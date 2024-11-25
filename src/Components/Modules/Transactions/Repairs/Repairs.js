@@ -13,13 +13,7 @@ const RepairForm = () => {
           <InputField label="Date:" type="date" />
         </div>
 
-        <div className="form-section">
-          <InputField label="Receipt No:" />
-        </div>
-
-        <div className="form-section">
-          <InputField label="Date:" type="date" />
-        </div>
+        
 
         <div className="form-section">
           <h3>Customer Details</h3>
