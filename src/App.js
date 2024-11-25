@@ -8,8 +8,7 @@ import {
 } from "react-router-dom";
 import './App.css';
 
-import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
 import Repairs from "./Components/Modules/Transactions/Repairs/Repairs"; // Adjust the path based on your project structure
 
 
