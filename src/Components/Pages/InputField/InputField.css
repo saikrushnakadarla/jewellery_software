@@ -1,0 +1,30 @@
+.input-field-container {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .input-label {
+    position: absolute;
+    top: -10px;
+    left: 10px;
+    background-color: white;
+    padding: 0 5px;
+    font-size: 14px;
+    color:black ;
+  }
+  
+  .styled-input {
+    width: 100%;
+    padding: 10px;
+    /* border: 1px solid #c4c4c4;
+    border-radius: 8px; */
+    font-size: 12px;
+    outline: none;
+    box-sizing: border-box;
+  }
+  
+  .styled-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+  
