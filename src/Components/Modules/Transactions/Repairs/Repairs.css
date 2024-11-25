@@ -2,6 +2,7 @@
     max-width: 1200px;
     margin: auto;
     padding: 20px;
+    margin-top: 10px;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #f9f9f9;
@@ -15,10 +16,7 @@
   .repair-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
   }
-  
-  
   
   .form-row {
     display: flex;
@@ -28,11 +26,6 @@
   
   .form-row > * {
     flex: 1;
-  }
-  
-  .input-wrapper {
-    display: flex;
-    flex-direction: column;
   }
   
   label {
@@ -45,6 +38,11 @@
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+  }
+  
+  .form-buttons {
+    display: flex;
+    gap: 5px; /* Adds 5px space between the buttons */
   }
   
   button {
@@ -68,6 +66,7 @@
   button[type="button"]:hover {
     background-color: #5a6268;
   }
+  
   
   /* Responsive Design */
   @media (max-width: 768px) {
