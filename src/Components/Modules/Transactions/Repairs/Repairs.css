@@ -14,12 +14,25 @@
   
   .repair-form {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 20px;
   }
   
   .form-section {
-    flex: 1 1 calc(50% - 20px);
+    padding-bottom: 20px;
+  }
+  
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+  }
+  
+  .form-row > * {
+    flex: 1;
+  }
+  
+  .input-wrapper {
     display: flex;
     flex-direction: column;
   }
@@ -34,7 +47,6 @@
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    margin-bottom: 15px;
   }
   
   button {
@@ -59,9 +71,10 @@
     background-color: #5a6268;
   }
   
+  /* Responsive Design */
   @media (max-width: 768px) {
-    .form-section {
-      flex: 1 1 100%;
+    .form-row {
+      flex-direction: column;
     }
   }
   
