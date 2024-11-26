@@ -20,12 +20,13 @@ const FormWithTable = () => {
             </div>
 
             <div className="row mt-3">
-                <div className="col-12">
+                <div className="col-12" style={{ marginTop: '49px' }}>
                     {/* Form Section */}
                     <form className="form-container">
 
+                      
                         <div className="form-container">
-                            <h4>Product Details</h4>
+                        <h4 style={{marginBottom:'15px',textAlign:'center'}}>Product Details</h4>
                             <div className="form-row">
                                 <InputField label="Product Name:" />
                                 <InputField
@@ -43,7 +44,7 @@ const FormWithTable = () => {
                             </div>
 
 
-                            <div className="form-row">
+                            <div className="form-row" style={{ marginBottom: '-20px' }}>
                                 <InputField label="Short Name:" />
                                 <InputField
                                     label="Sale Account Head:"
@@ -91,9 +92,15 @@ const FormWithTable = () => {
                                 <InputField label="HSN Code:" />
                             </div>
                         </div>
+                       
                         <div className="form-container" style={{ marginTop: '15px' }}>
-                            <h4>Main Tags</h4>
-                            <div className="form-row">
+                        <div className="main-tags-row" style={{marginBottom:'15px',textAlign:'center'}}>
+                            <input type="checkbox" id="main-tags" />
+                            <label htmlFor="main-tags">
+                                <h4>Main Tags</h4>
+                            </label>
+                        </div>
+                            <div className="form-row" style={{ marginBottom: '-20px' }}>
                                 <InputField label="OP.Qty:" />
                                 <InputField label="OP.Value:" />
                                 <InputField label="OP.Weight:" />
@@ -102,8 +109,9 @@ const FormWithTable = () => {
                             </div>
                         </div>
 
+                        
                         <div className="form-container" style={{ marginTop: '15px' }}>
-                            <h4>Stack Entry</h4>
+                        <h4 style={{marginBottom:'15px',textAlign:'center'}}>Stack Entry</h4>
                             <div className="form-row">
                                 <InputField
                                     label="Pricing:"
@@ -136,22 +144,26 @@ const FormWithTable = () => {
                                 <button className="stone-details-btn">Stone Details</button>
                                 <InputField label="Weight WW:" />
                             </div>
-                        </div>
-                        <div className="form-row">
-                        <InputField
+
+                            <div className="form-row" style={{ marginBottom: '-20px' }}>
+                                <InputField
                                     label="Wastage On:"
                                     type="select"
                                     value={metal}
                                     onChange={(e) => setMetal(e.target.value)}
                                     options={[
                                         { value: "Weight", label: "Weight" },
-                                       
+
                                     ]}
                                 />
-                            <InputField label="Wastage:" value="NaN" readOnly />
-                            <InputField label="%:" />
-                            <button className="stone-details-btn">Stone Details</button>
-                            <InputField label="Weight WW:" />
+                                <InputField label="Wastage:" value="NaN" readOnly />
+                                <InputField label="%:" />
+                                <InputField label="Weight:" />
+                                <InputField label="Making Chaeges:" />
+                                <InputField label="Cal:" />
+                                <InputField label="Tax:" />
+                                <InputField label="Stack Point:" />
+                            </div>
                         </div>
                     </form>
                 </div>
