@@ -81,7 +81,7 @@ function Navbar() {
               <Link to="/refunds">STOCK ENTRY</Link>
               <Link to="/refunds">Customized Oders</Link>
               <Link to="/refunds">Payments & Reciepts</Link>
-              <Link to="/refunds">Repairs</Link>
+              <Link to="/repairstable">Repairs</Link>
             </div>
           )}
         </div>

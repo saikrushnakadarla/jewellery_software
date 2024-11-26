@@ -6,9 +6,7 @@ const RepairForm = () => {
   const [metal, setMetal] = useState("");
   const [type, setType] = useState("");
   const [purity, setPurity] = useState("");
-
   
-
   return (
     <div className="repair-form-container">
       <form className="repair-form">
