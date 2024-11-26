@@ -41,6 +41,7 @@ function Supplier_Master() {
   const [metal, setMetal] = useState("");
 
   return (
+    <div className="main-container">
     <div className="customer-master-container">
       <h2>Supplier Master Form</h2>
       <form className="customer-master-form" onSubmit={handleSubmit}>
@@ -48,7 +49,7 @@ function Supplier_Master() {
         <div className="form-row">
 
 
-          <div className="form-section">
+          <div className="">
             <div className="form-row">
               <InputField label="Customer Name:" />
               <InputField label="Print Name:" />
@@ -67,6 +68,7 @@ function Supplier_Master() {
 
                 ]}
               />
+               <InputField label="Pincode:" />
             </div>
           </div>
           
@@ -76,9 +78,9 @@ function Supplier_Master() {
         {/* Row 2 */}
         <div className="form-row">
 
-          <div className="form-section">
+          <div className="">
             <div className="form-row">
-              <InputField label="Pincode:" />
+             
               <InputField
                 label="State:"
                 type="select"
@@ -99,6 +101,8 @@ function Supplier_Master() {
                 ]}
               />
               <InputField label="State Code:" type="State Code:" />
+              <InputField label="Phone:" />
+              <InputField label="Mobile:" />
             </div>
           </div>
          
@@ -107,38 +111,39 @@ function Supplier_Master() {
         {/* Row 3 */}
         <div className="form-row">
 
-          <div className="form-section">
+          <div className="">
             <div className="form-row">
-              <InputField label="Phone:" />
-              <InputField label="Mobile:" />
+              
               <InputField label="Email:" />
+              <InputField label="Birthday :" type="date"/>
+              <InputField label="Anniversary :" type="date"/>
+              <InputField label="Bank Account No :" />
             </div>
           </div>
         
         </div>
 
         {/* Row 4 */}
-        <div className="form-row">
+        {/* <div className="form-row">
 
 
-          <div className="form-section">
+          <div className="">
             <div className="form-row">
-              <InputField label="Birthday :" type="date"/>
-              <InputField label="Anniversary :" type="date"/>
-              <InputField label="Bank Account No :" />
+              
             </div>
           </div>
          
-        </div>
+        </div> */}
 
         {/* Row 5 */}
         <div className="form-row">
 
-          <div className="form-section">
+          <div className="">
             <div className="form-row">
               <InputField label="Bank Name :" />
               <InputField label="IFSC Code :" />
               <InputField label="Branch :" />
+              <InputField label="GSTIN :" />
             </div>
           </div>
          
@@ -147,9 +152,9 @@ function Supplier_Master() {
         {/* Row 6 */}
         <div className="form-row">
 
-          <div className="form-section">
+          <div className="">
             <div className="form-row">
-              <InputField label="GSTIN :" />
+              
               <InputField label="Aadhar Card :" />
               <InputField label="PAN Card :" />
             </div>
@@ -176,6 +181,7 @@ function Supplier_Master() {
         <button type="submit" className="cus-submit-btn">Save</button>
 
       </form>
+    </div>
     </div>
   );
 }
