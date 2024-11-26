@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import './App.css';
 import Repairs from "./Components/Modules/Transactions/Repairs/Repairs"; 
-import ItemMaster from "./Components/Pages/ItemMasters/ItemMaster";
+import ItemMaster from "./Components/Modules/Masters/ItemMaster/ItemMaster";
 
 function App() {
   return (
