@@ -31,6 +31,7 @@ const RepairsTable = () => {
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
 
   return (
+    <div className="main-container">
     <div className="repairs-table-container">
       <div className="table-header">
         <input
@@ -78,6 +79,7 @@ const RepairsTable = () => {
           )}
         </tbody>
       </table>
+    </div>
     </div>
   );
 };

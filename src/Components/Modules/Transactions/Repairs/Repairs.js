@@ -8,7 +8,7 @@ const RepairForm = () => {
   const [purity, setPurity] = useState("");
 
   return (
-    <div style={{paddingTop: '50px'}}>
+    <div className="main-container">
     <div className="repair-form-container">
       <form className="repair-form">
         {/* Left Section */}
@@ -45,9 +45,7 @@ const RepairForm = () => {
               <InputField label="Counter:" placeholder="Counter Name" />
             </div>
             
-          </div>
-
-          
+          </div> 
         </div>
         {/* Right Section */}
         <div className="repair-form-right">
