@@ -36,17 +36,7 @@ function Navbar() {
         <header className="navbar-header">
             <div className="navbar-brand">Jewellery App</div>
 
-            {/* Mobile Navbar */}
-            <div
-                className={`navbar-hamburger ${isOpen ? 'open' : ''}`}
-                onClick={toggleMenu}
-            >
-                <div className="navbar-bar"></div>
-                <div className="navbar-bar"></div>
-                <div className="navbar-bar"></div>
-            </div>
-
-
+            
             <nav className={`navbar-links ${isOpen ? 'open' : ''}`}>
                 {/* Masters Dropdown */}
                 <div
