@@ -48,28 +48,6 @@ function Navbar() {
 
 
             <nav className={`navbar-links ${isOpen ? 'open' : ''}`}>
-
-        {/* Transactions Dropdown */}
-        <div
-          className="navbar-dropdown"
-          onMouseEnter={() => toggleDropdown('transactions')}
-          onMouseLeave={() => toggleDropdown('transactions')}
-        >
-          <span>TRANSACTIONS</span>
-          {transactionsDropdownOpen && (
-            <div className="navbar-dropdown-content">
-              <Link to="/sales">SALES</Link>
-              <Link to="/purchases">ESTIMATE</Link>
-              <Link to="/refunds">STOCK ENTRY</Link>
-              <Link to="/refunds">Customized Oders</Link>
-              <Link to="/refunds">Payments & Reciepts</Link>
-              <Link to="/repairstable">Repairs</Link>
-              <Link to="/urd_purchase">URD Purchase</Link>
-            </div>
-          )}
-        </div>
-
-
                 {/* Masters Dropdown */}
                 <div
                     className="navbar-dropdown"
