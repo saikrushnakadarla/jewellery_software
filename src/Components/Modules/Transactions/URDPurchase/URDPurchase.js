@@ -13,35 +13,26 @@ const URDPurchase = () => {
     const [stoneType2, setStoneType2] = useState("");
     const [isChecked, setIsChecked] = useState("");
   return (
-    <div className="repair-form-container">
-      {/* <h2>Repair Form</h2> */}
-      <form className="repair-form">
-        {/* First Row */}
-        <div className="form-section">
-        <div className="form-row">
-          <InputField label="Entry Type:" value="URD Purchase" readOnly />
-          <InputField label="Code:" />
-          <InputField label="Date:" type="date" />
-        </div>
-        </div>
-        {/* Customer Details */}
-        <div className="form-section">
-          <h4>Customer Details</h4>
-          <div className="form-row">
-            <InputField label="Name:" />
-            <InputField label="Mobile:" />
-            <InputField label="Phone:" />
-            <InputField label="Address1:" />
-          </div>
-          <div className="form-row">    
-              
-          
-            <InputField label="Address2:" />
-            <InputField label="Aadhar:"  />
-            <InputField label="PAN:" />   
-           
-          </div>
-          <div className="form-row">
+    <div className="main-container">
+    <div className="urdpurchase-form-container">
+        <form className="urdpurchase-form">
+        {/* Left Section */}
+        <div className="urdpurchase-form-left">
+          {/* Customer Details */}
+          <div className="form-section">
+            <h4 className="mb-2">Customer Details</h4>
+            <div className="form-row">
+              <InputField label="Name:" />
+              <InputField label="Mobile:" />
+              <InputField label="Phone:" />
+              {/* <InputField label="Email:" type="email" /> */}
+            </div>
+            <div className="form-row">
+              <InputField label="Address1:" />
+              <InputField label="Address2:" />
+              <InputField label="Aadhar:" />
+            </div>
+            <div className="form-row">
             <InputField label="Staff:" />
             <InputField
               label="Type:"
@@ -56,10 +47,27 @@ const URDPurchase = () => {
                 
               ]}
             />
+              
+            </div>
+            
+          </div> 
+        </div>
+        {/* Right Section */}
+        <div className="urdpurchase-form-right">
+          <div className="form-section">
+          
+            <div className="form-row mt-4">
+            <InputField label="Entry Type:" value="REPAIR" readOnly />
+            </div>
+            <div className="form-row">
+            <InputField label="Code:" />
+            </div>
+            <div className="form-row">
+            <InputField label="Date:" type="date" />
+            </div>
           </div>
         </div>
-
-        {/* Staff and Delivery Info */}
+      </form>
        
         <div className="form-section">
         <h4>Purchase Details</h4> 
@@ -211,6 +219,7 @@ const URDPurchase = () => {
         {/* Extra Charges */}
         <div className="form-section">
           <h4>Item Details</h4>
+          
           <table className="item-details-table">
             <thead>
               <tr>
@@ -261,7 +270,8 @@ const URDPurchase = () => {
           <button type="button">Print</button>
           <button type="button">New</button>
         </div>
-      </form>
+     
+    </div>
     </div>
   );
 };

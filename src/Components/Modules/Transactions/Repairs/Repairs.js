@@ -6,8 +6,9 @@ const RepairForm = () => {
   const [metal, setMetal] = useState("");
   const [type, setType] = useState("");
   const [purity, setPurity] = useState("");
-  
+
   return (
+    <div className="main-container">
     <div className="repair-form-container">
       <form className="repair-form">
         {/* Left Section */}
@@ -44,9 +45,7 @@ const RepairForm = () => {
               <InputField label="Counter:" placeholder="Counter Name" />
             </div>
             
-          </div>
-
-          
+          </div> 
         </div>
         {/* Right Section */}
         <div className="repair-form-right">
@@ -117,6 +116,7 @@ const RepairForm = () => {
           <button type="submit">Save</button>
           <button type="button">Print</button>
         </div>
+      </div>
       </div>
   );
 };
