@@ -6,8 +6,9 @@ const RepairForm = () => {
   const [metal, setMetal] = useState("");
   const [type, setType] = useState("");
   const [purity, setPurity] = useState("");
-  
+
   return (
+    <div style={{paddingTop: '50px'}}>
     <div className="repair-form-container">
       <form className="repair-form">
         {/* Left Section */}
@@ -117,6 +118,7 @@ const RepairForm = () => {
           <button type="submit">Save</button>
           <button type="button">Print</button>
         </div>
+      </div>
       </div>
   );
 };

@@ -47,7 +47,7 @@ function Navbar() {
                     <span>MASTERS</span>
                     {mastersDropdownOpen && (
                         <div className="navbar-dropdown-content">
-                            <Link to="/masters/customers">CUSTOMER_MASTER</Link>
+                            <Link to="/customerstable">CUSTOMER_MASTER</Link>
                             <Link to="/masters/suppliers">PRODUCT</Link>
                             <Link to="/masters/products">BANKS</Link>
                             <Link to="/masters/employees">EXPENSE</Link>
