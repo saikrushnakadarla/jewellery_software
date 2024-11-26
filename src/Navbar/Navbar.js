@@ -99,6 +99,11 @@ function Navbar() {
               <Link to="/reports/financial">RE PRINT BILLS</Link>
               <Link to="/reports/operations">BARCODE PRINTING</Link>
               <Link to="/reports/analytics">DAILY SALES REPORT</Link>
+              <Link to="/reports/analytics">DAILY SALES REPORT</Link>
+              <Link to="/reports/analytics">DAILY SALES REPORT</Link>
+
+              
+
             </div>
           )}
         </div>
