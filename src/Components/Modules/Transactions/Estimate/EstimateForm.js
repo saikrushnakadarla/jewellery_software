@@ -54,6 +54,7 @@ const RepairForm = () => {
             <div className="input-twenty">
             <InputField label="MC Per Gram:" />
             </div>
+            
             <div className="input-twenty">
             <InputField label="Total B4 Tax" />
             </div>
@@ -69,6 +70,7 @@ const RepairForm = () => {
             <div className="input-third">
             <InputField label="Total Rs." />
             </div>
+            
           </div>
          
         </div>
