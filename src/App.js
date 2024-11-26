@@ -8,16 +8,33 @@ import {
 } from "react-router-dom";
 import './App.css';
 import Repairs from "./Components/Modules/Transactions/Repairs/Repairs"; 
-import ItemMaster from "./Components/Pages/ItemMasters/ItemMaster";
+// import ItemMaster from "./Components/Pages/ItemMasters/ItemMaster";
 import URDPurchase from "./Components/Modules/Transactions/URDPurchase/URDPurchase";
+
+
+
+import ItemMaster from "./Components/Modules/Masters/ItemMaster/ItemMaster";
+
+
+import RepairsTable from './Components/Modules/Transactions/Repairs/RepairsTable';
+import Navbar from './Navbar/Navbar';
+import Dashboard from './Components/Pages/Dashboard/Dashboard';
+
+
 
 function App() {
   return (
     <Router>
+      < Navbar />
       <Routes>
+      <Route path="/" exact element={<Dashboard />} />
         <Route path="/itemmaster" exact element={<ItemMaster />} />
         <Route path="/repairs" element={<Repairs />} />
+
         <Route path="/urd_purchase" element={<URDPurchase />} />
+
+        <Route path="/repairstable" element={<RepairsTable />} />
+
       </Routes>
     </Router>
   );
