@@ -16,6 +16,7 @@ import ItemMaster from "./Components/Modules/Masters/ItemMaster/ItemMaster";
 
 import RepairsTable from './Components/Modules/Transactions/Repairs/RepairsTable';
 
+import ItemMasterTable from './Components/Modules/Masters/ItemMaster/ItemMasterTable';
 
 import Navbar from './Navbar/Navbar';
 import Dashboard from './Components/Pages/Dashboard/Dashboard';
@@ -30,6 +31,7 @@ function App() {
         <Route path="/itemmaster" exact element={<ItemMaster />} />
         <Route path="/repairs" element={<Repairs />} />
         <Route path="/repairstable" element={<RepairsTable />} />
+        <Route path="/itemmastertable" element={<ItemMasterTable />} />
       </Routes>
     </Router>
   );

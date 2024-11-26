@@ -19,14 +19,14 @@ const FormWithTable = () => {
                 </div>
             </div>
 
-            <div className="row mt-3">
-                <div className="col-12" style={{ marginTop: '49px' }}>
+            <div className="row mt-3" style={{ width:'1500px', marginLeft:'-100px'}}>
+                <div className="col-12" style={{ marginTop: '-55px' }}>
                     {/* Form Section */}
                     <form className="form-container">
 
                       
                         <div className="form-container">
-                        <h4 style={{marginBottom:'15px',textAlign:'center'}}>Product Details</h4>
+                        <h4 style={{marginBottom:'15px',}}>Product Details</h4>
                             <div className="form-row">
                                 <InputField label="Product Name:" />
                                 <InputField
@@ -94,10 +94,10 @@ const FormWithTable = () => {
                         </div>
                        
                         <div className="form-container" style={{ marginTop: '15px' }}>
-                        <div className="main-tags-row" style={{marginBottom:'15px',textAlign:'center'}}>
-                            <input type="checkbox" id="main-tags" />
+                        <div className="main-tags-row" style={{marginBottom:'15px',}}>
+                            <input type="checkbox" id="main-tags" style={{width:'35px'}} />
                             <label htmlFor="main-tags">
-                                <h4>Main Tags</h4>
+                                <h4>Maintain Tags</h4>
                             </label>
                         </div>
                             <div className="form-row" style={{ marginBottom: '-20px' }}>
@@ -111,7 +111,7 @@ const FormWithTable = () => {
 
                         
                         <div className="form-container" style={{ marginTop: '15px' }}>
-                        <h4 style={{marginBottom:'15px',textAlign:'center'}}>Stack Entry</h4>
+                        <h4 style={{marginBottom:'15px',}}>Stock Entry</h4>
                             <div className="form-row">
                                 <InputField
                                     label="Pricing:"
