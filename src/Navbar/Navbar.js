@@ -81,7 +81,7 @@ function Navbar() {
               <Link to="/refunds">STOCK ENTRY</Link>
               <Link to="/refunds">Customized Oders</Link>
               <Link to="/refunds">Payments & Reciepts</Link>
-              <Link to="/refunds">Repairs</Link>
+              <Link to="/repairstable">Repairs</Link>
             </div>
           )}
         </div>
@@ -99,6 +99,11 @@ function Navbar() {
               <Link to="/reports/financial">RE PRINT BILLS</Link>
               <Link to="/reports/operations">BARCODE PRINTING</Link>
               <Link to="/reports/analytics">DAILY SALES REPORT</Link>
+              <Link to="/reports/analytics">DAILY SALES REPORT</Link>
+              <Link to="/reports/analytics">DAILY SALES REPORT</Link>
+
+              
+
             </div>
           )}
         </div>
