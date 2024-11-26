@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Itemmasterform from "./ItemMaster";
 import './ItemMasterTable.css';
+import { useNavigate } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus } from "react-icons/fa";
 
 const ItemMasterTable = () => {
@@ -8,7 +8,7 @@ const ItemMasterTable = () => {
   const [showForm, setShowForm] = useState(false);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const navigate = useNavigate(); // Create navigate function
   // Sample repair data
   const productsData = [
     { id: 1, name: "Ring", category: "Gold", saleaccount: "Saale", purchaseaccount: "Purchase", purity: "91.6",weight:"10gmrs" },
@@ -43,7 +43,8 @@ const ItemMasterTable = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-            <button onClick={() => setShowForm(true)} className="add-button">
+            {/* <button onClick={() => setShowForm(true)} className="add-button"> */}
+            <button onClick={() => navigate("/itemmaster")} className="add-button"> 
             + Add Product
             </button>
           </div>
@@ -113,7 +114,7 @@ const ItemMasterTable = () => {
          
         </>
       )}
-      {showForm && <Itemmasterform />}
+     
     </div>
     </div>
   );
