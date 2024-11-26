@@ -30,7 +30,7 @@ const ItemMasterTable = () => {
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
 
   return (
-    
+    <div style={{paddingTop:'50px'}}>
     <div className={`repairs-table-container ${showForm ? "form-visible" : ""}`}>
       {!showForm && (
         <>
@@ -114,6 +114,7 @@ const ItemMasterTable = () => {
         </>
       )}
       {showForm && <Itemmasterform />}
+    </div>
     </div>
   );
 };
