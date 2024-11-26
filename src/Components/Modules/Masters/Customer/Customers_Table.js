@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Customers_Table.css";
+import { useNavigate } from "react-router-dom";
 import { FaTrash, FaEdit, FaPlus } from "react-icons/fa";
 import Customer_Master from "../Customer/Customer_Master";
 
@@ -8,7 +9,7 @@ const CustomerTable =() => {
   const [showForm, setShowForm] = useState(false);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-
+  const navigate = useNavigate(); // Create navigate function
   // Sample repair data
   const repairsData = [
     { id: 1, name: "Madan", contact: "7103947594", email: "madan@gmail.com", createdBy: "iiiQbets", date: "2024-11-25" },
@@ -43,7 +44,7 @@ const CustomerTable =() => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-            <button onClick={() => setShowForm(true)} className="add-button">
+            <button onClick={() => navigate("/customermaster")} className="add-button"> 
             + Create
             </button>
           </div>

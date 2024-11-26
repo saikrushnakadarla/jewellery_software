@@ -11,6 +11,7 @@ const FormWithTable = () => {
     // const [purity, setPurity] = useState("");
 
     return (
+        <div style={{paddingTop:'90px'}}>
         <div className="container mt-4">
             <div className="row">
                 <div className="col-12">
@@ -168,6 +169,7 @@ const FormWithTable = () => {
                     </form>
                 </div>
             </div>
+        </div>
         </div>
     );
 };
