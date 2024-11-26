@@ -1,77 +1,103 @@
 .repair-form-container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-    margin-top: 10px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    background-color: #f9f9f9;
-  }
+  max-width: 1500px;
+  margin: auto;
+  padding: 20px;
+  margin-top: 10px;
+  /* border: 1px solid #ddd; */
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+
+h4 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.repair-form {
+  display: flex;
+  gap: 20px;
+}
+
+.repair-form-left {
+  flex: 1;
+}
+
+.repair-form-right {
+  flex: 0 0 20%;
+}
+
+.form-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd; /* Add border */
+  /* border-radius: 5px;  */
   
-  h2 {
-    text-align: center;
-    color: #333;
-  }
-  
+}
+
+h4 {
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row > * {
+  flex: 1;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button[type="button"] {
+  background-color: #6c757d;
+}
+
+button[type="button"]:hover {
+  background-color: #5a6268;
+}
+
+@media (max-width: 768px) {
   .repair-form {
-    display: flex;
     flex-direction: column;
   }
-  
-  .form-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
+
+  .repair-form-right {
+    flex: 1; /* Take full width on smaller screens */
   }
-  
-  .form-row > * {
-    flex: 1;
-  }
-  
-  label {
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  input,
-  select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .form-buttons {
-    display: flex;
-    gap: 5px; /* Adds 5px space between the buttons */
-  }
-  
-  button {
-    padding: 10px 20px;
-    margin: 5px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  button[type="button"] {
-    background-color: #6c757d;
-  }
-  
-  button[type="button"]:hover {
-    background-color: #5a6268;
-  }
-  
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .form-row {
-      flex-direction: column;
-    }
-  }
-  
+}
