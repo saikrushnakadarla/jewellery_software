@@ -13,9 +13,9 @@ const URDPurchase = () => {
     const [stoneType2, setStoneType2] = useState("");
     const [isChecked, setIsChecked] = useState("");
   return (
-    <div className="repair-form-container">
+    <div className="urdpurchase-form-container">
       {/* <h2>Repair Form</h2> */}
-      <form className="repair-form">
+      <form className="urdpurchase-form">
         {/* First Row */}
         <div className="form-section">
         <div className="form-row">
@@ -211,6 +211,7 @@ const URDPurchase = () => {
         {/* Extra Charges */}
         <div className="form-section">
           <h4>Item Details</h4>
+          
           <table className="item-details-table">
             <thead>
               <tr>
