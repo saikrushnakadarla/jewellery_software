@@ -15,10 +15,15 @@ import URDPurchase from "./Components/Modules/Transactions/URDPurchase/URDPurcha
 
 import ItemMaster from "./Components/Modules/Masters/ItemMaster/ItemMaster";
 
+import Supplier_Table from './Components/Modules/Masters/Supplier/Supplier_Table';
+import Customers_Table from './Components/Modules/Masters/Customer/Customers_Table';
 
 import RepairsTable from './Components/Modules/Transactions/Repairs/RepairsTable';
 import Navbar from './Navbar/Navbar';
 import Dashboard from './Components/Pages/Dashboard/Dashboard';
+import Customer_Master from './Components/Modules/Masters/Customer/Customer_Master';
+import Supplier_Master from './Components/Modules/Masters/Supplier/Supplier_Master';
+
 
 
 
@@ -30,10 +35,17 @@ function App() {
       <Route path="/" exact element={<Dashboard />} />
         <Route path="/itemmaster" exact element={<ItemMaster />} />
         <Route path="/repairs" element={<Repairs />} />
+        
 
         <Route path="/urd_purchase" element={<URDPurchase />} />
 
         <Route path="/repairstable" element={<RepairsTable />} />
+        <Route path="/suppliertable" element={<Supplier_Table />} />
+        <Route path="/customerstable" element={<Customers_Table />} />
+        <Route path="/customermaster" element={<Customer_Master />} />
+        <Route path="/suppliermaster" element={<Supplier_Master />} />
+
+
 
       </Routes>
     </Router>
