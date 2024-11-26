@@ -75,3 +75,21 @@
     }
   }
   
+
+  .item-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .item-details-table th,
+  .item-details-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .item-details-table th {
+    background-color: #f4f4f4;
+  }
+  

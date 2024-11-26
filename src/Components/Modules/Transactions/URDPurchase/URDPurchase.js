@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./URDPurchase.css";
 import InputField from "../../../Pages/InputField/InputField";
 
-const RepairForm = () => {
+const URDPurchase = () => {
 
     const [metal, setMetal] = useState("");
     const [type, setType] = useState("");
@@ -60,8 +60,9 @@ const RepairForm = () => {
         </div>
 
         {/* Staff and Delivery Info */}
-        <h4>Purchase Details</h4> 
+       
         <div className="form-section">
+        <h4>Purchase Details</h4> 
           <div className="form-row">
           <InputField
               label="Metal:"
@@ -124,10 +125,10 @@ const RepairForm = () => {
              
           </div>
           
-        </div>
+       
         
         {/* Repair Item Details */}
-        <div className="form-section">
+        
           {/* <h4>Repair Item Details</h4> */}
           <div className="form-row">
             <InputField label="Gross:"  />
@@ -187,36 +188,71 @@ const RepairForm = () => {
               <InputField  />
 
 
-              <div className="form-checkbox">
-    <label>
-      <input
-        type="checkbox"
-        value={isChecked}
-        onChange={(e) => setIsChecked(e.target.checked)}
-      />
-     Add
-    </label>
-  </div>
+              <div className="form-add-button">
+  <button 
+    type="button" 
+    className="btn-primary" 
+    onClick={() => {
+      // Add your functionality here
+      console.log("Add button clicked");
+    }}
+  >
+    Add
+  </button>
+</div>
+
             </div>
 
-
+            </div>
             
           
-        </div>
+       
 
         {/* Extra Charges */}
         <div className="form-section">
-          <h4>Extra Charges</h4>
-          <div className="form-row">
-            <InputField label="Extra Weight:" />
-            <InputField label="Stone Value:" />
-            <InputField label="Making Charge (MC):" />
-            <InputField label="Handling Charge (HC):" />
-            <InputField label="Total:" />
-
-           
-          </div>
-          
+          <h4>Item Details</h4>
+          <table className="item-details-table">
+            <thead>
+              <tr>
+                <th>S.No</th>
+                <th>Item</th>
+                <th>WT</th>
+                <th>Dust</th>
+                <th>Purity</th>
+                <th>Touch%</th>
+                <th>ML%</th>
+                <th>Eqv WT</th>
+                <th>Rate</th>
+                <th>HSN</th>
+                <th>Stone</th>
+                <th>CT</th>
+                <th>PCS</th>
+                <th>Stone Value</th>
+                <th>M.Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* Example Row */}
+              <tr>
+                <td>1</td>
+                <td>Sample Item</td>
+                <td>10</td>
+                <td>0.5</td>
+                <td>22K</td>
+                <td>95%</td>
+                <td>2%</td>
+                <td>9.5</td>
+                <td>4500</td>
+                <td>HSN1234</td>
+                <td>Ruby</td>
+                <td>0.2</td>
+                <td>5</td>
+                <td>500</td>
+                <td>50</td>
+              </tr>
+              {/* Add more rows dynamically as needed */}
+            </tbody>
+          </table>
         </div>
 
         {/* Buttons */}
@@ -230,4 +266,4 @@ const RepairForm = () => {
   );
 };
 
-export default RepairForm;
+export default URDPurchase;
