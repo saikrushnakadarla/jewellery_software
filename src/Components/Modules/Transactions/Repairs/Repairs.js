@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Repairs.css";
 import InputField from "../../../Pages/InputField/InputField";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
 const RepairForm = () => {
   const [metal, setMetal] = useState("");
@@ -14,23 +15,46 @@ const RepairForm = () => {
         {/* Left Section */}
         <div className="repair-form-left">
           {/* Customer Details */}
-          <div className="form-section">
+          <Col className="form-section">
             <h4 className="mb-2">Customer Details</h4>
-            <div className="form-row">
+            <Row>
+            <Col xs={12} md={4}>
               <InputField label="Name:" />
+            </Col>
+            <Col xs={12} md={4}>
               <InputField label="Mobile:" />
-              {/* <InputField label="Phone:" /> */}
+            </Col>
+            <Col xs={12} md={4}>
               <InputField label="Email:" type="email" />
-            </div>
-            <div className="form-row">
-              <InputField label="Address1:" />
-              <InputField label="Address2:" />
-              <InputField label="Address3:" />
-            </div>
-            <div className="form-row">
+            </Col>
+            
+              
+              
+              {/* <InputField label="Phone:" /> */}
+              
+            </Row>
+            <Row >
+            <Col xs={12} md={4}>
+            <InputField label="Address1:" />
+            </Col>
+            <Col xs={12} md={4}>
+            <InputField label="Address2:" />
+            </Col>
+            <Col xs={12} md={4}>
+            <InputField label="Address3:" />
+            </Col>
+            </Row>
+            <Row >
+            <Col xs={12} md={2}>
             <InputField label="Staff:" />
+            </Col>
+            <Col xs={12} md={2}>
             <InputField label="Delivery Date:" type="date" />
+            </Col>
+            <Col xs={12} md={3}>
             <InputField label="Place:" />
+            </Col>
+            <Col xs={12} md={2}>
             <InputField
                 label="Metal:"
                 type="select"
@@ -42,33 +66,38 @@ const RepairForm = () => {
                   { value: "PLATINUM", label: "Platinum" },
                 ]}
               />
-              <InputField label="Counter:" placeholder="Counter Name" />
-            </div>
-            
-          </div> 
+            </Col>
+            <Col xs={12} md={3}>
+            <InputField label="Counter:" placeholder="Counter Name" />
+            </Col>
+            </Row>
+            </Col>
+         
         </div>
         {/* Right Section */}
         <div className="repair-form-right">
-          <div className="form-section">
+          <Col className="form-section">
           
-            <div className="form-row mt-4">
+            <Row className="mt-4">
             <InputField label="Entry Type:" value="REPAIR" readOnly />
-            </div>
-            <div className="form-row">
-            <InputField label="Receipt No:" />
-            </div>
-            <div className="form-row">
+            </Row>
+            <Row>  
+              <InputField label="Receipt No:" />
+            </Row>
+            <Row>
             <InputField label="Date:" type="date" />
-            </div>
-          </div>
+
+            </Row>
+            
+          </Col>
         </div>
       </form>
 
       {/* Repair Item Details */}
-      <div className="form-section">
+      <Row className="form-section">
           <h4>Repair Item Details</h4>
-          <div className="form-row">
-            <div className="input-wrapper">             
+          <Col xs={12} md={2}>
+                  
               <InputField
               label="Type:"
               type="select"
@@ -79,10 +108,17 @@ const RepairForm = () => {
                 { value: "REPAIR PURPOSE", label: "Repair Purpose" },
               ]}
             />
-            </div>
+           </Col>
+            <Col xs={12} md={3}>
             <InputField label="Item:" placeholder="Item Name" />
+            </Col>
+            <Col xs={12} md={3}>
             <InputField label="Tag No:" />
+            </Col>
+            <Col xs={12} md={2}>
             <InputField label="Description:" placeholder="Description" />
+            </Col>
+            <Col xs={12} md={2}>
             <InputField
               label="Purity:"
               type="select"
@@ -94,22 +130,36 @@ const RepairForm = () => {
                 { value: "18K", label: "18K" },
               ]}
             />
-          </div>
+            </Col>
+            
+            
+            
+           
           
-        </div>
+          
+        </Row>
 
         {/* Extra Charges */}
-        <div className="form-section">
-          <h4>Extra Charges</h4>
-          <div className="form-row">
-            <InputField label="Extra Weight:" />
-            <InputField label="Stone Value:" />
-            <InputField label="Making Charge (MC):" />
-            <InputField label="Handling Charge (HC):" />
-            <InputField label="Total:" />
-          </div>
+        <Row className="form-section">
+          <h4>Extra Charges</h4> 
+          <Col xs={12} md={2}>
+              <InputField label="Extra Weight:" />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField label="Stone Value:" />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField label="Making Charge (MC):" />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField label="Handling Charge (HC):" />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField label="Total:" />
+            </Col>
+          </Row>
           
-        </div>
+       
 
         {/* Buttons */}
         <div className="form-buttons">
