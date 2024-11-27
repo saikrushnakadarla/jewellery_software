@@ -16,11 +16,7 @@ import ItemMaster from "./Components/Modules/Masters/ItemMaster/ItemMaster";
 import Supplier_Table from './Components/Modules/Masters/Supplier/Supplier_Table';
 import Customers_Table from './Components/Modules/Masters/Customer/Customers_Table';
 import RepairsTable from './Components/Modules/Transactions/Repairs/RepairsTable';
-
-
 import ItemMasterTable from './Components/Modules/Masters/ItemMaster/ItemMasterTable';
-
-
 import Navbar from './Navbar/Navbar';
 import Dashboard from './Components/Pages/Dashboard/Dashboard';
 import Estimate from './Components/Modules/Transactions/Estimate/EstimateForm'
@@ -28,6 +24,7 @@ import Customer_Master from './Components/Modules/Masters/Customer/Customer_Mast
 import Supplier_Master from './Components/Modules/Masters/Supplier/Supplier_Master';
 import StockEntry from './Components/Modules/Transactions/StockEntry/StockEntry';
 import StockEntryTable from './Components/Modules/Transactions/StockEntry/StockEntryTable';
+import EstimateTable from './Components/Modules/Transactions/Estimate/EstimateTable';
 
 function App() {
   return (
@@ -40,13 +37,15 @@ function App() {
         <Route path="/urd_purchase" element={<URDPurchase />} />
         <Route path="/repairstable" element={<RepairsTable />} />
         <Route path="/itemmastertable" element={<ItemMasterTable />} />
-        <Route path="/estimate" element={<Estimate />} />
+        <Route path="/estimates/" element={<Estimate />} />
+        <Route path="/estimatetable" element={<EstimateTable />} />
         <Route path="/suppliertable" element={<Supplier_Table />} />
         <Route path="/customerstable" element={<Customers_Table />} />
         <Route path="/customermaster" element={<Customer_Master />} />
         <Route path="/suppliermaster" element={<Supplier_Master />} />
         <Route path="/stockEntry" element={<StockEntry />} />
         <Route path="/stockEntryTable" element={<StockEntryTable />} />
+        <Route path="/estimates/:product_id" element={<Estimate />} />
       </Routes>
     </Router>
   );
