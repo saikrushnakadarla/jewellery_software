@@ -31,7 +31,7 @@ const CustomerTable =() => {
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
 
   return (
-    <div style={{paddingTop:'50px'}}>
+    <div className="main-container">
     <div className={`repairs-table-container ${showForm ? "form-visible" : ""}`}>
       {!showForm && (
         <>

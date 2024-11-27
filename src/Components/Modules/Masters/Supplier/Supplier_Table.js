@@ -3,12 +3,14 @@ import Suppliermaster from './Supplier_Master';
 import "./Supplier_Table.css";
 import { FaTrash, FaEdit, FaPlus } from "react-icons/fa";
 import Supplier_Master from "./Supplier_Master";
+import { useNavigate } from "react-router-dom";
 
 const SuppliersTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const navigate = useNavigate(); // Create navigate function
 
   // Sample repair data
   const repairsData = [
@@ -31,7 +33,7 @@ const SuppliersTable = () => {
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
 
   return (
-    <div style={{paddingTop:'50px'}}>
+    <div className="main-container">
     <div className={`repairs-table-container ${showForm ? "form-visible" : ""}`}>
       {!showForm && (
         <>
@@ -44,7 +46,8 @@ const SuppliersTable = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
             />
-            <button onClick={() => setShowForm(true)} className="add-button">
+           
+            <button onClick={() => navigate("/suppliermaster")} className="add-button"> 
             + Create
             </button>
           </div>
