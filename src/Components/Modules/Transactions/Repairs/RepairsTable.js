@@ -1,8 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { Button, Row, Col } from 'react-bootstrap'; // Import React Bootstrap components
 
 const RepairsTable = () => {
+  const navigate = useNavigate(); // Initialize navigate function
+
   const columns = React.useMemo(
     () => [
       {
@@ -51,13 +55,24 @@ const RepairsTable = () => {
     // Implement your delete logic here
   };
 
+  const handleCreate = () => {
+    navigate('/repairs'); // Navigate to the /repairs page
+  };
+
   return (
-<div className="main-container">
-    <div className="repairs-table-container">
-      <h3>Repairs Table</h3>
-      <DataTable columns={columns} data={data} />
+    <div className="main-container">
+      <div className="repairs-table-container">
+        <Row className="mb-3">
+          <Col className="d-flex justify-content-between align-items-center">
+            <h3>Repairs</h3>
+            <Button variant="success" onClick={handleCreate}>
+              + Create
+            </Button>
+          </Col>
+        </Row>
+        <DataTable columns={columns} data={data} />
+      </div>
     </div>
-</div>
   );
 };
 
