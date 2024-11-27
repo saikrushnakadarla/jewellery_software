@@ -10,7 +10,7 @@ const RepairForm = () => {
 
   return (
     <div className="main-container">
-    <div className="repair-form-container">
+    <Container className="repair-form-container">
       <form className="repair-form">
         {/* Left Section */}
         <div className="repair-form-left">
@@ -166,7 +166,7 @@ const RepairForm = () => {
           <button type="submit">Save</button>
           <button type="button">Print</button>
         </div>
-      </div>
+      </Container>
       </div>
   );
 };
