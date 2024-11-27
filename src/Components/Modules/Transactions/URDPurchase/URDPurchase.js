@@ -217,7 +217,7 @@ const URDPurchase = () => {
        
 
         {/* Extra Charges */}
-        {/* <div className="urd-form-section">
+        <div className="urd-form-section">
           <h4>Item Details</h4>
           
           <table className="item-details-table">
@@ -262,7 +262,7 @@ const URDPurchase = () => {
               
             </tbody>
           </table>
-        </div> */}
+        </div>
 
         {/* Buttons */}
         <div className="form-buttons">
