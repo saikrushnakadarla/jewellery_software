@@ -1,0 +1,16 @@
+.stockentry-form-container{
+    width: 1500px;
+    margin-left: -100px;
+  }
+
+  .form-container-stockentry{
+    background-color: #f9f9f9;
+  }
+  
+  @media (max-width: 767px)  {
+  
+  .stockentry-form-container {
+    width: 110%;
+    margin-left: -17px;
+  }
+}

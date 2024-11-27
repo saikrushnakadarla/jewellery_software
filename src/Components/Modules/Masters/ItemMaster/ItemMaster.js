@@ -11,7 +11,7 @@ const FormWithTable = () => {
     // const [purity, setPurity] = useState("");
 
     return (
-        <div style={{paddingTop:'45px'}}>
+        <div style={{paddingTop:'79px'}}>
         <div className="container mt-4">
             <div className="row">
                 <div className="col-12">

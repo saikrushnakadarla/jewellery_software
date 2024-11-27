@@ -24,6 +24,8 @@ import Dashboard from './Components/Pages/Dashboard/Dashboard';
 import Estimate from './Components/Modules/Transactions/Estimate/EstimateForm'
 import Customer_Master from './Components/Modules/Masters/Customer/Customer_Master';
 import Supplier_Master from './Components/Modules/Masters/Supplier/Supplier_Master';
+import StockEntry from './Components/Modules/Transactions/StockEntry/StockEntry';
+import StockEntryTable from './Components/Modules/Transactions/StockEntry/StockEntryTable';
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
         <Route path="/customerstable" element={<Customers_Table />} />
         <Route path="/customermaster" element={<Customer_Master />} />
         <Route path="/suppliermaster" element={<Supplier_Master />} />
+        <Route path="/stockEntry" element={<StockEntry />} />
+        <Route path="/stockEntryTable" element={<StockEntryTable />} />
       </Routes>
     </Router>
   );
