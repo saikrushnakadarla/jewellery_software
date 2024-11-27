@@ -19,20 +19,20 @@ const URDPurchase = () => {
         {/* Left Section */}
         <div className="urdpurchase-form-left">
           {/* Customer Details */}
-          <div className="form-section">
+          <div className="urd-form-section">
             <h4 className="mb-2">Customer Details</h4>
-            <div className="form-row">
+            <div className="urd-form-row">
               <InputField label="Name:" />
               <InputField label="Mobile:" />
               <InputField label="Phone:" />
               {/* <InputField label="Email:" type="email" /> */}
             </div>
-            <div className="form-row">
+            <div className="urd-form-row">
               <InputField label="Address1:" />
               <InputField label="Address2:" />
               <InputField label="Aadhar:" />
             </div>
-            <div className="form-row">
+            <div className="urd-form-row">
             <InputField label="Staff:" />
             <InputField
               label="Type:"
@@ -54,24 +54,24 @@ const URDPurchase = () => {
         </div>
         {/* Right Section */}
         <div className="urdpurchase-form-right">
-          <div className="form-section">
+          <div className="urd-form-section">
           
-            <div className="form-row mt-4">
+            <div className="urd-form-row mt-4">
             <InputField label="Entry Type:" value="REPAIR" readOnly />
             </div>
-            <div className="form-row">
+            <div className="urd-form-row">
             <InputField label="Code:" />
             </div>
-            <div className="form-row">
+            <div className="urd-form-row">
             <InputField label="Date:" type="date" />
             </div>
           </div>
         </div>
       </form>
        
-        <div className="form-section">
+        <div className="urd-form-section">
         <h4>Purchase Details</h4> 
-          <div className="form-row">
+          <div className="urd-form-row">
           <InputField
               label="Metal:"
               type="select"
@@ -138,7 +138,7 @@ const URDPurchase = () => {
         {/* Repair Item Details */}
         
           {/* <h4>Repair Item Details</h4> */}
-          <div className="form-row">
+          <div className="urd-form-row">
             <InputField label="Gross:"  />
             <InputField label="Dust:" />
             <InputField label="Touch %:" />
@@ -149,7 +149,7 @@ const URDPurchase = () => {
             <InputField label="value:" />
             
           </div>
-          <div className="form-row">
+          <div className="urd-form-row">
             <InputField
               label="Stone Type:"
               type="select"
@@ -178,7 +178,7 @@ const URDPurchase = () => {
     </label>
   </div>
             </div>
-            <div className="form-row">
+            <div className="urd-form-row">
             <InputField
              
               type="select"
@@ -217,7 +217,7 @@ const URDPurchase = () => {
        
 
         {/* Extra Charges */}
-        <div className="form-section">
+        {/* <div className="urd-form-section">
           <h4>Item Details</h4>
           
           <table className="item-details-table">
@@ -241,7 +241,7 @@ const URDPurchase = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Example Row */}
+              
               <tr>
                 <td>1</td>
                 <td>Sample Item</td>
@@ -259,10 +259,10 @@ const URDPurchase = () => {
                 <td>500</td>
                 <td>50</td>
               </tr>
-              {/* Add more rows dynamically as needed */}
+              
             </tbody>
           </table>
-        </div>
+        </div> */}
 
         {/* Buttons */}
         <div className="form-buttons">
