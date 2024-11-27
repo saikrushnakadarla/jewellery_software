@@ -10,7 +10,7 @@ const RepairForm = () => {
     <div className="estimate-form-container">
       {/* Repair Item Details */}
       <div className="form-section">
-          <h4>Estimate</h4>
+          <h2>Estimate</h2>
           <div className="form-row">
           <div className="input-third"> 
             <InputField label="PCODE:" placeholder="PCODE"/>
