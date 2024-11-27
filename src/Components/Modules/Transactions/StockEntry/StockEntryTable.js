@@ -11,8 +11,8 @@ const ItemMasterTable = () => {
   const navigate = useNavigate(); // Create navigate function
   // Sample repair data
   const productsData = [
-    { id: 1, name: "Ring", category: "Gold", saleaccount: "Saale", purchaseaccount: "Purchase", purity: "91.6",weight:"10gmrs" },
-    { id: 2, name: "Bangle", category: "Gold", saleaccount: "Sale", purchaseaccount: "Purchase", purity: "91.6",weight:"20grms" },
+    { id: 1, name: "Ring", category: "Gold", saleaccount: "Saale", purchaseaccount: "Purchase", purity: "91.6" },
+    { id: 2, name: "Bangle", category: "Gold", saleaccount: "Sale", purchaseaccount: "Purchase", purity: "91.6" },
     // Add more dummy data here
   ];
 
@@ -52,12 +52,11 @@ const ItemMasterTable = () => {
             <thead>
               <tr>
               <th>P_ID</th>
-                <th>Product NAME</th>
-                <th>Categories</th>
-                <th>Sale Account</th>
-                <th>Purchase Account</th>
-                <th>Purity</th>
-                <th>Weight</th>
+                <th>Pricing</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>PCode/BarCode</th>
+               
                 <th>Actions</th>
               </tr>
             </thead>
@@ -69,29 +68,22 @@ const ItemMasterTable = () => {
                     
                   </td>
                   <td>
-                    {product.name}
+                    {product.pricing}
                    
+                  </td>
+                  <td>
+                    {product.productname}
+                    
                   </td>
                   <td>
                     {product.category}
                     
                   </td>
                   <td>
-                    {product.saleaccount}
+                    {product.pcode}
                     
                   </td>
-                  <td>
-                    {product.purchaseaccount}
-                    
-                  </td>
-                  <td>
-                    {product.purity}
-                    
-                  </td>
-                  <td>
-                    {product.weight}
-                    
-                  </td>
+                 
                   <td>
                     <button className="action-button edit-button">
                       <FaEdit />

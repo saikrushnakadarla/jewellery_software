@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import './StockEntry.css';
 import InputField from "../../Masters/ItemMaster/Inputfield";
 
 const StockEntry = () => {
@@ -124,9 +125,11 @@ const StockEntry = () => {
 
             {/* Modal for Stone Details */}
             {showModal && (
+               
                 <div className="modal show d-block" tabIndex="-1" role="dialog">
                     <div className="modal-dialog" role="document">
-                        <div className="modal-content">
+                    <div className="stockentrymodalformcontainer">
+                        <div style={{backgroundColor:'#f9f9f9'}} className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title">Stone Details</h5>
                                 <button
@@ -175,6 +178,7 @@ const StockEntry = () => {
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             )}
         </div>

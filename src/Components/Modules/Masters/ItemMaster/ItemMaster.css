@@ -74,6 +74,10 @@
   margin-left: -100px;
 }
 
+.product-stockentrymodalformcontainer{
+  margin-top: 130px;
+}
+
 @media (max-width: 767px)  {
 
 .itemmaster-form-container {

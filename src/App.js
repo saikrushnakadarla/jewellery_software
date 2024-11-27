@@ -7,6 +7,8 @@ import {
   Routes,
 } from "react-router-dom";
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import Repairs from "./Components/Modules/Transactions/Repairs/Repairs"; 
 // import ItemMaster from "./Components/Pages/ItemMasters/ItemMaster";
 import URDPurchase from "./Components/Modules/Transactions/URDPurchase/URDPurchase";
