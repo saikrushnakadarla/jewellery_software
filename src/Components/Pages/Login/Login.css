@@ -1,4 +1,4 @@
-.main-container {
+/* .main-container {
     display: flex;
     justify-content: center; 
     align-items: center; 
@@ -10,7 +10,7 @@
       width: 400px;
       margin-right: 20px;
       padding: 20px;
-      background-color: #ffffff; /* White background for the form container */
+      background-color: #ffffff; 
     }
     
     label {
@@ -39,7 +39,7 @@
     .registration-image {
       width: 400px;
       height: auto;
-      border-radius: 5px; /* Rounded corners for the image */
+      border-radius: 5px; 
     }
     
     @media screen and (max-width: 768px) {
@@ -83,4 +83,4 @@
       .column2 {
         width: auto; 
       }
-    }
+    } */
