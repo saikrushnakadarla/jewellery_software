@@ -1,89 +1,82 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Estimate.css";
 import InputField from "../../../Pages/InputField/InputField";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
 const RepairForm = () => {
-
-  
   return (
-    <div className="main-container">
-    <div className="estimate-form-container">
-      {/* Repair Item Details */}
-      <div className="form-section">
-          <h2>Estimate</h2>
-          <div className="form-row">
-          <div className="input-third"> 
-            <InputField label="PCODE:" placeholder="PCODE"/>
-            </div>
-            <div className="input-half"> 
-            <InputField label="Product Name:" />
-            </div>
-            <div className="input-twenty"> 
-                <InputField label="Gross Weight:" />
-            </div>
-            <div className="input-twenty"> 
-                <InputField label="Stones Weight:" />
-            </div>
-            <div className="input-twenty"> 
-                <InputField label="Stones Price:" />
-            </div>
-            <div className="input-twenty"> 
-                <InputField label="Weight WW:" />
-            </div>
-            <div className="input-tenth"> 
-            <div className="input-with-suffix">
-                <InputField label="Wastage:" />
-                <span className="suffix">%</span>
-            </div>
-            </div>            
-            <div className="input-twenty"> 
-                <InputField label="Wastage:" />
-            </div>
-            <div className="input-twenty"> 
-                <InputField label="Nett Weight:" />
-            </div>
-            <div className="input-twenty">
-                <InputField label="Rate AV:" />
-            </div>
-            <div className="input-twenty">
-                <InputField label="Rate/10Gms:" />
-            </div>
-            <div className="input-twenty">
-                <InputField label="Rate/1Gms:" />
-            </div>
-            <div className="input-twenty">
-            <InputField label="MC Per Gram:" />
-            </div>
-            
-            <div className="input-twenty">
-            <InputField label="Total B4 Tax" />
-            </div>
-            <div className="input-twenty">
-            <InputField label="Total MC" />
-            </div>
-            <div className="input-tenth">
-            <InputField label="Tax %" />
-            </div>
-            <div className="input-twenty">
-            <InputField label="Tax VAT Amount" />
-            </div>
-            <div className="input-third">
-            <InputField label="Total Rs." />
-            </div>
-            
+<div className="main-container">
+    <Container className="estimate-form-container">
+      <Row className="estimate-form-section">
+        {/* First Row of Inputs */}
+        <h2>Estimate</h2>
+        <Col xs={12} md={3}>
+          <InputField label="PCODE:" placeholder="PCODE" />
+        </Col>
+        <Col xs={12} md={3}>
+          <InputField label="Product Name:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Gross Weight:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Stones Weight:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Stones Price:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Weight WW:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <div className="input-with-suffix">
+            <InputField label="Wastage:" />
+            <span className="suffix">%</span>
           </div>
-         
-        </div>
-
-        
-
-        {/* Buttons */}
-        <div className="form-buttons">
-          <button type="submit">Save</button>
-          <button type="button">Print</button>
-        </div>
-      </div>
-      </div>
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Nett Weight:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Rate AV:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Rate/10Gms:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Rate/1Gms:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="MC Per Gram:" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Total B4 Tax" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Total MC" />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField label="Tax %" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField label="Tax VAT Amount" />
+        </Col>
+        <Col xs={12} md={3}>
+          <InputField label="Total Rs." />
+        </Col>
+      </Row>
+      <Row className="form-buttons">
+        <Col>
+          <Button variant="primary" type="submit">
+            Save
+          </Button>
+          <Button variant="secondary" type="button">
+            Print
+          </Button>
+        </Col>
+      </Row>
+    </Container>
+    </div>
   );
 };
 

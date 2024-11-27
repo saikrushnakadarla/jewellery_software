@@ -9,86 +9,13 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
   
-  h4 {
-    margin-bottom: 10px;
-    color: #333;
-    font-size: 1.2rem;
-  }
-  
-  .form-section {
+  .estimate-form-section {
     margin-bottom: 10px;
     padding: 15px;
     border: 1px solid #ddd;
     border-radius: 8px;
   }
   
-  .form-row {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap; /* Ensures items wrap to the next line if there's no space */
-  }
-  
-  .form-row > .input-half {
-    flex: 0 0 300px; /* 50% width */
-  }
-  
-  .form-row > .input-third {
-    flex: 0 0 250px; /* 30% width */
-  }
-  
-  .form-row > .input-tenth {
-    flex: 0 0 100px; /* 10% width */
-  }
-  
-  .form-row > .input-twenty {
-    flex: 0 0 200px; /* 20% width */
-  }
-  
-  input,
-  select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-size: 1rem;
-  }
-  
-  label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  
-  .form-buttons {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  
-  button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-  
-  button:hover {
-    background-color: #0056b3;
-  }
-  
-  button[type="button"] {
-    background-color: #6c757d;
-  }
-  
-  button[type="button"]:hover {
-    background-color: #5a6268;
-  }
-
   .input-with-suffix {
     display: flex;
     align-items: center;
@@ -103,67 +30,14 @@
     color: #333; /* Optional: Match with your theme */
   }
   
-  
-
-  
-
-  
-  
   /* Mobile responsive design for medium screens (max-width: 768px) */
   @media (max-width: 768px) {
     .repair-form-container {
       margin-top: 20px; /* Adjusted top margin */
       padding-top: 20px; /* Reduced padding for smaller screens */
     }
-  
-    .form-row > .input-half {
-      flex: 0 0 48%; /* Adjusted to 48% for better spacing */
-    }
-  
-    .form-row > .input-third {
-      flex: 0 0 48%; /* Adjusted to 48% for better spacing */
-    }
-  
-    .form-row > .input-twenty {
-      flex: 0 0 48%; /* Adjusted to 48% for better spacing */
-    }
-  
-    /* Stack items vertically on smaller screens */
-    .form-row > * {
-      min-width: 100%; /* Stack all items vertically */
-    }
-  
-    button {
-      width: 100%; /* Make buttons take full width */
-      font-size: 1rem; /* Slightly increase font size for better readability */
-    }
+
   }
   
-  /* Mobile responsive design for small screens (max-width: 480px) */
-  @media (max-width: 480px) {
-    h4 {
-      font-size: 1rem; /* Smaller heading font for mobile */
-    }
-  
-    input,
-    select {
-      font-size: 0.9rem; /* Smaller input font for better fit */
-    }
-  
-    button {
-      font-size: 0.9rem; /* Smaller button font for mobile */
-    }
-  
-    .form-row > .input-half {
-      flex: 0 0 100%; /* Make input fields full width on small screens */
-    }
-  
-    .form-row > .input-third {
-      flex: 0 0 100%; /* Make input fields full width on small screens */
-    }
-  
-    .form-row > .input-twenty {
-      flex: 0 0 100%; /* Make input fields full width on small screens */
-    }
-  }
+
   
