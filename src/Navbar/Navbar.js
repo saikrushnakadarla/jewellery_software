@@ -61,9 +61,9 @@ function Navbar() {
               <Link to="/customerstable">CUSTOMER_MASTER</Link>
               <Link to="/suppliertable">SUPPLIER_MASTER</Link>
               <Link to="/itemmastertable">PRODUCT</Link>
-              <Link to="/masters/products">BANKS</Link>
+              {/* <Link to="/masters/products">BANKS</Link>
               <Link to="/masters/employees">EXPENSE</Link>
-              <Link to="/masters/employees">STOCK POINT</Link>
+              <Link to="/masters/employees">STOCK POINT</Link> */}
             </div>
           )}
         </div>
@@ -79,9 +79,10 @@ function Navbar() {
             <div className="navbar-dropdown-content">
               <Link to="/sales">SALES</Link>
               <Link to="/estimate">ESTIMATE</Link>
-              <Link to="/refunds">STOCK ENTRY</Link>
+              {/* <Link to="/refunds">STOCK ENTRY</Link>
               <Link to="/refunds">Customized Oders</Link>
-              <Link to="/refunds">Payments & Reciepts</Link>
+              <Link to="/refunds">Payments & Reciepts</Link> */}
+              <Link to="/purchase">Purchase</Link>
               <Link to="/repairstable">Repairs</Link>
               <Link to="/urd_purchase">URD Purchase</Link>
             </div>
