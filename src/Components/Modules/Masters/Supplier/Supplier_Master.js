@@ -43,7 +43,7 @@ function Supplier_Master() {
   return (
     <div className="main-container">
     <div className="customer-master-container">
-      <h2>Supplier Master Form</h2>
+      <h2>Suppliers</h2>
       <form className="customer-master-form" onSubmit={handleSubmit}>
         {/* Row 1 */}
         <div className="form-row">
