@@ -65,7 +65,7 @@ const RepairForm = () => {
           <InputField label="Total Rs." />
         </Col>
       </Row>
-      <Row className="form-buttons">
+      <Row >
         <Col>
           <Button variant="primary" type="submit">
             Save

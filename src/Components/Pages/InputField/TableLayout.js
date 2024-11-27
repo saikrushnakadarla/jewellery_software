@@ -4,17 +4,19 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 // A simple global filter for searching
 function GlobalFilter({ globalFilter, setGlobalFilter }) {
-  return (
-    <div className="mb-3">
-      <input
-        value={globalFilter || ''}
-        onChange={(e) => setGlobalFilter(e.target.value)}
-        className="form-control"
-        placeholder="Search..."
-      />
-    </div>
-  );
-}
+    return (
+      <div className="mb-3">
+        <input
+          value={globalFilter || ''}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          className="form-control"
+          style={{ width: '200px', maxWidth: '100%', borderRadius:'5px' }} // Set fixed width with responsive fallback
+          placeholder="Search..."
+        />
+      </div>
+    );
+  }
+  
 
 // Reusable DataTable component
 export default function DataTable({ columns, data }) {
