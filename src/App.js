@@ -21,7 +21,7 @@ import StockEntry from './Components/Modules/Transactions/StockEntry/StockEntry'
 import StockEntryTable from './Components/Modules/Transactions/StockEntry/StockEntryTable';
 import EstimateTable from './Components/Modules/Transactions/Estimate/EstimateTable';
 import Purchase from './Components/Modules/Transactions/Purchase/Purchase';
-
+import PurchaseTable from './Components/Modules/Transactions/Purchase/PurchaseTable'
 
 
 function App() {
@@ -53,6 +53,8 @@ function App() {
 
         <Route path="/estimates/:product_id" element={<Estimate />} />
         <Route path="/purchase" element={<Purchase />} />
+        <Route path="/purchasetable" element={<PurchaseTable />} />
+
 
 
       </Routes>
