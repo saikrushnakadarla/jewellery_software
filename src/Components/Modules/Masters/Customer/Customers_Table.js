@@ -1,103 +1,163 @@
-import React, { useState } from "react";
-import "./Customers_Table.css";
-import { useNavigate } from "react-router-dom";
-import { FaTrash, FaEdit, FaPlus } from "react-icons/fa";
-import Customer_Master from "../Customer/Customer_Master";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { Button, Row, Col } from 'react-bootstrap';
+// import './EstimateTable.css';
 
-const CustomerTable =() => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  const navigate = useNavigate(); // Create navigate function
-  // Sample repair data
-  const repairsData = [
-    { id: 1, name: "Madan", contact: "7103947594", email: "madan@gmail.com", createdBy: "iiiQbets", date: "2024-11-25" },
-    { id: 2, name: "Kumar", contact: "9854783938", email: "kumar@gmail.com", createdBy: "iiiQbets", date: "2024-11-25" },
-    // Add more dummy data here
-  ];
+const RepairsTable = () => {
+  const navigate = useNavigate();
+  const [data, setData] = useState([]); // State to store table data
 
-  // Filter data based on search input
-  const filteredData = repairsData.filter((repair) =>
-    repair.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Customer Name',
+        accessor: 'supplier_id',
+      },
+        
+      {
+        Header: 'Print Name',
+        accessor: 'print_name',
+      },
+      {
+        Header: 'Account Group',
+        accessor: 'account_group',
+      },
+      {
+        Header: 'Pincode',
+        accessor: 'pincode',
+      },
+      {
+        Header: 'State',
+        accessor: 'state',
+      },
+      {
+        Header: 'State Code',
+        accessor: 'state_code',
+      },
+      {
+        Header: 'Phone',
+        accessor: 'phone',
+      },
+      {
+        Header: 'Mobile',
+        accessor: 'mobile',
+      },
+      {
+        Header: 'Email',
+        accessor: 'email',
+      },
+      {
+        Header: 'Birthday',
+        accessor: 'birthday',
+      },
+      {
+        Header: 'Anniversary',
+        accessor: 'anniversary',
+      },
+      {
+        Header: 'Bank Account No',
+        accessor: 'bank_account_no',
+      },
+      {
+        Header: 'Bank Name ',
+        accessor: 'bank_name',
+      },
+      {
+        Header: 'IFSC Code',
+        accessor: 'ifsc_code',
+      },
+      {
+        Header: 'Branch',
+        accessor: 'branch',
+      },
+      {
+        Header: 'GSTIN',
+        accessor: 'gst_in',
+      },
+      {
+        Header: 'Aadhar Card',
+        accessor: 'aadhar_card',
+      },
+      {
+        Header: 'PAN Card',
+        accessor: 'pan_card',
+      },
+     
+      {
+        Header: 'Action',
+        Cell: ({ row }) => (
+            <div className="d-flex align-items-center">
+              <button
+                className="action-button edit-button"
+                onClick={() => navigate(`/estimates/${row.original.product_id}`)}
+              >
+                <FaEdit />
+              </button>
+              <button
+                className="action-button delete-button"
+                onClick={() => handleDelete(row.original.product_id)}
+              >
+                <FaTrash />
+              </button>
+            </div>
+          ),
+          
+      },
+      
+    ],
+    []
   );
 
-  // Paginated data
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * entriesPerPage,
-    currentPage * entriesPerPage
-  );
+  useEffect(() => {
+    fetch('http://localhost:4000/get-estimates')
+      .then((response) => response.json())
+      .then((data) => {
+        setData(data); // Set the fetched data to state
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }, []);
 
-  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+  const handleDelete = (product_id) => {
+    if (window.confirm('Are you sure you want to delete this estimate?')) {
+      fetch(`http://localhost:4000/delete-estimate/${product_id}`, {
+        method: 'DELETE',
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.message); // Success message
+          // Refresh data after deletion
+          setData((prevData) => prevData.filter((item) => item.product_id !== product_id));
+        })
+        .catch((error) => {
+          console.error('Error deleting record:', error);
+          alert('Failed to delete estimate. Please try again.');
+        });
+    }
+  };
+
+  const handleCreate = () => {
+    navigate('/customermaster'); // Navigate to the /estimates page
+  };
 
   return (
     <div className="main-container">
-    <div className={`repairs-table-container ${showForm ? "form-visible" : ""}`}>
-      {!showForm && (
-        <>
-          <div className="table-header">
-           
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            <button onClick={() => navigate("/customermaster")} className="add-button"> 
-            + Create
-            </button>
-          </div>
-          <table className="repairs-table">
-            <thead>
-              <tr>
-                <th>NAME</th>
-                <th>CONTACT INFO</th>
-                <th>CREATED BY</th>
-                <th>ACTION</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedData.map((repair) => (
-                <tr key={repair.id}>
-                  <td>
-                    {repair.name}
-                    
-                  </td>
-                  <td>
-                    {repair.contact}
-                   
-                  </td>
-                  <td>
-                    {repair.createdBy}
-                    
-                  </td>
-                  <td>
-                    <button className="action-button edit-button">
-                      <FaEdit />
-                    </button>
-                    <button className="action-button delete-button">
-                      <FaTrash />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {paginatedData.length === 0 && (
-                <tr>
-                  <td colSpan="4" className="no-data">
-                    No records found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-         
-        </>
-      )}
-      {showForm && <Customer_Master/>}
-    </div>
+      <div className="estimates-table-container">
+        <Row className="mb-3">
+          <Col className="d-flex justify-content-between align-items-center">
+            <h3>Customers</h3>
+            <Button variant="success" onClick={handleCreate}>
+              + Create
+            </Button>
+          </Col>
+        </Row>
+        <DataTable columns={columns} data={data} />
+      </div>
     </div>
   );
 };
 
-export default CustomerTable;
+export default RepairsTable;
