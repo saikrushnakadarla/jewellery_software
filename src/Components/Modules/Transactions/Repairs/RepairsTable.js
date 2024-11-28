@@ -1,85 +1,77 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
-import "./RepairsTable.css";
-import { FaTrash, FaEdit, FaPlus } from "react-icons/fa";
+import React from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { Button, Row, Col } from 'react-bootstrap'; // Import React Bootstrap components
 
 const RepairsTable = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
-  
-  const navigate = useNavigate(); // Create navigate function
+  const navigate = useNavigate(); // Initialize navigate function
 
-  // Sample repair data
-  const repairsData = [
-    { id: 1, name: "Madan", contact: "7103947594", email: "madan@gmail.com", createdBy: "iiiQbets", date: "2024-11-25" },
-    { id: 2, name: "Kumar", contact: "9854783938", email: "kumar@gmail.com", createdBy: "iiiQbets", date: "2024-11-25" },
-    // Add more dummy data here
-  ];
-
-  // Filter data based on search input
-  const filteredData = repairsData.filter((repair) =>
-    repair.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'NAME',
+        accessor: 'name', // Key from the data
+      },
+      {
+        Header: 'CONTACT INFO',
+        accessor: 'contact',
+      },
+      {
+        Header: 'CREATED BY',
+        accessor: 'createdBy',
+      },
+      {
+        Header: 'ACTION',
+        Cell: ({ row }) => (
+          <div>
+            <button className="action-button edit-button">
+              <FaEdit />
+            </button>
+            <button
+              className="action-button delete-button"
+              onClick={() => handleDelete(row.original.id)} // Call a delete handler
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    []
   );
 
-  // Paginated data
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * entriesPerPage,
-    currentPage * entriesPerPage
+  const data = React.useMemo(
+    () => [
+      { id: 1, name: 'John Doe', contact: '1234567890', createdBy: 'Admin' },
+      { id: 2, name: 'Jane Smith', contact: '9876543210', createdBy: 'Manager' },
+      // Add more records as needed
+    ],
+    []
   );
 
-  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+  const handleDelete = (id) => {
+    console.log('Delete record with id:', id);
+    // Implement your delete logic here
+  };
+
+  const handleCreate = () => {
+    navigate('/repairs'); // Navigate to the /repairs page
+  };
 
   return (
     <div className="main-container">
-    <div className="repairs-table-container">
-      <div className="table-header">
-        <input
-          type="text"
-          placeholder="Search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-input"
-        />
-        <button onClick={() => navigate("/repairs")} className="add-button"> 
-          + Create
-        </button>
+      <div className="repairs-table-container">
+        <Row className="mb-3">
+          <Col className="d-flex justify-content-between align-items-center">
+            <h3>Repairs</h3>
+            <Button variant="success" onClick={handleCreate}>
+              + Create
+            </Button>
+          </Col>
+        </Row>
+        <DataTable columns={columns} data={data} />
       </div>
-      <table className="repairs-table">
-        <thead>
-          <tr>
-            <th>NAME</th>
-            <th>CONTACT INFO</th>
-            <th>CREATED BY</th>
-            <th>ACTION</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedData.map((repair) => (
-            <tr key={repair.id}>
-              <td>{repair.name}</td>
-              <td>{repair.contact}</td>
-              <td>{repair.createdBy}</td>
-              <td>
-                <button className="action-button edit-button">
-                  <FaEdit />
-                </button>
-                <button className="action-button delete-button">
-                  <FaTrash />
-                </button>
-              </td>
-            </tr>
-          ))}
-          {paginatedData.length === 0 && (
-            <tr>
-              <td colSpan="4" className="no-data">
-                No records found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
     </div>
   );
 };

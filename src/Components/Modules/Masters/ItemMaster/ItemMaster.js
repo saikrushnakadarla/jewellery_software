@@ -9,9 +9,13 @@ const FormWithTable = () => {
     const [metal, setMetal] = useState("");
     // const [type, setType] = useState("");
     // const [purity, setPurity] = useState("");
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
 
     return (
-        <div style={{paddingTop:'45px'}}>
+        <div style={{paddingTop:'90px'}}>
         <div className="container mt-4">
             <div className="row">
                 <div className="col-12">
@@ -141,8 +145,15 @@ const FormWithTable = () => {
                             <div className="form-row">
                                 <InputField label="Gross Weight:" />
                                 <InputField label="Stones Weight:" />
+                                <button
+                                            type="button" style={{backgroundColor:'blue'}}
+                                            className="stone-details-btn"
+                                            onClick={handleOpenModal}
+                                        >
+                                            Stone Details
+                                        </button>
                                 <InputField label="Stones Price:" />
-                                <button className="stone-details-btn">Stone Details</button>
+                                {/* <button className="stone-details-btn">Stone Details</button> */}
                                 <InputField label="Weight WW:" />
                             </div>
 
@@ -170,6 +181,64 @@ const FormWithTable = () => {
                 </div>
             </div>
         </div>
+
+        {showModal && (
+               
+               <div className="modal show d-block" tabIndex="-1" role="dialog">
+                   <div className="modal-dialog" role="document">
+                   <div className="product-stockentrymodalformcontainer">
+                       <div style={{backgroundColor:'#f9f9f9'}} className="modal-content">
+                           <div className="modal-header">
+                               <h5 className="modal-title">Stone Details</h5>
+                               <button
+                                    type="button" 
+                                   className="btn-close"
+                                   aria-label="Close"
+                                   onClick={handleCloseModal}
+                               ></button>
+                           </div>
+                           <div className="modal-body">
+                               <div className="row g-3">
+                                   <div className="col-md-6">
+                                       <InputField label="P Code:" />
+                                   </div>
+                                   <div className="col-md-6">
+                                       <InputField label="Product Name:" />
+                                   </div>
+                                   <div className="col-md-6">
+                                       <InputField label="Stone Name:" />
+                                   </div>
+                                   <div className="col-md-6">
+                                       <InputField label="Weight:" />
+                                   </div>
+                                   <div className="col-md-6">
+                                       <InputField label="Rate per Gram:" />
+                                   </div>
+                                   <div className="col-md-6">
+                                       <InputField label="Total Weight:" />
+                                   </div>
+                                   <div className="col-md-6">
+                                       <InputField label="Total Price:" />
+                                   </div>
+                               </div>
+                           </div>
+                           <div className="modal-footer">
+                               <button
+                                   type="button"
+                                   className="btn btn-secondary"
+                                   onClick={handleCloseModal}
+                               >
+                                   Close
+                               </button>
+                               <button type="button" style={{backgroundColor:'blue'}} className="btn btn-primary">
+                                   Save 
+                               </button>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+               </div>
+           )}
         </div>
     );
 };
