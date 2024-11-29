@@ -10,8 +10,9 @@
     background-color: white;
     padding: 0 5px;
     font-size: 14px;
-    color:black ;
+    color:#A26D2B ;
   }
+
   
   .styled-input {
     width: 100%;
@@ -19,6 +20,7 @@
     font-size: 12px;
     outline: none;
     box-sizing: border-box;
+    border: 1px solid #A26D2B;
   }
   
   .styled-input:focus {
