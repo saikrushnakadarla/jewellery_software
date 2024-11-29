@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col, Form } from 'react-bootstrap';
-// import './EstimateTable.css';
+import './SalesReport.css';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -75,7 +75,7 @@ const RepairsTable = () => {
           <div className="d-flex align-items-center">
             <button
               className="action-button edit-button"
-              onClick={() => navigate(`/estimates/${row.original.product_id}`)}
+              onClick={() => navigate(`/sales/${row.original.product_id}`)}
             >
               <FaEdit />
             </button>
@@ -95,7 +95,7 @@ const RepairsTable = () => {
   );
 
   useEffect(() => {
-    fetch('http://localhost:4000/get-estimates')
+    fetch('http://localhost:4000/get-sales')
       .then((response) => response.json())
       .then((data) => {
         setData(data); // Set the fetched data to state
@@ -126,7 +126,7 @@ const RepairsTable = () => {
   };
 
   const handleCreate = () => {
-    navigate('/estimates'); // Navigate to the /estimates page
+    navigate('/sales'); // Navigate to the /sales page
   };
   const handleFilter = () => {
     // Fetch or filter data based on the selected dates
@@ -135,7 +135,7 @@ const RepairsTable = () => {
       return;
     }
 
-    fetch(`http://localhost:4000/filter-estimates?from_date=${fromDate}&to_date=${toDate}`)
+    fetch(`http://localhost:4000/filter-sales?from_date=${fromDate}&to_date=${toDate}`)
       .then((response) => response.json())
       .then((filteredData) => {
         setData(filteredData); // Set the filtered data
@@ -147,7 +147,7 @@ const RepairsTable = () => {
 
   return (
     <div className="main-container">
-    <div className="estimates-table-container">
+    <div className="sales-table-container">
       <Row className="mb-3">
         <Col className="d-flex justify-content-between align-items-center">
           <h3>SalesReport</h3>

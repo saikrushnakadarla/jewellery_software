@@ -144,7 +144,7 @@ const RepairsTable = () => {
 
   return (
     <div className="main-container">
-    <div className="estimates-table-container">
+    <div className="sales-table-container">
       <Row className="mb-3">
         <Col className="d-flex justify-content-between align-items-center">
           <h3>RepairsReport</h3>
