@@ -16,6 +16,7 @@
   .styled-input1 {
     width: 100%;
     padding: 10px;
+    border: 1px solid #A26D2B;
     /* border: 1px solid #c4c4c4;
     border-radius: 8px; */
     font-size: 12px;

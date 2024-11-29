@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
-// import './EstimateTable.css';
+import './StockEntryTable.css';
 
 const StockEntryTable = () => {
   const navigate = useNavigate();
@@ -141,7 +141,7 @@ const StockEntryTable = () => {
 
   return (
     <div className="main-container">
-      <div className="estimates-table-container">
+      <div className="stockentry-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Stock Entry</h3>

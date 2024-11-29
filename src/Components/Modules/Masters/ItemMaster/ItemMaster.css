@@ -3,6 +3,7 @@
   border: 1px solid #ddd;
   padding: 20px;
   border-radius: 8px;
+  background-color: rgba(163, 110, 41, 0.08);
   /* background-color: #A26D2B; */
 }
 
@@ -91,6 +92,10 @@
   border-radius: 5px;
   background-color: #007bff;
   color: #fff;
+}
+
+.stockentrymodalformcontainer{
+  background-color: rgba(163, 110, 41, 0.08);
 }
 @media (max-width: 767px)  {
 
