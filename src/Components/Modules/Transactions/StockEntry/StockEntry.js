@@ -31,7 +31,10 @@ const StockEntry = () => {
                                             type="select"
                                             value={metal}
                                             onChange={(e) => setMetal(e.target.value)}
-                                            options={[{ value: "By Weight", label: "By Weight" }]}
+                                            options={[
+                                                { value: "By Weight", label: "By Weight" },
+                                                { value: "By fixed", label: "By fixed" },
+                                            ]}
                                         />
                                     </div>
                                     <div className="col-md-4">
@@ -40,8 +43,10 @@ const StockEntry = () => {
                                     <div className="col-md-4">
                                         <InputField label="Product Name:" />
                                     </div>
-                                    <div className="col-md-4">
-                                        <InputField
+                                    <div className="col-md-3">
+                                    <InputField label="Category:" value="Gold" readOnly />
+                                    </div>
+                                        {/* <InputField
                                             label="Category:"
                                             type="select"
                                             value={metal}
@@ -50,9 +55,26 @@ const StockEntry = () => {
                                                 { value: "Silver", label: "Silver" },
                                                 { value: "Gold", label: "Gold" },
                                             ]}
-                                        />
+                                        /> */}
+                                        
+                                        <div className="col-md-3">
+                                         <InputField label="Prefix:" value="Gold" readOnly />
                                     </div>
-                                    <div className="col-md-4">
+                                    <div className="col-md-3">
+                                    <InputField
+                                            label="purity:"
+                                            type="select"
+                                            value={metal}
+                                            onChange={(e) => setMetal(e.target.value)}
+                                            options={[
+                                                { value: "916HM", label: "916HM" },
+                                                { value: "22K", label: "22k" },
+                                                { value: "18K", label: "18k" },
+                                            ]}
+                                        /> 
+                                        
+                                    </div>
+                                    <div className="col-md-3">
                                         <InputField label="PCode/BarCode:" />
                                     </div>
                                 </div>
@@ -114,7 +136,7 @@ const StockEntry = () => {
                                         <InputField label="Tax:" />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Stack Point:" />
+                                        <InputField label="Stock Point:" />
                                     </div>
                                 </div>
                             </div>
