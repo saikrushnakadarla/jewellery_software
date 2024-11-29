@@ -18,8 +18,19 @@ import StockEntry from './Components/Modules/Transactions/StockEntry/StockEntry'
 import StockEntryTable from './Components/Modules/Transactions/StockEntry/StockEntryTable';
 import EstimateTable from './Components/Modules/Transactions/Estimate/EstimateTable';
 import Purchase from './Components/Modules/Transactions/Purchase/Purchase';
-import PurchaseTable from './Components/Modules/Transactions/Purchase/PurchaseTable'
+import PurchaseTable from './Components/Modules/Transactions/Purchase/PurchaseTable';
+import Receipts from './Components/Modules/Transactions/Receipts/Receipts';
+import ReceiptsTable from './Components/Modules/Transactions/Receipts/ReceiptsTable';
+import PurchaseReport from './Components/Modules/Reports/PurchaseReport/PurchaseReport'
+import SalesReport from './Components/Modules/Reports/SalesReport/SalesReport'
+import EstimateReport from './Components/Modules/Reports/EstimateReport/EstimateReport'
+import RepairsReport from './Components/Modules/Reports/RepairsReport/RepairsReport'
+import URDPurchaseReport from './Components/Modules/Reports/URDPurchaseReport/URDPurchase'
 
+
+
+import Payments from './Components/Modules/Transactions/Payments/Payments';
+import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTable';
 
 function App() {
   const location = useLocation();
@@ -34,8 +45,8 @@ function App() {
         <Route path="/" exact element={<Dashboard />} />
         <Route path="/itemmaster" exact element={<ItemMaster />} />
         <Route path="/repairs" element={<Repairs />} />
-        <Route path="/urd_purchase" element={<URDPurchase />} />
         <Route path="/repairstable" element={<RepairsTable />} />
+        <Route path="/urd_purchase" element={<URDPurchase />} />
         <Route path="/itemmastertable" element={<ItemMasterTable />} />
         <Route path="/estimates/" element={<Estimate />} />
         <Route path="/estimatetable" element={<EstimateTable />} />
@@ -43,15 +54,23 @@ function App() {
         <Route path="/customerstable" element={<Customers_Table />} />
         <Route path="/customermaster" element={<Customer_Master />} />
         <Route path="/suppliermaster" element={<Supplier_Master />} />
-       
         <Route path="/stockEntry" element={<StockEntry />} />
         <Route path="/stockEntryTable" element={<StockEntryTable />} />
-
         <Route path="/estimates/:product_id" element={<Estimate />} />
         <Route path="/purchase" element={<Purchase />} />
         <Route path="/purchasetable" element={<PurchaseTable />} />
+        <Route path="/receipts" element={<Receipts />} />
+        <Route path="/receiptstable" element={<ReceiptsTable />} />
+
+        <Route path="/purchaseReport" element={<PurchaseReport />} />
+        <Route path="/salesReport" element={<SalesReport />} />
+        <Route path="/estimateReport" element={<EstimateReport />} />
+        <Route path="/repairsReport" element={<RepairsReport />} />
+        <Route path="/urdPurchaseReport" element={<URDPurchaseReport />} />
 
 
+        <Route path="/payments" element={<Payments />} />
+        <Route path="/paymentstable" element={<PaymentsTable />} />
 
       </Routes>
     </>

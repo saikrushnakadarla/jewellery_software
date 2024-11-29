@@ -58,12 +58,11 @@ function Navbar() {
           <span>MASTERS</span>
           {mastersDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/customerstable">CUSTOMER_MASTER</Link>
-              <Link to="/suppliertable">SUPPLIER_MASTER</Link>
-              <Link to="/itemmastertable">PRODUCT</Link>
-              {/* <Link to="/masters/products">BANKS</Link>
-              <Link to="/masters/employees">EXPENSE</Link>
-              <Link to="/masters/employees">STOCK POINT</Link> */}
+              <Link to="/customerstable">Customer_Master</Link>
+              <Link to="/suppliertable">Supplier_Master</Link>
+              <Link to="/itemmastertable">Product</Link>
+              <Link to="/purity">Purity</Link>
+              <Link to="/accounts">Accounts</Link>
             </div>
           )}
         </div>
@@ -78,12 +77,11 @@ function Navbar() {
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
               <Link to="/sales">Sales</Link>
-              <Link to="/estimatetable">Estimate</Link>
-              {/* <Link to="/refunds">STOCK ENTRY</Link>
-              <Link to="/refunds">Customized Oders</Link>
-              <Link to="/refunds">Payments & Reciepts</Link> */}
-              <Link to="/purchasetable">Purchase</Link>
+              <Link to="/estimates">Estimate</Link>
               <Link to="/stockEntryTable">Stock Entry</Link>
+              <Link to="/paymentstable">Payments</Link>
+              <Link to="/receiptstable">Receipts</Link>
+              <Link to="/purchasetable">Purchase</Link>
               <Link to="/repairstable">Repairs</Link>
               <Link to="/urd_purchase">URD Purchase</Link>
             </div>
@@ -99,15 +97,11 @@ function Navbar() {
           <span>REPORTS</span>
           {reportsDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/reports/overview">STOCK BY STATUS/CATEGORY</Link>
-              <Link to="/reports/financial">RE PRINT BILLS</Link>
-              <Link to="/reports/operations">BARCODE PRINTING</Link>
-              <Link to="/reports/analytics">DAILY SALES REPORT</Link>
-              <Link to="/reports/analytics">DAILY SALES REPORT</Link>
-              <Link to="/reports/analytics">DAILY SALES REPORT</Link>
-
-              
-
+              <Link to="/salesReport">Sales Report</Link>
+              <Link to="/estimateReport">Estimate Report</Link>
+              <Link to="/purchaseReport">Purchase Report</Link>
+              <Link to="/repairsReport">Repairs Report</Link>
+              <Link to="/urdPurchaseReport">URDPurchase Report</Link>
             </div>
           )}
         </div>

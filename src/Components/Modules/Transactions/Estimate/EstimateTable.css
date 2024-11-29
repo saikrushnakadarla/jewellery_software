@@ -7,22 +7,5 @@
     background-color: #f9f9f9;
   }
   
-  .action-button {
-    border: none;
-    background: none;
-    cursor: pointer;
-    margin: 0 5px;
-  }
-  
-  .edit-button {
-    color: #007bff; /* Bootstrap primary color */
-  }
-  
-  .delete-button {
-    color: #dc3545; /* Bootstrap danger color */
-  }
-  
-  .action-button:hover {
-    opacity: 0.8;
-  }
+
   

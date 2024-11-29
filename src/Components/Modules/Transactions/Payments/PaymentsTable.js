@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate for naviga
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap'; 
-import './RepairsTable.css'
+import './PaymentsTable.css'
 
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
@@ -11,32 +11,44 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'NAME',
-        accessor: 'name', // Key from the data
+        Header: 'Date',
+        accessor: 'date', // Key from the data
       },
       {
-        Header: 'CONTACT INFO',
-        accessor: 'contact',
+        Header: 'Mode',
+        accessor: 'mode',
       },
       {
-        Header: 'CREATED BY',
-        accessor: 'createdBy',
+        Header: 'Cheque Number',
+        accessor: 'cheque_number',
       },
       {
-        Header: 'ACTION',
-        Cell: ({ row }) => (
-          <div>
-            <button className="action-button edit-button">
-              <FaEdit />
-            </button>
-            <button
-              className="action-button delete-button"
-              onClick={() => handleDelete(row.original.id)} // Call a delete handler
-            >
-              <FaTrash />
-            </button>
-          </div>
-        ),
+        Header: 'Receipt No',
+        accessor: 'receipt_no',
+      },
+      {
+        Header: 'Account Name',
+        accessor: 'account_name',
+      },
+      {
+        Header: 'Total Amt',
+        accessor: 'total_amt',
+      },
+      {
+        Header: 'Discount Amt',
+        accessor: 'discount_amt',
+      },
+      {
+        Header: 'Cash Amt',
+        accessor: 'cash_amt',
+      },
+      {
+        Header: 'Remarks',
+        accessor: 'remarks',
+      },
+      {
+        Header: 'Actions',
+        accessor: 'actions',
       },
     ],
     []
@@ -44,9 +56,7 @@ const RepairsTable = () => {
 
   const data = React.useMemo(
     () => [
-      { id: 1, name: 'John Doe', contact: '1234567890', createdBy: 'Admin' },
-      { id: 2, name: 'Jane Smith', contact: '9876543210', createdBy: 'Manager' },
-      // Add more records as needed
+   
     ],
     []
   );
@@ -57,15 +67,15 @@ const RepairsTable = () => {
   };
 
   const handleCreate = () => {
-    navigate('/repairs'); // Navigate to the /repairs page
+    navigate('/payments'); // Navigate to the /repairs page
   };
 
   return (
     <div className="main-container">
-      <div className="repairs-table-container">
+      <div className="payments-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Repairs</h3>
+            <h3>Payments</h3>
             <Button variant="success" onClick={handleCreate}>
               + Create
             </Button>

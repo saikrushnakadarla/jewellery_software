@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./URDPurchase.css";
 import InputField from "../../../Pages/InputField/InputField";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
 const URDPurchase = () => {
 
@@ -266,9 +267,9 @@ const URDPurchase = () => {
 
         {/* Buttons */}
         <div className="form-buttons">
-          <button type="submit">Save</button>
-          <button type="button">Print</button>
-          <button type="button">New</button>
+          <Button type="submit" variant="success">Save</Button>
+          <Button type="submit" variant="secondary">cancel</Button>
+          <Button type="submit" variant="primary">Print</Button>
         </div>
      
     </div>
