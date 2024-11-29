@@ -30,7 +30,7 @@ const FormWithTable = () => {
                 <div className="row mt-3 itemmaster-form-container" >
                     <div className="col-12" style={{ marginTop: '-55px' }}>
                         {/* Form Section */}
-                        <form className="form-container">
+                        <form className="itemmaster-main-container">
 
 
                             <div className="form-container">
