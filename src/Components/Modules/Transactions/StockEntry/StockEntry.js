@@ -18,11 +18,7 @@ const StockEntry = () => {
     return (
         <div style={{ paddingTop: "79px" }}>
             <div className="container mt-4">
-                <div className="row">
-                    <div className="col-12">
-                        {/* Tab Navigation */}
-                    </div>
-                </div>
+                
 
                 <div className="row mt-3">
                     <div className="col-12">
