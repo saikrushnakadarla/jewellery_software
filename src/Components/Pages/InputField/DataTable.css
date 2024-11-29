@@ -14,7 +14,7 @@
     font-size: 14px;
     text-align: left;
     background-color: #ffffff;
-    overflow-x: auto; /* Make the table scrollable on small screens */
+    overflow-x: auto; 
 }
 
 .dataTable_headerRow {

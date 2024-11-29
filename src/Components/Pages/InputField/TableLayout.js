@@ -6,13 +6,13 @@ import './DataTable.css';
 // Global Search Filter Component
 function GlobalFilter({ globalFilter, setGlobalFilter }) {
   return (
-    <div className="dataTable_search">
+    <div className="dataTable_search mb-3">
       <input
         value={globalFilter || ''}
         onChange={(e) => setGlobalFilter(e.target.value)}
         className="form-control"
         placeholder="Search..."
-        style={{ width: '200px' }} // Fixed width for search
+        style={{ maxWidth: '300px' }} // Fixed width for search input
       />
     </div>
   );
@@ -46,57 +46,59 @@ export default function DataTable({ columns, data }) {
   );
 
   return (
-    <div className="dataTable_wrapper">
+    <div className="dataTable_wrapper container-fluid">
       {/* Global Search Filter */}
       <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
 
       {/* Table */}
-      <table {...getTableProps()} className="table dataTable_table">
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()} className="dataTable_headerRow">
-              {headerGroup.headers.map((column) => (
-                <th
-                  {...column.getHeaderProps(column.getSortByToggleProps())}
-                  className="dataTable_headerCell"
-                >
-                  {column.render('Header')}
-                  <span>
-                    {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()} className="dataTable_body">
-          {page.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()} className="dataTable_row">
-                {row.cells.map((cell) => (
-                  <td {...cell.getCellProps()} className="dataTable_cell">
-                    {cell.render('Cell')}
-                  </td>
+      <div className="table-responsive">
+        <table {...getTableProps()} className="table table-striped ">
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()} className="dataTable_headerRow">
+                {headerGroup.headers.map((column) => (
+                  <th
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    className="dataTable_headerCell"
+                  >
+                    {column.render('Header')}
+                    <span>
+                      {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
+                    </span>
+                  </th>
                 ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()} className="dataTable_body">
+            {page.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()} className="dataTable_row">
+                  {row.cells.map((cell) => (
+                    <td {...cell.getCellProps()} className="dataTable_cell">
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination Controls */}
-      <div className="dataTable_pagination">
+      <div className="d-flex align-items-center justify-content-between mt-3">
         <div>
           <button
-            className="btn btn-sm btn-primary dataTable_previous"
+            className="btn btn-sm btn-primary me-2"
             onClick={() => previousPage()}
             disabled={!canPreviousPage}
           >
             Previous
           </button>
           <button
-            className="btn btn-sm btn-primary dataTable_next ms-2"
+            className="btn btn-sm btn-primary"
             onClick={() => nextPage()}
             disabled={!canNextPage}
           >
@@ -111,13 +113,13 @@ export default function DataTable({ columns, data }) {
         </div>
         <div>
           <select
-            className="form-select dataTable_pageSize"
+            className="form-select form-select-sm"
             value={pageSize}
             onChange={(e) => setPageSize(Number(e.target.value))}
           >
             {[5, 10, 20].map((size) => (
               <option key={size} value={size}>
-                Show &ensp;{size}
+                Show {size}
               </option>
             ))}
           </select>

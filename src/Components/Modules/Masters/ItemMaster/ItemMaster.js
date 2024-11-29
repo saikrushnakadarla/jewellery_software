@@ -30,7 +30,7 @@ const FormWithTable = () => {
                     <form className="form-container">
 
                       
-                        <div className="form-container">
+                        <div className="itemmaster-container">
                         <h4 style={{marginBottom:'15px',}}>Product Details</h4>
                             <div className="form-row">
                                 <InputField label="Product Name:" />
@@ -98,7 +98,7 @@ const FormWithTable = () => {
                             </div>
                         </div>
                        
-                        <div className="form-container" style={{ marginTop: '15px' }}>
+                        <div className="itemmaster-container" style={{ marginTop: '15px' }}>
                         <div className="main-tags-row" style={{marginBottom:'15px',}}>
                             <input type="checkbox" id="main-tags" style={{width:'35px'}} />
                             <label htmlFor="main-tags">
@@ -115,7 +115,7 @@ const FormWithTable = () => {
                         </div>
 
                         
-                        <div className="form-container" style={{ marginTop: '15px' }}>
+                        <div className="itemmaster-container" style={{ marginTop: '15px' }}>
                         <h4 style={{marginBottom:'15px',}}>Stock Entry</h4>
                             <div className="form-row">
                                 <InputField
