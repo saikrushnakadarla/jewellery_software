@@ -13,6 +13,7 @@ const StockEntry = () => {
 
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+    const [showStockPointModal, setShowStockPointModal] = useState(false);
 
     return (
         <div style={{ paddingTop: "79px" }}>
@@ -160,36 +161,27 @@ const StockEntry = () => {
                                         <InputField label="Tax:" />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField
-                                            label="Stock Point:"
-                                            type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
-                                            options={[
-                                                { value: "Main Store", label: "Main Store" },
-                                                { value: "Secondary Store", label: "Secondary Store" },
-                                            ]}
-                                        /> <button className="plusbutton"
-                                            onClick={handleAddStockPoint}
-                                            // style={{
-                                            //     padding: "4px 8px",
-                                            //     borderRadius: "50%",
-                                            //     backgroundColor: "#007BFF",
-                                            //     color: "white",
-                                            //     border: "none",
-                                            //     cursor: "pointer",
-                                            //     fontSize: "14px",
-                                            //     display: "flex",
-                                            //     alignItems: "center",
-                                            //     justifyContent: "center",
-                                            //     height: "24px",
-                                            //     width: "24px",
-                                            // }}
-                                            title="Add Stock Point"
-                                        >
-                                            +
-                                        </button>
+                                        <div className="input-group">
+                                            <InputField
+                                                label="Stock Point:"
+                                                type="select"
+                                                value={metal}
+                                                onChange={(e) => setMetal(e.target.value)}
+                                                options={[
+                                                    { value: "Main Store", label: "Main Store" },
+                                                    { value: "Secondary Store", label: "Secondary Store" },
+                                                ]}
+                                            />
+                                            <button 
+                                                type="button" style={{height: '39px'}}
+                                                className="btn btn-outline-secondary"
+                                                onClick={() => setShowStockPointModal(true)}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                         </form>
@@ -214,7 +206,7 @@ const StockEntry = () => {
                                     ></button>
                                 </div>
                                 <div className="modal-body">
-                                    <div className="row g-3" style={{backgroundColor:'rgba(163, 110, 41, 0.08)'}}>
+                                    <div className="row g-3" style={{ backgroundColor: 'rgba(163, 110, 41, 0.08)' }}>
                                         <div className="col-md-4">
                                             <InputField label="P Code:" />
                                         </div>
