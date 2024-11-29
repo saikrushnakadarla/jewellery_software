@@ -163,8 +163,8 @@ const RepairForm = () => {
 
         {/* Buttons */}
         <div className="form-buttons">
-          <button type="submit">Save</button>
-          <button type="button">Print</button>
+          <Button type="submit" variant="secondary">cancel</Button>
+          <Button type="submit" variant="primary">Print</Button>
         </div>
       </Container>
       </div>
