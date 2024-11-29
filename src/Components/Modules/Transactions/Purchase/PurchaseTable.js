@@ -4,84 +4,202 @@ import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reu
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 
-const RepairsTable = () => {
+const PurchaseTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store table data
 
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Supplier Name',
+        Header: 'Name',
         accessor: 'supplier_id',
       },
         
       {
-        Header: 'Print Name',
+        Header: 'Metal',
         accessor: 'print_name',
       },
       {
-        Header: 'Account Group',
+        Header: 'Purity',
         accessor: 'account_group',
       },
       {
-        Header: 'Pincode',
+        Header: 'A/C Address:',
         accessor: 'pincode',
       },
       {
-        Header: 'State',
+        Header: 'GSTIN',
         accessor: 'state',
       },
       {
-        Header: 'State Code',
+        Header: ' Indent',
         accessor: 'state_code',
       },
       {
-        Header: 'Phone',
+        Header: 'Bill No:',
         accessor: 'phone',
       },
       {
-        Header: 'Mobile',
+        Header: 'Type',
         accessor: 'mobile',
       },
       {
-        Header: 'Email',
+        Header: 'Rate-Cut',
         accessor: 'email',
       },
       {
-        Header: 'Birthday',
+        Header: 'Date',
         accessor: 'birthday',
       },
       {
-        Header: 'Anniversary',
+        Header: 'Bill Date:',
         accessor: 'anniversary',
       },
       {
-        Header: 'Bank Account No',
+        Header: 'Category',
         accessor: 'bank_account_no',
       },
       {
-        Header: 'Bank Name ',
+        Header: 'Due Date',
         accessor: 'bank_name',
       },
       {
-        Header: 'IFSC Code',
+        Header: 'Rate',
         accessor: 'ifsc_code',
       },
       {
-        Header: 'Branch',
+        Header: 'Item Name',
         accessor: 'branch',
       },
       {
-        Header: 'GSTIN',
+        Header: 'Design Code ',
         accessor: 'gst_in',
       },
       {
-        Header: 'Aadhar Card',
+        Header: ' HSN',
         accessor: 'aadhar_card',
       },
       {
-        Header: 'PAN Card',
+        Header: 'Type',
         accessor: 'pan_card',
+      },
+      {
+        Header: 'Stock Type',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Pcs',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Gross',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Stone',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Net',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Purity',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Rate',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Unit',
+        accessor: 'branch',
+      },
+      {
+        Header: 'W% ',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Waste ',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Pure Wt',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Alloy ',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Cost',
+        accessor: 'branch',
+      },
+      {
+        Header: 'Tot Wt :',
+        accessor: 'branch',
+      },
+      {
+        Header: 'WT*Rate Amt',
+        accessor: 'branch',
+      },
+      {
+        Header: 'MC/GM',
+        accessor: 'mc/gm',
+      },
+      {
+        Header: 'MC',
+        accessor: 'mc',
+      },
+      {
+        Header: 'Stn. Amt',
+        accessor: 'stn_amt',
+      },
+      {
+        Header: 'Total ',
+        accessor: 'total',
+      },
+      {
+        Header: 'Stone ',
+        accessor: 'stone',
+      },
+      {
+        Header: 'Pcs ',
+        accessor: 'pcs',
+      },
+      {
+        Header: 'CT ',
+        accessor: 'ct',
+      },
+
+      {
+        Header: 'Gms  ',
+        accessor: 'gms',
+      },
+      {
+        Header: 'CWP ',
+        accessor: 'cwp',
+      },
+    
+      {
+        Header: 'Rate  ',
+        accessor: 'rate',
+      },
+      {
+        Header: 'Clear  ',
+        accessor: 'clear',
+      },
+      {
+        Header: 'Class  ',
+        accessor: 'class',
+      },
+      {
+        Header: 'Cut  ',
+        accessor: 'cut',
+      },
+      {
+        Header: 'Clarity  ',
+        accessor: 'clarity',
       },
      
       {
@@ -139,7 +257,7 @@ const RepairsTable = () => {
   };
 
   const handleCreate = () => {
-    navigate('/suppliermaster'); // Navigate to the /estimates page
+    navigate('/purchase'); // Navigate to the /estimates page
   };
 
   return (
@@ -147,7 +265,7 @@ const RepairsTable = () => {
       <div className="estimates-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Suppliers</h3>
+            <h3>Purchase</h3>
             <Button variant="success" onClick={handleCreate}>
               + Create
             </Button>
@@ -159,4 +277,4 @@ const RepairsTable = () => {
   );
 };
 
-export default RepairsTable;
+export default PurchaseTable;

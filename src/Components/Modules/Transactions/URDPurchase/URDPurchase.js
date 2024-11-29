@@ -24,7 +24,7 @@ const URDPurchase = () => {
             <div className="urd-form-row">
               <InputField label="Name:" />
               <InputField label="Mobile:" />
-              <InputField label="Phone:" />
+              <InputField label="Pin:" />
               {/* <InputField label="Email:" type="email" /> */}
             </div>
             <div className="urd-form-row">
