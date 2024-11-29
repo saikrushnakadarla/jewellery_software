@@ -77,8 +77,8 @@ function Navbar() {
           <span>TRANSACTIONS</span>
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/sales">SALES</Link>
-              <Link to="/estimatetable">ESTIMATE</Link>
+              <Link to="/sales">Sales</Link>
+              <Link to="/estimatetable">Estimate</Link>
               {/* <Link to="/refunds">STOCK ENTRY</Link>
               <Link to="/refunds">Customized Oders</Link>
               <Link to="/refunds">Payments & Reciepts</Link> */}
