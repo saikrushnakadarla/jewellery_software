@@ -180,7 +180,7 @@ const RepairsTable = () => {
       </Row>
        {/* From Date, To Date, and Filter Button */}
        <Row className="mb-4">
-        <Col xs={12} md={4}>
+        <Col xs={12} md={2}>
           <Form.Group>
             <Form.Label>From Date</Form.Label>
             <Form.Control
@@ -192,7 +192,7 @@ const RepairsTable = () => {
             />
           </Form.Group>
         </Col>
-        <Col xs={12} md={4}>
+        <Col xs={12} md={2}>
           <Form.Group>
             <Form.Label>To Date</Form.Label>
             <Form.Control

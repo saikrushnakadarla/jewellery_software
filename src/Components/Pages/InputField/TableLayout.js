@@ -12,7 +12,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter }) {
         onChange={(e) => setGlobalFilter(e.target.value)}
         className="form-control"
         placeholder="Search..."
-        style={{ maxWidth: '300px' }} // Fixed width for search input
+        style={{ maxWidth: '200px' }} // Fixed width for search input
       />
     </div>
   );

@@ -102,6 +102,9 @@ function Navbar() {
               <Link to="/purchaseReport">Purchase Report</Link>
               <Link to="/repairsReport">Repairs Report</Link>
               <Link to="/urdPurchaseReport">URDPurchase Report</Link>
+              <Link to="/stockReort">Stock Report</Link>
+              <Link to="/barcodeprinting">Barcode Printing Report</Link>
+              <Link to="/cashReport">Cash Report</Link>
             </div>
           )}
         </div>
@@ -115,10 +118,8 @@ function Navbar() {
           <span>UTILITY/SETTINGS</span>
           {utilityDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/settings/profile">Profile</Link>
-              <Link to="/settings/preferences">Preferences</Link>
-              <Link to="/settings/security">Security</Link>
-              <Link to="/settings/notifications">Notifications</Link>
+              <Link to="/invoice">Invoice</Link>
+              
             </div>
           )}
         </div>
