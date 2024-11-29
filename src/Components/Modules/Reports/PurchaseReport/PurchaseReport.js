@@ -289,23 +289,26 @@ const PurchaseTable = () => {
         </Row>
          {/* From Date, To Date, and Filter Button */}
          <Row className="mb-4">
-          <Col xs={12} md={4}>
+          <Col xs={12} md={2}>
             <Form.Group>
               <Form.Label>From Date</Form.Label>
               <Form.Control
                 type="date"
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
+                style={{width:'200px'}}
               />
             </Form.Group>
           </Col>
-          <Col xs={12} md={4}>
+          <Col xs={12} md={2}>
             <Form.Group>
               <Form.Label>To Date</Form.Label>
               <Form.Control
                 type="date"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
+                style={{width:'200px'}}
+
               />
             </Form.Group>
           </Col>
