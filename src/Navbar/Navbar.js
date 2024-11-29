@@ -82,7 +82,7 @@ function Navbar() {
               {/* <Link to="/refunds">STOCK ENTRY</Link>
               <Link to="/refunds">Customized Oders</Link>
               <Link to="/refunds">Payments & Reciepts</Link> */}
-              <Link to="/purchase">Purchase</Link>
+              <Link to="/purchasetable">Purchase</Link>
               <Link to="/stockEntryTable">Stock Entry</Link>
               <Link to="/repairstable">Repairs</Link>
               <Link to="/urd_purchase">URD Purchase</Link>

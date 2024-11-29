@@ -17,131 +17,131 @@ const PurchaseTable = () => {
         
       {
         Header: 'Metal',
-        accessor: 'print_name',
+        accessor: 'metal',
       },
       {
         Header: 'Purity',
-        accessor: 'account_group',
+        accessor: 'purity',
       },
       {
         Header: 'A/C Address:',
-        accessor: 'pincode',
+        accessor: 'a/c_address',
       },
       {
         Header: 'GSTIN',
-        accessor: 'state',
-      },
-      {
-        Header: ' Indent',
-        accessor: 'state_code',
-      },
-      {
-        Header: 'Bill No:',
-        accessor: 'phone',
-      },
-      {
-        Header: 'Type',
-        accessor: 'mobile',
-      },
-      {
-        Header: 'Rate-Cut',
-        accessor: 'email',
-      },
-      {
-        Header: 'Date',
-        accessor: 'birthday',
-      },
-      {
-        Header: 'Bill Date:',
-        accessor: 'anniversary',
-      },
-      {
-        Header: 'Category',
-        accessor: 'bank_account_no',
-      },
-      {
-        Header: 'Due Date',
-        accessor: 'bank_name',
-      },
-      {
-        Header: 'Rate',
-        accessor: 'ifsc_code',
-      },
-      {
-        Header: 'Item Name',
-        accessor: 'branch',
-      },
-      {
-        Header: 'Design Code ',
         accessor: 'gst_in',
       },
       {
-        Header: ' HSN',
-        accessor: 'aadhar_card',
+        Header: ' Indent',
+        accessor: 'indent',
+      },
+      {
+        Header: 'Bill No:',
+        accessor: 'bill_no',
       },
       {
         Header: 'Type',
-        accessor: 'pan_card',
+        accessor: 'type',
       },
       {
-        Header: 'Stock Type',
-        accessor: 'branch',
+        Header: 'Rate_Cut',
+        accessor: 'rate_cut',
       },
       {
-        Header: 'Pcs',
-        accessor: 'branch',
+        Header: 'Date',
+        accessor: 'date',
       },
       {
-        Header: 'Gross',
-        accessor: 'branch',
+        Header: 'Bill Date:',
+        accessor: 'bill_date',
       },
       {
-        Header: 'Stone',
-        accessor: 'branch',
+        Header: 'Category',
+        accessor: 'category',
       },
       {
-        Header: 'Net',
-        accessor: 'branch',
-      },
-      {
-        Header: 'Purity',
-        accessor: 'branch',
+        Header: 'Due Date',
+        accessor: 'due_date',
       },
       {
         Header: 'Rate',
-        accessor: 'branch',
+        accessor: 'rate',
       },
       {
+        Header: 'Item Name',
+        accessor: 'item_name',
+      },
+      {
+        Header: 'Design Code ',
+        accessor: 'design_code',
+      },
+      {
+        Header: ' HSN',
+        accessor: 'hsn',
+      },
+      // {
+      //   Header: 'Type',
+      //   accessor: 'type',
+      // },
+      {
+        Header: 'Stock Type',
+        accessor: 'stock_type',
+      },
+      // {
+      //   Header: 'Pcs',
+      //   accessor: 'pcs',
+      // },
+      {
+        Header: 'Gross',
+        accessor: 'gross',
+      },
+      {
+        Header: 'Stone',
+        accessor: 'stone',
+      },
+      {
+        Header: 'Net',
+        accessor: 'net',
+      },
+      // {
+      //   Header: 'Purity',
+      //   accessor: 'purity',
+      // },
+      // {
+      //   Header: 'Rate',
+      //   accessor: 'rate',
+      // },
+      {
         Header: 'Unit',
-        accessor: 'branch',
+        accessor: 'unit',
       },
       {
         Header: 'W% ',
-        accessor: 'branch',
+        accessor: 'w%',
       },
       {
         Header: 'Waste ',
-        accessor: 'branch',
+        accessor: 'waste',
       },
       {
         Header: 'Pure Wt',
-        accessor: 'branch',
+        accessor: 'pure_wt',
       },
       {
         Header: 'Alloy ',
-        accessor: 'branch',
+        accessor: 'alloy',
       },
       {
         Header: 'Cost',
-        accessor: 'branch',
+        accessor: 'cost',
       },
       {
         Header: 'Tot Wt :',
-        accessor: 'branch',
+        accessor: 'total_wt',
       },
       {
         Header: 'WT*Rate Amt',
-        accessor: 'branch',
+        accessor: 'wt_rate_amt',
       },
       {
         Header: 'MC/GM',
@@ -159,10 +159,10 @@ const PurchaseTable = () => {
         Header: 'Total ',
         accessor: 'total',
       },
-      {
-        Header: 'Stone ',
-        accessor: 'stone',
-      },
+      // {
+      //   Header: 'Stone ',
+      //   accessor: 'stone',
+      // },
       {
         Header: 'Pcs ',
         accessor: 'pcs',
@@ -181,10 +181,10 @@ const PurchaseTable = () => {
         accessor: 'cwp',
       },
     
-      {
-        Header: 'Rate  ',
-        accessor: 'rate',
-      },
+      // {
+      //   Header: 'Rate  ',
+      //   accessor: 'rate',
+      // },
       {
         Header: 'Clear  ',
         accessor: 'clear',
