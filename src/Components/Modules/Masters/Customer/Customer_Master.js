@@ -44,7 +44,7 @@ function Customer_Master() {
   return (
     <div className="main-container">
     <div className="customer-master-container">
-      <h2>Customers</h2>
+      <h2 style={{color:'#A26D2B'}}>Customers</h2>
       <form className="customer-master-form" onSubmit={handleSubmit}>
         {/* Row 1 */}
         <div className="form-row">
