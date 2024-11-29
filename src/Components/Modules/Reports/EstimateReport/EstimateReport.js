@@ -187,6 +187,8 @@ const RepairsTable = () => {
               type="date"
               value={fromDate}
               onChange={(e) => setFromDate(e.target.value)}
+              style={{width:'200px'}}
+
             />
           </Form.Group>
         </Col>
@@ -197,6 +199,8 @@ const RepairsTable = () => {
               type="date"
               value={toDate}
               onChange={(e) => setToDate(e.target.value)}
+              style={{width:'200px'}}
+
             />
           </Form.Group>
         </Col>
