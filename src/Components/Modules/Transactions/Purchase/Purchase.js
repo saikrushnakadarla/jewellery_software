@@ -261,7 +261,7 @@ const Purchase = () => {
                                         </div>
                                 </div>
                         </div>
-                        <button type="submit" className="pur-submit-btn">Save</button>
+                        <Button type="submit" variant="success">Save</Button>
                 </div>
         );
 };
