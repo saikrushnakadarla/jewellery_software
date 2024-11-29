@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate for naviga
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap'; 
-import './ReceiptsTable.css'
+import './PaymentsTable.css'
 
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
@@ -67,15 +67,15 @@ const RepairsTable = () => {
   };
 
   const handleCreate = () => {
-    navigate('/receipts'); // Navigate to the /repairs page
+    navigate('/payments'); // Navigate to the /repairs page
   };
 
   return (
     <div className="main-container">
-      <div className="receipt-table-container">
+      <div className="payments-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Receipts</h3>
+            <h3>Payments</h3>
             <Button variant="success" onClick={handleCreate}>
               + Create
             </Button>

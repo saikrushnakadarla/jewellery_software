@@ -29,7 +29,8 @@ import URDPurchaseReport from './Components/Modules/Reports/URDPurchaseReport/UR
 
 
 
-
+import Payments from './Components/Modules/Transactions/Payments/Payments';
+import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTable';
 
 function App() {
   const location = useLocation();
@@ -60,6 +61,7 @@ function App() {
         <Route path="/purchasetable" element={<PurchaseTable />} />
         <Route path="/receipts" element={<Receipts />} />
         <Route path="/receiptstable" element={<ReceiptsTable />} />
+
         <Route path="/purchaseReport" element={<PurchaseReport />} />
         <Route path="/salesReport" element={<SalesReport />} />
         <Route path="/estimateReport" element={<EstimateReport />} />
@@ -67,6 +69,8 @@ function App() {
         <Route path="/urdPurchaseReport" element={<URDPurchaseReport />} />
 
 
+        <Route path="/payments" element={<Payments />} />
+        <Route path="/paymentstable" element={<PaymentsTable />} />
 
       </Routes>
     </>
