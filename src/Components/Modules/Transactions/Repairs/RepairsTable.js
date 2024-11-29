@@ -2,7 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { Button, Row, Col } from 'react-bootstrap'; // Import React Bootstrap components
+import { Button, Row, Col } from 'react-bootstrap'; 
+import './RepairsTable.css'
 
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function

@@ -21,7 +21,8 @@ import Purchase from './Components/Modules/Transactions/Purchase/Purchase';
 import PurchaseTable from './Components/Modules/Transactions/Purchase/PurchaseTable';
 import Receipts from './Components/Modules/Transactions/Receipts/Receipts';
 import ReceiptsTable from './Components/Modules/Transactions/Receipts/ReceiptsTable';
-
+import Payments from './Components/Modules/Transactions/Payments/Payments';
+import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTable';
 
 function App() {
   const location = useLocation();
@@ -52,6 +53,8 @@ function App() {
         <Route path="/purchasetable" element={<PurchaseTable />} />
         <Route path="/receipts" element={<Receipts />} />
         <Route path="/receiptstable" element={<ReceiptsTable />} />
+        <Route path="/payments" element={<Payments />} />
+        <Route path="/paymentstable" element={<PaymentsTable />} />
 
       </Routes>
     </>

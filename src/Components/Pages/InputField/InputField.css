@@ -13,7 +13,6 @@
     color:#A26D2B ;
   }
 
-  
   .styled-input {
     width: 100%;
     padding: 10px;
@@ -26,5 +25,9 @@
   .styled-input:focus {
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  }
+
+  h1,h2,h3,h4 {
+    color:#A26D2B ;
   }
   

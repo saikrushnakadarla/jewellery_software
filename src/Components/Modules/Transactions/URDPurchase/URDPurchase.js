@@ -268,7 +268,7 @@ const URDPurchase = () => {
         <div className="form-buttons">
           <button type="submit">Save</button>
           <button type="button">Print</button>
-          <button type="button">New</button>
+          <button type="button">Cancel</button>
         </div>
      
     </div>

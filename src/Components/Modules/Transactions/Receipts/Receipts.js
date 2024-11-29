@@ -13,7 +13,7 @@ const RepairForm = () => {
     <Container className="receipt-form-container">
 
       <Row className="receipt-form-section">
-          <h4>Product Details</h4>
+          <h4 className="mb-3">Product Details</h4>
           <Col xs={12} md={2}> <InputField label="Date:" type="date" /></Col>
           <Col xs={12} md={2}>
                   
