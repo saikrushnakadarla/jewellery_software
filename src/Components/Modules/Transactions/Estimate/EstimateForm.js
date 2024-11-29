@@ -4,6 +4,7 @@ import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import EstimateTable from "./EstimateTable"; 
 
 const RepairForm = () => {
   const { product_id } = useParams(); // Get product_id from URL (for edit mode)
@@ -81,8 +82,9 @@ const RepairForm = () => {
   return (
     <div className="main-container">
       <Container className="estimate-form-container">
+        
         <Row className="estimate-form-section">
-          <h2>{product_id ? "Edit Estimate" : "Create Estimate"}</h2>
+          {/* <h2>{product_id ? "Edit Estimate" : "Create Estimate"}</h2> */}
           <Col xs={12} md={2}>
             <InputField label="PCODE:" name="pcode" value={formData.pcode} onChange={handleInputChange}/>
           </Col>
@@ -142,6 +144,10 @@ const RepairForm = () => {
             <InputField label="Total Rs:" name="total_rs" value={formData.total_rs} onChange={handleInputChange}/>
           </Col>
         </Row>
+        <Row className="estimate-form-section">
+        <EstimateTable />
+        </Row>
+
         <Row>
           <Col>
             <Button variant="primary" type="submit" onClick={handleSubmit}>

@@ -77,7 +77,7 @@ function Navbar() {
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
               <Link to="/sales">Sales</Link>
-              <Link to="/estimatetable">Estimate</Link>
+              <Link to="/estimates">Estimate</Link>
               <Link to="/stockEntryTable">Stock Entry</Link>
               <Link to="/payments">Payments</Link>
               <Link to="/receipts">Receipts</Link>
