@@ -148,16 +148,14 @@ const RepairForm = () => {
         <EstimateTable />
         </Row>
 
-        <Row>
-          <Col>
+        <div className="form-buttons">
             <Button variant="primary" type="submit" onClick={handleSubmit}>
               {product_id ? "Update" : "Print"}
             </Button>
             <Button variant="secondary" type="button" onClick={() => navigate("/estimatetable")}>
               Cancel
             </Button>
-          </Col>
-        </Row>
+         </div>
       </Container>
     </div>
   );

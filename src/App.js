@@ -26,11 +26,10 @@ import SalesReport from './Components/Modules/Reports/SalesReport/SalesReport'
 import EstimateReport from './Components/Modules/Reports/EstimateReport/EstimateReport'
 import RepairsReport from './Components/Modules/Reports/RepairsReport/RepairsReport'
 import URDPurchaseReport from './Components/Modules/Reports/URDPurchaseReport/URDPurchase'
-
-
-
 import Payments from './Components/Modules/Transactions/Payments/Payments';
 import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTable';
+import Accounts from './Components/Modules/Masters/Accounts/Accounts';
+import AccountsTable from './Components/Modules/Masters/Accounts/AccountsTable'
 
 function App() {
   const location = useLocation();
@@ -61,16 +60,15 @@ function App() {
         <Route path="/purchasetable" element={<PurchaseTable />} />
         <Route path="/receipts" element={<Receipts />} />
         <Route path="/receiptstable" element={<ReceiptsTable />} />
-
         <Route path="/purchaseReport" element={<PurchaseReport />} />
         <Route path="/salesReport" element={<SalesReport />} />
         <Route path="/estimateReport" element={<EstimateReport />} />
         <Route path="/repairsReport" element={<RepairsReport />} />
         <Route path="/urdPurchaseReport" element={<URDPurchaseReport />} />
-
-
         <Route path="/payments" element={<Payments />} />
         <Route path="/paymentstable" element={<PaymentsTable />} />
+        <Route path="/accounts" element={<Accounts />} />
+        <Route path="/accountstable" element={<AccountsTable />} />
 
       </Routes>
     </>
