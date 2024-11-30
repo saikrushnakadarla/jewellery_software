@@ -2,18 +2,17 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./ItemMaster.css";
 import InputField from "./Inputfield";
+import StoneDetailsModal from "../../Transactions/StockEntry/StoneDetailsModal";
 
 const handleAddStockPoint = () => {
     alert("Add new stock point functionality!");
     // Implement the functionality to add a new stock point here
 };
 const FormWithTable = () => {
-
     const [metal, setMetal] = useState("");
     // const [type, setType] = useState("");
     // const [purity, setPurity] = useState("");
     const [showModal, setShowModal] = useState(false);
-
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
 
@@ -23,16 +22,12 @@ const FormWithTable = () => {
                 <div className="row">
                     <div className="col-12">
                         {/* Tab Navigation */}
-
                     </div>
                 </div>
-
                 <div className="row mt-3 itemmaster-form-container" >
                     <div className="col-12" style={{ marginTop: '-55px' }}>
                         {/* Form Section */}
                         <form className="itemmaster-main-container">
-
-
                             <div className="form-container">
                                 <h4 style={{ marginBottom: '15px', }}>Product Details</h4>
                                 <div className="form-row">
@@ -46,13 +41,10 @@ const FormWithTable = () => {
                                         options={[
                                             { value: "GOLD", label: "Gold" },
                                             { value: "SILVER", label: "Silver" },
-
                                         ]}
                                     />
                                     <InputField label="Item Prefix:" />
                                 </div>
-
-
                                 <div className="form-row" style={{ marginBottom: '-20px' }}>
                                     <InputField label="Short Name:" />
                                     <InputField
@@ -65,8 +57,6 @@ const FormWithTable = () => {
 
                                         ]}
                                     />
-
-
                                     <InputField
                                         label="Purchase Account Head:"
                                         type="select"
@@ -77,7 +67,6 @@ const FormWithTable = () => {
 
                                         ]}
                                     />
-
                                     <InputField
                                         label="Status:"
                                         type="select"
@@ -101,7 +90,6 @@ const FormWithTable = () => {
                                     <InputField label="HSN Code:" />
                                 </div>
                             </div>
-
                             <div className="form-container" style={{ marginTop: '15px' }}>
                                 <div className="main-tags-row" style={{ marginBottom: '15px', }}>
                                     <input type="checkbox" id="main-tags" style={{ width: '35px' }} />
@@ -127,8 +115,6 @@ const FormWithTable = () => {
                                     <InputField label="HUID No:" />
                                 </div>
                             </div>
-
-
                             <div className="form-container" style={{ marginTop: '15px' }}>
                                 <h4 style={{ marginBottom: '15px', }}>Stock Entry</h4>
                                 <div className="form-row">
@@ -158,16 +144,7 @@ const FormWithTable = () => {
                                             { value: "18K", label: "18k" },
                                         ]}
                                     />
-                                    {/* <InputField
-                                        label="Category:"
-                                        type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
-                                        options={[
-                                            { value: "Silver", label: "Silver" },
-                                            { value: "Gold", label: "Gold" },
-                                        ]}
-                                    /> */}
+                                  
                                     <InputField label="PCode/BarCode:" />
                                 </div>
                                 <div className="form-row">
@@ -213,131 +190,16 @@ const FormWithTable = () => {
                                                 { value: "Secondary Store", label: "Secondary Store" },
                                             ]}
                                         />
-
-                                   
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
-            </div>
-
-            {showModal && (
-                <div className="modal show d-block" tabIndex="-1" role="dialog">
-                    <div className="modal-dialog modal-lg" role="document">
-                        {/* Increased modal width using `modal-lg` */}
-                        <div className="stockentrymodalformcontainer">
-                            <div className="modal-content bg-light" >
-                                <div className="modal-header">
-                                    <h5 className="modal-title">Stone Details</h5>
-                                    <button
-                                        type="button"
-                                        className="btn-close"
-                                        aria-label="Close"
-                                        onClick={handleCloseModal}
-                                    ></button>
-                                </div>
-                                <div className="modal-body">
-                                    <div className="row g-3" style={{backgroundColor:'rgba(163, 110, 41, 0.08)'}}>
-                                        <div className="col-md-4">
-                                            <InputField label="P Code:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Product Name:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Stone Name:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Weight:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Rate per Gram:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Total Weight:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Total Price:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <button type="button" className="btn btn-primary">
-                                                Save
-                                            </button>
-                                        </div>
-
-                                    </div>
-
-                                    {/* Table Section */}
-                                    <div className="mt-4">
-                                        <h6 className="fw-bold">Stone List</h6>
-                                        {/* Use a scrollable container to ensure the table fits */}
-                                        <div className="table-responsive">
-                                            <table className="table table-striped table-bordered table-hover">
-                                                <thead className="table-secondary">
-                                                    <tr>
-                                                        <th>P Code</th>
-                                                        <th>Product Name</th>
-                                                        <th>Stone Name</th>
-                                                        <th>Weight</th>
-                                                        <th>Rate/Gram</th>
-                                                        <th>Total Weight</th>
-                                                        <th>Total Price</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {/* Example Row 1 */}
-                                                    <tr>
-                                                        <td>P001</td>
-                                                        <td>Product A</td>
-                                                        <td>Diamond</td>
-                                                        <td>5g</td>
-                                                        <td>$500</td>
-                                                        <td>5g</td>
-                                                        <td>$2500</td>
-                                                        <td>
-                                                            <button className="btn btn-primary btn-sm me-2">Edit</button>
-                                                            <button className="btn btn-danger btn-sm">Delete</button>
-                                                        </td>
-                                                    </tr>
-                                                    {/* Example Row 2 */}
-                                                    <tr>
-                                                        <td>P002</td>
-                                                        <td>Product B</td>
-                                                        <td>Ruby</td>
-                                                        <td>3g</td>
-                                                        <td>$300</td>
-                                                        <td>3g</td>
-                                                        <td>$900</td>
-                                                        <td>
-                                                            <button className="btn btn-primary btn-sm me-2">Edit</button>
-                                                            <button className="btn btn-danger btn-sm">Delete</button>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="modal-footer">
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={handleCloseModal}
-                                    >
-                                        Close
-                                    </button>
-                                    <button type="button" className="btn btn-primary">
-                                        Save Changes
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            </div>           
+             <StoneDetailsModal
+        showModal={showModal}
+        handleCloseModal={handleCloseModal}
+      />
         </div>
     );
 };
