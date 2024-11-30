@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate for naviga
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap'; 
-import './RepairsTable.css'
+import './AccountsTable.css'
 
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
@@ -11,19 +11,31 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'NAME',
-        accessor: '', // Key from the data
+        Header: 'Account Name',
+        accessor: 'account_name', // Key from the data
       },
       {
-        Header: 'Mobile',
+        Header: 'Print Name',
         accessor: '',
       },
       {
-        Header: 'Email',
+        Header: 'Group',
         accessor: '',
       },
       {
-        Header: 'Address1',
+        Header: 'Op. Bal.',
+        accessor: '',
+      },
+      {
+        Header: 'Dr/Cr',
+        accessor: '',
+      },
+      {
+        Header: 'Metal Balance',
+        accessor: '',
+      },
+      {
+        Header: 'Address',
         accessor: '',
       },
       {
@@ -31,102 +43,68 @@ const RepairsTable = () => {
         accessor: '',
       },
       {
-        Header: 'Address3',
+        Header: 'City',
         accessor: '',
       },
       {
-        Header: 'Staff',
+        Header: 'Area',
         accessor: '',
       },
       {
-        Header: 'Delivery Date',
+        Header: 'Pincode',
         accessor: '',
       },
       {
-        Header: 'Place',
+        Header: 'State',
         accessor: '',
       },
       {
-        Header: 'Metal',
+        Header: 'State Code',
         accessor: '',
       },
       {
-        Header: 'Counter',
+        Header: 'Phone',
         accessor: '',
       },
       {
-        Header: 'Entry Type',
+        Header: 'Mobile',
         accessor: '',
       },
       {
-        Header: 'Receipt No',
+        Header: 'Contact Person',
         accessor: '',
       },
       {
-        Header: 'Date',
+        Header: 'Email',
         accessor: '',
       },
       {
-        Header: 'Type',
-        accessor: '',
-      },
-
-      {
-        Header: 'Item',
-        accessor: '',
-      },
-
-      {
-        Header: 'Tag No',
-        accessor: '',
-      },
-
-      {
-        Header: 'Description',
+        Header: 'Birthday On',
         accessor: '',
       },
       {
-        Header: 'Purity',
+        Header: 'Anniversary',
         accessor: '',
       },
       {
-        Header: 'Extra Weight',
+        Header: 'Bank Account No.',
         accessor: '',
       },
       {
-        Header: 'Stone Value',
+        Header: 'Bank Name',
         accessor: '',
       },
       {
-        Header: 'Making Charge (MC)',
+        Header: 'IFSC Code',
         accessor: '',
       },
       {
-        Header: 'Handling Charge (HC)',
+        Header: 'Branch',
         accessor: '',
       },
       {
-        Header: 'Total',
-        accessor: '',
-      },
-      {
-        Header: 'ACTION',
-        Cell: ({ row }) => (
-          <div className="d-flex align-items-center">
-          <button
-            className="action-button edit-button"
-            
-          >
-            <FaEdit />
-          </button>
-          <button
-            className="action-button delete-button"
-            
-          >
-            <FaTrash />
-          </button>
-          </div>
-        ),
+        Header: 'Actions',
+        accessor: 'actions',
       },
     ],
     []
@@ -134,27 +112,23 @@ const RepairsTable = () => {
 
   const data = React.useMemo(
     () => [
-      { id: 1, name: 'John Doe', contact: '1234567890', createdBy: 'Admin' },
-      
+   
     ],
     []
   );
 
-  const handleDelete = (id) => {
-    console.log('Delete record with id:', id);
-    // Implement your delete logic here
-  };
+
 
   const handleCreate = () => {
-    navigate('/repairs'); // Navigate to the /repairs page
+    navigate('/accounts'); // Navigate to the /repairs page
   };
 
   return (
     <div className="main-container">
-      <div className="repairs-table-container">
+      <div className="accounts-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Repairs</h3>
+            <h3>Payments</h3>
             <Button variant="success" onClick={handleCreate}>
               + Create
             </Button>

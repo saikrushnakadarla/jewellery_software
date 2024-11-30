@@ -72,7 +72,7 @@ const RepairForm = () => {
         alert(response.data.message || "Estimate added successfully.");
       }
       setFormData(initialFormData);
-      navigate("/estimatetable"); // Redirect to estimates list
+      // navigate("/estimatetable"); 
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Failed to submit form.");
@@ -148,16 +148,14 @@ const RepairForm = () => {
         <EstimateTable />
         </Row>
 
-        <Row>
-          <Col>
+        <div className="form-buttons">
             <Button variant="primary" type="submit" onClick={handleSubmit}>
               {product_id ? "Update" : "Print"}
             </Button>
             <Button variant="secondary" type="button" onClick={() => navigate("/estimatetable")}>
               Cancel
             </Button>
-          </Col>
-        </Row>
+         </div>
       </Container>
     </div>
   );

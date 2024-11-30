@@ -23,7 +23,7 @@ const InputField = ({
           disabled={readOnly}
         >
           <option value="" disabled>
-            {placeholder || "Select an option"}
+            {placeholder || "Select"}
           </option>
           {options.map((option, index) => (
             <option key={index} value={option.value}>

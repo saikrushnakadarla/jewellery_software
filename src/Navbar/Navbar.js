@@ -62,7 +62,7 @@ function Navbar() {
               <Link to="/suppliertable">Supplier_Master</Link>
               <Link to="/itemmastertable">Product</Link>
               <Link to="/purity">Purity</Link>
-              <Link to="/accounts">Accounts</Link>
+              <Link to="/accountstable">Accounts</Link>
             </div>
           )}
         </div>
