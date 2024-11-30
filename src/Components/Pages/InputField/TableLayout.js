@@ -1,24 +1,24 @@
 import React from 'react';
 import { useTable, usePagination, useGlobalFilter, useSortBy } from 'react-table';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './DataTable.css';
 
-// A simple global filter for searching
+// Global Search Filter Component
 function GlobalFilter({ globalFilter, setGlobalFilter }) {
-    return (
-      <div className="mb-3">
-        <input
-          value={globalFilter || ''}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          className="form-control"
-          style={{ width: '200px', maxWidth: '100%', borderRadius:'5px' }} // Set fixed width with responsive fallback
-          placeholder="Search..."
-        />
-      </div>
-    );
-  }
-  
+  return (
+    <div className="dataTable_search mb-3">
+      <input
+        value={globalFilter || ''}
+        onChange={(e) => setGlobalFilter(e.target.value)}
+        className="form-control"
+        placeholder="Search..."
+        style={{ maxWidth: '200px' }} // Fixed width for search input
+      />
+    </div>
+  );
+}
 
-// Reusable DataTable component
+// Reusable DataTable Component
 export default function DataTable({ columns, data }) {
   const {
     getTableProps,
@@ -38,7 +38,7 @@ export default function DataTable({ columns, data }) {
     {
       columns,
       data,
-      initialState: { pageIndex: 0 }, // Set initial page index to 0
+      initialState: { pageIndex: 0 },
     },
     useGlobalFilter,
     useSortBy,
@@ -46,69 +46,84 @@ export default function DataTable({ columns, data }) {
   );
 
   return (
-    <div>
+    <div className="dataTable_wrapper container-fluid">
       {/* Global Search Filter */}
       <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
 
       {/* Table */}
-      <table {...getTableProps()} className="table table-bordered table-striped">
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render('Header')}
-                  <span>
-                    {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => (
-                  <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+      <div className="table-responsive">
+        <table {...getTableProps()} className="table table-striped ">
+          <thead>
+            {headerGroups.map((headerGroup) => (
+              <tr {...headerGroup.getHeaderGroupProps()} className="dataTable_headerRow">
+                {headerGroup.headers.map((column) => (
+                  <th
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    className="dataTable_headerCell"
+                  >
+                    {column.render('Header')}
+                    <span>
+                      {column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}
+                    </span>
+                  </th>
                 ))}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()} className="dataTable_body">
+            {page.map((row) => {
+              prepareRow(row);
+              return (
+                <tr {...row.getRowProps()} className="dataTable_row">
+                  {row.cells.map((cell) => (
+                    <td {...cell.getCellProps()} className="dataTable_cell">
+                      {cell.render('Cell')}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination Controls */}
-      <div className="d-flex justify-content-between align-items-center mt-3">
+      <div className="d-flex align-items-center justify-content-between mt-3">
         <div>
-          <button className="btn btn-sm btn-primary" onClick={() => previousPage()} disabled={!canPreviousPage}>
+          <button
+            className="btn btn-sm btn-primary me-2"
+            onClick={() => previousPage()}
+            disabled={!canPreviousPage}
+          >
             Previous
           </button>
-          <button className="btn btn-sm btn-primary ms-2" onClick={() => nextPage()} disabled={!canNextPage}>
+          <button
+            className="btn btn-sm btn-primary"
+            onClick={() => nextPage()}
+            disabled={!canNextPage}
+          >
             Next
           </button>
         </div>
-
-        <div>
+        <div className="dataTable_pageInfo">
           Page{' '}
           <strong>
             {pageIndex + 1} of {pageOptions.length}
           </strong>
         </div>
-
-        <select
-          className="form-select w-auto"
-          value={pageSize}
-          onChange={(e) => setPageSize(Number(e.target.value))}
-        >
-          {[5, 10, 20].map((size) => (
-            <option key={size} value={size}>
-              Show {size}
-            </option>
-          ))}
-        </select>
+        <div>
+          <select
+            className="form-select form-select-sm"
+            value={pageSize}
+            onChange={(e) => setPageSize(Number(e.target.value))}
+          >
+            {[5, 10, 20].map((size) => (
+              <option key={size} value={size}>
+                Show {size}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );

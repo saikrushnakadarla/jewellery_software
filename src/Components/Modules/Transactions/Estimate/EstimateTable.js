@@ -147,19 +147,19 @@ const RepairsTable = () => {
   };
 
   return (
-    <div className="main-container">
-      <div className="estimates-table-container">
-        <Row className="mb-3">
+    <>
+      {/* <div className="estimates-table-container"> */}
+        {/* <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Estimates</h3>
             <Button variant="success" onClick={handleCreate}>
               + Create
             </Button>
           </Col>
-        </Row>
+        </Row> */}
         <DataTable columns={columns} data={data} />
-      </div>
-    </div>
+      {/* </div> */}
+      </>
   );
 };
 
