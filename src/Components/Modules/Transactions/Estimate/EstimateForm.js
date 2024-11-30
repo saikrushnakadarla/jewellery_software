@@ -72,7 +72,7 @@ const RepairForm = () => {
         alert(response.data.message || "Estimate added successfully.");
       }
       setFormData(initialFormData);
-      navigate("/estimatetable"); // Redirect to estimates list
+      // navigate("/estimatetable"); 
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Failed to submit form.");
