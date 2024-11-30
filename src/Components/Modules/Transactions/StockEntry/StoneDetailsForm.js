@@ -3,8 +3,8 @@ import InputField from "../../Masters/ItemMaster/Inputfield";
 
 const StoneDetailsForm = () => {
   return (
-    <div className="modal-body">
-      <div className="row g-3" style={{ backgroundColor: 'rgba(163, 110, 41, 0.08)' }}>
+    <div className="modal-body" style={{ backgroundColor: 'rgba(163, 110, 41, 0.08)' }}> 
+      <div className="row g-3" >
         <div className="col-md-4">
           <InputField label="P Code:" />
         </div>
