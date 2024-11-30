@@ -1,3 +1,6 @@
+
+
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
@@ -8,14 +11,14 @@ import './Customers_Table.css';
 const RepairsTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store table data
+  const [loading, setLoading] = useState(true); // State for loading indicator
 
   const columns = React.useMemo(
     () => [
       {
         Header: 'Customer Name',
-        accessor: 'supplier_id',
+        accessor: 'customer_name',
       },
-        
       {
         Header: 'Print Name',
         accessor: 'print_name',
@@ -26,7 +29,7 @@ const RepairsTable = () => {
       },
       {
         Header: 'Pincode',
-        accessor: 'pincode',
+        accessor: 'pin_code',
       },
       {
         Header: 'State',
@@ -61,7 +64,7 @@ const RepairsTable = () => {
         accessor: 'bank_account_no',
       },
       {
-        Header: 'Bank Name ',
+        Header: 'Bank Name',
         accessor: 'bank_name',
       },
       {
@@ -84,17 +87,79 @@ const RepairsTable = () => {
         Header: 'PAN Card',
         accessor: 'pan_card',
       },
-     
       {
         Header: 'Action',
-       
-          
+        Cell: ({ row }) => (
+          <div>
+            <button
+              className="edit-btn"
+              onClick={() => handleEdit(row.original)}
+            >
+              <FaEdit />
+            </button>
+            <button
+              className="delete-btn"
+              onClick={() => handleDelete(row.original.id)}
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ),
       },
-      
     ],
     []
   );
 
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          'http://localhost:5000/get/supplier-and-customer'
+        );
+        const result = await response.json();
+        setData(result);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleEdit = (customer) => {
+    // Navigate to the edit page with customer data
+    navigate(`/edit-customer/${customer.id}`);
+  };
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this customer?'
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/delete/supplier-and-customer/${id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (response.ok) {
+        setData((prevData) => prevData.filter((item) => item.id !== id));
+        alert('Customer deleted successfully.');
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to delete customer: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      alert('An error occurred while trying to delete the customer.');
+    }
+  };
 
   const handleCreate = () => {
     navigate('/customermaster'); // Navigate to the /customers page
@@ -111,10 +176,15 @@ const RepairsTable = () => {
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} />
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <DataTable columns={columns} data={data} />
+        )}
       </div>
     </div>
   );
 };
 
 export default RepairsTable;
+
