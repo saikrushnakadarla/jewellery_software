@@ -16,9 +16,13 @@
 .navbar-brand {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #0056b3;
+    color: #a36e29;
     margin-bottom: 5px;
     margin-right: 5%;
+  }
+
+  .navbar-brand:hover{
+    color: #a36e29;
   }
   
 /* Logo styles */
@@ -55,7 +59,7 @@
 }
   
 .navbar-links a:hover, .navbar-links span:hover {
-    color: #0056b3;
+    color: #a36e29;
 }
   
 /* Dropdown styling */
@@ -87,13 +91,14 @@
 }
   
 .navbar-dropdown-content a:hover {
-    background-color: #0056b3;
+    background-color: #a36e29;
     color: #fff;
 }
   
 /* Show the dropdown when hovering over the Services link */
 .navbar-dropdown:hover .navbar-dropdown-content {
     display: block;
+    
 }
   
 /* Buttons */
@@ -173,7 +178,7 @@
 .navbar-brand {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #0056b3;
+    color: #a36e29;
     z-index: 1001; /* Ensures visibility */
     position: relative;
     display: block;
@@ -269,7 +274,7 @@
     .navbar-brand {
         font-size: 1.5rem;
         font-weight: bold;
-        color: #0056b3;
+        color: #a36e29;
         z-index: 1001; /* Ensures it stays above other elements */
         position: relative; /* Keeps its layout intact */
         display: block; /* Ensure visibility */
