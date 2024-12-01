@@ -18,7 +18,7 @@
   .sales-form {
     display: flex;
     gap: 10px;
-    margin-top: -20px;
+    margin-top: -40px; 
   }
   
   .sales-form-left {
@@ -27,6 +27,20 @@
   
   .sales-form-right {
     flex: 0 0 50%; /* 20% width */
+  }
+
+  .sales-form2 {
+    display: flex;
+    gap: 10px;
+    
+  }
+
+  .sales-form-third {
+    flex: 0 0 60%; /* 80% width */
+  }
+
+  .sales-form-fourth {
+    flex: 0 0 40%; /* 80% width */
   }
   
   .sales-form-section {

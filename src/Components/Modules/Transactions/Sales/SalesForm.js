@@ -5,8 +5,6 @@ import { Container, Row, Col, Button, Table } from "react-bootstrap";
 
 const RepairForm = () => {
   const [metal, setMetal] = useState("");
-  const [type, setType] = useState("");
-  const [purity, setPurity] = useState("");
 
   return (
     <div className="main-container">
@@ -211,129 +209,171 @@ const RepairForm = () => {
           </Col>
         </div>
       </form>
+      <form className="sales-form2">
+        <div className="sales-form-third">
+          <Col className="sales-form-section">
+            <Row >
+            <h4 className="mb-3">Old</h4>
+            <Col xs={12} md={3}>
+                <InputField
+                label="Category"
+                type="select"
+                value={metal}
+                onChange={(e) => setMetal(e.target.value)}
+                options={[
+                    { value: "GOLD", label: "Gold" },
+                    { value: "SILVER", label: "Silver" },
+                    { value: "PLATINUM", label: "Platinum" },
+                ]}
+                />
+            </Col>
+            <Col xs={12} md={4}>
+                <InputField label="Item" />
+            </Col>
+            <Col xs={12} md={3}>
+                <InputField label="Dust" />
+            </Col>
+            <Col xs={12} md={2}>
+                <InputField
+                label="Purity"
+                type="select"
+                value={metal}
+                onChange={(e) => setMetal(e.target.value)}
+                options={[
+                    { value: "916HM", label: "916HM" },
+                    { value: "22k", label: "22k" },
+                    { value: "18k", label: "18k" },
+                ]}
+                />
+            </Col>
+            <Col xs={12} md={2}>
+                <InputField label="Touch %" />
+            </Col>
+            <Col xs={12} md={3}>
+                <InputField
+                label="Remark"
+                type="select"
+                value={metal}
+                onChange={(e) => setMetal(e.target.value)}
+                options={[
+                    { value: "916HM", label: "916HM" },
+                    { value: "22k", label: "22k" },
+                    { value: "18k", label: "18k" },
+                ]}
+                />
+            </Col>
+            <Col xs={12} md={3}>
+                <InputField label="Rate" />
+            </Col>
+            <Col xs={12} md={2}>
+                <InputField
+                label="HSN"
+                type="select"
+                value={metal}
+                onChange={(e) => setMetal(e.target.value)}
+                options={[
+                    { value: "916HM", label: "916HM" },
+                    { value: "22k", label: "22k" },
+                    { value: "18k", label: "18k" },
+                ]}
+                />
+            </Col>
+            <Col xs={12} md={2}>
+                <InputField label="Amount" />
+            </Col>
+            <Col xs={12} md={2}>
+                <InputField
+                label="Stone"
+                type="select"
+                value={metal}
+                onChange={(e) => setMetal(e.target.value)}
+                options={[
+                    { value: "916HM", label: "916HM" },
+                    { value: "22k", label: "22k" },
+                    { value: "18k", label: "18k" },
+                ]}
+                />
+            </Col>
+            <Col xs={12} md={1}>
+                <InputField label="PCs" />
+            </Col>
+            <Col xs={12} md={1}>
+                <InputField label="CT" />
+            </Col>
+            <Col xs={12} md={2}>
+                <InputField label="R" />
+            </Col>
+            <Col xs={12} md={2}>
+                <InputField label="S.Amt" />
+            </Col>
+            <Col xs={12} md={1}>
+                <div className="form-check">
+                <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="cashCheckbox"
+                    value="cash"
+                />
+                <label className="form-check-label" htmlFor="cashCheckbox">
+                    Cash
+                </label>
+                </div>
+                <div className="form-check">
+                <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id="hallMarkCheckbox"
+                    value="hallmark"
+                />
+                <label className="form-check-label" htmlFor="hallMarkCheckbox">
+                    HallMark
+                </label>
+                </div>
+            </Col>
+            </Row>
+            </Col>
+        </div>
+        <div className="sales-form-fourth"> 
+          <Col className="sales-form-section">
+          <Row>
+          <h4 className="mb-3">Payment Details</h4>
+         
+            <Col xs={12} md={4}>
+                <InputField label="Walkin" />
+            </Col>
+            
+            
+            <Col xs={12} md={4}>
+                <InputField label="Cash" />
+            </Col>
+            <Col xs={12} md={4}>
+                <InputField label="Card" />
+            </Col>
+            <Col xs={12} md={4}>
+                <InputField label="Amt" />
+            </Col>
+            <Col xs={12} md={4}>
+                <InputField label="Chq#" />
+            </Col>
+            <Col xs={12} md={4}>
+                <InputField label="Amt" />
+            </Col>
+            <Col xs={12} md={4}>
+                <InputField label="Online " />
+            </Col>
+            <Col xs={12} md={4}>
+                <InputField label="Amt" />
+            </Col>
+            <Col xs={12} md={4}>
+            <Button type="submit" variant="primary">Save</Button>
+            </Col>
+                        
+            </Row>    
+          </Col>
+        </div>
+        
+      </form>
 
-
-
-        {/* Extra Charges */}
-        <Row className="sales-form-section">
-  <h4 className="mb-3">Old</h4>
-  <Col xs={12} md={2}>
-    <InputField
-      label="Category"
-      type="select"
-      value={metal}
-      onChange={(e) => setMetal(e.target.value)}
-      options={[
-        { value: "GOLD", label: "Gold" },
-        { value: "SILVER", label: "Silver" },
-        { value: "PLATINUM", label: "Platinum" },
-      ]}
-    />
-  </Col>
-  <Col xs={12} md={2}>
-    <InputField label="Item" />
-  </Col>
-  <Col xs={12} md={1}>
-    <InputField label="Dust" />
-  </Col>
-  <Col xs={12} md={2}>
-    <InputField
-      label="Purity"
-      type="select"
-      value={metal}
-      onChange={(e) => setMetal(e.target.value)}
-      options={[
-        { value: "916HM", label: "916HM" },
-        { value: "22k", label: "22k" },
-        { value: "18k", label: "18k" },
-      ]}
-    />
-  </Col>
-  <Col xs={12} md={1}>
-    <InputField label="Touch %" />
-  </Col>
-  <Col xs={12} md={2}>
-    <InputField
-      label="Remark"
-      type="select"
-      value={metal}
-      onChange={(e) => setMetal(e.target.value)}
-      options={[
-        { value: "916HM", label: "916HM" },
-        { value: "22k", label: "22k" },
-        { value: "18k", label: "18k" },
-      ]}
-    />
-  </Col>
-  <Col xs={12} md={2}>
-    <InputField label="Rate" />
-  </Col>
-  <Col xs={12} md={2}>
-    <InputField
-      label="HSN"
-      type="select"
-      value={metal}
-      onChange={(e) => setMetal(e.target.value)}
-      options={[
-        { value: "916HM", label: "916HM" },
-        { value: "22k", label: "22k" },
-        { value: "18k", label: "18k" },
-      ]}
-    />
-  </Col>
-  <Col xs={12} md={2}>
-    <InputField label="Amount" />
-  </Col>
-  <Col xs={12} md={2}>
-    <InputField
-      label="Stone"
-      type="select"
-      value={metal}
-      onChange={(e) => setMetal(e.target.value)}
-      options={[
-        { value: "916HM", label: "916HM" },
-        { value: "22k", label: "22k" },
-        { value: "18k", label: "18k" },
-      ]}
-    />
-  </Col>
-  <Col xs={12} md={1}>
-    <InputField label="PCs" />
-  </Col>
-  <Col xs={12} md={1}>
-    <InputField label="CT" />
-  </Col>
-  <Col xs={12} md={1}>
-    <InputField label="R" />
-  </Col>
-  <Col xs={12} md={2}>
-    <InputField label="S.Amt" />
-  </Col>
-  <Col xs={12} md={1}>
-    <div className="form-check">
-      <input
-        className="form-check-input"
-        type="checkbox"
-        id="cashCheckbox"
-        value="cash"
-      />
-      <label className="form-check-label" htmlFor="cashCheckbox">
-        Cash
-      </label>
-    </div>
-    <div className="form-check">
-      <input
-        className="form-check-input"
-        type="checkbox"
-        id="hallMarkCheckbox"
-        value="hallmark"
-      />
-      <label className="form-check-label" htmlFor="hallMarkCheckbox">
-        Hall Mark
-      </label>
-    </div>
-  </Col>
-</Row>
 
 <Row className="sales-form-section">
 <Table bordered hover responsive>
