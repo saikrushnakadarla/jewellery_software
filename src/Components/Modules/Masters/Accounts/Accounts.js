@@ -90,7 +90,7 @@ const RepairForm = () => {
             <InputField label="Contact Person" />
             </Col>
             <Col xs={12} md={3}>
-            <InputField label="Email" />
+            <InputField label="Email" type="email"/>
             </Col>
             <Col xs={12} md={2}>
             <InputField label="Birthday On" type="date"/>

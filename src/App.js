@@ -29,7 +29,9 @@ import URDPurchaseReport from './Components/Modules/Reports/URDPurchaseReport/UR
 import Payments from './Components/Modules/Transactions/Payments/Payments';
 import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTable';
 import Accounts from './Components/Modules/Masters/Accounts/Accounts';
-import AccountsTable from './Components/Modules/Masters/Accounts/AccountsTable'
+import AccountsTable from './Components/Modules/Masters/Accounts/AccountsTable';
+import Sales from './Components/Modules/Transactions/Sales/SalesForm';
+
 
 function App() {
   const location = useLocation();
@@ -69,7 +71,7 @@ function App() {
         <Route path="/paymentstable" element={<PaymentsTable />} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/accountstable" element={<AccountsTable />} />
-
+        <Route path="/sales" element={<Sales />} />
       </Routes>
     </>
   );
