@@ -13,12 +13,10 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-
-
 .repair-form {
   display: flex;
   gap: 10px;
-  margin-top: -20px;
+  margin-top: -40px;
 }
 
 .repair-form-left {
@@ -27,6 +25,13 @@
 
 .repair-form-right {
   flex: 0 0 20%; /* 20% width */
+}
+
+
+.repair-form2 {
+  display: flex;
+  gap: 10px;
+  
 }
 
 .form-section {
@@ -71,6 +76,33 @@ label {
   flex-wrap: wrap;
 }
 
+.image-upload-container {
+  text-align: center;
+}
+
+.upload-button {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.upload-button:hover {
+  background-color: #0056b3;
+}
+
+.image-preview {
+  margin-top: 10px;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 200px;
+  margin-top: 10px;
+}
 
 
 @media (max-width: 768px) {

@@ -7,6 +7,18 @@ const RepairForm = () => {
   const [metal, setMetal] = useState("");
   const [type, setType] = useState("");
   const [purity, setPurity] = useState("");
+  const [image, setImage] = useState(null); // State to store the uploaded image
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result); // Set the image as the source
+      };
+      reader.readAsDataURL(file); // Read the file as a data URL
+    }
+  };
 
   return (
     <div className="main-container">
@@ -26,14 +38,7 @@ const RepairForm = () => {
             </Col>
             <Col xs={12} md={4}>
               <InputField label="Email:" type="email" />
-            </Col>
-            
-              
-              
-              {/* <InputField label="Phone:" /> */}
-              
-            </Row>
-            <Row >
+            </Col>   
             <Col xs={12} md={4}>
             <InputField label="Address1:" />
             </Col>
@@ -43,8 +48,6 @@ const RepairForm = () => {
             <Col xs={12} md={4}>
             <InputField label="Address3:" />
             </Col>
-            </Row>
-            <Row >
             <Col xs={12} md={2}>
             <InputField label="Staff:" />
             </Col>
@@ -93,9 +96,11 @@ const RepairForm = () => {
         </div>
       </form>
 
-      {/* Repair Item Details */}
-      <Row className="form-section">
+      <form className="repair-form2">      
+        <div className="repair-form-left">
+        <Col className="form-section">
           <h4>Repair Item Details</h4>
+          <Row>
           <Col xs={12} md={2}>
                   
               <InputField
@@ -109,13 +114,13 @@ const RepairForm = () => {
               ]}
             />
            </Col>
-            <Col xs={12} md={3}>
+            <Col xs={12} md={4}>
             <InputField label="Item:" placeholder="Item Name" />
             </Col>
             <Col xs={12} md={3}>
             <InputField label="Tag No:" />
             </Col>
-            <Col xs={12} md={2}>
+            <Col xs={12} md={3}>
             <InputField label="Description:" placeholder="Description" />
             </Col>
             <Col xs={12} md={2}>
@@ -131,13 +136,38 @@ const RepairForm = () => {
               ]}
             />
             </Col>
-            
-            
-            
-           
-          
-          
-        </Row>
+            </Row>
+        </Col>
+        </div>
+        <div className="repair-form-right">
+        <Col className="form-section">
+        <h4>Upload Image</h4>
+              <Row>
+                <Col xs={12} md={4}>
+                  <div className="image-upload-container">
+                    <label htmlFor="image-upload" className="upload-button">
+                      Upload
+                    </label>
+                    <input
+                      type="file"
+                      id="image-upload"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{ display: "none" }}
+                    />  
+                    {image && (
+                      <div className="image-preview">
+                        <img src={image} alt="Uploaded" className="img-thumbnail" />
+                      </div>
+                    )}
+                  </div>
+                </Col>
+              </Row>
+        </Col>
+        </div>
+        </form>
+
+      
 
         {/* Extra Charges */}
         <Row className="form-section">
