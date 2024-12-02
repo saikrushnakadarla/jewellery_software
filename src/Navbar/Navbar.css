@@ -25,9 +25,16 @@
     color: #a36e29;
   }
 
-  .dropdown-arrow {
-    font-size: 0.8rem;
-    margin-left: 0.5rem;
+  .dropdown-arrow-icon {
+    margin-left: 8px;
+    font-size: 14px;
+    transition: transform 0.3s ease;
+  }
+  
+  .navbar-dropdown-title {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
   }
   
 /* Logo styles */
