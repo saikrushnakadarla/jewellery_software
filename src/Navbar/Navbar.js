@@ -53,7 +53,10 @@ function Navbar() {
           onMouseLeave={() => toggleDropdown('masters')}
         >
           <span className="navbar-dropdown-title">
-            MASTERS <span className="dropdown-arrow">▼</span>
+            MASTERS{' '}
+            <span className="dropdown-arrow">
+              {mastersDropdownOpen ? '▲' : '▼'}
+            </span>
           </span>
           {mastersDropdownOpen && (
             <div className="navbar-dropdown-content">
@@ -73,7 +76,10 @@ function Navbar() {
           onMouseLeave={() => toggleDropdown('transactions')}
         >
           <span className="navbar-dropdown-title">
-            TRANSACTIONS <span className="dropdown-arrow">▼</span>
+            TRANSACTIONS{' '}
+            <span className="dropdown-arrow">
+              {transactionsDropdownOpen ? '▲' : '▼'}
+            </span>
           </span>
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
@@ -96,7 +102,10 @@ function Navbar() {
           onMouseLeave={() => toggleDropdown('reports')}
         >
           <span className="navbar-dropdown-title">
-            REPORTS <span className="dropdown-arrow">▼</span>
+            REPORTS{' '}
+            <span className="dropdown-arrow">
+              {reportsDropdownOpen ? '▲' : '▼'}
+            </span>
           </span>
           {reportsDropdownOpen && (
             <div className="navbar-dropdown-content">
@@ -119,7 +128,10 @@ function Navbar() {
           onMouseLeave={() => toggleDropdown('utility')}
         >
           <span className="navbar-dropdown-title">
-            UTILITY/SETTINGS <span className="dropdown-arrow">▼</span>
+            UTILITY/SETTINGS{' '}
+            <span className="dropdown-arrow">
+              {utilityDropdownOpen ? '▲' : '▼'}
+            </span>
           </span>
           {utilityDropdownOpen && (
             <div className="navbar-dropdown-content">
