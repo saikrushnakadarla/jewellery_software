@@ -12,7 +12,7 @@ const ItemMasterTable = () => {
     () => [
       {
         Header: 'Product Name:',
-        accessor: 'product_name',
+        accessor: 'productname',
       },
         
       {
@@ -21,19 +21,19 @@ const ItemMasterTable = () => {
       },
       {
         Header: 'Item Prefix',
-        accessor: 'item_prefix',
+        accessor: 'itemprefix',
       },
       {
         Header: 'Short Name:',
-        accessor: 'short_name',
+        accessor: 'shortname',
       },
       {
         Header: 'Sale Account Head',
-        accessor: 'sale_account_head',
+        accessor: 'saleaccounthead',
       },
       {
         Header: 'Purchase Account Head:',
-        accessor: 'purchase_account_head',
+        accessor: 'purchaseaccounthead',
       },
       {
         Header: 'Status',
@@ -41,23 +41,23 @@ const ItemMasterTable = () => {
       },
       {
         Header: 'Tax Slab',
-        accessor: 'tax_slab',
+        accessor: 'taxslab',
       },
       {
         Header: 'HSN Code',
-        accessor: 'hsn_code',
+        accessor: 'hsncode',
       },
       {
         Header: 'OP.Qty:',
-        accessor: 'op.qty',
+        accessor: 'opqty',
       },
       {
         Header: 'OP.Value:',
-        accessor: 'pP.value',
+        accessor: 'opvalue',
       },
       {
         Header: 'OP.Weight:',
-        accessor: 'op.weight',
+        accessor: 'opweight',
       },
       {
         Header: 'Purity',
@@ -65,7 +65,7 @@ const ItemMasterTable = () => {
       },
       {
         Header: 'HUID No:',
-        accessor: 'huid_no',
+        accessor: 'huidno',
       },
       {
         Header: 'Pricing',
@@ -73,7 +73,7 @@ const ItemMasterTable = () => {
       },
       {
         Header: 'P ID:',
-        accessor: 'p_id',
+        accessor: 'pid',
       },
       // {
       //   Header: 'Product Name:',
@@ -89,23 +89,23 @@ const ItemMasterTable = () => {
       },
       {
         Header: 'Gross Weight:',
-        accessor: 'gross_weight',
+        accessor: 'grossweight',
       },
       {
         Header: 'Stones Weight:',
-        accessor: 'stones_weight',
+        accessor: 'stonesweight',
       },
       {
         Header: 'Stones Price:',
-        accessor: 'stones_price',
+        accessor: 'stonesprice',
       },
       {
         Header: 'Weight WW:',
-        accessor: 'weight_ww',
+        accessor: 'weightww',
       },
       {
         Header: 'Wastage On:',
-        accessor: 'wastage_on',
+        accessor: 'wastageon',
       },
       {
         Header: 'Wastage:',
@@ -113,7 +113,7 @@ const ItemMasterTable = () => {
       },
       {
         Header: '%:',
-        accessor: '%:',
+        accessor: 'percentage',
       },
       {
         Header: 'Weight:',
@@ -121,7 +121,7 @@ const ItemMasterTable = () => {
       },
       {
         Header: 'Making Chaeges::',
-        accessor: 'making_chaeges',
+        accessor: 'makingchaeges',
       },
       {
         Header: 'Cal:',
@@ -133,7 +133,7 @@ const ItemMasterTable = () => {
       },
       {
         Header: 'Stack Point:',
-        accessor: 'stack_point',
+        accessor: 'stackpoint',
       },
       {
         Header: 'Action',

@@ -1,29 +1,92 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./StockEntry.css";
 import InputField from "../../Masters/ItemMaster/Inputfield";
 import StoneDetailsModal from "./StoneDetailsModal";
 
 const StockEntry = () => {
-  const [metal, setMetal] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const handleOpenModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
-  return (
-    <div style={{ paddingTop: "79px" }}>
-         <div className="container mt-4">
+    const [metal, setMetal] = useState("");
+    const [productname, setproductname] = useState("");
+    const [showModal, setShowModal] = useState(false);
+
+    const handleCloseModal = () => setShowModal(false);
+    const [formData, setFormData] = useState({
+        productname: "",
+        categories: "Jewelry",
+        itemprefix: "",
+        shortname: "",
+        saleaccounthead: "",
+        purchaseaccounthead: "",
+        status: true,
+        taxslab: 18.0,
+        hsncode: "",
+        opqty: 0,
+        opvalue: 0.0,
+        opweight: 0.0,
+        purity: "",
+        huidno: "",
+        pricing: "",
+        pid: "",
+        category: "Gold",
+        prefix: "",
+        pcode: "",
+        grossweight: "",
+        stonesweight: "",
+        stonesprice: "",
+        weightww: "",
+        wastageon: "",
+        wastage: "",
+        percentage: "",
+        weight: "",
+        makingcharges: "",
+        cal: "",
+        tax: "",
+        stackpoint: "",
+    });
+
+
+
+    const handleOpenModal = () => setShowModal(true);
+
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          // Make sure formData is correctly passed and contains all required fields
+          console.log("Form data before submission:", formData);
+          const response = await axios.post("http://localhost:5000/addStockEntry", formData);
+          console.log("Data saved successfully:", response.data);
+          alert("Product added successfully!");
+        } catch (error) {
+          console.error("Error saving data:", error);
+          alert("Failed to add product. Please try again.");
+        }
+      };
+    return (
+        <div style={{ paddingTop: "79px" }}>
+            <div className="container mt-4">
                 <div className="row mt-3">
                     <div className="col-12">
-                        <form className="p-4 border rounded form-container-stockentry">
+                        <form className="p-4 border rounded form-container-stockentry" onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <h4>Stock Entry</h4>
                                 <div className="row g-3">
                                     <div className="col-md-4">
                                         <InputField
                                             label="Pricing:"
+                                            name="pricing"
                                             type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
+                                            value={formData.pricing}
+                                            onChange={handleChange}
                                             options={[
                                                 { value: "By Weight", label: "By Weight" },
                                                 { value: "By fixed", label: "By fixed" },
@@ -34,8 +97,9 @@ const StockEntry = () => {
                                         <InputField
                                             label="P ID:"
                                             type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
+                                            value={formData.pid}
+                                            onChange={handleChange}
+                                            name="pid"
                                             options={[
                                                 { value: "PR001", label: "PR001" },
                                                 { value: "PR002", label: "PR002" },
@@ -44,10 +108,11 @@ const StockEntry = () => {
                                     </div>
                                     <div className="col-md-4">
                                         <InputField
-                                            label="Product Name:"
+                                            label="productname:"
                                             type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
+                                            value={formData.productname}
+                                            onChange={handleChange}
+                                            name="productname"
                                             options={[
                                                 { value: "product1", label: "product1" },
                                                 { value: "product2", label: "product2" },
@@ -64,8 +129,9 @@ const StockEntry = () => {
                                         <InputField
                                             label="purity:"
                                             type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
+                                            value={formData.purity}
+                                            onChange={handleChange}
+                                            name="purity"
                                             options={[
                                                 { value: "916HM", label: "916HM" },
                                                 { value: "22K", label: "22k" },
@@ -74,32 +140,53 @@ const StockEntry = () => {
                                         />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="PCode/BarCode:" />
+                                        <InputField label="PCode/BarCode:"
+                                            value={formData.pcode}
+                                            onChange={handleChange}
+                                            name="pcode"
+                                        />
                                     </div>
                                 </div>
                             </div>
                             <div className="mb-4">
                                 <div className="row g-3">
                                     <div className="col-md-2">
-                                        <InputField label="Gross Weight:" />
+                                        <InputField label="Gross Weight:"
+                                            value={formData.grossweight}
+                                            onChange={handleChange}
+                                            name="grossweight"
+                                        />
                                     </div>
                                     <div className="col-md-2">
-                                        <InputField label="Stones Weight:" />
+                                        <InputField label="Stones Weight:"
+                                            value={formData.stonesweight}
+                                            onChange={handleChange}
+                                            name="stonesweight"
+                                        />
                                     </div>
                                     <div className="col-md-2">
                                         <button
                                             type="button" style={{ backgroundColor: 'blue' }}
                                             className="btn btn-primary w-100"
                                             onClick={handleOpenModal}
+
                                         >
                                             Stone Details
                                         </button>
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Stones Price:" />
+                                        <InputField label="Stones Price:"
+                                            value={formData.stonesprice}
+                                            onChange={handleChange}
+                                            name="stonesprice"
+                                        />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Weight WW:" />
+                                        <InputField label="Weight WW:"
+                                            value={formData.weightww}
+                                            onChange={handleChange}
+                                            name="weightww"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -109,8 +196,9 @@ const StockEntry = () => {
                                         <InputField
                                             label="Wastage On:"
                                             type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
+                                            value={formData.wastageon}
+                                            onChange={handleChange}
+                                            name="wastageon"
                                             options={[{ value: "Weight", label: "Weight" }]}
                                         />
                                     </div>
@@ -118,36 +206,57 @@ const StockEntry = () => {
                                         <InputField label="Wastage:" value="NaN" readOnly />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="%:" />
+                                        <InputField label="%:"
+                                            value={formData.percentage}
+                                            onChange={handleChange}
+                                            name="percentage"
+                                        />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Weight:" />
+                                        <InputField label="Weight:"
+                                            value={formData.weight}
+                                            onChange={handleChange}
+                                            name="weight"
+                                        />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Making Charges:" />
+                                        <InputField label="Making Charges:"
+                                            value={formData.makingcharges}
+                                            onChange={handleChange}
+                                            name="makingcharges"
+                                        />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Cal:" />
+                                        <InputField label="Cal:"
+                                            value={formData.cal}
+                                            onChange={handleChange}
+                                            name="cal"
+                                        />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Tax:" />
+                                        <InputField label="Tax:"
+                                            value={formData.tax}
+                                            onChange={handleChange}
+                                            name="tax"
+                                        />
                                     </div>
                                     <div className="col-md-3">
                                         <div className="input-group">
                                             <InputField
                                                 label="Stock Point:"
                                                 type="select"
-                                                value={metal}
-                                                onChange={(e) => setMetal(e.target.value)}
+                                                value={formData.stackpoint}
+                                                onChange={handleChange}
+                                                name="tax"
                                                 options={[
                                                     { value: "Main Store", label: "Main Store" },
                                                     { value: "Secondary Store", label: "Secondary Store" },
                                                 ]}
                                             />
-                                            <button 
-                                                type="button" style={{height: '39px'}}
+                                            <button
+                                                type="button" style={{ height: '39px' }}
                                                 className="btn btn-outline-secondary"
-                                                // onClick={() => setShowStockPointModal(true)}
+                                            // onClick={() => setShowStockPointModal(true)}
                                             >
                                                 +
                                             </button>
@@ -155,16 +264,18 @@ const StockEntry = () => {
                                     </div>
                                 </div>
                             </div>
+                            <button type="submit" className="cus-submit-btn">Save</button>
                         </form>
                     </div>
                 </div>
+
             </div>
-      <StoneDetailsModal
-        showModal={showModal}
-        handleCloseModal={handleCloseModal}
-      />
-    </div>
-  );
+            <StoneDetailsModal
+                showModal={showModal}
+                handleCloseModal={handleCloseModal}
+            />
+        </div>
+    );
 };
 
 export default StockEntry;

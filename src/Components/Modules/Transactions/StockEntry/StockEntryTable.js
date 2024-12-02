@@ -1,142 +1,90 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
+import DataTable from '../../../Pages/InputField/TableLayout'; // Import your reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 import './StockEntryTable.css';
 
 const StockEntryTable = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState([]); // State to store table data
+  const [data, setData] = useState([]); // State to store fetched table data
 
+  // Define the columns for the table
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'Pricing',
-        accessor: 'pricing',
-      },
-        
-      {
-        Header: 'P ID',
-        accessor: 'p_id',
-      },
-      {
-        Header: 'Product Name:',
-        accessor: 'product_name',
-      },
-      {
-        Header: 'Category',
-        accessor: 'category',
-      },
-      {
-        Header: 'PCode',
-        accessor: 'pcode',
-      },
-      {
-        Header: 'Gross Weight:',
-        accessor: 'gross_weight',
-      },
-      {
-        Header: 'Stones Weight:',
-        accessor: 'stones_weight',
-      },
-      {
-        Header: 'Stones Price:',
-        accessor: 'stones_price',
-      },
-      {
-        Header: 'Weight WW',
-        accessor: 'weight_ww',
-      },
-      {
-        Header: 'Wastage On',
-        accessor: 'wastage_on',
-      },
-      {
-        Header: 'Wastage',
-        accessor: 'wastage',
-      },
-      {
-        Header: '%',
-        accessor: '%',
-      },
-      {
-        Header: 'Weight',
-        accessor: 'weight',
-      },
-      {
-        Header: 'Making Charges',
-        accessor: 'making_charges',
-      },
-      {
-        Header: 'Cal',
-        accessor: 'cal',
-      },
-      {
-        Header: 'Tax',
-        accessor: 'tax',
-      },
-      {
-        Header: 'Stock Point',
-        accessor: 'stock_point',
-      },
-     
+      { Header: 'Pricing', accessor: 'pricing' },
+      { Header: 'Product ID', accessor: 'pid' },
+      { Header: 'Product Name', accessor: 'productname' },
+      { Header: 'Category', accessor: 'category' },
+      { Header: 'Prefix', accessor: 'prefix' },
+      { Header: 'Purity', accessor: 'purity' },
+      { Header: 'Product Code', accessor: 'pcode' },
+      { Header: 'Gross Weight', accessor: 'grossweight' },
+      { Header: 'Stones Weight', accessor: 'stonesweight' },
+      { Header: 'Stones Price', accessor: 'stonesprice' },
+      { Header: 'Weight (WW)', accessor: 'weightww' },
+      { Header: 'Wastage On', accessor: 'wastageon' },
+      { Header: 'Wastage', accessor: 'wastage' },
+      { Header: 'Percentage', accessor: 'percentage' },
+      { Header: 'Weight', accessor: 'weight' },
+      { Header: 'Making Charges', accessor: 'makingchaeges' },
+      { Header: 'Cal', accessor: 'cal' },
+      { Header: 'Tax', accessor: 'tax' },
+      { Header: 'Stock Point', accessor: 'stackpoint' },
       {
         Header: 'Action',
         Cell: ({ row }) => (
-            <div className="d-flex align-items-center">
-              <button
-                className="action-button edit-button"
-                onClick={() => navigate(`/estimates/${row.original.product_id}`)}
-              >
-                <FaEdit />
-              </button>
-              <button
-                className="action-button delete-button"
-                onClick={() => handleDelete(row.original.product_id)}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          ),
-          
+          <div className="d-flex align-items-center">
+            <button
+              className="action-button edit-button"
+              onClick={() => navigate(`/edit-stock/${row.original.pid}`)}
+            >
+              <FaEdit />
+            </button>
+            <button
+              className="action-button delete-button"
+              onClick={() => handleDelete(row.original.pid)}
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ),
       },
-      
     ],
-    []
+    [navigate]
   );
 
+  // Fetch data from the API
   useEffect(() => {
-    fetch('http://localhost:4000/get-estimates')
+    fetch('http://localhost:5000/getStockEntries')
       .then((response) => response.json())
       .then((data) => {
-        setData(data); // Set the fetched data to state
+        setData(data); // Set fetched data to state
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching stock entries:', error);
       });
   }, []);
 
-  const handleDelete = (product_id) => {
-    if (window.confirm('Are you sure you want to delete this estimate?')) {
-      fetch(`http://localhost:4000/delete-estimate/${product_id}`, {
-        method: 'DELETE',
-      })
+  // Handle delete action
+  const handleDelete = (pid) => {
+    if (window.confirm('Are you sure you want to delete this stock entry?')) {
+      fetch(`http://localhost:5000/deleteStockEntry/${pid}`, { method: 'DELETE' })
         .then((response) => response.json())
-        .then((data) => {
-          console.log(data.message); // Success message
-          // Refresh data after deletion
-          setData((prevData) => prevData.filter((item) => item.product_id !== product_id));
+        .then((result) => {
+          alert(result.message);
+          setData((prevData) => prevData.filter((item) => item.pid !== pid)); // Update state
         })
         .catch((error) => {
-          console.error('Error deleting record:', error);
-          alert('Failed to delete estimate. Please try again.');
+          console.error('Error deleting stock entry:', error);
+          alert('Failed to delete stock entry. Please try again.');
         });
     }
   };
 
+  // Navigate to the create stock entry page
   const handleCreate = () => {
-    navigate('/stockEntry'); // Navigate to the /estimates page
+    navigate('/stockEntry');
   };
 
   return (
@@ -150,6 +98,7 @@ const StockEntryTable = () => {
             </Button>
           </Col>
         </Row>
+        {/* DataTable component */}
         <DataTable columns={columns} data={data} />
       </div>
     </div>

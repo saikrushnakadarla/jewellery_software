@@ -4,202 +4,393 @@ import "./ItemMaster.css";
 import InputField from "./Inputfield";
 import StoneDetailsModal from "../../Transactions/StockEntry/StoneDetailsModal";
 
-const handleAddStockPoint = () => {
-    alert("Add new stock point functionality!");
-    // Implement the functionality to add a new stock point here
-};
 const FormWithTable = () => {
-    const [metal, setMetal] = useState("");
-    // const [type, setType] = useState("");
-    // const [purity, setPurity] = useState("");
+    const [formData, setFormData] = useState({
+        productname: "",
+        rbarcode: "",
+        categories: "",
+        itemprefix: "",
+        shortname: "",
+        saleaccounthead: "",
+        purchaseaccounthead: "",
+        status: true,
+        taxslab: "",
+        hsncode: "",
+        opqty: 0,
+        opvalue: 0,
+        opweight: 0,
+        purity: "",
+        huidno: "",
+        pricing: "",
+        pid: 0,
+        category: "Gold",
+        prefix: "R",
+        pcode: "",
+        grossweight: 0,
+        stonesweight: 0,
+        stonesprice: 0,
+        weightww: 0,
+        wastageon: "",
+        wastage: 0,
+        percentage: 0,
+        weight: 0,
+        makingcharges: 0,
+        cal: 0,
+        tax: 0,
+        stackpoint: "",
+    });
+
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    // Handle form submission
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await fetch("http://localhost:5000/add-product", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                alert("Product added successfully!");
+                setFormData({
+                    productname: "",
+                    rbarcode: "",
+                    categories: "",
+                    itemprefix: "",
+                    shortname: "",
+                    saleaccounthead: "",
+                    purchaseaccounthead: "",
+                    status: true,
+                    taxslab: "",
+                    hsncode: "",
+                    opqty: 0,
+                    opvalue: 0,
+                    opweight: 0,
+                    purity: "",
+                    huidno: "",
+                    pricing: "",
+                    pid: 0,
+                    category: "Gold",
+                    prefix: "R",
+                    pcode: "",
+                    grossweight: 0,
+                    stonesweight: 0,
+                    stonesprice: 0,
+                    weightww: 0,
+                    wastageon: "",
+                    wastage: 0,
+                    percentage: 0,
+                    weight: 0,
+                    makingcharges: 0,
+                    cal: 0,
+                    tax: 0,
+                    stackpoint: "",
+                });
+            } else {
+                const errorData = await response.json();
+                alert(`Error: ${errorData.message}`);
+            }
+        } catch (error) {
+            alert("Error submitting the form. Please try again.");
+            console.error(error);
+        }
+    };
 
     return (
-        <div style={{ paddingTop: '90px' }}>
+        <div style={{ paddingTop: "90px" }}>
             <div className="container mt-4">
-                <div className="row">
+            <div className="row">
                     <div className="col-12">
                         {/* Tab Navigation */}
                     </div>
                 </div>
-                <div className="row mt-3 itemmaster-form-container" >
+                <div className="row mt-3 itemmaster-form-container">
                     <div className="col-12" style={{ marginTop: '-55px' }}>
                         {/* Form Section */}
-                        <form className="itemmaster-main-container">
-                            <div className="form-container">
-                                <h4 style={{ marginBottom: '15px', }}>Product Details</h4>
-                                <div className="form-row">
-                                    <InputField label="Product Name:" />
-                                    <InputField label="Rbarcode:" />
-                                    <InputField
-                                        label="Categories:"
-                                        type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
-                                        options={[
-                                            { value: "GOLD", label: "Gold" },
-                                            { value: "SILVER", label: "Silver" },
-                                        ]}
-                                    />
-                                    <InputField label="Item Prefix:" />
-                                </div>
-                                <div className="form-row" style={{ marginBottom: '-20px' }}>
-                                    <InputField label="Short Name:" />
-                                    <InputField
-                                        label="Sale Account Head:"
-                                        type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
-                                        options={[
-                                            { value: "Sales", label: "Sales" },
-
-                                        ]}
-                                    />
-                                    <InputField
-                                        label="Purchase Account Head:"
-                                        type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
-                                        options={[
-                                            { value: "Purchase", label: "Purchase" },
-
-                                        ]}
-                                    />
-                                    <InputField
-                                        label="Status:"
-                                        type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
-                                        options={[
-                                            { value: "ACTIVE", label: "ACTIVE" },
-                                            { value: "INACTIVE", label: "INACTIVE" },
-                                        ]}
-                                    />
-                                    <InputField
+                <form className="itemmaster-main-container" onSubmit={handleSubmit}>
+                    <div className="form-container">
+                        <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
+                        <div className="form-row">
+                            <InputField
+                                label="Product Name:"
+                                name="productname"
+                                value={formData.productname}
+                                onChange={handleChange}
+                            />
+                            <InputField
+                                label="Rbarcode:"
+                                name="rbarcode"
+                                value={formData.rbarcode}
+                                onChange={handleChange}
+                            />
+                            <InputField
+                                label="Categories:"
+                                name="categories"
+                                type="select"
+                                value={formData.categories}
+                                onChange={handleChange}
+                                options={[
+                                    { value: "Jewelry", label: "Jewelry" },
+                                    { value: "Gold", label: "Gold" },
+                                    { value: "Silver", label: "Silver" },
+                                ]}
+                            />
+                            <InputField
+                                label="Item Prefix:"
+                                name="itemprefix"
+                                value={formData.itemprefix}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="form-row">
+                            <InputField
+                                label="Short Name:"
+                                name="shortname"
+                                value={formData.shortname}
+                                onChange={handleChange}
+                            />
+                            <InputField
+                                label="Sale Account Head:"
+                                name="saleaccounthead"
+                                type="select"
+                                value={formData.saleaccounthead}
+                                onChange={handleChange}
+                                options={[
+                                    { value: "Sales", label: "Sales" },
+                                    { value: "Purchase", label: "Purchase" },
+                                ]}
+                            />
+                            <InputField
+                                label="Purchase Account Head:"
+                                name="purchaseaccounthead"
+                                type="select"
+                                value={formData.purchaseaccounthead}
+                                onChange={handleChange}
+                                options={[
+                                    { value: "Purchase", label: "Purchase" },
+                                    { value: "Sales", label: "Sales" },
+                                ]}
+                            />
+                            <InputField
+                                label="Status:"
+                                name="status"
+                                type="select"
+                                value={formData.status}
+                                onChange={handleChange}
+                                options={[
+                                    { value: "ACTIVE", label: "ACTIVE" },
+                                    { value: "INACTIVE", label: "INACTIVE" },
+                                ]}
+                            />
+                               <InputField
                                         label="Tax Slab:"
+                                        name="taxslab"
                                         type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
+                                        value={formData.taxslab}
+                                        onChange={handleChange}
                                         options={[
                                             { value: "ACTIVE", label: "ACTIVE" },
                                             { value: "INACTIVE", label: "INACTIVE" },
                                         ]}
                                     />
-                                    <InputField label="HSN Code:" />
-                                </div>
-                            </div>
-                            <div className="form-container" style={{ marginTop: '15px' }}>
-                                <div className="main-tags-row" style={{ marginBottom: '15px', }}>
+                                    <InputField label="HSN Code:" 
+                                     name="hsncode"
+                                     value={formData.hsncode}
+                                     onChange={handleChange}
+                                    />
+                        </div>
+                    </div>
+                    <div className="form-container" style={{ marginTop: '15px' }}>
+                                <div className="main-tags-row" style={{ marginBottom: '15px' }}>
                                     <input type="checkbox" id="main-tags" style={{ width: '35px' }} />
                                     <label htmlFor="main-tags">
                                         <h4>Maintain Tags</h4>
                                     </label>
                                 </div>
                                 <div className="form-row" style={{ marginBottom: '-20px' }}>
-                                    <InputField label="OP.Qty:" />
-                                    <InputField label="OP.Value:" />
-                                    <InputField label="OP.Weight:" />
+                                    <InputField label="OP.Qty:" 
+                                      name="opqty"
+                                      value={formData.opqty}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField label="OP.Value:"
+                                      name="opvalue"
+                                      value={formData.opvalue}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField label="OP.Weight:" 
+                                      name="opweight"
+                                      value={formData.opweight}
+                                      onChange={handleChange}
+                                    />
                                     <InputField
                                         label="Purity:"
                                         type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
+                                        name="purity"
+                                        value={formData.purity}
+                                        onChange={handleChange}
                                         options={[
                                             { value: "91.6HM", label: "91.6HM" },
-                                            { value: "22K", label: "22k" },
-                                            { value: "18K", label: "18k" },
+                                            { value: "22K", label: "22K" },
+                                            { value: "18K", label: "18K" },
                                         ]}
                                     />
-                                    <InputField label="HUID No:" />
+                                    <InputField label="HUID No:"
+                                      name="huidno"
+                                      value={formData.huidno}
+                                      onChange={handleChange}
+                                    />
                                 </div>
                             </div>
                             <div className="form-container" style={{ marginTop: '15px' }}>
-                                <h4 style={{ marginBottom: '15px', }}>Stock Entry</h4>
+                                <h4 style={{ marginBottom: '15px' }}>Stock Entry</h4>
                                 <div className="form-row">
                                     <InputField
                                         label="Pricing:"
                                         type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
+                                        name="pricing"
+                                        value={formData.pricing}
+                                        onChange={handleChange}
                                         options={[
                                             { value: "By Weight", label: "By Weight" },
-                                            { value: "By fixed", label: "By fixed" },
+                                            { value: "By Fixed", label: "By Fixed" },
                                         ]}
                                     />
-                                    <InputField label="P ID:" />
-                                    <InputField label="Product Name:" />
+                                    <InputField label="P ID:"
+                                      name="pid"
+                                      value={formData.pid}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField label="Product Name:" 
+                                      name="productname"
+                                      value={formData.productname}
+                                      onChange={handleChange}
+                                    />
                                     <InputField label="Category:" value="Gold" readOnly />
-
                                     <InputField label="Prefix:" value="Gold" readOnly />
                                     <InputField
-                                        label="purity:"
+                                        label="Purity:"
                                         type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
+                                        name="purity"
+                                        value={formData.purity}
+                                        onChange={handleChange}
                                         options={[
                                             { value: "916HM", label: "916HM" },
-                                            { value: "22K", label: "22k" },
-                                            { value: "18K", label: "18k" },
+                                            { value: "22K", label: "22K" },
+                                            { value: "18K", label: "18K" },
                                         ]}
                                     />
-                                  
-                                    <InputField label="PCode/BarCode:" />
+                                    <InputField label="PCode/BarCode:" 
+                                      name="pcode"
+                                      value={formData.pcode}
+                                      onChange={handleChange}
+                                    />
                                 </div>
                                 <div className="form-row">
-                                    <InputField label="Gross Weight:" />
-                                    <InputField label="Stones Weight:" />
+                                    <InputField label="Gross Weight:" 
+                                      name="grossweight"
+                                      value={formData.grossweight}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField label="Stones Weight:"
+                                      name="stonesweight"
+                                      value={formData.stonesweight}
+                                      onChange={handleChange}
+                                    />
                                     <button
-                                        type="button" style={{ backgroundColor: 'blue' }}
+                                        type="button"
+                                        style={{ backgroundColor: 'blue' }}
                                         className="stone-details-btn"
                                         onClick={handleOpenModal}
                                     >
                                         Stone Details
                                     </button>
-                                    <InputField label="Stones Price:" />
-                                    {/* <button className="stone-details-btn">Stone Details</button> */}
-                                    <InputField label="Weight WW:" />
+                                    <InputField label="Stones Price:" 
+                                      name="stonesprice"
+                                      value={formData.stonesprice}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField label="Weight WW:" 
+                                      name="weightww"
+                                      value={formData.weightww}
+                                      onChange={handleChange}
+                                    />
                                 </div>
-
                                 <div className="form-row" style={{ marginBottom: '-20px' }}>
                                     <InputField
                                         label="Wastage On:"
                                         type="select"
-                                        value={metal}
-                                        onChange={(e) => setMetal(e.target.value)}
+                                        name="wastageon"
+                                     value={formData.wastageon}
+                                     onChange={handleChange}
                                         options={[
                                             { value: "Weight", label: "Weight" },
-
                                         ]}
                                     />
                                     <InputField label="Wastage:" value="NaN" readOnly />
-                                    <InputField label="%:" />
-                                    <InputField label="Weight:" />
-                                    <InputField label="Making Chaeges:" />
-                                    <InputField label="Cal:" />
-                                    <InputField label="Tax:" />
-                                    
-                                        <InputField
-                                            label="Stock Point:"
-                                            type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
-                                            options={[
-                                                { value: "Main Store", label: "Main Store" },
-                                                { value: "Secondary Store", label: "Secondary Store" },
-                                            ]}
-                                        />
+                                    <InputField label="%:"
+                                      name="percentage"
+                                      value={formData.percentage}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField label="Weight:" 
+                                      name="weight"
+                                      value={formData.weight}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField label="Making Charges:"
+                                      name="makingcharges"
+                                      value={formData.makingcharges}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField label="Cal:" 
+                                      name="cal"
+                                      value={formData.cal}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField label="Tax:"
+                                      name="tax"
+                                      value={formData.tax}
+                                      onChange={handleChange}
+                                    />
+                                    <InputField
+                                        label="Stock Point:"
+                                        type="select"
+                                        name="stackpoint"
+                                        value={formData.stackpoint}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Main Store", label: "Main Store" },
+                                            { value: "Secondary Store", label: "Secondary Store" },
+                                        ]}
+                                    />
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                    {/* Add additional fields similarly */}
+                    <button type="submit" className="btn btn-primary">
+                        Submit
+                    </button>
+                </form>
+                <StoneDetailsModal
+                    showModal={showModal}
+                    handleCloseModal={handleCloseModal}
+                />
+                 </div>
                 </div>
-            </div>           
-             <StoneDetailsModal
-        showModal={showModal}
-        handleCloseModal={handleCloseModal}
-      />
+            </div>
         </div>
     );
 };

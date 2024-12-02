@@ -1,21 +1,23 @@
 import React from "react";
 import "./Inputfield.css";
 
-const InputField = ({
-  label,
-  type = "text",
-  placeholder,
-  value,
-  readOnly,
-  onChange,
-  options = [],
+const Inputfield = ({ 
+  label, 
+  type = "text", 
+  placeholder, 
+  value, 
+  readOnly, 
+  onChange, 
+  name, 
+  options = [] 
 }) => {
   return (
     <div className="input-field-container">
-      <label className="input-label1">{label}</label>
+      <label className="input-label">{label}</label>
       {type === "select" ? (
         <select
-          className="styled-input1"
+          className="styled-input"
+          name={name}
           value={value}
           onChange={onChange}
           disabled={readOnly}
@@ -33,6 +35,7 @@ const InputField = ({
         <input
           className="styled-input"
           type={type}
+          name={name}
           placeholder={placeholder}
           value={value}
           readOnly={readOnly}
@@ -43,4 +46,4 @@ const InputField = ({
   );
 };
 
-export default InputField;
+export default Inputfield;
