@@ -73,7 +73,7 @@
 //         <div className="form-row">
 //           <div className="">
 //             <div className="form-row">
-             
+
 //               <InputField
 //                 label="State:"
 //                 type="select"
@@ -98,7 +98,7 @@
 //               <InputField label="Mobile:" />
 //             </div>
 //           </div>
-         
+
 //         </div>
 
 //         {/* Row 3 */}
@@ -106,17 +106,17 @@
 
 //           <div className="">
 //             <div className="form-row">
-              
+
 //               <InputField label="Email:" />
 //               <InputField label="Birthday :" type="date"/>
 //               <InputField label="Anniversary :" type="date"/>
 //               <InputField label="Bank Account No :" />
 //             </div>
 //           </div>
-        
+
 //         </div>
 
-      
+
 //         <div className="form-row">
 
 //           <div className="">
@@ -127,7 +127,7 @@
 //               <InputField label="GSTIN :" />
 //             </div>
 //           </div>
-         
+
 //         </div>
 
 //         {/* Row 6 */}
@@ -135,13 +135,13 @@
 
 //           <div className="">
 //             <div className="form-row">
-              
+
 //               <InputField label="Aadhar Card :" />
 //               <InputField label="PAN Card :" />
 //             </div>
 //           </div>
 
-         
+
 //         </div>
 
 
@@ -187,6 +187,9 @@
 import React, { useState } from 'react';
 // import './Customer_Master.css';
 import InputField from '../../../Pages/InputField/InputField';
+import './Supplier_Master.css'
+import { useNavigate } from 'react-router-dom';
+
 
 function Customer_Master() {
   const [formData, setFormData] = useState({
@@ -223,7 +226,7 @@ function Customer_Master() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...formData,account_group: 'Supplier', tcsApplicable };
+    const payload = { ...formData, account_group: 'Supplier', tcsApplicable };
 
     try {
       const response = await fetch('http://localhost:5000/supplier-and-customer', {
@@ -247,6 +250,11 @@ function Customer_Master() {
       alert('An error occurred. Please try again.');
     }
   };
+  const navigate = useNavigate();
+  const handleBack = () => {
+    navigate('/suppliertable'); 
+  };
+
 
   return (
     <div className="main-container">
@@ -267,7 +275,7 @@ function Customer_Master() {
               value={formData.print_name}
               onChange={handleChange}
             />
-           <InputField
+            <InputField
               label="Account Group:"
               name="account_group"
               value="Supplier"
@@ -401,9 +409,27 @@ function Customer_Master() {
               TCS Applicable
             </label>
           </div>
+          {/* <div>
+         
           <button type="submit" className="cus-submit-btn">
             Save
           </button>
+          </div> */}
+          <div className="sup-button-container">
+            <button
+              type="button"
+              className="cus-back-btn"
+              onClick={handleBack}
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              className="cus-submit-btn"
+            >
+              Save
+            </button>
+          </div>
         </form>
       </div>
     </div>

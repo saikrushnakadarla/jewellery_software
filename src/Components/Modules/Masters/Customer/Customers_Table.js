@@ -96,13 +96,13 @@ const RepairsTable = () => {
         Cell: ({ row }) => (
           <div>
             <button
-              className="edit-btn"
+              className="edit-btn edit-button"
               onClick={() => handleEdit(row.original)}
             >
               <FaEdit />
             </button>
             <button
-              className="delete-btn"
+              className="delete-btn delete-button"
               onClick={() => handleDelete(row.original.id)}
             >
               <FaTrash />
@@ -114,7 +114,7 @@ const RepairsTable = () => {
     []
   );
 
-  // Fetch data from the API
+  // Fetch data and filter where account_group = "supplier"
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -122,7 +122,13 @@ const RepairsTable = () => {
           'http://localhost:5000/get/supplier-and-customer'
         );
         const result = await response.json();
-        setData(result);
+
+        // Filter only suppliers
+        const suppliers = result.filter(
+          (item) => item.account_group && item.account_group.toLowerCase() === 'customer'
+        );
+
+        setData(suppliers);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -132,6 +138,7 @@ const RepairsTable = () => {
 
     fetchData();
   }, []);
+
 
   const handleEdit = (customer) => {
     // Navigate to the edit page with customer data

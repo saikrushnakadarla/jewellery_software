@@ -1,0 +1,35 @@
+/* Container to align the buttons */
+.sup-button-container {
+        display: flex;
+        gap: 10px; /* Space between buttons */
+        margin-top: 20px;
+      }
+      
+      /* Styling for the "Back" button */
+      .cus-back-btn {
+        background-color: #007bff; /* Red color for back button */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+      
+    
+      
+      /* Styling for the "Save" button */
+      .cus-submit-btn {
+        background-color: #007bff; /* Green color for save button */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+      
+     
+      

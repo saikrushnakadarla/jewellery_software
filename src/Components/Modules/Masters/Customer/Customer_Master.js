@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './Customer_Master.css';
 import InputField from '../../../Pages/InputField/InputField';
+import { useNavigate } from 'react-router-dom';
+
 
 function Customer_Master() {
   const [formData, setFormData] = useState({
@@ -60,6 +62,10 @@ function Customer_Master() {
       console.error('Error:', error);
       alert('An error occurred. Please try again.');
     }
+  };
+  const navigate = useNavigate();
+  const handleBack = () => {
+    navigate('/customerstable'); 
   };
 
   return (
@@ -215,9 +221,24 @@ function Customer_Master() {
               TCS Applicable
             </label>
           </div>
-          <button type="submit" className="cus-submit-btn">
+          {/* <button type="submit" className="cus-submit-btn">
             Save
-          </button>
+          </button> */}
+           <div className="sup-button-container">
+            <button
+              type="button"
+              className="cus-back-btn"
+              onClick={handleBack}
+            >
+              Back
+            </button>
+            <button
+              type="submit"
+              className="cus-submit-btn"
+            >
+              Save
+            </button>
+          </div>
         </form>
       </div>
     </div>
