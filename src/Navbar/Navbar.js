@@ -4,11 +4,8 @@ import './Navbar.css';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [offlineDropdownOpen, setOfflineDropdownOpen] = useState(false);
-  const [onlineDropdownOpen, setOnlineDropdownOpen] = useState(false);
-  const [brandsDropdownOpen, setBrandsDropdownOpen] = useState(false);
-  const [transactionsDropdownOpen, setTransactionsDropdownOpen] = useState(false);
   const [mastersDropdownOpen, setMastersDropdownOpen] = useState(false);
+  const [transactionsDropdownOpen, setTransactionsDropdownOpen] = useState(false);
   const [reportsDropdownOpen, setReportsDropdownOpen] = useState(false);
   const [utilityDropdownOpen, setUtilityDropdownOpen] = useState(false);
 
@@ -21,14 +18,14 @@ function Navbar() {
       case 'masters':
         setMastersDropdownOpen(!mastersDropdownOpen);
         break;
+      case 'transactions':
+        setTransactionsDropdownOpen(!transactionsDropdownOpen);
+        break;
       case 'reports':
         setReportsDropdownOpen(!reportsDropdownOpen);
         break;
       case 'utility':
         setUtilityDropdownOpen(!utilityDropdownOpen);
-        break;
-      case 'transactions':
-        setTransactionsDropdownOpen(!transactionsDropdownOpen);
         break;
       default:
         break;
@@ -37,7 +34,7 @@ function Navbar() {
 
   return (
     <header className="navbar-header">
-       <div className="navbar-brand">Jewellery App</div>
+      <div className="navbar-brand">Jewellery App</div>
 
       <div
         className={`navbar-hamburger ${isOpen ? 'open' : ''}`}
@@ -55,7 +52,9 @@ function Navbar() {
           onMouseEnter={() => toggleDropdown('masters')}
           onMouseLeave={() => toggleDropdown('masters')}
         >
-          <span>MASTERS</span>
+          <span className="navbar-dropdown-title">
+            MASTERS <span className="dropdown-arrow">▼</span>
+          </span>
           {mastersDropdownOpen && (
             <div className="navbar-dropdown-content">
               <Link to="/customerstable">Customer_Master</Link>
@@ -73,7 +72,9 @@ function Navbar() {
           onMouseEnter={() => toggleDropdown('transactions')}
           onMouseLeave={() => toggleDropdown('transactions')}
         >
-          <span>TRANSACTIONS</span>
+          <span className="navbar-dropdown-title">
+            TRANSACTIONS <span className="dropdown-arrow">▼</span>
+          </span>
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
               <Link to="/sales">Sales</Link>
@@ -94,7 +95,9 @@ function Navbar() {
           onMouseEnter={() => toggleDropdown('reports')}
           onMouseLeave={() => toggleDropdown('reports')}
         >
-          <span>REPORTS</span>
+          <span className="navbar-dropdown-title">
+            REPORTS <span className="dropdown-arrow">▼</span>
+          </span>
           {reportsDropdownOpen && (
             <div className="navbar-dropdown-content">
               <Link to="/salesReport">Sales Report</Link>
@@ -115,11 +118,12 @@ function Navbar() {
           onMouseEnter={() => toggleDropdown('utility')}
           onMouseLeave={() => toggleDropdown('utility')}
         >
-          <span>UTILITY/SETTINGS</span>
+          <span className="navbar-dropdown-title">
+            UTILITY/SETTINGS <span className="dropdown-arrow">▼</span>
+          </span>
           {utilityDropdownOpen && (
             <div className="navbar-dropdown-content">
               <Link to="/invoice">Invoice</Link>
-              
             </div>
           )}
         </div>
