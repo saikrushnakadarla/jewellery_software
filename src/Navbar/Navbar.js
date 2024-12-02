@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import './Navbar.css';
 
 function Navbar() {
@@ -54,9 +56,10 @@ function Navbar() {
         >
           <span className="navbar-dropdown-title">
             MASTERS{' '}
-            <span className="dropdown-arrow">
-              {mastersDropdownOpen ? '▲' : '▼'}
-            </span>
+            <FontAwesomeIcon
+              icon={mastersDropdownOpen ? faChevronUp : faChevronDown}
+              className="dropdown-arrow-icon"
+            />
           </span>
           {mastersDropdownOpen && (
             <div className="navbar-dropdown-content">
@@ -77,9 +80,10 @@ function Navbar() {
         >
           <span className="navbar-dropdown-title">
             TRANSACTIONS{' '}
-            <span className="dropdown-arrow">
-              {transactionsDropdownOpen ? '▲' : '▼'}
-            </span>
+            <FontAwesomeIcon
+              icon={transactionsDropdownOpen ? faChevronUp : faChevronDown}
+              className="dropdown-arrow-icon"
+            />
           </span>
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
@@ -103,9 +107,10 @@ function Navbar() {
         >
           <span className="navbar-dropdown-title">
             REPORTS{' '}
-            <span className="dropdown-arrow">
-              {reportsDropdownOpen ? '▲' : '▼'}
-            </span>
+            <FontAwesomeIcon
+              icon={reportsDropdownOpen ? faChevronUp : faChevronDown}
+              className="dropdown-arrow-icon"
+            />
           </span>
           {reportsDropdownOpen && (
             <div className="navbar-dropdown-content">
@@ -129,9 +134,10 @@ function Navbar() {
         >
           <span className="navbar-dropdown-title">
             UTILITY/SETTINGS{' '}
-            <span className="dropdown-arrow">
-              {utilityDropdownOpen ? '▲' : '▼'}
-            </span>
+            <FontAwesomeIcon
+              icon={utilityDropdownOpen ? faChevronUp : faChevronDown}
+              className="dropdown-arrow-icon"
+            />
           </span>
           {utilityDropdownOpen && (
             <div className="navbar-dropdown-content">
