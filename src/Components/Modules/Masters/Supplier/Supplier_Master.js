@@ -193,7 +193,7 @@ import { useNavigate } from 'react-router-dom';
 
 function Customer_Master() {
   const [formData, setFormData] = useState({
-    customer_name: '',
+    account_name: '',
     print_name: '',
     account_group: '',
     pin_code: '',
@@ -265,8 +265,8 @@ function Customer_Master() {
           <div className="form-row">
             <InputField
               label="Customer Name:"
-              name="customer_name"
-              value={formData.customer_name}
+              name="account_name"
+              value={formData.account_name}
               onChange={handleChange}
             />
             <InputField

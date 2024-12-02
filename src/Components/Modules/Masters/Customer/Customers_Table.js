@@ -21,7 +21,7 @@ const RepairsTable = () => {
       },
       {
         Header: 'Customer Name',
-        accessor: 'customer_name',
+        accessor: 'account_name',
       },
       {
         Header: 'Print Name',
