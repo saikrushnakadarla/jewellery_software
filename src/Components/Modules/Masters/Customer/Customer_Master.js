@@ -37,7 +37,7 @@ function Customer_Master() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...formData, tcsApplicable };
+    const payload = { ...formData,account_group: 'Customer', tcsApplicable };
 
     try {
       const response = await fetch('http://localhost:5000/supplier-and-customer', {
@@ -81,18 +81,11 @@ function Customer_Master() {
               value={formData.print_name}
               onChange={handleChange}
             />
-            <InputField
+           <InputField
               label="Account Group:"
               name="account_group"
-              type="select"
-              value={formData.account_group}
-              onChange={handleChange}
-              options={[
-                { value: 'Individual', label: 'Individual' },
-                { value: 'Corporate', label: 'Corporate' },
-                { value: 'Vendor', label: 'Vendor' },
-                { value: 'Customer', label: 'Customer' },
-              ]}
+              value="Customer"
+              readOnly
             />
             <InputField
               label="Pincode:"

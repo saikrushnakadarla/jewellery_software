@@ -223,7 +223,7 @@ function Customer_Master() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...formData, tcsApplicable };
+    const payload = { ...formData,account_group: 'Supplier', tcsApplicable };
 
     try {
       const response = await fetch('http://localhost:5000/supplier-and-customer', {
@@ -237,7 +237,7 @@ function Customer_Master() {
       if (response.ok) {
         const result = await response.json();
         console.log('Data saved successfully:', result);
-        alert('Customer data saved successfully!');
+        alert('Supplier data saved successfully!');
       } else {
         console.error('Failed to save data:', response.statusText);
         alert('Failed to save data. Please try again.');
@@ -267,18 +267,11 @@ function Customer_Master() {
               value={formData.print_name}
               onChange={handleChange}
             />
-            <InputField
+           <InputField
               label="Account Group:"
               name="account_group"
-              type="select"
-              value={formData.account_group}
-              onChange={handleChange}
-              options={[
-                { value: 'Individual', label: 'Individual' },
-                { value: 'Corporate', label: 'Corporate' },
-                { value: 'Vendor', label: 'Vendor' },
-                { value: 'Customer', label: 'Customer' },
-              ]}
+              value="Supplier"
+              readOnly
             />
             <InputField
               label="Pincode:"
