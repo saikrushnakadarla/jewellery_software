@@ -24,6 +24,11 @@
   .navbar-brand:hover{
     color: #a36e29;
   }
+
+  .dropdown-arrow {
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+  }
   
 /* Logo styles */
 .navbar-logo {
