@@ -135,10 +135,10 @@ const RepairsTable = () => {
   fetchData();
 }, []);
 
-  const handleEdit = (customer) => {
-    // Navigate to the edit page with customer data
-    navigate(`/edit-customer/${customer.id}`);
-  };
+const handleEdit = (customer) => {
+  navigate(`/suppliereditform/:id`); // Navigate to the edit form with the customer ID
+};
+
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
@@ -170,6 +170,7 @@ const RepairsTable = () => {
   const handleCreate = () => {
     navigate('/suppliermaster'); // Navigate to the /customers page
   };
+  
 
   return (
     <div className="main-container">

@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import './Customer_Master.css';
+import React, { useState, useEffect } from 'react';
 import InputField from '../../../Pages/InputField/InputField';
-import { useNavigate } from 'react-router-dom';
+import './Supplier_Master.css';
+import { useNavigate, useParams } from 'react-router-dom';
 
-
-function Customer_Master() {
+function EditCustomer_Master() {
+  const { id } = useParams();  // Assuming you're passing the customer ID as a URL parameter
   const [formData, setFormData] = useState({
     customer_name: '',
     print_name: '',
-    account_group: '',
+    account_group: 'Supplier',
     pin_code: '',
     state: '',
     state_code: '',
@@ -28,6 +28,33 @@ function Customer_Master() {
 
   const [tcsApplicable, setTcsApplicable] = useState(false);
 
+  const navigate = useNavigate();
+
+  // Fetch existing customer data to populate the form
+  useEffect(() => {
+    const fetchCustomerData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/supplier-and-customer/${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setFormData({
+            ...data,
+            account_group: 'Supplier',  // Ensure account group is always set to 'Supplier'
+          });
+          setTcsApplicable(data.tcsApplicable || false); // Set TCS if available
+        } else {
+          console.error('Failed to fetch data');
+          alert('Failed to load data. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while fetching customer data.');
+      }
+    };
+
+    fetchCustomerData();
+  }, [id]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -39,11 +66,11 @@ function Customer_Master() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...formData,account_group: 'Customer', tcsApplicable };
+    const payload = { ...formData, tcsApplicable };
 
     try {
-      const response = await fetch('http://localhost:5000/supplier-and-customer', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:5000/supplier-and-customer/${id}`, {
+        method: 'PUT',  // Use PUT method to update data
         headers: {
           'Content-Type': 'application/json',
         },
@@ -52,26 +79,27 @@ function Customer_Master() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Data saved successfully:', result);
-        alert('Customer data saved successfully!');
+        console.log('Data updated successfully:', result);
+        alert('Supplier data updated successfully!');
+        navigate('/suppliertable');  // Redirect to the suppliers table after successful update
       } else {
-        console.error('Failed to save data:', response.statusText);
-        alert('Failed to save data. Please try again.');
+        console.error('Failed to update data:', response.statusText);
+        alert('Failed to update data. Please try again.');
       }
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred. Please try again.');
     }
   };
-  const navigate = useNavigate();
+
   const handleBack = () => {
-    navigate('/customerstable'); 
+    navigate('/suppliertable');  // Navigate back to the suppliers table
   };
 
   return (
     <div className="main-container">
       <div className="customer-master-container">
-        <h2>Customers</h2>
+        <h2>Edit Supplier</h2>
         <form className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
@@ -80,21 +108,17 @@ function Customer_Master() {
               name="customer_name"
               value={formData.customer_name}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="Print Name:"
               name="print_name"
               value={formData.print_name}
               onChange={handleChange}
-              required={true}
-
             />
-           <InputField
+            <InputField
               label="Account Group:"
               name="account_group"
-              value="Customer"
+              value={formData.account_group}
               readOnly
             />
             <InputField
@@ -102,8 +126,6 @@ function Customer_Master() {
               name="pin_code"
               value={formData.pin_code}
               onChange={handleChange}
-              required={true}
-
             />
           </div>
 
@@ -115,8 +137,6 @@ function Customer_Master() {
               type="select"
               value={formData.state}
               onChange={handleChange}
-              required={true}
-
               options={[
                 { value: 'Andhra Pradesh', label: 'Andhra Pradesh' },
                 { value: 'Bihar', label: 'Bihar' },
@@ -132,24 +152,18 @@ function Customer_Master() {
               name="state_code"
               value={formData.state_code}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="Phone:"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="Mobile:"
               name="mobile"
               value={formData.mobile}
               onChange={handleChange}
-              required={true}
-
             />
           </div>
 
@@ -160,8 +174,6 @@ function Customer_Master() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="Birthday:"
@@ -169,8 +181,6 @@ function Customer_Master() {
               type="date"
               value={formData.birthday}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="Anniversary:"
@@ -178,16 +188,12 @@ function Customer_Master() {
               type="date"
               value={formData.anniversary}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="Bank Account No:"
               name="bank_account_no"
               value={formData.bank_account_no}
               onChange={handleChange}
-              required={true}
-
             />
           </div>
           <div className="form-row">
@@ -196,32 +202,24 @@ function Customer_Master() {
               name="bank_name"
               value={formData.bank_name}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="IFSC Code:"
               name="ifsc_code"
               value={formData.ifsc_code}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="Branch:"
               name="branch"
               value={formData.branch}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="GSTIN:"
               name="gst_in"
               value={formData.gst_in}
               onChange={handleChange}
-              required={true}
-
             />
           </div>
           <div className="form-row">
@@ -230,16 +228,12 @@ function Customer_Master() {
               name="aadhar_card"
               value={formData.aadhar_card}
               onChange={handleChange}
-              required={true}
-
             />
             <InputField
               label="PAN Card:"
               name="pan_card"
               value={formData.pan_card}
               onChange={handleChange}
-              required={true}
-
             />
           </div>
           <div className="form-group">
@@ -255,10 +249,8 @@ function Customer_Master() {
               TCS Applicable
             </label>
           </div>
-          {/* <button type="submit" className="cus-submit-btn">
-            Save
-          </button> */}
-           <div className="sup-button-container">
+
+          <div className="sup-button-container">
             <button
               type="button"
               className="cus-back-btn"
@@ -279,4 +271,4 @@ function Customer_Master() {
   );
 }
 
-export default Customer_Master;
+export default EditCustomer_Master;

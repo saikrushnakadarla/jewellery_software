@@ -31,6 +31,8 @@ import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTa
 import Accounts from './Components/Modules/Masters/Accounts/Accounts';
 import AccountsTable from './Components/Modules/Masters/Accounts/AccountsTable';
 import Sales from './Components/Modules/Transactions/Sales/SalesForm';
+import SupplierEditForm from './Components/Modules/Masters/Supplier/Supplier_Edit_Form';
+
 
 
 function App() {
@@ -72,6 +74,7 @@ function App() {
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/accountstable" element={<AccountsTable />} />
         <Route path="/sales" element={<Sales />} />
+        <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/>
       </Routes>
     </>
   );
