@@ -79,14 +79,12 @@ function Navbar() {
           </span>
           {mastersDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/customerstable">Customer Master</Link>
-              <Link to="/suppliertable">Supplier Master</Link>
-              <Link to="/itemmastertable">Product</Link>
-              <Link to="/purity">Purity</Link>
-              <Link to="/metaltype">Metal Type</Link>
-              <Link to="/designmaster">Design Master</Link>
-              <Link to="/accountstable">Accounts</Link>
-=======
+              
+              
+              {/* <Link to="/metaltype">Metal Type</Link>
+              <Link to="/designmaster">Design Master</Link> */}
+             
+
               <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable')}>Customer_Master</Link>
               <Link to="/suppliertable" onClick={handleItemClick} className={isActive('/suppliertable')}>Supplier_Master</Link>
               <Link to="/itemmastertable" onClick={handleItemClick} className={isActive('/itemmastertable')}>Product</Link>
@@ -121,14 +119,7 @@ function Navbar() {
               <Link to="/repairstable" onClick={handleItemClick} className={isActive('/repairstable')}>Repairs</Link>
               <Link to="/urd_purchase" onClick={handleItemClick} className={isActive('/urd_purchase')}>URD Purchase</Link>
 
-              <Link to="/salestable">Sales</Link>
-              <Link to="/estimates">Estimate</Link>
-              <Link to="/stockEntryTable">Stock Entry</Link>
-              <Link to="/paymentstable">Payments</Link>
-              <Link to="/receiptstable">Receipts</Link>
-              <Link to="/purchasetable">Purchase</Link>
-              <Link to="/repairstable">Repairs</Link>
-              <Link to="/urdpurchasetable">URD Purchase</Link>
+             
 
             </div>
           )}

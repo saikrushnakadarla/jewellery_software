@@ -128,8 +128,8 @@ const RepairsTable = () => {
       <div className="accounts-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Payments</h3>
-            <Button variant="success" onClick={handleCreate}>
+            <h3>Accounts</h3>
+            <Button className='create_but' variant="success" onClick={handleCreate}>
               + Create
             </Button>
           </Col>
