@@ -13,6 +13,12 @@
     margin-top: -10px;
 }
 
+.active {
+  background-color: #a36e29;
+  color: #fff;  /* Highlight text color */
+}
+
+
 .navbar-brand {
     font-size: 1.5rem;
     font-weight: bold;

@@ -35,8 +35,8 @@ import MetalType from './Components/Modules/Masters/MetalType/MetalType';
 import DesignMaster from './Components/Modules/Masters/DesignMaster/DesignMaster';
 import Purity from './Components/Modules/Masters/Purity/Purity';
 import SupplierEditForm from './Components/Modules/Masters/Supplier/Supplier_Edit_Form';
-
-
+import SalesTable from './Components/Modules/Transactions/Sales/SalesTable';
+import URDPurchasetable from './Components/Modules/Transactions/URDPurchase/URDPurchasetable';
 
 function App() {
   const location = useLocation();
@@ -81,6 +81,8 @@ function App() {
         <Route path="/purity" element={<Purity />}/>
         <Route path="/designmaster" element={<DesignMaster />}/>
         <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/>
+        <Route path="/salestable" element={<SalesTable />} />
+        <Route path="/urdpurchasetable" element={<URDPurchasetable />} />
       </Routes>
     </>
   );

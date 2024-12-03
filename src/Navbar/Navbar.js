@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import './Navbar.css';
@@ -10,6 +10,8 @@ function Navbar() {
   const [transactionsDropdownOpen, setTransactionsDropdownOpen] = useState(false);
   const [reportsDropdownOpen, setReportsDropdownOpen] = useState(false);
   const [utilityDropdownOpen, setUtilityDropdownOpen] = useState(false);
+
+  const location = useLocation();  // Get the current location from React Router
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -32,6 +34,20 @@ function Navbar() {
       default:
         break;
     }
+  };
+
+  const handleItemClick = () => {
+    // Close all dropdowns and collapse the hamburger menu
+    setMastersDropdownOpen(false);
+    setTransactionsDropdownOpen(false);
+    setReportsDropdownOpen(false);
+    setUtilityDropdownOpen(false);
+    setIsOpen(false);
+  };
+
+  // Function to check if the link is active based on the current location
+  const isActive = (path) => {
+    return location.pathname === path ? 'active' : '';  // Return 'active' if the path matches the current location
   };
 
   return (
@@ -70,6 +86,12 @@ function Navbar() {
               <Link to="/metaltype">Metal Type</Link>
               <Link to="/designmaster">Design Master</Link>
               <Link to="/accountstable">Accounts</Link>
+=======
+              <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable')}>Customer_Master</Link>
+              <Link to="/suppliertable" onClick={handleItemClick} className={isActive('/suppliertable')}>Supplier_Master</Link>
+              <Link to="/itemmastertable" onClick={handleItemClick} className={isActive('/itemmastertable')}>Product</Link>
+              <Link to="/purity" onClick={handleItemClick} className={isActive('/purity')}>Purity</Link>
+              <Link to="/accountstable" onClick={handleItemClick} className={isActive('/accountstable')}>Accounts</Link>
             </div>
           )}
         </div>
@@ -89,14 +111,25 @@ function Navbar() {
           </span>
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/sales">Sales</Link>
+
+              <Link to="/sales" onClick={handleItemClick} className={isActive('/sales')}>Sales</Link>
+              <Link to="/estimates" onClick={handleItemClick} className={isActive('/estimates')}>Estimate</Link>
+              <Link to="/stockEntryTable" onClick={handleItemClick} className={isActive('/stockEntryTable')}>Stock Entry</Link>
+              <Link to="/paymentstable" onClick={handleItemClick} className={isActive('/paymentstable')}>Payments</Link>
+              <Link to="/receiptstable" onClick={handleItemClick} className={isActive('/receiptstable')}>Receipts</Link>
+              <Link to="/purchasetable" onClick={handleItemClick} className={isActive('/purchasetable')}>Purchase</Link>
+              <Link to="/repairstable" onClick={handleItemClick} className={isActive('/repairstable')}>Repairs</Link>
+              <Link to="/urd_purchase" onClick={handleItemClick} className={isActive('/urd_purchase')}>URD Purchase</Link>
+
+              <Link to="/salestable">Sales</Link>
               <Link to="/estimates">Estimate</Link>
               <Link to="/stockEntryTable">Stock Entry</Link>
               <Link to="/paymentstable">Payments</Link>
               <Link to="/receiptstable">Receipts</Link>
               <Link to="/purchasetable">Purchase</Link>
               <Link to="/repairstable">Repairs</Link>
-              <Link to="/urd_purchase">URD Purchase</Link>
+              <Link to="/urdpurchasetable">URD Purchase</Link>
+
             </div>
           )}
         </div>
@@ -116,14 +149,14 @@ function Navbar() {
           </span>
           {reportsDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/salesReport">Sales Report</Link>
-              <Link to="/estimateReport">Estimate Report</Link>
-              <Link to="/purchaseReport">Purchase Report</Link>
-              <Link to="/repairsReport">Repairs Report</Link>
-              <Link to="/urdPurchaseReport">URDPurchase Report</Link>
-              <Link to="/stockReort">Stock Report</Link>
-              <Link to="/barcodeprinting">Barcode Printing Report</Link>
-              <Link to="/cashReport">Cash Report</Link>
+              <Link to="/salesReport" onClick={handleItemClick} className={isActive('/salesReport')}>Sales Report</Link>
+              <Link to="/estimateReport" onClick={handleItemClick} className={isActive('/estimateReport')}>Estimate Report</Link>
+              <Link to="/purchaseReport" onClick={handleItemClick} className={isActive('/purchaseReport')}>Purchase Report</Link>
+              <Link to="/repairsReport" onClick={handleItemClick} className={isActive('/repairsReport')}>Repairs Report</Link>
+              <Link to="/urdPurchaseReport" onClick={handleItemClick} className={isActive('/urdPurchaseReport')}>URDPurchase Report</Link>
+              <Link to="/stockReort" onClick={handleItemClick} className={isActive('/stockReort')}>Stock Report</Link>
+              <Link to="/barcodeprinting" onClick={handleItemClick} className={isActive('/barcodeprinting')}>Barcode Printing Report</Link>
+              <Link to="/cashReport" onClick={handleItemClick} className={isActive('/cashReport')}>Cash Report</Link>
             </div>
           )}
         </div>
@@ -143,7 +176,7 @@ function Navbar() {
           </span>
           {utilityDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/invoice">Invoice</Link>
+              <Link to="/invoice" onClick={handleItemClick} className={isActive('/invoice')}>Invoice</Link>
             </div>
           )}
         </div>
