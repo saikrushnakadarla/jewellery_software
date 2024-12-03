@@ -89,27 +89,27 @@ export default function DataTable({ columns, data }) {
 
       {/* Pagination Controls */}
       <div className="d-flex align-items-center justify-content-between mt-3">
-        <div>
-          <button
-            className="btn btn-sm btn-primary me-2"
-            onClick={() => previousPage()}
-            disabled={!canPreviousPage}
-          >
-            Previous
-          </button>
-          <button
-            className="btn btn-sm btn-primary"
-            onClick={() => nextPage()}
-            disabled={!canNextPage}
-          >
-            Next
-          </button>
-        </div>
         <div className="dataTable_pageInfo">
           Page{' '}
           <strong>
             {pageIndex + 1} of {pageOptions.length}
           </strong>
+        </div>
+        <div className='pagebuttons'>
+          <button
+            className="btn btn-sm btn-primary me-2 btn1"
+            onClick={() => previousPage()}
+            disabled={!canPreviousPage}
+          >
+            Prev
+          </button>
+          <button
+            className="btn btn-sm btn-primary btn1"
+            onClick={() => nextPage()}
+            disabled={!canNextPage}
+          >
+            Nex
+          </button>
         </div>
         <div>
           <select
