@@ -79,6 +79,14 @@ function Navbar() {
           </span>
           {mastersDropdownOpen && (
             <div className="navbar-dropdown-content">
+              <Link to="/customerstable">Customer Master</Link>
+              <Link to="/suppliertable">Supplier Master</Link>
+              <Link to="/itemmastertable">Product</Link>
+              <Link to="/purity">Purity</Link>
+              <Link to="/metaltype">Metal Type</Link>
+              <Link to="/designmaster">Design Master</Link>
+              <Link to="/accountstable">Accounts</Link>
+=======
               <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable')}>Customer_Master</Link>
               <Link to="/suppliertable" onClick={handleItemClick} className={isActive('/suppliertable')}>Supplier_Master</Link>
               <Link to="/itemmastertable" onClick={handleItemClick} className={isActive('/itemmastertable')}>Product</Link>
