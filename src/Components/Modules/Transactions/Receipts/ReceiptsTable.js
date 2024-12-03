@@ -15,14 +15,6 @@ const RepairsTable = () => {
         accessor: 'date', // Key from the data
       },
       {
-        Header: 'Mode',
-        accessor: 'mode',
-      },
-      {
-        Header: 'Cheque Number',
-        accessor: 'cheque_number',
-      },
-      {
         Header: 'Receipt No',
         accessor: 'receipt_no',
       },
@@ -30,6 +22,15 @@ const RepairsTable = () => {
         Header: 'Account Name',
         accessor: 'account_name',
       },
+      {
+        Header: 'Mode',
+        accessor: 'mode',
+      },
+      {
+        Header: 'Cheque Number',
+        accessor: 'cheque_number',
+      },
+     
       {
         Header: 'Total Amt',
         accessor: 'total_amt',

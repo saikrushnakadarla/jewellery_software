@@ -19,17 +19,18 @@ const RepairsTable = () => {
         accessor: 'mode',
       },
       {
-        Header: 'Cheque Number',
-        accessor: 'cheque_number',
-      },
-      {
-        Header: 'Receipt No',
-        accessor: 'receipt_no',
+        Header: 'Payment No',
+        accessor: 'payment',
       },
       {
         Header: 'Account Name',
         accessor: 'account_name',
       },
+      {
+        Header: 'Cheque Number',
+        accessor: 'cheque_number',
+      },
+     
       {
         Header: 'Total Amt',
         accessor: 'total_amt',

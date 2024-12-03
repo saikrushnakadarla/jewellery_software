@@ -166,9 +166,7 @@ const RepairForm = () => {
         </Col>
         </div>
         </form>
-
       
-
         {/* Extra Charges */}
         <Row className="form-section">
           <h4>Extra Charges</h4> 
@@ -189,8 +187,6 @@ const RepairForm = () => {
             </Col>
           </Row>
           
-       
-
         {/* Buttons */}
         <div className="form-buttons">
           <Button type="submit" variant="secondary">cancel</Button>

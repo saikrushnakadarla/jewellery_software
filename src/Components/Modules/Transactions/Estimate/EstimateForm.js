@@ -152,9 +152,7 @@ const RepairForm = () => {
             <Button variant="primary" type="submit" onClick={handleSubmit}>
               {product_id ? "Update" : "Print"}
             </Button>
-            <Button variant="secondary" type="button" onClick={() => navigate("/estimatetable")}>
-              Cancel
-            </Button>
+           
          </div>
       </Container>
     </div>
