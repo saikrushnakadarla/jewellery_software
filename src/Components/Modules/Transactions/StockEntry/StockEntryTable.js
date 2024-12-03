@@ -93,7 +93,7 @@ const StockEntryTable = () => {
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Stock Entry</h3>
-            <Button variant="success" onClick={handleCreate}>
+            <Button className='create_but' variant="success" onClick={handleCreate}>
               + Create
             </Button>
           </Col>
