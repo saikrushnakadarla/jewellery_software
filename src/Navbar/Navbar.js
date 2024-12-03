@@ -110,14 +110,14 @@ function Navbar() {
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
 
-              <Link to="/sales" onClick={handleItemClick} className={isActive('/sales')}>Sales</Link>
+              <Link to="/salestable" onClick={handleItemClick} className={isActive('/sales')}>Sales</Link>
               <Link to="/estimates" onClick={handleItemClick} className={isActive('/estimates')}>Estimate</Link>
               <Link to="/stockEntryTable" onClick={handleItemClick} className={isActive('/stockEntryTable')}>Stock Entry</Link>
               <Link to="/paymentstable" onClick={handleItemClick} className={isActive('/paymentstable')}>Payments</Link>
               <Link to="/receiptstable" onClick={handleItemClick} className={isActive('/receiptstable')}>Receipts</Link>
               <Link to="/purchasetable" onClick={handleItemClick} className={isActive('/purchasetable')}>Purchase</Link>
               <Link to="/repairstable" onClick={handleItemClick} className={isActive('/repairstable')}>Repairs</Link>
-              <Link to="/urd_purchase" onClick={handleItemClick} className={isActive('/urd_purchase')}>URD Purchase</Link>
+              <Link to="/urdpurchasetable" onClick={handleItemClick} className={isActive('/urd_purchase')}>URD Purchase</Link>
 
              
 
