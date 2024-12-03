@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import "./Repairs.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
+import { useParams, useNavigate } from "react-router-dom";
 
 const RepairForm = () => {
+  const navigate = useNavigate();
   const [metal, setMetal] = useState("");
   const [type, setType] = useState("");
   const [purity, setPurity] = useState("");
@@ -189,7 +191,7 @@ const RepairForm = () => {
           
         {/* Buttons */}
         <div className="form-buttons">
-          <Button type="submit" variant="secondary">cancel</Button>
+          <Button type="submit" className="cus-back-btn" variant="secondary" onClick={() => navigate("/repairstable")}>cancel</Button>
           <Button type="submit" variant="primary">Save</Button>
         </div>
       </Container>

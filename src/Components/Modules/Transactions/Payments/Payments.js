@@ -69,7 +69,7 @@ const RepairForm = () => {
 
         <div className="form-buttons">
           
-          <Button variant="secondary" type="button" onClick={() => navigate("/paymentstable")}>
+          <Button variant="secondary" className="cus-back-btn" type="button" onClick={() => navigate("/paymentstable")}>
               Cancel
             </Button>
             <Button type="submit" variant="primary">Save</Button>
