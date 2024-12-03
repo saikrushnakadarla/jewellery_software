@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./StockEntry.css";
 import InputField from "../../Masters/ItemMaster/Inputfield";
 import StoneDetailsModal from "./StoneDetailsModal";
+import { useNavigate } from 'react-router-dom';
 
 const StockEntry = () => {
     const [metal, setMetal] = useState("");
@@ -61,16 +62,20 @@ const StockEntry = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-          // Make sure formData is correctly passed and contains all required fields
-          console.log("Form data before submission:", formData);
-          const response = await axios.post("http://localhost:5000/addStockEntry", formData);
-          console.log("Data saved successfully:", response.data);
-          alert("Product added successfully!");
+            // Make sure formData is correctly passed and contains all required fields
+            console.log("Form data before submission:", formData);
+            const response = await axios.post("http://localhost:5000/addStockEntry", formData);
+            console.log("Data saved successfully:", response.data);
+            alert("Product added successfully!");
         } catch (error) {
-          console.error("Error saving data:", error);
-          alert("Failed to add product. Please try again.");
+            console.error("Error saving data:", error);
+            alert("Failed to add product. Please try again.");
         }
-      };
+    };
+    const navigate = useNavigate();
+    const handleBack = () => {
+        navigate('/stockEntryTable');
+    };
     return (
         <div style={{ paddingTop: "79px" }}>
             <div className="container mt-4">
@@ -264,6 +269,14 @@ const StockEntry = () => {
                                     </div>
                                 </div>
                             </div>
+                            <button
+                                type="button"
+                                className="cus-back-btn"
+                                variant="secondary"
+                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
+                            >
+                                cancel
+                            </button>
                             <button type="submit" className="cus-submit-btn">Save</button>
                         </form>
                     </div>

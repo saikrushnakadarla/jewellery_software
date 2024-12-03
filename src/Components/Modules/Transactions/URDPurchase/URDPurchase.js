@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./URDPurchase.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
-
+import { useNavigate } from 'react-router-dom';
 const URDPurchase = () => {
 
     const [metal, setMetal] = useState("");
@@ -13,6 +13,11 @@ const URDPurchase = () => {
     const [stoneType, setStoneType] = useState("");
     const [stoneType2, setStoneType2] = useState("");
     const [isChecked, setIsChecked] = useState("");
+
+    const navigate = useNavigate();
+    const handleBack = () => {
+        navigate('/urdpurchasetable');
+    };
   return (
     <div className="main-container">
     <div className="urdpurchase-form-container">
@@ -268,7 +273,14 @@ const URDPurchase = () => {
         {/* Buttons */}
         <div className="form-buttons">
           <Button type="submit" variant="success">Save</Button>
-          <Button type="submit" variant="secondary">cancel</Button>
+          <button
+                                type="button"
+                                className="cus-back-btn"
+                                variant="secondary"
+                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
+                            >
+                                cancel
+                            </button>
           <Button type="submit" variant="primary">Print</Button>
         </div>
      

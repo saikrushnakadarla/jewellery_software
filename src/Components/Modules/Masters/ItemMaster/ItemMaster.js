@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./ItemMaster.css";
 import InputField from "./Inputfield";
 import StoneDetailsModal from "../../Transactions/StockEntry/StoneDetailsModal";
+import { useNavigate } from 'react-router-dom';
 
 const FormWithTable = () => {
     const [formData, setFormData] = useState({
@@ -108,11 +109,14 @@ const FormWithTable = () => {
             console.error(error);
         }
     };
-
+    const navigate = useNavigate();
+    const handleBack = () => {
+        navigate('/itemmastertable');
+    };
     return (
         <div style={{ paddingTop: "90px" }}>
             <div className="container mt-4">
-            <div className="row">
+                <div className="row">
                     <div className="col-12">
                         {/* Tab Navigation */}
                     </div>
@@ -120,82 +124,82 @@ const FormWithTable = () => {
                 <div className="row mt-3 itemmaster-form-container">
                     <div className="col-12" style={{ marginTop: '-55px' }}>
                         {/* Form Section */}
-                <form className="itemmaster-main-container" onSubmit={handleSubmit}>
-                    <div className="form-container">
-                        <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
-                        <div className="form-row">
-                            <InputField
-                                label="Product Name:"
-                                name="productname"
-                                value={formData.productname}
-                                onChange={handleChange}
-                            />
-                            <InputField
-                                label="Rbarcode:"
-                                name="rbarcode"
-                                value={formData.rbarcode}
-                                onChange={handleChange}
-                            />
-                            <InputField
-                                label="Categories:"
-                                name="categories"
-                                type="select"
-                                value={formData.categories}
-                                onChange={handleChange}
-                                options={[
-                                    { value: "Jewelry", label: "Jewelry" },
-                                    { value: "Gold", label: "Gold" },
-                                    { value: "Silver", label: "Silver" },
-                                ]}
-                            />
-                            <InputField
-                                label="Item Prefix:"
-                                name="itemprefix"
-                                value={formData.itemprefix}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className="form-row">
-                            <InputField
-                                label="Short Name:"
-                                name="shortname"
-                                value={formData.shortname}
-                                onChange={handleChange}
-                            />
-                            <InputField
-                                label="Sale Account Head:"
-                                name="saleaccounthead"
-                                type="select"
-                                value={formData.saleaccounthead}
-                                onChange={handleChange}
-                                options={[
-                                    { value: "Sales", label: "Sales" },
-                                    { value: "Purchase", label: "Purchase" },
-                                ]}
-                            />
-                            <InputField
-                                label="Purchase Account Head:"
-                                name="purchaseaccounthead"
-                                type="select"
-                                value={formData.purchaseaccounthead}
-                                onChange={handleChange}
-                                options={[
-                                    { value: "Purchase", label: "Purchase" },
-                                    { value: "Sales", label: "Sales" },
-                                ]}
-                            />
-                            <InputField
-                                label="Status:"
-                                name="status"
-                                type="select"
-                                value={formData.status}
-                                onChange={handleChange}
-                                options={[
-                                    { value: "ACTIVE", label: "ACTIVE" },
-                                    { value: "INACTIVE", label: "INACTIVE" },
-                                ]}
-                            />
-                               <InputField
+                        <form className="itemmaster-main-container" onSubmit={handleSubmit}>
+                            <div className="form-container">
+                                <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
+                                <div className="form-row">
+                                    <InputField
+                                        label="Product Name:"
+                                        name="productname"
+                                        value={formData.productname}
+                                        onChange={handleChange}
+                                    />
+                                    <InputField
+                                        label="Rbarcode:"
+                                        name="rbarcode"
+                                        value={formData.rbarcode}
+                                        onChange={handleChange}
+                                    />
+                                    <InputField
+                                        label="Categories:"
+                                        name="categories"
+                                        type="select"
+                                        value={formData.categories}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Jewelry", label: "Jewelry" },
+                                            { value: "Gold", label: "Gold" },
+                                            { value: "Silver", label: "Silver" },
+                                        ]}
+                                    />
+                                    <InputField
+                                        label="Item Prefix:"
+                                        name="itemprefix"
+                                        value={formData.itemprefix}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="form-row">
+                                    <InputField
+                                        label="Short Name:"
+                                        name="shortname"
+                                        value={formData.shortname}
+                                        onChange={handleChange}
+                                    />
+                                    <InputField
+                                        label="Sale Account Head:"
+                                        name="saleaccounthead"
+                                        type="select"
+                                        value={formData.saleaccounthead}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Sales", label: "Sales" },
+                                            { value: "Purchase", label: "Purchase" },
+                                        ]}
+                                    />
+                                    <InputField
+                                        label="Purchase Account Head:"
+                                        name="purchaseaccounthead"
+                                        type="select"
+                                        value={formData.purchaseaccounthead}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Purchase", label: "Purchase" },
+                                            { value: "Sales", label: "Sales" },
+                                        ]}
+                                    />
+                                    <InputField
+                                        label="Status:"
+                                        name="status"
+                                        type="select"
+                                        value={formData.status}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "ACTIVE", label: "ACTIVE" },
+                                            { value: "INACTIVE", label: "INACTIVE" },
+                                        ]}
+                                    />
+                                    <InputField
                                         label="Tax Slab:"
                                         name="taxslab"
                                         type="select"
@@ -206,14 +210,14 @@ const FormWithTable = () => {
                                             { value: "INACTIVE", label: "INACTIVE" },
                                         ]}
                                     />
-                                    <InputField label="HSN Code:" 
-                                     name="hsncode"
-                                     value={formData.hsncode}
-                                     onChange={handleChange}
+                                    <InputField label="HSN Code:"
+                                        name="hsncode"
+                                        value={formData.hsncode}
+                                        onChange={handleChange}
                                     />
-                        </div>
-                    </div>
-                    <div className="form-container" style={{ marginTop: '15px' }}>
+                                </div>
+                            </div>
+                            <div className="form-container" style={{ marginTop: '15px' }}>
                                 <div className="main-tags-row" style={{ marginBottom: '15px' }}>
                                     <input type="checkbox" id="main-tags" style={{ width: '35px' }} />
                                     <label htmlFor="main-tags">
@@ -221,20 +225,20 @@ const FormWithTable = () => {
                                     </label>
                                 </div>
                                 <div className="form-row" style={{ marginBottom: '-20px' }}>
-                                    <InputField label="OP.Qty:" 
-                                      name="opqty"
-                                      value={formData.opqty}
-                                      onChange={handleChange}
+                                    <InputField label="OP.Qty:"
+                                        name="opqty"
+                                        value={formData.opqty}
+                                        onChange={handleChange}
                                     />
                                     <InputField label="OP.Value:"
-                                      name="opvalue"
-                                      value={formData.opvalue}
-                                      onChange={handleChange}
+                                        name="opvalue"
+                                        value={formData.opvalue}
+                                        onChange={handleChange}
                                     />
-                                    <InputField label="OP.Weight:" 
-                                      name="opweight"
-                                      value={formData.opweight}
-                                      onChange={handleChange}
+                                    <InputField label="OP.Weight:"
+                                        name="opweight"
+                                        value={formData.opweight}
+                                        onChange={handleChange}
                                     />
                                     <InputField
                                         label="Purity:"
@@ -249,9 +253,9 @@ const FormWithTable = () => {
                                         ]}
                                     />
                                     <InputField label="HUID No:"
-                                      name="huidno"
-                                      value={formData.huidno}
-                                      onChange={handleChange}
+                                        name="huidno"
+                                        value={formData.huidno}
+                                        onChange={handleChange}
                                     />
                                 </div>
                             </div>
@@ -270,14 +274,14 @@ const FormWithTable = () => {
                                         ]}
                                     />
                                     <InputField label="P ID:"
-                                      name="pid"
-                                      value={formData.pid}
-                                      onChange={handleChange}
+                                        name="pid"
+                                        value={formData.pid}
+                                        onChange={handleChange}
                                     />
-                                    <InputField label="Product Name:" 
-                                      name="productname"
-                                      value={formData.productname}
-                                      onChange={handleChange}
+                                    <InputField label="Product Name:"
+                                        name="productname"
+                                        value={formData.productname}
+                                        onChange={handleChange}
                                     />
                                     <InputField label="Category:" value="Gold" readOnly />
                                     <InputField label="Prefix:" value="Gold" readOnly />
@@ -293,22 +297,22 @@ const FormWithTable = () => {
                                             { value: "18K", label: "18K" },
                                         ]}
                                     />
-                                    <InputField label="PCode/BarCode:" 
-                                      name="pcode"
-                                      value={formData.pcode}
-                                      onChange={handleChange}
+                                    <InputField label="PCode/BarCode:"
+                                        name="pcode"
+                                        value={formData.pcode}
+                                        onChange={handleChange}
                                     />
                                 </div>
                                 <div className="form-row">
-                                    <InputField label="Gross Weight:" 
-                                      name="grossweight"
-                                      value={formData.grossweight}
-                                      onChange={handleChange}
+                                    <InputField label="Gross Weight:"
+                                        name="grossweight"
+                                        value={formData.grossweight}
+                                        onChange={handleChange}
                                     />
                                     <InputField label="Stones Weight:"
-                                      name="stonesweight"
-                                      value={formData.stonesweight}
-                                      onChange={handleChange}
+                                        name="stonesweight"
+                                        value={formData.stonesweight}
+                                        onChange={handleChange}
                                     />
                                     <button
                                         type="button"
@@ -318,15 +322,15 @@ const FormWithTable = () => {
                                     >
                                         Stone Details
                                     </button>
-                                    <InputField label="Stones Price:" 
-                                      name="stonesprice"
-                                      value={formData.stonesprice}
-                                      onChange={handleChange}
+                                    <InputField label="Stones Price:"
+                                        name="stonesprice"
+                                        value={formData.stonesprice}
+                                        onChange={handleChange}
                                     />
-                                    <InputField label="Weight WW:" 
-                                      name="weightww"
-                                      value={formData.weightww}
-                                      onChange={handleChange}
+                                    <InputField label="Weight WW:"
+                                        name="weightww"
+                                        value={formData.weightww}
+                                        onChange={handleChange}
                                     />
                                 </div>
                                 <div className="form-row" style={{ marginBottom: '-20px' }}>
@@ -334,37 +338,37 @@ const FormWithTable = () => {
                                         label="Wastage On:"
                                         type="select"
                                         name="wastageon"
-                                     value={formData.wastageon}
-                                     onChange={handleChange}
+                                        value={formData.wastageon}
+                                        onChange={handleChange}
                                         options={[
                                             { value: "Weight", label: "Weight" },
                                         ]}
                                     />
                                     <InputField label="Wastage:" value="NaN" readOnly />
                                     <InputField label="%:"
-                                      name="percentage"
-                                      value={formData.percentage}
-                                      onChange={handleChange}
+                                        name="percentage"
+                                        value={formData.percentage}
+                                        onChange={handleChange}
                                     />
-                                    <InputField label="Weight:" 
-                                      name="weight"
-                                      value={formData.weight}
-                                      onChange={handleChange}
+                                    <InputField label="Weight:"
+                                        name="weight"
+                                        value={formData.weight}
+                                        onChange={handleChange}
                                     />
                                     <InputField label="Making Charges:"
-                                      name="makingcharges"
-                                      value={formData.makingcharges}
-                                      onChange={handleChange}
+                                        name="makingcharges"
+                                        value={formData.makingcharges}
+                                        onChange={handleChange}
                                     />
-                                    <InputField label="Cal:" 
-                                      name="cal"
-                                      value={formData.cal}
-                                      onChange={handleChange}
+                                    <InputField label="Cal:"
+                                        name="cal"
+                                        value={formData.cal}
+                                        onChange={handleChange}
                                     />
                                     <InputField label="Tax:"
-                                      name="tax"
-                                      value={formData.tax}
-                                      onChange={handleChange}
+                                        name="tax"
+                                        value={formData.tax}
+                                        onChange={handleChange}
                                     />
                                     <InputField
                                         label="Stock Point:"
@@ -379,16 +383,24 @@ const FormWithTable = () => {
                                     />
                                 </div>
                             </div>
-                    {/* Add additional fields similarly */}
-                    <button type="submit" className="btn btn-primary">
-                        Submit
-                    </button>
-                </form>
-                <StoneDetailsModal
-                    showModal={showModal}
-                    handleCloseModal={handleCloseModal}
-                />
-                 </div>
+                            <button
+                                type="button"
+                                className="cus-back-btn"
+                                variant="secondary"
+                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
+                            >
+                                cancel
+                            </button>
+                            {/* Add additional fields similarly */}
+                            <button type="submit" className="btn btn-primary">
+                                Submit
+                            </button>
+                        </form>
+                        <StoneDetailsModal
+                            showModal={showModal}
+                            handleCloseModal={handleCloseModal}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
