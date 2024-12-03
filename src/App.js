@@ -31,6 +31,9 @@ import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTa
 import Accounts from './Components/Modules/Masters/Accounts/Accounts';
 import AccountsTable from './Components/Modules/Masters/Accounts/AccountsTable';
 import Sales from './Components/Modules/Transactions/Sales/SalesForm';
+import MetalType from './Components/Modules/Masters/MetalType/MetalType';
+import DesignMaster from './Components/Modules/Masters/DesignMaster/DesignMaster';
+import Purity from './Components/Modules/Masters/Purity/Purity';
 import SupplierEditForm from './Components/Modules/Masters/Supplier/Supplier_Edit_Form';
 
 
@@ -74,6 +77,9 @@ function App() {
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/accountstable" element={<AccountsTable />} />
         <Route path="/sales" element={<Sales />} />
+        <Route path="/metaltype" element={<MetalType />}/>
+        <Route path="/purity" element={<Purity />}/>
+        <Route path="/designmaster" element={<DesignMaster />}/>
         <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/>
       </Routes>
     </>

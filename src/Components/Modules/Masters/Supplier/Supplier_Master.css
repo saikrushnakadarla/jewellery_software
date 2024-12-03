@@ -47,3 +47,37 @@
 .edit-form-container .form-group {
   margin-bottom: 15px;
 }
+
+
+
+@media only screen and (max-width: 768px) {
+  .cus-back-btn {
+    background-color: #007bff; /* Red color for back button */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 13%;
+    transition: background-color 0.3s ease;
+  }
+  
+}
+
+
+
+@media only screen and (max-width: 480px) {
+  .cus-back-btn {
+    background-color: #007bff; /* Red color for back button */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 30%;
+    transition: background-color 0.3s ease;
+  }
+  
+}

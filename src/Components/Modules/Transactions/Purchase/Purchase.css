@@ -114,5 +114,98 @@
 
       }
 
+      .pur-cus-back-btn{
+        
+                background-color: #007bff;
+                color: white;
+                padding: 10px 30px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-left: 30px;
+                transition: background-color 0.3s ease;
+            
+      }
+      @media only screen and (max-width: 768px) {
+        .pur-submit-btn{
+                margin-left: 30px;
+                background-color: #007bff; 
+                border: none;           
+                color: white;            
+                padding: 12px 24px;      
+                text-align: center;       
+                text-decoration: none;    
+                display: inline-block;   
+                font-size: 16px;          
+                font-weight: bold;        
+                border-radius: 8px;      
+                cursor: pointer;          /* Pointer cursor on hover */
+                transition: all 0.3s ease; 
+                width: 15%;
+                margin-bottom: 30px;
+
+      
+            }
+        
+        
+      .pur-cus-back-btn{
+        
+        background-color: #007bff;
+        color: white;
+        width: 15%;
+        padding: 10px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: 30px;
+        transition: background-color 0.3s ease;
+        margin-bottom: 30px;
+    
+}
+        
+      }
 
 
+
+      @media only screen and (max-width: 480px) {
+
+
+        .pur-submit-btn{
+                margin-left: 30px;
+                background-color: #007bff; 
+                border: none;           
+                color: white;            
+                padding: 12px 24px;      
+                text-align: center;       
+                text-decoration: none;    
+                display: inline-block;   
+                font-size: 16px;          
+                font-weight: bold;        
+                border-radius: 8px;      
+                cursor: pointer;          /* Pointer cursor on hover */
+                transition: all 0.3s ease; 
+                width: 30%;
+
+      
+            }
+        
+      .pur-cus-back-btn{
+        
+        background-color: #007bff;
+        color: white;
+        padding: 10px 30px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: 30px;
+        width: 30%;
+
+        transition: background-color 0.3s ease;
+    
+}
+
+
+      }

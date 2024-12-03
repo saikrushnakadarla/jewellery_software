@@ -63,10 +63,12 @@ function Navbar() {
           </span>
           {mastersDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/customerstable">Customer_Master</Link>
-              <Link to="/suppliertable">Supplier_Master</Link>
+              <Link to="/customerstable">Customer Master</Link>
+              <Link to="/suppliertable">Supplier Master</Link>
               <Link to="/itemmastertable">Product</Link>
               <Link to="/purity">Purity</Link>
+              <Link to="/metaltype">Metal Type</Link>
+              <Link to="/designmaster">Design Master</Link>
               <Link to="/accountstable">Accounts</Link>
             </div>
           )}

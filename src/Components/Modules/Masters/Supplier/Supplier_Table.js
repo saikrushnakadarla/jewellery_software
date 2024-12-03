@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
-// import './Customers_Table.css';
+ import './Supplier_Table.css';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -178,7 +178,7 @@ const handleEdit = (customer) => {
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Suppliers</h3>
-            <Button variant="success" onClick={handleCreate}>
+            <Button className='create_but' variant="success" onClick={handleCreate}>
               + Create
             </Button>
           </Col>
