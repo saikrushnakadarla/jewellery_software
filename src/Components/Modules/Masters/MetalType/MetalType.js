@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import InputField from '../../../Pages/InputField/InputField';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './MetalType.css'
 
-const MetalType = () => {
+
+import React, { useState } from "react";
+import InputField from "../../../Pages/InputField/InputField";
+import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
+import { FaEdit, FaTrash } from "react-icons/fa";
+// import "./Purity.scss";
+
+function MetalType() {
   const [formData, setFormData] = useState({
     metal_name: '',
     description: '',
@@ -35,39 +38,74 @@ const MetalType = () => {
     });
   };
 
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "Sr. No.",
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number
+      },
+      {
+        Header: "Metal Name",
+        accessor: "metal_name",
+      },
+      {
+        Header: "Description",
+        accessor: "description",
+      },
+      {
+        Header: "Default Purity",
+        accessor: "default_purity",
+      },
+      {
+        Header: "Default Purity for Rate Entry",
+        accessor: "default_purity_for_rate_entry",
+      },
+      {
+        Header: "Default Purity for Old Metal",
+        accessor: "default_purity_for_old_metal",
+      },
+      {
+        Header: "Default Issue Purity",
+        accessor: "default_issue_purity",
+      },
+     
+      {
+        Header: "Action",
+        Cell: ({ row }) => (
+          <div>
+            <button className="edit-btn edit-button">
+              <FaEdit />
+            </button>
+            <button className="delete-btn delete-button">
+              <FaTrash />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    []
+  );
+
   return (
     <div className="main-container">
-
-    <div className="container py-5">
-      <div className="card shadow p-4 mb-4">
-        <h3 className="text-center mb-4">Metal Type</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="row g-3">
-            {/* Metal Name */}
-            <div className="col-md-4">
-              <InputField
-                label="Metal Name:"
-                name="metal_name"
-                value={formData.metal_name}
-                onChange={handleChange}
-                required={true}
-              />
-            </div>
-
-            {/* Description */}
-            <div className="col-md-4">
-              <InputField
-                label="Description:"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                required={true}
-              />
-            </div>
-
-            {/* Default Purity */}
-            <div className="col-md-4">
-              <InputField
+      <div className="customer-master-container">
+        <h3  style={{ textAlign: 'center', marginBottom:'30px'  }}>Metal Type</h3>
+        <form className="customer-master-form" onSubmit={handleSubmit}>
+          {/* Row 1 */}
+          <div className="form-row">
+            <InputField
+              label="Metal Name:"
+              name="metal_name"
+              value={formData.metal_name}
+              onChange={handleChange}
+            />
+            <InputField
+              label="Description:"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+            />
+            <InputField
                 label="Default Purity:"
                 name="default_purity"
                 type="select"
@@ -81,11 +119,12 @@ const MetalType = () => {
                   { value: '95.0', label: '95.0%' },
                 ]}
               />
-            </div>
+           
+          </div>
 
-            {/* Default Purity for Rate Entry */}
-            <div className="col-md-4">
-              <InputField
+          {/* Row 2 */}
+          <div className="form-row">
+          <InputField
                 label="Default Purity for Rate Entry:"
                 name="default_purity_for_rate_entry"
                 type="select"
@@ -99,11 +138,7 @@ const MetalType = () => {
                   { value: '95.0', label: '95.0%' },
                 ]}
               />
-            </div>
-
-            {/* Default Purity for Old Metal */}
-            <div className="col-md-4">
-              <InputField
+            <InputField
                 label="Default Purity for Old Metal:"
                 name="default_purity_for_old_metal"
                 type="select"
@@ -117,11 +152,7 @@ const MetalType = () => {
                   { value: '95.0', label: '95.0%' },
                 ]}
               />
-            </div>
-
-            {/* Default Issue Purity */}
-            <div className="col-md-4">
-              <InputField
+            <InputField
                 label="Default Issue Purity:"
                 name="default_issue_purity"
                 type="select"
@@ -135,62 +166,27 @@ const MetalType = () => {
                   { value: '95.0', label: '95.0%' },
                 ]}
               />
-            </div>
+          
           </div>
 
-          {/* Submit Button */}
-          <div className="text-center mt-4">
-            <button type="submit" className="btn btn-primary px-5">
+          <div className="sup-button-container">
+            <button type="button" className="cus-back-btn">
+              Back
+            </button>
+            <button type="submit" className="cus-submit-btn">
               Save
             </button>
           </div>
         </form>
-      </div>
 
-      {/* Submitted Data Table */}
-      <div className="card shadow p-4">
-        <h3 className="text-center mb-4">Submitted Metal Data</h3>
-        <div className="table-responsive">
-          <table className="table table-bordered table-hover">
-            <thead className="table-light">
-              <tr>
-                <th>S.no.</th>
-                <th>Metal Name</th>
-                <th>Description</th>
-                <th>Default Purity</th>
-                <th>Purity for Rate Entry</th>
-                <th>Purity for Old Metal</th>
-                <th>Issue Purity</th>
-              </tr>
-            </thead>
-            <tbody>
-              {submittedData.length > 0 ? (
-                submittedData.map((data, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{data.metal_name}</td>
-                    <td>{data.description}</td>
-                    <td>{data.default_purity}</td>
-                    <td>{data.default_purity_for_rate_entry}</td>
-                    <td>{data.default_purity_for_old_metal}</td>
-                    <td>{data.default_issue_purity}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="text-center">
-                    No data submitted yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        {/* Purity Table */}
+        <div className="purity-table-container">
+          <h3 style={{textAlign:'center'}}>Submitted Data</h3>
+          <DataTable columns={columns} data={submittedData} />
         </div>
       </div>
     </div>
-    </div>
-
   );
-};
+}
 
 export default MetalType;

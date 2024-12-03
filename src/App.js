@@ -37,6 +37,8 @@ import Purity from './Components/Modules/Masters/Purity/Purity';
 import SupplierEditForm from './Components/Modules/Masters/Supplier/Supplier_Edit_Form';
 import SalesTable from './Components/Modules/Transactions/Sales/SalesTable';
 import URDPurchasetable from './Components/Modules/Transactions/URDPurchase/URDPurchasetable';
+import PurityTable from './Components/Modules/Masters/Purity/PurityTable';
+
 
 function App() {
   const location = useLocation();
@@ -83,6 +85,8 @@ function App() {
         <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/>
         <Route path="/salestable" element={<SalesTable />} />
         <Route path="/urdpurchasetable" element={<URDPurchasetable />} />
+        <Route path="/puritytable" element={<PurityTable />} />
+
       </Routes>
     </>
   );

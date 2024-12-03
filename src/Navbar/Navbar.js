@@ -81,8 +81,8 @@ function Navbar() {
             <div className="navbar-dropdown-content">
               
               
-              {/* <Link to="/metaltype">Metal Type</Link>
-              <Link to="/designmaster">Design Master</Link> */}
+              <Link to="/metaltype">Metal Type</Link>
+              <Link to="/designmaster">Design Master</Link>
              
 
               <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable')}>Customer_Master</Link>
