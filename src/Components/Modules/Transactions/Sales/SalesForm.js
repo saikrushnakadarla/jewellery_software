@@ -417,14 +417,14 @@ const RepairForm = () => {
 
         {/* Buttons */}
         <div className="form-buttons">
-          <button
+          <Button
             type="button"
             className="cus-back-btn"
             variant="secondary"
             onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
           >
             cancel
-          </button>
+          </Button>
           <Button type="submit" variant="primary">Print</Button>
         </div>
       </Container>
