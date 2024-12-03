@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./URDPurchase.css";
 import InputField from "../../../Pages/InputField/InputField";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button,Table } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 const URDPurchase = () => {
 
@@ -222,53 +222,7 @@ const URDPurchase = () => {
           
        
 
-        {/* Extra Charges */}
-        <div className="urd-form-section">
-          <h4>Item Details</h4>
-          
-          <table className="item-details-table">
-            <thead>
-              <tr>
-                <th>S.No</th>
-                <th>Item</th>
-                <th>WT</th>
-                <th>Dust</th>
-                <th>Purity</th>
-                <th>Touch%</th>
-                <th>ML%</th>
-                <th>Eqv WT</th>
-                <th>Rate</th>
-                <th>HSN</th>
-                <th>Stone</th>
-                <th>CT</th>
-                <th>PCS</th>
-                <th>Stone Value</th>
-                <th>M.Value</th>
-              </tr>
-            </thead>
-            <tbody>
-              
-              <tr>
-                <td>1</td>
-                <td>Sample Item</td>
-                <td>10</td>
-                <td>0.5</td>
-                <td>22K</td>
-                <td>95%</td>
-                <td>2%</td>
-                <td>9.5</td>
-                <td>4500</td>
-                <td>HSN1234</td>
-                <td>Ruby</td>
-                <td>0.2</td>
-                <td>5</td>
-                <td>500</td>
-                <td>50</td>
-              </tr>
-              
-            </tbody>
-          </table>
-        </div>
+
 
         {/* Buttons */}
         <div className="form-buttons">

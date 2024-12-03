@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTable, usePagination, useGlobalFilter, useSortBy } from 'react-table';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './DataTable.css';
+
 
 // Global Search Filter Component
 function GlobalFilter({ globalFilter, setGlobalFilter }) {
