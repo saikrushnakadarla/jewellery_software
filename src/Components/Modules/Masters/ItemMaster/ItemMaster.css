@@ -104,6 +104,11 @@
   margin-left: -17px;
 }
 
+.btn {
+  padding: 8px 16px;
+  width: 115px;
+}
+
 .form-container {
   width: 104%;
   margin-left: -5px;
@@ -111,5 +116,27 @@
   padding: 20px;
   border-radius: 8px;
   background-color: #f9f9f9;
+}
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+.btn {
+  padding: 8px 16px;
+  width: 130px;
+}
+.itemmaster-form-container {
+  width: 713px;
+  margin-left: 17px;
+}
+.cus-back-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  width: 104px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 }
