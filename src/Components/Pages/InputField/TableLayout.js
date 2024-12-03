@@ -97,14 +97,14 @@ export default function DataTable({ columns, data }) {
         </div>
         <div className='pagebuttons'>
           <button
-            className="btn btn-sm btn-primary me-2 btn1"
+            className="btn btn-primary me-2 btn1"
             onClick={() => previousPage()}
             disabled={!canPreviousPage}
           >
             Prev
           </button>
           <button
-            className="btn btn-sm btn-primary btn1"
+            className="btn btn-primary btn1"
             onClick={() => nextPage()}
             disabled={!canNextPage}
           >
