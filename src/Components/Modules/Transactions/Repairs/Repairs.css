@@ -110,6 +110,12 @@ label {
     margin-top: 50px;
   }
 
+  .repair-form2 {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
   .repair-form {
     flex-direction: column; /* Stack sections vertically on smaller screens */
   }

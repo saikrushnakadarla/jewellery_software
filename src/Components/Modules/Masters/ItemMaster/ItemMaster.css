@@ -106,7 +106,8 @@
 
 .btn {
   padding: 8px 16px;
-  width: 60px;
+  width: 65px;
+  text-align: center;
 }
 
 .form-container {
