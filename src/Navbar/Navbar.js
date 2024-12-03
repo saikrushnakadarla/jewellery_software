@@ -87,14 +87,14 @@ function Navbar() {
           </span>
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
-              <Link to="/sales">Sales</Link>
+              <Link to="/salestable">Sales</Link>
               <Link to="/estimates">Estimate</Link>
               <Link to="/stockEntryTable">Stock Entry</Link>
               <Link to="/paymentstable">Payments</Link>
               <Link to="/receiptstable">Receipts</Link>
               <Link to="/purchasetable">Purchase</Link>
               <Link to="/repairstable">Repairs</Link>
-              <Link to="/urd_purchase">URD Purchase</Link>
+              <Link to="/urdpurchasetable">URD Purchase</Link>
             </div>
           )}
         </div>

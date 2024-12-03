@@ -32,8 +32,8 @@ import Accounts from './Components/Modules/Masters/Accounts/Accounts';
 import AccountsTable from './Components/Modules/Masters/Accounts/AccountsTable';
 import Sales from './Components/Modules/Transactions/Sales/SalesForm';
 import SupplierEditForm from './Components/Modules/Masters/Supplier/Supplier_Edit_Form';
-
-
+import SalesTable from './Components/Modules/Transactions/Sales/SalesTable';
+import URDPurchasetable from './Components/Modules/Transactions/URDPurchase/URDPurchasetable';
 
 function App() {
   const location = useLocation();
@@ -75,6 +75,8 @@ function App() {
         <Route path="/accountstable" element={<AccountsTable />} />
         <Route path="/sales" element={<Sales />} />
         <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/>
+        <Route path="/salestable" element={<SalesTable />} />
+        <Route path="/urdpurchasetable" element={<URDPurchasetable />} />
       </Routes>
     </>
   );
