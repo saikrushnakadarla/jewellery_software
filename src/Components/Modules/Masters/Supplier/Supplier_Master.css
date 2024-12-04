@@ -7,7 +7,7 @@
       
       /* Styling for the "Back" button */
       .cus-back-btn {
-        background-color: #007bff; /* Red color for back button */
+        background-color: grey; /* Red color for back button */
         color: white;
         padding: 10px 20px;
         border: none;

@@ -392,8 +392,8 @@ const FormWithTable = () => {
                                 cancel
                             </button>
                             {/* Add additional fields similarly */}
-                            <button type="submit" className="btn btn-primary">
-                                Submit
+                            <button type="submit" className="btn btn-primary" >
+                                Save
                             </button>
                         </form>
                         <StoneDetailsModal

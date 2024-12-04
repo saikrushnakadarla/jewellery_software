@@ -87,16 +87,23 @@ label {
 
 @media (max-width: 768px) {
   .sales-form-container {
-    margin-top: 50px;
+    margin-top: 10px;
   }
 
   .sales-form {
     flex-direction: column; /* Stack sections vertically on smaller screens */
   }
 
+  .sales-form2 {
+    flex-direction: column; /* Stack sections vertically */
+   
+  }
+
   .sales-form-left,
-  .sales-form-right {
-    flex: 1; /* Full width for both sections */
+  .sales-form-right,
+  .sales-form-third,
+  .sales-form-fourth {
+    flex: 1; /* Full width for all sections */
   }
 
   .form-row > * {

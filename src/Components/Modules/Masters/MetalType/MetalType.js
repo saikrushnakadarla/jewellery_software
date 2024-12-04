@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
 import { FaEdit, FaTrash } from "react-icons/fa";
-// import "./Purity.scss";
+import { Container, Row, Col, Button } from "react-bootstrap";
 
 function MetalType() {
   const [formData, setFormData] = useState({
@@ -169,14 +169,14 @@ function MetalType() {
           
           </div>
 
-          <div className="sup-button-container">
-            <button type="button" className="cus-back-btn">
-              Back
-            </button>
-            <button type="submit" className="cus-submit-btn">
-              Save
-            </button>
-          </div>
+          
+          <div className="form-buttons">
+        <Button variant="secondary" type="button" className="cus-back-btn" >
+              Cancel
+            </Button>
+          <Button type="submit" variant="primary">Save</Button>
+          {/* <Button type="button">Print</Button> */}
+        </div>
         </form>
 
         {/* Purity Table */}
