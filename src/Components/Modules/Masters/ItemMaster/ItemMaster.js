@@ -152,6 +152,18 @@ const FormWithTable = () => {
                                             { value: "Silver", label: "Silver" },
                                         ]}
                                     />
+                                     <InputField
+                                        label="Design Master:"
+                                        name="designmaster"
+                                        type="select"
+                                        value={formData.designmaster}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Jewelry", label: "Jewelry" },
+                                            { value: "Gold", label: "Gold" },
+                                            { value: "Silver", label: "Silver" },
+                                        ]}
+                                    />
                                     <InputField
                                         label="Item Prefix:"
                                         name="itemprefix"
