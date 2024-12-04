@@ -141,7 +141,7 @@ function Navbar() {
               <Link to="/purchaseReport" onClick={handleItemClick} className={isActive('/purchaseReport')}>Purchase Report</Link>
               <Link to="/repairsReport" onClick={handleItemClick} className={isActive('/repairsReport')}>Repairs Report</Link>
               <Link to="/urdPurchaseReport" onClick={handleItemClick} className={isActive('/urdPurchaseReport')}>URDPurchase Report</Link>
-              <Link to="/stockReort" onClick={handleItemClick} className={isActive('/stockReort')}>Stock Report</Link>
+              <Link to="/stockReport" onClick={handleItemClick} className={isActive('/stockReport')}>Stock Report</Link>
               <Link to="/barcodeprinting" onClick={handleItemClick} className={isActive('/barcodeprinting')}>Barcode Printing Report</Link>
               <Link to="/cashReport" onClick={handleItemClick} className={isActive('/cashReport')}>Cash Report</Link>
             </div>
