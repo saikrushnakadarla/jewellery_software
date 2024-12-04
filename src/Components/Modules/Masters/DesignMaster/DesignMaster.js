@@ -488,8 +488,8 @@ function MetalType() {
         </form>
 
         {/* Purity Table */}
-        <div className="purity-table-container">
-          <h3 style={{ textAlign: 'center' }}>Submitted Data</h3>
+        <div style={{marginTop:'20px'}}className="purity-table-container">
+          {/* <h3 style={{ textAlign: 'center' }}>Submitted Data</h3> */}
           <DataTable columns={columns} data={submittedData} />
         </div>
       </div>
