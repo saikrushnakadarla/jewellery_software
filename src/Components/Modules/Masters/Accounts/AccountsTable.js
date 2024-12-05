@@ -63,9 +63,6 @@ const RepairsTable = () => {
     return <div>Loading...</div>;
   }
 
-
-
-
   const handleCreate = () => {
     navigate('/accounts'); // Navigate to the /repairs page
   };
