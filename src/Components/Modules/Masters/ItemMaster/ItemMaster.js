@@ -10,6 +10,7 @@ const FormWithTable = () => {
         productname: "",
         rbarcode: "",
         categories: "",
+        designmaster: "",
         itemprefix: "",
         shortname: "",
         saleaccounthead: "",
@@ -70,6 +71,7 @@ const FormWithTable = () => {
                     productname: "",
                     rbarcode: "",
                     categories: "",
+                    designmaster: "",
                     itemprefix: "",
                     shortname: "",
                     saleaccounthead: "",
@@ -147,19 +149,20 @@ const FormWithTable = () => {
                                         value={formData.categories}
                                         onChange={handleChange}
                                         options={[
-                                            { value: "Jewelry", label: "Jewelry" },
+                                            { value: "Jewellery", label: "Jewellery" },
                                             { value: "Gold", label: "Gold" },
                                             { value: "Silver", label: "Silver" },
                                         ]}
                                     />
                                      <InputField
+                                        
                                         label="Design Master:"
                                         name="designmaster"
                                         type="select"
                                         value={formData.designmaster}
                                         onChange={handleChange}
                                         options={[
-                                            { value: "Jewelry", label: "Jewelry" },
+                                            { value: "Jewellery", label: "Jewellery" },
                                             { value: "Gold", label: "Gold" },
                                             { value: "Silver", label: "Silver" },
                                         ]}

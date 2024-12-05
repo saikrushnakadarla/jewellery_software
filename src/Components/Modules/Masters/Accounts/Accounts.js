@@ -67,7 +67,7 @@ const RepairForm = () => {
               value={purity}
               onChange={(e) => setPurity(e.target.value)}
               options={[
-                { value: "Area1", label: "Area1." },
+                { value: "Area1", label: "Area1" },
                 { value: "Area2", label: "Area2" },
                 
               ]}

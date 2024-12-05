@@ -137,56 +137,13 @@ const ItemMasterTable = () => {
       },
       {
         Header: 'Action',
-        Cell: ({ row }) => (
-            <div className="d-flex align-items-center">
-              <button
-                className="action-button edit-button"
-                onClick={() => navigate(`/estimates/${row.original.product_id}`)}
-              >
-                <FaEdit />
-              </button>
-              <button
-                className="action-button delete-button"
-                onClick={() => handleDelete(row.original.product_id)}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          ),
-          
+        
       },
       
     ],
     []
   );
-  useEffect(() => {
-    fetch('http://localhost:4000/get-estimates')
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data); // Set the fetched data to state
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
 
-  const handleDelete = (product_id) => {
-    if (window.confirm('Are you sure you want to delete this estimate?')) {
-      fetch(`http://localhost:4000/delete-estimate/${product_id}`, {
-        method: 'DELETE',
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data.message); // Success message
-          // Refresh data after deletion
-          setData((prevData) => prevData.filter((item) => item.product_id !== product_id));
-        })
-        .catch((error) => {
-          console.error('Error deleting record:', error);
-          alert('Failed to delete estimate. Please try again.');
-        });
-    }
-  };
   const handleCreate = () => {
     navigate('/itemmaster'); // Navigate to the /estimates page
   };
