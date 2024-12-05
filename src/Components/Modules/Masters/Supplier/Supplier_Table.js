@@ -88,25 +88,25 @@ const RepairsTable = () => {
         Header: 'PAN Card',
         accessor: 'pan_card',
       },
-      {
-        Header: 'Action',
-        Cell: ({ row }) => (
-          <div>
-            <button
-              className="edit-btn edit-button"
-              onClick={() => handleEdit(row.original)}
-            >
-              <FaEdit />
-            </button>
-            <button
-              className="delete-btn delete-button"
-              onClick={() => handleDelete(row.original.id)}
-            >
-              <FaTrash />
-            </button>
-          </div>
-        ),
-      },
+      // {
+      //   Header: 'Action',
+      //   Cell: ({ row }) => (
+      //     <div>
+      //       <button
+      //         className="edit-btn edit-button"
+      //         onClick={() => handleEdit(row.original)}
+      //       >
+      //         <FaEdit />
+      //       </button>
+      //       <button
+      //         className="delete-btn delete-button"
+      //         onClick={() => handleDelete(row.original.id)}
+      //       >
+      //         <FaTrash />
+      //       </button>
+      //     </div>
+      //   ),
+      // },
     ],
     []
   );

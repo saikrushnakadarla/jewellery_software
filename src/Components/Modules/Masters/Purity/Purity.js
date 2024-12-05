@@ -107,19 +107,19 @@ function Purity() {
         Header: "Skin Print",
         accessor: "skin_print",
       },
-      {
-        Header: "Action",
-        Cell: ({ row }) => (
-          <div>
-            <button className="edit-btn edit-button">
-              <FaEdit />
-            </button>
-            <button className="delete-btn delete-button">
-              <FaTrash />
-            </button>
-          </div>
-        ),
-      },
+      // {
+      //   Header: "Action",
+      //   Cell: ({ row }) => (
+      //     <div>
+      //       <button className="edit-btn edit-button">
+      //         <FaEdit />
+      //       </button>
+      //       <button className="delete-btn delete-button">
+      //         <FaTrash />
+      //       </button>
+      //     </div>
+      //   ),
+      // },
     ],
     []
   );

@@ -95,19 +95,19 @@ function MetalType() {
         accessor: "default_issue_purity",
       },
 
-      {
-        Header: "Action",
-        Cell: ({ row }) => (
-          <div>
-            <button className="edit-btn edit-button">
-              <FaEdit />
-            </button>
-            <button className="delete-btn delete-button">
-              <FaTrash />
-            </button>
-          </div>
-        ),
-      },
+      // {
+      //   Header: "Action",
+      //   Cell: ({ row }) => (
+      //     <div>
+      //       <button className="edit-btn edit-button">
+      //         <FaEdit />
+      //       </button>
+      //       <button className="delete-btn delete-button">
+      //         <FaTrash />
+      //       </button>
+      //     </div>
+      //   ),
+      // },
     ],
     []
   );
