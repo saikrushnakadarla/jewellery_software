@@ -38,7 +38,9 @@ import SupplierEditForm from './Components/Modules/Masters/Supplier/Supplier_Edi
 import SalesTable from './Components/Modules/Transactions/Sales/SalesTable';
 import URDPurchasetable from './Components/Modules/Transactions/URDPurchase/URDPurchasetable';
 import PurityTable from './Components/Modules/Masters/Purity/PurityTable';
-
+import OrdersTable from './Components/Modules/Transactions/Orders/OrdersTable';
+import Orders from './Components/Modules/Transactions/Orders/Orders';
+import BarCodePrinting from './Components/Modules/Reports/BarcodePrinting/BarCodePrinting';
 
 function App() {
   const location = useLocation();
@@ -86,7 +88,9 @@ function App() {
         <Route path="/salestable" element={<SalesTable />} />
         <Route path="/urdpurchasetable" element={<URDPurchasetable />} />
         <Route path="/puritytable" element={<PurityTable />} />
-
+        <Route path="/orderstable" element={<OrdersTable />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/barcodeprinting" element={<BarCodePrinting />} />
       </Routes>
     </>
   );
