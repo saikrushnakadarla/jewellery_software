@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
@@ -7,115 +7,62 @@ import './AccountsTable.css'
 
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
+  const [data, setData] = useState([]); // State to store accounts data
+  const [loading, setLoading] = useState(true); // State to manage loading
+
+  // Fetch accounts data from the API
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/get/accounts'); // Adjust the URL if necessary
+        if (!response.ok) {
+          throw new Error('Failed to fetch accounts data');
+        }
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error('Error fetching accounts data:', error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccounts();
+  }, []);
 
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'Account Name',
-        accessor: 'account_name', // Key from the data
-      },
-      {
-        Header: 'Print Name',
-        accessor: '',
-      },
-      {
-        Header: 'Group',
-        accessor: '',
-      },
-      {
-        Header: 'Op. Bal.',
-        accessor: '',
-      },
-      {
-        Header: 'Dr/Cr',
-        accessor: '',
-      },
-      {
-        Header: 'Metal Balance',
-        accessor: '',
-      },
-      {
-        Header: 'Address',
-        accessor: '',
-      },
-      {
-        Header: 'Address2',
-        accessor: '',
-      },
-      {
-        Header: 'City',
-        accessor: '',
-      },
-      {
-        Header: 'Area',
-        accessor: '',
-      },
-      {
-        Header: 'Pincode',
-        accessor: '',
-      },
-      {
-        Header: 'State',
-        accessor: '',
-      },
-      {
-        Header: 'State Code',
-        accessor: '',
-      },
-      {
-        Header: 'Phone',
-        accessor: '',
-      },
-      {
-        Header: 'Mobile',
-        accessor: '',
-      },
-      {
-        Header: 'Contact Person',
-        accessor: '',
-      },
-      {
-        Header: 'Email',
-        accessor: '',
-      },
-      {
-        Header: 'Birthday On',
-        accessor: '',
-      },
-      {
-        Header: 'Anniversary',
-        accessor: '',
-      },
-      {
-        Header: 'Bank Account No.',
-        accessor: '',
-      },
-      {
-        Header: 'Bank Name',
-        accessor: '',
-      },
-      {
-        Header: 'IFSC Code',
-        accessor: '',
-      },
-      {
-        Header: 'Branch',
-        accessor: '',
-      },
-      {
-        Header: 'Actions',
-        accessor: 'actions',
-      },
+      { Header: 'Account Name', accessor: 'account_name' },
+      { Header: 'Print Name', accessor: 'print_name' },
+      { Header: 'Group', accessor: 'group' },
+      { Header: 'Op. Bal.', accessor: 'op_bal' },
+      { Header: 'Dr/Cr', accessor: 'dr_cr' },
+      { Header: 'Metal Balance', accessor: 'metal_balance' },
+      { Header: 'Address', accessor: 'address' },
+      { Header: 'Address2', accessor: 'address2' },
+      { Header: 'City', accessor: 'city' },
+      { Header: 'Area', accessor: 'area' },
+      { Header: 'Pincode', accessor: 'pincode' },
+      { Header: 'State', accessor: 'state' },
+      { Header: 'State Code', accessor: 'state_code' },
+      { Header: 'Phone', accessor: 'phone' },
+      { Header: 'Mobile', accessor: 'mobile' },
+      { Header: 'Contact Person', accessor: 'contact_person' },
+      { Header: 'Email', accessor: 'email' },
+      { Header: 'Birthday On', accessor: 'birthday_on' },
+      { Header: 'Anniversary', accessor: 'anniversary_on' },
+      { Header: 'Bank Account No.', accessor: 'bank_account_no' },
+      { Header: 'Bank Name', accessor: 'bank_name' },
+      { Header: 'IFSC Code', accessor: 'ifsc_code' },
+      { Header: 'Branch', accessor: 'branch' },
     ],
     []
   );
 
-  const data = React.useMemo(
-    () => [
-   
-    ],
-    []
-  );
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
 
 
 

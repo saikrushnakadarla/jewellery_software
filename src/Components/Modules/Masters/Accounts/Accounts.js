@@ -2,129 +2,307 @@ import React, { useState } from "react";
 import "./Accounts.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const RepairForm = () => {
   const navigate = useNavigate();
-  const [metal, setMetal] = useState("");
-  const [type, setType] = useState("");
-  const [purity, setPurity] = useState("");
+  const [formData, setFormData] = useState({
+    account_name: "",
+    print_name: "",
+    group: "",
+    op_bal: "",
+    dr_cr: "",
+    metal_balance: "",
+    address: "",
+    address2: "",
+    city: "",
+    area: "",
+    pincode: "",
+    state: "",
+    state_code: "",
+    phone: "",
+    mobile: "",
+    contact_person: "",
+    email: "",
+    birthday_on: "",
+    anniversary_on: "",
+    branch: "",
+    bank_account_no: "",
+    bank_name: "",
+    ifsc_code: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:5000/post/accounts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server error: ${errorText}`);
+      }
+  
+      const result = await response.json();
+      alert("Account created successfully!");
+      navigate("/accountstable");
+    } catch (err) {
+      console.error("Error submitting form:", err.message);
+      alert(`Error: ${err.message}`);
+    }
+  };
+  
 
   return (
     <div className="main-container">
-    <Container className="accounts-form-container">
-
-      <Row className="accounts-form-section">
-          <h4 className="mb-4">Create Account</h4>
-          <Col xs={12} md={4}> <InputField label="Account Name" /></Col>
-          <Col xs={12} md={4}> <InputField label="Print Name" /></Col>
-          <Col xs={12} md={4}>                  
+      <Container className="accounts-form-container">
+        <form onSubmit={handleSubmit}>
+          <Row className="accounts-form-section">
+            <h4 className="mb-4">Create Account</h4>
+            <Col xs={12} md={4}>
               <InputField
-              label="Group"
-              type="select"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              options={[
-                { value: "Bank Accounts", label: "Bank Accounts" },
-                { value: "Cheque", label: "Cheque" },
-                { value: "Online", label: "Online" },
-              ]}
-            />
-           </Col>
-            <Col xs={12} md={2}>
-            <InputField label="Op. Bal."/>
-            </Col>
-            <Col xs={12} md={1}>
-            <InputField
-              label="Dr/Cr"
-              type="select"
-              value={purity}
-              onChange={(e) => setPurity(e.target.value)}
-              options={[
-                { value: "Dr", label: "Dr." },
-                { value: "Cr", label: "Cr." },
-                
-              ]}
-            />
-            </Col>
-            <Col xs={12} md={2}>
-            <InputField label="Metal Balance" />
-            </Col>
-            
-            <Col xs={12} md={3}>
-            <InputField label="Address" />
+                label="Account Name"
+                name="account_name"
+                value={formData.account_name}
+                onChange={handleChange}
+              />
             </Col>
             <Col xs={12} md={4}>
-            <InputField label="Address2" />
+              <InputField
+                label="Print Name"
+                name="print_name"
+                value={formData.print_name}
+                onChange={handleChange}
+              />
             </Col>
-            <Col xs={12} md={3}>
-            <InputField label="City" />
-            </Col>
-            <Col xs={12} md={3}>
-            <InputField
-              label="Area"
-              type="select"
-              value={purity}
-              onChange={(e) => setPurity(e.target.value)}
-              options={[
-                { value: "Area1", label: "Area1" },
-                { value: "Area2", label: "Area2" },
-                
-              ]}
-            />
-            </Col>
-            <Col xs={12} md={2}>
-            <InputField label="Pincode" type='number'/>
-            </Col>
-            <Col xs={12} md={2}>
-            <InputField label="State"/>
-            </Col>
-            <Col xs={12} md={2}>
-            <InputField label="State Code" type='number'/>
-            </Col>
-            <Col xs={12} md={3}>
-            <InputField label="Phone" type='number'/>
-            </Col>
-            <Col xs={12} md={3}>
-            <InputField label="Mobile" type='number'/>
-            </Col>
-            <Col xs={12} md={3}>
-            <InputField label="Contact Person" />
-            </Col>
-            <Col xs={12} md={3}>
-            <InputField label="Email" type="email"/>
+            <Col xs={12} md={4}>
+              <InputField
+                label="Group"
+                name="group"
+                type="select"
+                value={formData.group}
+                onChange={handleChange}
+                options={[
+                  { value: "Capital Ac", label: "Capital Ac" },
+                  { value: "Current As", label: "Current As" },
+                  { value: "Current Li", label: "Current Li" },
+                  { value: "Fixed Asse", label: "Fixed Asse" },
+                  { value: "Investment", label: "Investment" },
+                  { value: "Loans (Lia", label: "Loans (Lia" },
+                  { value: "Pre-Operat", label: "Pre-Operat" },
+                  { value: "Profit & L", label: "Profit & L" },
+                  { value: "Revenue Ac", label: "Revenue Ac" },
+                  { value: "Suspense A", label: "Suspense A" },
+                ]}
+              />
             </Col>
             <Col xs={12} md={2}>
-            <InputField label="Birthday On" type="date"/>
+              <InputField
+                label="Op. Bal."
+                name="op_bal"
+                type="number"
+                value={formData.op_bal}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Dr/Cr"
+                name="dr_cr"
+                type="select"
+                value={formData.dr_cr}
+                onChange={handleChange}
+                options={[
+                  { value: "Dr", label: "Dr." },
+                  { value: "Cr", label: "Cr." },
+                ]}
+              />
             </Col>
             <Col xs={12} md={2}>
-            <InputField label="Anniversary" type='date'/>
+              <InputField
+                label="Metal Balance"
+                name="metal_balance"
+                type="number"
+                value={formData.metal_balance}
+                onChange={handleChange}
+              />
             </Col>
             <Col xs={12} md={3}>
-            <InputField label="Bank Account No." />
+              <InputField
+                label="Address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={4}>
+              <InputField
+                label="Address2"
+                name="address2"
+                value={formData.address2}
+                onChange={handleChange}
+              />
             </Col>
             <Col xs={12} md={3}>
-            <InputField label="Bank Name" />
+              <InputField
+                label="City"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField
+                label="Area"
+                name="area"
+                type="select"
+                value={formData.area}
+                onChange={handleChange}
+                options={[
+                  { value: "Area1", label: "Area1" },
+                  { value: "Area2", label: "Area2" },
+                ]}
+              />
             </Col>
             <Col xs={12} md={2}>
-            <InputField label="IFSC Code" />
+              <InputField
+                label="Pincode"
+                name="pincode"
+                type="number"
+                value={formData.pincode}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="State"
+                name="state"
+                value={formData.state}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="State Code"
+                name="state_code"
+                type="text"
+                value={formData.state_code}
+                onChange={handleChange}
+              />
             </Col>
             <Col xs={12} md={3}>
-            <InputField label="Branch" />
+              <InputField
+                label="Phone"
+                name="phone"
+                type="number"
+                value={formData.phone}
+                onChange={handleChange}
+              />
             </Col>
-          
-          
-        </Row>
+            <Col xs={12} md={3}>
+              <InputField
+                label="Mobile"
+                name="mobile"
+                type="number"
+                value={formData.mobile}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField
+                label="Contact Person"
+                name="contact_person"
+                value={formData.contact_person}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField
+                label="Email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Birthday On"
+                name="birthday_on"
+                type="date"
+                value={formData.birthday_on}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Anniversary On"
+                name="anniversary_on"
+                type="date"
+                value={formData.anniversary_on}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField
+                label="Bank Account No."
+                name="bank_account_no"
+                value={formData.bank_account_no}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField
+                label="Bank Name"
+                name="bank_name"
+                value={formData.bank_name}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="IFSC Code"
+                name="ifsc_code"
+                value={formData.ifsc_code}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField
+                label="Branch"
+                name="branch"
+                value={formData.branch}
+                onChange={handleChange}
+              />
+            </Col>
+          </Row>
 
-        <div className="form-buttons">
-        <Button variant="secondary" type="button" className="cus-back-btn" onClick={() => navigate("/accountstable")}>
+          <div className="form-buttons">
+            <Button
+              variant="secondary"
+              type="button"
+              className="cus-back-btn"
+              onClick={() => navigate("/accountstable")}
+            >
               Cancel
             </Button>
-          <Button type="submit" variant="primary">Save</Button>
-          {/* <Button type="button">Print</Button> */}
-        </div>
+            <Button type="submit" variant="primary">
+              Save
+            </Button>
+          </div>
+        </form>
       </Container>
-      </div>
+    </div>
   );
 };
 
