@@ -1,10 +1,9 @@
 
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
 import { FaEdit, FaTrash } from "react-icons/fa";
-// import "./Purity.scss";
+import axios from "axios";
 
 function Purity() {
   const [formData, setFormData] = useState({
@@ -19,29 +18,51 @@ function Purity() {
     skin_print: "",
   });
 
-  const [submittedData, setSubmittedData] = useState([]); // Store submitted form entries
+  const [submittedData, setSubmittedData] = useState([]); // Store fetched and submitted form entries
+
+  // Fetch data from the backend API when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/purity");
+        setSubmittedData(response.data); // Populate table with fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Append formData to submittedData and reset the form
-    setSubmittedData([...submittedData, formData]);
-    setFormData({
-      name: "",
-      metal: "",
-      purity_percentage: "",
-      purity: "",
-      urd_purity: "",
-      desc: "",
-      old_purity_desc: "",
-      cut_issue: "",
-      skin_print: "",
-    });
+    try {
+      const response = await axios.post("http://localhost:5000/purity", formData);
+      console.log("Data submitted:", response.data);
+
+      // Update the table with the new data
+      setSubmittedData([...submittedData, { ...formData, id: response.data.id }]);
+      // Reset the form
+      setFormData({
+        name: "",
+        metal: "",
+        purity_percentage: "",
+        purity: "",
+        urd_purity: "",
+        desc: "",
+        old_purity_desc: "",
+        cut_issue: "",
+        skin_print: "",
+      });
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
   };
 
   const columns = React.useMemo(
@@ -106,7 +127,7 @@ function Purity() {
   return (
     <div className="main-container">
       <div className="customer-master-container">
-        <h3  style={{ textAlign: 'center', marginBottom:'30px'  }} >Purity</h3>
+        <h3 style={{ textAlign: "center", marginBottom: "30px" }}>Purity</h3>
         <form className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
@@ -181,8 +202,7 @@ function Purity() {
         </form>
 
         {/* Purity Table */}
-        <div style={{marginTop:'20px'}} className="purity-table-container">
-          {/* <h3 style={{textAlign:'center'}}>Submitted Data</h3> */}
+        <div style={{ marginTop: "20px" }} className="purity-table-container">
           <DataTable columns={columns} data={submittedData} />
         </div>
       </div>

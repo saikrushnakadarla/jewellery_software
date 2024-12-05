@@ -253,11 +253,14 @@
 
 
 
-import React, { useState } from "react";
+
+
+
+import React, { useState, useEffect } from "react";
 import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
 import { FaEdit, FaTrash } from "react-icons/fa";
-// import "./Purity.scss";
+import axios from "axios";
 
 function MetalType() {
   const [formData, setFormData] = useState({
@@ -275,30 +278,52 @@ function MetalType() {
 
   const [submittedData, setSubmittedData] = useState([]); // Store submitted form entries
 
+  // Fetch data from the backend API when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/designmaster");
+        setSubmittedData(response.data); // Populate table with fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Append formData to submittedData and reset the form
-    setSubmittedData([...submittedData, formData]);
-    setFormData({
-      metal: '',
-      short_id: '',
-      item_type: '',
-      design_item: '',
-      design_name: '',
-      wastage_percentage: '',
-      making_charge: '',
-      design_short_code: '',
-      brand_category: '',
-      mc_type: '',
-    });
-  };
+    try {
+      const response = await axios.post("http://localhost:5000/designmaster", formData);
+      console.log("Data submitted:", response.data);
 
+      // Update the table with the new data
+      setSubmittedData([...submittedData, { ...formData, id: response.data.id }]);
+      // Reset the form
+      setFormData({
+        metal: '',
+        short_id: '',
+        item_type: '',
+        design_item: '',
+        design_name: '',
+        wastage_percentage: '',
+        making_charge: '',
+        design_short_code: '',
+        brand_category: '',
+        mc_type: '',
+      });
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
   const columns = React.useMemo(
     () => [
       {
@@ -366,20 +391,20 @@ function MetalType() {
   return (
     <div className="main-container">
       <div className="customer-master-container">
-        <h3 style={{ textAlign: 'center', marginBottom:'30px' }}  >Design Master</h3>
+        <h3 style={{ textAlign: 'center', marginBottom: '30px' }}  >Design Master</h3>
         <form className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
             <InputField
               label="Metal:"
-              name="metal_name"
-              value={formData.metal_name}
+              name="metal"
+              value={formData.metal}
               onChange={handleChange}
             />
             <InputField
               label="Short Id:"
-              name="description"
-              value={formData.description}
+              name="short_id"
+              value={formData.short_id}
               onChange={handleChange}
             />
             <InputField
@@ -488,8 +513,7 @@ function MetalType() {
         </form>
 
         {/* Purity Table */}
-        <div style={{marginTop:'20px'}}className="purity-table-container">
-          {/* <h3 style={{ textAlign: 'center' }}>Submitted Data</h3> */}
+        <div style={{ marginTop: '20px' }} className="purity-table-container">
           <DataTable columns={columns} data={submittedData} />
         </div>
       </div>
