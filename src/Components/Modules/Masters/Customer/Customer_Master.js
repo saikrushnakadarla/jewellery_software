@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import './Customer_Master.css';
-import InputField from '../../../Pages/InputField/InputField';
-import { useNavigate } from 'react-router-dom';
 
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import InputField from '../../../Pages/InputField/InputField';
+import './Customer_Master.css';
 
 function Customer_Master() {
   const [formData, setFormData] = useState({
     account_name: '',
     print_name: '',
-    account_group: '',
-    pin_code: '',
+    account_group: 'Customer',
+    pincode: '',
     state: '',
     state_code: '',
     phone: '',
@@ -27,6 +27,23 @@ function Customer_Master() {
   });
 
   const [tcsApplicable, setTcsApplicable] = useState(false);
+  const navigate = useNavigate();
+  const { id } = useParams(); // Get ID from URL
+
+  useEffect(() => {
+    if (id) {
+      const fetchCustomer = async () => {
+        try {
+          const response = await fetch(`http://localhost:5000/get/supplier-and-customer/${id}`);
+          const result = await response.json();
+          setFormData(result);
+        } catch (error) {
+          console.error('Error fetching customer:', error);
+        }
+      };
+      fetchCustomer();
+    }
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,39 +56,42 @@ function Customer_Master() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...formData,account_group: 'Customer', tcsApplicable };
 
     try {
-      const response = await fetch('http://localhost:5000/supplier-and-customer', {
-        method: 'POST',
+      const method = id ? 'PUT' : 'POST';
+      const endpoint = id
+        ? `http://localhost:5000/edit/supplier-and-customer/${id}`
+        : 'http://localhost:5000/supplier-and-customer';
+
+      const response = await fetch(endpoint, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...formData, tcsApplicable }),
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log('Data saved successfully:', result);
-        alert('Customer data saved successfully!');
+        alert(`Customer ${id ? 'updated' : 'created'} successfully!`);
+        navigate('/customerstable');
       } else {
-        console.error('Failed to save data:', response.statusText);
-        alert('Failed to save data. Please try again.');
+        console.error('Failed to save customer');
+        alert('Failed to save customer.');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred. Please try again.');
+      alert('An error occurred.');
     }
   };
-  const navigate = useNavigate();
+
   const handleBack = () => {
-    navigate('/customerstable'); 
+    navigate('/customerstable');
   };
 
   return (
     <div className="main-container">
       <div className="customer-master-container">
-        <h2>Customers</h2>
+      <h2>{id ? 'Edit Customer' : 'Add Customer'}</h2>
         <form className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
@@ -99,8 +119,8 @@ function Customer_Master() {
             />
             <InputField
               label="Pincode:"
-              name="pin_code"
-              value={formData.pin_code}
+              name="pincode"
+              value={formData.pincode}
               onChange={handleChange}
               required={true}
 

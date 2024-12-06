@@ -34,7 +34,7 @@ import Sales from './Components/Modules/Transactions/Sales/SalesForm';
 import MetalType from './Components/Modules/Masters/MetalType/MetalType';
 import DesignMaster from './Components/Modules/Masters/DesignMaster/DesignMaster';
 import Purity from './Components/Modules/Masters/Purity/Purity';
-import SupplierEditForm from './Components/Modules/Masters/Supplier/Supplier_Edit_Form';
+
 import SalesTable from './Components/Modules/Transactions/Sales/SalesTable';
 import URDPurchasetable from './Components/Modules/Transactions/URDPurchase/URDPurchasetable';
 import PurityTable from './Components/Modules/Masters/Purity/PurityTable';
@@ -63,7 +63,9 @@ function App() {
         <Route path="/suppliertable" element={<Supplier_Table />} />
         <Route path="/customerstable" element={<Customers_Table />} />
         <Route path="/customermaster" element={<Customer_Master />} />
+        <Route path="/customermaster/:id" element={<Customer_Master />} />
         <Route path="/suppliermaster" element={<Supplier_Master />} />
+        <Route path="/suppliermaster/:id" element={<Supplier_Master />} />
         <Route path="/stockEntry" element={<StockEntry />} />
         <Route path="/stockEntryTable" element={<StockEntryTable />} />
         <Route path="/estimates/:product_id" element={<Estimate />} />
@@ -85,7 +87,7 @@ function App() {
         <Route path="/metaltype" element={<MetalType />}/>
         <Route path="/purity" element={<Purity />}/>
         <Route path="/designmaster" element={<DesignMaster />}/>
-        <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/>
+        {/* <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/> */}
         <Route path="/salestable" element={<SalesTable />} />
         <Route path="/urdpurchasetable" element={<URDPurchasetable />} />
         <Route path="/puritytable" element={<PurityTable />} />

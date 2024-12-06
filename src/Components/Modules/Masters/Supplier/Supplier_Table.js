@@ -88,25 +88,25 @@ const RepairsTable = () => {
         Header: 'PAN Card',
         accessor: 'pan_card',
       },
-      // {
-      //   Header: 'Action',
-      //   Cell: ({ row }) => (
-      //     <div>
-      //       <button
-      //         className="edit-btn edit-button"
-      //         onClick={() => handleEdit(row.original)}
-      //       >
-      //         <FaEdit />
-      //       </button>
-      //       <button
-      //         className="delete-btn delete-button"
-      //         onClick={() => handleDelete(row.original.id)}
-      //       >
-      //         <FaTrash />
-      //       </button>
-      //     </div>
-      //   ),
-      // },
+      {
+        Header: 'Action',
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center">
+            <button
+              className="action-button edit-button"
+              onClick={() => handleEdit(row.original.id)}
+            >
+              <FaEdit />
+            </button>
+            <button
+              className="action-button delete-button"
+              onClick={() => handleDelete(row.original.id)}
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ),
+      },
     ],
     []
   );
@@ -135,36 +135,32 @@ const RepairsTable = () => {
   fetchData();
 }, []);
 
-const handleEdit = (customer) => {
-  navigate(`/suppliereditform/:id`); // Navigate to the edit form with the customer ID
-};
 
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      'Are you sure you want to delete this customer?'
-    );
-    if (!confirmDelete) return;
-
+const handleDelete = async (id) => {
+  if (window.confirm('Are you sure you want to delete this customer?')) {
     try {
-      const response = await fetch(
-        `http://localhost:5000/delete/supplier-and-customer/${id}`,
-        {
-          method: 'DELETE',
-        }
-      );
+      const response = await fetch(`http://localhost:5000/delete/supplier-and-customer/${id}`, {
+        method: 'DELETE',
+      });
 
       if (response.ok) {
-        setData((prevData) => prevData.filter((item) => item.id !== id));
-        alert('Customer deleted successfully.');
+        alert('Supplier deleted successfully!');
+        setData((prevData) => prevData.filter((customer) => customer.id !== id));
       } else {
-        const errorData = await response.json();
-        alert(`Failed to delete customer: ${errorData.message}`);
+        console.error('Failed to delete customer');
+        alert('Failed to delete customer.');
       }
     } catch (error) {
-      console.error('Error deleting customer:', error);
-      alert('An error occurred while trying to delete the customer.');
+      console.error('Error:', error);
+      alert('An error occurred while deleting.');
     }
+  }
+};
+
+  // Navigate to edit form
+  const handleEdit = (id) => {
+    navigate(`/suppliermaster/${id}`);
   };
 
   const handleCreate = () => {

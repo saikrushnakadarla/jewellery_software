@@ -1,6 +1,3 @@
-
-
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
@@ -91,30 +88,30 @@ const RepairsTable = () => {
         Header: 'PAN Card',
         accessor: 'pan_card',
       },
-      // {
-      //   Header: 'Action',
-      //   Cell: ({ row }) => (
-      //     <div>
-      //       <button
-      //         className="edit-btn edit-button"
-      //         onClick={() => handleEdit(row.original)}
-      //       >
-      //         <FaEdit />
-      //       </button>
-      //       <button
-      //         className="delete-btn delete-button"
-      //         onClick={() => handleDelete(row.original.id)}
-      //       >
-      //         <FaTrash />
-      //       </button>
-      //     </div>
-      //   ),
-      // },
+      {
+        Header: 'Action',
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center">
+            <button
+              className="action-button edit-button"
+              onClick={() => handleEdit(row.original.id)}
+            >
+              <FaEdit />
+            </button>
+            <button
+              className="action-button delete-button"
+              onClick={() => handleDelete(row.original.id)}
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ),
+      },
     ],
     []
   );
 
-  // Fetch data and filter where account_group = "supplier"
+  // Fetch data and filter where account_group = "customer"
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -123,12 +120,12 @@ const RepairsTable = () => {
         );
         const result = await response.json();
 
-        // Filter only suppliers
-        const suppliers = result.filter(
+        // Filter only customers
+        const customers = result.filter(
           (item) => item.account_group && item.account_group.toLowerCase() === 'customer'
         );
 
-        setData(suppliers);
+        setData(customers);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -139,41 +136,35 @@ const RepairsTable = () => {
     fetchData();
   }, []);
 
-
-  const handleEdit = (customer) => {
-    // Navigate to the edit page with customer data
-    navigate(`/edit-customer/${customer.id}`);
-  };
-
+  // Delete a customer
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      'Are you sure you want to delete this customer?'
-    );
-    if (!confirmDelete) return;
-
-    try {
-      const response = await fetch(
-        `http://localhost:5000/delete/supplier-and-customer/${id}`,
-        {
+    if (window.confirm('Are you sure you want to delete this customer?')) {
+      try {
+        const response = await fetch(`http://localhost:5000/delete/supplier-and-customer/${id}`, {
           method: 'DELETE',
-        }
-      );
+        });
 
-      if (response.ok) {
-        setData((prevData) => prevData.filter((item) => item.id !== id));
-        alert('Customer deleted successfully.');
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to delete customer: ${errorData.message}`);
+        if (response.ok) {
+          alert('Customer deleted successfully!');
+          setData((prevData) => prevData.filter((customer) => customer.id !== id));
+        } else {
+          console.error('Failed to delete customer');
+          alert('Failed to delete customer.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while deleting.');
       }
-    } catch (error) {
-      console.error('Error deleting customer:', error);
-      alert('An error occurred while trying to delete the customer.');
     }
   };
 
+  // Navigate to edit form
+  const handleEdit = (id) => {
+    navigate(`/customermaster/${id}`);
+  };
+
   const handleCreate = () => {
-    navigate('/customermaster'); // Navigate to the /customers page
+    navigate('/customermaster'); // Navigate to the /customermaster page
   };
 
   return (
@@ -182,7 +173,7 @@ const RepairsTable = () => {
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Customers</h3>
-            <Button  className='create_but' variant="success" onClick={handleCreate}>
+            <Button className="create_but" variant="success" onClick={handleCreate}>
               + Create
             </Button>
           </Col>
@@ -198,4 +189,3 @@ const RepairsTable = () => {
 };
 
 export default RepairsTable;
-
