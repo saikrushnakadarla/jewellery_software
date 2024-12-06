@@ -143,17 +143,18 @@ const RepairForm = () => {
           <Col xs={12} md={2}>
             <InputField label="Total Rs:" name="total_rs" value={formData.total_rs} onChange={handleInputChange}/>
           </Col>
+          <Col xs={12} md={2}>          
+            <Button type="submit" onClick={handleSubmit} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+              {product_id ? "Update" : "Print"}
+            </Button>           
+         </Col>
         </Row>
-        <Row className="estimate-form-section">
+        
+        
+         <Row className="estimate-form-section">
         <EstimateTable />
         </Row>
 
-        <div className="form-buttons">
-            <Button variant="primary" type="submit" onClick={handleSubmit}>
-              {product_id ? "Update" : "Print"}
-            </Button>
-           
-         </div>
       </Container>
     </div>
   );

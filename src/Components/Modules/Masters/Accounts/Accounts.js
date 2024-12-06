@@ -317,7 +317,7 @@ const RepairForm = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" variant="primary">
+            <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
               
               {id ? "Update" : "Save"}
             </Button>

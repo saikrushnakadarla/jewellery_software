@@ -28,18 +28,7 @@
     border-radius: 5px;
   }
   
-  .add-button {
-    background-color: #28a745;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .add-button:hover {
-    background-color: #218838;
-  }
+ 
   
   .repairs-table {
     width: 100%;

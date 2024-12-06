@@ -331,7 +331,7 @@ const FormWithTable = () => {
                                     />
                                     <button
                                         type="button"
-                                        style={{ backgroundColor: 'blue' }}
+                                        style={{ backgroundColor: '#a36e29' }}
                                         className="stone-details-btn"
                                         onClick={handleOpenModal}
                                     >
@@ -402,12 +402,12 @@ const FormWithTable = () => {
                                 type="button"
                                 className="cus-back-btn"
                                 variant="secondary"
-                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
+                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px',marginTop:'10px' }}
                             >
                                 cancel
                             </button>
                             {/* Add additional fields similarly */}
-                            <button type="submit" className="btn btn-primary" >
+                            <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
                                 Save
                             </button>
                         </form>

@@ -21,15 +21,21 @@
       
       /* Styling for the "Save" button */
       .cus-submit-btn {
-        background-color: #007bff; /* Green color for save button */
-        color: white;
+        background-color: #a36e29; /* Button background color */
+        color: white; /* Text color */
         padding: 10px 20px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
         font-size: 16px;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.3s ease; /* Smooth transition */
       }
+      
+      .cus-submit-btn:hover {
+        background-color: #a36e29; /* Maintain the same color on hover */
+        color: white; /* Optional: Ensure text color remains consistent */
+      }
+      
       
      
       /* styles.css or EditForm.css */

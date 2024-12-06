@@ -156,6 +156,7 @@ const RepairForm = () => {
                       accept="image/*"
                       onChange={handleImageChange}
                       style={{ display: "none" }}
+                      
                     />  
                     {image && (
                       <div className="image-preview">
@@ -192,7 +193,7 @@ const RepairForm = () => {
         {/* Buttons */}
         <div className="form-buttons">
           <Button type="submit" className="cus-back-btn" variant="secondary" onClick={() => navigate("/repairstable")}>cancel</Button>
-          <Button type="submit" variant="primary">Save</Button>
+          <Button type="submit" variant="primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
         </div>
       </Container>
       </div>

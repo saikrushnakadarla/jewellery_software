@@ -455,6 +455,7 @@ const Purchase = () => {
                                 <button
                                         type="submit"
                                         className="pur-submit-btn"
+                                        style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
                                 >
                                         Save
                                 </button>

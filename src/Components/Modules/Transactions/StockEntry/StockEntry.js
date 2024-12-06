@@ -171,7 +171,7 @@ const StockEntry = () => {
                                     </div>
                                     <div className="col-md-2">
                                         <button
-                                            type="button" style={{ backgroundColor: 'blue' }}
+                                            type="button" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
                                             className="btn btn-primary w-100"
                                             onClick={handleOpenModal}
 

@@ -279,7 +279,7 @@ const URDPurchase = () => {
                             >
                                 cancel
                             </button>
-          <Button type="submit" variant="primary">Print</Button>
+          <Button type="submit" variant="primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
         </div>
      
     </div>

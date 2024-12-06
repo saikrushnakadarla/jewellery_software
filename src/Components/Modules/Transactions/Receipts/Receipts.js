@@ -70,7 +70,7 @@ const RepairForm = () => {
         <Button variant="secondary" className="cus-back-btn" type="button" onClick={() => navigate("/paymentstable")}>
               Cancel
             </Button>
-          <Button type="submit" variant="primary">Save</Button>
+          <Button type="submit" variant="primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
           {/* <Button type="button">Print</Button> */}
         </div>
       </Container>

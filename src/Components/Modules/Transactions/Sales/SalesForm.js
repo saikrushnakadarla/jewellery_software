@@ -368,7 +368,7 @@ const RepairForm = () => {
                   <InputField label="Amt" />
                 </Col>
                 <Col xs={12} md={4}>
-                  <Button type="submit" variant="primary">Save</Button>
+                  <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
                 </Col>
 
               </Row>
@@ -425,7 +425,7 @@ const RepairForm = () => {
           >
             cancel
           </Button>
-          <Button type="submit" variant="primary">Print</Button>
+          <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
         </div>
       </Container>
     </div>

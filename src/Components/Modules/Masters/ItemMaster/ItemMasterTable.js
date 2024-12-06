@@ -152,8 +152,8 @@ const ItemMasterTable = () => {
       <div className="itemmaster-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Item Master Table</h3>
-            <Button className='create_but' variant="success" onClick={handleCreate}>
+            <h3>Products</h3>
+            <Button className='create_but' onClick={handleCreate} variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
               + Create
             </Button>
           </Col>
