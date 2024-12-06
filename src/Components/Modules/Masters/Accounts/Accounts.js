@@ -318,7 +318,8 @@ const RepairForm = () => {
               Cancel
             </Button>
             <Button type="submit" variant="primary">
-              Save
+              
+              {id ? "Update" : "Save"}
             </Button>
           </div>
         </form>

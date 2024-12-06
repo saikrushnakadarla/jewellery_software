@@ -284,13 +284,13 @@ function Customer_Master() {
               className="cus-back-btn"
               onClick={handleBack}
             >
-              Back
+              CLose
             </button>
             <button
               type="submit"
               className="cus-submit-btn"
-            >
-              Save
+            >              
+              {id ? 'Update' : 'Save'}
             </button>
           </div>
         </form>
