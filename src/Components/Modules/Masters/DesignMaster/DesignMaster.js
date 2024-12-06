@@ -256,13 +256,284 @@
 
 
 
+// import React, { useState, useEffect } from "react";
+// import InputField from "../../../Pages/InputField/InputField";
+// import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
+// import { FaEdit, FaTrash } from "react-icons/fa";
+// import axios from "axios";
+
+// function DesignMaster() {
+//   const [formData, setFormData] = useState({
+//     metal: '',
+//     short_id: '',
+//     item_type: '',
+//     design_item: '',
+//     design_name: '',
+//     wastage_percentage: '',
+//     making_charge: '',
+//     design_short_code: '',
+//     brand_category: '',
+//     mc_type: '',
+//   });
+
+//   const [submittedData, setSubmittedData] = useState([]); // Store submitted form entries
+
+//   // Fetch data from the backend API when the component mounts
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const response = await axios.get("http://localhost:5000/designmaster");
+//         setSubmittedData(response.data); // Populate table with fetched data
+//       } catch (error) {
+//         console.error("Error fetching data:", error);
+//       }
+//     };
+
+//     fetchData();
+//   }, []);
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData({ ...formData, [name]: value });
+//   };
+
+
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     try {
+//       const response = await axios.post("http://localhost:5000/designmaster", formData);
+//       console.log("Data submitted:", response.data);
+
+//       // Update the table with the new data
+//       setSubmittedData([...submittedData, { ...formData, id: response.data.id }]);
+//       // Reset the form
+//       setFormData({
+//         metal: '',
+//         short_id: '',
+//         item_type: '',
+//         design_item: '',
+//         design_name: '',
+//         wastage_percentage: '',
+//         making_charge: '',
+//         design_short_code: '',
+//         brand_category: '',
+//         mc_type: '',
+//       });
+//     } catch (error) {
+//       console.error("Error submitting data:", error);
+//     }
+//   };
+//   const columns = React.useMemo(
+//     () => [
+//       {
+//         Header: "Sr. No.",
+//         Cell: ({ row }) => row.index + 1, // Generate a sequential number
+//       },
+//       {
+//         Header: "Metal",
+//         accessor: "metal",
+//       },
+//       {
+//         Header: "Short Id",
+//         accessor: "short_id",
+//       },
+//       {
+//         Header: "Item Type",
+//         accessor: "item_type",
+//       },
+//       {
+//         Header: "Design Item",
+//         accessor: "design_item",
+//       },
+//       {
+//         Header: "Design Name",
+//         accessor: "design_name",
+//       },
+//       {
+//         Header: "Wastage Percentage",
+//         accessor: "wastage_percentage",
+//       },
+//       {
+//         Header: "Making Charge",
+//         accessor: "making_charge",
+//       },
+//       {
+//         Header: "Design Short Code",
+//         accessor: "design_short_code",
+//       },
+//       {
+//         Header: "Brand/Category",
+//         accessor: "brand_category",
+//       },
+//       {
+//         Header: "MC Type",
+//         accessor: "mc_type",
+//       },
+
+//       {
+//         Header: "Action",
+//         Cell: ({ row }) => (
+//           <div>
+//             <button className="edit-btn edit-button">
+//               <FaEdit />
+//             </button>
+//             <button className="delete-btn delete-button">
+//               <FaTrash />
+//             </button>
+//           </div>
+//         ),
+//       },
+//     ],
+//     []
+//   );
+
+//   return (
+//     <div className="main-container">
+//       <div className="customer-master-container">
+//         <h3 style={{ textAlign: 'center', marginBottom: '30px' }}  >Design Master</h3>
+//         <form className="customer-master-form" onSubmit={handleSubmit}>
+//           {/* Row 1 */}
+//           <div className="form-row">
+//             <InputField
+//               label="Metal:"
+//               name="metal"
+//               value={formData.metal}
+//               onChange={handleChange}
+//             />
+//             <InputField
+//               label="Short Id:"
+//               name="short_id"
+//               value={formData.short_id}
+//               onChange={handleChange}
+//             />
+//             <InputField
+//               label="Item Type:"
+//               name="item_type"
+//               type="select"
+//               value={formData.item_type}
+//               onChange={handleChange}
+//               required={true}
+//               options={[
+//                 { value: '', label: 'Select Item Type' },
+//                 { value: 'ring', label: 'Ring' },
+//                 { value: 'bracelet', label: 'Bracelet' },
+//                 { value: 'necklace', label: 'Necklace' },
+//                 { value: 'earring', label: 'Earring' },
+//               ]}
+//             />
+
+//             <InputField
+//               label="Design Item:"
+//               name="design_item"
+//               value={formData.design_item}
+//               onChange={handleChange}
+//               required={true}
+//             />
+
+//             <InputField
+//               label="Design Name:"
+//               name="design_name"
+//               value={formData.design_name}
+//               onChange={handleChange}
+//               required={true}
+//             />
+
+
+
+//           </div>
+
+//           {/* Row 2 */}
+//           <div className="form-row">
+//             <InputField
+//               label="Wastage Percentage:"
+//               name="wastage_percentage"
+//               value={formData.wastage_percentage}
+//               onChange={handleChange}
+//               required={true}
+//             />
+
+
+//             <InputField
+//               label="Making Charge:"
+//               name="making_charge"
+//               value={formData.making_charge}
+//               onChange={handleChange}
+//               required={true}
+//             />
+//             <InputField
+//               label="Design Short Code:"
+//               name="design_short_code"
+//               value={formData.design_short_code}
+//               onChange={handleChange}
+//               required={true}
+//             />
+
+//             <InputField
+//               label="Brand/Category:"
+//               name="brand_category"
+//               type="select"
+//               value={formData.brand_category}
+//               onChange={handleChange}
+//               required={true}
+//               options={[
+//                 { value: '', label: 'Select Category' },
+//                 { value: 'gold', label: 'Gold' },
+//                 { value: 'silver', label: 'Silver' },
+//                 { value: 'platinum', label: 'Platinum' },
+//                 { value: 'diamond', label: 'Diamond' },
+//               ]}
+//             />
+
+
+//             <InputField
+//               label="MC Type:"
+//               name="mc_type"
+//               type="select"
+//               value={formData.mc_type}
+//               onChange={handleChange}
+//               required={true}
+//               options={[
+//                 { value: '', label: 'Select MC Type' },
+//                 { value: 'fixed', label: 'Fixed' },
+//                 { value: 'percentage', label: 'Percentage' },
+//               ]}
+//             />
+
+//           </div>
+
+//           <div className="sup-button-container">
+//             <button type="button" className="cus-back-btn">
+//               Back
+//             </button>
+//             <button type="submit" className="cus-submit-btn">
+//               Save
+//             </button>
+//           </div>
+//         </form>
+
+//         {/* Purity Table */}
+//         <div style={{ marginTop: '20px' }} className="purity-table-container">
+//           <DataTable columns={columns} data={submittedData} />
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default DesignMaster;
+
+
+
+
+
 import React, { useState, useEffect } from "react";
 import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 
-function MetalType() {
+function DesignMaster() {
   const [formData, setFormData] = useState({
     metal: '',
     short_id: '',
@@ -291,12 +562,11 @@ function MetalType() {
 
     fetchData();
   }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -306,7 +576,7 @@ function MetalType() {
       console.log("Data submitted:", response.data);
 
       // Update the table with the new data
-      setSubmittedData([...submittedData, { ...formData, id: response.data.id }]);
+      setSubmittedData([...submittedData, { ...formData, design_id: response.data.id }]);
       // Reset the form
       setFormData({
         metal: '',
@@ -324,6 +594,20 @@ function MetalType() {
       console.error("Error submitting data:", error);
     }
   };
+
+  const handleDelete = async (id) => {
+    const isConfirmed = window.confirm(`Are you sure you want to delete the record with ID ${id}?`);
+    if (!isConfirmed) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/designmaster/${id}`);
+      setSubmittedData(submittedData.filter((item) => item.design_id !== id));
+      console.log(`Record with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error("Error deleting record:", error);
+    }
+  };
+
   const columns = React.useMemo(
     () => [
       {
@@ -370,28 +654,30 @@ function MetalType() {
         Header: "MC Type",
         accessor: "mc_type",
       },
-
-      // {
-      //   Header: "Action",
-      //   Cell: ({ row }) => (
-      //     <div>
-      //       <button className="edit-btn edit-button">
-      //         <FaEdit />
-      //       </button>
-      //       <button className="delete-btn delete-button">
-      //         <FaTrash />
-      //       </button>
-      //     </div>
-      //   ),
-      // },
+      {
+        Header: "Action",
+        Cell: ({ row }) => (
+          <div>
+            <button className="edit-btn edit-button">
+              <FaEdit />
+            </button>
+            <button
+              className="delete-btn delete-button"
+              onClick={() => handleDelete(row.original.design_id)}
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ),
+      },
     ],
-    []
+    [submittedData]
   );
 
   return (
     <div className="main-container">
       <div className="customer-master-container">
-        <h3 style={{ textAlign: 'center', marginBottom: '30px' }}  >Design Master</h3>
+        <h3 style={{ textAlign: 'center', marginBottom: '30px' }}>Design Master</h3>
         <form className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
@@ -422,7 +708,6 @@ function MetalType() {
                 { value: 'earring', label: 'Earring' },
               ]}
             />
-
             <InputField
               label="Design Item:"
               name="design_item"
@@ -430,7 +715,6 @@ function MetalType() {
               onChange={handleChange}
               required={true}
             />
-
             <InputField
               label="Design Name:"
               name="design_name"
@@ -438,9 +722,6 @@ function MetalType() {
               onChange={handleChange}
               required={true}
             />
-
-
-
           </div>
 
           {/* Row 2 */}
@@ -452,8 +733,6 @@ function MetalType() {
               onChange={handleChange}
               required={true}
             />
-
-
             <InputField
               label="Making Charge:"
               name="making_charge"
@@ -468,7 +747,6 @@ function MetalType() {
               onChange={handleChange}
               required={true}
             />
-
             <InputField
               label="Brand/Category:"
               name="brand_category"
@@ -484,8 +762,6 @@ function MetalType() {
                 { value: 'diamond', label: 'Diamond' },
               ]}
             />
-
-
             <InputField
               label="MC Type:"
               name="mc_type"
@@ -499,7 +775,6 @@ function MetalType() {
                 { value: 'percentage', label: 'Percentage' },
               ]}
             />
-
           </div>
 
           <div className="sup-button-container">
@@ -512,7 +787,7 @@ function MetalType() {
           </div>
         </form>
 
-        {/* Purity Table */}
+        {/* Design Master Table */}
         <div style={{ marginTop: '20px' }} className="purity-table-container">
           <DataTable columns={columns} data={submittedData} />
         </div>
@@ -521,4 +796,4 @@ function MetalType() {
   );
 }
 
-export default MetalType;
+export default DesignMaster;

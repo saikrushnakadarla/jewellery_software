@@ -37,7 +37,7 @@ function MetalType() {
     setFormData({ ...formData, [name]: value });
   };
 
- 
+
 
 
   const handleSubmit = async (e) => {
@@ -60,6 +60,26 @@ function MetalType() {
       });
     } catch (error) {
       console.error("Error submitting data:", error);
+    }
+  };
+
+
+
+  const handleDelete = async (id) => {
+    const isConfirmed = window.confirm(`Are you sure you want to delete the record with ID ${id}?`);
+
+    if (!isConfirmed) {
+      return; // Do nothing if the user cancels the action
+    }
+
+    try {
+      // Send DELETE request to the backend
+      await axios.delete(`http://localhost:5000/metaltype/${id}`);
+      // Update the frontend state after successful deletion
+      setSubmittedData(submittedData.filter((item) => item.metal_type_id !== id));
+      console.log(`Record with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error("Error deleting record:", error);
     }
   };
 
@@ -95,21 +115,23 @@ function MetalType() {
         accessor: "default_issue_purity",
       },
 
-      // {
-      //   Header: "Action",
-      //   Cell: ({ row }) => (
-      //     <div>
-      //       <button className="edit-btn edit-button">
-      //         <FaEdit />
-      //       </button>
-      //       <button className="delete-btn delete-button">
-      //         <FaTrash />
-      //       </button>
-      //     </div>
-      //   ),
-      // },
+      {
+        Header: "Action",
+        Cell: ({ row }) => (
+          <div>
+            <button className="edit-btn edit-button">
+              <FaEdit />
+            </button>
+            <button className="delete-btn delete-button"
+              onClick={() => handleDelete(row.original.metal_type_id)}
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ),
+      },
     ],
-    []
+    [submittedData]
   );
 
   return (
