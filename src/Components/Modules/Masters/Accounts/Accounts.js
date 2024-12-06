@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Accounts.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const RepairForm = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); // Get the account ID from URL params
   const [formData, setFormData] = useState({
     account_name: "",
     print_name: "",
@@ -32,6 +33,25 @@ const RepairForm = () => {
     ifsc_code: "",
   });
 
+  // Fetch data if editing an existing account
+  useEffect(() => {
+    if (id) {
+      const fetchAccountData = async () => {
+        try {
+          const response = await fetch(`http://localhost:5000/get/accounts/${id}`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch account data");
+          }
+          const result = await response.json();
+          setFormData(result);
+        } catch (error) {
+          console.error("Error fetching account data:", error.message);
+        }
+      };
+      fetchAccountData();
+    }
+  }, [id]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -40,8 +60,10 @@ const RepairForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/post/accounts", {
-        method: "POST",
+      const method = id ? "PUT" : "POST";
+      const url = id ? `http://localhost:5000/put/accounts/${id}` : "http://localhost:5000/post/accounts";
+      const response = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -54,21 +76,20 @@ const RepairForm = () => {
       }
   
       const result = await response.json();
-      alert("Account created successfully!");
+      alert(id ? "Account updated successfully!" : "Account created successfully!");
       navigate("/accountstable");
     } catch (err) {
       console.error("Error submitting form:", err.message);
       alert(`Error: ${err.message}`);
     }
   };
-  
 
   return (
     <div className="main-container">
       <Container className="accounts-form-container">
         <form onSubmit={handleSubmit}>
           <Row className="accounts-form-section">
-            <h4 className="mb-4">Create Account</h4>
+          <h4 className="mb-4">{id ? "Edit Account" : "Create Account"}</h4>
             <Col xs={12} md={4}>
               <InputField
                 label="Account Name"

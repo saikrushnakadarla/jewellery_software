@@ -79,6 +79,7 @@ function App() {
         <Route path="/payments" element={<Payments />} />
         <Route path="/paymentstable" element={<PaymentsTable />} />
         <Route path="/accounts" element={<Accounts />} />
+        <Route path="/accounts/:id" element={<Accounts />} />
         <Route path="/accountstable" element={<AccountsTable />} />
         <Route path="/sales" element={<Sales />} />
         <Route path="/metaltype" element={<MetalType />}/>

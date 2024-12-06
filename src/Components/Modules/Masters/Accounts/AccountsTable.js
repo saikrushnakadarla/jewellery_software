@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate for naviga
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap'; 
-import './AccountsTable.css'
+import './AccountsTable.css';
 
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
@@ -11,24 +11,48 @@ const RepairsTable = () => {
   const [loading, setLoading] = useState(true); // State to manage loading
 
   // Fetch accounts data from the API
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/get/accounts'); // Adjust the URL if necessary
-        if (!response.ok) {
-          throw new Error('Failed to fetch accounts data');
-        }
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        console.error('Error fetching accounts data:', error.message);
-      } finally {
-        setLoading(false);
+  const fetchAccounts = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get/accounts'); // Adjust the URL if necessary
+      if (!response.ok) {
+        throw new Error('Failed to fetch accounts data');
       }
-    };
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error('Error fetching accounts data:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchAccounts();
+  useEffect(() => {
+    fetchAccounts(); // Initial fetch when the component mounts
   }, []);
+
+  const handleEdit = (id) => {
+    navigate(`/accounts/${id}`); // Navigate to the edit form with account ID
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this account?")) {
+      try {
+        const response = await fetch(`http://localhost:5000/delete/accounts/${id}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error deleting account: ${errorText}`);
+        }
+        alert("Account deleted successfully!");
+        // Refetch data after deletion
+        fetchAccounts();
+      } catch (err) {
+        console.error("Error deleting account:", err.message);
+        alert(`Error: ${err.message}`);
+      }
+    }
+  };
 
   const columns = React.useMemo(
     () => [
@@ -55,6 +79,21 @@ const RepairsTable = () => {
       { Header: 'Bank Name', accessor: 'bank_name' },
       { Header: 'IFSC Code', accessor: 'ifsc_code' },
       { Header: 'Branch', accessor: 'branch' },
+      {
+        Header: 'Actions',
+        Cell: ({ row }) => (
+          <div>
+            <FaEdit 
+              style={{ cursor: 'pointer', marginRight: 10 }} 
+              onClick={() => handleEdit(row.original.account_id)} 
+            />
+            <FaTrash 
+              style={{ cursor: 'pointer' }} 
+              onClick={() => handleDelete(row.original.account_id)} 
+            />
+          </div>
+        )
+      }
     ],
     []
   );
