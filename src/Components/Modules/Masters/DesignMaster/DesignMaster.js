@@ -596,17 +596,24 @@ function DesignMaster() {
   };
 
   const handleDelete = async (id) => {
+    console.log("Deleting ID:", id); // Debug log
     const isConfirmed = window.confirm(`Are you sure you want to delete the record with ID ${id}?`);
     if (!isConfirmed) return;
-
+  
     try {
-      await axios.delete(`http://localhost:5000/designmaster/${id}`);
-      setSubmittedData(submittedData.filter((item) => item.design_id !== id));
-      console.log(`Record with ID ${id} deleted successfully.`);
+      const response = await axios.delete(`http://localhost:5000/designmaster/${id}`);
+      if (response.status === 200) {
+        setSubmittedData(submittedData.filter((item) => item.design_id !== id));
+        console.log(`Record with ID ${id} deleted successfully.`);
+      } else {
+        console.error("Failed to delete the record from the database.");
+      }
     } catch (error) {
       console.error("Error deleting record:", error);
     }
   };
+  
+  
 
   const columns = React.useMemo(
     () => [
