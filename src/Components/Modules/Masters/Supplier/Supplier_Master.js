@@ -254,7 +254,7 @@ function Customer_Master() {
               className="cus-back-btn"
               onClick={handleBack}
             >
-              CLose
+              Close
             </button>
             <button
               type="submit"
