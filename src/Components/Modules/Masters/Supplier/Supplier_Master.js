@@ -56,13 +56,27 @@ function Customer_Master() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Validation
+    if (!formData.account_name.trim()) {
+      alert('Customer Name is required.');
+      return;
+    }
+    if (!formData.mobile.trim()) {
+      alert('Mobile number is required.');
+      return;
+    }
+    if (!formData.phone.trim()) {
+      alert('Phone number is required.');
+      return;
+    }
+  
     try {
       const method = id ? 'PUT' : 'POST';
       const endpoint = id
         ? `http://localhost:5000/edit/supplier-and-customer/${id}`
         : 'http://localhost:5000/supplier-and-customer';
-
+  
       const response = await fetch(endpoint, {
         method,
         headers: {
@@ -70,19 +84,20 @@ function Customer_Master() {
         },
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
-
+  
       if (response.ok) {
         alert(`Supplier ${id ? 'updated' : 'created'} successfully!`);
         navigate('/suppliertable');
       } else {
-        console.error('Failed to save supplier');
-        alert('Failed to save supplier.');
+        console.error('Failed to save customer');
+        alert('Failed to save customer.');
       }
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred.');
     }
   };
+  
 
   const handleBack = () => {
     navigate('/suppliertable'); 

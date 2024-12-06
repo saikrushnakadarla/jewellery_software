@@ -56,13 +56,27 @@ function Customer_Master() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Validation
+    if (!formData.account_name.trim()) {
+      alert('Customer Name is required.');
+      return;
+    }
+    if (!formData.mobile.trim()) {
+      alert('Mobile number is required.');
+      return;
+    }
+    if (!formData.phone.trim()) {
+      alert('Phone number is required.');
+      return;
+    }
+  
     try {
       const method = id ? 'PUT' : 'POST';
       const endpoint = id
         ? `http://localhost:5000/edit/supplier-and-customer/${id}`
         : 'http://localhost:5000/supplier-and-customer';
-
+  
       const response = await fetch(endpoint, {
         method,
         headers: {
@@ -70,7 +84,7 @@ function Customer_Master() {
         },
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
-
+  
       if (response.ok) {
         alert(`Customer ${id ? 'updated' : 'created'} successfully!`);
         navigate('/customerstable');
@@ -83,6 +97,7 @@ function Customer_Master() {
       alert('An error occurred.');
     }
   };
+  
 
   const handleBack = () => {
     navigate('/customerstable');

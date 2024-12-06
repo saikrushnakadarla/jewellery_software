@@ -227,7 +227,7 @@ const RepairsTable = () => {
                     setShowPopover(false); // Close popover
                   }}
                 >
-                  Send to Deliver Counter
+                  Delivery to Customer
                 </li>
               </ul>
             </Popover.Body>
