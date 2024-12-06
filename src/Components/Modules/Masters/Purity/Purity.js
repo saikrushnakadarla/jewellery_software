@@ -1,4 +1,6 @@
 
+
+
 // import React, { useState, useEffect } from "react";
 // import InputField from "../../../Pages/InputField/InputField";
 // import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
@@ -47,7 +49,7 @@
 //       console.log("Data submitted:", response.data);
 
 //       // Update the table with the new data
-//       setSubmittedData([...submittedData, { ...formData, id: response.data.id }]);
+//       setSubmittedData([...submittedData, { ...formData, purity_id: response.data.id }]);
 //       // Reset the form
 //       setFormData({
 //         name: "",
@@ -65,21 +67,25 @@
 //     }
 //   };
 
-
-
 //   const handleDelete = async (id) => {
-//     if (window.confirm("Are you sure you want to delete this record?")) {
-//       try {
-//         await axios.delete(`http://localhost:5000/purity/${id}`);
-//         console.log("Record deleted:", id);
-
-//         // Update the table to remove the deleted record
-//         setSubmittedData(submittedData.filter((item) => item.id !== id));
-//       } catch (error) {
-//         console.error("Error deleting record:", error);
-//       }
+//     const isConfirmed = window.confirm(`Are you sure you want to delete the record with ID ${id}?`);
+  
+//     if (!isConfirmed) {
+//       return; // Do nothing if the user cancels the action
+//     }
+  
+//     try {
+//       // Send DELETE request to the backend
+//       await axios.delete(`http://localhost:5000/purity/${id}`);
+//       // Update the frontend state after successful deletion
+//       setSubmittedData(submittedData.filter((item) => item.purity_id !== id));
+//       console.log(`Record with ID ${id} deleted successfully.`);
+//     } catch (error) {
+//       console.error("Error deleting record:", error);
 //     }
 //   };
+  
+
 //   const columns = React.useMemo(
 //     () => [
 //       {
@@ -129,9 +135,10 @@
 //             <button className="edit-btn edit-button">
 //               <FaEdit />
 //             </button>
-//             <button className="delete-btn delete-button"
-//                           onClick={() => handleDelete(row.original.id)} // Call handleDelete with record ID
-// >
+//             <button
+//               className="delete-btn delete-button"
+//               onClick={() => handleDelete(row.original.purity_id)}
+//             >
 //               <FaTrash />
 //             </button>
 //           </div>
@@ -233,10 +240,6 @@
 
 
 
-
-
-
-
 import React, { useState, useEffect } from "react";
 import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
@@ -257,6 +260,8 @@ function Purity() {
   });
 
   const [submittedData, setSubmittedData] = useState([]); // Store fetched and submitted form entries
+  const [editMode, setEditMode] = useState(false); // Toggle between add and edit modes
+  const [editId, setEditId] = useState(null); // Store ID of the record being edited
 
   // Fetch data from the backend API when the component mounts
   useEffect(() => {
@@ -280,36 +285,54 @@ function Purity() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await axios.post("http://localhost:5000/purity", formData);
-      console.log("Data submitted:", response.data);
+    if (editMode) {
+      // Edit functionality
+      try {
+        const response = await axios.put(`http://localhost:5000/purity/${editId}`, formData);
+        console.log("Data updated:", response.data);
 
-      // Update the table with the new data
-      setSubmittedData([...submittedData, { ...formData, purity_id: response.data.id }]);
-      // Reset the form
-      setFormData({
-        name: "",
-        metal: "",
-        purity_percentage: "",
-        purity: "",
-        urd_purity: "",
-        desc: "",
-        old_purity_desc: "",
-        cut_issue: "",
-        skin_print: "",
-      });
-    } catch (error) {
-      console.error("Error submitting data:", error);
+        // Update the table with the edited data
+        setSubmittedData(
+          submittedData.map((item) =>
+            item.purity_id === editId ? { ...formData, purity_id: editId } : item
+          )
+        );
+
+        // Reset the form and exit edit mode
+        resetForm();
+      } catch (error) {
+        console.error("Error updating data:", error);
+      }
+    } else {
+      // Add functionality
+      try {
+        const response = await axios.post("http://localhost:5000/purity", formData);
+        console.log("Data submitted:", response.data);
+
+        // Update the table with the new data
+        setSubmittedData([...submittedData, { ...formData, purity_id: response.data.id }]);
+
+        // Reset the form
+        resetForm();
+      } catch (error) {
+        console.error("Error submitting data:", error);
+      }
     }
+  };
+
+  const handleEdit = (row) => {
+    setEditMode(true);
+    setEditId(row.purity_id); // Set the ID of the record being edited
+    setFormData({ ...row }); // Pre-fill the form with the selected record's data
   };
 
   const handleDelete = async (id) => {
     const isConfirmed = window.confirm(`Are you sure you want to delete the record with ID ${id}?`);
-  
+
     if (!isConfirmed) {
       return; // Do nothing if the user cancels the action
     }
-  
+
     try {
       // Send DELETE request to the backend
       await axios.delete(`http://localhost:5000/purity/${id}`);
@@ -320,7 +343,22 @@ function Purity() {
       console.error("Error deleting record:", error);
     }
   };
-  
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      metal: "",
+      purity_percentage: "",
+      purity: "",
+      urd_purity: "",
+      desc: "",
+      old_purity_desc: "",
+      cut_issue: "",
+      skin_print: "",
+    });
+    setEditMode(false);
+    setEditId(null);
+  };
 
   const columns = React.useMemo(
     () => [
@@ -368,7 +406,10 @@ function Purity() {
         Header: "Action",
         Cell: ({ row }) => (
           <div>
-            <button className="edit-btn edit-button">
+            <button
+              className="edit-btn edit-button"
+              onClick={() => handleEdit(row.original)}
+            >
               <FaEdit />
             </button>
             <button
@@ -387,7 +428,9 @@ function Purity() {
   return (
     <div className="main-container">
       <div className="customer-master-container">
-        <h3 style={{ textAlign: "center", marginBottom: "30px" }}>Purity</h3>
+        <h3 style={{ textAlign: "center", marginBottom: "30px" }}>
+          {editMode ? "Edit Purity" : "Add Purity"}
+        </h3>
         <form className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
@@ -452,11 +495,11 @@ function Purity() {
           </div>
 
           <div className="sup-button-container">
-            <button type="button" className="cus-back-btn">
-              Back
+            <button type="button" className="cus-back-btn" onClick={resetForm}>
+              Cancel
             </button>
             <button type="submit" className="cus-submit-btn">
-              Save
+              {editMode ? "Update" : "Save"}
             </button>
           </div>
         </form>
