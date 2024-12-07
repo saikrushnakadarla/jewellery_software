@@ -4,6 +4,7 @@ import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reu
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap'; 
 import './AccountsTable.css';
+import Baseurl from "../../../../Url/Baseurl";
 
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
@@ -13,7 +14,7 @@ const RepairsTable = () => {
   // Fetch accounts data from the API
   const fetchAccounts = async () => {
     try {
-      const response = await fetch('http://localhost:5000/get/accounts'); // Adjust the URL if necessary
+      const response = await fetch(`${Baseurl}/get/accounts`);
       if (!response.ok) {
         throw new Error('Failed to fetch accounts data');
       }
@@ -37,7 +38,7 @@ const RepairsTable = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this account?")) {
       try {
-        const response = await fetch(`http://localhost:5000/delete/accounts/${id}`, {
+        const response = await fetch(`${Baseurl}/delete/accounts/${id}`, {
           method: 'DELETE',
         });
         if (!response.ok) {

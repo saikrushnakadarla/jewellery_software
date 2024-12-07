@@ -4,6 +4,7 @@ import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reu
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
  import './Supplier_Table.css';
+ import Baseurl from "../../../../Url/Baseurl";
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -114,9 +115,7 @@ const RepairsTable = () => {
  useEffect(() => {
   const fetchData = async () => {
     try {
-      const response = await fetch(
-        'http://localhost:5000/get/supplier-and-customer'
-      );
+      const response = await fetch(`${Baseurl}/get/supplier-and-customer`);
       const result = await response.json();
 
       // Filter only suppliers
@@ -140,7 +139,7 @@ const RepairsTable = () => {
 const handleDelete = async (id) => {
   if (window.confirm('Are you sure you want to delete this customer?')) {
     try {
-      const response = await fetch(`http://localhost:5000/delete/supplier-and-customer/${id}`, {
+      const response = await fetch(`${Baseurl}/delete/supplier-and-customer/${id}`, {
         method: 'DELETE',
       });
 

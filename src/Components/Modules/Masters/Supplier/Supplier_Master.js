@@ -2,7 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import InputField from '../../../Pages/InputField/InputField';
-import './Supplier_Master.css'
+import './Supplier_Master.css';
+import Baseurl from "../../../../Url/Baseurl";
 
 function Customer_Master() {
   const [formData, setFormData] = useState({
@@ -34,7 +35,7 @@ function Customer_Master() {
     if (id) {
       const fetchSupplier = async () => {
         try {
-          const response = await fetch(`http://localhost:5000/get/supplier-and-customer/${id}`);
+          const response = await fetch(`${Baseurl}/get/supplier-and-customer/${id}`);
           const result = await response.json();
           setFormData(result);
         } catch (error) {
@@ -74,8 +75,8 @@ function Customer_Master() {
     try {
       const method = id ? 'PUT' : 'POST';
       const endpoint = id
-        ? `http://localhost:5000/edit/supplier-and-customer/${id}`
-        : 'http://localhost:5000/supplier-and-customer';
+        ? `${Baseurl}/edit/supplier-and-customer/${id}`
+        : `${Baseurl}/supplier-and-customer`;
   
       const response = await fetch(endpoint, {
         method,
