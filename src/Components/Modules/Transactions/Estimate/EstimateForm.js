@@ -84,7 +84,7 @@ const RepairForm = () => {
       <Container className="estimate-form-container">
         
         <Row className="estimate-form-section">
-          {/* <h2>{product_id ? "Edit Estimate" : "Create Estimate"}</h2> */}
+          <h2>Estimate</h2>
           <Col xs={12} md={2}>
             <InputField label="PCODE:" name="pcode" value={formData.pcode} onChange={handleInputChange}/>
           </Col>

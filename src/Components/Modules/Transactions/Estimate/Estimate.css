@@ -30,6 +30,10 @@
     font-size: 0.9rem; /* Optional: Adjust size for better alignment */
     color: #333; /* Optional: Match with your theme */
   }
+
+  /* h2{
+    color: #a36e29;
+  } */
   
   /* Mobile responsive design for medium screens (max-width: 768px) */
   @media (max-width: 768px) {
