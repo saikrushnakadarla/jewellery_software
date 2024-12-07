@@ -3,7 +3,7 @@ import "./Accounts.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import Baseurl from "../../../../Url/Baseurl";
+import baseURL from "../../../../Url/baseURL";
 
 const RepairForm = () => {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ const RepairForm = () => {
     if (id) {
       const fetchAccountData = async () => {
         try {
-          const response = await fetch(`${Baseurl}/get/accounts/${id}`);
+          const response = await fetch(`${baseURL}/get/accounts/${id}`);
           if (!response.ok) {
             throw new Error("Failed to fetch account data");
           }
@@ -63,8 +63,8 @@ const RepairForm = () => {
     try {
       const method = id ? "PUT" : "POST";
       const url = id
-        ? `${Baseurl}/put/accounts/${id}`
-        : `${Baseurl}/post/accounts`;
+        ? `${baseURL}/put/accounts/${id}`
+        : `${baseURL}/post/accounts`;
       const response = await fetch(url, {
         method: method,
         headers: {
