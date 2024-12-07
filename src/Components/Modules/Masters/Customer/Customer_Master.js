@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import InputField from '../../../Pages/InputField/InputField';
 import './Customer_Master.css';
-import baseURL from "../../../../Url/BaseURL";
+import baseURL from '../../../../Url/BaseUrl';
 
 function Customer_Master() {
   const [formData, setFormData] = useState({
