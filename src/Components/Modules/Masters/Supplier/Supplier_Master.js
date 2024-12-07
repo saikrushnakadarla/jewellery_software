@@ -9,7 +9,7 @@ function Customer_Master() {
     account_name: '',
     print_name: '',
     account_group: 'Supplier',
-    pin_code: '',
+    pincode: '',
     state: '',
     state_code: '',
     phone: '',
@@ -131,8 +131,8 @@ function Customer_Master() {
             />
             <InputField
               label="Pincode:"
-              name="pin_code"
-              value={formData.pin_code}
+              name="pincode"
+              value={formData.pincode}
               onChange={handleChange}
             />
           </div>

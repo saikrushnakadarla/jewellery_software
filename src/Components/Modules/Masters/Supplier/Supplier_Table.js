@@ -30,7 +30,7 @@ const RepairsTable = () => {
       },
       {
         Header: 'Pincode',
-        accessor: 'pin_code',
+        accessor: 'pincode',
       },
       {
         Header: 'State',
