@@ -583,9 +583,9 @@ function DesignMaster() {
           </div>
 
           <div className="sup-button-container">
-            <button type="button" className="cus-back-btn" onClick={resetForm}>
+            {/* <button type="button" className="cus-back-btn" onClick={resetForm}>
               Cancel
-            </button>
+            </button> */}
             <button type="submit" className="cus-submit-btn">
               {editMode ? "Update" : "Save"}
             </button>

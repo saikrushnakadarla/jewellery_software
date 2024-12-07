@@ -481,9 +481,9 @@ function MetalType() {
           </div>
 
           <div className="sup-button-container">
-            <button type="button" className="cus-back-btn">
+            {/* <button type="button" className="cus-back-btn">
               Back
-            </button>
+            </button> */}
             <button type="submit" className="cus-submit-btn">
               {editing ? "Update" : "Save"}
             </button>
