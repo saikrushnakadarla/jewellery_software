@@ -4,7 +4,7 @@ import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reu
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap'; 
 import './AccountsTable.css';
-import baseURL from "../../../../Url/baseurl";
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function

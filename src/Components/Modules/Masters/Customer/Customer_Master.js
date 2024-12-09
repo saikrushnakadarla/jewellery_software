@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import InputField from '../../../Pages/InputField/InputField';
 import './Customer_Master.css';
 import { Row, Col } from 'react-bootstrap';
-import baseURL from '../../../../Url/baseurl';
+import baseURL from '../../../../Url/NodeBaseURL';
 
 function Customer_Master() {
   const [formData, setFormData] = useState({

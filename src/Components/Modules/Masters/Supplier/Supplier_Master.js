@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import InputField from '../../../Pages/InputField/InputField';
 import './Supplier_Master.css';
-import baseURL from "../../../../Url/baseurl";
+import baseURL from "../../../../Url/NodeBaseURL";
 import { Row, Col } from 'react-bootstrap';
 
 function Customer_Master() {
