@@ -19,3 +19,9 @@
     cursor: pointer;
   }
  
+  .popover {
+    margin-top: 155px; /* Optional: Add spacing between popover and table */
+    margin-left: 1280px;
+
+  }
+  

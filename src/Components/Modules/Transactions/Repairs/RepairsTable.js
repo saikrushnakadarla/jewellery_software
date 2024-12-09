@@ -199,84 +199,134 @@ const RepairsTable = () => {
         <DataTable columns={columns} data={data} />
         
         {/* Popover below the table */}
-        <Overlay
-          show={showPopover}
-          target={popoverData.target}
-          placement="right"
-          containerPadding={10}
-          rootClose
-          onHide={() => setShowPopover(false)} // Close popover when clicked outside
+        {/* Popover below the table */}
+<Overlay
+  show={showPopover}
+  target={popoverData.target}
+  placement="bottom" // Ensures popover appears below the target
+  containerPadding={10} // Add padding if needed
+  rootClose
+  onHide={() => setShowPopover(false)} // Close popover when clicked outside
+>
+  <Popover id={`popover-${popoverData.rowIndex}`}>
+    <Popover.Body>
+      <ul className="popover-options">
+        <li
+          onClick={() => {
+            setShowPopover(false); // Close popover
+          }}
         >
-          <Popover id={`popover-${popoverData.rowIndex}`}>
-            <Popover.Body>
-              <ul className="popover-options">
-                <li
-                  onClick={() => {
-                    setShowPopover(false); // Close popover
-                  }}
-                >
-                  Assign to Workshop
-                </li>
-                <li
-                  onClick={handleReceiveFromWorkshop} // Open modal on this option click
-                >
-                  Receive from Workshop
-                </li>
-                <li
-                  onClick={() => {
-                    setShowPopover(false); // Close popover
-                  }}
-                >
-                  Delivery to Customer
-                </li>
-              </ul>
-            </Popover.Body>
-          </Popover>
-        </Overlay>
+          Assign to Workshop
+        </li>
+        <li
+          onClick={handleReceiveFromWorkshop} // Open modal on this option click
+        >
+          Receive from Workshop
+        </li>
+        <li
+          onClick={() => {
+            setShowPopover(false); // Close popover
+          }}
+        >
+          Delivery to Customer
+        </li>
+      </ul>
+    </Popover.Body>
+  </Popover>
+</Overlay>
+
 
         {/* Modal for receiving from the workshop */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>Receive from Workshop</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form onSubmit={handleSubmit}>
-              <Form.Group controlId="formParticulars">
-                <Form.Label>Particulars</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Enter particulars"
-                  name="particulars"
-                  value={formData.particulars}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <Form.Group controlId="formRate">
-                <Form.Label>Rate</Form.Label>
-                <Form.Control
-                  type="number"
-                  placeholder="Enter rate"
-                  name="rate"
-                  value={formData.rate}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <Form.Group controlId="formQty">
-                <Form.Label>Qty</Form.Label>
-                <Form.Control
-                  type="number"
-                  placeholder="Enter quantity"
-                  name="qty"
-                  value={formData.qty}
-                  onChange={handleInputChange}
-                />
-              </Form.Group>
-              <Button  variant="primary" type="submit" className='mt-3'>
-                Submit
-              </Button>
-            </Form>
-          </Modal.Body>
-        </Modal>
+        <Modal.Header closeButton>
+          <Modal.Title>Receive from Workshop</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form onSubmit={handleSubmit}>
+            <Row>
+              <Col md={6}>
+                <Form.Group controlId="formParticulars">
+                  <Form.Label>Metal Type</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="metal_type"
+                    value={formData.metal_type}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group controlId="formDescription">
+                  <Form.Label>Description</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+              <Col md={6}>
+                <Form.Group controlId="formWeight">
+                  <Form.Label>Weight</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="weight"
+                    value={formData.weight}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group controlId="formQty">
+                  <Form.Label>Qty</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="qty"
+                    value={formData.qty}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row>
+            
+              <Col md={6}>
+                <Form.Group controlId="formRateType">
+                  <Form.Label>Rate Type</Form.Label>
+                  <Form.Select
+                    as="select"
+                    name="rate_type"
+                    value={formData.rate_type}
+                    onChange={handleInputChange}
+                  >
+                    <option value="" disabled>Select</option>
+                    <option value="rate_per_weight">Rate per Weight</option>
+                    <option value="rate_per_qty">Rate per Quantity</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group controlId="formRate">
+                  <Form.Label>Rate</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="rate"
+                    value={formData.rate}
+                    onChange={handleInputChange}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+            <Button variant="primary" type="submit" className="mt-3">
+              Add
+            </Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
       </div>
     </div>
   );

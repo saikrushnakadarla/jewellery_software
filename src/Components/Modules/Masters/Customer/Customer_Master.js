@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams,useLocation } from 'react-router-dom';
 import InputField from '../../../Pages/InputField/InputField';
 import './Customer_Master.css';
 
@@ -9,6 +9,7 @@ import baseURL from '../../../../Url/NodeBaseURL';
 
 
 function Customer_Master() {
+  const location = useLocation();
   const [formData, setFormData] = useState({
     account_name: '',
     print_name: '',
@@ -64,7 +65,6 @@ function Customer_Master() {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Validation
     if (!formData.account_name.trim()) {
       alert('Customer Name is required.');
       return;
@@ -79,37 +79,41 @@ function Customer_Master() {
     }
   
     try {
-      const method = id ? 'PUT' : 'POST';
+      const method = id ? "PUT" : "POST";
       const endpoint = id
         ? `${baseURL}/edit/supplier-and-customer/${id}`
         : `${baseURL}/supplier-and-customer`;
-
   
       const response = await fetch(endpoint, {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
   
       if (response.ok) {
-        alert(`Customer ${id ? 'updated' : 'created'} successfully!`);
-        navigate('/customerstable');
+        alert(`Customer ${id ? "updated" : "created"} successfully!`);
+        
+        // Check where to navigate back
+        const from = location.state?.from || "/customerstable";
+        navigate(from); // Redirect to the origin page or default to the customers table
       } else {
-        console.error('Failed to save customer');
-        alert('Failed to save customer.');
+        alert("Failed to save customer.");
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred.');
+      console.error("Error:", error);
+      alert("An error occurred.");
     }
   };
   
+  
 
   const handleBack = () => {
-    navigate('/customerstable');
+    const from = location.state?.from || "/customerstable";
+    navigate(from);
   };
+  
 
   return (
     <div className="main-container">

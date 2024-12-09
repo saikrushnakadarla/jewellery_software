@@ -1,92 +1,208 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./SalesForm.css";
 import InputField from "../../../Pages/InputField/InputField";
-import { Container, Row, Col, Button, Table } from "react-bootstrap";
+import { Container, Row, Col, Button, Table ,Form} from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
+import baseURL from "../../../../Url/NodeBaseURL";
+import axios from "axios";
+import { AiOutlinePlus } from "react-icons/ai";
+
 const RepairForm = () => {
   const [metal, setMetal] = useState("");
   const navigate = useNavigate();
-  const handleBack = () => {
-      navigate('/salestable');
+  const [loading, setLoading] = useState(true);
+  const [customers, setCustomers] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    mobile: "",
+    email: "",
+    address1: "",
+    address2: "",
+    address3: "",
+    city: "",
+    
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/supplier-and-customer`);
+        const result = await response.json();
+
+        const customers = result.filter(
+          (item) => item.account_group && item.account_group.toLowerCase() === "customer"
+        );
+
+        setCustomers(customers);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleCustomerChange = (customerId) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      customer_id: customerId, // Ensure customer_id is correctly updated
+    }));
+  
+    const customer = customers.find((cust) => String(cust.id) === String(customerId));
+  
+    if (customer) {
+      setFormData({
+        ...formData,
+        customer_id: customerId, // Ensure this is correctly set
+        name: customer.account_name, // Set the name field to the selected customer
+        mobile: customer.phone || "",
+        email: customer.email || "",
+        address1: customer.address1 || "",
+        address2: customer.address2 || "",
+        city: customer.city || "",
+        pincode: customer.pincode || "",
+        state: customer.state || "",
+        aadhar_card: customer.aadhar_card || "",
+        gst_in: customer.gst_in || "",
+        pan_card: customer.pan_card || "",
+
+      });
+    } else {
+      setFormData({
+        ...formData,
+        customer_id: "",
+        name: "",
+        mobile: "",
+        email: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        aadhar_card: "",
+        gst_in: "",
+        pan_card: "",
+      });
+    }
+  };
+
+  const handleBack = () => {
+    navigate('/salestable');
+  };
+
+  const handleAddCustomer = () => {
+    navigate("/customermaster", { state: { from: "/sales" } });
+  };
+
   return (
     <div className="main-container">
       <Container className="sales-form-container">
-        <form className="sales-form">
+        <Form>
+        <div className="sales-form">
           <div className="sales-form-left">
             <Col className="sales-form-section">
-              {/* <h4 className="mb-2">Customer Details</h4> */}
               <Row>
-                <Col xs={12} md={5}>
-                  <InputField label="Name" />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Mobile" />
-                </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={6}  className="d-flex align-items-center">
+                  <div style={{ flex: 1 }}>
                   <InputField
-                    label="Category"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "GOLD", label: "Gold" },
-                      { value: "SILVER", label: "Silver" },
-                      { value: "PLATINUM", label: "Platinum" },
-                    ]}
+                  label="Customer Name:"
+                  name="customer_id"
+                  type="select"
+                  value={formData.customer_id || ""}
+                  onChange={(e) => handleCustomerChange(e.target.value)}
+                  options={[
+                    ...customers.map((customer) => ({
+                      value: customer.id,
+                      label: customer.account_name, // Use account_name or your preferred field
+                    })),
+                  ]}
+                />
+                </div>
+                <AiOutlinePlus
+                  size={20}
+                  color="black"
+                  onClick={handleAddCustomer}
+                  style={{ marginLeft: '10px', cursor: 'pointer', marginBottom:'20px' }}
+                />
+                </Col>
+                <Col xs={12} md={6}>
+                <InputField
+                    label="Mobile:"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    readOnly
                   />
                 </Col>
                 <Col xs={12} md={6}>
-                  <InputField label="Street:" />
+                <InputField
+                    label="Email:"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    readOnly
+                  />
                 </Col>
                 <Col xs={12} md={6}>
-                  <InputField label="Address:" />
+                <InputField
+                    label="Address1:"
+                    name="address1"
+                    value={formData.address1}
+                    onChange={handleChange}
+                    readOnly
+                  />
                 </Col>
-                <Col xs={12} md={4}>
-                  <InputField
-                    label="Area"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "Area1", label: "Area1" },
-                      { value: "Area2", label: "Area2" },
-                      { value: "Area3", label: "Area3" },
-                    ]}
+                <Col xs={12} md={5}>
+                <InputField
+                    label="Address2:"
+                    name="address2"
+                    value={formData.address2}
+                    onChange={handleChange}
+                    readOnly
                   />
                 </Col>
                 <Col xs={12} md={4}>
-                  <InputField label="PIN" />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Place" />
+                <InputField
+                    label="City"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    readOnly
+                  />
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="State:" />
-                </Col>
-                <Col xs={12} md={5}>
-                  <InputField label="Aadhar" type="number" />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="GSTIN" />
-                </Col>
-                <Col xs={12} md={5}>
-                  <InputField label="PAN" />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField
-                    // label="Metal:"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "GOLD", label: "Gold" },
-                      { value: "SILVER", label: "Silver" },
-                      { value: "PLATINUM", label: "Platinum" },
-                    ]}
+                  <InputField 
+                  label="PinCode" 
+                  name="pincode"
+                  value={formData.pincode}
+                  onChange={handleChange}
+                  readOnly
                   />
                 </Col>
-
+                <Col xs={12} md={3}>
+                  <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={5}>
+                  <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={4}>
+                  <InputField label="GSTIN"name="gst_in" value={formData.gst_in} onChange={handleChange} readOnly />
+                </Col>
+                <Col xs={12} md={5}>
+                  <InputField label="PAN" name="pan_card" value={formData.pan_card} onChange={handleChange} readOnly />
+                </Col>
+                
               </Row>
             </Col>
           </div>
@@ -96,7 +212,7 @@ const RepairForm = () => {
               <Row>
                 <Col xs={12} md={3}>
                   <InputField
-                    label="SGJ"
+                    label="Sadashri Jewels"
                     type="select"
                     value={metal}
                     onChange={(e) => setMetal(e.target.value)}
@@ -110,7 +226,7 @@ const RepairForm = () => {
 
                 <Col xs={12} md={3}>
                   <InputField
-                    label="Floor"
+                    label="Purity"
                     type="select"
                     value={metal}
                     onChange={(e) => setMetal(e.target.value)}
@@ -211,8 +327,8 @@ const RepairForm = () => {
               </Row>
             </Col>
           </div>
-        </form>
-        <form className="sales-form2">
+        </div>
+        <div className="sales-form2">
           <div className="sales-form-third">
             <Col className="sales-form-section">
               <Row >
@@ -375,9 +491,7 @@ const RepairForm = () => {
             </Col>
           </div>
 
-        </form>
-
-
+        </div>
         <Row className="sales-form-section">
           <Table bordered hover responsive>
             <thead>
@@ -411,10 +525,6 @@ const RepairForm = () => {
           </Table>
 
         </Row>
-
-
-
-
         {/* Buttons */}
         <div className="form-buttons">
           <Button
@@ -426,7 +536,8 @@ const RepairForm = () => {
             cancel
           </Button>
           <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
-        </div>
+        </div>                  
+        </Form>
       </Container>
     </div>
   );
