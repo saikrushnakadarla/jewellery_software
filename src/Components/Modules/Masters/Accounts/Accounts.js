@@ -3,7 +3,7 @@ import "./Accounts.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import baseURL from "../../../../Url/BaseUrl";
+import baseURL from "./../../../../Url/Baseurl";
 
 const RepairForm = () => {
   const navigate = useNavigate();
@@ -52,6 +52,28 @@ const RepairForm = () => {
       fetchAccountData();
     }
   }, [id]);
+
+  const [accountGroups, setAccountGroups] = useState([]);
+  useEffect(() => {
+    const fetchAccountGroups = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/accountsgroup");
+        if (!response.ok) {
+          throw new Error("Failed to fetch account groups");
+        }
+        const data = await response.json();
+        // Assuming the API returns an array of objects with `AccountsGroupName`
+        const formattedOptions = data.map(group => ({
+          value: group.AccountsGroupName,
+          label: group.AccountsGroupName,
+        }));
+        setAccountGroups(formattedOptions);
+      } catch (error) {
+        console.error("Error fetching account groups:", error.message);
+      }
+    };
+    fetchAccountGroups();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -116,18 +138,7 @@ const RepairForm = () => {
                 type="select"
                 value={formData.group}
                 onChange={handleChange}
-                options={[
-                  { value: "Capital Ac", label: "Capital Ac" },
-                  { value: "Current As", label: "Current As" },
-                  { value: "Current Li", label: "Current Li" },
-                  { value: "Fixed Asse", label: "Fixed Asse" },
-                  { value: "Investment", label: "Investment" },
-                  { value: "Loans (Lia", label: "Loans (Lia" },
-                  { value: "Pre-Operat", label: "Pre-Operat" },
-                  { value: "Profit & L", label: "Profit & L" },
-                  { value: "Revenue Ac", label: "Revenue Ac" },
-                  { value: "Suspense A", label: "Suspense A" },
-                ]}
+                options={accountGroups} // Dynamic options
               />
             </Col>
             <Col xs={12} md={2}>
