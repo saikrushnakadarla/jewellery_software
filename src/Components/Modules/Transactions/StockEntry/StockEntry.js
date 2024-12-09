@@ -85,7 +85,7 @@ const StockEntry = () => {
                             <div className="mb-4">
                                 <h4>Stock Entry</h4>
                                 <div className="row g-3">
-                                    <div className="col-md-4">
+                                    <div className="col-md-3">
                                         <InputField
                                             label="Pricing:"
                                             name="pricing"
@@ -98,7 +98,7 @@ const StockEntry = () => {
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-4">
+                                    <div className="col-md-3">
                                         <InputField
                                             label="P ID:"
                                             type="select"
@@ -111,7 +111,7 @@ const StockEntry = () => {
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-4">
+                                    <div className="col-md-3">
                                         <InputField
                                             label="productname:"
                                             type="select"
@@ -123,6 +123,21 @@ const StockEntry = () => {
                                                 { value: "product2", label: "product2" },
                                             ]}
                                         />
+                                    </div>
+                                    <div className="col-md-3">
+                                    <InputField
+                                        
+                                        label="Design Master:"
+                                        name="designmaster"
+                                        type="select"
+                                        value={formData.designmaster}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Jewellery", label: "Jewellery" },
+                                            { value: "Gold", label: "Gold" },
+                                            { value: "Silver", label: "Silver" },
+                                        ]}
+                                    />
                                     </div>
                                     <div className="col-md-3">
                                         <InputField label="Category:" value="Gold" readOnly />
@@ -225,6 +240,18 @@ const StockEntry = () => {
                                         />
                                     </div>
                                     <div className="col-md-3">
+                                        <InputField
+                                            label="Charges:"
+                                            type="select"
+                                            value={formData.wastageon}
+                                            onChange={handleChange}
+                                            name="wastageon"
+                                            options={[{ value: "By Weight", label: "by Weight" },
+                                                { value: "Fixed", label: "Fixed" },
+                                            ]}
+                                        />
+                                    </div>
+                                    <div className="col-md-3">
                                         <InputField label="Making Charges:"
                                             value={formData.makingcharges}
                                             onChange={handleChange}
@@ -238,15 +265,15 @@ const StockEntry = () => {
                                             name="cal"
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    {/* <div className="col-md-3">
                                         <InputField label="Tax:"
                                             value={formData.tax}
                                             onChange={handleChange}
                                             name="tax"
                                         />
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-3">
-                                        <div className="input-group">
+                                        {/* <div className="input-group"> */}
                                             <InputField
                                                 label="Stock Point:"
                                                 type="select"
@@ -258,14 +285,15 @@ const StockEntry = () => {
                                                     { value: "Secondary Store", label: "Secondary Store" },
                                                 ]}
                                             />
-                                            <button
+                                              {/* </div> */}
+                                            {/* <button
                                                 type="button" style={{ height: '39px' }}
                                                 className="btn btn-outline-secondary"
                                             // onClick={() => setShowStockPointModal(true)}
                                             >
                                                 +
-                                            </button>
-                                        </div>
+                                            </button> */}
+                                      
                                     </div>
                                 </div>
                             </div>

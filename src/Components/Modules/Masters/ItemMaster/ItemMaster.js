@@ -130,6 +130,11 @@ const FormWithTable = () => {
                             <div className="form-container">
                                 <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
                                 <div className="form-row">
+                                <InputField label="P ID:"
+                                        name="pid"
+                                        value={formData.pid}
+                                        onChange={handleChange}
+                                    />
                                     <InputField
                                         label="Product Name:"
                                         name="productname"
@@ -165,6 +170,18 @@ const FormWithTable = () => {
                                             { value: "Jewellery", label: "Jewellery" },
                                             { value: "Gold", label: "Gold" },
                                             { value: "Silver", label: "Silver" },
+                                        ]}
+                                    />
+                                      <InputField
+                                        label="Purity:"
+                                        type="select"
+                                        name="purity"
+                                        value={formData.purity}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "91.6HM", label: "91.6HM" },
+                                            { value: "22K", label: "22K" },
+                                            { value: "18K", label: "18K" },
                                         ]}
                                     />
                                     <InputField
@@ -255,18 +272,7 @@ const FormWithTable = () => {
                                         value={formData.opweight}
                                         onChange={handleChange}
                                     />
-                                    <InputField
-                                        label="Purity:"
-                                        type="select"
-                                        name="purity"
-                                        value={formData.purity}
-                                        onChange={handleChange}
-                                        options={[
-                                            { value: "91.6HM", label: "91.6HM" },
-                                            { value: "22K", label: "22K" },
-                                            { value: "18K", label: "18K" },
-                                        ]}
-                                    />
+                                  
                                     <InputField label="HUID No:"
                                         name="huidno"
                                         value={formData.huidno}
@@ -275,7 +281,7 @@ const FormWithTable = () => {
                                 </div>
                             </div>
                             <div className="form-container" style={{ marginTop: '15px' }}>
-                                <h4 style={{ marginBottom: '15px' }}>Stock Entry</h4>
+                                <h4 style={{ marginBottom: '15px' }}>Opening Tags Entry</h4>
                                 <div className="form-row">
                                     <InputField
                                         label="Pricing:"
@@ -288,17 +294,17 @@ const FormWithTable = () => {
                                             { value: "By Fixed", label: "By Fixed" },
                                         ]}
                                     />
-                                    <InputField label="P ID:"
+                                    <InputField label="Tag ID:"
                                         name="pid"
                                         value={formData.pid}
                                         onChange={handleChange}
                                     />
-                                    <InputField label="Product Name:"
+                                    {/* <InputField label="Product Name:"
                                         name="productname"
                                         value={formData.productname}
                                         onChange={handleChange}
                                     />
-                                    <InputField label="Category:" value="Gold" readOnly />
+                                    <InputField label="Category:" value="Gold" readOnly /> */}
                                     <InputField label="Prefix:" value="Gold" readOnly />
                                     <InputField
                                         label="Purity:"
@@ -347,6 +353,11 @@ const FormWithTable = () => {
                                         value={formData.weightww}
                                         onChange={handleChange}
                                     />
+                                       <InputField label="HUID No:"
+                                        name="huidno"
+                                        value={formData.huidno}
+                                        onChange={handleChange}
+                                    />
                                 </div>
                                 <div className="form-row" style={{ marginBottom: '-20px' }}>
                                     <InputField
@@ -356,7 +367,8 @@ const FormWithTable = () => {
                                         value={formData.wastageon}
                                         onChange={handleChange}
                                         options={[
-                                            { value: "Weight", label: "Weight" },
+                                            { value: "Gross Weight", label: "Gross Weight" },
+                                            { value: "Weight WW", label: "Weight WW" },
                                         ]}
                                     />
                                     <InputField label="Wastage:" value="NaN" readOnly />
