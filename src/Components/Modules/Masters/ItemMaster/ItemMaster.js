@@ -86,6 +86,8 @@ const FormWithTable = () => {
                     huidno: "",
                     pricing: "",
                     pid: ' ',
+                    purity: "",
+                    tagid: ' ',
                     category: "Gold",
                     prefix: "R",
                     pcode: "",
@@ -100,6 +102,7 @@ const FormWithTable = () => {
                     makingcharges: ' ',
                     cal: ' ',
                     tax: ' ',
+                    status: "",
                     stackpoint: "",
                 });
             } else {
@@ -295,8 +298,8 @@ const FormWithTable = () => {
                                         ]}
                                     />
                                     <InputField label="Tag ID:"
-                                        name="pid"
-                                        value={formData.pid}
+                                        name="tag id"
+                                        value={formData.tagid}
                                         onChange={handleChange}
                                     />
                                     {/* <InputField label="Product Name:"
@@ -322,6 +325,17 @@ const FormWithTable = () => {
                                         name="pcode"
                                         value={formData.pcode}
                                         onChange={handleChange}
+                                    />
+                                     <InputField
+                                        label="Status:"
+                                        type="select"
+                                        name="status"
+                                        value={formData.status}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Sold", label: "Sold" },
+                                            { value: "Purchase", label: "Purchase" },
+                                        ]}
                                     />
                                 </div>
                                 <div className="form-row">
@@ -409,6 +423,9 @@ const FormWithTable = () => {
                                         ]}
                                     />
                                 </div>
+                                <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29',marginLeft:'90%',marginTop:'15px' }}>
+                                Add
+                            </button>
                             </div>
                             <button
                                 type="button"
