@@ -59,7 +59,7 @@ const RepairForm = () => {
   useEffect(() => {
     const fetchAccountGroups = async () => {
       try {
-        const response = await fetch("http://localhost:5000/accountsgroup");
+        const response = await fetch(`${baseURL}/accountsgroup`);
         if (!response.ok) {
           throw new Error("Failed to fetch account groups");
         }
