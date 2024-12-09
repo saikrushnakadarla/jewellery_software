@@ -15,12 +15,12 @@ const RepairForm = () => {
     <Container className="payments-form-container">
 
       <Row className="payments-form-section">
-          <h4 className="mb-3">Product Details</h4>
-          <Col xs={12} md={2}> <InputField label="Date:" type="date" /></Col>
+          <h4 className="mb-4">Payments</h4>
+          <Col xs={12} md={2}> <InputField label="Date" type="date" /></Col>
           <Col xs={12} md={2}>
                   
               <InputField
-              label="Mode:"
+              label="Mode"
               type="select"
               value={type}
               onChange={(e) => setType(e.target.value)}
@@ -32,15 +32,15 @@ const RepairForm = () => {
             />
            </Col>
             <Col xs={12} md={3}>
-            <InputField label="Cheque Number:"/>
+            <InputField label="Cheque Number"/>
             </Col>
             <Col xs={12} md={2}>
-            <InputField label="Payment No.:" />
+            <InputField label="Payment No." />
             </Col>
             
             <Col xs={12} md={3}>
             <InputField
-              label="Account Name:"
+              label="Account Name"
               type="select"
               value={purity}
               onChange={(e) => setPurity(e.target.value)}
@@ -52,16 +52,16 @@ const RepairForm = () => {
             />
             </Col>
             <Col xs={12} md={2}>
-            <InputField label="Total Amt:" type="number"/>
+            <InputField label="Total Amt" type="number"/>
             </Col>
             <Col xs={12} md={2}>
-            <InputField label="Discount Amt:" type="number" />
+            <InputField label="Discount Amt" type="number" />
             </Col>
             <Col xs={12} md={2}>
-            <InputField label="Cash Amt:" type="number"/>
+            <InputField label="Cash Amt" type="number"/>
             </Col>
             <Col xs={12} md={3}>
-            <InputField label="Remarks:" />
+            <InputField label="Remarks" />
             </Col>
           
           
