@@ -3,13 +3,19 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import InputField from '../../../Pages/InputField/InputField';
 import './Customer_Master.css';
-import baseURL from './../../../../Url/Baseurl';
+
+import { Row, Col } from 'react-bootstrap';
+import baseURL from '../../../../Url/NodeBaseURL';
+
 
 function Customer_Master() {
   const [formData, setFormData] = useState({
     account_name: '',
     print_name: '',
     account_group: 'Customer',
+    address1:'',
+    address2:'',
+    city:'',
     pincode: '',
     state: '',
     state_code: '',
@@ -109,193 +115,237 @@ function Customer_Master() {
     <div className="main-container">
       <div className="customer-master-container">
       <h2>{id ? 'Edit Customer' : 'Add Customer'}</h2>
-        <form className="customer-master-form" onSubmit={handleSubmit}>
-          {/* Row 1 */}
-          <div className="form-row">
-            <InputField
-              label="Customer Name:"
-              name="account_name"
-              value={formData.account_name}
-              onChange={handleChange}
-              required={true}
+      <form className="customer-master-form" onSubmit={handleSubmit}>
+  {/* Row 1 */}
+  <Row>
+    <Col md={4}>
+      <InputField
+        label="Customer Name:"
+        name="account_name"
+        value={formData.account_name}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={4}>
+      <InputField
+        label="Print Name:"
+        name="print_name"
+        value={formData.print_name}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={4}>
+      <InputField
+        label="Account Group:"
+        name="account_group"
+        value="Customer"
+        readOnly
+      />
+    </Col>
+    <Col md={4}>
+      <InputField
+        label="Address1"
+        name="address1"
+        value={formData.address1}
+        onChange={handleChange}
+        required
+      />
+    </Col>
 
-            />
-            <InputField
-              label="Print Name:"
-              name="print_name"
-              value={formData.print_name}
-              onChange={handleChange}
-              required={true}
+    <Col md={4}>
+      <InputField
+        label="Address2"
+        name="address2"
+        value={formData.address2}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={4}>
+      <InputField
+        label="City"
+        name="city"
+        value={formData.city}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={2}>
+      <InputField
+        label="Pincode:"
+        name="pincode"
+        value={formData.pincode}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={2}>
+      <InputField
+        label="State:"
+        name="state"
+        type="select"
+        value={formData.state}
+        onChange={handleChange}
+        required
+        options={[
+          { value: 'Telangana', label: 'Telangana' },
+          { value: 'Andhra Pradesh', label: 'Andhra Pradesh' },
+          { value: 'Bihar', label: 'Bihar' },
+          { value: 'Delhi', label: 'Delhi' },
+          { value: 'Goa', label: 'Goa' },
+          { value: 'Maharashtra', label: 'Maharashtra' },
+          { value: 'Tamil Nadu', label: 'Tamil Nadu' },
+          { value: 'West Bengal', label: 'West Bengal' },
+        ]}
+      />
+    </Col>
 
-            />
-           <InputField
-              label="Account Group:"
-              name="account_group"
-              value="Customer"
-              readOnly
-            />
-            <InputField
-              label="Pincode:"
-              name="pincode"
-              value={formData.pincode}
-              onChange={handleChange}
-              required={true}
+    <Col md={2}>
+      <InputField
+        label="State Code:"
+        name="state_code"
+        value={formData.state_code}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={3}>
+      <InputField
+        label="Phone:"
+        name="phone"
+        value={formData.phone}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={3}>
+      <InputField
+        label="Mobile:"
+        name="mobile"
+        value={formData.mobile}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={4}>
+      <InputField
+        label="Email:"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        required
+      />
+    </Col>
 
-            />
-          </div>
+    <Col md={2}>
+      <InputField
+        label="Birthday:"
+        name="birthday"
+        type="date"
+        value={formData.birthday}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={2}>
+      <InputField
+        label="Anniversary:"
+        name="anniversary"
+        type="date"
+        value={formData.anniversary}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={4}>
+      <InputField
+        label="Bank Account No:"
+        name="bank_account_no"
+        value={formData.bank_account_no}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={3}>
+      <InputField
+        label="Bank Name:"
+        name="bank_name"
+        value={formData.bank_name}
+        onChange={handleChange}
+        required
+      />
+    </Col>
 
-          {/* Row 2 */}
-          <div className="form-row">
-            <InputField
-              label="State:"
-              name="state"
-              type="select"
-              value={formData.state}
-              onChange={handleChange}
-              required={true}
+    <Col md={3}>
+      <InputField
+        label="IFSC Code:"
+        name="ifsc_code"
+        value={formData.ifsc_code}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={3}>
+      <InputField
+        label="Branch:"
+        name="branch"
+        value={formData.branch}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={3}>
+      <InputField
+        label="GSTIN:"
+        name="gst_in"
+        value={formData.gst_in}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={4}>
+      <InputField
+        label="Aadhar Card:"
+        name="aadhar_card"
+        value={formData.aadhar_card}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+    <Col md={4}>
+      <InputField
+        label="PAN Card:"
+        name="pan_card"
+        value={formData.pan_card}
+        onChange={handleChange}
+        required
+      />
+    </Col>
+  </Row>
 
-              options={[
-                { value: 'Andhra Pradesh', label: 'Andhra Pradesh' },
-                { value: 'Bihar', label: 'Bihar' },
-                { value: 'Delhi', label: 'Delhi' },
-                { value: 'Goa', label: 'Goa' },
-                { value: 'Maharashtra', label: 'Maharashtra' },
-                { value: 'Tamil Nadu', label: 'Tamil Nadu' },
-                { value: 'West Bengal', label: 'West Bengal' },
-              ]}
-            />
-            <InputField
-              label="State Code:"
-              name="state_code"
-              value={formData.state_code}
-              onChange={handleChange}
-              required={true}
+  {/* Checkbox */}
+  <Row>
+    <Col>
+      <div className="form-group">
+        <label className="checkbox-label" htmlFor="tcs">
+          <input
+            type="checkbox"
+            id="tcs"
+            name="tcsApplicable"
+            className="checkbox-input"
+            checked={tcsApplicable}
+            onChange={handleCheckboxChange}
+          />
+          TCS Applicable
+        </label>
+      </div>
+    </Col>
+  </Row>
 
-            />
-            <InputField
-              label="Phone:"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required={true}
-
-            />
-            <InputField
-              label="Mobile:"
-              name="mobile"
-              value={formData.mobile}
-              onChange={handleChange}
-              required={true}
-
-            />
-          </div>
-
-          {/* Additional Rows */}
-          <div className="form-row">
-            <InputField
-              label="Email:"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required={true}
-
-            />
-            <InputField
-              label="Birthday:"
-              name="birthday"
-              type="date"
-              value={formData.birthday}
-              onChange={handleChange}
-              required={true}
-
-            />
-            <InputField
-              label="Anniversary:"
-              name="anniversary"
-              type="date"
-              value={formData.anniversary}
-              onChange={handleChange}
-              required={true}
-
-            />
-            <InputField
-              label="Bank Account No:"
-              name="bank_account_no"
-              value={formData.bank_account_no}
-              onChange={handleChange}
-              required={true}
-
-            />
-          </div>
-          <div className="form-row">
-            <InputField
-              label="Bank Name:"
-              name="bank_name"
-              value={formData.bank_name}
-              onChange={handleChange}
-              required={true}
-
-            />
-            <InputField
-              label="IFSC Code:"
-              name="ifsc_code"
-              value={formData.ifsc_code}
-              onChange={handleChange}
-              required={true}
-
-            />
-            <InputField
-              label="Branch:"
-              name="branch"
-              value={formData.branch}
-              onChange={handleChange}
-              required={true}
-
-            />
-            <InputField
-              label="GSTIN:"
-              name="gst_in"
-              value={formData.gst_in}
-              onChange={handleChange}
-              required={true}
-
-            />
-          </div>
-          <div className="form-row">
-            <InputField
-              label="Aadhar Card:"
-              name="aadhar_card"
-              value={formData.aadhar_card}
-              onChange={handleChange}
-              required={true}
-
-            />
-            <InputField
-              label="PAN Card:"
-              name="pan_card"
-              value={formData.pan_card}
-              onChange={handleChange}
-              required={true}
-
-            />
-          </div>
-          <div className="form-group">
-            <label className="checkbox-label" htmlFor="tcs">
-              <input
-                type="checkbox"
-                id="tcs"
-                name="tcsApplicable"
-                className="checkbox-input"
-                checked={tcsApplicable}
-                onChange={handleCheckboxChange}
-              />
-              TCS Applicable
-            </label>
-          </div>
-          {/* <button type="submit" className="cus-submit-btn">
-            Save
-          </button> */}
-           <div className="sup-button-container">
+  {/* Buttons */}
+  <div className="sup-button-container">
             <button
               type="button"
               className="cus-back-btn"
@@ -306,11 +356,11 @@ function Customer_Master() {
             <button
               type="submit"
               className="cus-submit-btn"
-            >              
+            >  
               {id ? 'Update' : 'Save'}
             </button>
           </div>
-        </form>
+</form>
       </div>
     </div>
   );

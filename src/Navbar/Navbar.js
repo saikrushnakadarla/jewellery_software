@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import './Navbar.css';
@@ -11,8 +11,7 @@ function Navbar() {
   const [reportsDropdownOpen, setReportsDropdownOpen] = useState(false);
   const [utilityDropdownOpen, setUtilityDropdownOpen] = useState(false);
 
-  const location = useLocation();
-  const navigate = useNavigate();
+  const location = useLocation();  // Get the current location from React Router
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -38,6 +37,7 @@ function Navbar() {
   };
 
   const handleItemClick = () => {
+    // Close all dropdowns and collapse the hamburger menu
     setMastersDropdownOpen(false);
     setTransactionsDropdownOpen(false);
     setReportsDropdownOpen(false);
@@ -45,24 +45,10 @@ function Navbar() {
     setIsOpen(false);
   };
 
+  // Function to check if the link is active based on the current location
   const isActive = (path) => {
-    return location.pathname === path ? 'active' : '';
+    return location.pathname === path ? 'active' : '';  // Return 'active' if the path matches the current location
   };
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'Backspace') {
-        navigate(-1); // Go back
-      } else if (event.key === 'Enter') {
-        navigate(1); // Go forward
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [navigate]);
 
   return (
     <header className="navbar-header">
@@ -119,6 +105,7 @@ function Navbar() {
           </span>
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
+
               <Link to="/salestable" onClick={handleItemClick} className={isActive('/salestable')}>Sales</Link>
               <Link to="/estimates" onClick={handleItemClick} className={isActive('/estimates')}>Estimate</Link>
               <Link to="/stockEntryTable" onClick={handleItemClick} className={isActive('/stockEntryTable')}>Stock Entry</Link>
@@ -128,6 +115,9 @@ function Navbar() {
               <Link to="/repairstable" onClick={handleItemClick} className={isActive('/repairstable')}>Repairs</Link>
               <Link to="/orderstable" onClick={handleItemClick} className={isActive('/orderstable')}>Orders</Link>
               <Link to="/urdpurchasetable" onClick={handleItemClick} className={isActive('/urdpurchasetable')}>URD Purchase</Link>
+
+             
+
             </div>
           )}
         </div>
@@ -152,7 +142,9 @@ function Navbar() {
               <Link to="/purchaseReport" onClick={handleItemClick} className={isActive('/purchaseReport')}>Purchase Report</Link>
               <Link to="/repairsReport" onClick={handleItemClick} className={isActive('/repairsReport')}>Repairs Report</Link>
               <Link to="/urdPurchaseReport" onClick={handleItemClick} className={isActive('/urdPurchaseReport')}>URDPurchase Report</Link>
+              {/* <Link to="/stockReport" onClick={handleItemClick} className={isActive('/stockReport')}>Stock Report</Link> */}
               <Link to="/barcodeprinting" onClick={handleItemClick} className={isActive('/barcodeprinting')}>Barcode Printing Report</Link>
+              {/* <Link to="/cashReport" onClick={handleItemClick} className={isActive('/cashReport')}>Cash Report</Link> */}
             </div>
           )}
         </div>
