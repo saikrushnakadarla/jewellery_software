@@ -38,11 +38,13 @@ const StockEntry = () => {
         weightww: "",
         wastageon: "",
         wastage: "",
+        charges: "",
         percentage: "",
         weight: "",
         makingcharges: "",
         cal: "",
         tax: "",
+        status: "",
         stackpoint: "",
     });
 
@@ -145,7 +147,7 @@ const StockEntry = () => {
                                     <div className="col-md-3">
                                         <InputField label="Prefix:" value="Gold" readOnly />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
                                         <InputField
                                             label="purity:"
                                             type="select"
@@ -159,12 +161,25 @@ const StockEntry = () => {
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
                                         <InputField label="PCode/BarCode:"
                                             value={formData.pcode}
                                             onChange={handleChange}
                                             name="pcode"
                                         />
+                                    </div>
+                                    <div className="col-md-2">
+                                    <InputField
+                                        label="Status:"
+                                        type="select"
+                                        name="status"
+                                        value={formData.status}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Sold", label: "Sold" },
+                                            { value: "Purchase", label: "Purchase" },
+                                        ]}
+                                    />
                                     </div>
                                 </div>
                             </div>
@@ -243,9 +258,9 @@ const StockEntry = () => {
                                         <InputField
                                             label="Charges:"
                                             type="select"
-                                            value={formData.wastageon}
+                                            value={formData.charges}
                                             onChange={handleChange}
-                                            name="wastageon"
+                                            name="charges"
                                             options={[{ value: "By Weight", label: "by Weight" },
                                                 { value: "Fixed", label: "Fixed" },
                                             ]}
