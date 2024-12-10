@@ -34,21 +34,26 @@ const Orders = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${baseURL}/get/supplier-and-customer`);
+        const response = await fetch(`${baseURL}/get/account-details`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
         const result = await response.json();
-
+  
+        // Filter only suppliers
         const customers = result.filter(
-          (item) => item.account_group && item.account_group.toLowerCase() === "customer"
+          (item) => item.account_group === 'CUSTOMERS'
         );
-
+  
         setCustomers(customers);
+        // setLoading(false);
+        console.log("Customers=",customers)
       } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
+        console.error('Error fetching data:', error);
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
 
@@ -58,7 +63,8 @@ const Orders = () => {
       customer_id: customerId, // Ensure customer_id is correctly updated
     }));
   
-    const customer = customers.find((cust) => String(cust.id) === String(customerId));
+    const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
+    console.log("Customer Id=",customer)
   
     if (customer) {
       setFormData({
@@ -72,6 +78,7 @@ const Orders = () => {
         city: customer.city || "",
         pincode: customer.pincode || "",
         state: customer.state || "",
+        state_code: customer.state_code || "",
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
@@ -89,12 +96,14 @@ const Orders = () => {
         city: "",
         pincode: "",
         state: "",
+        state_code: "",
         aadhar_card: "",
         gst_in: "",
         pan_card: "",
       });
     }
   };
+
   const handleBack = () => {
       navigate('/orderstable');
   };
@@ -120,7 +129,7 @@ const Orders = () => {
                   onChange={(e) => handleCustomerChange(e.target.value)}
                   options={[
                     ...customers.map((customer) => ({
-                      value: customer.id,
+                      value: customer.account_id,
                       label: customer.account_name, // Use account_name or your preferred field
                     })),
                   ]}
