@@ -72,6 +72,7 @@ const RepairForm = () => {
         city: customer.city || "",
         pincode: customer.pincode || "",
         state: customer.state || "",
+        state_code: customer.state_code || "",
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
@@ -89,6 +90,7 @@ const RepairForm = () => {
         city: "",
         pincode: "",
         state: "",
+        state_code: "",
         aadhar_card: "",
         gst_in: "",
         pan_card: "",
@@ -192,6 +194,9 @@ const RepairForm = () => {
                 </Col>
                 <Col xs={12} md={3}>
                   <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="State:"  name="state" value={formData.state_code} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={5}>
                   <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
@@ -328,6 +333,39 @@ const RepairForm = () => {
             </Col>
           </div>
         </div>
+        <Row className="sales-form-section">
+          <Table bordered hover responsive>
+            <thead>
+              <tr>
+                <th>SI</th>
+                <th>Tagno</th>
+                <th>Pc</th>
+                <th>Item</th>
+                <th>Design</th>
+                <th>Purity</th>
+                <th>Gross</th>
+                <th>Stone</th>
+                <th>Net</th>
+                <th>W%</th>
+                <th>Total[Gms]</th>
+                <th>Rate</th>
+                <th>Amount[M]</th>
+                <th>MC/G</th>
+                <th>MC</th>
+                <th>SLAmt</th>
+                <th>HC</th>
+                <th>Total Amt</th>
+                <th>Staff</th>
+                <th>OF</th>
+                <th>Tax%</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+          </Table>
+
+        </Row>
         <div className="sales-form2">
           <div className="sales-form-third">
             <Col className="sales-form-section">
@@ -492,39 +530,7 @@ const RepairForm = () => {
           </div>
 
         </div>
-        <Row className="sales-form-section">
-          <Table bordered hover responsive>
-            <thead>
-              <tr>
-                <th>SI</th>
-                <th>Tagno</th>
-                <th>Pc</th>
-                <th>Item</th>
-                <th>Design</th>
-                <th>Purity</th>
-                <th>Gross</th>
-                <th>Stone</th>
-                <th>Net</th>
-                <th>W%</th>
-                <th>Total[Gms]</th>
-                <th>Rate</th>
-                <th>Amount[M]</th>
-                <th>MC/G</th>
-                <th>MC</th>
-                <th>SLAmt</th>
-                <th>HC</th>
-                <th>Total Amt</th>
-                <th>Staff</th>
-                <th>OF</th>
-                <th>Tax%</th>
-              </tr>
-            </thead>
-            <tbody>
 
-            </tbody>
-          </Table>
-
-        </Row>
         {/* Buttons */}
         <div className="form-buttons">
           <Button
