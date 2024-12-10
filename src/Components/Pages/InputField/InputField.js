@@ -9,7 +9,8 @@ const InputField = ({
   readOnly, 
   onChange, 
   name, 
-  options = [] 
+  options = [] ,
+  required = false,
 }) => {
   return (
     <div className="input-field-container">
@@ -21,6 +22,7 @@ const InputField = ({
           value={value}
           onChange={onChange}
           disabled={readOnly}
+          required={required}
         >
           <option value="" disabled>
             {placeholder || "Select"}
@@ -40,6 +42,7 @@ const InputField = ({
           value={value}
           readOnly={readOnly}
           onChange={onChange}
+          required={required}
         />
       )}
     </div>
