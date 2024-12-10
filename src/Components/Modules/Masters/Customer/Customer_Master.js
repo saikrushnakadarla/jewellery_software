@@ -55,8 +55,19 @@ function Customer_Master() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  
+    // Update both account_name and print_name if account_name is being typed
+    if (name === 'account_name') {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+        print_name: prevData.print_name === prevData.account_name ? value : prevData.print_name,
+      }));
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
+  
 
   const handleCheckboxChange = () => {
     setTcsApplicable(!tcsApplicable);
