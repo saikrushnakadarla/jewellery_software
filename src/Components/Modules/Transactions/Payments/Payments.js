@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Payments.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
@@ -8,18 +8,46 @@ import baseURL from "../../../../Url/NodeBaseURL";
 const RepairForm = () => {
   const navigate = useNavigate();
 
-  // State variables for form fields
+  // State variables for form fields and account names
   const [formData, setFormData] = useState({
     date: "",
     mode: "",
     cheque_number: "",
     receipt_no: "",
     account_name: "",
-    total_amt: "", // Read-only
+    total_amt: "",
     discount_amt: "",
-    cash_amt: "", // Calculated field
+    cash_amt: "",
     remarks: "",
   });
+
+  const [accountOptions, setAccountOptions] = useState([]);
+
+  // Fetch account names on component mount
+  useEffect(() => {
+    const fetchAccountNames = async () => {
+      try {
+        const response = await fetch(`${baseURL}/payment-account-names`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch account names");
+        }
+        const data = await response.json();
+  
+        // Map API response to match the options structure
+        const formattedOptions = data.map((item) => ({
+          value: item.account_name,
+          label: item.account_name,
+        }));
+  
+        setAccountOptions(formattedOptions);
+      } catch (error) {
+        console.error("Error fetching account names:", error);
+      }
+    };
+  
+    fetchAccountNames();
+  }, []);
+  
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -28,7 +56,6 @@ const RepairForm = () => {
     setFormData((prevData) => {
       const updatedData = { ...prevData, [name]: value };
 
-      // Calculate cash_amt if discount_amt changes
       if (name === "discount_amt") {
         const discount = value === "" ? 0 : parseFloat(value);
         const total = parseFloat(prevData.total_amt || 0);
@@ -126,11 +153,7 @@ const RepairForm = () => {
               name="account_name"
               value={formData.account_name}
               onChange={handleInputChange}
-              options={[
-                { value: "Account1", label: "Account1" },
-                { value: "Account2", label: "Account2" },
-                { value: "Account3", label: "Account3" },
-              ]}
+              options={accountOptions}
             />
           </Col>
           <Col xs={12} md={2}>
@@ -140,7 +163,6 @@ const RepairForm = () => {
               name="total_amt"
               value={formData.total_amt}
               onChange={handleInputChange}
-               // Total amount is read-only
             />
           </Col>
           <Col xs={12} md={2}>
@@ -158,7 +180,7 @@ const RepairForm = () => {
               type="number"
               name="cash_amt"
               value={formData.cash_amt}
-              readOnly // Cash amount is calculated automatically
+              readOnly
             />
           </Col>
           <Col xs={12} md={3}>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Receipts.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
@@ -19,6 +19,27 @@ const RepairForm = () => {
     cash_amt: "",
     remarks: "",
   });
+
+  const [accountNames, setAccountNames] = useState([]);
+
+  useEffect(() => {
+    // Fetch account names when the component mounts
+    const fetchAccountNames = async () => {
+      try {
+        const response = await fetch(`${baseURL}/account-names`);
+        if (response.ok) {
+          const data = await response.json();
+          setAccountNames(data);
+        } else {
+          console.error("Error fetching account names:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching account names:", error);
+      }
+    };
+
+    fetchAccountNames();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +76,7 @@ const RepairForm = () => {
 
       if (response.ok) {
         alert("Receipt added successfully!");
-        navigate("/paymentstable");
+        navigate("/receiptstable");
       } else {
         console.error("Error adding receipt:", result.message);
         alert(result.message || "Failed to add receipt.");
@@ -112,18 +133,18 @@ const RepairForm = () => {
               />
             </Col>
             <Col xs={12} md={3}>
-              <InputField
-                label="Account Name"
-                type="select"
-                name="account_name"
-                value={formData.account_name}
-                onChange={handleChange}
-                options={[
-                  { value: "Account1", label: "Account1" },
-                  { value: "Account2", label: "Account2" },
-                  { value: "Account3", label: "Account3" },
-                ]}
-              />
+            <InputField
+  label="Account Name"
+  type="select"
+  name="account_name"
+  value={formData.account_name}
+  onChange={handleChange}
+  options={accountNames.map((name) => ({
+    value: name.account_name, // Access the correct field from your API response
+    label: name.account_name,
+  }))}
+/>
+
             </Col>
             <Col xs={12} md={2}>
               <InputField
@@ -132,7 +153,6 @@ const RepairForm = () => {
                 name="total_amt"
                 value={formData.total_amt}
                 onChange={handleChange}
-                
               />
             </Col>
             <Col xs={12} md={2}>
@@ -167,7 +187,7 @@ const RepairForm = () => {
               variant="secondary"
               className="cus-back-btn"
               type="button"
-              onClick={() => navigate("/paymentstable")}
+              onClick={() => navigate("/receiptstable")}
             >
               Cancel
             </Button>
