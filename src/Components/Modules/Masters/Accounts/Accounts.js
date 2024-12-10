@@ -13,14 +13,14 @@ const RepairForm = () => {
   const [formData, setFormData] = useState({
     account_name: "",
     print_name: "",
-    group: "",
+    account_group: "",
     op_bal: "",
     dr_cr: "",
     metal_balance: "",
-    address: "",
+    address1: "",
     address2: "",
     city: "",
-    area: "",
+    gst_in: '',
     pincode: "",
     state: "",
     state_code: "",
@@ -28,8 +28,8 @@ const RepairForm = () => {
     mobile: "",
     contact_person: "",
     email: "",
-    birthday_on: "",
-    anniversary_on: "",
+    birthday: "",
+    anniversary: "",
     branch: "",
     bank_account_no: "",
     bank_name: "",
@@ -41,7 +41,7 @@ const RepairForm = () => {
     if (id) {
       const fetchAccountData = async () => {
         try {
-          const response = await fetch(`${baseURL}/get/accounts/${id}`);
+          const response = await fetch(`${baseURL}/get/account-details/${id}`);
           if (!response.ok) {
             throw new Error("Failed to fetch account data");
           }
@@ -87,8 +87,8 @@ const RepairForm = () => {
     try {
       const method = id ? "PUT" : "POST";
       const url = id
-        ? `${baseURL}/put/accounts/${id}`
-        : `${baseURL}/post/accounts`;
+        ? `${baseURL}/edit/account-details/${id}`
+        : `${baseURL}/account-details`;
       const response = await fetch(url, {
         method: method,
         headers: {
@@ -136,9 +136,9 @@ const RepairForm = () => {
             <Col xs={12} md={4}>
               <InputField
                 label="Group"
-                name="group"
+                name="account_group"
                 type="select"
-                value={formData.group}
+                value={formData.account_group}
                 onChange={handleChange}
                 options={accountGroups} // Dynamic options
               />
@@ -149,6 +149,16 @@ const RepairForm = () => {
                 name="op_bal"
                 type="number"
                 value={formData.op_bal}
+                onChange={handleChange}
+              />
+            </Col>
+          
+            <Col xs={12} md={2}>
+              <InputField
+                label="Metal Balance"
+                name="metal_balance"
+                type="number"
+                value={formData.metal_balance}
                 onChange={handleChange}
               />
             </Col>
@@ -165,20 +175,11 @@ const RepairForm = () => {
                 ]}
               />
             </Col>
-            <Col xs={12} md={2}>
-              <InputField
-                label="Metal Balance"
-                name="metal_balance"
-                type="number"
-                value={formData.metal_balance}
-                onChange={handleChange}
-              />
-            </Col>
             <Col xs={12} md={3}>
               <InputField
                 label="Address"
-                name="address"
-                value={formData.address}
+                name="address1"
+                value={formData.address1}
                 onChange={handleChange}
               />
             </Col>
@@ -198,19 +199,7 @@ const RepairForm = () => {
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={12} md={3}>
-              <InputField
-                label="Area"
-                name="area"
-                type="select"
-                value={formData.area}
-                onChange={handleChange}
-                options={[
-                  { value: "Area1", label: "Area1" },
-                  { value: "Area2", label: "Area2" },
-                ]}
-              />
-            </Col>
+           
             <Col xs={12} md={2}>
               <InputField
                 label="Pincode"
@@ -272,24 +261,33 @@ const RepairForm = () => {
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={12} md={2}>
+            <Col xs={12} md={3}>
               <InputField
                 label="Birthday On"
-                name="birthday_on"
+                name="birthday"
                 type="date"
-                value={formData.birthday_on}
+                value={formData.birthday}
                 onChange={handleChange}
               />
             </Col>
             <Col xs={12} md={2}>
               <InputField
                 label="Anniversary On"
-                name="anniversary_on"
+                name="anniversary"
                 type="date"
-                value={formData.anniversary_on}
+                value={formData.anniversary}
                 onChange={handleChange}
               />
             </Col>
+            <Col  xs={12} md={3}>
+      <InputField
+        label="GSTIN:"
+        name="gst_in"
+        value={formData.gst_in}
+        onChange={handleChange}
+        required
+      />
+    </Col>
             <Col xs={12} md={3}>
               <InputField
                 label="Bank Account No."

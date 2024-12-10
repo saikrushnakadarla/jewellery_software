@@ -16,7 +16,7 @@ const RepairsTable = () => {
   // Fetch accounts data from the API
   const fetchAccounts = async () => {
     try {
-      const response = await fetch(`${baseURL}/get/accounts`);
+      const response = await fetch(`${baseURL}/get/account-details`);
       if (!response.ok) {
         throw new Error('Failed to fetch accounts data');
       }
@@ -40,7 +40,7 @@ const RepairsTable = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this account?")) {
       try {
-        const response = await fetch(`${baseURL}/delete/accounts/${id}`, {
+        const response = await fetch(`${baseURL}/delete/account-details/${id}`, {
           method: 'DELETE',
         });
         if (!response.ok) {
@@ -59,16 +59,23 @@ const RepairsTable = () => {
 
   const columns = React.useMemo(
     () => [
+      {
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, 
+      },
       { Header: 'Account Name', accessor: 'account_name' },
       { Header: 'Print Name', accessor: 'print_name' },
-      { Header: 'Group', accessor: 'group' },
+      { Header: 'Group', accessor: 'account_group' },
       { Header: 'Op. Bal.', accessor: 'op_bal' },
       { Header: 'Dr/Cr', accessor: 'dr_cr' },
       { Header: 'Metal Balance', accessor: 'metal_balance' },
-      { Header: 'Address', accessor: 'address' },
+      { Header: 'Address', accessor: 'address1' },
       { Header: 'Address2', accessor: 'address2' },
       { Header: 'City', accessor: 'city' },
-      { Header: 'Area', accessor: 'area' },
+      {
+        Header: 'GSTIN',
+        accessor: 'gst_in',
+      },
       { Header: 'Pincode', accessor: 'pincode' },
       { Header: 'State', accessor: 'state' },
       { Header: 'State Code', accessor: 'state_code' },
@@ -76,8 +83,8 @@ const RepairsTable = () => {
       { Header: 'Mobile', accessor: 'mobile' },
       { Header: 'Contact Person', accessor: 'contact_person' },
       { Header: 'Email', accessor: 'email' },
-      { Header: 'Birthday On', accessor: 'birthday_on' },
-      { Header: 'Anniversary', accessor: 'anniversary_on' },
+      { Header: 'Birthday On', accessor: 'birthday' },
+      { Header: 'Anniversary', accessor: 'anniversary' },
       { Header: 'Bank Account No.', accessor: 'bank_account_no' },
       { Header: 'Bank Name', accessor: 'bank_name' },
       { Header: 'IFSC Code', accessor: 'ifsc_code' },

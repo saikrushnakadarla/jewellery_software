@@ -13,7 +13,7 @@ function Customer_Master() {
   const [formData, setFormData] = useState({
     account_name: '',
     print_name: '',
-    account_group: 'Customer',
+    account_group: 'CUSTOMERS',
     address1:'',
     address2:'',
     city:'',
@@ -42,7 +42,7 @@ function Customer_Master() {
     if (id) {
       const fetchCustomer = async () => {
         try {
-          const response = await fetch(`${baseURL}/get/supplier-and-customer/${id}`);
+          const response = await fetch(`${baseURL}/get/account-details/${id}`);
           const result = await response.json();
           setFormData(result);
         } catch (error) {
@@ -81,8 +81,8 @@ function Customer_Master() {
     try {
       const method = id ? "PUT" : "POST";
       const endpoint = id
-        ? `${baseURL}/edit/supplier-and-customer/${id}`
-        : `${baseURL}/supplier-and-customer`;
+        ? `${baseURL}/edit/account-details/${id}`
+        : `${baseURL}/account-details`;
   
       const response = await fetch(endpoint, {
         method,
