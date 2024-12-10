@@ -292,6 +292,18 @@ import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 
+  // Example validation functions (These should match your actual validation logic)
+  const validateMetal = (value) => /^[a-zA-Z]+$/.test(value); // Only alphabets
+  const validateShortId = (value) => /^[a-zA-Z0-9]+$/.test(value); // Alphanumeric characters
+  const validateItemType = (value) => value.trim() !== ""; // Not empty
+  const validateDesignItem = (value) => /^[a-zA-Z]+$/.test(value); // Only alphabets
+  const validateDesignName = (value) => /^[a-zA-Z]+$/.test(value); // Only alphabets
+  const validateWastagePercentage = (value) => !isNaN(value) && value >= 0 && value <= 100; // Valid percentage
+  const validateMakingCharge = (value) => !isNaN(value); // Valid number
+  const validateDesignShortCode = (value) => /^[a-zA-Z0-9]+$/.test(value); // Alphanumeric characters
+  const validateBrandCategory = (value) => value.trim() !== ""; // Not empty
+  const validateMcType = (value) => value.trim() !== ""; // Not empty
+
 function DesignMaster() {
   const [formData, setFormData] = useState({
     metal: '',
@@ -309,6 +321,8 @@ function DesignMaster() {
   const [submittedData, setSubmittedData] = useState([]); // Store fetched and submitted form entries
   const [editMode, setEditMode] = useState(false); // Toggle between add and edit modes
   const [editId, setEditId] = useState(null); // Store ID of the record being edited
+  const [errors, setErrors] = useState({}); // Store validation errors
+
 
   // Fetch data from the backend API when the component mounts
   useEffect(() => {
@@ -324,11 +338,68 @@ function DesignMaster() {
     fetchData();
   }, []);
 
+  // Handle change function
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    // Update formData state
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+
+    // Initialize a variable to store error message for the field
+    let error = "";
+
+    // Validate field based on its name
+    if (name === "metal" && !validateMetal(value)) {
+      error = "Invalid Metal Name (only alphabets allowed)";
+    } else if (name === "short_id" && !validateShortId(value)) {
+      error = "Invalid Short ID (only alphanumeric characters allowed)";
+    } else if (name === "item_type" && !validateItemType(value)) {
+      error = "Item Type is required";
+    } else if (name === "design_item" && !validateDesignItem(value)) {
+      error = "Invalid Design Item (only alphabets allowed)";
+    } else if (name === "design_name" && !validateDesignName(value)) {
+      error = "Invalid Design Name (only alphabets allowed)";
+    } else if (name === "wastage_percentage" && !validateWastagePercentage(value)) {
+      error = "Invalid Wastage Percentage (valid number required)";
+    } else if (name === "making_charge" && !validateMakingCharge(value)) {
+      error = "Invalid Making Charge (valid number required)";
+    } else if (name === "design_short_code" && !validateDesignShortCode(value)) {
+      error = "Invalid Design Short Code (only alphanumeric characters allowed)";
+    } else if (name === "brand_category" && !validateBrandCategory(value)) {
+      error = "Brand/Category is required";
+    } else if (name === "mc_type" && !validateMcType(value)) {
+      error = "MC Type is required";
+    }
+
+    // Update error state for the specific field
+    setErrors({
+      ...errors,
+      [name]: error,
+    });
   };
 
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Apply each validation function to the respective form fields
+    if (!validateMetal(formData.metal)) newErrors.metal = "Invalid Metal Name (only alphabets allowed)";
+    if (!validateShortId(formData.short_id)) newErrors.short_id = "Invalid Short ID (only alphanumeric characters allowed)";
+    if (!validateItemType(formData.item_type)) newErrors.item_type = "Item Type is required";
+    if (!validateDesignItem(formData.design_item)) newErrors.design_item = "Invalid Design Item (only alphabets allowed)";
+    if (!validateDesignName(formData.design_name)) newErrors.design_name = "Invalid Design Name (only alphabets allowed)";
+    if (!validateWastagePercentage(formData.wastage_percentage)) newErrors.wastage_percentage = "Invalid Wastage Percentage (valid number required)";
+    if (!validateMakingCharge(formData.making_charge)) newErrors.making_charge = "Invalid Making Charge (valid number required)";
+    if (!validateDesignShortCode(formData.design_short_code)) newErrors.design_short_code = "Invalid Design Short Code (only alphanumeric characters allowed)";
+    if (!validateBrandCategory(formData.brand_category)) newErrors.brand_category = "Brand/Category is required";
+    if (!validateMcType(formData.mc_type)) newErrors.mc_type = "MC Type is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // If no errors, form is valid
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -406,6 +477,8 @@ function DesignMaster() {
     });
     setEditMode(false);
     setEditId(null);
+    setErrors({});
+
   };
 
   const columns = React.useMemo(
@@ -491,13 +564,23 @@ function DesignMaster() {
               name="metal"
               value={formData.metal}
               onChange={handleChange}
+              required={true}
+              error={errors.metal}
+
             />
+                      {errors.metal && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.metal}</p>}
+
             <InputField
               label="Short Id:"
               name="short_id"
               value={formData.short_id}
               onChange={handleChange}
+              required={true}
+              error={errors.short_id}
+
             />
+                      {errors.short_id && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.short_id}</p>}
+
             <InputField
               label="Item Type:"
               name="item_type"
@@ -512,21 +595,33 @@ function DesignMaster() {
                 { value: 'necklace', label: 'Necklace' },
                 { value: 'earring', label: 'Earring' },
               ]}
+              error={errors.item_type}
+
             />
+                      {errors.item_type && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.item_type}</p>}
+
             <InputField
               label="Design Item:"
               name="design_item"
               value={formData.design_item}
               onChange={handleChange}
               required={true}
+              error={errors.design_item}
+
             />
+                      {errors.design_item && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.design_item}</p>}
+
             <InputField
               label="Design Name:"
               name="design_name"
               value={formData.design_name}
               onChange={handleChange}
               required={true}
+              error={errors.design_name}
+
             />
+                      {errors.design_name && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.design_name}</p>}
+
           </div>
 
           {/* Row 2 */}
@@ -537,21 +632,33 @@ function DesignMaster() {
               value={formData.wastage_percentage}
               onChange={handleChange}
               required={true}
+              error={errors.wastage_percentage}
+
             />
+                      {errors.wastage_percentage && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.wastage_percentage}</p>}
+
             <InputField
               label="Making Charge:"
               name="making_charge"
               value={formData.making_charge}
               onChange={handleChange}
               required={true}
+              error={errors.making_charge}
+
             />
+                      {errors.making_charge && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.making_charge}</p>}
+
             <InputField
               label="Design Short Code:"
               name="design_short_code"
               value={formData.design_short_code}
               onChange={handleChange}
               required={true}
+              error={errors.design_short_code}
+
             />
+                      {errors.design_short_code && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.design_short_code}</p>}
+
             <InputField
               label="Brand/Category:"
               name="brand_category"
@@ -566,7 +673,11 @@ function DesignMaster() {
                 { value: 'platinum', label: 'Platinum' },
                 { value: 'diamond', label: 'Diamond' },
               ]}
+              error={errors.brand_category}
+
             />
+                      {errors.brand_category && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.brand_category}</p>}
+
             <InputField
               label="MC Type:"
               name="mc_type"
@@ -579,7 +690,11 @@ function DesignMaster() {
                 { value: 'fixed', label: 'Fixed' },
                 { value: 'percentage', label: 'Percentage' },
               ]}
+              error={errors.mc_type}
+
             />
+                      {errors.mc_type && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.mc_type}</p>}
+
           </div>
 
           <div className="sup-button-container">

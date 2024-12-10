@@ -268,6 +268,8 @@ function MetalType() {
 
   const [submittedData, setSubmittedData] = useState([]); // Store submitted form entries
   const [editing, setEditing] = useState(null); // Track whether we're editing a record
+  const [errors, setErrors] = useState({}); // State for tracking validation errors
+
 
   // Fetch data from the backend API when the component mounts
   useEffect(() => {
@@ -283,10 +285,66 @@ function MetalType() {
     fetchData();
   }, []);
 
-  const handleChange = (e) => {
+   // Validation functions
+   const validateMetalName = (value) => /^[A-Za-z\s]+$/.test(value);
+   const validateDescription = (value) => value.trim() !== "";
+   const validatePurity = (value) => /^[0-9.]+$/.test(value);
+ 
+
+   const handleChange = (e) => {
     const { name, value } = e.target;
+  
+    // Initialize a variable to store validation error
+    let error = "";
+  
+    // Validate specific fields based on the input's name
+    if (name === "metal_name" && !validateMetalName(value)) {
+      error = "Metal name should contain only alphabets.";
+    } else if (name === "description" && !validateDescription(value)) {
+      error = "Description is required.";
+    } else if (name === "default_purity" && !validatePurity(value)) {
+      error = "Purity should be selected.";
+    } else if (name === "default_purity_for_rate_entry" && !validatePurity(value)) {
+      error = "Purity for Rate Entry should be selected.";
+    } else if (name === "default_purity_for_old_metal" && !validatePurity(value)) {
+      error = "Purity for Old Metal should be selected.";
+    } else if (name === "default_issue_purity" && !validatePurity(value)) {
+      error = "Issue Purity should be selected.";
+    }
+  
+    // Update formData and errors state
     setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: error });
   };
+
+
+  const validateForm = () => {
+    const formErrors = {};
+  
+    // Validate Metal Name
+    if (!validateMetalName(formData.metal_name)) {
+      formErrors.metal_name = "Metal Name should contain only alphabets.";
+    }
+  
+    // Validate Description
+    if (!validateDescription(formData.description)) {
+      formErrors.description = "Description is required.";
+    }
+  
+    // Validate Purity Fields
+    ["default_purity", "default_purity_for_rate_entry", "default_purity_for_old_metal", "default_issue_purity"].forEach((field) => {
+      if (!validatePurity(formData[field])) {
+        formErrors[field] = "Purity should be a valid number.";
+      }
+    });
+  
+    // Set errors in state
+    setErrors(formErrors);
+  
+    // Return true if no errors, otherwise false
+    return Object.keys(formErrors).length === 0;
+  };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -411,13 +469,21 @@ function MetalType() {
               name="metal_name"
               value={formData.metal_name}
               onChange={handleChange}
+              required={true}
+              error={errors.metal_name}
             />
+            {errors.metal_name && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.metal_name}</p>}
+
             <InputField
               label="Description:"
               name="description"
               value={formData.description}
               onChange={handleChange}
+              required={true}
+              error={errors.description}
             />
+            {errors.description && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.description}</p>}
+
             <InputField
               label="Default Purity:"
               name="default_purity"
@@ -431,8 +497,12 @@ function MetalType() {
                 { value: '99.5', label: '99.5%' },
                 { value: '95.0', label: '95.0%' },
               ]}
+              error={errors.default_purity}
+
             />
           </div>
+          {errors.default_purity && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.default_purity}</p>}
+
 
           {/* Row 2 */}
           <div className="form-row">
@@ -449,7 +519,11 @@ function MetalType() {
                 { value: '99.5', label: '99.5%' },
                 { value: '95.0', label: '95.0%' },
               ]}
+              error={errors.default_purity_for_rate_entry}
+
             />
+            {errors.default_purity_for_rate_entry && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.default_purity_for_rate_entry}</p>}
+
             <InputField
               label="Default Purity for Old Metal:"
               name="default_purity_for_old_metal"
@@ -477,7 +551,11 @@ function MetalType() {
                 { value: '99.5', label: '99.5%' },
                 { value: '95.0', label: '95.0%' },
               ]}
+              error={errors.default_purity_for_old_metal}
+
             />
+            {errors.default_purity_for_old_metal && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.default_purity_for_old_metal}</p>}
+
           </div>
 
           <div className="sup-button-container">
