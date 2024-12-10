@@ -147,7 +147,7 @@ const StockEntry = () => {
                                     <div className="col-md-3">
                                         <InputField label="Prefix:" value="Gold" readOnly />
                                     </div>
-                                    <div className="col-md-2">
+                                    <div className="col-md-3">
                                         <InputField
                                             label="purity:"
                                             type="select"
@@ -161,14 +161,14 @@ const StockEntry = () => {
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-2">
+                                    <div className="col-md-3">
                                         <InputField label="PCode/BarCode:"
                                             value={formData.pcode}
                                             onChange={handleChange}
                                             name="pcode"
                                         />
                                     </div>
-                                    <div className="col-md-2">
+                                    {/* <div className="col-md-2">
                                     <InputField
                                         label="Status:"
                                         type="select"
@@ -180,7 +180,7 @@ const StockEntry = () => {
                                             { value: "Purchase", label: "Purchase" },
                                         ]}
                                     />
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className="mb-4">
@@ -228,35 +228,47 @@ const StockEntry = () => {
                             <div>
                                 <div className="row g-3">
                                     <div className="col-md-3">
-                                        <InputField
-                                            label="Wastage On:"
-                                            type="select"
-                                            value={formData.wastageon}
+                                    <InputField
+                                        label="Wastage On:"
+                                        type="select"
+                                        name="wastageon"
+                                        value={formData.wastageon}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Gross Weight", label: "Gross Weight" },
+                                            { value: "Weight WW", label: "Weight WW" },
+                                        ]}
+                                    />
+                                    </div>
+                                    <div className="col-md-3">
+                                        <InputField label="Wastage %:"  value={formData.wastagepercentage}
                                             onChange={handleChange}
-                                            name="wastageon"
-                                            options={[{ value: "Weight", label: "Weight" }]}
-                                        />
+                                            name="wastagepercentage" />
                                     </div>
-                                    <div className="col-md-3">
-                                        <InputField label="Wastage:" value="NaN" readOnly />
-                                    </div>
-                                    <div className="col-md-3">
+                                    {/* <div className="col-md-3">
                                         <InputField label="%:"
                                             value={formData.percentage}
                                             onChange={handleChange}
                                             name="percentage"
                                         />
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-3">
-                                        <InputField label="Weight:"
-                                            value={formData.weight}
+                                        <InputField label="Wastage Weight:"
+                                            value={formData.wastageweight}
                                             onChange={handleChange}
-                                            name="weight"
+                                            name="wastageweight"
                                         />
                                     </div>
                                     <div className="col-md-3">
+                                    <InputField label="total Weight:"
+                                        name="totalweight"
+                                        value={formData.totalweight}
+                                        onChange={handleChange}
+                                    />
+                                    </div>
+                                    <div className="col-md-3">
                                         <InputField
-                                            label="Charges:"
+                                            label="Making Charges On:"
                                             type="select"
                                             value={formData.charges}
                                             onChange={handleChange}
@@ -267,19 +279,26 @@ const StockEntry = () => {
                                         />
                                     </div>
                                     <div className="col-md-3">
+                                    <InputField label="Mc Per Gram:"
+                                        name="mcpergram"
+                                        value={formData.mcpergram}
+                                        onChange={handleChange}
+                                    />
+                                    </div>
+                                    <div className="col-md-3">
                                         <InputField label="Making Charges:"
                                             value={formData.makingcharges}
                                             onChange={handleChange}
                                             name="makingcharges"
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    {/* <div className="col-md-3">
                                         <InputField label="Cal:"
                                             value={formData.cal}
                                             onChange={handleChange}
                                             name="cal"
                                         />
-                                    </div>
+                                    </div> */}
                                     {/* <div className="col-md-3">
                                         <InputField label="Tax:"
                                             value={formData.tax}
