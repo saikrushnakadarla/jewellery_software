@@ -145,7 +145,7 @@ const RepairsTable = () => {
 const handleDelete = async (id) => {
   if (window.confirm('Are you sure you want to delete this customer?')) {
     try {
-      const response = await fetch(`${baseURL}/delete/supplier-and-customer/${id}`, {
+      const response = await fetch(`${baseURL}/delete/account-details/${id}`, {
         method: 'DELETE',
       });
 
