@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./StockEntry.css";
@@ -7,6 +7,7 @@ import StoneDetailsModal from "./StoneDetailsModal";
 import { useNavigate } from "react-router-dom";
 
 const StockEntry = () => {
+    const [productOptions, setProductOptions] = useState([]);
     const [formData, setFormData] = useState({
         product_id: "",
         Pricing: "",
@@ -52,6 +53,24 @@ const StockEntry = () => {
     const handleBack = () => {
         navigate("/stockEntryTable");
     };
+
+    useEffect(() => {
+        const fetchProductIds = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/api/products");
+                const productData = response.data; // Ensure the response structure matches this
+                const options = productData.map((product) => ({
+                    value: product.product_id,
+                    label: product.product_id,
+                }));
+                setProductOptions(options);
+            } catch (error) {
+                console.error("Error fetching product IDs:", error);
+            }
+        };
+
+        fetchProductIds();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -111,19 +130,15 @@ const StockEntry = () => {
                                         />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField
-                                            label="P ID:"
-                                            name="product_id"
-                                            type="select"
-                                            value={formData.product_id}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "4", label: "4" },
-                                                { value: "5", label: "5" },
-                                                { value: "6", label: "6" },
-                                            ]}
-                                        />
-                                    </div>
+            <InputField
+                label="P ID:"
+                name="product_id"
+                type="select"
+                value={formData.product_id}
+                onChange={handleChange}
+                options={productOptions}
+            />
+        </div>
                                     <div className="col-md-2">
                                         <InputField
                                             label="Tag ID:"
