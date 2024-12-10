@@ -113,7 +113,15 @@ const StockEntry = () => {
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
+                                    <InputField
+                                        label="Tag ID:"
+                                        name="tagid"
+                                        value={formData.tagid}
+                                        onChange={handleChange}
+                                    />
+                                    </div>
+                                    <div className="col-md-2">
                                         <InputField
                                             label="productname:"
                                             type="select"
@@ -126,7 +134,7 @@ const StockEntry = () => {
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
                                     <InputField
                                         
                                         label="Design Master:"
