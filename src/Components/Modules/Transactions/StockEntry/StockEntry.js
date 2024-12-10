@@ -11,7 +11,7 @@ const StockEntry = () => {
         product_id: "",
         Pricing: "",
         Tag_ID: "",
-        Prefix: "",
+        Prefix: "tag",
         Category: "Gold", 
         Purity: "",
         PCode_BarCode: "",
@@ -163,7 +163,7 @@ const StockEntry = () => {
                                         <InputField label="Category:" value="Gold" readOnly />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Prefix:" value="Gold" readOnly />
+                                        <InputField label="Prefix:" value="tag" readOnly />
                                     </div>
                                     <div className="col-md-3">
                                         <InputField
