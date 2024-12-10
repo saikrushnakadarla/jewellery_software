@@ -124,7 +124,7 @@ const StockEntry = () => {
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
                                         <InputField
                                             label="Tag ID:"
                                             name="Tag_ID"
@@ -132,7 +132,7 @@ const StockEntry = () => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
                                         <InputField
                                             label="Product Name:"
                                             name="product_Name"
@@ -145,7 +145,7 @@ const StockEntry = () => {
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
                                         <InputField
                                             label="Design Master:"
                                             name="Design_Master"
@@ -161,6 +161,9 @@ const StockEntry = () => {
                                     </div>
                                     <div className="col-md-3">
                                         <InputField label="Category:" value="Gold" readOnly />
+                                    </div>
+                                    <div className="col-md-3">
+                                        <InputField label="Prefix:" value="Gold" readOnly />
                                     </div>
                                     <div className="col-md-3">
                                         <InputField
@@ -205,21 +208,30 @@ const StockEntry = () => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div className="col-md-3">
-                                        <button
-                                            type="button"
+                                    <div className="col-md-2">
+                                    <button
+                                            type="button" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
                                             className="btn btn-primary w-100"
                                             onClick={handleOpenModal}
+
                                         >
                                             Stone Details
                                         </button>
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
                                         <InputField
                                             label="Stones Price:"
                                             name="Stones_Price"
                                             value={formData.Stones_Price}
                                             onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="col-md-2">
+                                        <InputField label="Weight BW:"
+                                         name="Weight_BW"
+                                            value={formData.Weight_BW}
+                                            onChange={handleChange}
+                                           
                                         />
                                     </div>
                                 </div>
