@@ -365,7 +365,7 @@ const FormWithTable = () => {
                                         readOnly={!isMaintainTagsChecked}
                                         style={openingTagsStyle}
                                     />
-                                    <InputField
+                                    {/* <InputField
                                         label="Status:"
                                         type="select"
                                         name="status"
@@ -377,7 +377,7 @@ const FormWithTable = () => {
                                         ]}
                                         readOnly={!isMaintainTagsChecked}
                                         style={openingTagsStyle}
-                                    />
+                                    /> */}
                                 </div>
                                 <div className="form-row">
                                     <InputField
@@ -398,9 +398,10 @@ const FormWithTable = () => {
                                     />
                                     <button
                                         type="button"
-                                        style={{ backgroundColor: "#a36e29" }}
+                                        style={{ backgroundColor: '#a36e29' }}
                                         className="stone-details-btn"
-                                        onClick={() => console.log("Stone Details Modal")}
+                                        onClick={handleOpenModal}
+                                        readOnly={!isMaintainTagsChecked}
                                     >
                                         Stone Details
                                     </button>
@@ -413,7 +414,7 @@ const FormWithTable = () => {
                                         style={openingTagsStyle}
                                     />
                                     <InputField
-                                        label="Weight WW:"
+                                        label="Weight BW:"
                                         name="weightww"
                                         value={formData.weightww}
                                         onChange={handleChange}
@@ -429,6 +430,95 @@ const FormWithTable = () => {
                                         style={openingTagsStyle}
                                     />
                                 </div>
+                                <div className="form-row" style={{ marginBottom: '-20px' }}>
+                                    <InputField
+                                        label="Wastage On:"
+                                        type="select"
+                                        name="wastageon"
+                                        value={formData.wastageon}
+                                        onChange={handleChange}
+                                        readOnly={!isMaintainTagsChecked}
+                                        style={openingTagsStyle}
+                                        options={[
+                                            { value: "Gross Weight", label: "Gross Weight" },
+                                            { value: "Weight WW", label: "Weight WW" },
+                                        ]}
+                                    />
+                                     <InputField label="Wastage %:"  value={formData.wastagepercentage}
+                                            onChange={handleChange}
+                                            readOnly={!isMaintainTagsChecked}
+                                            style={openingTagsStyle}
+                                            name="wastagepercentage" />
+                                            
+                                    {/* <InputField label="%:"
+                                        name="percentage"
+                                        value={formData.percentage}
+                                        onChange={handleChange}
+                                    /> */}
+                                    <InputField label="wastage Weight:"
+                                        name="wastageweight"
+                                        value={formData.wastageweight}
+                                        onChange={handleChange}
+                                        readOnly={!isMaintainTagsChecked}
+                                        style={openingTagsStyle}
+                                    />
+                                     <InputField label="total Weight AW:"
+                                        name="totalweight"
+                                        value={formData.totalweight}
+                                        onChange={handleChange}
+                                        readOnly={!isMaintainTagsChecked}
+                                        style={openingTagsStyle}
+                                    />
+                                     <InputField
+                                            label="Making Charges On:"
+                                            type="select"
+                                            value={formData.charges}
+                                            onChange={handleChange}
+                                            name="charges"
+                                            readOnly={!isMaintainTagsChecked}
+                                            style={openingTagsStyle}
+                                            options={[{ value: "By Weight", label: "by Weight" },
+                                                { value: "Fixed", label: "Fixed" },
+                                            ]}
+                                        />
+                                         <InputField label="Mc Per Gram:"
+                                        name="mcpergram"
+                                        value={formData.mcpergram}
+                                        onChange={handleChange}
+                                        readOnly={!isMaintainTagsChecked}
+                                        style={openingTagsStyle}
+                                    />
+                                    <InputField label="Making Charges:"
+                                        name="makingcharges"
+                                        value={formData.makingcharges}
+                                        onChange={handleChange}
+                                        readOnly={!isMaintainTagsChecked}
+                                        style={openingTagsStyle}
+                                    />
+                                   
+                                    {/* <InputField label="Tax:"
+                                        name="tax"
+                                        value={formData.tax}
+                                        onChange={handleChange}
+                                    /> */}
+                                    <InputField
+                                        label="Stock Point:"
+                                        type="select"
+                                        name="stackpoint"
+                                        value={formData.stackpoint}
+                                        onChange={handleChange}
+                                        readOnly={!isMaintainTagsChecked}
+                                        style={openingTagsStyle}
+                                        options={[
+                                            { value: "Main Store", label: "Main Store" },
+                                            { value: "Secondary Store", label: "Secondary Store" },
+                                        ]}
+                                    />
+                                </div>
+                                <button type="submit" className="btn btn-primary"  readOnly={!isMaintainTagsChecked}
+                                       style={{ backgroundColor: '#a36e29', borderColor: '#a36e29',marginLeft:'95%',marginTop:'15px',openingTagsStyle }}>
+                                Add
+                            </button>
                             </div>
 
                             <button
