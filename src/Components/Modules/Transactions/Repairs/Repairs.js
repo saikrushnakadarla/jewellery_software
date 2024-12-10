@@ -36,7 +36,8 @@ const RepairForm = () => {
     stone_value: "",
     making_charge: "",
     handling_charge: "",
-    total: ""
+    total: "",
+    status:"",
   });
 
   const [customers, setCustomers] = useState([]);

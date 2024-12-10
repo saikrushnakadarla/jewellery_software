@@ -45,8 +45,6 @@ const FormWithTable = () => {
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
-    const [isMaintainTagsChecked, setIsMaintainTagsChecked] = useState(false);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -54,18 +52,6 @@ const FormWithTable = () => {
             [name]: value,
         }));
     };
-
-    const handleCheckboxChange = () => {
-        setIsMaintainTagsChecked((prev) => !prev);
-    };
-
-    const maintainTagsStyle = !isMaintainTagsChecked
-        ? {}
-        : { backgroundColor: "#f5f5f5", color: "#888" };
-
-    const openingTagsStyle = isMaintainTagsChecked
-        ? {}
-        : { backgroundColor: "#f5f5f5", color: "#888" };
 
     // Handle form submission
     const handleSubmit = async (e) => {
@@ -147,7 +133,7 @@ const FormWithTable = () => {
                             <div className="form-container">
                                 <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
                                 <div className="form-row">
-                                    <InputField label="P ID:"
+                                <InputField label="P ID:"
                                         name="pid"
                                         value={formData.pid}
                                         onChange={handleChange}
@@ -176,8 +162,8 @@ const FormWithTable = () => {
                                             { value: "Silver", label: "Silver" },
                                         ]}
                                     />
-                                    <InputField
-
+                                     <InputField
+                                        
                                         label="Design Master:"
                                         name="designmaster"
                                         type="select"
@@ -189,7 +175,7 @@ const FormWithTable = () => {
                                             { value: "Silver", label: "Silver" },
                                         ]}
                                     />
-                                    <InputField
+                                      <InputField
                                         label="Purity:"
                                         type="select"
                                         name="purity"
@@ -266,60 +252,39 @@ const FormWithTable = () => {
                                     />
                                 </div>
                             </div>
-                            <div className="form-container" style={{ marginTop: "15px" }}>
-                                {/* Maintain Tags Section */}
-                                <div className="main-tags-row" style={{ marginBottom: "15px" }}>
-                                    <input
-                                        type="checkbox"
-                                        id="main-tags"
-                                        style={{ width: "35px" }}
-                                        checked={isMaintainTagsChecked}
-                                        onChange={handleCheckboxChange}
-                                    />
+                            <div className="form-container" style={{ marginTop: '15px' }}>
+                                <div className="main-tags-row" style={{ marginBottom: '15px' }}>
+                                    <input type="checkbox" id="main-tags" style={{ width: '35px' }} />
                                     <label htmlFor="main-tags">
                                         <h4>Maintain Tags</h4>
                                     </label>
                                 </div>
-                                <div className="form-row" style={{ marginBottom: "-20px" }}>
-                                    <InputField
-                                        label="OP.Qty:"
+                                <div className="form-row" style={{ marginBottom: '-20px' }}>
+                                    <InputField label="OP.Qty:"
                                         name="opqty"
                                         value={formData.opqty}
                                         onChange={handleChange}
-                                        readOnly={isMaintainTagsChecked}
-                                        style={maintainTagsStyle}
                                     />
-                                    <InputField
-                                        label="OP.Value:"
+                                    <InputField label="OP.Value:"
                                         name="opvalue"
                                         value={formData.opvalue}
                                         onChange={handleChange}
-                                        readOnly={isMaintainTagsChecked}
-                                        style={maintainTagsStyle}
                                     />
-                                    <InputField
-                                        label="OP.Weight:"
+                                    <InputField label="OP.Weight:"
                                         name="opweight"
                                         value={formData.opweight}
                                         onChange={handleChange}
-                                        readOnly={isMaintainTagsChecked}
-                                        style={maintainTagsStyle}
                                     />
-                                    <InputField
-                                        label="HUID No:"
+                                  
+                                    <InputField label="HUID No:"
                                         name="huidno"
                                         value={formData.huidno}
                                         onChange={handleChange}
-                                        readOnly={isMaintainTagsChecked}
-                                        style={maintainTagsStyle}
                                     />
                                 </div>
-
-
                             </div>
-                            {/* Opening Tags Entry Section */}
-                            <div className="form-container" style={{ marginTop: "15px" }}>
-                                <h4 style={{ marginBottom: "15px" }}>Opening Tags Entry</h4>
+                            <div className="form-container" style={{ marginTop: '15px' }}>
+                                <h4 style={{ marginBottom: '15px' }}>Opening Tags Entry</h4>
                                 <div className="form-row">
                                     <InputField
                                         label="Pricing:"
@@ -331,18 +296,19 @@ const FormWithTable = () => {
                                             { value: "By Weight", label: "By Weight" },
                                             { value: "By Fixed", label: "By Fixed" },
                                         ]}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
-                                    <InputField
-                                        label="Tag ID:"
-                                        name="tagid"
+                                    <InputField label="Tag ID:"
+                                        name="tag id"
                                         value={formData.tagid}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
-                                    <InputField label="Prefix:" value="Gold" readOnly style={openingTagsStyle} />
+                                    {/* <InputField label="Product Name:"
+                                        name="productname"
+                                        value={formData.productname}
+                                        onChange={handleChange}
+                                    />
+                                    <InputField label="Category:" value="Gold" readOnly /> */}
+                                    <InputField label="Prefix:" value="Gold" readOnly />
                                     <InputField
                                         label="Purity:"
                                         type="select"
@@ -354,18 +320,13 @@ const FormWithTable = () => {
                                             { value: "22K", label: "22K" },
                                             { value: "18K", label: "18K" },
                                         ]}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
-                                    <InputField
-                                        label="PCode/BarCode:"
+                                    <InputField label="PCode/BarCode:"
                                         name="pcode"
                                         value={formData.pcode}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
-                                    {/* <InputField
+                                     {/* <InputField
                                         label="Status:"
                                         type="select"
                                         name="status"
@@ -375,59 +336,41 @@ const FormWithTable = () => {
                                             { value: "Sold", label: "Sold" },
                                             { value: "Purchase", label: "Purchase" },
                                         ]}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     /> */}
                                 </div>
                                 <div className="form-row">
-                                    <InputField
-                                        label="Gross Weight:"
+                                    <InputField label="Gross Weight:"
                                         name="grossweight"
                                         value={formData.grossweight}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
-                                    <InputField
-                                        label="Stones Weight:"
+                                    <InputField label="Stones Weight:"
                                         name="stonesweight"
                                         value={formData.stonesweight}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
                                     <button
                                         type="button"
                                         style={{ backgroundColor: '#a36e29' }}
                                         className="stone-details-btn"
                                         onClick={handleOpenModal}
-                                        readOnly={!isMaintainTagsChecked}
                                     >
                                         Stone Details
                                     </button>
-                                    <InputField
-                                        label="Stones Price:"
+                                    <InputField label="Stones Price:"
                                         name="stonesprice"
                                         value={formData.stonesprice}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
-                                    <InputField
-                                        label="Weight BW:"
+                                    <InputField label="Weight BW:"
                                         name="weightww"
                                         value={formData.weightww}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
-                                    <InputField
-                                        label="HUID No:"
+                                       <InputField label="HUID No:"
                                         name="huidno"
                                         value={formData.huidno}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
                                 </div>
                                 <div className="form-row" style={{ marginBottom: '-20px' }}>
@@ -437,8 +380,6 @@ const FormWithTable = () => {
                                         name="wastageon"
                                         value={formData.wastageon}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                         options={[
                                             { value: "Gross Weight", label: "Gross Weight" },
                                             { value: "Weight WW", label: "Weight WW" },
@@ -446,10 +387,7 @@ const FormWithTable = () => {
                                     />
                                      <InputField label="Wastage %:"  value={formData.wastagepercentage}
                                             onChange={handleChange}
-                                            readOnly={!isMaintainTagsChecked}
-                                            style={openingTagsStyle}
                                             name="wastagepercentage" />
-                                            
                                     {/* <InputField label="%:"
                                         name="percentage"
                                         value={formData.percentage}
@@ -459,15 +397,11 @@ const FormWithTable = () => {
                                         name="wastageweight"
                                         value={formData.wastageweight}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
                                      <InputField label="total Weight AW:"
                                         name="totalweight"
                                         value={formData.totalweight}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
                                      <InputField
                                             label="Making Charges On:"
@@ -475,8 +409,6 @@ const FormWithTable = () => {
                                             value={formData.charges}
                                             onChange={handleChange}
                                             name="charges"
-                                            readOnly={!isMaintainTagsChecked}
-                                            style={openingTagsStyle}
                                             options={[{ value: "By Weight", label: "by Weight" },
                                                 { value: "Fixed", label: "Fixed" },
                                             ]}
@@ -485,15 +417,11 @@ const FormWithTable = () => {
                                         name="mcpergram"
                                         value={formData.mcpergram}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
                                     <InputField label="Making Charges:"
                                         name="makingcharges"
                                         value={formData.makingcharges}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                     />
                                    
                                     {/* <InputField label="Tax:"
@@ -507,25 +435,21 @@ const FormWithTable = () => {
                                         name="stackpoint"
                                         value={formData.stackpoint}
                                         onChange={handleChange}
-                                        readOnly={!isMaintainTagsChecked}
-                                        style={openingTagsStyle}
                                         options={[
                                             { value: "Main Store", label: "Main Store" },
                                             { value: "Secondary Store", label: "Secondary Store" },
                                         ]}
                                     />
                                 </div>
-                                <button type="submit" className="btn btn-primary"  readOnly={!isMaintainTagsChecked}
-                                       style={{ backgroundColor: '#a36e29', borderColor: '#a36e29',marginLeft:'95%',marginTop:'15px',openingTagsStyle }}>
+                                <button type="submit" className="btn btn-primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29',marginLeft:'95%',marginTop:'15px' }}>
                                 Add
                             </button>
                             </div>
-
                             <button
                                 type="button"
                                 className="cus-back-btn"
                                 variant="secondary"
-                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px', marginTop: '10px' }}
+                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px',marginTop:'10px' }}
                             >
                                 cancel
                             </button>

@@ -115,18 +115,21 @@ const RepairsTable = () => {
   );
 
   // Fetch data and filter where account_group = "customer"
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${baseURL}/get/supplier-and-customer`);
-
+        const response = await fetch(`${baseURL}/get/account-details`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
         const result = await response.json();
-
-        // Filter only customers
+  
+        // Filter only suppliers
         const customers = result.filter(
-          (item) => item.account_group && item.account_group.toLowerCase() === 'customer'
+          (item) => item.account_group === 'CUSTOMERS'
         );
-
+  
         setData(customers);
         setLoading(false);
       } catch (error) {
@@ -134,9 +137,10 @@ const RepairsTable = () => {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
   // Delete a customer
   const handleDelete = async (id) => {

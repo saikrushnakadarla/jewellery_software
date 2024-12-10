@@ -12,7 +12,7 @@ function Customer_Master() {
   const [formData, setFormData] = useState({
     account_name: '',
     print_name: '',
-    account_group: 'Supplier',
+    account_group: 'SUPPLIERS',
     address1:'',
     address2:'',
     city:'',
@@ -41,7 +41,7 @@ function Customer_Master() {
     if (id) {
       const fetchSupplier = async () => {
         try {
-          const response = await fetch(`${baseURL}/get/supplier-and-customer/${id}`);
+          const response = await fetch(`${baseURL}/get/account-details/${id}`);
           const result = await response.json();
           setFormData(result);
         } catch (error) {
@@ -52,10 +52,22 @@ function Customer_Master() {
     }
   }, [id]);
 
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  
+    // Update both account_name and print_name if account_name is being typed
+    if (name === 'account_name') {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+        print_name: prevData.print_name === prevData.account_name ? value : prevData.print_name,
+      }));
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
+  
 
   const handleCheckboxChange = () => {
     setTcsApplicable(!tcsApplicable);
@@ -81,8 +93,8 @@ function Customer_Master() {
     try {
       const method = id ? 'PUT' : 'POST';
       const endpoint = id
-        ? `${baseURL}/edit/supplier-and-customer/${id}`
-        : `${baseURL}/supplier-and-customer`;
+        ? `${baseURL}/edit/account-details/${id}`
+        : `${baseURL}/account-details`;
   
       const response = await fetch(endpoint, {
         method,
@@ -149,7 +161,7 @@ function Customer_Master() {
         label="Address1"
         name="address1"
         value={formData.address1}
-        readOnly
+        onChange={handleChange}
       />
     </Col>
 
@@ -158,7 +170,7 @@ function Customer_Master() {
         label="Address2"
         name="address2"
         value={formData.address2}
-        readOnly
+        onChange={handleChange}
       />
     </Col>
     <Col md={4}>
@@ -166,7 +178,7 @@ function Customer_Master() {
         label="City"
         name="city"
         value={formData.city}
-        readOnly
+        onChange={handleChange}
       />
     </Col>
     <Col md={2}>

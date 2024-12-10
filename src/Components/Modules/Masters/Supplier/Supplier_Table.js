@@ -17,10 +17,10 @@ const RepairsTable = () => {
     () => [
       {
         Header: 'Sr. No.',
-        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+        Cell: ({ row }) => row.index + 1, 
       },
       {
-        Header: 'Customer Name',
+        Header: 'Supplier Name',
         accessor: 'account_name',
       },
       {
@@ -117,12 +117,15 @@ const RepairsTable = () => {
  useEffect(() => {
   const fetchData = async () => {
     try {
-      const response = await fetch(`${baseURL}/get/supplier-and-customer`);
+      const response = await fetch(`${baseURL}/get/account-details`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
       const result = await response.json();
 
       // Filter only suppliers
       const suppliers = result.filter(
-        (item) => item.account_group && item.account_group.toLowerCase() === 'supplier'
+        (item) => item.account_group === 'SUPPLIERS'
       );
 
       setData(suppliers);
@@ -135,6 +138,7 @@ const RepairsTable = () => {
 
   fetchData();
 }, []);
+
 
 
 
