@@ -22,10 +22,21 @@ const RepairForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+
+    setFormData((prevData) => {
+      const updatedData = {
+        ...prevData,
+        [name]: value,
+      };
+
+      if (name === "total_amt" || name === "discount_amt") {
+        const totalAmt = parseFloat(updatedData.total_amt) || 0;
+        const discountAmt = parseFloat(updatedData.discount_amt) || 0;
+        updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
+      }
+
+      return updatedData;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -121,6 +132,7 @@ const RepairForm = () => {
                 name="total_amt"
                 value={formData.total_amt}
                 onChange={handleChange}
+                
               />
             </Col>
             <Col xs={12} md={2}>
@@ -138,7 +150,7 @@ const RepairForm = () => {
                 type="number"
                 name="cash_amt"
                 value={formData.cash_amt}
-                onChange={handleChange}
+                readOnly
               />
             </Col>
             <Col xs={12} md={3}>

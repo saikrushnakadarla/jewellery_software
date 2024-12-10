@@ -12,22 +12,31 @@ const RepairForm = () => {
   const [formData, setFormData] = useState({
     date: "",
     mode: "",
-    cheque_number: "", // Updated to match the database field name
-    receipt_no: "", // Updated to match the database field name
-    account_name: "", // Updated to match the database field name
-    total_amt: "", // Updated to match the database field name
-    discount_amt: "", // Updated to match the database field name
-    cash_amt: "", // Updated to match the database field name
+    cheque_number: "",
+    receipt_no: "",
+    account_name: "",
+    total_amt: "", // Read-only
+    discount_amt: "",
+    cash_amt: "", // Calculated field
     remarks: "",
   });
 
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+
+    setFormData((prevData) => {
+      const updatedData = { ...prevData, [name]: value };
+
+      // Calculate cash_amt if discount_amt changes
+      if (name === "discount_amt") {
+        const discount = value === "" ? 0 : parseFloat(value);
+        const total = parseFloat(prevData.total_amt || 0);
+        updatedData.cash_amt = total - discount;
+      }
+
+      return updatedData;
+    });
   };
 
   // Submit form data to the backend
@@ -40,7 +49,7 @@ const RepairForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData), // Send formData directly
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -48,10 +57,7 @@ const RepairForm = () => {
         throw new Error(errorData.message || "Failed to save payment data.");
       }
 
-      // Show success message
       window.alert("Payment data saved successfully!");
-      
-      // Clear form data
       setFormData({
         date: "",
         mode: "",
@@ -64,7 +70,6 @@ const RepairForm = () => {
         remarks: "",
       });
     } catch (err) {
-      // Show error message
       window.alert(`Error: ${err.message}`);
     }
   };
@@ -101,7 +106,7 @@ const RepairForm = () => {
           <Col xs={12} md={3}>
             <InputField
               label="Cheque Number"
-              name="cheque_number" // Updated to match the database field name
+              name="cheque_number"
               value={formData.cheque_number}
               onChange={handleInputChange}
             />
@@ -109,7 +114,7 @@ const RepairForm = () => {
           <Col xs={12} md={2}>
             <InputField
               label="Payment No."
-              name="receipt_no" // Updated to match the database field name
+              name="receipt_no"
               value={formData.receipt_no}
               onChange={handleInputChange}
             />
@@ -118,7 +123,7 @@ const RepairForm = () => {
             <InputField
               label="Account Name"
               type="select"
-              name="account_name" // Updated to match the database field name
+              name="account_name"
               value={formData.account_name}
               onChange={handleInputChange}
               options={[
@@ -132,16 +137,17 @@ const RepairForm = () => {
             <InputField
               label="Total Amt"
               type="number"
-              name="total_amt" // Updated to match the database field name
+              name="total_amt"
               value={formData.total_amt}
               onChange={handleInputChange}
+               // Total amount is read-only
             />
           </Col>
           <Col xs={12} md={2}>
             <InputField
               label="Discount Amt"
               type="number"
-              name="discount_amt" // Updated to match the database field name
+              name="discount_amt"
               value={formData.discount_amt}
               onChange={handleInputChange}
             />
@@ -150,9 +156,9 @@ const RepairForm = () => {
             <InputField
               label="Cash Amt"
               type="number"
-              name="cash_amt" // Updated to match the database field name
+              name="cash_amt"
               value={formData.cash_amt}
-              onChange={handleInputChange}
+              readOnly // Cash amount is calculated automatically
             />
           </Col>
           <Col xs={12} md={3}>
