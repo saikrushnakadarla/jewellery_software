@@ -97,13 +97,13 @@ const RepairsTable = () => {
           <div className="d-flex align-items-center">
             <button
               className="action-button edit-button"
-              onClick={() => handleEdit(row.original.id)}
+              onClick={() => handleEdit(row.original.account_id)}
             >
               <FaEdit />
             </button>
             <button
               className="action-button delete-button"
-              onClick={() => handleDelete(row.original.id)}
+              onClick={() => handleDelete(row.original.account_id)}
             >
               <FaTrash />
             </button>
