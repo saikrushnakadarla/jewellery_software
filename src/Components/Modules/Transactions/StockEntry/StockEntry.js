@@ -4,54 +4,39 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./StockEntry.css";
 import InputField from "../../Masters/ItemMaster/Inputfield";
 import StoneDetailsModal from "./StoneDetailsModal";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const StockEntry = () => {
-    const [metal, setMetal] = useState("");
-    const [productname, setproductname] = useState("");
-    const [showModal, setShowModal] = useState(false);
-
-    const handleCloseModal = () => setShowModal(false);
     const [formData, setFormData] = useState({
-        productname: "",
-        categories: "Jewelry",
-        itemprefix: "",
-        shortname: "",
-        saleaccounthead: "",
-        purchaseaccounthead: "",
-        status: true,
-        taxslab: 18.0,
-        hsncode: "",
-        opqty: 0,
-        opvalue: 0.0,
-        opweight: 0.0,
-        purity: "",
-        huidno: "",
-        pricing: "",
-        pid: "",
-        category: "Gold",
-        prefix: "",
-        pcode: "",
-        grossweight: "",
-        stonesweight: "",
-        stonesprice: "",
-        weightww: "",
-        wastageon: "",
-        wastage: "",
-        charges: "",
-        percentage: "",
-        weight: "",
-        makingcharges: "",
-        cal: "",
-        tax: "",
-        status: "",
-        stackpoint: "",
+        product_id: "",
+        Pricing: "",
+        Tag_ID: "",
+        Prefix: "",
+        Category: "",
+        Purity: "",
+        PCode_BarCode: "",
+        Gross_Weight: "",
+        Stones_Weight: "",
+        Stones_Price: "",
+        HUID_No: "",
+        Wastage_On: "",
+        Wastage_Percentage: "",
+        Source: "",
+        Stock_Point: "",
+        WastageWeight: "",
+        TotalWeight_AW: "",
+        MC_Per_Gram: "",
+        Making_Charges_On: "",
+        Making_Charges: "",
+        Design_Master: "",
+        product_Name: "",
+        Weight_BW: "",
     });
 
-
+    const [showModal, setShowModal] = useState(false);
 
     const handleOpenModal = () => setShowModal(true);
-
+    const handleCloseModal = () => setShowModal(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -61,23 +46,47 @@ const StockEntry = () => {
         }));
     };
 
+    const navigate = useNavigate();
+
+    const handleBack = () => {
+        navigate("/stockEntryTable");
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        // Log formData to debug
+        console.log("Submitting formData:", formData);
+    
         try {
-            // Make sure formData is correctly passed and contains all required fields
-            console.log("Form data before submission:", formData);
-            const response = await axios.post("http://localhost:5000/addStockEntry", formData);
+            const response = await axios.post(
+                "http://localhost:5000/api/opening-tags-entry", 
+                formData, 
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+    
             console.log("Data saved successfully:", response.data);
-            alert("Product added successfully!");
+            alert("Data saved successfully!");
+            navigate("/stockEntryTable");
         } catch (error) {
-            console.error("Error saving data:", error);
-            alert("Failed to add product. Please try again.");
+            if (error.response) {
+                // Server responded with a status code other than 2xx
+                console.error("Response error:", error.response.data);
+                alert(`Error: ${error.response.data.message || "Invalid input data"}`);
+            } else if (error.request) {
+                // Request made but no response received
+                console.error("Request error:", error.request);
+                alert("No response received from server. Please try again.");
+            } else {
+                // Something else caused the error
+                console.error("Error:", error.message);
+                alert("An error occurred. Please check the console for details.");
+            }
         }
     };
-    const navigate = useNavigate();
-    const handleBack = () => {
-        navigate('/stockEntryTable');
-    };
+    
     return (
         <div style={{ paddingTop: "79px" }}>
             <div className="container mt-4">
@@ -90,9 +99,9 @@ const StockEntry = () => {
                                     <div className="col-md-3">
                                         <InputField
                                             label="Pricing:"
-                                            name="pricing"
+                                            name="Pricing"
                                             type="select"
-                                            value={formData.pricing}
+                                            value={formData.Pricing}
                                             onChange={handleChange}
                                             options={[
                                                 { value: "By Weight", label: "By Weight" },
@@ -103,132 +112,112 @@ const StockEntry = () => {
                                     <div className="col-md-3">
                                         <InputField
                                             label="P ID:"
+                                            name="product_id"
                                             type="select"
-                                            value={formData.pid}
+                                            value={formData.product_id}
                                             onChange={handleChange}
-                                            name="pid"
                                             options={[
-                                                { value: "PR001", label: "PR001" },
-                                                { value: "PR002", label: "PR002" },
+                                                { value: "4", label: "4" },
+                                                { value: "5", label: "5" },
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-2">
-                                    <InputField
-                                        label="Tag ID:"
-                                        name="tagid"
-                                        value={formData.tagid}
-                                        onChange={handleChange}
-                                    />
-                                    </div>
-                                    <div className="col-md-2">
+                                    <div className="col-md-3">
                                         <InputField
-                                            label="productname:"
-                                            type="select"
-                                            value={formData.productname}
+                                            label="Tag ID:"
+                                            name="Tag_ID"
+                                            value={formData.Tag_ID}
                                             onChange={handleChange}
-                                            name="productname"
+                                        />
+                                    </div>
+                                    <div className="col-md-3">
+                                        <InputField
+                                            label="Product Name:"
+                                            name="product_Name"
+                                            type="select"
+                                            value={formData.product_Name}
+                                            onChange={handleChange}
                                             options={[
-                                                { value: "product1", label: "product1" },
-                                                { value: "product2", label: "product2" },
+                                                { value: "Product1", label: "Product1" },
+                                                { value: "Product2", label: "Product2" },
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-2">
-                                    <InputField
-                                        
-                                        label="Design Master:"
-                                        name="designmaster"
-                                        type="select"
-                                        value={formData.designmaster}
-                                        onChange={handleChange}
-                                        options={[
-                                            { value: "Jewellery", label: "Jewellery" },
-                                            { value: "Gold", label: "Gold" },
-                                            { value: "Silver", label: "Silver" },
-                                        ]}
-                                    />
+                                    <div className="col-md-3">
+                                        <InputField
+                                            label="Design Master:"
+                                            name="Design_Master"
+                                            type="select"
+                                            value={formData.Design_Master}
+                                            onChange={handleChange}
+                                            options={[
+                                                { value: "Jewellery", label: "Jewellery" },
+                                                { value: "Gold", label: "Gold" },
+                                                { value: "Silver", label: "Silver" },
+                                            ]}
+                                        />
                                     </div>
                                     <div className="col-md-3">
                                         <InputField label="Category:" value="Gold" readOnly />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Prefix:" value="Gold" readOnly />
-                                    </div>
-                                    <div className="col-md-3">
                                         <InputField
-                                            label="purity:"
+                                            label="Purity:"
+                                            name="Purity"
                                             type="select"
-                                            value={formData.purity}
+                                            value={formData.Purity}
                                             onChange={handleChange}
-                                            name="purity"
                                             options={[
                                                 { value: "916HM", label: "916HM" },
-                                                { value: "22K", label: "22k" },
-                                                { value: "18K", label: "18k" },
+                                                { value: "22K", label: "22K" },
+                                                { value: "18K", label: "18K" },
                                             ]}
                                         />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="PCode/BarCode:"
-                                            value={formData.pcode}
+                                        <InputField
+                                            label="PCode/BarCode:"
+                                            name="PCode_BarCode"
+                                            value={formData.PCode_BarCode}
                                             onChange={handleChange}
-                                            name="pcode"
                                         />
                                     </div>
-                                    {/* <div className="col-md-2">
-                                    <InputField
-                                        label="Status:"
-                                        type="select"
-                                        name="status"
-                                        value={formData.status}
-                                        onChange={handleChange}
-                                        options={[
-                                            { value: "Sold", label: "Sold" },
-                                            { value: "Purchase", label: "Purchase" },
-                                        ]}
-                                    />
-                                    </div> */}
+
                                 </div>
                             </div>
                             <div className="mb-4">
                                 <div className="row g-3">
-                                    <div className="col-md-2">
-                                        <InputField label="Gross Weight:"
+                                    <div className="col-md-3">
+                                        <InputField
+                                            label="Gross Weight:"
+                                            name="grossweight"
                                             value={formData.grossweight}
                                             onChange={handleChange}
-                                            name="grossweight"
                                         />
                                     </div>
-                                    <div className="col-md-2">
-                                        <InputField label="Stones Weight:"
+                                    <div className="col-md-3">
+                                        <InputField
+                                            label="Stones Weight:"
+                                            name="stonesweight"
                                             value={formData.stonesweight}
                                             onChange={handleChange}
-                                            name="stonesweight"
                                         />
                                     </div>
-                                    <div className="col-md-2">
+                                    <div className="col-md-3">
                                         <button
-                                            type="button" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+                                            type="button"
                                             className="btn btn-primary w-100"
                                             onClick={handleOpenModal}
-
                                         >
                                             Stone Details
                                         </button>
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Stones Price:"
+                                        <InputField
+                                            label="Stones Price:"
+                                            name="stonesprice"
                                             value={formData.stonesprice}
                                             onChange={handleChange}
-                                            name="stonesprice"
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField label="Weight WW:"
-                                            value={formData.weightww}
-                                            onChange={handleChange}
-                                            name="weightww"
                                         />
                                     </div>
                                 </div>
@@ -236,127 +225,102 @@ const StockEntry = () => {
                             <div>
                                 <div className="row g-3">
                                     <div className="col-md-3">
-                                    <InputField
-                                        label="Wastage On:"
-                                        type="select"
-                                        name="wastageon"
-                                        value={formData.wastageon}
-                                        onChange={handleChange}
-                                        options={[
-                                            { value: "Gross Weight", label: "Gross Weight" },
-                                            { value: "Weight WW", label: "Weight WW" },
-                                        ]}
-                                    />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField label="Wastage %:"  value={formData.wastagepercentage}
+                                        <InputField
+                                            label="Wastage On:"
+                                            name="wastageon"
+                                            type="select"
+                                            value={formData.wastageon}
                                             onChange={handleChange}
-                                            name="wastagepercentage" />
-                                    </div>
-                                    {/* <div className="col-md-3">
-                                        <InputField label="%:"
-                                            value={formData.percentage}
-                                            onChange={handleChange}
-                                            name="percentage"
+                                            options={[
+                                                { value: "Gross Weight", label: "Gross Weight" },
+                                                { value: "Weight WW", label: "Weight WW" },
+                                            ]}
                                         />
-                                    </div> */}
+                                    </div>
                                     <div className="col-md-3">
-                                        <InputField label="Wastage Weight:"
+                                        <InputField
+                                            label="Wastage %:"
+                                            name="wastagepercentage"
+                                            value={formData.wastagepercentage}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="col-md-3">
+                                        <InputField
+                                            label="Wastage Weight:"
+                                            name="wastageweight"
                                             value={formData.wastageweight}
                                             onChange={handleChange}
-                                            name="wastageweight"
                                         />
                                     </div>
                                     <div className="col-md-3">
-                                    <InputField label="total Weight:"
-                                        name="totalweight"
-                                        value={formData.totalweight}
-                                        onChange={handleChange}
-                                    />
+                                        <InputField
+                                            label="Total Weight:"
+                                            name="totalweight"
+                                            value={formData.totalweight}
+                                            onChange={handleChange}
+                                        />
                                     </div>
                                     <div className="col-md-3">
                                         <InputField
                                             label="Making Charges On:"
+                                            name="charges"
                                             type="select"
                                             value={formData.charges}
                                             onChange={handleChange}
-                                            name="charges"
-                                            options={[{ value: "By Weight", label: "by Weight" },
+                                            options={[
+                                                { value: "By Weight", label: "By Weight" },
                                                 { value: "Fixed", label: "Fixed" },
                                             ]}
                                         />
                                     </div>
                                     <div className="col-md-3">
-                                    <InputField label="Mc Per Gram:"
-                                        name="mcpergram"
-                                        value={formData.mcpergram}
-                                        onChange={handleChange}
-                                    />
+                                        <InputField
+                                            label="MC Per Gram:"
+                                            name="mcpergram"
+                                            value={formData.mcpergram}
+                                            onChange={handleChange}
+                                        />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Making Charges:"
+                                        <InputField
+                                            label="Making Charges:"
+                                            name="makingcharges"
                                             value={formData.makingcharges}
                                             onChange={handleChange}
-                                            name="makingcharges"
                                         />
                                     </div>
-                                    {/* <div className="col-md-3">
-                                        <InputField label="Cal:"
-                                            value={formData.cal}
-                                            onChange={handleChange}
-                                            name="cal"
-                                        />
-                                    </div> */}
-                                    {/* <div className="col-md-3">
-                                        <InputField label="Tax:"
-                                            value={formData.tax}
-                                            onChange={handleChange}
-                                            name="tax"
-                                        />
-                                    </div> */}
                                     <div className="col-md-3">
-                                        {/* <div className="input-group"> */}
-                                            <InputField
-                                                label="Stock Point:"
-                                                type="select"
-                                                value={formData.stackpoint}
-                                                onChange={handleChange}
-                                                name="tax"
-                                                options={[
-                                                    { value: "Main Store", label: "Main Store" },
-                                                    { value: "Secondary Store", label: "Secondary Store" },
-                                                ]}
-                                            />
-                                              {/* </div> */}
-                                            {/* <button
-                                                type="button" style={{ height: '39px' }}
-                                                className="btn btn-outline-secondary"
-                                            // onClick={() => setShowStockPointModal(true)}
-                                            >
-                                                +
-                                            </button> */}
-                                      
+                                        <InputField
+                                            label="Stock Point:"
+                                            name="stackpoint"
+                                            type="select"
+                                            value={formData.stackpoint}
+                                            onChange={handleChange}
+                                            options={[
+                                                { value: "Main Store", label: "Main Store" },
+                                                { value: "Secondary Store", label: "Secondary Store" },
+                                            ]}
+                                        />
                                     </div>
                                 </div>
                             </div>
                             <button
                                 type="button"
                                 className="cus-back-btn"
-                                variant="secondary"
-                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
+                                onClick={handleBack}
+                                style={{ backgroundColor: "gray", marginRight: "10px" }}
                             >
-                                cancel
+                                Cancel
                             </button>
-                            <button type="submit" className="cus-submit-btn">Save</button>
+                            <button type="submit" className="cus-submit-btn">
+                                Save
+                            </button>
                         </form>
                     </div>
                 </div>
-
             </div>
-            <StoneDetailsModal
-                showModal={showModal}
-                handleCloseModal={handleCloseModal}
-            />
+            <StoneDetailsModal showModal={showModal} handleCloseModal={handleCloseModal} />
         </div>
     );
 };

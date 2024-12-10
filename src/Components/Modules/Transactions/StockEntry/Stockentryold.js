@@ -1,83 +1,157 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import './StockEntry.css';
+import "./StockEntry.css";
 import InputField from "../../Masters/ItemMaster/Inputfield";
+import StoneDetailsModal from "./StoneDetailsModal";
+import { useNavigate } from 'react-router-dom';
 
-const handleAddStockPoint = () => {
-    alert("Add new stock point functionality!");
-    // Implement the functionality to add a new stock point here
-};
 const StockEntry = () => {
     const [metal, setMetal] = useState("");
+    const [productname, setproductname] = useState("");
     const [showModal, setShowModal] = useState(false);
 
-    const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
-    const [showStockPointModal, setShowStockPointModal] = useState(false);
+    const [formData, setFormData] = useState({
+        productname: "",
+        categories: "Jewelry",
+        itemprefix: "",
+        shortname: "",
+        saleaccounthead: "",
+        purchaseaccounthead: "",
+        status: true,
+        taxslab: 18.0,
+        hsncode: "",
+        opqty: 0,
+        opvalue: 0.0,
+        opweight: 0.0,
+        purity: "",
+        huidno: "",
+        pricing: "",
+        pid: "",
+        category: "Gold",
+        prefix: "",
+        pcode: "",
+        grossweight: "",
+        stonesweight: "",
+        stonesprice: "",
+        weightww: "",
+        wastageon: "",
+        wastage: "",
+        charges: "",
+        percentage: "",
+        weight: "",
+        makingcharges: "",
+        cal: "",
+        tax: "",
+        status: "",
+        stackpoint: "",
+    });
 
+
+
+    const handleOpenModal = () => setShowModal(true);
+
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            // Make sure formData is correctly passed and contains all required fields
+            console.log("Form data before submission:", formData);
+            const response = await axios.post("http://localhost:5000/addStockEntry", formData);
+            console.log("Data saved successfully:", response.data);
+            alert("Product added successfully!");
+        } catch (error) {
+            console.error("Error saving data:", error);
+            alert("Failed to add product. Please try again.");
+        }
+    };
+    const navigate = useNavigate();
+    const handleBack = () => {
+        navigate('/stockEntryTable');
+    };
     return (
         <div style={{ paddingTop: "79px" }}>
             <div className="container mt-4">
-                
-
                 <div className="row mt-3">
                     <div className="col-12">
-                        <form className="p-4 border rounded form-container-stockentry">
+                        <form className="p-4 border rounded form-container-stockentry" onSubmit={handleSubmit}>
                             <div className="mb-4">
                                 <h4>Stock Entry</h4>
                                 <div className="row g-3">
-                                    <div className="col-md-4">
+                                    <div className="col-md-3">
                                         <InputField
                                             label="Pricing:"
+                                            name="pricing"
                                             type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
+                                            value={formData.pricing}
+                                            onChange={handleChange}
                                             options={[
                                                 { value: "By Weight", label: "By Weight" },
                                                 { value: "By fixed", label: "By fixed" },
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-4">
-
+                                    <div className="col-md-3">
                                         <InputField
                                             label="P ID:"
                                             type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
+                                            value={formData.pid}
+                                            onChange={handleChange}
+                                            name="pid"
                                             options={[
                                                 { value: "PR001", label: "PR001" },
                                                 { value: "PR002", label: "PR002" },
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-4">
-
+                                    <div className="col-md-2">
+                                    <InputField
+                                        label="Tag ID:"
+                                        name="tagid"
+                                        value={formData.tagid}
+                                        onChange={handleChange}
+                                    />
+                                    </div>
+                                    <div className="col-md-2">
                                         <InputField
-                                            label="Product Name:"
+                                            label="productname:"
                                             type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
+                                            value={formData.productname}
+                                            onChange={handleChange}
+                                            name="productname"
                                             options={[
                                                 { value: "product1", label: "product1" },
                                                 { value: "product2", label: "product2" },
                                             ]}
                                         />
                                     </div>
+                                    <div className="col-md-2">
+                                    <InputField
+                                        
+                                        label="Design Master:"
+                                        name="designmaster"
+                                        type="select"
+                                        value={formData.designmaster}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Jewellery", label: "Jewellery" },
+                                            { value: "Gold", label: "Gold" },
+                                            { value: "Silver", label: "Silver" },
+                                        ]}
+                                    />
+                                    </div>
                                     <div className="col-md-3">
                                         <InputField label="Category:" value="Gold" readOnly />
                                     </div>
-                                    {/* <InputField
-                                            label="Category:"
-                                            type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
-                                            options={[
-                                                { value: "Silver", label: "Silver" },
-                                                { value: "Gold", label: "Gold" },
-                                            ]}
-                                        /> */}
-
                                     <div className="col-md-3">
                                         <InputField label="Prefix:" value="Gold" readOnly />
                                     </div>
@@ -85,226 +159,204 @@ const StockEntry = () => {
                                         <InputField
                                             label="purity:"
                                             type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
+                                            value={formData.purity}
+                                            onChange={handleChange}
+                                            name="purity"
                                             options={[
                                                 { value: "916HM", label: "916HM" },
                                                 { value: "22K", label: "22k" },
                                                 { value: "18K", label: "18k" },
                                             ]}
                                         />
-
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="PCode/BarCode:" />
+                                        <InputField label="PCode/BarCode:"
+                                            value={formData.pcode}
+                                            onChange={handleChange}
+                                            name="pcode"
+                                        />
                                     </div>
+                                    {/* <div className="col-md-2">
+                                    <InputField
+                                        label="Status:"
+                                        type="select"
+                                        name="status"
+                                        value={formData.status}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Sold", label: "Sold" },
+                                            { value: "Purchase", label: "Purchase" },
+                                        ]}
+                                    />
+                                    </div> */}
                                 </div>
                             </div>
-
                             <div className="mb-4">
                                 <div className="row g-3">
                                     <div className="col-md-2">
-                                        <InputField label="Gross Weight:" />
+                                        <InputField label="Gross Weight:"
+                                            value={formData.grossweight}
+                                            onChange={handleChange}
+                                            name="grossweight"
+                                        />
                                     </div>
                                     <div className="col-md-2">
-                                        <InputField label="Stones Weight:" />
+                                        <InputField label="Stones Weight:"
+                                            value={formData.stonesweight}
+                                            onChange={handleChange}
+                                            name="stonesweight"
+                                        />
                                     </div>
                                     <div className="col-md-2">
                                         <button
-                                            type="button" style={{ backgroundColor: 'blue' }}
+                                            type="button" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
                                             className="btn btn-primary w-100"
                                             onClick={handleOpenModal}
+
                                         >
                                             Stone Details
                                         </button>
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Stones Price:" />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField label="Weight WW:" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div>
-                                <div className="row g-3">
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Wastage On:"
-                                            type="select"
-                                            value={metal}
-                                            onChange={(e) => setMetal(e.target.value)}
-                                            options={[{ value: "Weight", label: "Weight" }]}
+                                        <InputField label="Stones Price:"
+                                            value={formData.stonesprice}
+                                            onChange={handleChange}
+                                            name="stonesprice"
                                         />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Wastage:" value="NaN" readOnly />
+                                        <InputField label="Weight WW:"
+                                            value={formData.weightww}
+                                            onChange={handleChange}
+                                            name="weightww"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="row g-3">
+                                    <div className="col-md-3">
+                                    <InputField
+                                        label="Wastage On:"
+                                        type="select"
+                                        name="wastageon"
+                                        value={formData.wastageon}
+                                        onChange={handleChange}
+                                        options={[
+                                            { value: "Gross Weight", label: "Gross Weight" },
+                                            { value: "Weight WW", label: "Weight WW" },
+                                        ]}
+                                    />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="%:" />
+                                        <InputField label="Wastage %:"  value={formData.wastagepercentage}
+                                            onChange={handleChange}
+                                            name="wastagepercentage" />
+                                    </div>
+                                    {/* <div className="col-md-3">
+                                        <InputField label="%:"
+                                            value={formData.percentage}
+                                            onChange={handleChange}
+                                            name="percentage"
+                                        />
+                                    </div> */}
+                                    <div className="col-md-3">
+                                        <InputField label="Wastage Weight:"
+                                            value={formData.wastageweight}
+                                            onChange={handleChange}
+                                            name="wastageweight"
+                                        />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Weight:" />
+                                    <InputField label="total Weight:"
+                                        name="totalweight"
+                                        value={formData.totalweight}
+                                        onChange={handleChange}
+                                    />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Making Charges:" />
+                                        <InputField
+                                            label="Making Charges On:"
+                                            type="select"
+                                            value={formData.charges}
+                                            onChange={handleChange}
+                                            name="charges"
+                                            options={[{ value: "By Weight", label: "by Weight" },
+                                                { value: "Fixed", label: "Fixed" },
+                                            ]}
+                                        />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Cal:" />
+                                    <InputField label="Mc Per Gram:"
+                                        name="mcpergram"
+                                        value={formData.mcpergram}
+                                        onChange={handleChange}
+                                    />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField label="Tax:" />
+                                        <InputField label="Making Charges:"
+                                            value={formData.makingcharges}
+                                            onChange={handleChange}
+                                            name="makingcharges"
+                                        />
                                     </div>
+                                    {/* <div className="col-md-3">
+                                        <InputField label="Cal:"
+                                            value={formData.cal}
+                                            onChange={handleChange}
+                                            name="cal"
+                                        />
+                                    </div> */}
+                                    {/* <div className="col-md-3">
+                                        <InputField label="Tax:"
+                                            value={formData.tax}
+                                            onChange={handleChange}
+                                            name="tax"
+                                        />
+                                    </div> */}
                                     <div className="col-md-3">
-                                        <div className="input-group">
+                                        {/* <div className="input-group"> */}
                                             <InputField
                                                 label="Stock Point:"
                                                 type="select"
-                                                value={metal}
-                                                onChange={(e) => setMetal(e.target.value)}
+                                                value={formData.stackpoint}
+                                                onChange={handleChange}
+                                                name="tax"
                                                 options={[
                                                     { value: "Main Store", label: "Main Store" },
                                                     { value: "Secondary Store", label: "Secondary Store" },
                                                 ]}
                                             />
-                                            <button 
-                                                type="button" style={{height: '39px'}}
+                                              {/* </div> */}
+                                            {/* <button
+                                                type="button" style={{ height: '39px' }}
                                                 className="btn btn-outline-secondary"
-                                                onClick={() => setShowStockPointModal(true)}
+                                            // onClick={() => setShowStockPointModal(true)}
                                             >
                                                 +
-                                            </button>
-                                        </div>
+                                            </button> */}
+                                      
                                     </div>
-
                                 </div>
                             </div>
+                            <button
+                                type="button"
+                                className="cus-back-btn"
+                                variant="secondary"
+                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
+                            >
+                                cancel
+                            </button>
+                            <button type="submit" className="cus-submit-btn">Save</button>
                         </form>
                     </div>
                 </div>
+
             </div>
-
-            {/* Modal for Stone Details */}
-            {showModal && (
-                <div className="modal show d-block" tabIndex="-1" role="dialog">
-                    <div className="modal-dialog modal-lg" role="document">
-                        {/* Increased modal width using `modal-lg` */}
-                        <div className="stockentrymodalformcontainer">
-                            <div className="modal-content bg-light">
-                                <div className="modal-header">
-                                    <h5 className="modal-title">Stone Details</h5>
-                                    <button
-                                        type="button"
-                                        className="btn-close"
-                                        aria-label="Close"
-                                        onClick={handleCloseModal}
-                                    ></button>
-                                </div>
-                                <div className="modal-body">
-                                    <div className="row g-3" style={{ backgroundColor: 'rgba(163, 110, 41, 0.08)' }}>
-                                        <div className="col-md-4">
-                                            <InputField label="P Code:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Product Name:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Stone Name:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Weight:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Rate per Gram:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Total Weight:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <InputField label="Total Price:" />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <button type="button" className="btn btn-primary">
-                                                Save
-                                            </button>
-                                        </div>
-
-                                    </div>
-
-                                    {/* Table Section */}
-                                    <div className="mt-4">
-                                        <h6 className="fw-bold">Stone List</h6>
-                                        {/* Use a scrollable container to ensure the table fits */}
-                                        <div className="table-responsive">
-                                            <table className="table table-striped table-bordered table-hover">
-                                                <thead className="table-secondary">
-                                                    <tr>
-                                                        <th>P Code</th>
-                                                        <th>Product Name</th>
-                                                        <th>Stone Name</th>
-                                                        <th>Weight</th>
-                                                        <th>Rate/Gram</th>
-                                                        <th>Total Weight</th>
-                                                        <th>Total Price</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {/* Example Row 1 */}
-                                                    <tr>
-                                                        <td>P001</td>
-                                                        <td>Product A</td>
-                                                        <td>Diamond</td>
-                                                        <td>5g</td>
-                                                        <td>$500</td>
-                                                        <td>5g</td>
-                                                        <td>$2500</td>
-                                                        <td>
-                                                            <button className="btn btn-primary btn-sm me-2">Edit</button>
-                                                            <button className="btn btn-danger btn-sm">Delete</button>
-                                                        </td>
-                                                    </tr>
-                                                    {/* Example Row 2 */}
-                                                    <tr>
-                                                        <td>P002</td>
-                                                        <td>Product B</td>
-                                                        <td>Ruby</td>
-                                                        <td>3g</td>
-                                                        <td>$300</td>
-                                                        <td>3g</td>
-                                                        <td>$900</td>
-                                                        <td>
-                                                            <button className="btn btn-primary btn-sm me-2">Edit</button>
-                                                            <button className="btn btn-danger btn-sm">Delete</button>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="modal-footer">
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={handleCloseModal}
-                                    >
-                                        Close
-                                    </button>
-                                    <button type="button" className="btn btn-primary">
-                                        Save Changes
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-
-
+            <StoneDetailsModal
+                showModal={showModal}
+                handleCloseModal={handleCloseModal}
+            />
         </div>
     );
 };
