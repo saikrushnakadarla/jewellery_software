@@ -127,6 +127,15 @@ const RepairForm = () => {
               name="date"
               value={formData.date}
               onChange={handleInputChange}
+              max={new Date().toISOString().split("T")[0]}
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="Payment No."
+              name="receipt_no"
+              value={formData.receipt_no}
+              onChange={handleInputChange}
             />
           </Col>
           <Col xs={12} md={2}>
@@ -145,20 +154,13 @@ const RepairForm = () => {
           </Col>
           <Col xs={12} md={3}>
             <InputField
-              label="Cheque Number"
+              label="Reference Number"
               name="cheque_number"
               value={formData.cheque_number}
               onChange={handleInputChange}
             />
           </Col>
-          <Col xs={12} md={2}>
-            <InputField
-              label="Payment No."
-              name="receipt_no"
-              value={formData.receipt_no}
-              onChange={handleInputChange}
-            />
-          </Col>
+         
           <Col xs={12} md={3}>
             <InputField
               label="Account Name"

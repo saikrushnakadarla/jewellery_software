@@ -105,11 +105,22 @@ const RepairForm = () => {
           <Row className="receipt-form-section">
             <h4 className="mb-4">Receipts</h4>
             <Col xs={12} md={2}>
+  <InputField
+    label="Date"
+    type="date"
+    name="date"
+    value={formData.date}
+    onChange={handleChange}
+    max={new Date().toISOString().split("T")[0]} // Restricts future dates
+  />
+</Col>
+
+
+            <Col xs={12} md={2}>
               <InputField
-                label="Date"
-                type="date"
-                name="date"
-                value={formData.date}
+                label="Receipt No."
+                name="receipt_no"
+                value={formData.receipt_no}
                 onChange={handleChange}
               />
             </Col>
@@ -129,20 +140,13 @@ const RepairForm = () => {
             </Col>
             <Col xs={12} md={3}>
               <InputField
-                label="Cheque Number"
+                label="Reference Number"
                 name="cheque_number"
                 value={formData.cheque_number}
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={12} md={2}>
-              <InputField
-                label="Receipt No."
-                name="receipt_no"
-                value={formData.receipt_no}
-                onChange={handleChange}
-              />
-            </Col>
+           
             <Col xs={12} md={3}>
               <InputField
                 label="Account Name"

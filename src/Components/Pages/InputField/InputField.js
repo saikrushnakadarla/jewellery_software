@@ -11,6 +11,7 @@ const InputField = ({
   name, 
   options = [] ,
   required = false,
+  max,
 }) => {
   return (
     <div className="input-field-container">
@@ -43,6 +44,7 @@ const InputField = ({
           readOnly={readOnly}
           onChange={onChange}
           required={required}
+          max={max}
         />
       )}
     </div>
