@@ -224,20 +224,26 @@ const RepairForm = () => {
                 <Col xs={12} md={3}>
                   <InputField
                     label="Sadashri Jewels"
+                    value="Sadashri Jewels"                    
+                  />
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField
+                    label="Code"
                     type="select"
-                    value={metal}
+                    
                     onChange={(e) => setMetal(e.target.value)}
                     options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
+                      { value: "BarCode", label: "BarCode" },
+                      { value: "Rbarcode", label: "Rbarcode" },
+                      
                     ]}
                   />
                 </Col>
 
                 <Col xs={12} md={3}>
                   <InputField
-                    label="Purity"
+                    label="P ID"
                     type="select"
                     value={metal}
                     onChange={(e) => setMetal(e.target.value)}
@@ -248,124 +254,95 @@ const RepairForm = () => {
                     ]}
                   />
                 </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="T" />
-                </Col>
+                
                 <Col xs={12} md={3}>
                   <InputField
-                    label="PEARLS"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
+                    label="Product Name"
+                    
                   />
                 </Col>
                 <Col xs={12} md={4}>
-                  <InputField
-                    label="ItemType"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
-                  />
-                </Col>
-                <Col xs={12} md={6}>
                   <InputField
                     label="Design Name"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
+                    
                   />
                 </Col>
                 <Col xs={12} md={2}>
-                  <InputField label="Q" />
+                  <InputField label="Purity" />
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="G" />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="S" />
+                  <InputField label="Gross Weight" />
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="N" />
+                  <InputField label="Stone Weight" />
                 </Col>
-                <Col xs={12} md={2}>
+                <Col xs={12} md={3}>
+                  <InputField label="Stone Price" />
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="Weight BW" />
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="Wastage On" />
+                </Col>
+                <Col xs={12} md={3}>
                   <InputField label="VA%" />
                 </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="W" />
+                <Col xs={12} md={3}>
+                  <InputField label="Wastage Weight" />
+                </Col>
+                
+                <Col xs={12} md={3}>
+                  <InputField label="Total Weight AW" />
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="T" />
-                </Col>
-                <Col xs={12} md={4}>
                   <InputField
-                    label="MC"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "MC/GM", label: "MC" },
-
-                    ]}
+                    label="Making Charges on"                   
                   />
                 </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="HC/ct" />
+                <Col xs={12} md={3}>
+                  <InputField
+                    label="MC Per Gram"                   
+                  />
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="H.C." />
+                  <InputField
+                    label="Making Charges"                   
+                  />
                 </Col>
+               
                 <Col xs={12} md={3}>
                   <InputField label="Rodium" />
                 </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Note" />
-                </Col>
+                
               </Row>
             </Col>
           </div>
         </div>
         <Row className="sales-form-section">
           <Table bordered hover responsive>
-            <thead>
-              <tr>
-                <th>SI</th>
-                <th>Tagno</th>
-                <th>Pc</th>
-                <th>Item</th>
-                <th>Design</th>
-                <th>Purity</th>
-                <th>Gross</th>
-                <th>Stone</th>
-                <th>Net</th>
-                <th>W%</th>
-                <th>Total[Gms]</th>
-                <th>Rate</th>
-                <th>Amount[M]</th>
-                <th>MC/G</th>
-                <th>MC</th>
-                <th>SLAmt</th>
-                <th>HC</th>
-                <th>Total Amt</th>
-                <th>Staff</th>
-                <th>OF</th>
-                <th>Tax%</th>
-              </tr>
-            </thead>
+          <thead>
+          <tr>            
+            <th>Sadashri Jewels</th>
+            <th>Code</th>
+            <th>P ID</th>
+            <th>Product Name</th>
+            <th>Design Name</th>
+            <th>Purity</th>
+            <th>Gross Weight</th>
+            <th>Stone Weight</th>
+            <th>Stone Price</th>
+            <th>Weight BW</th>
+            <th>Wastage On</th>
+            <th>VA%</th>
+            <th>Wastage Weight</th>
+            <th>Total Weight AW</th>
+            <th>Making Charges on</th>
+            <th>MC Per Gram</th>
+            <th>Making Charges</th>
+            <th>Rodium</th>
+          </tr>
+        </thead>
             <tbody>
 
             </tbody>

@@ -37,7 +37,7 @@ const RepairForm = () => {
     making_charge: "",
     handling_charge: "",
     total: "",
-    status:"",
+    status:"Pending",
   });
 
   const [customers, setCustomers] = useState([]);
@@ -151,8 +151,6 @@ const RepairForm = () => {
     }
   };
 
-  
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -164,20 +162,31 @@ const RepairForm = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    try {
-      const response = await axios.post(`${baseURL}/add/repairs`, formData);
-      if (response.status === 201) {
-        alert("Repair entry added successfully!");
-        navigate("/repairstable");
-      }
-    } catch (error) {
-      console.error("Error submitting the form:", error);
-      alert("Failed to submit the repair entry");
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Format date to dd-mm-yyyy
+  const formattedDate = formData.date
+    ? new Date(formData.date).toLocaleDateString("en-GB")
+    : ""; // Convert date to dd-mm-yyyy format if it exists
+
+  const updatedFormData = {
+    ...formData,
+    date: formattedDate, // Replace date with the formatted date
   };
+
+  try {
+    const response = await axios.post(`${baseURL}/add/repairs`, updatedFormData);
+    if (response.status === 201) {
+      alert("Repair entry added successfully!");
+      navigate("/repairstable");
+    }
+  } catch (error) {
+    console.error("Error submitting the form:", error);
+    alert("Failed to submit the repair entry");
+  }
+};
+
   
 
   const handleAddCustomer = () => {

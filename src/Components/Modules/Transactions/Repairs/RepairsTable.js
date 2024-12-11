@@ -40,7 +40,6 @@ const RepairsTable = () => {
     fetchRepairs();
   }, []);
 
-  // Handle form changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -50,19 +49,10 @@ const RepairsTable = () => {
   };
 
 const handlePopoverToggle = (event, repairId) => {
-  // Check if repairs data is loaded
-  if (!repairs || repairs.length === 0) {
-    console.warn('Repairs data is not loaded or empty.');
-    return;
-  }
+
 
   const repair = repairs.find((r) => r.repair_id === repairId);
 
-  // Check if the specific repair exists
-  if (!repair) {
-    console.warn(`Repair data not found for repairId: ${repairId}`, { repairs, repairId });
-    return;
-  }
 
   setSelectedRepair(repair);
   setPopoverData({
@@ -72,19 +62,15 @@ const handlePopoverToggle = (event, repairId) => {
   setShowPopover((prev) => popoverData.repairId !== repairId);
 };
 
-  
-
-  // Handle "Receive from Workshop"
   const handleReceiveFromWorkshop = () => {
-    if (!selectedRepair) {
-      console.error('No repair selected!');
-      return;
-    }
+    // if (!selectedRepair) {
+    //   console.error('No repair selected!');
+    //   return;
+    // }
     setShowPopover(false);
     setShowModal(true);
   };
 
-  // Fetch repair details
   const fetchRepairDetails = async () => {
     try {
       const response = await axios.get(`${baseURL}/get/repair-details`);
@@ -93,10 +79,10 @@ const handlePopoverToggle = (event, repairId) => {
       console.error('Error fetching repair details:', error);
     }
   };
-
   useEffect(() => {
     fetchRepairDetails();
   }, []);
+
   const clearForm = () => {
     setFormData({
       metal_type: '',
@@ -107,7 +93,6 @@ const handlePopoverToggle = (event, repairId) => {
       rate: '',
     });
   };
-
   
 const handleEditDetail = (detail) => {
   setFormData(detail); // Populate form with selected detail
@@ -118,10 +103,10 @@ const handleEditDetail = (detail) => {
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (!selectedRepair) {
-    console.error('No repair selected.');
-    return;
-  }
+  // if (!selectedRepair) {
+  //   console.error('No repair selected.');
+  //   return;
+  // }
 
   try {
     if (selectedRepair.id) {
@@ -135,8 +120,10 @@ const handleSubmit = async (e) => {
         console.log('Details updated successfully');
         fetchRepairDetails(); // Refresh details
         clearForm(); // Clear form fields
-        // setShowModal(false); 
         setSelectedRepair(null); // Reset selected repair
+
+        // Update repair status
+        await handleUpdateStatus(selectedRepair.repair_id, 'Receive from Workshop');
       }
     } else {
       // Add new repair detail
@@ -149,12 +136,16 @@ const handleSubmit = async (e) => {
         fetchRepairDetails(); // Refresh details
         clearForm(); // Clear form fields
         setShowModal(false); // Close modal
+
+        // Update repair status
+        await handleUpdateStatus(selectedRepair.repair_id, 'Receive from Workshop');
       }
     }
   } catch (error) {
     console.error('Error adding or updating repair details:', error);
   }
 };
+
 
 
   const handleDeleteDetail = async (id) => {
@@ -190,6 +181,7 @@ const handleSubmit = async (e) => {
   // Define table columns
   const columns = React.useMemo(
     () => [
+      { Header: 'Repair ID', accessor: 'repair_id' },
       { Header: 'NAME', accessor: 'name' },
       { Header: 'Mobile', accessor: 'mobile' },
       { Header: 'Email', accessor: 'email' },
@@ -204,9 +196,9 @@ const handleSubmit = async (e) => {
         Header: 'ACTION',
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
-            <button className="action-button edit-button">
+            {/* <button className="action-button edit-button">
               <FaEdit />
-            </button>
+            </button> */}
             <button className="action-button delete-button">
               <FaTrash />
             </button>
