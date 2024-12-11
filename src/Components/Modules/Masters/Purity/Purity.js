@@ -69,11 +69,11 @@
 
 //   const handleDelete = async (id) => {
 //     const isConfirmed = window.confirm(`Are you sure you want to delete the record with ID ${id}?`);
-  
+
 //     if (!isConfirmed) {
 //       return; // Do nothing if the user cancels the action
 //     }
-  
+
 //     try {
 //       // Send DELETE request to the backend
 //       await axios.delete(`http://localhost:5000/purity/${id}`);
@@ -84,7 +84,7 @@
 //       console.error("Error deleting record:", error);
 //     }
 //   };
-  
+
 
 //   const columns = React.useMemo(
 //     () => [
@@ -248,14 +248,14 @@ import axios from "axios";
 // Custom validation functions
 const validateName = (name) => /^[a-zA-Z\s]+$/.test(name); // Only alphabets and spaces
 const validateMetal = (metal) => /^[a-zA-Z\s]+$/.test(metal); // Only alphabets and spaces
-const validatePurityPercentage = (purity_percentage) => /^[0-9]+(\.[0-9]{1,2})?$/.test(purity_percentage); // Numbers with optional 2 decimals
-const validatePurity = (purity) => /^[a-zA-Z0-9\s]+$/.test(purity); // Alphanumeric with spaces
-const validateURDPurity = (urd_purity) => /^[a-zA-Z0-9\s]+$/.test(urd_purity); // Alphanumeric with spaces
-const validateDescription = (desc) => desc.trim() !== ""; // Required field (non-empty)
-const validateOldPurityDesc = (old_purity_desc) => old_purity_desc.trim() !== ""; // Required field (non-empty)
-const validateCutIssue = (cut_issue) => cut_issue.trim() !== ""; // Required field (non-empty)
-const validateSkinPrint = (skin_print) => skin_print.trim() !== ""; // Required field (non-empty)
-
+const validatePurityPercentage = (purity_percentage) =>
+  /^[0-9]*\.?[0-9]{0,2}$/.test(purity_percentage);
+const validatePurity = (purity) => purity === "" || /^[a-zA-Z0-9\s]+$/.test(purity); // Allow empty string
+const validateURDPurity = (urd_purity) => urd_purity === "" || /^[a-zA-Z0-9\s]+$/.test(urd_purity); // Allow empty string
+const validateDescription = (desc) => desc === "" || desc.trim() !== ""; // Allow empty, but non-whitespace is required
+const validateOldPurityDesc = (old_purity_desc) => old_purity_desc === "" || old_purity_desc.trim() !== ""; // Allow empty string
+const validateCutIssue = (cut_issue) => cut_issue === "" || cut_issue.trim() !== ""; // Allow empty string
+const validateSkinPrint = (skin_print) => skin_print === "" || skin_print.trim() !== ""; // Allow empty string
 
 function Purity() {
   const [formData, setFormData] = useState({
@@ -290,49 +290,91 @@ function Purity() {
   }, []);
 
 
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   // Initialize a variable to store validation error
+  //   let error = "";
+
+  //   // Validate specific fields based on the input's name
+  //   if (name === "name" && !validateName(value)) {
+  //     error = "Name should contain only alphabets.";
+  //   } else if (name === "metal" && !validateMetal(value)) {
+  //     error = "Metal should contain only alphabets.";
+  //   } else if (name === "purity_percentage" && !validatePurityPercentage(value)) {
+  //     error = "Purity Percentage should be a number (up to 2 decimals).";
+  //   } else if (name === "purity" && !validatePurity(value)) {
+  //     error = "Purity should contain alphanumeric characters.";
+  //   } else if (name === "urd_purity" && !validateURDPurity(value)) {
+  //     error = "URD Purity should contain alphanumeric characters.";
+  //   } else if (name === "desc" && !validateDescription(value)) {
+  //     error = "Description is required.";
+  //   } else if (name === "old_purity_desc" && !validateOldPurityDesc(value)) {
+  //     error = "Old Purity Description is required.";
+  //   } else if (name === "cut_issue" && !validateCutIssue(value)) {
+  //     error = "Cut Issue is required.";
+  //   } else if (name === "skin_print" && !validateSkinPrint(value)) {
+  //     error = "Skin Print is required.";
+  //   }
+
+  //   // Update formData and errors state
+  //   setFormData({ ...formData, [name]: value });
+  //   setErrors({ ...errors, [name]: error });
+  // };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
-    // Initialize a variable to store validation error
-    let error = "";
-  
-    // Validate specific fields based on the input's name
-    if (name === "name" && !validateName(value)) {
-      error = "Name should contain only alphabets.";
-    } else if (name === "metal" && !validateMetal(value)) {
-      error = "Metal should contain only alphabets.";
-    } else if (name === "purity_percentage" && !validatePurityPercentage(value)) {
-      error = "Purity Percentage should be a number (up to 2 decimals).";
-    } else if (name === "purity" && !validatePurity(value)) {
-      error = "Purity should contain alphanumeric characters.";
-    } else if (name === "urd_purity" && !validateURDPurity(value)) {
-      error = "URD Purity should contain alphanumeric characters.";
-    } else if (name === "desc" && !validateDescription(value)) {
-      error = "Description is required.";
-    } else if (name === "old_purity_desc" && !validateOldPurityDesc(value)) {
-      error = "Old Purity Description is required.";
-    } else if (name === "cut_issue" && !validateCutIssue(value)) {
-      error = "Cut Issue is required.";
-    } else if (name === "skin_print" && !validateSkinPrint(value)) {
-      error = "Skin Print is required.";
+
+    // Validate input based on its name
+    if (name === "name" && validateName(value)) {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+    } else if (name === "metal" && validateMetal(value)) {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+    } else if (name === "purity_percentage" && validatePurityPercentage(value)) {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+    } else if (name === "purity" && validatePurity(value)) {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+
+    } else if (name === "urd_purity" && validateURDPurity(value)) {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+    } else if (name === "desc" && validateDescription(value)) {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+    } else if (name === "old_purity_desc" && validateOldPurityDesc(value)) {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+    } else if (name === "cut_issue" && validateCutIssue(value)) {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+    } else if (name === "skin_print" && validateSkinPrint(value)) {
+      setFormData({ ...formData, [name]: value });
+      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+
+
+    } else {
+      // Set an error for invalid input without updating formData
+      setErrors({ ...errors, [name]: `Invalid ${name}. Only alphabets allowed.` });
     }
-  
-    // Update formData and errors state
-    setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: error });
   };
-  
-  
+
+
+
+
 
   const validateForm = () => {
     let formErrors = {};
-    
+
     // Validations for each input field
     if (!validateName(formData.name)) {
-      formErrors.name = "Name should contain only alphabets.";
+      formErrors.metal_type = "Name should contain only alphabets.";
     }
     if (!validateMetal(formData.metal)) {
-      formErrors.metal = "Metal should contain only alphabets.";
+      formErrors.item_name = "Metal should contain only alphabets.";
     }
     if (!validatePurityPercentage(formData.purity_percentage)) {
       formErrors.purity_percentage = "Purity Percentage should be a number (up to 2 decimals).";
@@ -363,10 +405,10 @@ function Purity() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-        // Validate form before submitting
-        if (!validateForm()) {
-          return; // Stop if there are validation errors
-        }
+    // Validate form before submitting
+    if (!validateForm()) {
+      return; // Stop if there are validation errors
+    }
 
     if (editMode) {
       // Edit functionality
@@ -407,6 +449,8 @@ function Purity() {
     setEditMode(true);
     setEditId(row.purity_id); // Set the ID of the record being edited
     setFormData({ ...row }); // Pre-fill the form with the selected record's data
+    setErrors({}); // Clear any previous errors
+
   };
 
   const handleDelete = async (id) => {
@@ -441,6 +485,8 @@ function Purity() {
     });
     setEditMode(false);
     setEditId(null);
+    setErrors({});
+
   };
 
   const columns = React.useMemo(
@@ -517,6 +563,15 @@ function Purity() {
         <form className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
+            {/* <InputField
+              label="Purity Percentage:"
+              name="purity_percentage"
+              value={formData.purity_percentage}
+              onChange={handleChange}
+              required={true}
+              error={errors.purity_percentage}
+            /> */}
+
             <InputField
               label="Name:"
               name="name"
@@ -525,17 +580,29 @@ function Purity() {
               required={true}
               error={errors.name}
             />
-            {errors.name && <p style={{color:'red', fontSize:'15px'}} className="error-message">{errors.name}</p>}
-
             <InputField
               label="Metal:"
               name="metal"
               value={formData.metal}
               onChange={handleChange}
               required={true}
-              error={errors.metal}
-            />
-            {errors.metal && <p  style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.metal}</p>}
+              error={errors.metal} />
+            {/* <InputField
+              label="Item Name:"
+              name="item_name"
+              type="select"
+              value={formData.item_name}
+              onChange={handleChange}
+              required={true}
+              options={[
+                { value: '', label: 'Select Item Name' },
+                { value: 'ring', label: 'Ring' },
+                { value: 'bracelet', label: 'Bracelet' },
+                { value: 'necklace', label: 'Necklace' },
+                { value: 'earring', label: 'Earring' },
+              ]}
+              error={errors.item_name}
+            /> */}
 
             <InputField
               label="Purity Percentage:"
@@ -545,7 +612,6 @@ function Purity() {
               required={true}
               error={errors.purity_percentage}
             />
-            {errors.purity_percentage && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.purity_percentage}</p>}
 
             <InputField
               label="Purity:"
@@ -556,7 +622,6 @@ function Purity() {
               error={errors.purity}
 
             />
-            {errors.purity && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.purity}</p>}
 
           </div>
 
@@ -571,7 +636,6 @@ function Purity() {
               error={errors.urd_purity}
 
             />
-            {errors.urd_purity && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.urd_purity}</p>}
 
             <InputField
               label="DESC:"
@@ -582,7 +646,6 @@ function Purity() {
               error={errors.desc}
 
             />
-            {errors.desc && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.desc}</p>}
 
             <InputField
               label="Old Purity Desc:"
@@ -593,7 +656,6 @@ function Purity() {
               error={errors.old_purity_desc}
 
             />
-            {errors.old_purity_desc && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.old_purity_desc}</p>}
 
             <InputField
               label="Cut Issue:"
@@ -604,7 +666,6 @@ function Purity() {
               error={errors.cut_issue}
 
             />
-            {errors.cut_issue && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.cut_issue}</p>}
 
             <InputField
               label="Skin Print:"
@@ -615,7 +676,6 @@ function Purity() {
               error={errors.skin_print}
 
             />
-            {errors.skin_print && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.skin_print}</p>}
 
           </div>
 
