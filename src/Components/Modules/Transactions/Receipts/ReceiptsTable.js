@@ -90,9 +90,25 @@ const ReceiptsTable = () => {
     fetchReceipts();
   }, []);
 
-  const handleDelete = (id) => {
-    console.log('Delete record with id:', id);
-    // Implement your delete logic here
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this receipt?')) {
+      try {
+        const response = await fetch(`${baseURL}/delete/receipts/${id}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to delete receipt.');
+        }
+
+        // Update the data state to remove the deleted receipt
+        setData((prevData) => prevData.filter((item) => item.receipt_id !== id));
+        window.alert('Receipt deleted successfully!');
+      } catch (error) {
+        window.alert(`Error: ${error.message}`);
+      }
+    }
   };
 
   const handleEdit = (record) => {

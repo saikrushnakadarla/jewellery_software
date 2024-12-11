@@ -23,6 +23,10 @@ const RepairForm = () => {
   const [accountNames, setAccountNames] = useState([]);
 
   useEffect(() => {
+    // Set default date to today
+    const today = new Date().toISOString().split("T")[0];
+    setFormData((prevData) => ({ ...prevData, date: today }));
+
     // Fetch account names when the component mounts
     const fetchAccountNames = async () => {
       try {
@@ -53,7 +57,14 @@ const RepairForm = () => {
       if (name === "total_amt" || name === "discount_amt") {
         const totalAmt = parseFloat(updatedData.total_amt) || 0;
         const discountAmt = parseFloat(updatedData.discount_amt) || 0;
-        updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
+
+        // Ensure discount amount is not greater than total amount
+        if (discountAmt > totalAmt) {
+          alert("Discount amount cannot be greater than total amount.");
+          updatedData.discount_amt = "";
+        } else {
+          updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
+        }
       }
 
       return updatedData;
@@ -133,18 +144,17 @@ const RepairForm = () => {
               />
             </Col>
             <Col xs={12} md={3}>
-            <InputField
-  label="Account Name"
-  type="select"
-  name="account_name"
-  value={formData.account_name}
-  onChange={handleChange}
-  options={accountNames.map((name) => ({
-    value: name.account_name, // Access the correct field from your API response
-    label: name.account_name,
-  }))}
-/>
-
+              <InputField
+                label="Account Name"
+                type="select"
+                name="account_name"
+                value={formData.account_name}
+                onChange={handleChange}
+                options={accountNames.map((name) => ({
+                  value: name.account_name, // Access the correct field from your API response
+                  label: name.account_name,
+                }))}
+              />
             </Col>
             <Col xs={12} md={2}>
               <InputField

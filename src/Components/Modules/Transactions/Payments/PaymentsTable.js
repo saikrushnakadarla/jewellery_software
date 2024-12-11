@@ -82,9 +82,26 @@ const RepairsTable = () => {
     fetchData();
   }, []);
 
-  const handleDelete = (id) => {
-    console.log('Delete record with id:', id);
-    // Implement delete logic, e.g., make a DELETE request to the API
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this payment?')) return;
+
+    try {
+      const response = await fetch(`${baseURL}/delete/payments/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        alert('Payment deleted successfully');
+        setData((prevData) => prevData.filter((payment) => payment.payment_id !== id));
+      } else {
+        const result = await response.json();
+        console.error('Error deleting payment:', result.message);
+        alert('Failed to delete payment. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error deleting payment:', error);
+      alert('An error occurred while deleting the payment.');
+    }
   };
 
   const handleCreate = () => {

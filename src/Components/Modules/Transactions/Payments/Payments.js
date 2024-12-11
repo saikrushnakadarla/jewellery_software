@@ -25,6 +25,9 @@ const RepairForm = () => {
 
   // Fetch account names on component mount
   useEffect(() => {
+     // Set default date to today
+     const today = new Date().toISOString().split("T")[0];
+     setFormData((prevData) => ({ ...prevData, date: today }));
     const fetchAccountNames = async () => {
       try {
         const response = await fetch(`${baseURL}/payment-account-names`);
@@ -54,12 +57,22 @@ const RepairForm = () => {
     const { name, value } = e.target;
 
     setFormData((prevData) => {
-      const updatedData = { ...prevData, [name]: value };
+      const updatedData = {
+        ...prevData,
+        [name]: value,
+      };
 
-      if (name === "discount_amt") {
-        const discount = value === "" ? 0 : parseFloat(value);
-        const total = parseFloat(prevData.total_amt || 0);
-        updatedData.cash_amt = total - discount;
+      if (name === "total_amt" || name === "discount_amt") {
+        const totalAmt = parseFloat(updatedData.total_amt) || 0;
+        const discountAmt = parseFloat(updatedData.discount_amt) || 0;
+
+        // Ensure discount amount is not greater than total amount
+        if (discountAmt > totalAmt) {
+          alert("Discount amount cannot be greater than total amount.");
+          updatedData.discount_amt = "";
+        } else {
+          updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
+        }
       }
 
       return updatedData;
