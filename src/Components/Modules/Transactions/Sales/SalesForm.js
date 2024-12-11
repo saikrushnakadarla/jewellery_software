@@ -9,6 +9,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 
 const RepairForm = () => {
   const [metal, setMetal] = useState("");
+  const [code, setCode] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
@@ -123,15 +124,15 @@ const RepairForm = () => {
                 <Col xs={12} md={6}  className="d-flex align-items-center">
                   <div style={{ flex: 1 }}>
                   <InputField
-                  label="Customer Name:"
+                  label="Mobile:"
                   name="customer_id"
                   type="select"
-                  value={formData.customer_id || ""}
+                  value={formData.mobile || ""}
                   onChange={(e) => handleCustomerChange(e.target.value)}
                   options={[
                     ...customers.map((customer) => ({
                       value: customer.account_id,
-                      label: customer.account_name, // Use account_name or your preferred field
+                      label: customer.mobile, // Use account_name or your preferred field
                     })),
                   ]}
                 />
@@ -145,9 +146,9 @@ const RepairForm = () => {
                 </Col>
                 <Col xs={12} md={6}>
                 <InputField
-                    label="Mobile:"
-                    name="mobile"
-                    value={formData.mobile}
+                    label="Customer Name:"
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
                     readOnly
                   />
@@ -202,9 +203,9 @@ const RepairForm = () => {
                   <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="State:"  name="state" value={formData.state_code} onChange={handleChange} readOnly/>
+                  <InputField label="State Code:"  name="state" value={formData.state_code} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={5}>
+                <Col xs={12} md={6}>
                   <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={4}>
@@ -221,18 +222,13 @@ const RepairForm = () => {
           <div className="sales-form-right">
             <Col className="sales-form-section">
               <Row>
+                
                 <Col xs={12} md={3}>
                   <InputField
-                    label="Sadashri Jewels"
-                    value="Sadashri Jewels"                    
-                  />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField
-                    label="Code"
+                    label="BarCode/Rbarcode"
                     type="select"
-                    
-                    onChange={(e) => setMetal(e.target.value)}
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
                     options={[
                       { value: "BarCode", label: "BarCode" },
                       { value: "Rbarcode", label: "Rbarcode" },
@@ -261,6 +257,12 @@ const RepairForm = () => {
                     
                   />
                 </Col>
+                <Col xs={12} md={3}>
+                  <InputField
+                    label="Metal Type"
+                                       
+                  />
+                </Col>
                 <Col xs={12} md={4}>
                   <InputField
                     label="Design Name"
@@ -277,13 +279,14 @@ const RepairForm = () => {
                   <InputField label="Stone Weight" />
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="Stone Price" />
-                </Col>
-                <Col xs={12} md={3}>
                   <InputField label="Weight BW" />
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="Wastage On" />
+                  <InputField label="Stone Price" />
+                </Col>
+                
+                <Col xs={12} md={3}>
+                  <InputField label="VA On" />
                 </Col>
                 <Col xs={12} md={3}>
                   <InputField label="VA%" />
@@ -297,7 +300,7 @@ const RepairForm = () => {
                 </Col>
                 <Col xs={12} md={3}>
                   <InputField
-                    label="Making Charges on"                   
+                    label="MC on"                   
                   />
                 </Col>
                 <Col xs={12} md={3}>
@@ -309,6 +312,12 @@ const RepairForm = () => {
                   <InputField
                     label="Making Charges"                   
                   />
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="Rate" />
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="Total Price" />
                 </Col>
                
                 <Col xs={12} md={3}>
@@ -477,12 +486,6 @@ const RepairForm = () => {
             <Col className="sales-form-section">
               <Row>
                 <h4 className="mb-3">Payment Details</h4>
-
-                <Col xs={12} md={4}>
-                  <InputField label="Walkin" />
-                </Col>
-
-
                 <Col xs={12} md={4}>
                   <InputField label="Cash" />
                 </Col>
@@ -504,19 +507,14 @@ const RepairForm = () => {
                 <Col xs={12} md={4}>
                   <InputField label="Amt" />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={2}>
                   <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
                 </Col>
-
-              </Row>
-            </Col>
-          </div>
-
-        </div>
-
-        {/* Buttons */}
-        <div className="form-buttons">
-          <Button
+                <Col xs={12} md={2}>
+                <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
+                </Col>
+                <Col xs={12} md={2}>
+                <Button
             type="button"
             className="cus-back-btn"
             variant="secondary"
@@ -524,8 +522,16 @@ const RepairForm = () => {
           >
             cancel
           </Button>
-          <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
-        </div>                  
+                </Col>
+                
+              </Row>
+            </Col>
+          </div>
+
+        </div>
+
+        {/* Buttons */}
+                        
         </Form>
       </Container>
     </div>

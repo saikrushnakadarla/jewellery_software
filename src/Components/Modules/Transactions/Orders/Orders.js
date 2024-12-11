@@ -119,18 +119,18 @@ const Orders = () => {
         <div className="sales-form-left">
             <Col className="sales-form-section">
               <Row>
-                <Col xs={12} md={6}  className="d-flex align-items-center">
+              <Col xs={12} md={6}  className="d-flex align-items-center">
                   <div style={{ flex: 1 }}>
                   <InputField
-                  label="Customer Name:"
+                  label="Mobile:"
                   name="customer_id"
                   type="select"
-                  value={formData.customer_id || ""}
+                  value={formData.mobile || ""}
                   onChange={(e) => handleCustomerChange(e.target.value)}
                   options={[
                     ...customers.map((customer) => ({
                       value: customer.account_id,
-                      label: customer.account_name, // Use account_name or your preferred field
+                      label: customer.mobile, // Use account_name or your preferred field
                     })),
                   ]}
                 />
@@ -144,9 +144,9 @@ const Orders = () => {
                 </Col>
                 <Col xs={12} md={6}>
                 <InputField
-                    label="Mobile:"
-                    name="mobile"
-                    value={formData.mobile}
+                    label="Customer Name:"
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
                     readOnly
                   />

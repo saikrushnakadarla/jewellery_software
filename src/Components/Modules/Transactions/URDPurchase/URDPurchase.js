@@ -1,8 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./URDPurchase.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button,Table } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
+import baseURL from "../../../../Url/NodeBaseURL";
+import axios from "axios";
+import { AiOutlinePlus } from "react-icons/ai";
+
 const URDPurchase = () => {
 
     const [metal, setMetal] = useState("");
@@ -13,11 +17,109 @@ const URDPurchase = () => {
     const [stoneType, setStoneType] = useState("");
     const [stoneType2, setStoneType2] = useState("");
     const [isChecked, setIsChecked] = useState("");
-
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const [customers, setCustomers] = useState([]);
+    const [formData, setFormData] = useState({
+      name: "",
+      mobile: "",
+      email: "",
+      address1: "",
+      address2: "",
+      address3: "",
+      city: "",
+      
+    });
+  
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value
+      }));
+    };
+  
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await fetch(`${baseURL}/get/account-details`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch data');
+          }
+          const result = await response.json();
+    
+          // Filter only suppliers
+          const customers = result.filter(
+            (item) => item.account_group === 'CUSTOMERS'
+          );
+    
+          setCustomers(customers);
+          // setLoading(false);
+          console.log("Customers=",customers)
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          setLoading(false);
+        }
+      };
+    
+      fetchData();
+    }, []);
+  
+    const handleCustomerChange = (customerId) => {
+      setFormData((prevData) => ({
+        ...prevData,
+        customer_id: customerId, // Ensure customer_id is correctly updated
+      }));
+    
+      const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
+      console.log("Customer Id=",customer)
+    
+      if (customer) {
+        setFormData({
+          ...formData,
+          customer_id: customerId, // Ensure this is correctly set
+          name: customer.account_name, // Set the name field to the selected customer
+          mobile: customer.phone || "",
+          email: customer.email || "",
+          address1: customer.address1 || "",
+          address2: customer.address2 || "",
+          city: customer.city || "",
+          pincode: customer.pincode || "",
+          state: customer.state || "",
+          state_code: customer.state_code || "",
+          aadhar_card: customer.aadhar_card || "",
+          gst_in: customer.gst_in || "",
+          pan_card: customer.pan_card || "",
+  
+        });
+      } else {
+        setFormData({
+          ...formData,
+          customer_id: "",
+          name: "",
+          mobile: "",
+          email: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          state_code: "",
+          aadhar_card: "",
+          gst_in: "",
+          pan_card: "",
+        });
+      }
+    };
     const handleBack = () => {
         navigate('/urdpurchasetable');
     };
+
+    const handleAddCustomer = () => {
+      navigate("/customermaster", { state: { from: "/urd_purchase" } });
+    };
+
   return (
     <div className="main-container">
     <div className="urdpurchase-form-container">
@@ -25,38 +127,106 @@ const URDPurchase = () => {
         {/* Left Section */}
         <div className="urdpurchase-form-left">
           {/* Customer Details */}
-          <div className="urd-form-section">
+          <Col className="urd-form-section">
             <h4 className="mb-2">Customer Details</h4>
-            <div className="urd-form-row">
-              <InputField label="Name:" />
-              <InputField label="Mobile:" />
-              <InputField label="Pin:" />
-              {/* <InputField label="Email:" type="email" /> */}
-            </div>
-            <div className="urd-form-row">
-              <InputField label="Address1:" />
-              <InputField label="Address2:" />
-              <InputField label="Aadhar:" />
-            </div>
-            <div className="urd-form-row">
-            <InputField label="Staff:" />
-            <InputField
-              label="Type:"
-              type="select"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              options={[
-                { value: "EXCHANGE", label: "Exchange" },
-                { value: "PURCHASE", label: "Purchase" },
-                { value: "REPAIR", label: "Repair" },
-                { value: "RETURN", label: "Return" },
+            <Row>
+            <Col xs={12} md={4}  className="d-flex align-items-center">
+                  <div style={{ flex: 1 }}>
+                  <InputField
+                  label="Mobile:"
+                  name="customer_id"
+                  type="select"
+                  value={formData.mobile || ""}
+                  onChange={(e) => handleCustomerChange(e.target.value)}
+                  options={[
+                    ...customers.map((customer) => ({
+                      value: customer.account_id,
+                      label: customer.mobile, // Use account_name or your preferred field
+                    })),
+                  ]}
+                />
+                </div>
+                <AiOutlinePlus
+                  size={20}
+                  color="black"
+                  onClick={handleAddCustomer}
+                  style={{ marginLeft: '10px', cursor: 'pointer', marginBottom:'20px' }}
+                />
+                </Col>
+                <Col xs={12} md={4}>
+                <InputField
+                    label="Customer Name:"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={4}>
+                <InputField
+                    label="Email:"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={3}>
+                <InputField
+                    label="Address1:"
+                    name="address1"
+                    value={formData.address1}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={3}>
+                <InputField
+                    label="Address2:"
+                    name="address2"
+                    value={formData.address2}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={2}>
+                <InputField
+                    label="City"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={2}>
+                  <InputField 
+                  label="PinCode" 
+                  name="pincode"
+                  value={formData.pincode}
+                  onChange={handleChange}
+                  readOnly
+                  />
+                </Col>
+                <Col xs={12} md={2}>
+                  <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={2}>
+                  <InputField label="State Code:"  name="state" value={formData.state_code} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={4}>
+                  <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="GSTIN"name="gst_in" value={formData.gst_in} onChange={handleChange} readOnly />
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="PAN" name="pan_card" value={formData.pan_card} onChange={handleChange} readOnly />
+                </Col>
                 
-              ]}
-            />
-              
-            </div>
+              </Row>
             
-          </div> 
+          </Col> 
         </div>
         {/* Right Section */}
         <div className="urdpurchase-form-right">
