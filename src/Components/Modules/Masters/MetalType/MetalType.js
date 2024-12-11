@@ -258,7 +258,8 @@ import axios from "axios";
 
 function MetalType() {
   const [formData, setFormData] = useState({
-    metal_name: '',
+    metal_type: '',
+    item_type: '',
     description: '',
     default_purity: '',
     default_purity_for_rate_entry: '',
@@ -286,7 +287,8 @@ function MetalType() {
   }, []);
 
    // Validation functions
-   const validateMetalName = (value) => /^[A-Za-z\s]+$/.test(value);
+   const validateMetalType = (value) => /^[A-Za-z\s]+$/.test(value);
+   const validateItemType = (value) => value.trim() !== ""; // Not empty
    const validateDescription = (value) => value.trim() !== "";
    const validatePurity = (value) => /^[0-9.]+$/.test(value);
  
@@ -298,8 +300,10 @@ function MetalType() {
     let error = "";
   
     // Validate specific fields based on the input's name
-    if (name === "metal_name" && !validateMetalName(value)) {
-      error = "Metal name should contain only alphabets.";
+    if (name === "metal_type" && !validateMetalType(value)) {
+      error = "Metal type should contain only alphabets.";
+    } else if (name === "item_type" && !validateItemType(value)) {
+      error = "Item Type is required";
     } else if (name === "description" && !validateDescription(value)) {
       error = "Description is required.";
     } else if (name === "default_purity" && !validatePurity(value)) {
@@ -322,8 +326,13 @@ function MetalType() {
     const formErrors = {};
   
     // Validate Metal Name
-    if (!validateMetalName(formData.metal_name)) {
+    if (!validateMetalType(formData.metal_name)) {
       formErrors.metal_name = "Metal Name should contain only alphabets.";
+    }
+     
+    // Validate Metal Name
+    if (!validateItemType(formData.item_type)) {
+      formErrors.item_type = "Item Type should contain only alphabets.";
     }
   
     // Validate Description
@@ -370,7 +379,8 @@ function MetalType() {
 
       // Reset the form and stop editing mode
       setFormData({
-        metal_name: '',
+        metal_type: '',
+        item_type: '',
         description: '',
         default_purity: '',
         default_purity_for_rate_entry: '',
@@ -414,8 +424,12 @@ function MetalType() {
         Cell: ({ row }) => row.index + 1, // Generate a sequential number
       },
       {
-        Header: "Metal Name",
-        accessor: "metal_name",
+        Header: "Metal Type",
+        accessor: "metal_type",
+      },
+      {
+        Header: "Item Type",
+        accessor: "item_type",
       },
       {
         Header: "Description",
@@ -465,15 +479,23 @@ function MetalType() {
           {/* Row 1 */}
           <div className="form-row">
             <InputField
-              label="Metal Name:"
-              name="metal_name"
-              value={formData.metal_name}
+              label="Metal Type:"
+              name="metal_type"
+              value={formData.metal_type}
               onChange={handleChange}
               required={true}
-              error={errors.metal_name}
+              error={errors.metal_type}
             />
-            {errors.metal_name && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.metal_name}</p>}
+            {errors.metal_type && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.metal_type}</p>}
 
+            <InputField
+              label="Item Type:"
+              name="item_type"
+              value={formData.item_type}
+              onChange={handleChange}
+              required={true}
+              error={errors.item_type}
+            />
             <InputField
               label="Description:"
               name="description"
@@ -492,7 +514,6 @@ function MetalType() {
               onChange={handleChange}
               required={true}
               options={[
-                { value: '', label: 'Select Purity' },
                 { value: '99.9', label: '99.9%' },
                 { value: '99.5', label: '99.5%' },
                 { value: '95.0', label: '95.0%' },
@@ -514,7 +535,6 @@ function MetalType() {
               onChange={handleChange}
               required={true}
               options={[
-                { value: '', label: 'Select Purity' },
                 { value: '99.9', label: '99.9%' },
                 { value: '99.5', label: '99.5%' },
                 { value: '95.0', label: '95.0%' },
@@ -532,7 +552,6 @@ function MetalType() {
               onChange={handleChange}
               required={true}
               options={[
-                { value: '', label: 'Select Purity' },
                 { value: '99.9', label: '99.9%' },
                 { value: '99.5', label: '99.5%' },
                 { value: '95.0', label: '95.0%' },
@@ -546,7 +565,6 @@ function MetalType() {
               onChange={handleChange}
               required={true}
               options={[
-                { value: '', label: 'Select Purity' },
                 { value: '99.9', label: '99.9%' },
                 { value: '99.5', label: '99.5%' },
                 { value: '95.0', label: '95.0%' },
