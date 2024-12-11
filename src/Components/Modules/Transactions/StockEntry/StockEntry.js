@@ -19,7 +19,7 @@ const StockEntry = () => {
         Gross_Weight: "",
         Stones_Weight: "",
         Stones_Price: "",
-        HUID_No: "ABC1234",
+        HUID_No: "",
         Wastage_On: "",
         Wastage_Percentage: "",
         Status: "sold",
@@ -48,10 +48,102 @@ const StockEntry = () => {
         }));
     };
 
+    // Automatically calculate Weight_BW when Gross_Weight or Stones_Weight changes
+    useEffect(() => {
+        const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+        const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
+        const weightBW = grossWeight - stonesWeight;
+
+        setFormData((prev) => ({
+            ...prev,
+            Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
+        }));
+    }, [formData.Gross_Weight, formData.Stones_Weight]);
+  // Automatically calculate WastageWeight and TotalWeight_AW
+  useEffect(() => {
+    const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
+    const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+    const weightBW = parseFloat(formData.Weight_BW) || 0;
+
+    let wastageWeight = 0;
+    let totalWeight = 0;
+
+    if (formData.Wastage_On === "Gross Weight") {
+        wastageWeight = (grossWeight * wastagePercentage) / 100;
+        totalWeight = grossWeight + wastageWeight;
+    } else if (formData.Wastage_On === "Weight WW") {
+        wastageWeight = (weightBW * wastagePercentage) / 100;
+        totalWeight = weightBW + wastageWeight;
+    }
+
+    setFormData((prev) => ({
+        ...prev,
+        WastageWeight: wastageWeight.toFixed(2),
+        TotalWeight_AW: totalWeight.toFixed(2),
+    }));
+}, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
+
+const handleMakingChargesCalculation = () => {
+    const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
+    const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
+    const makingCharges = parseFloat(formData.Making_Charges) || 0;
+
+    if (formData.Making_Charges_On === "By Weight") {
+        const calculatedMakingCharges = totalWeight * mcPerGram;
+        setFormData((prev) => ({
+            ...prev,
+            Making_Charges: calculatedMakingCharges.toFixed(2),
+        }));
+    } else if (formData.Making_Charges_On === "Fixed") {
+        const calculatedMcPerGram = makingCharges / totalWeight;
+        setFormData((prev) => ({
+            ...prev,
+            MC_Per_Gram: calculatedMcPerGram.toFixed(2),
+        }));
+    }
+};
+
+
+
+useEffect(() => {
+    handleMakingChargesCalculation();
+}, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
+
     const navigate = useNavigate();
 
     const handleBack = () => {
         navigate("/stockEntryTable");
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        console.log("Submitting formData:", formData);
+
+        try {
+            const response = await axios.post(
+                "http://localhost:5000/api/opening-tags-entry",
+                formData,
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+
+            console.log("Data saved successfully:", response.data);
+            alert("Data saved successfully!");
+            navigate("/stockEntryTable");
+        } catch (error) {
+            if (error.response) {
+                console.error("Response error:", error.response.data);
+                alert(`Error: ${error.response.data.message || "Invalid input data"}`);
+            } else if (error.request) {
+                console.error("Request error:", error.request);
+                alert("No response received from server. Please try again.");
+            } else {
+                console.error("Error:", error.message);
+                alert("An error occurred. Please check the console for details.");
+            }
+        }
     };
 
     useEffect(() => {
@@ -72,41 +164,7 @@ const StockEntry = () => {
         fetchProductIds();
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        // Log formData to debug
-        console.log("Submitting formData:", formData);
-
-        try {
-            const response = await axios.post(
-                "http://localhost:5000/api/opening-tags-entry",
-                formData,
-                {
-                    headers: { "Content-Type": "application/json" },
-                }
-            );
-
-            console.log("Data saved successfully:", response.data);
-            alert("Data saved successfully!");
-            navigate("/stockEntryTable");
-        } catch (error) {
-            if (error.response) {
-                // Server responded with a status code other than 2xx
-                console.error("Response error:", error.response.data);
-                alert(`Error: ${error.response.data.message || "Invalid input data"}`);
-            } else if (error.request) {
-                // Request made but no response received
-                console.error("Request error:", error.request);
-                alert("No response received from server. Please try again.");
-            } else {
-                // Something else caused the error
-                console.error("Error:", error.message);
-                alert("An error occurred. Please check the console for details.");
-            }
-        }
-    };
-
+    
     return (
         <div style={{ paddingTop: "79px" }}>
             <div className="container mt-4">
@@ -138,6 +196,14 @@ const StockEntry = () => {
                 onChange={handleChange}
                 options={productOptions}
             />
+            {/* <InputField
+                                            label="P ID:"
+                                            name="product_id"
+                                            type="text"
+                                            value={formData.product_id}
+                                            onChange={handleChange}
+                                            
+                        /> */}
         </div>
                                     <div className="col-md-2">
                                         <InputField
@@ -311,7 +377,7 @@ const StockEntry = () => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
                                         <InputField
                                             label="Making Charges:"
                                             name="Making_Charges"
@@ -319,7 +385,15 @@ const StockEntry = () => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
+                                    <InputField
+                                        label="HUID No:"
+                                        name="HUID_No"
+                                        value={formData.HUID_No}
+                                        onChange={handleChange}
+                                    />
+                                    </div>
+                                    <div className="col-md-2">
                                         <InputField
                                             label="Stock Point:"
                                             name="Stock_Point"

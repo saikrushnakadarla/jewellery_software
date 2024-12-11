@@ -61,6 +61,8 @@ const StockEntry = () => {
         }));
     };
 
+    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
