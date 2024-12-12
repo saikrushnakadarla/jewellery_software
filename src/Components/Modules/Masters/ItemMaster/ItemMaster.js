@@ -20,10 +20,13 @@ const FormWithTable = () => {
     op_qty: "",
     op_value: "",
     op_weight: "",
+    maintain_tags:false, // Default as false
     Tag_ID: "",
     Prefix: "tag",
+    item_prefix:"",
     Category: "Gold", // Set a default value for Category
     Purity: "",
+    purity: "",
     PCode_BarCode: "",
     Gross_Weight: "",
     Stones_Weight: "",
@@ -53,7 +56,14 @@ const FormWithTable = () => {
   const [isMaintainTagsChecked, setIsMaintainTagsChecked] = useState(false);
 
   const handleCheckboxChange = () => {
-    setIsMaintainTagsChecked((prev) => !prev);
+    setIsMaintainTagsChecked((prev) => {
+      const newCheckedState = !prev;
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        maintain_tags: newCheckedState, // Update maintain_tags in formData
+      }));
+      return newCheckedState;
+    });
   };
 
   const maintainTagsStyle = !isMaintainTagsChecked
@@ -209,8 +219,8 @@ const FormWithTable = () => {
                 <InputField
                   label="Purity:"
                   type="select"
-                  name="Purity"
-                  value={formData.Purity}
+                  name="purity"
+                  value={formData.purity}
                   onChange={handleChange}
                   options={[
                     { value: "91.6HM", label: "91.6HM" },
@@ -220,8 +230,8 @@ const FormWithTable = () => {
                 />
                 <InputField
                   label="Item Prefix:"
-                  name="Prefix"
-                  value={formData.Prefix}
+                  name="item_prefix"
+                  value={formData.item_prefix}
                   onChange={handleChange}
                 />
               </div>
@@ -291,9 +301,11 @@ const FormWithTable = () => {
                 <input
                   type="checkbox"
                   id="main-tags"
+                  name="maintain_tags"
                   style={{ width: "35px" }}
                   checked={isMaintainTagsChecked}
                   onChange={handleCheckboxChange}
+                  value={formData.maintain_tags}
                 />
                 <label htmlFor="main-tags">
                   <h4>Maintain Tags</h4>
