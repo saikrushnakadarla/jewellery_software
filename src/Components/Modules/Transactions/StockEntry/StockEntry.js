@@ -71,7 +71,7 @@ const StockEntry = () => {
     if (formData.Wastage_On === "Gross Weight") {
         wastageWeight = (grossWeight * wastagePercentage) / 100;
         totalWeight = grossWeight + wastageWeight;
-    } else if (formData.Wastage_On === "Weight WW") {
+    } else if (formData.Wastage_On === "Weight BW") {
         wastageWeight = (weightBW * wastagePercentage) / 100;
         totalWeight = weightBW + wastageWeight;
     }
@@ -328,7 +328,7 @@ useEffect(() => {
                                             onChange={handleChange}
                                             options={[
                                                 { value: "Gross Weight", label: "Gross Weight" },
-                                                { value: "Weight WW", label: "Weight WW" },
+                                                { value: "Weight BW", label: "Weight BW" },
                                             ]}
                                         />
                                     </div>

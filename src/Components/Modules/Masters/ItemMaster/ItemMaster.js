@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import InputField from "./Inputfield"; // Assuming you have this component
@@ -17,9 +17,9 @@ const FormWithTable = () => {
     purchase_account_head: "",
     tax_slab: "",
     hsn_code: "",
-    op_qty: "",
+    op_qty: 0,
     op_value: "",
-    op_weight: "",
+    op_weight: 0,
     maintain_tags:false, // Default as false
     Tag_ID: "",
     Prefix: "tag",
@@ -74,87 +74,187 @@ const FormWithTable = () => {
     ? {}
     : { backgroundColor: "#f5f5f5", color: "#888", cursor: "not-allowed" };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+      const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      };
+      
+      const handleAddOpenTagEntry = (e) => {
+        e.preventDefault();
+      
+        const newEntry = {
+          Pricing: formData.Pricing,
+          Tag_ID: formData.Tag_ID,
+          Prefix: formData.Prefix,
+          Category: formData.Category,
+          Purity: formData.Purity,
+          PCode_BarCode: formData.PCode_BarCode,
+          Gross_Weight: formData.Gross_Weight,
+          Stones_Weight: formData.Stones_Weight,
+          Stones_Price: formData.Stones_Price,
+          WastageWeight: formData.WastageWeight,
+          HUID_No: formData.HUID_No,
+          Wastage_On: formData.Wastage_On,
+          Wastage_Percentage: formData.Wastage_Percentage,
+          status: formData.status,
+          Source: formData.Source,
+          Stock_Point: formData.Stock_Point,
+          Weight_BW: formData.Weight_BW,
+          TotalWeight_AW: formData.TotalWeight_AW,
+          MC_Per_Gram: formData.MC_Per_Gram,
+          Making_Charges_On: formData.Making_Charges_On,
+          Making_Charges: formData.Making_Charges,
+          Design_Master: formData.Design_Master,
+        };
+      
+        // Update the `op_qty` and `op_weight` fields
+        setFormData((prev) => ({
+          ...prev,
+          op_qty: prev.op_qty + 1, // Increment op_qty
+          op_weight: parseFloat(prev.op_weight) + parseFloat(formData.Gross_Weight || 0), // Add Gross_Weight
+        }));
+      
+        // Add the new entry to the table
+        setOpenTagsEntries((prev) => [...prev, newEntry]);
+      
+        // Reset other form fields
+        setFormData((prev) => ({
+          ...prev,
+          Pricing: "",
+          Tag_ID: "",
+          Prefix: "Gold",
+          Category: "",
+          Purity: "",
+          PCode_BarCode: "",
+          Gross_Weight: "",
+          Stones_Weight: "",
+          Stones_Price: "",
+          WastageWeight: "",
+          HUID_No: "",
+          Wastage_On: "",
+          Wastage_Percentage: "",
+          status: "",
+          Source: "",
+          Stock_Point: "",
+          Weight_BW: "",
+          TotalWeight_AW: "",
+          MC_Per_Gram: "",
+          Making_Charges_On: "",
+          Making_Charges: "",
+          Design_Master: "",
+        }));
+      };
+      
+      
+      useEffect(() => {
+        const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+        const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
+        const weightBW = grossWeight - stonesWeight;
+
+        setFormData((prev) => ({
+            ...prev,
+            Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
+        }));
+    }, [formData.Gross_Weight, formData.Stones_Weight]);
+  // Automatically calculate WastageWeight and TotalWeight_AW
+  useEffect(() => {
+    const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
+    const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+    const weightBW = parseFloat(formData.Weight_BW) || 0;
+
+    let wastageWeight = 0;
+    let totalWeight = 0;
+
+    if (formData.Wastage_On === "Gross Weight") {
+        wastageWeight = (grossWeight * wastagePercentage) / 100;
+        totalWeight = grossWeight + wastageWeight;
+    } else if (formData.Wastage_On === "Weight BW") {
+        wastageWeight = (weightBW * wastagePercentage) / 100;
+        totalWeight = weightBW + wastageWeight;
+    }
+
     setFormData((prev) => ({
-      ...prev,
-      [name]: value,
+        ...prev,
+        WastageWeight: wastageWeight.toFixed(2),
+        TotalWeight_AW: totalWeight.toFixed(2),
     }));
-  };
+}, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
 
-  const handleAddOpenTagEntry = (e) => {
-    e.preventDefault();
-    const newEntry = {
-      // product_id: formData.product_id,
-      // product_name: formData.product_name,
-      // design_master: formData.design_master,
-      Pricing: formData.Pricing,
-      Tag_ID: formData.Tag_ID,
-      Prefix: formData.Prefix,
-      Category: formData.Category,
-      Purity: formData.Purity,
-      PCode_BarCode: formData.PCode_BarCode,
-      Gross_Weight: formData.Gross_Weight,
-      Stones_Weight: formData.Stones_Weight,
-      Stones_Price: formData.Stones_Price,
-      WastageWeight: formData.WastageWeight,
-      HUID_No: formData.HUID_No,
-      Wastage_On: formData.Wastage_On,
-      Wastage_Percentage: formData.Wastage_Percentage,
-      status: formData.status,
-      Source: formData.Source,
-      Stock_Point: formData.Stock_Point,
-      Weight_BW: formData.Weight_BW,
-      TotalWeight_AW: formData.TotalWeight_AW,
-      MC_Per_Gram: formData.MC_Per_Gram,
-      Making_Charges_On: formData.Making_Charges_On,
-      Making_Charges: formData.Making_Charges,
-      Design_Master: formData.Design_Master,
-      // short_name: formData.short_name,
-      // sale_account_head: formData.sale_account_head,
-      // purchase_account_head: formData.purchase_account_head,
-      // tax_slab: formData.tax_slab,
-      // hsn_code: formData.hsn_code,
-      // op_qty: formData.op_qty,
-      // op_value: formData.op_value,
-      // op_weight: formData.op_weight,
-      // huid_no: formData.huid_no,
-      // rbarcode: formData.rbarcode,
-    };
+const handleMakingChargesCalculation = () => {
+    const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
+    const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
+    const makingCharges = parseFloat(formData.Making_Charges) || 0;
+
+    if (formData.Making_Charges_On === "By Weight") {
+        const calculatedMakingCharges = totalWeight * mcPerGram;
+        setFormData((prev) => ({
+            ...prev,
+            Making_Charges: calculatedMakingCharges.toFixed(2),
+        }));
+    } else if (formData.Making_Charges_On === "Fixed") {
+        const calculatedMcPerGram = makingCharges / totalWeight;
+        setFormData((prev) => ({
+            ...prev,
+            MC_Per_Gram: calculatedMcPerGram.toFixed(2),
+        }));
+    }
+};
 
 
-    // Add the new entry to the table
-    setOpenTagsEntries((prev) => [...prev, newEntry]);
-  };
+
+useEffect(() => {
+    handleMakingChargesCalculation();
+}, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
+
 
   const handleSave = async () => {
     try {
       // Ensure Category and other fields are not empty
       const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
-
+  
       // Save product details
       const productResponse = await axios.post("http://localhost:5000/api/products", updatedFormData);
       const { product_id } = productResponse.data;
-
+  
       // Append product_id to openTagsEntries
       const entriesWithProductId = openTagsEntries.map((entry) => ({
         ...entry,
         product_id, // Append product_id to entries
       }));
-
+  
       // Save opening tag entries
       const saveEntriesPromises = entriesWithProductId.map((entry) =>
         axios.post("http://localhost:5000/api/opening-tags-entry", entry)
       );
-
+  
       await Promise.all(saveEntriesPromises);
       alert("Data saved successfully!");
+  
+      // Reset the form fields
+      setFormData({
+        product_name: "",
+        rbarcode: "",
+        Category: "",
+        design_master: "",
+        purity: "",
+        item_prefix: "",
+        short_name: "",
+        sale_account_head: "",
+        purchase_account_head: "",
+        status: "",
+        tax_slab: "",
+        hsn_code: "",
+        op_qty: "",
+        op_value: "",
+        op_weight: "",
+        huid_no: "",
+      });
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Failed to save data. Please try again.");
     }
   };
-
+  
   const handleBack = () => {
     navigate("/itemmastertable");
   };
@@ -174,11 +274,7 @@ const FormWithTable = () => {
             <div className="form-container">
               <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
               <div className="form-row">
-                <InputField label="P ID:"
-                  name="product_id"
-                  value={formData.product_id}
-                  onChange={handleChange}
-                />
+               
                 <InputField
                   label="Product Name:"
                   name="product_name"
@@ -469,7 +565,7 @@ const FormWithTable = () => {
                   style={openingTagsStyle}
                   options={[
                     { value: "Gross Weight", label: "Gross Weight" },
-                    { value: "Weight WW", label: "Weight WW" },
+                    { value: "Weight BW", label: "Weight BW" },
                   ]}
                 />
                 <InputField
@@ -555,9 +651,7 @@ const FormWithTable = () => {
                 Add
               </button>
 
-              {/* <button type="submit" className="btn btn-primary">
-                Add
-              </button> */}
+           
             </form>
 
             <button
@@ -595,17 +689,11 @@ const FormWithTable = () => {
               </table>
             </div>
 
-            {/* <button className="btn btn-primary" onClick={handleSave}>
-              Save
-            </button> */}
             <StoneDetailsModal
               showModal={showModal}
               handleCloseModal={handleCloseModal}
             />
           </div>
-
-
-
         </div>
       </div>
     </div>
