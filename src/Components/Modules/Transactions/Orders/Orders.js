@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./Orders.css";
 import InputField from "../../../Pages/InputField/InputField";
-import { Container, Row, Col, Button, Table } from "react-bootstrap";
+import { Container, Row, Col, Button, Table ,Form} from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
 
-const Orders = () => {
+const RepairForm = () => {
   const [metal, setMetal] = useState("");
+  const [code, setCode] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
@@ -105,21 +106,23 @@ const Orders = () => {
   };
 
   const handleBack = () => {
-      navigate('/orderstable');
+    navigate('/salestable');
   };
 
   const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/orders" } });
+    navigate("/customermaster", { state: { from: "/sales" } });
   };
 
   return (
     <div className="main-container">
       <Container className="sales-form-container">
-        <form className="sales-form">
-        <div className="sales-form-left">
+        <Form>
+
+        <div className="sales-form">
+          <div className="sales-form-left">
             <Col className="sales-form-section">
-            <Row>
-                <Col xs={12} md={6}  className="d-flex align-items-center">
+              <Row>
+                <Col xs={12} md={2}  className="d-flex align-items-center">
                   <div style={{ flex: 1 }}>
                   <InputField
                   label="Mobile:"
@@ -142,7 +145,7 @@ const Orders = () => {
                   style={{ marginLeft: '10px', cursor: 'pointer', marginBottom:'20px' }}
                 />
                 </Col>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Customer Name:"
                     name="name"
@@ -151,7 +154,7 @@ const Orders = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Email:"
                     name="email"
@@ -161,7 +164,7 @@ const Orders = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Address1:"
                     name="address1"
@@ -170,7 +173,7 @@ const Orders = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={5}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Address2:"
                     name="address2"
@@ -179,7 +182,7 @@ const Orders = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="City"
                     name="city"
@@ -188,28 +191,28 @@ const Orders = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={1}>
                   <InputField 
-                  label="PinCode" 
+                  label="PIN" 
                   name="pincode"
                   value={formData.pincode}
                   onChange={handleChange}
                   readOnly
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="State Code:"  name="state" value={formData.state_code} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={3}>
                   <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={2}>
                   <InputField label="GSTIN"name="gst_in" value={formData.gst_in} onChange={handleChange} readOnly />
                 </Col>
-                <Col xs={12} md={5}>
+                <Col xs={12} md={2}>
                   <InputField label="PAN" name="pan_card" value={formData.pan_card} onChange={handleChange} readOnly />
                 </Col>
                 
@@ -218,25 +221,38 @@ const Orders = () => {
           </div>
           {/* Right Section */}
           <div className="sales-form-right">
-            <Col className="sales-form-section">
+          <Col className="sales-form-section">          
+          <Row>
+            <InputField label="Date:" type="date" />
+          </Row> 
+          <Row>
+            <InputField label="Invoice Number:" />
+          </Row>             
+          </Col>
+          
+          </div>
+        </div>
+        <div className="sales-form-section"> 
+        <Col >
               <Row>
-                <Col xs={12} md={3}>
+                
+                <Col xs={12} md={2}>
                   <InputField
-                    label="SGJ"
+                    label="BarCode/Rbarcode"
                     type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
                     options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
+                      { value: "BarCode", label: "BarCode" },
+                      { value: "Rbarcode", label: "Rbarcode" },
+                      
                     ]}
                   />
                 </Col>
 
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField
-                    label="Floor"
+                    label="P ID"
                     type="select"
                     value={metal}
                     onChange={(e) => setMetal(e.target.value)}
@@ -247,98 +263,116 @@ const Orders = () => {
                     ]}
                   />
                 </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="T" />
-                </Col>
+                
                 <Col xs={12} md={3}>
                   <InputField
-                    label="PEARLS"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
+                    label="Product Name"
+                    
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={2}>
                   <InputField
-                    label="ItemType"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
+                    label="Metal Type"
+                                       
                   />
                 </Col>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={2}>
                   <InputField
                     label="Design Name"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
+                    
                   />
                 </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="Q" />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="G" />
+                <Col xs={12} md={1}>
+                  <InputField label="Purity" />
                 </Col>
                 <Col xs={12} md={2}>
-                  <InputField label="S" />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="N" />
+                  <InputField label="Gross Weight" />
                 </Col>
                 <Col xs={12} md={2}>
+                  <InputField label="Stone Weight" />
+                </Col>
+                <Col xs={12} md={2}>
+                  <InputField label="Weight BW" />
+                </Col>
+                <Col xs={12} md={2}>
+                  <InputField label="Stone Price" />
+                </Col>
+                
+                <Col xs={12} md={1}>
+                  <InputField label="VA On" />
+                </Col>
+                <Col xs={12} md={1}>
                   <InputField label="VA%" />
                 </Col>
                 <Col xs={12} md={2}>
-                  <InputField label="W" />
+                  <InputField label="Wastage Weight" />
                 </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="T" />
+                
+                <Col xs={12} md={2}>
+                  <InputField label="Total Weight AW" />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={1}>
                   <InputField
-                    label="MC"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "MC/GM", label: "MC" },
-
-                    ]}
+                    label="MC on"                   
                   />
                 </Col>
                 <Col xs={12} md={2}>
-                  <InputField label="HC/ct" />
+                  <InputField
+                    label="MC Per Gram"                   
+                  />
                 </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="H.C." />
+                <Col xs={12} md={2}>
+                  <InputField
+                    label="Making Charges"                   
+                  />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
+                  <InputField label="Rate" />
+                </Col>
+                <Col xs={12} md={2}>
+                  <InputField label="Total Price" />
+                </Col>
+               
+                {/* <Col xs={12} md={3}>
                   <InputField label="Rodium" />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Note" />
-                </Col>
+                </Col>   */}
+                <Col xs={12} md={1}>
+                <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
+                </Col>              
               </Row>
             </Col>
-          </div>
-        </form>
-        <form className="sales-form2">
+        </div>
+
+        <div className="sales-form-section">
+          <Table bordered hover responsive>
+          <thead>
+          <tr>            
+            <th>Sadashri Jewels</th>
+            <th>Code</th>
+            <th>P ID</th>
+            <th>Product Name</th>
+            <th>Design Name</th>
+            <th>Purity</th>
+            <th>Gross Weight</th>
+            <th>Stone Weight</th>
+            <th>Stone Price</th>
+            <th>Weight BW</th>
+            <th>Wastage On</th>
+            <th>VA%</th>
+            <th>Wastage Weight</th>
+            <th>Total Weight AW</th>
+            <th>Making Charges on</th>
+            <th>MC Per Gram</th>
+            <th>Making Charges</th>
+            <th>Rodium</th>
+          </tr>
+        </thead>
+            <tbody>
+
+            </tbody>
+          </Table>
+        </div>
+        <div className="sales-form2">
           <div className="sales-form-third">
             <Col className="sales-form-section">
               <Row >
@@ -466,12 +500,6 @@ const Orders = () => {
             <Col className="sales-form-section">
               <Row>
                 <h4 className="mb-3">Payment Details</h4>
-
-                <Col xs={12} md={4}>
-                  <InputField label="Walkin" />
-                </Col>
-
-
                 <Col xs={12} md={4}>
                   <InputField label="Cash" />
                 </Col>
@@ -493,57 +521,14 @@ const Orders = () => {
                 <Col xs={12} md={4}>
                   <InputField label="Amt" />
                 </Col>
-                <Col xs={12} md={4}>
-                  <Button type="submit" variant="primary">Save</Button>
+                <Col xs={12} md={2}>
+                  <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
                 </Col>
-
-              </Row>
-            </Col>
-          </div>
-
-        </form>
-
-
-        <Row className="sales-form-section">
-          <Table bordered hover responsive>
-            <thead>
-              <tr>
-                <th>SI</th>
-                <th>Tagno</th>
-                <th>Pc</th>
-                <th>Item</th>
-                <th>Design</th>
-                <th>Purity</th>
-                <th>Gross</th>
-                <th>Stone</th>
-                <th>Net</th>
-                <th>W%</th>
-                <th>Total[Gms]</th>
-                <th>Rate</th>
-                <th>Amount[M]</th>
-                <th>MC/G</th>
-                <th>MC</th>
-                <th>SLAmt</th>
-                <th>HC</th>
-                <th>Total Amt</th>
-                <th>Staff</th>
-                <th>OF</th>
-                <th>Tax%</th>
-              </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
-          </Table>
-
-        </Row>
-
-
-
-
-        {/* Buttons */}
-        <div className="form-buttons">
-          <Button
+                <Col xs={12} md={2}>
+                <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
+                </Col>
+                <Col xs={12} md={2}>
+                <Button
             type="button"
             className="cus-back-btn"
             variant="secondary"
@@ -551,11 +536,20 @@ const Orders = () => {
           >
             cancel
           </Button>
-          <Button type="submit" variant="primary">Print</Button>
+                </Col>
+                
+              </Row>
+            </Col>
+          </div>
+
         </div>
+
+        {/* Buttons */}
+                        
+        </Form>
       </Container>
     </div>
   );
 };
 
-export default Orders;
+export default RepairForm;

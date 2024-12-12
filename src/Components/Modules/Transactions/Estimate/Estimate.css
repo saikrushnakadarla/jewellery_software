@@ -15,6 +15,15 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: rgba(163, 110, 41, 0.08);
+    margin-top: -40px;
+  }
+
+  .estimate-form-section2{
+    margin-bottom: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: rgba(163, 110, 41, 0.08);
   }
   
   .input-with-suffix {

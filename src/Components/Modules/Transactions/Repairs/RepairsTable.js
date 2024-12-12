@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import DataTable from '../../../Pages/InputField/TableLayout';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { Button, Row, Col, Modal, Form, Overlay, Popover, Table } from 'react-bootstrap';
+import { FaTrash } from 'react-icons/fa';
 import { FiAlignJustify } from 'react-icons/fi';
-import { Button, Row, Col, Overlay, Popover, Modal, Form } from 'react-bootstrap';
+import DataTable from '../../../Pages/InputField/TableLayout';
 import './RepairsTable.css';
+import { saveToLocalStorage, getFromLocalStorage, clearLocalStorage } from './LocalStorageUtils';
 import baseURL from '../../../../Url/NodeBaseURL';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
-
+  const [repairs, setRepairs] = useState([]);
   const [showPopover, setShowPopover] = useState(false);
   const [popoverData, setPopoverData] = useState({ repairId: null, target: null });
   const [showModal, setShowModal] = useState(false);
@@ -22,9 +23,8 @@ const RepairsTable = () => {
     rate_type: '',
     rate: '',
   });
-  const [repairs, setRepairs] = useState([]);
-  const [repairDetails, setRepairDetails] = useState([]);
-  const [selectedRepair, setSelectedRepair] = useState(null);
+  const [localDetails, setLocalDetails] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
 
   // Fetch repairs
   useEffect(() => {
@@ -34,10 +34,15 @@ const RepairsTable = () => {
         setRepairs(response.data);
       } catch (error) {
         console.error('Error fetching repairs:', error);
-      } 
+      }
     };
 
     fetchRepairs();
+  }, []);
+
+  useEffect(() => {
+    const storedDetails = getFromLocalStorage('repairDetails') || [];
+    setLocalDetails(storedDetails);
   }, []);
 
   const handleInputChange = (e) => {
@@ -49,123 +54,35 @@ const RepairsTable = () => {
   };
 
 const handlePopoverToggle = (event, repairId) => {
-
-
-  const repair = repairs.find((r) => r.repair_id === repairId);
-
-
-  setSelectedRepair(repair);
-  setPopoverData({
-    repairId: popoverData.repairId === repairId ? null : repairId,
-    target: event.target,
-  });
-  setShowPopover((prev) => popoverData.repairId !== repairId);
-};
+    setPopoverData({
+      repairId,
+      target: event.target,
+    });
+    setShowPopover((prev) => popoverData.repairId !== repairId);
+  };
 
   const handleReceiveFromWorkshop = () => {
-    // if (!selectedRepair) {
-    //   console.error('No repair selected!');
-    //   return;
-    // }
     setShowPopover(false);
     setShowModal(true);
   };
 
-  const fetchRepairDetails = async () => {
-    try {
-      const response = await axios.get(`${baseURL}/get/repair-details`);
-      setRepairDetails(response.data);
-    } catch (error) {
-      console.error('Error fetching repair details:', error);
-    }
-  };
-  useEffect(() => {
-    fetchRepairDetails();
-  }, []);
 
-  const clearForm = () => {
-    setFormData({
-      metal_type: '',
-      description: '',
-      weight: '',
-      qty: '',
-      rate_type: '',
-      rate: '',
-    });
-  };
-  
-const handleEditDetail = (detail) => {
-  setFormData(detail); // Populate form with selected detail
-  setSelectedRepair(detail); // Set selected repair detail for update
-  setShowModal(true); // Open modal
-};
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  // if (!selectedRepair) {
-  //   console.error('No repair selected.');
-  //   return;
-  // }
-
-  try {
-    if (selectedRepair.id) {
-      // Update existing repair detail
-      const response = await axios.put(
-        `${baseURL}/update/repair-details/${selectedRepair.id}`,
-        formData
-      );
-
-      if (response.status === 200) {
-        console.log('Details updated successfully');
-        fetchRepairDetails(); // Refresh details
-        clearForm(); // Clear form fields
-        setSelectedRepair(null); // Reset selected repair
-
-        // Update repair status
-        await handleUpdateStatus(selectedRepair.repair_id, 'Receive from Workshop');
-      }
-    } else {
-      // Add new repair detail
-      const { repair_id, repair_no } = selectedRepair;
-      const dataToSend = { ...formData, repair_id, repair_no };
-      const response = await axios.post(`${baseURL}/add/repair-details`, dataToSend);
-
-      if (response.status === 200) {
-        console.log('Details added successfully');
-        fetchRepairDetails(); // Refresh details
-        clearForm(); // Clear form fields
-        setShowModal(false); // Close modal
-
-        // Update repair status
-        await handleUpdateStatus(selectedRepair.repair_id, 'Receive from Workshop');
-      }
-    }
-  } catch (error) {
-    console.error('Error adding or updating repair details:', error);
-  }
-};
-
-
-
-  const handleDeleteDetail = async (id) => {
-    try {
-      await axios.delete(`${baseURL}/delete/repair-details/${id}`);
-      console.log('Detail deleted successfully');
-      fetchRepairDetails(); // Refresh the table
-    } catch (error) {
-      console.error('Error deleting detail:', error);
-    }
-  };
 
   // Update repair status
   const handleUpdateStatus = async (repairId, status) => {
+    // Show confirmation dialog
+    const isConfirmed = window.confirm("Are you sure you want to update the status?");
+  
+    if (!isConfirmed) {
+      return; // If user cancels, exit the function
+    }
+  
     try {
       const response = await axios.post(`${baseURL}/update/repair-status/${repairId}`, {
         repair_id: repairId,
         status,
       });
-
+  
       if (response.status === 200) {
         setRepairs((prev) =>
           prev.map((repair) =>
@@ -177,6 +94,7 @@ const handleSubmit = async (e) => {
       console.error('Error updating status:', error);
     }
   };
+  
 
   // Define table columns
   const columns = React.useMemo(
@@ -214,6 +132,60 @@ const handleSubmit = async (e) => {
     ],
     [popoverData.repairId]
   );
+
+
+  const handleAddToLocalDetails = () => {
+    if (editIndex !== null) {
+      const updatedDetails = [...localDetails];
+      updatedDetails[editIndex] = formData;
+      setLocalDetails(updatedDetails);
+      setEditIndex(null);
+    } else {
+      setLocalDetails([...localDetails, formData]);
+    }
+    setFormData({ metal_type: '', description: '', weight: '', qty: '', rate_type: '', rate: '' });
+  };
+
+  const handleEdit = (index) => {
+    setFormData(localDetails[index]);
+    setEditIndex(index);
+  };
+
+  const handleDelete = (index) => {
+    const updatedDetails = localDetails.filter((_, i) => i !== index);
+    setLocalDetails(updatedDetails);
+  };
+
+
+  const handleSubmitDetails = async () => {
+    if (localDetails.length === 0) {
+      alert('No details to submit');
+      return;
+    }
+
+    try {
+      await axios.post(`${baseURL}/add/repair-details`, {
+        repair_id: popoverData.repairId,
+        details: localDetails,
+      });
+
+      // Clear local storage and local state
+      clearLocalStorage('repairDetails');
+      setLocalDetails([]);
+      setRepairs((prev) =>
+        prev.map((repair) =>
+          repair.repair_id === popoverData.repairId
+            ? { ...repair, status: 'Receive from Workshop' }
+            : repair
+        )
+      );
+
+      setShowModal(false);
+    } catch (error) {
+      console.error('Error submitting details:', error);
+    }
+  };
+
 
   return (
     <div className="main-container">
@@ -272,7 +244,7 @@ const handleSubmit = async (e) => {
             <Modal.Title>Receive from Workshop</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form onSubmit={handleSubmit}>
+            <Form >
               <Row>
                 <Col md={6}>
                   <Form.Group controlId="formMetalType">
@@ -348,54 +320,49 @@ const handleSubmit = async (e) => {
                   </Form.Group>
                 </Col>
               </Row>
-              <Button type="submit" variant="primary" className="mt-3 mb-3">
-        {selectedRepair?.id ? 'Update' : 'Add'}
-      </Button>
+              <Button className="mt-3" onClick={handleAddToLocalDetails}>
+              Add
+            </Button>
             </Form>
-            <table className="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Metal Type</th>
-            <th>Description</th>
-            <th>Weight</th>
-            <th>Qty</th>
-            <th>Rate Type</th>
-            <th>Rate</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {repairDetails
-            .filter((detail) => detail.repair_id === selectedRepair?.repair_id)
-            .map((detail) => (
-              <tr key={detail.id}>
-                <td>{detail.metal_type}</td>
-                <td>{detail.description}</td>
-                <td>{detail.weight}</td>
-                <td>{detail.qty}</td>
-                <td>{detail.rate_type}</td>
-                <td>{detail.rate}</td>
-                <td >
-                  <div className="d-flex align-items-center">
-                  <button
-                   className="action-button edit-button"
-                    onClick={() => handleEditDetail(detail)}
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    className="action-button delete-button"
-                    onClick={() => handleDeleteDetail(detail.id)}
-                  >
-                    <FaTrash />
-                  </button>
-                  </div>
-                </td>
+            <Table striped bordered hover className="mt-4">
+            <thead>
+              <tr>
+                <th>S No</th>
+                <th>Metal Type</th>
+                <th>Description</th>
+                <th>Weight</th>
+                <th>Qty</th>
+                <th>Rate Type</th>
+                <th>Rate</th>
+                <th>Actions</th>
               </tr>
-            ))}
-        </tbody>
-      </table>
-          </Modal.Body>
+            </thead>
+            <tbody>
+              {localDetails.map((detail, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{detail.metal_type}</td>
+                  <td>{detail.description}</td>
+                  <td>{detail.weight}</td>
+                  <td>{detail.qty}</td>
+                  <td>{detail.rate_type}</td>
+                  <td>{detail.rate}</td>
+                  <td>
+                    <Button variant="warning" size="sm" onClick={() => handleEdit(index)}>
+                      Edit
+                    </Button>{' '}
+                    <Button variant="danger" size="sm" onClick={() => handleDelete(index)}>
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleSubmitDetails}>Submit</Button>
+        </Modal.Footer>
         </Modal>
       </div>
     </div>
