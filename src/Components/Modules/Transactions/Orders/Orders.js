@@ -115,10 +115,13 @@ const RepairForm = () => {
 
   return (
     <div className="main-container">
-      <Container className="sales-form-container">
-        <Form>
 
+      <Container className="sales-form-container">
+      
+        <Form>
+        <h3 style={{marginTop:'-45px', marginBottom:'10px', textAlign:'left', color:'#a36e29'}}>Orders</h3>
         <div className="sales-form">
+        
           <div className="sales-form-left">
             <Col className="sales-form-section">
               <Row>
@@ -267,35 +270,58 @@ const RepairForm = () => {
                 <Col xs={12} md={3}>
                   <InputField
                     label="Product Name"
-                    
+                    type="select"
+                    value={metal}
+                    onChange={(e) => setMetal(e.target.value)}
+                    options={[
+                      { value: "916HM", label: "916HM" },
+                    ]}
                   />
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField
                     label="Metal Type"
-                                       
+                    type="select"
+                    value={metal}
+                    onChange={(e) => setMetal(e.target.value)}
+                    options={[
+                      { value: "916HM", label: "916HM" },
+                    ]}                   
                   />
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField
                     label="Design Name"
-                    
+                    type="select"
+                    value={metal}
+                    onChange={(e) => setMetal(e.target.value)}
+                    options={[
+                      { value: "916HM", label: "916HM" },
+                    ]}  
                   />
                 </Col>
                 <Col xs={12} md={1}>
-                  <InputField label="Purity" />
+                  <InputField 
+                    label="Purity" 
+                    type="select"
+                    value={metal}
+                    onChange={(e) => setMetal(e.target.value)}
+                    options={[
+                      { value: "916HM", label: "916HM" },
+                    ]}  
+                  />
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField label="Gross Weight" />
                 </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="Stone Weight" />
+                <Col xs={12} md={1}>
+                  <InputField label="St Weight" />
                 </Col>
-                <Col xs={12} md={2}>
+                <Col xs={12} md={1}>
                   <InputField label="Weight BW" />
                 </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="Stone Price" />
+                <Col xs={12} md={1}>
+                  <InputField label="St Price" />
                 </Col>
                 
                 <Col xs={12} md={1}>
@@ -304,8 +330,8 @@ const RepairForm = () => {
                 <Col xs={12} md={1}>
                   <InputField label="VA%" />
                 </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="Wastage Weight" />
+                <Col xs={12} md={1}>
+                  <InputField label="WW" />
                 </Col>
                 
                 <Col xs={12} md={2}>
@@ -316,9 +342,9 @@ const RepairForm = () => {
                     label="MC on"                   
                   />
                 </Col>
-                <Col xs={12} md={2}>
+                <Col xs={12} md={1}>
                   <InputField
-                    label="MC Per Gram"                   
+                    label="MC/Gm"                   
                   />
                 </Col>
                 <Col xs={12} md={2}>
@@ -326,8 +352,14 @@ const RepairForm = () => {
                     label="Making Charges"                   
                   />
                 </Col>
-                <Col xs={12} md={2}>
+                <Col xs={12} md={1}>
                   <InputField label="Rate" />
+                </Col>
+                <Col xs={12} md={1}>
+                  <InputField label="Tax%" />
+                </Col>
+                <Col xs={12} md={1}>
+                  <InputField label="Tax Amt" />
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField label="Total Price" />

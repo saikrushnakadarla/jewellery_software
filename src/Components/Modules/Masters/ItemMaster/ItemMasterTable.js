@@ -1,164 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
-import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 import './ItemMasterTable.css';
 
 const ItemMasterTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store table data
+  const [loading, setLoading] = useState(true); // State for loading
+  const [error, setError] = useState(null); // State for error handling
+
+  // Columns definition for DataTable
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'Product Name:',
-        accessor: 'productname',
-      },
-        
-      {
-        Header: 'Categories',
-        accessor: 'categories',
-      },
-      {
-        Header: 'Item Prefix',
-        accessor: 'itemprefix',
-      },
-      {
-        Header: 'Short Name:',
-        accessor: 'shortname',
-      },
-      {
-        Header: 'Sale Account Head',
-        accessor: 'saleaccounthead',
-      },
-      {
-        Header: 'Purchase Account Head:',
-        accessor: 'purchaseaccounthead',
-      },
-      {
-        Header: 'Status',
-        accessor: 'status',
-      },
-      {
-        Header: 'Tax Slab',
-        accessor: 'taxslab',
-      },
-      {
-        Header: 'HSN Code',
-        accessor: 'hsncode',
-      },
-      {
-        Header: 'OP.Qty:',
-        accessor: 'opqty',
-      },
-      {
-        Header: 'OP.Value:',
-        accessor: 'opvalue',
-      },
-      {
-        Header: 'OP.Weight:',
-        accessor: 'opweight',
-      },
-      {
-        Header: 'Purity',
-        accessor: 'purity',
-      },
-      {
-        Header: 'HUID No:',
-        accessor: 'huidno',
-      },
-      {
-        Header: 'Pricing',
-        accessor: 'pricing',
-      },
-      {
-        Header: 'P ID:',
-        accessor: 'pid',
-      },
-      // {
-      //   Header: 'Product Name:',
-      //   accessor: 'product_name',
-      // },
-      {
-        Header: 'Category',
-        accessor: 'category',
-      },
-      {
-        Header: 'PCode',
-        accessor: 'pcode',
-      },
-      {
-        Header: 'Gross Weight:',
-        accessor: 'grossweight',
-      },
-      {
-        Header: 'Stones Weight:',
-        accessor: 'stonesweight',
-      },
-      {
-        Header: 'Stones Price:',
-        accessor: 'stonesprice',
-      },
-      {
-        Header: 'Weight WW:',
-        accessor: 'weightww',
-      },
-      {
-        Header: 'Wastage On:',
-        accessor: 'wastageon',
-      },
-      {
-        Header: 'Wastage:',
-        accessor: 'wastage',
-      },
-      {
-        Header: '%:',
-        accessor: 'percentage',
-      },
-      {
-        Header: 'Weight:',
-        accessor: 'weight',
-      },
-      {
-        Header: 'Making Chaeges::',
-        accessor: 'makingchaeges',
-      },
-      {
-        Header: 'Cal:',
-        accessor: 'cal',
-      },
-      {
-        Header: 'Tax:',
-        accessor: 'tax',
-      },
-      {
-        Header: 'Stack Point:',
-        accessor: 'stackpoint',
-      },
-      {
-        Header: 'Action',
-        
-      },
-      
+      { Header: 'Product Name:', accessor: 'product_name' },
+      { Header: 'Categories', accessor: 'Category' },
+      { Header: 'Item Prefix', accessor: 'item_prefix' },
+      { Header: 'Short Name:', accessor: 'short_name' },
+     
     ],
     []
   );
 
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/get/products');
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const result = await response.json();
+        setData(result); // Populate the data state with API response
+      } catch (error) {
+        setError(error.message); // Handle any errors during fetch
+      } finally {
+        setLoading(false); // Set loading to false
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleCreate = () => {
-    navigate('/itemmaster'); // Navigate to the /estimates page
+    navigate('/itemmaster'); // Navigate to the itemmaster creation page
   };
+
+  // Handle loading and error states
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className="main-container">
       <div className="itemmaster-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Products</h3>
-            <Button className='create_but' onClick={handleCreate} variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+            <Button
+              className="create_but"
+              onClick={handleCreate}
+              variant="success"
+              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+            >
               + Create
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data} /> {/* Render the table with fetched data */}
       </div>
     </div>
   );
