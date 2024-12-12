@@ -34,7 +34,7 @@ import Sales from './Components/Modules/Transactions/Sales/SalesForm';
 import MetalType from './Components/Modules/Masters/MetalType/MetalType';
 import DesignMaster from './Components/Modules/Masters/DesignMaster/DesignMaster';
 import Purity from './Components/Modules/Masters/Purity/Purity';
-
+import Rates from './Components/Modules/Masters/Rates/Rates';
 import SalesTable from './Components/Modules/Transactions/Sales/SalesTable';
 import URDPurchasetable from './Components/Modules/Transactions/URDPurchase/URDPurchasetable';
 import PurityTable from './Components/Modules/Masters/Purity/PurityTable';
@@ -86,6 +86,7 @@ function App() {
         <Route path="/sales" element={<Sales />} />
         <Route path="/metaltype" element={<MetalType />}/>
         <Route path="/purity" element={<Purity />}/>
+        <Route path="/rates" element={<Rates />}/>
         <Route path="/designmaster" element={<DesignMaster />}/>
         {/* <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/> */}
         <Route path="/salestable" element={<SalesTable />} />
