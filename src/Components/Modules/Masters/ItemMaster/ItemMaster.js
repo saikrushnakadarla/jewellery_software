@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import InputField from "./Inputfield"; // Assuming you have this component
 import StoneDetailsModal from "../../Transactions/StockEntry/StoneDetailsModal";
 import "./ItemMaster.css";
+import { BsCursor } from "react-icons/bs";
 
 const FormWithTable = () => {
   const [formData, setFormData] = useState({
@@ -57,11 +58,11 @@ const FormWithTable = () => {
 
   const maintainTagsStyle = !isMaintainTagsChecked
     ? {}
-    : { backgroundColor: "#f5f5f5", color: "#888" };
+    : { backgroundColor: "#f5f5f5", color: "#888", };
 
   const openingTagsStyle = isMaintainTagsChecked
     ? {}
-    : { backgroundColor: "#f5f5f5", color: "#888" };
+    : { backgroundColor: "#f5f5f5", color: "#888", cursor: "not-allowed" };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -530,12 +531,13 @@ const FormWithTable = () => {
                 type="submit"
                 className="btn btn-primary"
                 readOnly={!isMaintainTagsChecked}
+                disabled={!isMaintainTagsChecked} // Disable the button when isMaintainTagsChecked is false
                 style={{
-                  backgroundColor: "#a36e29",
-                  borderColor: "#a36e29",
+                  backgroundColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
+                  borderColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
                   marginLeft: "95%",
                   marginTop: "15px",
-                  ...openingTagsStyle
+                  ...openingTagsStyle,
                 }}
               >
                 Add
