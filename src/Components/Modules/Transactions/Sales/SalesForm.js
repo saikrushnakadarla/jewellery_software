@@ -117,11 +117,12 @@ const RepairForm = () => {
     <div className="main-container">
       <Container className="sales-form-container">
         <Form>
+
         <div className="sales-form">
           <div className="sales-form-left">
             <Col className="sales-form-section">
               <Row>
-                <Col xs={12} md={6}  className="d-flex align-items-center">
+                <Col xs={12} md={2}  className="d-flex align-items-center">
                   <div style={{ flex: 1 }}>
                   <InputField
                   label="Mobile:"
@@ -144,7 +145,7 @@ const RepairForm = () => {
                   style={{ marginLeft: '10px', cursor: 'pointer', marginBottom:'20px' }}
                 />
                 </Col>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Customer Name:"
                     name="name"
@@ -153,7 +154,7 @@ const RepairForm = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Email:"
                     name="email"
@@ -163,7 +164,7 @@ const RepairForm = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Address1:"
                     name="address1"
@@ -172,7 +173,7 @@ const RepairForm = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={5}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Address2:"
                     name="address2"
@@ -181,7 +182,7 @@ const RepairForm = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="City"
                     name="city"
@@ -190,28 +191,28 @@ const RepairForm = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={1}>
                   <InputField 
-                  label="PinCode" 
+                  label="PIN" 
                   name="pincode"
                   value={formData.pincode}
                   onChange={handleChange}
                   readOnly
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="State Code:"  name="state" value={formData.state_code} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={6}>
+                <Col xs={12} md={3}>
                   <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={2}>
                   <InputField label="GSTIN"name="gst_in" value={formData.gst_in} onChange={handleChange} readOnly />
                 </Col>
-                <Col xs={12} md={5}>
+                <Col xs={12} md={2}>
                   <InputField label="PAN" name="pan_card" value={formData.pan_card} onChange={handleChange} readOnly />
                 </Col>
                 
@@ -220,10 +221,22 @@ const RepairForm = () => {
           </div>
           {/* Right Section */}
           <div className="sales-form-right">
-            <Col className="sales-form-section">
+          <Col className="sales-form-section">          
+          <Row>
+            <InputField label="Date:" type="date" />
+          </Row> 
+          <Row>
+            <InputField label="Invoice Number:" />
+          </Row>             
+          </Col>
+          
+          </div>
+        </div>
+        <div className="sales-form-section"> 
+        <Col >
               <Row>
                 
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField
                     label="BarCode/Rbarcode"
                     type="select"
@@ -237,7 +250,7 @@ const RepairForm = () => {
                   />
                 </Col>
 
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField
                     label="P ID"
                     type="select"
@@ -257,78 +270,80 @@ const RepairForm = () => {
                     
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField
                     label="Metal Type"
                                        
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={2}>
                   <InputField
                     label="Design Name"
                     
                   />
                 </Col>
-                <Col xs={12} md={2}>
+                <Col xs={12} md={1}>
                   <InputField label="Purity" />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Gross Weight" />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Stone Weight" />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Weight BW" />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Stone Price" />
                 </Col>
                 
-                <Col xs={12} md={3}>
+                <Col xs={12} md={1}>
                   <InputField label="VA On" />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={1}>
                   <InputField label="VA%" />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Wastage Weight" />
                 </Col>
                 
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Total Weight AW" />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={1}>
                   <InputField
                     label="MC on"                   
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField
                     label="MC Per Gram"                   
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField
                     label="Making Charges"                   
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Rate" />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Total Price" />
                 </Col>
                
-                <Col xs={12} md={3}>
+                {/* <Col xs={12} md={3}>
                   <InputField label="Rodium" />
-                </Col>
-                
+                </Col>   */}
+                <Col xs={12} md={1}>
+                <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
+                </Col>              
               </Row>
             </Col>
-          </div>
         </div>
-        <Row className="sales-form-section">
+
+        <div className="sales-form-section">
           <Table bordered hover responsive>
           <thead>
           <tr>            
@@ -356,8 +371,7 @@ const RepairForm = () => {
 
             </tbody>
           </Table>
-
-        </Row>
+        </div>
         <div className="sales-form2">
           <div className="sales-form-third">
             <Col className="sales-form-section">

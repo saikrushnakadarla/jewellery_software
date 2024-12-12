@@ -118,8 +118,8 @@ const Orders = () => {
         <form className="sales-form">
         <div className="sales-form-left">
             <Col className="sales-form-section">
-              <Row>
-              <Col xs={12} md={6}  className="d-flex align-items-center">
+            <Row>
+                <Col xs={12} md={6}  className="d-flex align-items-center">
                   <div style={{ flex: 1 }}>
                   <InputField
                   label="Mobile:"
@@ -200,7 +200,10 @@ const Orders = () => {
                 <Col xs={12} md={3}>
                   <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={5}>
+                <Col xs={12} md={3}>
+                  <InputField label="State Code:"  name="state" value={formData.state_code} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={6}>
                   <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={4}>

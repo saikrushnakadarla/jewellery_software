@@ -20,11 +20,11 @@
 }
 
 .sales-form-left {
-  flex: 0 0 50%; /* 80% width */
+  flex: 0 0 80%; /* 80% width */
 }
 
 .sales-form-right {
-  flex: 0 0 50%; /* 20% width */
+  flex: 0 0 20%; /* 20% width */
 }
 
 .sales-form2 {
@@ -48,6 +48,8 @@
   border-radius: 8px;
   background-color: rgba(163, 110, 41, 0.08);
 }
+
+
 
 .form-row {
   display: flex;
