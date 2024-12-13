@@ -16,14 +16,15 @@ const FormWithTable = () => {
     sale_account_head: "",
     purchase_account_head: "",
     tax_slab: "",
+    tax_slab_id:"",
     hsn_code: "",
     op_qty: 0,
     op_value: "",
     op_weight: 0,
-    maintain_tags:false, // Default as false
+    maintain_tags: false, // Default as false
     Tag_ID: "",
     Prefix: "tag",
-    item_prefix:"",
+    item_prefix: "",
     Category: "Gold", // Set a default value for Category
     Purity: "",
     purity: "",
@@ -47,6 +48,7 @@ const FormWithTable = () => {
     Design_Master: "gold",
     product_name: "",
   });
+
 
   const [showModal, setShowModal] = useState(false);
   const handleOpenModal = () => setShowModal(true);
@@ -74,88 +76,104 @@ const FormWithTable = () => {
     ? {}
     : { backgroundColor: "#f5f5f5", color: "#888", cursor: "not-allowed" };
 
-      const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
-      };
-      
-      const handleAddOpenTagEntry = (e) => {
-        e.preventDefault();
-      
-        const newEntry = {
-          Pricing: formData.Pricing,
-          Tag_ID: formData.Tag_ID,
-          Prefix: formData.Prefix,
-          Category: formData.Category,
-          Purity: formData.Purity,
-          PCode_BarCode: formData.PCode_BarCode,
-          Gross_Weight: formData.Gross_Weight,
-          Stones_Weight: formData.Stones_Weight,
-          Stones_Price: formData.Stones_Price,
-          WastageWeight: formData.WastageWeight,
-          HUID_No: formData.HUID_No,
-          Wastage_On: formData.Wastage_On,
-          Wastage_Percentage: formData.Wastage_Percentage,
-          status: formData.status,
-          Source: formData.Source,
-          Stock_Point: formData.Stock_Point,
-          Weight_BW: formData.Weight_BW,
-          TotalWeight_AW: formData.TotalWeight_AW,
-          MC_Per_Gram: formData.MC_Per_Gram,
-          Making_Charges_On: formData.Making_Charges_On,
-          Making_Charges: formData.Making_Charges,
-          Design_Master: formData.Design_Master,
-        };
-      
-        // Update the `op_qty` and `op_weight` fields
-        setFormData((prev) => ({
-          ...prev,
-          op_qty: prev.op_qty + 1, // Increment op_qty
-          op_weight: parseFloat(prev.op_weight) + parseFloat(formData.Gross_Weight || 0), // Add Gross_Weight
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+    
+      if (name === "tax_slab") {
+        // Fetch the TaxSlabID based on the selected TaxSlab name
+        const selectedTaxSlab = taxOptions.find((option) => option.value === value);
+        if (selectedTaxSlab) {
+          setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+            tax_slab_id: selectedTaxSlab.id, // Store the TaxSlabID
+          }));
+        }
+      } else {
+        setFormData((prevState) => ({
+          ...prevState,
+          [name]: value,
         }));
-      
-        // Add the new entry to the table
-        setOpenTagsEntries((prev) => [...prev, newEntry]);
-      
-        // Reset other form fields
-        setFormData((prev) => ({
-          ...prev,
-          Pricing: "",
-          Tag_ID: "",
-          Prefix: "Gold",
-          Category: "",
-          Purity: "",
-          PCode_BarCode: "",
-          Gross_Weight: "",
-          Stones_Weight: "",
-          Stones_Price: "",
-          WastageWeight: "",
-          HUID_No: "",
-          Wastage_On: "",
-          Wastage_Percentage: "",
-          status: "",
-          Source: "",
-          Stock_Point: "",
-          Weight_BW: "",
-          TotalWeight_AW: "",
-          MC_Per_Gram: "",
-          Making_Charges_On: "",
-          Making_Charges: "",
-          Design_Master: "",
-        }));
-      };
-      
-      
-      useEffect(() => {
-        const grossWeight = parseFloat(formData.Gross_Weight) || 0;
-        const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
-        const weightBW = grossWeight - stonesWeight;
+      }
+    };
 
-        setFormData((prev) => ({
-            ...prev,
-            Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
-        }));
-    }, [formData.Gross_Weight, formData.Stones_Weight]);
+  const handleAddOpenTagEntry = (e) => {
+    e.preventDefault();
+
+    const newEntry = {
+      Pricing: formData.Pricing,
+      Tag_ID: formData.Tag_ID,
+      Prefix: formData.Prefix,
+      Category: formData.Category,
+      Purity: formData.Purity,
+      PCode_BarCode: formData.PCode_BarCode,
+      Gross_Weight: formData.Gross_Weight,
+      Stones_Weight: formData.Stones_Weight,
+      Stones_Price: formData.Stones_Price,
+      WastageWeight: formData.WastageWeight,
+      HUID_No: formData.HUID_No,
+      Wastage_On: formData.Wastage_On,
+      Wastage_Percentage: formData.Wastage_Percentage,
+      status: formData.status,
+      Source: formData.Source,
+      Stock_Point: formData.Stock_Point,
+      Weight_BW: formData.Weight_BW,
+      TotalWeight_AW: formData.TotalWeight_AW,
+      MC_Per_Gram: formData.MC_Per_Gram,
+      Making_Charges_On: formData.Making_Charges_On,
+      Making_Charges: formData.Making_Charges,
+      Design_Master: formData.Design_Master,
+    };
+
+    // Update the `op_qty` and `op_weight` fields
+    setFormData((prev) => ({
+      ...prev,
+      op_qty: prev.op_qty + 1, // Increment op_qty
+      op_weight: parseFloat(prev.op_weight) + parseFloat(formData.Gross_Weight || 0), // Add Gross_Weight
+    }));
+
+    // Add the new entry to the table
+    setOpenTagsEntries((prev) => [...prev, newEntry]);
+
+    // Reset other form fields
+    setFormData((prev) => ({
+      ...prev,
+      Pricing: "",
+      Tag_ID: "",
+      Prefix: "Gold",
+      Category: "",
+      Purity: "",
+      PCode_BarCode: "",
+      Gross_Weight: "",
+      Stones_Weight: "",
+      Stones_Price: "",
+      WastageWeight: "",
+      HUID_No: "",
+      Wastage_On: "",
+      Wastage_Percentage: "",
+      status: "",
+      Source: "",
+      Stock_Point: "",
+      Weight_BW: "",
+      TotalWeight_AW: "",
+      MC_Per_Gram: "",
+      Making_Charges_On: "",
+      Making_Charges: "",
+      Design_Master: "",
+    }));
+  };
+
+
+  useEffect(() => {
+    const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+    const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
+    const weightBW = grossWeight - stonesWeight;
+
+    setFormData((prev) => ({
+      ...prev,
+      Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
+    }));
+  }, [formData.Gross_Weight, formData.Stones_Weight]);
   // Automatically calculate WastageWeight and TotalWeight_AW
   useEffect(() => {
     const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
@@ -166,95 +184,114 @@ const FormWithTable = () => {
     let totalWeight = 0;
 
     if (formData.Wastage_On === "Gross Weight") {
-        wastageWeight = (grossWeight * wastagePercentage) / 100;
-        totalWeight = grossWeight + wastageWeight;
+      wastageWeight = (grossWeight * wastagePercentage) / 100;
+      totalWeight = grossWeight + wastageWeight;
     } else if (formData.Wastage_On === "Weight BW") {
-        wastageWeight = (weightBW * wastagePercentage) / 100;
-        totalWeight = weightBW + wastageWeight;
+      wastageWeight = (weightBW * wastagePercentage) / 100;
+      totalWeight = weightBW + wastageWeight;
     }
 
     setFormData((prev) => ({
-        ...prev,
-        WastageWeight: wastageWeight.toFixed(2),
-        TotalWeight_AW: totalWeight.toFixed(2),
+      ...prev,
+      WastageWeight: wastageWeight.toFixed(2),
+      TotalWeight_AW: totalWeight.toFixed(2),
     }));
-}, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
+  }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
 
-const handleMakingChargesCalculation = () => {
+  const handleMakingChargesCalculation = () => {
     const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
     const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
     const makingCharges = parseFloat(formData.Making_Charges) || 0;
 
     if (formData.Making_Charges_On === "By Weight") {
-        const calculatedMakingCharges = totalWeight * mcPerGram;
-        setFormData((prev) => ({
-            ...prev,
-            Making_Charges: calculatedMakingCharges.toFixed(2),
-        }));
+      const calculatedMakingCharges = totalWeight * mcPerGram;
+      setFormData((prev) => ({
+        ...prev,
+        Making_Charges: calculatedMakingCharges.toFixed(2),
+      }));
     } else if (formData.Making_Charges_On === "Fixed") {
-        const calculatedMcPerGram = makingCharges / totalWeight;
-        setFormData((prev) => ({
-            ...prev,
-            MC_Per_Gram: calculatedMcPerGram.toFixed(2),
-        }));
+      const calculatedMcPerGram = makingCharges / totalWeight;
+      setFormData((prev) => ({
+        ...prev,
+        MC_Per_Gram: calculatedMcPerGram.toFixed(2),
+      }));
     }
-};
+  };
 
+  const [taxOptions, setTaxOptions] = useState([]);
+  useEffect(() => {
+    const fetchProductIds = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/get/taxslabs");
+        const Data = response.data; // Ensure the response structure matches this
+        const options = Data.map((tax) => ({
+          value: tax.TaxSlabName,
+          label: tax.TaxSlabName,
+          id: tax.TaxSlabID, // Ensure you have the TaxSlabID
+        }));
+        setTaxOptions(options);
+      } catch (error) {
+        console.error("Error fetching product IDs:", error);
+      }
+    };
+  
+    fetchProductIds();
+  }, []);
 
-
-useEffect(() => {
+  useEffect(() => {
     handleMakingChargesCalculation();
-}, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
+  }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
 
 
   const handleSave = async () => {
-    try {
-      // Ensure Category and other fields are not empty
-      const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
-  
-      // Save product details
-      const productResponse = await axios.post("http://localhost:5000/api/products", updatedFormData);
-      const { product_id } = productResponse.data;
-  
-      // Append product_id to openTagsEntries
-      const entriesWithProductId = openTagsEntries.map((entry) => ({
-        ...entry,
-        product_id, // Append product_id to entries
-      }));
-  
-      // Save opening tag entries
-      const saveEntriesPromises = entriesWithProductId.map((entry) =>
-        axios.post("http://localhost:5000/api/opening-tags-entry", entry)
-      );
-  
-      await Promise.all(saveEntriesPromises);
-      alert("Data saved successfully!");
-  
-      // Reset the form fields
-      setFormData({
-        product_name: "",
-        rbarcode: "",
-        Category: "",
-        design_master: "",
-        purity: "",
-        item_prefix: "",
-        short_name: "",
-        sale_account_head: "",
-        purchase_account_head: "",
-        status: "",
-        tax_slab: "",
-        hsn_code: "",
-        op_qty: "",
-        op_value: "",
-        op_weight: "",
-        huid_no: "",
-      });
-    } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Failed to save data. Please try again.");
-    }
-  };
-  
+  try {
+    // Ensure Category and other fields are not empty
+    const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
+
+    // Save product details, now including tax_slab_id
+    const productResponse = await axios.post("http://localhost:5000/api/products", updatedFormData);
+    const { product_id } = productResponse.data;
+
+    // Append product_id to openTagsEntries
+    const entriesWithProductId = openTagsEntries.map((entry) => ({
+      ...entry,
+      product_id, // Append product_id to entries
+    }));
+
+    // Save opening tag entries
+    const saveEntriesPromises = entriesWithProductId.map((entry) =>
+      axios.post("http://localhost:5000/api/opening-tags-entry", entry)
+    );
+
+    await Promise.all(saveEntriesPromises);
+    alert("Data saved successfully!");
+
+    // Reset the form fields
+    setFormData({
+      product_name: "",
+      rbarcode: "",
+      Category: "",
+      design_master: "",
+      purity: "",
+      item_prefix: "",
+      short_name: "",
+      sale_account_head: "",
+      purchase_account_head: "",
+      status: "",
+      tax_slab: "",
+      tax_slab_id: "", // Reset tax_slab_id
+      hsn_code: "",
+      op_qty: "",
+      op_value: "",
+      op_weight: "",
+      huid_no: "",
+    });
+  } catch (error) {
+    console.error("Error saving data:", error);
+    alert("Failed to save data. Please try again.");
+  }
+};
+
   const handleBack = () => {
     navigate("/itemmastertable");
   };
@@ -274,7 +311,7 @@ useEffect(() => {
             <div className="form-container">
               <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
               <div className="form-row">
-               
+
                 <InputField
                   label="Product Name:"
                   name="product_name"
@@ -377,10 +414,7 @@ useEffect(() => {
                   type="select"
                   value={formData.tax_slab}
                   onChange={handleChange}
-                  options={[
-                    { value: "ACTIVE", label: "ACTIVE" },
-                    { value: "INACTIVE", label: "INACTIVE" },
-                  ]}
+                  options={taxOptions}
                 />
                 <InputField label="HSN Code:"
                   name="hsn_code"
@@ -651,7 +685,7 @@ useEffect(() => {
                 Add
               </button>
 
-           
+
             </form>
 
             <button
