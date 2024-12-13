@@ -244,6 +244,7 @@ const FormWithTable = () => {
 
 
   const handleSave = async () => {
+
   try {
     // Ensure Category and other fields are not empty
     const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
