@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./SalesForm.css";
 import InputField from "../../../Pages/InputField/InputField";
-import { Container, Row, Col, Button, Table ,Form} from "react-bootstrap";
+import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
-import axios from "axios";
-import { AiOutlinePlus } from "react-icons/ai";
 
 const RepairForm = () => {
-  const [metal, setMetal] = useState("");
-  const [code, setCode] = useState("");
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [data, setData] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -19,10 +15,70 @@ const RepairForm = () => {
     email: "",
     address1: "",
     address2: "",
-    address3: "",
     city: "",
-    
+    product_id: "",
+    product_name: "",
+    metal_type: "",
+    design_name: "",
+    purity: "",
+    gross_weight: "",
+    st_weight: "",
+    weight_bw: "",
+    rate: "",
+    tax: "",
+    barcode: "",
+    stones_price: "",
   });
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/get/products');
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const result = await response.json();
+        setProducts(result);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    const fetchTags = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/get/opening-tags-entry');
+        if (!response.ok) {
+          throw new Error('Failed to fetch tags');
+        }
+        const result = await response.json();
+        setData(result.result);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+
+    const fetchCustomers = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/account-details`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch customers');
+        }
+        const result = await response.json();
+        const customers = result.filter(
+          (item) => item.account_group === 'CUSTOMERS'
+        );
+        setCustomers(customers);
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      }
+    };
+
+    fetchProducts();
+    fetchTags();
+    fetchCustomers();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,223 +88,89 @@ const RepairForm = () => {
     }));
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${baseURL}/get/account-details`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        const result = await response.json();
-  
-        // Filter only suppliers
-        const customers = result.filter(
-          (item) => item.account_group === 'CUSTOMERS'
-        );
-  
-        setCustomers(customers);
-        // setLoading(false);
-        console.log("Customers=",customers)
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
+  const handleBarcodeChange = async (barcode) => {
+    try {
+      const product = products.find((prod) => String(prod.rbarcode) === String(barcode));
+
+      if (product) {
+        setFormData((prevData) => ({
+          ...prevData,
+          barcode: product.rbarcode || "",
+          product_id: product.product_id || "",
+          product_name: product.product_name || "",
+          metal_type: product.Category || "",
+          design_name: product.design_master || "",
+          purity: product.purity || "",
+          gross_weight: "",
+          st_weight: "",
+          stones_price: "",
+        }));
+        return;
       }
-    };
-  
-    fetchData();
-  }, []);
 
-  const handleCustomerChange = (customerId) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      customer_id: customerId, // Ensure customer_id is correctly updated
-    }));
-  
-    const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
-    console.log("Customer Id=",customer)
-  
-    if (customer) {
-      setFormData({
-        ...formData,
-        customer_id: customerId, // Ensure this is correctly set
-        name: customer.account_name, // Set the name field to the selected customer
-        mobile: customer.phone || "",
-        email: customer.email || "",
-        address1: customer.address1 || "",
-        address2: customer.address2 || "",
-        city: customer.city || "",
-        pincode: customer.pincode || "",
-        state: customer.state || "",
-        state_code: customer.state_code || "",
-        aadhar_card: customer.aadhar_card || "",
-        gst_in: customer.gst_in || "",
-        pan_card: customer.pan_card || "",
+      const tag = data.find((tag) => String(tag.PCode_BarCode) === String(barcode));
 
-      });
-    } else {
-      setFormData({
-        ...formData,
-        customer_id: "",
-        name: "",
-        mobile: "",
-        email: "",
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        state: "",
-        state_code: "",
-        aadhar_card: "",
-        gst_in: "",
-        pan_card: "",
-      });
+      if (tag) {
+        const productId = tag.product_id;
+        const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
+        console.log("Product Details=",productDetails)
+
+        setFormData((prevData) => ({
+          ...prevData,
+          barcode: tag.PCode_BarCode || "",
+          product_id: tag.product_id || "",
+          product_name: productDetails?.product_name || "",
+          metal_type: productDetails?.Category || "",
+          design_name: productDetails?.design_master || "",
+          purity: productDetails?.purity || "",
+          gross_weight: tag.gross_weight || "",
+          st_weight: tag.stones_weight || "",
+          stones_price: tag.stones_price || "",
+        }));
+        return;
+      }
+
+      setFormData((prevData) => ({
+        ...prevData,
+        barcode: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        gross_weight: "",
+        st_weight: "",
+        stones_price: "",
+      }));
+    } catch (error) {
+      console.error("Error handling barcode change:", error);
     }
-  };
-
-  const handleBack = () => {
-    navigate('/salestable');
-  };
-
-  const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/sales" } });
   };
 
   return (
     <div className="main-container">
-
       <Container className="sales-form-container">
-      
         <Form>
-        <h3 style={{marginTop:'-45px', marginBottom:'10px', textAlign:'left', color:'#a36e29'}}>Sales</h3>
-        <div className="sales-form">
-        
-          <div className="sales-form-left">
-            <Col className="sales-form-section">
+          <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>Sales</h3>
+          <div className="sales-form-section">
+            <Col>
               <Row>
-                <Col xs={12} md={2}  className="d-flex align-items-center">
-                  <div style={{ flex: 1 }}>
-                  <InputField
-                  label="Mobile:"
-                  name="customer_id"
-                  type="select"
-                  value={formData.mobile || ""}
-                  onChange={(e) => handleCustomerChange(e.target.value)}
-                  options={[
-                    ...customers.map((customer) => ({
-                      value: customer.account_id,
-                      label: customer.mobile, // Use account_name or your preferred field
-                    })),
-                  ]}
-                />
-                </div>
-                <AiOutlinePlus
-                  size={20}
-                  color="black"
-                  onClick={handleAddCustomer}
-                  style={{ marginLeft: '10px', cursor: 'pointer', marginBottom:'20px' }}
-                />
-                </Col>
-                <Col xs={12} md={2}>
-                <InputField
-                    label="Customer Name:"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
-                <Col xs={12} md={2}>
-                <InputField
-                    label="Email:"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
-                <Col xs={12} md={2}>
-                <InputField
-                    label="Address1:"
-                    name="address1"
-                    value={formData.address1}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
-                <Col xs={12} md={2}>
-                <InputField
-                    label="Address2:"
-                    name="address2"
-                    value={formData.address2}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
-                <Col xs={12} md={2}>
-                <InputField
-                    label="City"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField 
-                  label="PIN" 
-                  name="pincode"
-                  value={formData.pincode}
-                  onChange={handleChange}
-                  readOnly
-                  />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="State Code:"  name="state" value={formData.state_code} onChange={handleChange} readOnly/>
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="GSTIN"name="gst_in" value={formData.gst_in} onChange={handleChange} readOnly />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="PAN" name="pan_card" value={formData.pan_card} onChange={handleChange} readOnly />
-                </Col>
-                
-              </Row>
-            </Col>
-          </div>
-          {/* Right Section */}
-          <div className="sales-form-right">
-          <Col className="sales-form-section">          
-          <Row>
-            <InputField label="Date:" type="date" />
-          </Row> 
-          <Row>
-            <InputField label="Invoice Number:" />
-          </Row>             
-          </Col>
-          
-          </div>
-        </div>
-        <div className="sales-form-section"> 
-        <Col >
-              <Row>
-                
                 <Col xs={12} md={2}>
                   <InputField
                     label="BarCode/Rbarcode"
+                    name="barcode"
+                    value={formData.barcode}
+                    onChange={(e) => handleBarcodeChange(e.target.value)}
                     type="select"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
                     options={[
-                      { value: "BarCode", label: "BarCode" },
-                      { value: "Rbarcode", label: "Rbarcode" },
-                      
+                      ...products.map((product) => ({
+                        value: product.rbarcode,
+                        label: product.rbarcode,
+                      })),
+                      ...data.map((tag) => ({
+                        value: tag.PCode_BarCode,
+                        label: tag.PCode_BarCode,
+                      })),
                     ]}
                   />
                 </Col>
@@ -256,328 +178,74 @@ const RepairForm = () => {
                 <Col xs={12} md={2}>
                   <InputField
                     label="P ID"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
+                    name="product_id"
+                    value={formData.product_id}
+                    onChange={(e) => handleChange(e)}
+                    readOnly
                   />
                 </Col>
-                
+
                 <Col xs={12} md={3}>
                   <InputField
                     label="Product Name"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                    ]}
+                    name="product_name"
+                    value={formData.product_name}
+                    onChange={(e) => handleChange(e)}
+                    readOnly
                   />
                 </Col>
+
                 <Col xs={12} md={2}>
                   <InputField
                     label="Metal Type"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                    ]}                   
+                    value={formData.metal_type}
+                    onChange={handleChange}
+                    readOnly
                   />
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField
                     label="Design Name"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                    ]}  
+                    value={formData.design_name}
+                    onChange={handleChange}
+                    readOnly
                   />
                 </Col>
                 <Col xs={12} md={1}>
-                  <InputField 
-                    label="Purity" 
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                    ]}  
-                  />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="Gross Weight" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="St Weight" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="Weight BW" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="St Price" />
-                </Col>
-                
-                <Col xs={12} md={1}>
-                  <InputField label="VA On" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="VA%" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="WW" />
-                </Col>
-                
-                <Col xs={12} md={2}>
-                  <InputField label="Total Weight AW" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField
-                    label="MC on"                   
-                  />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField
-                    label="MC/Gm"                   
-                  />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField
-                    label="Making Charges"                   
-                  />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="Rate" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="Tax%" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="Tax Amt" />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="Total Price" />
-                </Col>
-               
-                {/* <Col xs={12} md={3}>
-                  <InputField label="Rodium" />
-                </Col>   */}
-                <Col xs={12} md={1}>
-                <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
-                </Col>              
-              </Row>
-            </Col>
-        </div>
-
-        <div className="sales-form-section">
-          <Table bordered hover responsive>
-          <thead>
-          <tr>            
-            <th>Sadashri Jewels</th>
-            <th>Code</th>
-            <th>P ID</th>
-            <th>Product Name</th>
-            <th>Design Name</th>
-            <th>Purity</th>
-            <th>Gross Weight</th>
-            <th>Stone Weight</th>
-            <th>Stone Price</th>
-            <th>Weight BW</th>
-            <th>Wastage On</th>
-            <th>VA%</th>
-            <th>Wastage Weight</th>
-            <th>Total Weight AW</th>
-            <th>Making Charges on</th>
-            <th>MC Per Gram</th>
-            <th>Making Charges</th>
-            <th>Rodium</th>
-          </tr>
-        </thead>
-            <tbody>
-
-            </tbody>
-          </Table>
-        </div>
-        <div className="sales-form2">
-          <div className="sales-form-third">
-            <Col className="sales-form-section">
-              <Row >
-                <h4 className="mb-3">Old</h4>
-                <Col xs={12} md={3}>
-                  <InputField
-                    label="Category"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "GOLD", label: "Gold" },
-                      { value: "SILVER", label: "Silver" },
-                      { value: "PLATINUM", label: "Platinum" },
-                    ]}
-                  />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Item" />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="Dust" />
-                </Col>
-                <Col xs={12} md={2}>
                   <InputField
                     label="Purity"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
+                    value={formData.purity}
+                    onChange={handleChange}
+                    readOnly
                   />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="Touch %" />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField
-                    label="Remark"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
-                  />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="Rate" />
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField
-                    label="HSN"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
+                    label="Gross Weight"
+                    value={formData.gross_weight}
+                    onChange={handleChange}
+                    readOnly
                   />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="Amount" />
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField
-                    label="Stone"
-                    type="select"
-                    value={metal}
-                    onChange={(e) => setMetal(e.target.value)}
-                    options={[
-                      { value: "916HM", label: "916HM" },
-                      { value: "22k", label: "22k" },
-                      { value: "18k", label: "18k" },
-                    ]}
+                    label="St Weight"
+                    value={formData.st_weight}
+                    onChange={handleChange}
+                    readOnly
                   />
                 </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="PCs" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <InputField label="CT" />
-                </Col>
                 <Col xs={12} md={2}>
-                  <InputField label="R" />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="S.Amt" />
-                </Col>
-                <Col xs={12} md={1}>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="cashCheckbox"
-                      value="cash"
-                    />
-                    <label className="form-check-label" htmlFor="cashCheckbox">
-                      Cash
-                    </label>
-                  </div>
-                  <div className="form-check">
-                    <input
-                      className="form-check-input"
-                      type="checkbox"
-                      id="hallMarkCheckbox"
-                      value="hallmark"
-                    />
-                    <label className="form-check-label" htmlFor="hallMarkCheckbox">
-                      HallMark
-                    </label>
-                  </div>
+                  <InputField
+                    label="Stones Price"
+                    value={formData.stones_price}
+                    onChange={handleChange}
+                    readOnly
+                  />
                 </Col>
               </Row>
             </Col>
           </div>
-          <div className="sales-form-fourth">
-            <Col className="sales-form-section">
-              <Row>
-                <h4 className="mb-3">Payment Details</h4>
-                <Col xs={12} md={4}>
-                  <InputField label="Cash" />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Card" />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Amt" />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Chq#" />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Amt" />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Online " />
-                </Col>
-                <Col xs={12} md={4}>
-                  <InputField label="Amt" />
-                </Col>
-                <Col xs={12} md={2}>
-                  <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
-                </Col>
-                <Col xs={12} md={2}>
-                <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
-                </Col>
-                <Col xs={12} md={2}>
-                <Button
-            type="button"
-            className="cus-back-btn"
-            variant="secondary"
-            onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
-          >
-            cancel
-          </Button>
-                </Col>
-                
-              </Row>
-            </Col>
-          </div>
-
-        </div>
-
-        {/* Buttons */}
-                        
         </Form>
       </Container>
     </div>

@@ -14,7 +14,11 @@ const StockEntryTable = () => {
     () => [
       { Header: 'Pricing', accessor: 'Pricing' },
       { Header: 'Product ID', accessor: 'product_id' },
+
       { Header: 'Product Name', accessor: 'product_Name' },
+
+      // { Header: 'Product Name', accessor: 'productname' },
+
       { Header: 'Category', accessor: 'Category' },
       { Header: 'Prefix', accessor: 'Prefix' },
       { Header: 'Purity', accessor: 'Purity' },
@@ -22,6 +26,7 @@ const StockEntryTable = () => {
       { Header: 'Gross Weight', accessor: 'Gross_Weight' },
       { Header: 'Stones Weight', accessor: 'Stones_Weight' },
       { Header: 'Stones Price', accessor: 'Stones_Price' },
+
       { Header: 'Weight (WW)', accessor: 'Weight_BW' },
       { Header: 'Wastage On', accessor: 'Wastage_On' },
       { Header: 'Wastage', accessor: 'WastageWeight' },
@@ -29,6 +34,8 @@ const StockEntryTable = () => {
       { Header: 'Weight', accessor: 'TotalWeight_AW' },
       { Header: 'Making Charges', accessor: 'Making_Charges' },
       { Header: 'Stock Point', accessor: 'Stock_Point' },
+
+
       {
         Header: 'Action',
         Cell: ({ row }) => (
@@ -54,21 +61,26 @@ const StockEntryTable = () => {
 
   // Fetch data from the API
   useEffect(() => {
-    fetch('http://localhost:5000/get/opening-tags-entry')
+
+    
+
+    fetch('http://localhost:5000/get/opening-tags-entry') // Correct URL
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Failed to fetch stock entries');
+
         }
         return response.json();
       })
       .then((data) => {
-        setData(data); // Set fetched data to state
+        setData(data.result); // Use data.result since the backend sends { result: [...] }
       })
       .catch((error) => {
         console.error('Error fetching stock entries:', error);
         alert('Failed to fetch stock entries. Please try again later.');
       });
   }, []);
+  
 
   // Handle delete action
   const handleDelete = (product_id) => {
