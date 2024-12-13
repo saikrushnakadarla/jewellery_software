@@ -224,7 +224,7 @@ useEffect(() => {
   
       // Save opening tag entries
       const saveEntriesPromises = entriesWithProductId.map((entry) =>
-        axios.post("http://localhost:5000/api/opening-tags-entry", entry)
+        axios.post("http://localhost:5000/post/opening-tags-entry", entry)
       );
   
       await Promise.all(saveEntriesPromises);
