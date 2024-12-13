@@ -10,86 +10,27 @@ const ItemMasterTable = () => {
   const [loading, setLoading] = useState(true); // State for loading
   const [error, setError] = useState(null); // State for error handling
 
-
+  const columns = React.useMemo(() => [
+    { Header: 'Product ID:', accessor: 'product_id' }, 
+    { Header: 'Product Name:', accessor: 'product_name' }, 
+    { Header: 'Barcode', accessor: 'rbarcode' }, 
+    { Header: 'Category', accessor: 'Category' }, 
+    { Header: 'Design Master', accessor: 'design_master' }, 
+    { Header: 'Purity', accessor: 'purity' }, 
+    { Header: 'Item Prefix', accessor: 'item_prefix' }, 
+    { Header: 'Short Name:', accessor: 'short_name' }, 
+    { Header: 'Sale Account Head', accessor: 'sale_account_head' }, 
+    { Header: 'Purchase Account Head:', accessor: 'purchase_account_head' }, 
+    { Header: 'Status', accessor: 'status' }, 
+    { Header: 'Tax Slab', accessor: 'tax_slab' }, 
+    { Header: 'HSN Code', accessor: 'hsn_code' }, 
+    { Header: 'Maintain Tags', accessor: 'maintain_tags' }, 
+    { Header: 'OP. Qty:', accessor: 'op_qty' }, 
+    { Header: 'OP. Value:', accessor: 'op_value' }, 
+    { Header: 'OP. Weight:', accessor: 'op_weight' }, 
+    { Header: 'HUID No:', accessor: 'huid_no' }
+  ], []);
   
-
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: 'Product ID:',
-        accessor: 'product_id',
-      },
-      {
-        Header: 'Product Name:',
-        accessor: 'product_name',
-      },
-      {
-        Header: 'Barcode',
-        accessor: 'rbarcode',
-      },
-      {
-        Header: 'Category',
-        accessor: 'Category',
-      },
-      {
-        Header: 'Design Master',
-        accessor: 'design_master',
-      },
-      {
-        Header: 'Purity',
-        accessor: 'purity',
-      },
-      {
-        Header: 'Item Prefix',
-        accessor: 'item_prefix',
-      },
-      {
-        Header: 'Short Name:',
-        accessor: 'short_name',
-      },
-      {
-        Header: 'Sale Account Head',
-        accessor: 'sale_account_head',
-      },
-      {
-        Header: 'Purchase Account Head:',
-        accessor: 'purchase_account_head',
-      },
-      {
-        Header: 'Status',
-        accessor: 'status',
-      },
-      {
-        Header: 'Tax Slab',
-        accessor: 'tax_slab',
-      },
-      {
-        Header: 'HSN Code',
-        accessor: 'hsn_code',
-      },
-      {
-        Header: 'Maintain Tags',
-        accessor: 'maintain_tags',
-      },
-      {
-        Header: 'OP. Qty:',
-        accessor: 'op_qty',
-      },
-      {
-        Header: 'OP. Value:',
-        accessor: 'op_value',
-      },
-      {
-        Header: 'OP. Weight:',
-        accessor: 'op_weight',
-      },
-      {
-        Header: 'HUID No:',
-        accessor: 'huid_no',
-      },
-    ],
-    []
-  );
 
    // Fetch data from the API
    useEffect(() => {
@@ -102,31 +43,17 @@ const ItemMasterTable = () => {
         const result = await response.json();
         setData(result); // Populate the data state with API response
       } catch (error) {
-        setError(error.message); // Handle any errors during fetch
-      } finally {
-        setLoading(false); // Set loading to false
-      }
+        
+      } 
     };
 
     fetchData();
   }, []);
 
- 
-
-
-
 
   const handleCreate = () => {
     navigate('/itemmaster'); // Navigate to the /itemmaster page
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
 
   return (
     <div className="main-container">

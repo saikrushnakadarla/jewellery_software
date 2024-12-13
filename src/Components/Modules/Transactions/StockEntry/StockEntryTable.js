@@ -12,22 +12,22 @@ const StockEntryTable = () => {
   // Define the columns for the table
   const columns = React.useMemo(
     () => [
-      { Header: 'Pricing', accessor: 'pricing' },
-      { Header: 'Product ID', accessor: 'pid' },
-      { Header: 'Product Name', accessor: 'productname' },
-      { Header: 'Category', accessor: 'category' },
-      { Header: 'Prefix', accessor: 'prefix' },
-      { Header: 'Purity', accessor: 'purity' },
-      { Header: 'Product Code', accessor: 'pcode' },
-      { Header: 'Gross Weight', accessor: 'grossweight' },
-      { Header: 'Stones Weight', accessor: 'stonesweight' },
-      { Header: 'Stones Price', accessor: 'stonesprice' },
-      { Header: 'Weight (WW)', accessor: 'weightww' },
-      { Header: 'Wastage On', accessor: 'wastageon' },
-      { Header: 'Wastage', accessor: 'wastage' },
+      { Header: 'Pricing', accessor: 'Pricing' },
+      { Header: 'Product ID', accessor: 'product_id' },
+      // { Header: 'Product Name', accessor: 'productname' },
+      { Header: 'Category', accessor: 'Category' },
+      { Header: 'Prefix', accessor: 'Prefix' },
+      { Header: 'Purity', accessor: 'Purity' },
+      { Header: 'Product Code', accessor: 'PCode_BarCode' },
+      { Header: 'Gross Weight', accessor: 'Gross_Weight' },
+      { Header: 'Stones Weight', accessor: 'Stones_Weight' },
+      { Header: 'Stones Price', accessor: 'Stones_Price' },
+      { Header: 'Weight (WW)', accessor: 'WastageWeight' },
+      { Header: 'Wastage On', accessor: 'Wastage_On' },
+      { Header: 'Wastage', accessor: 'Wastage_Percentage' },
       { Header: 'Percentage', accessor: 'percentage' },
-      { Header: 'Weight', accessor: 'weight' },
-      { Header: 'Making Charges', accessor: 'makingchaeges' },
+      { Header: 'Weight', accessor: 'Weight_BW' },
+      { Header: 'Making Charges', accessor: 'Making_Charges' },
       { Header: 'Cal', accessor: 'cal' },
       { Header: 'Tax', accessor: 'tax' },
       { Header: 'Stock Point', accessor: 'stackpoint' },
@@ -56,15 +56,21 @@ const StockEntryTable = () => {
 
   // Fetch data from the API
   useEffect(() => {
-    fetch('http://localhost:5000/getStockEntries')
-      .then((response) => response.json())
+    fetch('http://localhost:5000/get/opening-tags-entry') // Correct URL
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch stock entries');
+        }
+        return response.json();
+      })
       .then((data) => {
-        setData(data); // Set fetched data to state
+        setData(data.result); // Use data.result since the backend sends { result: [...] }
       })
       .catch((error) => {
         console.error('Error fetching stock entries:', error);
       });
   }, []);
+  
 
   // Handle delete action
   const handleDelete = (pid) => {
