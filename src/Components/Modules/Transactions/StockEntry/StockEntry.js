@@ -149,7 +149,7 @@ useEffect(() => {
     useEffect(() => {
         const fetchProductIds = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/products");
+                const response = await axios.get("http://localhost:5000/get/products");
                 const productData = response.data; // Ensure the response structure matches this
                 const options = productData.map((product) => ({
                     value: product.product_id,
