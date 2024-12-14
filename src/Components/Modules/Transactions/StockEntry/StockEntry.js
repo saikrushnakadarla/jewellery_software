@@ -13,7 +13,7 @@ const StockEntry = () => {
         Pricing: "",
         Tag_ID: "",
         Prefix: "tag",
-        Category: "Gold", 
+        Category: "", 
         Purity: "",
         PCode_BarCode: "",
         Gross_Weight: "",
@@ -40,13 +40,13 @@ const StockEntry = () => {
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
+    // const handleChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         [name]: value,
+    //     }));
+    // };
 
     // Automatically calculate Weight_BW when Gross_Weight or Stones_Weight changes
     useEffect(() => {
@@ -122,7 +122,7 @@ useEffect(() => {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/opening-tags-entry",
+                "http://localhost:5000/post/opening-tags-entry",
                 formData,
                 {
                     headers: { "Content-Type": "application/json" },
@@ -147,24 +147,44 @@ useEffect(() => {
     };
 
     useEffect(() => {
-        const fetchProductIds = async () => {
-            try {
-                const response = await axios.get("http://localhost:5000/api/products");
-                const productData = response.data; // Ensure the response structure matches this
-                const options = productData.map((product) => ({
+        axios.get("http://localhost:5000/get/products")
+            .then((response) => {
+                const options = response.data.map((product) => ({
                     value: product.product_id,
-                    label: product.product_id,
+                    label: ` ${product.product_id} `,
                 }));
                 setProductOptions(options);
-            } catch (error) {
-                console.error("Error fetching product IDs:", error);
-            }
-        };
-
-        fetchProductIds();
+            })
+            .catch((error) => console.error("Error fetching products:", error));
     }, []);
 
-    
+    // Handle field changes
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+
+        if (name === "product_id" && value) {
+            // Fetch details for the selected product ID
+            axios.get(`http://localhost:5000/get/products/${value}`)
+                .then((response) => {
+                    const product = response.data;
+                    setFormData({
+                        ...formData,
+                        product_id: value,
+                        product_Name: product.product_name,
+                        Design_Master: product.design_master,
+                        Category: product.Category,
+                        Purity: product.purity,
+                    });
+                })
+                .catch((error) =>
+                    console.error(`Error fetching product details for ID: ${value}`, error)
+                );
+        }
+    };
+
+
+   
     return (
         <div style={{ paddingTop: "79px" }}>
             <div className="container mt-4">
@@ -213,53 +233,41 @@ useEffect(() => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div className="col-md-2">
-                                        <InputField
-                                            label="Product Name:"
-                                            name="product_Name"
-                                            type="select"
-                                            value={formData.product_Name}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "Product1", label: "Product1" },
-                                                { value: "Product2", label: "Product2" },
-                                            ]}
-                                        />
-                                    </div>
-                                    <div className="col-md-2">
-                                        <InputField
-                                            label="Design Master:"
-                                            name="Design_Master"
-                                            type="select"
-                                            value={formData.Design_Master}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "Jewellery", label: "Jewellery" },
-                                                { value: "Gold", label: "Gold" },
-                                                { value: "Silver", label: "Silver" },
-                                            ]}
-                                        />
-                                    </div>
                                     <div className="col-md-3">
-                                        <InputField label="Category:" value="Gold" readOnly />
-                                    </div>
+                <InputField
+                    label="Product Name:"
+                    name="product_Name"
+                    value={formData.product_Name}
+                    readOnly
+                />
+            </div>
+            <div className="col-md-3">
+                <InputField
+                    label="Design Master:"
+                    name="Design_Master"
+                    value={formData.Design_Master}
+                    readOnly
+                />
+            </div>
+            <div className="col-md-3">
+                <InputField
+                    label="Category:"
+                    name="Category"
+                    value={formData.Category}
+                    readOnly
+                />
+            </div>
                                     <div className="col-md-3">
                                         <InputField label="Prefix:" value="tag" readOnly />
                                     </div>
                                     <div className="col-md-3">
-                                        <InputField
-                                            label="Purity:"
-                                            name="Purity"
-                                            type="select"
-                                            value={formData.Purity}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "916HM", label: "916HM" },
-                                                { value: "22K", label: "22K" },
-                                                { value: "18K", label: "18K" },
-                                            ]}
-                                        />
-                                    </div>
+                <InputField
+                    label="Purity:"
+                    name="Purity"
+                    value={formData.Purity}
+                    readOnly
+                />
+            </div>
                                     <div className="col-md-3">
                                         <InputField
                                             label="PCode/BarCode:"

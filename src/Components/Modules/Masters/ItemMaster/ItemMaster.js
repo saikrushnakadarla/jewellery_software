@@ -250,7 +250,7 @@ const FormWithTable = () => {
     const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
 
     // Save product details, now including tax_slab_id
-    const productResponse = await axios.post("http://localhost:5000/api/products", updatedFormData);
+    const productResponse = await axios.post("http://localhost:5000/post/products", updatedFormData);
     const { product_id } = productResponse.data;
 
     // Append product_id to openTagsEntries
