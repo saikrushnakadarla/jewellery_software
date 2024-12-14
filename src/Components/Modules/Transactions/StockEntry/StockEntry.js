@@ -13,7 +13,7 @@ const StockEntry = () => {
         Pricing: "",
         Tag_ID: "",
         Prefix: "tag",
-        Category: "", 
+        Category: "",
         Purity: "",
         PCode_BarCode: "",
         Gross_Weight: "",
@@ -59,55 +59,55 @@ const StockEntry = () => {
             Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
         }));
     }, [formData.Gross_Weight, formData.Stones_Weight]);
-  // Automatically calculate WastageWeight and TotalWeight_AW
-  useEffect(() => {
-    const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
-    const grossWeight = parseFloat(formData.Gross_Weight) || 0;
-    const weightBW = parseFloat(formData.Weight_BW) || 0;
+    // Automatically calculate WastageWeight and TotalWeight_AW
+    useEffect(() => {
+        const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
+        const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+        const weightBW = parseFloat(formData.Weight_BW) || 0;
 
-    let wastageWeight = 0;
-    let totalWeight = 0;
+        let wastageWeight = 0;
+        let totalWeight = 0;
 
-    if (formData.Wastage_On === "Gross Weight") {
-        wastageWeight = (grossWeight * wastagePercentage) / 100;
-        totalWeight = grossWeight + wastageWeight;
-    } else if (formData.Wastage_On === "Weight BW") {
-        wastageWeight = (weightBW * wastagePercentage) / 100;
-        totalWeight = weightBW + wastageWeight;
-    }
+        if (formData.Wastage_On === "Gross Weight") {
+            wastageWeight = (grossWeight * wastagePercentage) / 100;
+            totalWeight = grossWeight + wastageWeight;
+        } else if (formData.Wastage_On === "Weight BW") {
+            wastageWeight = (weightBW * wastagePercentage) / 100;
+            totalWeight = weightBW + wastageWeight;
+        }
 
-    setFormData((prev) => ({
-        ...prev,
-        WastageWeight: wastageWeight.toFixed(2),
-        TotalWeight_AW: totalWeight.toFixed(2),
-    }));
-}, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
-
-const handleMakingChargesCalculation = () => {
-    const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
-    const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
-    const makingCharges = parseFloat(formData.Making_Charges) || 0;
-
-    if (formData.Making_Charges_On === "By Weight") {
-        const calculatedMakingCharges = totalWeight * mcPerGram;
         setFormData((prev) => ({
             ...prev,
-            Making_Charges: calculatedMakingCharges.toFixed(2),
+            WastageWeight: wastageWeight.toFixed(2),
+            TotalWeight_AW: totalWeight.toFixed(2),
         }));
-    } else if (formData.Making_Charges_On === "Fixed") {
-        const calculatedMcPerGram = makingCharges / totalWeight;
-        setFormData((prev) => ({
-            ...prev,
-            MC_Per_Gram: calculatedMcPerGram.toFixed(2),
-        }));
-    }
-};
+    }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
+
+    const handleMakingChargesCalculation = () => {
+        const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
+        const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
+        const makingCharges = parseFloat(formData.Making_Charges) || 0;
+
+        if (formData.Making_Charges_On === "By Weight") {
+            const calculatedMakingCharges = totalWeight * mcPerGram;
+            setFormData((prev) => ({
+                ...prev,
+                Making_Charges: calculatedMakingCharges.toFixed(2),
+            }));
+        } else if (formData.Making_Charges_On === "Fixed") {
+            const calculatedMcPerGram = makingCharges / totalWeight;
+            setFormData((prev) => ({
+                ...prev,
+                MC_Per_Gram: calculatedMcPerGram.toFixed(2),
+            }));
+        }
+    };
 
 
 
-useEffect(() => {
-    handleMakingChargesCalculation();
-}, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
+    useEffect(() => {
+        handleMakingChargesCalculation();
+    }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
 
     const navigate = useNavigate();
 
@@ -184,7 +184,7 @@ useEffect(() => {
     };
 
 
-   
+
     return (
         <div style={{ paddingTop: "79px" }}>
             <div className="container mt-4">
@@ -208,15 +208,15 @@ useEffect(() => {
                                         />
                                     </div>
                                     <div className="col-md-3">
-            <InputField
-                label="P ID:"
-                name="product_id"
-                type="select"
-                value={formData.product_id}
-                onChange={handleChange}
-                options={productOptions}
-            />
-            {/* <InputField
+                                        <InputField
+                                            label="P ID:"
+                                            name="product_id"
+                                            type="select"
+                                            value={formData.product_id}
+                                            onChange={handleChange}
+                                            options={productOptions}
+                                        />
+                                        {/* <InputField
                                             label="P ID:"
                                             name="product_id"
                                             type="text"
@@ -224,7 +224,7 @@ useEffect(() => {
                                             onChange={handleChange}
                                             
                         /> */}
-        </div>
+                                    </div>
                                     <div className="col-md-2">
                                         <InputField
                                             label="Tag ID:"
@@ -234,40 +234,40 @@ useEffect(() => {
                                         />
                                     </div>
                                     <div className="col-md-2">
-                <InputField
-                    label="Product Name:"
-                    name="product_Name"
-                    value={formData.product_Name}
-                    readOnly
-                />
-            </div>
-            <div className="col-md-2">
-                <InputField
-                    label="Design Master:"
-                    name="Design_Master"
-                    value={formData.Design_Master}
-                    readOnly
-                />
-            </div>
-            <div className="col-md-3">
-                <InputField
-                    label="Category:"
-                    name="Category"
-                    value={formData.Category}
-                    readOnly
-                />
-            </div>
+                                        <InputField
+                                            label="Product Name:"
+                                            name="product_Name"
+                                            value={formData.product_Name}
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="col-md-2">
+                                        <InputField
+                                            label="Design Master:"
+                                            name="Design_Master"
+                                            value={formData.Design_Master}
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="col-md-3">
+                                        <InputField
+                                            label="Category:"
+                                            name="Category"
+                                            value={formData.Category}
+                                            readOnly
+                                        />
+                                    </div>
                                     <div className="col-md-3">
                                         <InputField label="Prefix:" value="tag" readOnly />
                                     </div>
                                     <div className="col-md-3">
-                <InputField
-                    label="Purity:"
-                    name="Purity"
-                    value={formData.Purity}
-                    readOnly
-                />
-            </div>
+                                        <InputField
+                                            label="Purity:"
+                                            name="Purity"
+                                            value={formData.Purity}
+                                            readOnly
+                                        />
+                                    </div>
                                     <div className="col-md-3">
                                         <InputField
                                             label="PCode/BarCode:"
@@ -298,7 +298,7 @@ useEffect(() => {
                                         />
                                     </div>
                                     <div className="col-md-2">
-                                    <button
+                                        <button
                                             type="button" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
                                             className="btn btn-primary w-100"
                                             onClick={handleOpenModal}
@@ -317,10 +317,10 @@ useEffect(() => {
                                     </div>
                                     <div className="col-md-2">
                                         <InputField label="Weight BW:"
-                                         name="Weight_BW"
+                                            name="Weight_BW"
                                             value={formData.Weight_BW}
                                             onChange={handleChange}
-                                           
+
                                         />
                                     </div>
                                 </div>
@@ -394,12 +394,12 @@ useEffect(() => {
                                         />
                                     </div>
                                     <div className="col-md-2">
-                                    <InputField
-                                        label="HUID No:"
-                                        name="HUID_No"
-                                        value={formData.HUID_No}
-                                        onChange={handleChange}
-                                    />
+                                        <InputField
+                                            label="HUID No:"
+                                            name="HUID_No"
+                                            value={formData.HUID_No}
+                                            onChange={handleChange}
+                                        />
                                     </div>
                                     <div className="col-md-2">
                                         <InputField
