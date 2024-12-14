@@ -53,8 +53,8 @@ const RepairForm = () => {
     rate_amt: "",
     tax_percent: "",
     tax_amt: "",
-    total_price: ""
-
+    total_price: "",
+    transaction_status: "Sales",
   });
   const [paymentDetails, setPaymentDetails] = useState({
     cash: 0, card: 0,
@@ -125,8 +125,8 @@ const RepairForm = () => {
       setFormData({
         ...formData,
         customer_id: customerId,
-        mobile: customer.mobile,
-        account_name: customer.account_name,
+        mobile: customer.mobile || "",
+        account_name: customer.account_name || "",
         email: customer.email || "",
         address1: customer.address1 || "",
         address2: customer.address2 || "",
@@ -251,6 +251,11 @@ const RepairForm = () => {
         mc_on: "",
         mc_per_gram: "",
         making_charges: "",
+        rate: "",
+        rate_amt: "",
+        tax_percent: "",
+        tax_amt: "",
+        total_price: "",
       }));
     }
   };
@@ -281,6 +286,7 @@ const RepairForm = () => {
           mc_on: "",
           mc_per_gram: "",
           making_charges: "",
+          tax_percent:product.tax_slab ,
         }));
       } else {
         // Check if tag exists by code
@@ -309,6 +315,7 @@ const RepairForm = () => {
             mc_on: tag.Making_Charges_On || "",
             mc_per_gram: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
+            tax_percent:productDetails?.tax_slab || "",
           }));
         } else {
           // Reset form if no tag is found
@@ -323,6 +330,19 @@ const RepairForm = () => {
             gross_weight: "",
             stone_weight: "",
             stone_price: "",
+            weight_bw: "",
+            va_on: "",
+            va_percent: "",
+            wastage_weight: "",
+            total_weight_aw: "",
+            mc_on: "",
+            mc_per_gram: "",
+            making_charges: "",
+            rate: "",
+            rate_amt: "",
+            tax_percent: "",
+            tax_amt: "",
+            total_price: "",
           }));
         }
       }
@@ -332,10 +352,13 @@ const RepairForm = () => {
   };
 
   const handleAdd = () => {
-    setRepairDetails([...repairDetails, { ...formData }]);
-    setFormData({
+    setRepairDetails([...repairDetails, { ...formData }]); // Add current formData to repairDetails
+    
+    // Reset only the product-related fields, keeping the customer details intact
+    setFormData((prevData) => ({
+      ...prevData, // Retain customer-related fields
       code: "",
-      product_id:"",
+      product_id: "",
       metal: "",
       product_name: "",
       metal_type: "",
@@ -356,10 +379,10 @@ const RepairForm = () => {
       rate_amt: "",
       tax_percent: "",
       tax_amt: "",
-      total_price: ""
-
-    });
+      total_price: "",
+    }));
   };
+  
 
   const handleSave = async () => {
     const dataToSave = repairDetails.map((item) => ({
@@ -520,104 +543,101 @@ const RepairForm = () => {
           <div className="sales-form">
             <div className="sales-form-left">
               <Col className="sales-form-section">
-                <Row>
-                  <Col xs={12} md={2} className="d-flex align-items-center">
-                    <div style={{ flex: 1 }}>
-                    <InputField
-                      label="Mobile"
-                      name="customer_id"
-                      type="select"
-                      value={formData.customer_id || ""} // Ensure no initial selection
-                      onChange={(e) => handleCustomerChange(e.target.value)}
-                      options={[
-                        { value: "", label: "Select" }, // Placeholder option
-                        ...customers.map((customer) => ({
-                          value: customer.account_id,
-                          label: customer.mobile,
-                        })),
-                      ]}
-                    />
+              <Row>
+  <Col xs={12} md={2} className="d-flex align-items-center">
+    <div style={{ flex: 1 }}>
+      <InputField
+        label="Mobile"
+        name="mobile"
+        type="select"
+        value={formData.customer_id || ""} // Use customer_id to match selected value
+        onChange={(e) => handleCustomerChange(e.target.value)}
+        options={[
+          { value: "", label: "Select" }, // Placeholder option
+          ...customers.map((customer) => ({
+            value: customer.account_id, // Use account_id as the value
+            label: customer.mobile, // Display mobile as the label
+          })),
+        ]}
+      />
+    </div>
+    <AiOutlinePlus
+      size={20}
+      color="black"
+      onClick={handleAddCustomer}
+      style={{
+        marginLeft: "10px",
+        cursor: "pointer",
+        marginBottom: "20px",
+      }}
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField
+      label="Customer Name"
+      name="account_name"
+      value={formData.account_name || ""}
+      readOnly
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField
+      label="Email:"
+      name="email"
+      type="email"
+      value={formData.email || ""}
+      readOnly
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField
+      label="Address1:"
+      name="address1"
+      value={formData.address1 || ""}
+      readOnly
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField
+      label="Address2:"
+      name="address2"
+      value={formData.address2 || ""}
+      readOnly
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField
+      label="City"
+      name="city"
+      value={formData.city || ""}
+      readOnly
+    />
+  </Col>
+  <Col xs={12} md={1}>
+    <InputField
+      label="PIN"
+      name="pincode"
+      value={formData.pincode || ""}
+      readOnly
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField label="State:" name="state" value={formData.state || ""} readOnly />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField label="State Code:" name="state_code" value={formData.state_code || ""} readOnly />
+  </Col>
+  <Col xs={12} md={3}>
+    <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card || ""} readOnly />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField label="GSTIN" name="gst_in" value={formData.gst_in || ""} readOnly />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField label="PAN" name="pan_card" value={formData.pan_card || ""} readOnly />
+  </Col>
+</Row>
 
-                    </div>
-                    <AiOutlinePlus
-                      size={20}
-                      color="black"
-                      onClick={handleAddCustomer}
-                      style={{ marginLeft: '10px', cursor: 'pointer', marginBottom: '20px' }}
-                    />
-
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField
-                      label="Customer Name"
-                      name="account_name"
-                      value={formData.account_name}
-                      readOnly
-                    />
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField
-                      label="Email:"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-
-                      readOnly
-                    />
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField
-                      label="Address1:"
-                      name="address1"
-                      value={formData.address1}
-
-                      readOnly
-                    />
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField
-                      label="Address2:"
-                      name="address2"
-                      value={formData.address2}
-
-                      readOnly
-                    />
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField
-                      label="City"
-                      name="city"
-                      value={formData.city}
-
-                      readOnly
-                    />
-                  </Col>
-                  <Col xs={12} md={1}>
-                    <InputField
-                      label="PIN"
-                      name="pincode"
-                      value={formData.pincode}
-
-                      readOnly
-                    />
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField label="State:" name="state" value={formData.state} readOnly />
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField label="State Code:" name="state" value={formData.state_code} readOnly />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} readOnly />
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField label="GSTIN" name="gst_in" value={formData.gst_in} readOnly />
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField label="PAN" name="pan_card" value={formData.pan_card} readOnly />
-                  </Col>
-
-                </Row>
               </Col>
             </div>
             {/* Right Section */}
@@ -852,7 +872,7 @@ const RepairForm = () => {
                 </Col>
                 <Col xs={12} md={2}>
                 <InputField
-                  label="Rate Amount"
+                  label="Amount"
                   name="rate_amt"
                   value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
                   onChange={handleChange} // Optional, since it's auto-calculated
@@ -926,8 +946,7 @@ const RepairForm = () => {
           <tr key={index}>
             <td>{detail.date}</td>
             <td>{detail.invoice_number}</td>
-            <td>{detail.code}</td>
-           
+            <td>{detail.code}</td>           
             <td>{detail.product_name}</td>
             <td>{detail.metal_type}</td>
             <td>{detail.design_name}</td>
@@ -1091,54 +1110,30 @@ const RepairForm = () => {
       <h4 className="mb-3">Payment Details</h4>
       <Col xs={12} md={4}>
                         <InputField
-                          label="Cash"
-                          name="cash"
-                          value={paymentDetails.cash}
+                          label="Cash Amt"
+                          name="cash_amount"
+                          value={paymentDetails.cash_amount}
                           onChange={(e) =>
                             setPaymentDetails({ ...paymentDetails, cash: e.target.value })
                           }
                         />
-                      </Col>
+                      </Col>                      
                       <Col xs={12} md={4}>
-                        <InputField
-                          label="Card"
-                          name="card"
-                          value={paymentDetails.card}
-                          onChange={(e) =>
-                            setPaymentDetails({ ...paymentDetails, card: e.target.value })
-                          }
-                        />
-                      </Col>
-                      <Col xs={12} md={4}>
-                        <InputField label="Amt" name="card_amt"
+                        <InputField label="Card Amt" name="card_amt"
                           value={paymentDetails.card_amt}
                           onChange={(e) =>
                             setPaymentDetails({ ...paymentDetails, card_amt: e.target.value })
                           } />
-                      </Col>
+                      </Col>                      
                       <Col xs={12} md={4}>
-                        <InputField label="Chq#" name="chq"
-                          value={paymentDetails.chq}
-                          onChange={(e) =>
-                            setPaymentDetails({ ...paymentDetails, chq: e.target.value })
-                          } />
-                      </Col>
-                      <Col xs={12} md={4}>
-                        <InputField label="Amt" name="chq_amt"
+                        <InputField label="Cheque Amt" name="chq_amt"
                           value={paymentDetails.chq_amt}
                           onChange={(e) =>
                             setPaymentDetails({ ...paymentDetails, chq_amt: e.target.value })
                           } />
-                      </Col>
+                      </Col>                     
                       <Col xs={12} md={4}>
-                        <InputField label="Online " name="online"
-                          value={paymentDetails.online}
-                          onChange={(e) =>
-                            setPaymentDetails({ ...paymentDetails, online: e.target.value })
-                          } />
-                      </Col>
-                      <Col xs={12} md={4}>
-                        <InputField label="Amt" name="online_amt"
+                        <InputField label="Online Amt" name="online_amt"
                           value={paymentDetails.online_amt}
                           onChange={(e) =>
                             setPaymentDetails({ ...paymentDetails, online_amt: e.target.value })
