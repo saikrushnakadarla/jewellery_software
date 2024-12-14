@@ -346,9 +346,9 @@ const FormWithTable = () => {
                   value={formData.design_master}
                   onChange={handleChange}
                   options={[
-                    { value: "Jewellery", label: "Jewellery" },
-                    { value: "Gold", label: "Gold" },
-                    { value: "Silver", label: "Silver" },
+                    { value: "Priyanka", label: "Priyanka" },
+                    { value: "Soundarya", label: "Soundarya" },
+                    { value: "gopi chain", label: "gopi chain" },
                   ]}
                 />
                 <InputField
