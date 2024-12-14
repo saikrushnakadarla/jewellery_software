@@ -96,7 +96,7 @@ const RepairForm = () => {
     if (product) {
       setFormData((prevData) => ({
         ...prevData,
-        barcode: product.rbarcode || "",
+        barcode: "",
         product_id: product.product_id || "",
         product_name: product.product_name || "",
         metal_type: product.Category || "",
@@ -129,23 +129,23 @@ const RepairForm = () => {
       if (tag) {
         setFormData((prevData) => ({
           ...prevData,
-          barcode: tag.PCode_BarCode || product.rbarcode, // Priority to tag barcode if available
+          barcode: '', // Priority to tag barcode if available
           product_id: product.product_id,
           product_name: product.product_name,
           metal_type: product.Category,
           design_name: product.design_master,
           purity: product.purity,
-          gross_weight: tag.Gross_Weight || "", // Use tag's gross weight
-          stones_weight: tag.Stones_Weight || "",
-          stones_price: tag.Stones_Price || "",
-          weight_bw: tag.Weight_BW || "",
-          va_on: tag.Wastage_On || "",
-          va_percentage: tag.Wastage_Percentage || "",
-          wastage_weight: tag.WastageWeight || "",
-          total_weight_aw: tag.TotalWeight_AW || "",
-          mc_on: tag.Making_Charges_On || "",
-          mc_per_gm: tag.MC_Per_Gram || "",
-          making_charges: tag.Making_Charges || "",
+          gross_weight: "", // Use tag's gross weight
+          stones_weight: "",
+          stones_price:"",
+          weight_bw: "",
+          va_on: "",
+          va_percentage:  "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gm: "",
+          making_charges: "",
         }));
       } else {
         // If no tag is found, just fill product details
@@ -280,25 +280,43 @@ const RepairForm = () => {
           <div className="sales-form-section">
             <Col>
               <Row>
-                <Col xs={12} md={2}>
-                  <InputField
-                    label="BarCode/Rbarcode"
-                    name="barcode"
-                    value={formData.barcode}
-                    onChange={(e) => handleBarcodeChange(e.target.value)}
-                    type="select"
-                    options={[
-                      ...products.map((product) => ({
-                        value: product.rbarcode,
-                        label: product.rbarcode,
-                      })),
-                      ...data.map((tag) => ({
-                        value: tag.PCode_BarCode,
-                        label: tag.PCode_BarCode,
-                      })),
-                    ]}
-                  />
-                </Col>
+              <Col xs={12} md={2}>
+  <InputField
+    label="BarCode/Rbarcode"
+    name="barcode"
+    value={formData.barcode}
+    onChange={(e) => handleBarcodeChange(e.target.value)}
+    type="select"
+    options={
+      !formData.product_id
+        ? [
+            ...products.map((product) => ({
+              value: product.rbarcode,
+              label: product.rbarcode,
+            })),
+            ...data.map((tag) => ({
+              value: tag.PCode_BarCode,
+              label: tag.PCode_BarCode,
+            })),
+          ]
+        : [
+            ...products
+              .filter((product) => String(product.product_id) === String(formData.product_id))
+              .map((product) => ({
+                value: product.rbarcode,
+                label: product.rbarcode,
+              })),
+            ...data
+              .filter((tag) => String(tag.product_id) === String(formData.product_id))
+              .map((tag) => ({
+                value: tag.PCode_BarCode,
+                label: tag.PCode_BarCode,
+              })),
+          ]
+    }
+  />
+</Col>
+
 
                 <Col xs={12} md={2}>
                   <InputField
@@ -315,17 +333,18 @@ const RepairForm = () => {
                 </Col>
 
                 <Col xs={12} md={3}>
-                  <InputField
-                    label="Product Name"
-                    name="product_name"
-                    value={formData.product_name}
-                    onChange={(e) => handleProductNameChange(e.target.value)}
-                    type="select"
-                    options={products.map((product) => ({
-                      value: product.product_name,
-                      label: product.product_name,
-                    }))}
-                  />
+                <InputField
+  label="Product Name"
+  name="product_name"
+  value={formData.product_name}
+  onChange={(e) => handleProductNameChange(e.target.value)}
+  type="select"
+  options={products.map((product) => ({
+    value: product.product_name,
+    label: product.product_name,
+  }))}
+/>
+
                 </Col>
 
 

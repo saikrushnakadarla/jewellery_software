@@ -12,7 +12,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 const RepairForm = () => {
   const navigate = useNavigate();
   const [metal, setMetal] = useState("");
- const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]);
   const [data, setData] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [formData, setFormData] = useState({
@@ -151,60 +151,20 @@ const RepairForm = () => {
   };
   
   const handleProductNameChange = (productName) => {
-    // Find the selected product by its name
     const product = products.find((prod) => String(prod.product_name) === String(productName));
-  
+
     if (product) {
-      // Check if there is a corresponding tag entry by matching the product_id
-      const tag = data.find((tag) => String(tag.product_id) === String(product.product_id));
-      
-      // If tag is found, populate the form with the tag's details
-      if (tag) {
-        setFormData((prevData) => ({
-          ...prevData,
-          code: tag.PCode_BarCode || product.rbarcode, // Priority to tag code if available
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          gross_weight: tag.Gross_Weight || "", // Use tag's gross weight
-          stone_weight: tag.Stones_Weight || "",
-          stone_price: tag.Stones_Price || "",
-          weight_bw: tag.Weight_BW || "",
-          va_on: tag.Wastage_On || "",
-          va_percent: tag.Wastage_Percentage || "",
-          wastage_weight: tag.WastageWeight || "",
-          total_weight_av: tag.TotalWeight_AW || "",
-          mc_on: tag.Making_Charges_On || "",
-          mc_per_gram: tag.MC_Per_Gram || "",
-          making_charges: tag.Making_Charges || "",
-        }));
-      } else {
-        // If no tag is found, just fill product details
-        setFormData((prevData) => ({
-          ...prevData,
-          code: product.rbarcode,
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          gross_weight: "",
-          stone_weight: "",
-          stone_price: "",
-          weight_bw: "",
-          va_on: "",
-          va_percent: "",
-          wastage_weight: "",
-          total_weight_av: "",
-          mc_on: "",
-          mc_per_gram: "",
-          making_charges: "",
-        }));
-      }
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
     } else {
-      // Reset form data if no product is selected
       setFormData((prevData) => ({
         ...prevData,
         code: "",
@@ -213,21 +173,10 @@ const RepairForm = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_av: "",
-        mc_on: "",
-        mc_per_gram: "",
-        making_charges: "",
+        
       }));
     }
   };
-  
 
   const handleProductChange = (productId) => {
     const product = products.find((prod) => String(prod.product_id) === String(productId));
@@ -240,23 +189,23 @@ const RepairForm = () => {
       if (tag) {
         setFormData((prevData) => ({
           ...prevData,
-          code: tag.PCode_BarCode || product.rbarcode, // Priority to tag code if available
+          code: '', // Priority to tag code if available
           product_id: product.product_id,
           product_name: product.product_name,
           metal_type: product.Category,
           design_name: product.design_master,
           purity: product.purity,
-          gross_weight: tag.Gross_Weight || "", // Use tag's gross weight
-          stone_weight: tag.Stones_Weight || "",
-          stone_price: tag.Stones_Price || "",
-          weight_bw: tag.Weight_BW || "",
-          va_on: tag.Wastage_On || "",
-          va_percent: tag.Wastage_Percentage || "",
-          wastage_weight: tag.WastageWeight || "",
-          total_weight_av: tag.TotalWeight_AW || "",
-          mc_on: tag.Making_Charges_On || "",
-          mc_per_gram: tag.MC_Per_Gram || "",
-          making_charges: tag.Making_Charges || "",
+          gross_weight: "", // Use tag's gross weight
+          stone_weight: "",
+          stone_price:"",
+          weight_bw: "",
+          va_on: "",
+          va_percent:  "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gram: "",
+          making_charges: "",
         }));
       } else {
         // If no tag is found, just fill product details
@@ -275,7 +224,7 @@ const RepairForm = () => {
           va_on: "",
           va_percent: "",
           wastage_weight: "",
-          total_weight_av: "",
+          total_weight_aw: "",
           mc_on: "",
           mc_per_gram: "",
           making_charges: "",
@@ -298,7 +247,7 @@ const RepairForm = () => {
         va_on: "",
         va_percent: "",
         wastage_weight: "",
-        total_weight_av: "",
+        total_weight_aw: "",
         mc_on: "",
         mc_per_gram: "",
         making_charges: "",
@@ -328,7 +277,7 @@ const RepairForm = () => {
           va_on: "",
           va_percent: "",
           wastage_weight: "",
-          total_weight_av: "",
+          total_weight_aw: "",
           mc_on: "",
           mc_per_gram: "",
           making_charges: "",
@@ -356,7 +305,7 @@ const RepairForm = () => {
             va_on: tag.Wastage_On || "",
             va_percent: tag.Wastage_Percentage || "",
             wastage_weight: tag.WastageWeight || "",
-            total_weight_av: tag.TotalWeight_AW || "",
+            total_weight_aw: tag.TotalWeight_AW || "",
             mc_on: tag.Making_Charges_On || "",
             mc_per_gram: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
@@ -703,25 +652,42 @@ const RepairForm = () => {
           <div className="sales-form-section">
             <Col >
               <Row>
-                <Col xs={12} md={2}>
-                  <InputField
-                    label="BarCode/Rbarcode"
-                    name="code"
-                    value={formData.code}
-                    onChange={(e) => handleBarcodeChange(e.target.value)}
-                    type="select"
-                    options={[
-                      ...products.map((product) => ({
-                        value: product.rbarcode,
-                        label: product.rbarcode,
-                      })),
-                      ...data.map((tag) => ({
-                        value: tag.PCode_BarCode,
-                        label: tag.PCode_BarCode,
-                      })),
-                    ]}
-                  />
-                </Col>
+              <Col xs={12} md={2}>
+  <InputField
+    label="BarCode/Rbarcode"
+    name="code"
+    value={formData.code}
+    onChange={(e) => handleBarcodeChange(e.target.value)}
+    type="select"
+    options={
+      !formData.product_id
+        ? [
+            ...products.map((product) => ({
+              value: product.rbarcode,
+              label: product.rbarcode,
+            })),
+            ...data.map((tag) => ({
+              value: tag.PCode_BarCode,
+              label: tag.PCode_BarCode,
+            })),
+          ]
+        : [
+            ...products
+              .filter((product) => String(product.product_id) === String(formData.product_id))
+              .map((product) => ({
+                value: product.rbarcode,
+                label: product.rbarcode,
+              })),
+            ...data
+              .filter((tag) => String(tag.product_id) === String(formData.product_id))
+              .map((tag) => ({
+                value: tag.PCode_BarCode,
+                label: tag.PCode_BarCode,
+              })),
+          ]
+    }
+  />
+</Col>
                 <Col xs={12} md={2}>
                   <InputField
                     label="P ID"

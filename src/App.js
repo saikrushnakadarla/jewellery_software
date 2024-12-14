@@ -41,6 +41,7 @@ import PurityTable from './Components/Modules/Masters/Purity/PurityTable';
 import OrdersTable from './Components/Modules/Transactions/Orders/OrdersTable';
 import Orders from './Components/Modules/Transactions/Orders/Orders';
 import BarCodePrinting from './Components/Modules/Reports/BarcodePrinting/BarCodePrinting';
+import SalesNew from './Components/Modules/Transactions/Sales/SalesNew';
 
 function App() {
   const location = useLocation();
@@ -95,6 +96,9 @@ function App() {
         <Route path="/orderstable" element={<OrdersTable />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/barcodeprinting" element={<BarCodePrinting />} />
+
+
+        <Route path="/salesNew" element={<SalesNew />} />
       </Routes>
     </>
   );

@@ -230,6 +230,7 @@ const FormWithTable = () => {
           id: tax.TaxSlabID, // Ensure you have the TaxSlabID
         }));
         setTaxOptions(options);
+        console.log("Names=",options)
       } catch (error) {
         console.error("Error fetching product IDs:", error);
       }
@@ -250,7 +251,7 @@ const FormWithTable = () => {
     const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
 
     // Save product details, now including tax_slab_id
-    const productResponse = await axios.post("http://localhost:5000/api/products", updatedFormData);
+    const productResponse = await axios.post("http://localhost:5000/post/products", updatedFormData);
     const { product_id } = productResponse.data;
 
     // Append product_id to openTagsEntries
@@ -261,7 +262,7 @@ const FormWithTable = () => {
 
     // Save opening tag entries
     const saveEntriesPromises = entriesWithProductId.map((entry) =>
-      axios.post("http://localhost:5000/api/opening-tags-entry", entry)
+      axios.post("http://localhost:5000/post/opening-tags-entry", entry)
     );
 
     await Promise.all(saveEntriesPromises);

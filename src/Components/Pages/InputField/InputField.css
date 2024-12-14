@@ -27,22 +27,4 @@
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
-.react-select {
-  width: 100%;
-  font-size: 12px;
-}
 
-.react-select .react-select__control {
-  border: 1px solid #A26D2B;
-  padding: 5px;
-  font-size: 12px;
-  border-radius: 4px;
-}
-
-.react-select .react-select__single-value {
-  font-size: 12px;
-}
-
-.react-select .react-select__option {
-  font-size: 12px;
-}

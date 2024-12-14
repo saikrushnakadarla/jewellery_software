@@ -122,7 +122,7 @@ useEffect(() => {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/opening-tags-entry",
+                "http://localhost:5000/post/opening-tags-entry",
                 formData,
                 {
                     headers: { "Content-Type": "application/json" },
@@ -149,7 +149,7 @@ useEffect(() => {
     useEffect(() => {
         const fetchProductIds = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/products");
+                const response = await axios.get("http://localhost:5000/get/products");
                 const productData = response.data; // Ensure the response structure matches this
                 const options = productData.map((product) => ({
                     value: product.product_id,
