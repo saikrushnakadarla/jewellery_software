@@ -122,7 +122,7 @@ useEffect(() => {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/post/opening-tags-entry",
+                "http://localhost:5000/api/opening-tags-entry",
                 formData,
                 {
                     headers: { "Content-Type": "application/json" },
