@@ -233,7 +233,7 @@ useEffect(() => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div className="col-md-3">
+                                    <div className="col-md-2">
                 <InputField
                     label="Product Name:"
                     name="product_Name"
@@ -241,7 +241,7 @@ useEffect(() => {
                     readOnly
                 />
             </div>
-            <div className="col-md-3">
+            <div className="col-md-2">
                 <InputField
                     label="Design Master:"
                     name="Design_Master"
