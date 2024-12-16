@@ -1,3 +1,5 @@
+
+
 import React, { useState } from 'react';
 import './Rates.css';
 import InputField from "../../../Pages/InputField/InputField";
@@ -26,10 +28,45 @@ const Rates = () => {
         }));
     };
 
-    const handleUpdateRates = () => {
-        console.log("Updated Rates:", rates);
-        // Add logic to save rates to the database or API
-        alert("Rates updated successfully!");
+    const handleUpdateRates = async () => {
+        const { currentDate, gold16, gold18, gold22, gold24, silverRate } = rates;
+
+        // Construct the data object to be sent in the POST request
+        const requestData = {
+            rate_date: currentDate,
+            rate_time: new Date().toLocaleTimeString(), // Current time
+            rate_16crt: gold16,
+            rate_18crt: gold18,
+            rate_22crt: gold22,
+            rate_24crt: gold24,
+            silver_rate: silverRate,
+        };
+
+        try {
+            // Send POST request to the backend API
+            const response = await fetch("http://localhost:3000/post/rates", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(requestData),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Handle successful response
+                alert("Rates updated successfully!");
+                console.log(result);
+            } else {
+                // Handle error response
+                alert(`Error: ${result.error}`);
+            }
+        } catch (error) {
+            // Handle network errors
+            alert("An error occurred while updating the rates.");
+            console.error("Error:", error);
+        }
     };
 
     return (
