@@ -1,21 +1,16 @@
+
 import React, { useState } from 'react';
 import './Rates.css';
 import InputField from "../../../Pages/InputField/InputField";
 
 const Rates = () => {
-    // Get today's date in YYYY-MM-DD format
-    const getCurrentDate = () => {
-        const today = new Date();
-        return today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    };
-
     const [rates, setRates] = useState({
-        currentDate: getCurrentDate(),
-        gold16: "70000.00",
-        gold18: "75000.00",
-        gold22: "77000.00",
-        gold24: "85000.00",
-        silverRate: "1000.00",
+        currentDate: "",
+        gold16: "",
+        gold18: "",
+        gold22: "",
+        gold24: "",
+        silverRate: "",
     });
 
     const handleInputChange = (e) => {
@@ -42,7 +37,7 @@ const Rates = () => {
                         name="currentDate"
                         type="date"
                         value={rates.currentDate}
-                        readOnly={true} // Current date is displayed but not editable
+                        onChange={handleInputChange}
                     />
                 </div>
 
