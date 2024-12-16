@@ -87,7 +87,7 @@ const RepairForm = () => {
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/metaltype");
+        const response = await axios.get(`${baseURL}/metaltype`);
         setMetalTypes(response.data);
       } catch (error) {
         console.error("Error fetching metal types:", error);

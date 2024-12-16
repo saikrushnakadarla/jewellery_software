@@ -122,7 +122,7 @@ const StockEntry = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/post/opening-tags-entry",
+                `${baseURL}/post/opening-tags-entry`,
                 formData,
                 {
                     headers: { "Content-Type": "application/json" },
@@ -148,7 +148,7 @@ const StockEntry = () => {
 
     // Fetch product options for P ID dropdown (product_id)
     useEffect(() => {
-        axios.get("http://localhost:5000/get/products")
+        axios.get(`${baseURL}/get/products`)
             .then((response) => {
                 const options = response.data.map((product) => ({
                     value: product.product_id,
@@ -166,7 +166,7 @@ const StockEntry = () => {
 
         if (name === "product_id" && value) {
             // Fetch details for the selected product ID
-            axios.get(`http://localhost:5000/get/products/${value}`)
+            axios.get(`${baseURL}/get/products/${value}`)
                 .then((response) => {
                     const product = response.data;
                     setFormData({

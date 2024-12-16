@@ -72,7 +72,7 @@ const RepairForm = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/products');
+        const response = await fetch(`${baseURL}/get/products`);
         if (!response.ok) {
           throw new Error('Failed to fetch products');
         }
@@ -85,7 +85,7 @@ const RepairForm = () => {
 
     const fetchTags = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/opening-tags-entry');
+        const response = await fetch(`${baseURL}/get/opening-tags-entry`);
         if (!response.ok) {
           throw new Error('Failed to fetch tags');
         }
@@ -397,7 +397,7 @@ const RepairForm = () => {
     }));
 
     try {
-      await axios.post("http://localhost:5000/save-repair-details", {
+      await axios.post(`${baseURL}/save-repair-details`, {
         repairDetails: dataToSave,
       });
       alert("Data saved successfully");

@@ -22,7 +22,7 @@
 //   useEffect(() => {
 //     const fetchData = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5000/metaltype");
+//         const response = await axios.get("${baseURL}/metaltype");
 //         setSubmittedData(response.data); // Populate table with fetched data
 //       } catch (error) {
 //         console.error("Error fetching data:", error);
@@ -44,7 +44,7 @@
 //     e.preventDefault();
 
 //     try {
-//       const response = await axios.post("http://localhost:5000/metaltype", formData);
+//       const response = await axios.post("${baseURL}/metaltype", formData);
 //       console.log("Data submitted:", response.data);
 
 //       // Update the table with the new data
@@ -74,7 +74,7 @@
 
 //     try {
 //       // Send DELETE request to the backend
-//       await axios.delete(`http://localhost:5000/metaltype/${id}`);
+//       await axios.delete(`${baseURL}/metaltype/${id}`);
 //       // Update the frontend state after successful deletion
 //       setSubmittedData(submittedData.filter((item) => item.metal_type_id !== id));
 //       console.log(`Record with ID ${id} deleted successfully.`);
@@ -255,6 +255,7 @@ import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
+import baseURL from "../../../../Url/NodeBaseURL";
 
 function MetalType() {
   const [formData, setFormData] = useState({
@@ -276,7 +277,7 @@ function MetalType() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/metaltype");
+        const response = await axios.get(`${baseURL}/metaltype`);
         setSubmittedData(response.data); // Populate table with fetched data
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -361,7 +362,7 @@ function MetalType() {
     try {
       if (editing) {
         // Update existing record
-        const response = await axios.put(`http://localhost:5000/metaltype/${editing}`, formData);
+        const response = await axios.put(`${baseURL}/metaltype/${editing}`, formData);
         console.log("Data updated:", response.data);
 
         // Update the table with the edited data
@@ -370,7 +371,7 @@ function MetalType() {
         ));
       } else {
         // Submit new record
-        const response = await axios.post("http://localhost:5000/metaltype", formData);
+        const response = await axios.post(`${baseURL}/metaltype`, formData);
         console.log("Data submitted:", response.data);
 
         // Update the table with the new data
@@ -402,7 +403,7 @@ function MetalType() {
 
     try {
       // Send DELETE request to the backend
-      await axios.delete(`http://localhost:5000/metaltype/${id}`);
+      await axios.delete(`${baseURL}/metaltype/${id}`);
       // Update the frontend state after successful deletion
       setSubmittedData(submittedData.filter((item) => item.metal_type_id !== id));
       console.log(`Record with ID ${id} deleted successfully.`);

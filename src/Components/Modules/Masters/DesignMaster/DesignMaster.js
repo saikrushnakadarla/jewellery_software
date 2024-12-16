@@ -24,7 +24,7 @@
 //   useEffect(() => {
 //     const fetchData = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5000/designmaster");
+//         const response = await axios.get("${baseURL}/designmaster");
 //         setSubmittedData(response.data); // Populate table with fetched data
 //       } catch (error) {
 //         console.error("Error fetching data:", error);
@@ -43,7 +43,7 @@
 //     e.preventDefault();
 
 //     try {
-//       const response = await axios.post("http://localhost:5000/designmaster", formData);
+//       const response = await axios.post("${baseURL}/designmaster", formData);
 //       console.log("Data submitted:", response.data);
 
 //       // Update the table with the new data
@@ -72,7 +72,7 @@
 //     if (!isConfirmed) return;
 
 //     try {
-//       const response = await axios.delete(`http://localhost:5000/designmaster/${id}`);
+//       const response = await axios.delete(`${baseURL}/designmaster/${id}`);
 //       if (response.status === 200) {
 //         setSubmittedData(submittedData.filter((item) => item.design_id !== id));
 //         console.log(`Record with ID ${id} deleted successfully.`);
@@ -291,6 +291,7 @@ import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
+import baseURL from "../../../../Url/NodeBaseURL";
 
   // Example validation functions (These should match your actual validation logic)
   const validateMetalType = (value) => /^[a-zA-Z]+$/.test(value); // Only alphabets
@@ -328,7 +329,7 @@ function DesignMaster() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/designmaster");
+        const response = await axios.get(`${baseURL}/designmaster`);
         setSubmittedData(response.data); // Populate table with fetched data
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -406,7 +407,7 @@ function DesignMaster() {
     if (editMode) {
       // Edit functionality
       try {
-        const response = await axios.put(`http://localhost:5000/designmaster/${editId}`, formData);
+        const response = await axios.put(`${baseURL}/designmaster/${editId}`, formData);
         console.log("Data updated:", response.data);
 
         // Update the table with the edited data
@@ -424,7 +425,7 @@ function DesignMaster() {
     } else {
       // Add functionality
       try {
-        const response = await axios.post("http://localhost:5000/designmaster", formData);
+        const response = await axios.post(`${baseURL}/designmaster`, formData);
         console.log("Data submitted:", response.data);
 
         // Update the table with the new data
@@ -453,7 +454,7 @@ function DesignMaster() {
 
     try {
       // Send DELETE request to the backend
-      await axios.delete(`http://localhost:5000/designmaster/${id}`);
+      await axios.delete(`${baseURL}/designmaster/${id}`);
       // Update the frontend state after successful deletion
       setSubmittedData(submittedData.filter((item) => item.design_id !== id));
       console.log(`Record with ID ${id} deleted successfully.`);

@@ -4,6 +4,7 @@ import DataTable from '../../../Pages/InputField/TableLayout'; // Import your re
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 import './StockEntryTable.css';
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const StockEntryTable = () => {
   const navigate = useNavigate();
@@ -64,7 +65,7 @@ const StockEntryTable = () => {
 
     
 
-    fetch('http://localhost:5000/get/opening-tags-entry') // Correct URL
+    fetch(`${baseURL}/get/opening-tags-entry`) // Correct URL
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch stock entries');
@@ -85,7 +86,7 @@ const StockEntryTable = () => {
   // Handle delete action
   const handleDelete = (product_id) => {
     if (window.confirm('Are you sure you want to delete this stock entry?')) {
-      fetch(`http://localhost:5000/deleteStockEntry/${product_id}`, { method: 'DELETE' })
+      fetch(`${baseURL}/deleteStockEntry/${product_id}`, { method: 'DELETE' })
         .then((response) => {
           if (!response.ok) {
             throw new Error('Failed to delete the stock entry');
