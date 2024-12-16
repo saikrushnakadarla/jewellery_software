@@ -4,6 +4,7 @@ import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import axios from "axios";
 import DataTable from '../../../Pages/InputField/TableLayout';
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const RepairForm = () => {
   // Get today's date in yyyy-mm-dd format
@@ -45,7 +46,7 @@ const RepairForm = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:5000/add/estimate", formData);
+      const response = await axios.post(`${baseURL}/add/estimate`, formData);
       if (response.status === 200) {
         alert("Estimate added successfully!");
         setFormData(initialFormData); // Clear the form after successful submission
@@ -59,7 +60,7 @@ const RepairForm = () => {
   useEffect(() => {
     const fetchEstimates = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/get/estimates");
+        const response = await axios.get(`${baseURL}/get/estimates`);
         setEstimates(response.data); // Set the fetched estimates in state
       } catch (error) {
         console.error("Error fetching estimates:", error);

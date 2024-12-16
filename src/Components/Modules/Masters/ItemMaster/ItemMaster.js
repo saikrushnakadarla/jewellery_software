@@ -5,6 +5,7 @@ import InputField from "./Inputfield"; // Assuming you have this component
 import StoneDetailsModal from "../../Transactions/StockEntry/StoneDetailsModal";
 import "./ItemMaster.css";
 import { BsCursor } from "react-icons/bs";
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const FormWithTable = () => {
   const [formData, setFormData] = useState({
@@ -223,7 +224,7 @@ const FormWithTable = () => {
   useEffect(() => {
     const fetchProductIds = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/get/taxslabs");
+        const response = await axios.get(`${baseURL}/get/taxslabs`);
         const Data = response.data; // Ensure the response structure matches this
         const options = Data.map((tax) => ({
           value: tax.TaxSlabName,
@@ -252,7 +253,7 @@ const FormWithTable = () => {
       const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
 
       // Save product details, now including tax_slab_id
-      const productResponse = await axios.post("http://localhost:5000/post/products", updatedFormData);
+      const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
       const { product_id } = productResponse.data;
 
       // Append product_id to openTagsEntries
@@ -263,7 +264,7 @@ const FormWithTable = () => {
 
       // Save opening tag entries
       const saveEntriesPromises = entriesWithProductId.map((entry) =>
-        axios.post("http://localhost:5000/post/opening-tags-entry", entry)
+        axios.post(`${baseURL}/post/opening-tags-entry`, entry)
       );
 
       await Promise.all(saveEntriesPromises);

@@ -26,7 +26,7 @@
 //   useEffect(() => {
 //     const fetchData = async () => {
 //       try {
-//         const response = await axios.get("http://localhost:5000/purity");
+//         const response = await axios.get("${baseURL}/purity");
 //         setSubmittedData(response.data); // Populate table with fetched data
 //       } catch (error) {
 //         console.error("Error fetching data:", error);
@@ -45,7 +45,7 @@
 //     e.preventDefault();
 
 //     try {
-//       const response = await axios.post("http://localhost:5000/purity", formData);
+//       const response = await axios.post("${baseURL}/purity", formData);
 //       console.log("Data submitted:", response.data);
 
 //       // Update the table with the new data
@@ -76,7 +76,7 @@
 
 //     try {
 //       // Send DELETE request to the backend
-//       await axios.delete(`http://localhost:5000/purity/${id}`);
+//       await axios.delete(`${baseURL}/purity/${id}`);
 //       // Update the frontend state after successful deletion
 //       setSubmittedData(submittedData.filter((item) => item.purity_id !== id));
 //       console.log(`Record with ID ${id} deleted successfully.`);
@@ -245,6 +245,8 @@ import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
+import baseURL from "../../../../Url/NodeBaseURL";
+
 // Custom validation functions
 const validateName = (name) => /^[a-zA-Z\s]+$/.test(name); // Only alphabets and spaces
 const validateMetal = (metal) => /^[a-zA-Z\s]+$/.test(metal); // Only alphabets and spaces
@@ -279,7 +281,7 @@ function Purity() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/purity");
+        const response = await axios.get(`${baseURL}/purity`);
         setSubmittedData(response.data); // Populate table with fetched data
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -413,7 +415,7 @@ function Purity() {
     if (editMode) {
       // Edit functionality
       try {
-        const response = await axios.put(`http://localhost:5000/purity/${editId}`, formData);
+        const response = await axios.put(`${baseURL}/purity/${editId}`, formData);
         console.log("Data updated:", response.data);
 
         // Update the table with the edited data
@@ -431,7 +433,7 @@ function Purity() {
     } else {
       // Add functionality
       try {
-        const response = await axios.post("http://localhost:5000/purity", formData);
+        const response = await axios.post( `${baseURL}/purity`, formData);
         console.log("Data submitted:", response.data);
 
         // Update the table with the new data
@@ -462,7 +464,7 @@ function Purity() {
 
     try {
       // Send DELETE request to the backend
-      await axios.delete(`http://localhost:5000/purity/${id}`);
+      await axios.delete(`${baseURL}/purity/${id}`);
       // Update the frontend state after successful deletion
       setSubmittedData(submittedData.filter((item) => item.purity_id !== id));
       console.log(`Record with ID ${id} deleted successfully.`);

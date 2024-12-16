@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { Button, Row, Col } from 'react-bootstrap';
 import './ItemMasterTable.css';
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const ItemMasterTable = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const ItemMasterTable = () => {
    useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/products');
+        const response = await fetch(`${baseURL}/get/products`);
         if (!response.ok) {
           throw new Error('Failed to fetch products');
         }
