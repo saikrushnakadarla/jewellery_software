@@ -13,10 +13,10 @@ const FormWithTable = () => {
     rbarcode: "",
     design_master: "",
     short_name: "",
-    sale_account_head: "",
-    purchase_account_head: "",
+    sale_account_head: "Sales",
+    purchase_account_head: "Purchase",
     tax_slab: "",
-    tax_slab_id:"",
+    tax_slab_id: "",
     hsn_code: "",
     op_qty: 0,
     op_value: "",
@@ -76,26 +76,26 @@ const FormWithTable = () => {
     ? {}
     : { backgroundColor: "#f5f5f5", color: "#888", cursor: "not-allowed" };
 
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-    
-      if (name === "tax_slab") {
-        // Fetch the TaxSlabID based on the selected TaxSlab name
-        const selectedTaxSlab = taxOptions.find((option) => option.value === value);
-        if (selectedTaxSlab) {
-          setFormData((prevState) => ({
-            ...prevState,
-            [name]: value,
-            tax_slab_id: selectedTaxSlab.id, // Store the TaxSlabID
-          }));
-        }
-      } else {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "tax_slab") {
+      // Fetch the TaxSlabID based on the selected TaxSlab name
+      const selectedTaxSlab = taxOptions.find((option) => option.value === value);
+      if (selectedTaxSlab) {
         setFormData((prevState) => ({
           ...prevState,
           [name]: value,
+          tax_slab_id: selectedTaxSlab.id, // Store the TaxSlabID
         }));
       }
-    };
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
+  };
 
   const handleAddOpenTagEntry = (e) => {
     e.preventDefault();
@@ -230,12 +230,12 @@ const FormWithTable = () => {
           id: tax.TaxSlabID, // Ensure you have the TaxSlabID
         }));
         setTaxOptions(options);
-        console.log("Names=",options)
+        console.log("Names=", options)
       } catch (error) {
         console.error("Error fetching product IDs:", error);
       }
     };
-  
+
     fetchProductIds();
   }, []);
 
@@ -246,53 +246,53 @@ const FormWithTable = () => {
 
   const handleSave = async () => {
 
-  try {
-    // Ensure Category and other fields are not empty
-    const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
+    try {
+      // Ensure Category and other fields are not empty
+      const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
 
-    // Save product details, now including tax_slab_id
-    const productResponse = await axios.post("http://localhost:5000/post/products", updatedFormData);
-    const { product_id } = productResponse.data;
+      // Save product details, now including tax_slab_id
+      const productResponse = await axios.post("http://localhost:5000/post/products", updatedFormData);
+      const { product_id } = productResponse.data;
 
-    // Append product_id to openTagsEntries
-    const entriesWithProductId = openTagsEntries.map((entry) => ({
-      ...entry,
-      product_id, // Append product_id to entries
-    }));
+      // Append product_id to openTagsEntries
+      const entriesWithProductId = openTagsEntries.map((entry) => ({
+        ...entry,
+        product_id, // Append product_id to entries
+      }));
 
-    // Save opening tag entries
-    const saveEntriesPromises = entriesWithProductId.map((entry) =>
-      axios.post("http://localhost:5000/post/opening-tags-entry", entry)
-    );
+      // Save opening tag entries
+      const saveEntriesPromises = entriesWithProductId.map((entry) =>
+        axios.post("http://localhost:5000/post/opening-tags-entry", entry)
+      );
 
-    await Promise.all(saveEntriesPromises);
-    alert("Data saved successfully!");
+      await Promise.all(saveEntriesPromises);
+      alert("Data saved successfully!");
 
-    // Reset the form fields
-    setFormData({
-      product_name: "",
-      rbarcode: "",
-      Category: "",
-      design_master: "",
-      purity: "",
-      item_prefix: "",
-      short_name: "",
-      sale_account_head: "",
-      purchase_account_head: "",
-      status: "",
-      tax_slab: "",
-      tax_slab_id: "", // Reset tax_slab_id
-      hsn_code: "",
-      op_qty: "",
-      op_value: "",
-      op_weight: "",
-      huid_no: "",
-    });
-  } catch (error) {
-    console.error("Error saving data:", error);
-    alert("Failed to save data. Please try again.");
-  }
-};
+      // Reset the form fields
+      setFormData({
+        product_name: "",
+        rbarcode: "",
+        Category: "",
+        design_master: "",
+        purity: "",
+        item_prefix: "",
+        short_name: "",
+        sale_account_head: "",
+        purchase_account_head: "",
+        status: "",
+        tax_slab: "",
+        tax_slab_id: "", // Reset tax_slab_id
+        hsn_code: "",
+        op_qty: "",
+        op_value: "",
+        op_weight: "",
+        huid_no: "",
+      });
+    } catch (error) {
+      console.error("Error saving data:", error);
+      alert("Failed to save data. Please try again.");
+    }
+  };
 
   const handleBack = () => {
     navigate("/itemmastertable");
@@ -399,7 +399,7 @@ const FormWithTable = () => {
                     { value: "Sales", label: "Sales" },
                   ]}
                 />
-                <InputField
+                {/* <InputField
                   label="Status:"
                   name="status"
                   type="select"
@@ -409,7 +409,7 @@ const FormWithTable = () => {
                     { value: "ACTIVE", label: "ACTIVE" },
                     { value: "INACTIVE", label: "INACTIVE" },
                   ]}
-                />
+                /> */}
                 <InputField
                   label="Tax Slab:"
                   name="tax_slab"
