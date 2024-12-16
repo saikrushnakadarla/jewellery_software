@@ -296,6 +296,21 @@ const FormWithTable = () => {
   const handleSave = async () => {
 
     try {
+
+      const { product_name, Category, design_master, purity } = formData;
+
+      // Check if the product exists
+      const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
+        product_name,
+        Category,
+        design_master,
+        purity,
+      });
+
+      if (checkResponse.data.exists) {
+        alert('This item already exists.');
+        return;
+      }
       // Ensure Category and other fields are not empty
       const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
 
@@ -426,7 +441,7 @@ const FormWithTable = () => {
                   value={formData.short_name}
                   onChange={handleChange}
                 />
-                <InputField
+                {/* <InputField
                   label="Sale Account Head:"
                   name="sale_account_head"
                   type="select"
@@ -447,7 +462,7 @@ const FormWithTable = () => {
                     { value: "Purchase", label: "Purchase" },
                     { value: "Sales", label: "Sales" },
                   ]}
-                />
+                /> */}
                 {/* <InputField
                   label="Status:"
                   name="status"
