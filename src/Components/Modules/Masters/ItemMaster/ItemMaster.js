@@ -50,6 +50,7 @@ const FormWithTable = () => {
     product_name: "",
   });
 
+  const [editingIndex, setEditingIndex] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const handleOpenModal = () => setShowModal(true);
@@ -164,6 +165,52 @@ const FormWithTable = () => {
     }));
   };
 
+  const handleDeleteOpenTagEntry = (index) => {
+    setOpenTagsEntries((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleEditOpenTagEntry = (index) => {
+    const entryToEdit = openTagsEntries[index];
+    setFormData(entryToEdit); // Populate the form with the selected entry
+    setEditingIndex(index); // Save the index for the update operation
+  };
+
+  const handleUpdateOpenTagEntry = (e) => {
+    e.preventDefault();
+
+    if (editingIndex !== null) {
+      const updatedEntries = [...openTagsEntries];
+      updatedEntries[editingIndex] = formData; // Update the selected entry
+      setOpenTagsEntries(updatedEntries);
+      setEditingIndex(null); // Reset editing index
+
+      // Reset form fields
+      setFormData({
+        Pricing: "",
+        Tag_ID: "",
+        Prefix: "Gold",
+        Category: "",
+        Purity: "",
+        PCode_BarCode: "",
+        Gross_Weight: "",
+        Stones_Weight: "",
+        Stones_Price: "",
+        WastageWeight: "",
+        HUID_No: "",
+        Wastage_On: "",
+        Wastage_Percentage: "",
+        status: "",
+        Source: "",
+        Stock_Point: "",
+        Weight_BW: "",
+        TotalWeight_AW: "",
+        MC_Per_Gram: "",
+        Making_Charges_On: "",
+        Making_Charges: "",
+        Design_Master: "",
+      });
+    }
+  };
 
   useEffect(() => {
     const grossWeight = parseFloat(formData.Gross_Weight) || 0;
@@ -487,7 +534,7 @@ const FormWithTable = () => {
           {/* Opening Tags Entry Section */}
           <div className="form-container" style={{ marginTop: "15px" }}>
             <h4 style={{ marginBottom: "15px" }}>Opening Tags Entry</h4>
-            <form onSubmit={handleAddOpenTagEntry}>
+            <form onSubmit={editingIndex !== null ? handleUpdateOpenTagEntry : handleAddOpenTagEntry}>
               <div className="form-row">
                 <InputField
                   label="Pricing:"
@@ -676,17 +723,17 @@ const FormWithTable = () => {
               <button
                 type="submit"
                 className="btn btn-primary"
-                readOnly={!isMaintainTagsChecked}
-                disabled={!isMaintainTagsChecked} // Disable the button when isMaintainTagsChecked is false
+                disabled={!isMaintainTagsChecked}
                 style={{
                   backgroundColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
                   borderColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
-                  marginLeft: "1397px",
+                  marginLeft: "95%",
                   marginTop: "15px",
                   ...openingTagsStyle,
                 }}
+
               >
-                Add
+                {editingIndex !== null ? "Update" : "Add"}
               </button>
 
 
@@ -720,6 +767,7 @@ const FormWithTable = () => {
                     {Object.keys(openTagsEntries[0] || {}).map((key) => (
                       <th key={key}>{key.replace(/_/g, " ")}</th>
                     ))}
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -728,6 +776,20 @@ const FormWithTable = () => {
                       {Object.keys(entry).map((key) => (
                         <td key={key}>{entry[key]}</td>
                       ))}
+                      <td>
+                        <button
+                          onClick={() => handleEditOpenTagEntry(index)}
+                          className="btn btn-warning btn-sm"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteOpenTagEntry(index)}
+                          className="btn btn-danger btn-sm"
+                        >
+                          Delete
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

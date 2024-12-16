@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import InputField from "./Inputfield"; // Assuming you have this component
 import StoneDetailsModal from "../../Transactions/StockEntry/StoneDetailsModal";
 import "./ItemMaster.css";
 import { BsCursor } from "react-icons/bs";
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const FormWithTable = () => {
   const [formData, setFormData] = useState({
@@ -13,17 +14,18 @@ const FormWithTable = () => {
     rbarcode: "",
     design_master: "",
     short_name: "",
-    sale_account_head: "",
-    purchase_account_head: "",
+    sale_account_head: "Sales",
+    purchase_account_head: "Purchase",
     tax_slab: "",
+    tax_slab_id: "",
     hsn_code: "",
-    op_qty: "",
+    op_qty: 0,
     op_value: "",
-    op_weight: "",
-    maintain_tags:false, // Default as false
+    op_weight: 0,
+    maintain_tags: false, // Default as false
     Tag_ID: "",
     Prefix: "tag",
-    item_prefix:"",
+    item_prefix: "",
     Category: "Gold", // Set a default value for Category
     Purity: "",
     purity: "",
@@ -47,6 +49,8 @@ const FormWithTable = () => {
     Design_Master: "gold",
     product_name: "",
   });
+
+  const [editingIndex, setEditingIndex] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
   const handleOpenModal = () => setShowModal(true);
@@ -76,18 +80,29 @@ const FormWithTable = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    if (name === "tax_slab") {
+      // Fetch the TaxSlabID based on the selected TaxSlab name
+      const selectedTaxSlab = taxOptions.find((option) => option.value === value);
+      if (selectedTaxSlab) {
+        setFormData((prevState) => ({
+          ...prevState,
+          [name]: value,
+          tax_slab_id: selectedTaxSlab.id, // Store the TaxSlabID
+        }));
+      }
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleAddOpenTagEntry = (e) => {
     e.preventDefault();
+
     const newEntry = {
-      // product_id: formData.product_id,
-      // product_name: formData.product_name,
-      // design_master: formData.design_master,
       Pricing: formData.Pricing,
       Tag_ID: formData.Tag_ID,
       Prefix: formData.Prefix,
@@ -110,30 +125,182 @@ const FormWithTable = () => {
       Making_Charges_On: formData.Making_Charges_On,
       Making_Charges: formData.Making_Charges,
       Design_Master: formData.Design_Master,
-      // short_name: formData.short_name,
-      // sale_account_head: formData.sale_account_head,
-      // purchase_account_head: formData.purchase_account_head,
-      // tax_slab: formData.tax_slab,
-      // hsn_code: formData.hsn_code,
-      // op_qty: formData.op_qty,
-      // op_value: formData.op_value,
-      // op_weight: formData.op_weight,
-      // huid_no: formData.huid_no,
-      // rbarcode: formData.rbarcode,
     };
 
+    // Update the `op_qty` and `op_weight` fields
+    setFormData((prev) => ({
+      ...prev,
+      op_qty: prev.op_qty + 1, // Increment op_qty
+      op_weight: parseFloat(prev.op_weight) + parseFloat(formData.Gross_Weight || 0), // Add Gross_Weight
+    }));
 
     // Add the new entry to the table
     setOpenTagsEntries((prev) => [...prev, newEntry]);
+
+    // Reset other form fields
+    setFormData((prev) => ({
+      ...prev,
+      Pricing: "",
+      Tag_ID: "",
+      Prefix: "Gold",
+      Category: "",
+      Purity: "",
+      PCode_BarCode: "",
+      Gross_Weight: "",
+      Stones_Weight: "",
+      Stones_Price: "",
+      WastageWeight: "",
+      HUID_No: "",
+      Wastage_On: "",
+      Wastage_Percentage: "",
+      status: "",
+      Source: "",
+      Stock_Point: "",
+      Weight_BW: "",
+      TotalWeight_AW: "",
+      MC_Per_Gram: "",
+      Making_Charges_On: "",
+      Making_Charges: "",
+      Design_Master: "",
+    }));
   };
 
+  const handleDeleteOpenTagEntry = (index) => {
+    setOpenTagsEntries((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleEditOpenTagEntry = (index) => {
+    const entryToEdit = openTagsEntries[index];
+    setFormData(entryToEdit); // Populate the form with the selected entry
+    setEditingIndex(index); // Save the index for the update operation
+  };
+
+  const handleUpdateOpenTagEntry = (e) => {
+    e.preventDefault();
+
+    if (editingIndex !== null) {
+      const updatedEntries = [...openTagsEntries];
+      updatedEntries[editingIndex] = formData; // Update the selected entry
+      setOpenTagsEntries(updatedEntries);
+      setEditingIndex(null); // Reset editing index
+
+      // Reset form fields
+      setFormData({
+        Pricing: "",
+        Tag_ID: "",
+        Prefix: "Gold",
+        Category: "",
+        Purity: "",
+        PCode_BarCode: "",
+        Gross_Weight: "",
+        Stones_Weight: "",
+        Stones_Price: "",
+        WastageWeight: "",
+        HUID_No: "",
+        Wastage_On: "",
+        Wastage_Percentage: "",
+        status: "",
+        Source: "",
+        Stock_Point: "",
+        Weight_BW: "",
+        TotalWeight_AW: "",
+        MC_Per_Gram: "",
+        Making_Charges_On: "",
+        Making_Charges: "",
+        Design_Master: "",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+    const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
+    const weightBW = grossWeight - stonesWeight;
+
+    setFormData((prev) => ({
+      ...prev,
+      Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
+    }));
+  }, [formData.Gross_Weight, formData.Stones_Weight]);
+  // Automatically calculate WastageWeight and TotalWeight_AW
+  useEffect(() => {
+    const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
+    const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+    const weightBW = parseFloat(formData.Weight_BW) || 0;
+
+    let wastageWeight = 0;
+    let totalWeight = 0;
+
+    if (formData.Wastage_On === "Gross Weight") {
+      wastageWeight = (grossWeight * wastagePercentage) / 100;
+      totalWeight = grossWeight + wastageWeight;
+    } else if (formData.Wastage_On === "Weight BW") {
+      wastageWeight = (weightBW * wastagePercentage) / 100;
+      totalWeight = weightBW + wastageWeight;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      WastageWeight: wastageWeight.toFixed(2),
+      TotalWeight_AW: totalWeight.toFixed(2),
+    }));
+  }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
+
+  const handleMakingChargesCalculation = () => {
+    const grossWeight = parseFloat(formData.Gross_Weight) || 0; // Use Gross Weight
+    const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
+    const makingCharges = parseFloat(formData.Making_Charges) || 0;
+
+    if (formData.Making_Charges_On === "By Weight") {
+      const calculatedMakingCharges = grossWeight * mcPerGram;
+      setFormData((prev) => ({
+        ...prev,
+        Making_Charges: calculatedMakingCharges.toFixed(2),
+      }));
+    } else if (formData.Making_Charges_On === "Fixed") {
+      const calculatedMcPerGram = grossWeight > 0 ? makingCharges / grossWeight : 0; // Avoid division by zero
+      setFormData((prev) => ({
+        ...prev,
+        MC_Per_Gram: calculatedMcPerGram.toFixed(2),
+      }));
+    }
+  };
+
+
+  const [taxOptions, setTaxOptions] = useState([]);
+  useEffect(() => {
+    const fetchProductIds = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/taxslabs`);
+        const Data = response.data; // Ensure the response structure matches this
+        const options = Data.map((tax) => ({
+          value: tax.TaxSlabName,
+          label: tax.TaxSlabName,
+          id: tax.TaxSlabID, // Ensure you have the TaxSlabID
+        }));
+        setTaxOptions(options);
+        console.log("Names=", options)
+      } catch (error) {
+        console.error("Error fetching product IDs:", error);
+      }
+    };
+
+    fetchProductIds();
+  }, []);
+
+  useEffect(() => {
+    handleMakingChargesCalculation();
+  }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
+
+
   const handleSave = async () => {
+
     try {
       // Ensure Category and other fields are not empty
       const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
 
-      // Save product details
-      const productResponse = await axios.post("http://localhost:5000/api/products", updatedFormData);
+      // Save product details, now including tax_slab_id
+      const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
       const { product_id } = productResponse.data;
 
       // Append product_id to openTagsEntries
@@ -144,11 +311,32 @@ const FormWithTable = () => {
 
       // Save opening tag entries
       const saveEntriesPromises = entriesWithProductId.map((entry) =>
-        axios.post("http://localhost:5000/api/opening-tags-entry", entry)
+        axios.post(`${baseURL}/post/opening-tags-entry`, entry)
       );
 
       await Promise.all(saveEntriesPromises);
       alert("Data saved successfully!");
+
+      // Reset the form fields
+      setFormData({
+        product_name: "",
+        rbarcode: "",
+        Category: "",
+        design_master: "",
+        purity: "",
+        item_prefix: "",
+        short_name: "",
+        sale_account_head: "",
+        purchase_account_head: "",
+        status: "",
+        tax_slab: "",
+        tax_slab_id: "", // Reset tax_slab_id
+        hsn_code: "",
+        op_qty: "",
+        op_value: "",
+        op_weight: "",
+        huid_no: "",
+      });
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Failed to save data. Please try again.");
@@ -174,11 +362,7 @@ const FormWithTable = () => {
             <div className="form-container">
               <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
               <div className="form-row">
-                <InputField label="P ID:"
-                  name="product_id"
-                  value={formData.product_id}
-                  onChange={handleChange}
-                />
+
                 <InputField
                   label="Product Name:"
                   name="product_name"
@@ -211,9 +395,9 @@ const FormWithTable = () => {
                   value={formData.design_master}
                   onChange={handleChange}
                   options={[
-                    { value: "Jewellery", label: "Jewellery" },
-                    { value: "Gold", label: "Gold" },
-                    { value: "Silver", label: "Silver" },
+                    { value: "Priyanka", label: "Priyanka" },
+                    { value: "Soundarya", label: "Soundarya" },
+                    { value: "gopi chain", label: "gopi chain" },
                   ]}
                 />
                 <InputField
@@ -264,7 +448,7 @@ const FormWithTable = () => {
                     { value: "Sales", label: "Sales" },
                   ]}
                 />
-                <InputField
+                {/* <InputField
                   label="Status:"
                   name="status"
                   type="select"
@@ -274,17 +458,14 @@ const FormWithTable = () => {
                     { value: "ACTIVE", label: "ACTIVE" },
                     { value: "INACTIVE", label: "INACTIVE" },
                   ]}
-                />
+                /> */}
                 <InputField
                   label="Tax Slab:"
                   name="tax_slab"
                   type="select"
                   value={formData.tax_slab}
                   onChange={handleChange}
-                  options={[
-                    { value: "ACTIVE", label: "ACTIVE" },
-                    { value: "INACTIVE", label: "INACTIVE" },
-                  ]}
+                  options={taxOptions}
                 />
                 <InputField label="HSN Code:"
                   name="hsn_code"
@@ -353,7 +534,7 @@ const FormWithTable = () => {
           {/* Opening Tags Entry Section */}
           <div className="form-container" style={{ marginTop: "15px" }}>
             <h4 style={{ marginBottom: "15px" }}>Opening Tags Entry</h4>
-            <form onSubmit={handleAddOpenTagEntry}>
+            <form onSubmit={editingIndex !== null ? handleUpdateOpenTagEntry : handleAddOpenTagEntry}>
               <div className="form-row">
                 <InputField
                   label="Pricing:"
@@ -368,7 +549,7 @@ const FormWithTable = () => {
                   readOnly={!isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
-                <InputField
+                {/* <InputField
                   label="Tag ID:"
                   name="Tag_ID"
                   type="text"
@@ -376,13 +557,13 @@ const FormWithTable = () => {
                   onChange={handleChange}
                   readOnly={!isMaintainTagsChecked}
                   style={openingTagsStyle}
-                />
-                <InputField
+                /> */}
+                {/* <InputField
                   label="Prefix:"
                   value="Gold"
                   readOnly
                   style={openingTagsStyle}
-                />
+                /> */}
                 <InputField
                   label="Purity:"
                   type="select"
@@ -469,7 +650,7 @@ const FormWithTable = () => {
                   style={openingTagsStyle}
                   options={[
                     { value: "Gross Weight", label: "Gross Weight" },
-                    { value: "Weight WW", label: "Weight WW" },
+                    { value: "Weight BW", label: "Weight BW" },
                   ]}
                 />
                 <InputField
@@ -542,8 +723,7 @@ const FormWithTable = () => {
               <button
                 type="submit"
                 className="btn btn-primary"
-                readOnly={!isMaintainTagsChecked}
-                disabled={!isMaintainTagsChecked} // Disable the button when isMaintainTagsChecked is false
+                disabled={!isMaintainTagsChecked}
                 style={{
                   backgroundColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
                   borderColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
@@ -551,27 +731,33 @@ const FormWithTable = () => {
                   marginTop: "15px",
                   ...openingTagsStyle,
                 }}
+
               >
-                Add
+                {editingIndex !== null ? "Update" : "Add"}
               </button>
 
-              {/* <button type="submit" className="btn btn-primary">
-                Add
-              </button> */}
+
             </form>
 
-            <button
-              type="button"
-              className="cus-back-btn"
-              variant="secondary"
-              onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px', marginTop: '10px' }}
-            >
-              cancel
-            </button>
-            {/* Add additional fields similarly */}
-            <button className="btn btn-primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSave}>
-              Save
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+              <button
+                type="button"
+                className="cus-back-btn"
+                variant="secondary"
+                onClick={handleBack}
+                style={{ backgroundColor: 'gray', marginRight: '10px' }}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            </div>
+
 
             {/* table Section */}
             <div style={{ overflowX: "scroll" }}>
@@ -581,6 +767,7 @@ const FormWithTable = () => {
                     {Object.keys(openTagsEntries[0] || {}).map((key) => (
                       <th key={key}>{key.replace(/_/g, " ")}</th>
                     ))}
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -589,23 +776,31 @@ const FormWithTable = () => {
                       {Object.keys(entry).map((key) => (
                         <td key={key}>{entry[key]}</td>
                       ))}
+                      <td>
+                        <button
+                          onClick={() => handleEditOpenTagEntry(index)}
+                          className="btn btn-warning btn-sm"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteOpenTagEntry(index)}
+                          className="btn btn-danger btn-sm"
+                        >
+                          Delete
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            {/* <button className="btn btn-primary" onClick={handleSave}>
-              Save
-            </button> */}
             <StoneDetailsModal
               showModal={showModal}
               handleCloseModal={handleCloseModal}
             />
           </div>
-
-
-
         </div>
       </div>
     </div>
