@@ -5,6 +5,7 @@ import "./StockEntry.css";
 import InputField from "../../Masters/ItemMaster/Inputfield";
 import StoneDetailsModal from "./StoneDetailsModal";
 import { useNavigate } from "react-router-dom";
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const StockEntry = () => {
     const [productOptions, setProductOptions] = useState([]);
