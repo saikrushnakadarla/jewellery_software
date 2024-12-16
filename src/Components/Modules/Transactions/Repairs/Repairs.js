@@ -118,7 +118,7 @@ const RepairForm = () => {
         ...formData,
         customer_id: customerId, // Ensure this is correctly set
         name: customer.account_name, // Set the name field to the selected customer
-        mobile: customer.phone || "",
+        mobile: customer.mobile || "",
         email: customer.email || "",
         address1: customer.address1 || "",
         address2: customer.address2 || "",
@@ -205,29 +205,34 @@ const handleSubmit = async (e) => {
           <Col className="form-section">
             <h4 className="mb-4">Customer Details</h4>
             <Row>
-            <Col xs={12} md={4}  className="d-flex align-items-center">
-                  <div style={{ flex: 1 }}>
-                  <InputField
-                  label="Mobile:"
-                  name="customer_id"
-                  type="select"
-                  value={formData.mobile || ""}
-                  onChange={(e) => handleCustomerChange(e.target.value)}
-                  options={[
-                    ...customers.map((customer) => ({
-                      value: customer.account_id,
-                      label: customer.mobile, // Use account_name or your preferred field
-                    })),
-                  ]}
-                />
-                </div>
-                <AiOutlinePlus
-                  size={20}
-                  color="black"
-                  onClick={handleAddCustomer}
-                  style={{ marginLeft: '10px', cursor: 'pointer', marginBottom:'20px' }}
-                />
-                </Col>
+            <Col xs={12} md={2} className="d-flex align-items-center">
+    <div style={{ flex: 1 }}>
+      <InputField
+        label="Mobile"
+        name="mobile"
+        type="select"
+        value={formData.customer_id || ""} // Use customer_id to match selected value
+        onChange={(e) => handleCustomerChange(e.target.value)}
+        options={[
+          { value: "", label: "Select" }, // Placeholder option
+          ...customers.map((customer) => ({
+            value: customer.account_id, // Use account_id as the value
+            label: customer.mobile, // Display mobile as the label
+          })),
+        ]}
+      />
+    </div>
+    <AiOutlinePlus
+      size={20}
+      color="black"
+      onClick={handleAddCustomer}
+      style={{
+        marginLeft: "10px",
+        cursor: "pointer",
+        marginBottom: "20px",
+      }}
+    />
+  </Col>
                 <Col xs={12} md={4}>
                 <InputField
                     label="Customer Name:"
