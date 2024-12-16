@@ -90,7 +90,61 @@ const RepairForm = () => {
     }));
   };
 
+  const handleMetalTypeChange = (metalType) => {
+    const product = products.find((prod) => String(prod.Category) === String(metalType));
 
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode || "",
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        
+      }));
+    }
+  };
+
+  const handleDesignNameChange = (designName) => {
+    const product = products.find((prod) => String(prod.design_master) === String(designName));
+
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode || "",
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        
+      }));
+    }
+  };
 
   const handleProductNameChange = (productName) => {
     const product = products.find((prod) => String(prod.product_name) === String(productName));
@@ -279,8 +333,6 @@ const RepairForm = () => {
     }
   };
   
-  
-
   return (
     <div className="main-container">
       <Container className="sales-form-container">
@@ -290,43 +342,41 @@ const RepairForm = () => {
             <Col>
               <Row>
               <Col xs={12} md={2}>
-  <InputField
-    label="BarCode/Rbarcode"
-    name="barcode"
-    value={formData.barcode}
-    onChange={(e) => handleBarcodeChange(e.target.value)}
-    type="select"
-    options={
-      !formData.product_id
-        ? [
-            ...products.map((product) => ({
-              value: product.rbarcode,
-              label: product.rbarcode,
-            })),
-            ...data.map((tag) => ({
-              value: tag.PCode_BarCode,
-              label: tag.PCode_BarCode,
-            })),
-          ]
-        : [
-            ...products
-              .filter((product) => String(product.product_id) === String(formData.product_id))
-              .map((product) => ({
-                value: product.rbarcode,
-                label: product.rbarcode,
-              })),
-            ...data
-              .filter((tag) => String(tag.product_id) === String(formData.product_id))
-              .map((tag) => ({
-                value: tag.PCode_BarCode,
-                label: tag.PCode_BarCode,
-              })),
-          ]
-    }
-  />
-</Col>
-
-
+              <InputField
+                label="BarCode/Rbarcode"
+                name="barcode"
+                value={formData.barcode}
+                onChange={(e) => handleBarcodeChange(e.target.value)}
+                type="select"
+                options={
+                  !formData.product_id
+                    ? [
+                        ...products.map((product) => ({
+                          value: product.rbarcode,
+                          label: product.rbarcode,
+                        })),
+                        ...data.map((tag) => ({
+                          value: tag.PCode_BarCode,
+                          label: tag.PCode_BarCode,
+                        })),
+                      ]
+                    : [
+                        ...products
+                          .filter((product) => String(product.product_id) === String(formData.product_id))
+                          .map((product) => ({
+                            value: product.rbarcode,
+                            label: product.rbarcode,
+                          })),
+                        ...data
+                          .filter((tag) => String(tag.product_id) === String(formData.product_id))
+                          .map((tag) => ({
+                            value: tag.PCode_BarCode,
+                            label: tag.PCode_BarCode,
+                          })),
+                      ]
+                }
+              />
+            </Col>
                 <Col xs={12} md={2}>
                   <InputField
                     label="P ID"
@@ -343,36 +393,40 @@ const RepairForm = () => {
 
                 <Col xs={12} md={3}>
                 <InputField
-  label="Product Name"
-  name="product_name"
-  value={formData.product_name}
-  onChange={(e) => handleProductNameChange(e.target.value)}
-  type="select"
-  options={products.map((product) => ({
-    value: product.product_name,
-    label: product.product_name,
-  }))}
-/>
-
+                  label="Product Name"
+                  name="product_name"
+                  value={formData.product_name}
+                  onChange={(e) => handleProductNameChange(e.target.value)}
+                  type="select"
+                  options={products.map((product) => ({
+                    value: product.product_name,
+                    label: product.product_name,
+                  }))}
+                />
                 </Col>
-
-
                 <Col xs={12} md={2}>
                   <InputField
                     label="Metal Type"
                     name="metal_type"
                     value={formData.metal_type}
-                    onChange={handleChange}
-                    readOnly
+                    onChange={(e) => handleMetalTypeChange(e.target.value)}                    
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.Category,
+                      label: product.Category,
+                    }))}                    
                   />
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField
                     label="Design Name"
                     name="design_name"
-                    value={formData.design_name}
-                    onChange={handleChange}
-                    readOnly
+                    onChange={(e) => handleDesignNameChange(e.target.value)}
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.design_master,
+                      label: product.design_master,
+                    }))}
                   />
                 </Col>
                 <Col xs={12} md={1}>

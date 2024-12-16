@@ -81,7 +81,7 @@ const RepairForm = () => {
   useEffect(() => {
     const fetchLastInvoiceNumber = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/lastInvoiceNumber");
+        const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
         setFormData({ ...formData, invoice_number: response.data.lastInvoiceNumber });
       } catch (error) {
         console.error("Error fetching invoice number:", error);
@@ -95,7 +95,7 @@ const RepairForm = () => {
    
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/products');
+        const response = await fetch(`${baseURL}/get/products`);
         if (!response.ok) {
           throw new Error('Failed to fetch products');
         }
@@ -108,7 +108,7 @@ const RepairForm = () => {
 
     const fetchTags = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/opening-tags-entry');
+        const response = await fetch(`${baseURL}/get/opening-tags-entry`);
         if (!response.ok) {
           throw new Error('Failed to fetch tags');
         }
@@ -172,6 +172,62 @@ const RepairForm = () => {
       [name]: value
     }));
   };
+
+  const handleMetalTypeChange = (metalType) => {
+    const product = products.find((prod) => String(prod.Category) === String(metalType));
+
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode || "",
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        
+      }));
+    }
+  };
+
+  const handleDesignNameChange = (designName) => {
+    const product = products.find((prod) => String(prod.design_master) === String(designName));
+
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode || "",
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        
+      }));
+    }
+  };
   
   const handleProductNameChange = (productName) => {
     const product = products.find((prod) => String(prod.product_name) === String(productName));
@@ -179,7 +235,9 @@ const RepairForm = () => {
     if (product) {
       setFormData((prevData) => ({
         ...prevData,
-        code: "",
+
+        code: product.rbarcode,
+
         product_id: product.product_id || "",
         product_name: product.product_name || "",
         metal_type: product.Category || "",
@@ -413,7 +471,6 @@ const RepairForm = () => {
     }));
   };
   
-
   const handleSave = async () => {
     const dataToSave = repairDetails.map((item) => ({
       ...item,
@@ -427,7 +484,7 @@ const RepairForm = () => {
     }));
 
     try {
-      await axios.post("http://localhost:5000/save-repair-details", {
+      await axios.post("${baseURL}/save-repair-details", {
         repairDetails: dataToSave,
       });
       alert("Data saved successfully");
@@ -770,17 +827,24 @@ const RepairForm = () => {
                     label="Metal Type"
                     name="metal_type"
                     value={formData.metal_type}
-                    onChange={handleChange}
-                    readOnly
+                    onChange={(e) => handleMetalTypeChange(e.target.value)}                    
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.Category,
+                      label: product.Category,
+                    }))}                    
                   />
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField
                     label="Design Name"
                     name="design_name"
-                    value={formData.design_name}
-                    onChange={handleChange}
-                    readOnly
+                    onChange={(e) => handleDesignNameChange(e.target.value)}
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.design_master,
+                      label: product.design_master,
+                    }))}
                   />
                 </Col>
                 <Col xs={12} md={1}>
