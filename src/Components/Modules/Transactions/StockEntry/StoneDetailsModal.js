@@ -114,7 +114,7 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
       for (const row of data) {
         await axios.post("http://localhost:5000/post/addProductstonedetails", row);
       }
-      alert("Changes saved successfully!");
+      alert("Data saved successfully!");
     } catch (error) {
       console.error("Error saving changes to DB", error);
     }
