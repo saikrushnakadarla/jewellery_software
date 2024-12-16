@@ -294,7 +294,7 @@ import axios from "axios";
 import baseURL from "../../../../Url/NodeBaseURL";
 
   // Example validation functions (These should match your actual validation logic)
-  const validateMetalType = (value) => /^[a-zA-Z]+$/.test(value); // Only alphabets
+  const validateMetal = (value) => /^[a-zA-Z]+$/.test(value); // Only alphabets
   const validateShortId = (value) => /^[a-zA-Z0-9]+$/.test(value); // Alphanumeric characters
   const validateItemType = (value) => value.trim() !== ""; // Not empty
   const validateDesignItem = (value) => /^[a-zA-Z]+$/.test(value); // Only alphabets
@@ -307,11 +307,11 @@ import baseURL from "../../../../Url/NodeBaseURL";
 
 function DesignMaster() {
   const [formData, setFormData] = useState({
-    metal_type: '',
+    metal: '',
+    short_id: '',
     item_type: '',
     design_item: '',
     design_name: '',
-    short_id: '',
     wastage_percentage: '',
     making_charge: '',
     design_short_code: '',
@@ -353,8 +353,8 @@ function DesignMaster() {
     let error = "";
 
     // Validate field based on its name
-    if (name === "metal_type" && !validateMetalType(value)) {
-      error = "Invalid MetalType Name (only alphabets allowed)";
+    if (name === "metal" && !validateMetal(value)) {
+      error = "Invalid Metal  (only alphabets allowed)";
     } else if (name === "short_id" && !validateShortId(value)) {
       error = "Invalid Short ID (only alphanumeric characters allowed)";
     } else if (name === "item_type" && !validateItemType(value)) {
@@ -387,7 +387,7 @@ function DesignMaster() {
     const newErrors = {};
 
     // Apply each validation function to the respective form fields
-    if (!validateMetalType(formData.metal_type)) newErrors.metal_type = "Invalid Metaltype Name (only alphabets allowed)";
+    if (!validateMetal(formData.metal)) newErrors.metal = "Invalid Metal (only alphabets allowed)";
     if (!validateShortId(formData.short_id)) newErrors.short_id = "Invalid Short ID (only alphanumeric characters allowed)";
     if (!validateItemType(formData.item_type)) newErrors.item_type = "Item Type is required";
     if (!validateDesignItem(formData.design_item)) newErrors.design_item = "Invalid Design Item (only alphabets allowed)";
@@ -465,11 +465,11 @@ function DesignMaster() {
 
   const resetForm = () => {
     setFormData({
-      metal_type: '',
+      metal: '',
+      short_id: '',
       item_type: '',
       design_item: '',
       design_name: '',
-      short_id: '',
       wastage_percentage: '',
       making_charge: '',
       design_short_code: '',
@@ -489,10 +489,13 @@ function DesignMaster() {
         Cell: ({ row }) => row.index + 1, // Generate a sequential number
       },
       {
-        Header: "Metal Type",
-        accessor: "metal_type",
+        Header: "Metal ",
+        accessor: "metal",
       },
-     
+      {
+        Header: "Short Id",
+        accessor: "short_id",
+      },
       {
         Header: "Item Type",
         accessor: "item_type",
@@ -505,10 +508,7 @@ function DesignMaster() {
         Header: "Design Name",
         accessor: "design_name",
       },
-      {
-        Header: "Short Id",
-        accessor: "short_id",
-      },
+     
       {
         Header: "Wastage Percentage",
         accessor: "wastage_percentage",
@@ -562,10 +562,10 @@ function DesignMaster() {
           {/* Row 1 */}
           <div className="form-row">
            <InputField
-              label="Metal Type:"
-              name="metal_type"
+              label="Metal :"
+              name="metal"
                type="select"
-              value={formData.metal_type}
+              value={formData.metal}
               onChange={handleChange}
               required={true}
 
@@ -575,10 +575,19 @@ function DesignMaster() {
                 { value: 'platinum', label: 'Platinum' },
                 { value: 'diamond', label: 'Diamond' },
               ]}
-              error={errors.metal_type}
+              error={errors.metal}
 
             />
-                      {errors.metal_type && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.metal_type}</p>}
+            
+            <InputField
+              label="Short Id:"
+              name="short_id"
+              value={formData.short_id}
+              onChange={handleChange}
+              required={true}
+              error={errors.short_id}
+
+            />
 
          
             <InputField
@@ -591,7 +600,6 @@ function DesignMaster() {
               error={errors.item_type}
 
             />
-                      {errors.item_type && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.item_type}</p>}
 
             <InputField
               label="Design Item:"
@@ -602,7 +610,6 @@ function DesignMaster() {
               error={errors.design_item}
 
             />
-                      {errors.design_item && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.design_item}</p>}
 
             <InputField
               label="Design Name:"
@@ -613,17 +620,6 @@ function DesignMaster() {
               error={errors.design_name}
 
             />
-                      {errors.design_name && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.design_name}</p>}
-                      <InputField
-              label="Short Id:"
-              name="short_id"
-              value={formData.short_id}
-              onChange={handleChange}
-              required={true}
-              error={errors.short_id}
-
-            />
-                      {errors.short_id && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.short_id}</p>}
 
           </div>
 
@@ -638,7 +634,6 @@ function DesignMaster() {
               error={errors.wastage_percentage}
 
             />
-                      {errors.wastage_percentage && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.wastage_percentage}</p>}
 
             <InputField
               label="Making Charge:"
@@ -649,7 +644,6 @@ function DesignMaster() {
               error={errors.making_charge}
 
             />
-                      {errors.making_charge && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.making_charge}</p>}
 
             <InputField
               label="Design Short Code:"
@@ -660,7 +654,6 @@ function DesignMaster() {
               error={errors.design_short_code}
 
             />
-                      {errors.design_short_code && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.design_short_code}</p>}
 
             <InputField
               label="Brand/Category:"
@@ -672,7 +665,6 @@ function DesignMaster() {
               error={errors.brand_category}
 
             />
-                      {errors.brand_category && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.brand_category}</p>}
 
             <InputField
               label="MC Type:"
@@ -688,7 +680,6 @@ function DesignMaster() {
               error={errors.mc_type}
 
             />
-                      {errors.mc_type && <p  style={{color:'red', fontSize:'15px'}}  className="error">{errors.mc_type}</p>}
 
           </div>
 

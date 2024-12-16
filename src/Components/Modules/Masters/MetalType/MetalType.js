@@ -259,8 +259,8 @@ import baseURL from "../../../../Url/NodeBaseURL";
 
 function MetalType() {
   const [formData, setFormData] = useState({
-    metal_type: '',
-    item_type: '',
+    metal_name: '',
+    // item_type: '',
     description: '',
     default_purity: '',
     default_purity_for_rate_entry: '',
@@ -288,8 +288,8 @@ function MetalType() {
   }, []);
 
    // Validation functions
-   const validateMetalType = (value) => /^[A-Za-z\s]+$/.test(value);
-   const validateItemType = (value) => value.trim() !== ""; // Not empty
+   const validateMetalName = (value) => /^[A-Za-z\s]+$/.test(value);
+  //  const validateItemType = (value) => value.trim() !== ""; 
    const validateDescription = (value) => value.trim() !== "";
    const validatePurity = (value) => /^[0-9.]+$/.test(value);
  
@@ -301,10 +301,8 @@ function MetalType() {
     let error = "";
   
     // Validate specific fields based on the input's name
-    if (name === "metal_type" && !validateMetalType(value)) {
+    if (name === "metal_name" && !validateMetalName(value)) {
       error = "Metal type should contain only alphabets.";
-    } else if (name === "item_type" && !validateItemType(value)) {
-      error = "Item Type is required";
     } else if (name === "description" && !validateDescription(value)) {
       error = "Description is required.";
     } else if (name === "default_purity" && !validatePurity(value)) {
@@ -327,14 +325,13 @@ function MetalType() {
     const formErrors = {};
   
     // Validate Metal Name
-    if (!validateMetalType(formData.metal_name)) {
+    if (!validateMetalName(formData.metal_name)) {
       formErrors.metal_name = "Metal Name should contain only alphabets.";
     }
      
-    // Validate Metal Name
-    if (!validateItemType(formData.item_type)) {
-      formErrors.item_type = "Item Type should contain only alphabets.";
-    }
+    // if (!validateItemType(formData.item_type)) {
+    //   formErrors.item_type = "Item Type should contain only alphabets.";
+    // }
   
     // Validate Description
     if (!validateDescription(formData.description)) {
@@ -359,6 +356,12 @@ function MetalType() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+
+      // Validate form before submitting
+      if (!validateForm()) {
+        return; // Stop if there are validation errors
+      }
+
     try {
       if (editing) {
         // Update existing record
@@ -380,8 +383,8 @@ function MetalType() {
 
       // Reset the form and stop editing mode
       setFormData({
-        metal_type: '',
-        item_type: '',
+        metal_name: '',
+        // item_type: '',
         description: '',
         default_purity: '',
         default_purity_for_rate_entry: '',
@@ -425,13 +428,13 @@ function MetalType() {
         Cell: ({ row }) => row.index + 1, // Generate a sequential number
       },
       {
-        Header: "Metal Type",
-        accessor: "metal_type",
+        Header: "Metal Name",
+        accessor: "metal_name",
       },
-      {
-        Header: "Item Type",
-        accessor: "item_type",
-      },
+      // {
+      //   Header: "Item Type",
+      //   accessor: "item_type",
+      // },
       {
         Header: "Description",
         accessor: "description",
@@ -480,23 +483,23 @@ function MetalType() {
           {/* Row 1 */}
           <div className="form-row">
             <InputField
-              label="Metal Type:"
-              name="metal_type"
-              value={formData.metal_type}
+              label="Metal Name:"
+              name="metal_name"
+              value={formData.metal_name}
               onChange={handleChange}
               required={true}
-              error={errors.metal_type}
+              error={errors.metal_name}
             />
-            {errors.metal_type && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.metal_type}</p>}
+        
 
-            <InputField
+            {/* <InputField
               label="Item Type:"
               name="item_type"
               value={formData.item_type}
               onChange={handleChange}
               required={true}
               error={errors.item_type}
-            />
+            /> */}
             <InputField
               label="Description:"
               name="description"

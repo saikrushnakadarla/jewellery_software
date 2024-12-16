@@ -248,7 +248,7 @@ import axios from "axios";
 import baseURL from "../../../../Url/NodeBaseURL";
 
 // Custom validation functions
-const validateName = (name) => /^[a-zA-Z\s]+$/.test(name); // Only alphabets and spaces
+const validateName = (name) => /^[a-zA-Z0-9\s]+$/.test(name); // Allows alphabets, numbers, and spaces
 const validateMetal = (metal) => /^[a-zA-Z\s]+$/.test(metal); // Only alphabets and spaces
 const validatePurityPercentage = (purity_percentage) =>
   /^[0-9]*\.?[0-9]{0,2}$/.test(purity_percentage);
@@ -331,6 +331,9 @@ function Purity() {
     if (name === "name" && validateName(value)) {
       setFormData({ ...formData, [name]: value });
       setErrors({ ...errors, [name]: "" }); // Clear error if valid
+    } else if (name === "name") {
+      setErrors({ ...errors, [name]: "Invalid name format. Only letters, numbers, and spaces are allowed." });
+    
     } else if (name === "metal" && validateMetal(value)) {
       setFormData({ ...formData, [name]: value });
       setErrors({ ...errors, [name]: "" }); // Clear error if valid
@@ -373,7 +376,7 @@ function Purity() {
 
     // Validations for each input field
     if (!validateName(formData.name)) {
-      formErrors.metal_type = "Name should contain only alphabets.";
+      formErrors.name = "Name should contain only letters, numbers, and spaces.";
     }
     if (!validateMetal(formData.metal)) {
       formErrors.item_name = "Metal should contain only alphabets.";
