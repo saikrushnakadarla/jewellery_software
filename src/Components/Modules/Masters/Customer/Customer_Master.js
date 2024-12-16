@@ -155,7 +155,7 @@ function Customer_Master() {
       <InputField
         label="Account Group:"
         name="account_group"
-        value="Customer"
+        value="CUSTOMER"
         readOnly
       />
     </Col>
