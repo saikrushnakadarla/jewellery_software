@@ -199,24 +199,25 @@ const FormWithTable = () => {
   }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
 
   const handleMakingChargesCalculation = () => {
-    const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
+    const grossWeight = parseFloat(formData.Gross_Weight) || 0; // Use Gross Weight
     const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
     const makingCharges = parseFloat(formData.Making_Charges) || 0;
 
     if (formData.Making_Charges_On === "By Weight") {
-      const calculatedMakingCharges = totalWeight * mcPerGram;
+      const calculatedMakingCharges = grossWeight * mcPerGram;
       setFormData((prev) => ({
         ...prev,
         Making_Charges: calculatedMakingCharges.toFixed(2),
       }));
     } else if (formData.Making_Charges_On === "Fixed") {
-      const calculatedMcPerGram = makingCharges / totalWeight;
+      const calculatedMcPerGram = grossWeight > 0 ? makingCharges / grossWeight : 0; // Avoid division by zero
       setFormData((prev) => ({
         ...prev,
         MC_Per_Gram: calculatedMcPerGram.toFixed(2),
       }));
     }
   };
+
 
   const [taxOptions, setTaxOptions] = useState([]);
   useEffect(() => {
@@ -500,7 +501,7 @@ const FormWithTable = () => {
                   readOnly={!isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
-                <InputField
+                {/* <InputField
                   label="Tag ID:"
                   name="Tag_ID"
                   type="text"
@@ -508,13 +509,13 @@ const FormWithTable = () => {
                   onChange={handleChange}
                   readOnly={!isMaintainTagsChecked}
                   style={openingTagsStyle}
-                />
-                <InputField
+                /> */}
+                {/* <InputField
                   label="Prefix:"
                   value="Gold"
                   readOnly
                   style={openingTagsStyle}
-                />
+                /> */}
                 <InputField
                   label="Purity:"
                   type="select"
@@ -679,7 +680,7 @@ const FormWithTable = () => {
                 style={{
                   backgroundColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
                   borderColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
-                  marginLeft: "95%",
+                  marginLeft: "1397px",
                   marginTop: "15px",
                   ...openingTagsStyle,
                 }}
@@ -690,18 +691,25 @@ const FormWithTable = () => {
 
             </form>
 
-            <button
-              type="button"
-              className="cus-back-btn"
-              variant="secondary"
-              onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px', marginTop: '10px' }}
-            >
-              cancel
-            </button>
-            {/* Add additional fields similarly */}
-            <button className="btn btn-primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSave}>
-              Save
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+              <button
+                type="button"
+                className="cus-back-btn"
+                variant="secondary"
+                onClick={handleBack}
+                style={{ backgroundColor: 'gray', marginRight: '10px' }}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            </div>
+
 
             {/* table Section */}
             <div style={{ overflowX: "scroll" }}>

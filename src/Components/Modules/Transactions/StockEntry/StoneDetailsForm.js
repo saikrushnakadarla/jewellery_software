@@ -77,15 +77,15 @@ const StoneDetailsForm = () => {
   return (
     <div className="modal-body" style={{ backgroundColor: "rgba(163, 110, 41, 0.08)" }}>
       <div className="row g-3">
-        <div className="col-md-4">
+        {/* <div className="col-md-4">
           <InputField label="P Code:" />
-        </div>
+        </div> */}
         <div className="col-md-4">
-          <InputField label="Product Name:" />
+          <InputField label="Sub Product Name:" />
         </div>
-        <div className="col-md-4">
+        {/* <div className="col-md-4">
           <InputField label="Stone Name:" />
-        </div>
+        </div> */}
         <div className="col-md-4">
           <InputField label="Weight:" />
         </div>
@@ -93,11 +93,11 @@ const StoneDetailsForm = () => {
           <InputField label="Rate per Gram:" />
         </div>
         <div className="col-md-4">
-          <InputField label="Total Weight:" />
+          <InputField label="Amount:" />
         </div>
-        <div className="col-md-4">
+        {/* <div className="col-md-4">
           <InputField label="Total Price:" />
-        </div>
+        </div> */}
         <div className="col-md-4">
           <button type="button" className="btn btn-primary">
             Save
@@ -109,6 +109,12 @@ const StoneDetailsForm = () => {
         <h6 className="fw-bold">Stone List</h6>
         <DataTable columns={columns} data={data} />
       </div>
+      <div className="col-md-4">
+          <InputField label="Total Weight:" />
+        </div>
+        <div className="col-md-4">
+          <InputField label="Total Amount:" />
+        </div>
     </div>
   );
 };
