@@ -31,11 +31,13 @@ const RepairForm = () => {
   });
 
   const navigate = useNavigate();
+  const [isQtyEditable, setIsQtyEditable] = useState(false);
+
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/products');
+        const response = await fetch(`${baseURL}/get/products`);
         if (!response.ok) {
           throw new Error('Failed to fetch products');
         }
@@ -48,7 +50,7 @@ const RepairForm = () => {
 
     const fetchTags = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/opening-tags-entry');
+        const response = await fetch(`${baseURL}/get/opening-tags-entry`);
         if (!response.ok) {
           throw new Error('Failed to fetch tags');
         }
@@ -96,7 +98,7 @@ const RepairForm = () => {
     if (product) {
       setFormData((prevData) => ({
         ...prevData,
-        barcode: "",
+        barcode: product.rbarcode,
         product_id: product.product_id || "",
         product_name: product.product_name || "",
         metal_type: product.Category || "",
@@ -129,7 +131,7 @@ const RepairForm = () => {
       if (tag) {
         setFormData((prevData) => ({
           ...prevData,
-          barcode: '', // Priority to tag barcode if available
+          barcode: product.rbarcode, // Priority to tag barcode if available
           product_id: product.product_id,
           product_name: product.product_name,
           metal_type: product.Category,
@@ -221,7 +223,9 @@ const RepairForm = () => {
           mc_on: "",
           mc_per_gm: "",
           making_charges: "",
+          qty: 1, // Set qty to 1 for product
         }));
+        setIsQtyEditable(false); // Set qty as read-only
       } else {
         // Check if tag exists by barcode
         const tag = data.find((tag) => String(tag.PCode_BarCode) === String(barcode));
@@ -249,7 +253,9 @@ const RepairForm = () => {
             mc_on: tag.Making_Charges_On || "",
             mc_per_gm: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
+            qty: 1, // Allow qty to be editable for tag
           }));
+          setIsQtyEditable(true); // Allow editing of qty
         } else {
           // Reset form if no tag is found
           setFormData((prevData) => ({
@@ -263,13 +269,16 @@ const RepairForm = () => {
             gross_weight: "",
             stones_weight: "",
             stones_price: "",
+            qty: "", // Reset qty
           }));
+          setIsQtyEditable(true); // Default to editable
         }
       }
     } catch (error) {
       console.error("Error handling barcode change:", error);
     }
   };
+  
   
 
   return (
@@ -434,6 +443,17 @@ const RepairForm = () => {
                     label="Making Charges" name="Making_Charges" value={formData.Making_Charges}  onChange={handleChange}                   
                   />
                 </Col>
+                <Col xs={12} md={1}>
+                <InputField
+                  label="Qty"
+                  name="qty"
+                  value={formData.qty}
+                  onChange={handleChange}
+                  readOnly={!isQtyEditable} // Make it editable when isQtyEditable is true
+                />
+              </Col>
+
+
                 {/* <Col xs={12} md={1}>
                   <InputField label="Rate" value={formData.stones_weight} onChange={handleChange}  />
                 </Col>
