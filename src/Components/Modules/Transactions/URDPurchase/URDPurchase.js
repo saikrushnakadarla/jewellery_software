@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./URDPurchase.css";
 import InputField from "../../../Pages/InputField/InputField";
-import { Container, Row, Col, Button,Table } from "react-bootstrap";
+import { Container, Row, Col, Button,Table, Form } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
@@ -123,7 +123,8 @@ const URDPurchase = () => {
   return (
     <div className="main-container">
     <div className="urdpurchase-form-container">
-        <form className="urdpurchase-form">
+      <Form>
+        <div className="urdpurchase-form">
         {/* Left Section */}
         <div className="urdpurchase-form-left">
           {/* Customer Details */}
@@ -245,7 +246,7 @@ const URDPurchase = () => {
             
           </div>
         </div>
-      </form>
+      </div>
        
       <div className="urd-form-section">
         <h4>Purchase Details</h4>
@@ -424,7 +425,7 @@ const URDPurchase = () => {
           </Button>
           
         </div>
-     
+        </Form>
     </div>
     </div>
   );

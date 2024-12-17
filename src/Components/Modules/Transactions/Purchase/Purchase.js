@@ -1,466 +1,443 @@
-
-import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './Purchase.css';
-import InputField from '../../../Pages/InputField/InputField';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import "./Purchase.css";
+import InputField from "../../../Pages/InputField/InputField";
+import { Container, Row, Col, Button,Table,Form } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
+import baseURL from "../../../../Url/NodeBaseURL";
+import axios from "axios";
+import { AiOutlinePlus } from "react-icons/ai";
 
+const URDPurchase = () => {
+    const [metal, setMetal] = useState("");
+    const [purity, setPurity] = useState("");
+    const [product, setProduct] = useState("");
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const [customers, setCustomers] = useState([]);
+    const [formData, setFormData] = useState({
+      name: "",
+      mobile: "",
+      email: "",
+      address1: "",
+      address2: "",
+      address3: "",
+      city: "",
+      
+    });
+  
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value
+      }));
+    };
+  
 
-const Purchase = () => {
-
-        const [formData, setFormData] = useState({
-                name: "",
-                metal: "",
-                purity: "",
-                a_c_address: "",
-                gst_in: "",
-                indent: "",
-                bill_no: "",
-                type: "",
-                rate_cut: "",
-                date: "",
-                bill_date: "",
-                category: "",
-                due_date: "",
-                rate: "",
-                item_name: "",
-                design_code: "",
-                hsn: "",
-                type_unit: "",
-                stock_type: "",
-                pcs: "",
-                gross: "",
-                stone: "",
-                net: "",
-                purity_unit: "",
-                rate_unit_one: "",
-                unit: "",
-                w_percentage: "",
-                waste: "",
-                pure_wt: "",
-                alloy: "",
-                cost: "",
-                total_wt: "",
-                wt_rate_amount: "",
-                mc_per_gm: "",
-                mc: "",
-                stn_amount: "",
-                total: "",
-                stone_unit: "",
-                pcs_stn: "",
-                ct: "",
-                gms: "",
-                cwp: "",
-                rate_unit_two: "",
-                clear: "",
-                class_type: "",
-                cut: "",
-                clarity: "",
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await fetch(`${baseURL}/get/account-details`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch data');
+          }
+          const result = await response.json();
+    
+          // Filter only suppliers
+          const customers = result.filter(
+            (item) => item.account_group === 'CUSTOMERS'
+          );
+    
+          setCustomers(customers);
+          // setLoading(false);
+          console.log("Customers=",customers)
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          setLoading(false);
+        }
+      };
+    
+      fetchData();
+    }, []);
+  
+    const handleCustomerChange = (customerId) => {
+      setFormData((prevData) => ({
+        ...prevData,
+        customer_id: customerId, // Ensure customer_id is correctly updated
+      }));
+    
+      const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
+      console.log("Customer Id=",customer)
+    
+      if (customer) {
+        setFormData({
+          ...formData,
+          customer_id: customerId, // Ensure this is correctly set
+          name: customer.account_name, // Set the name field to the selected customer
+          mobile: customer.mobile || "",
+          email: customer.email || "",
+          address1: customer.address1 || "",
+          address2: customer.address2 || "",
+          city: customer.city || "",
+          pincode: customer.pincode || "",
+          state: customer.state || "",
+          state_code: customer.state_code || "",
+          aadhar_card: customer.aadhar_card || "",
+          gst_in: customer.gst_in || "",
+          pan_card: customer.pan_card || "",
+  
         });
+      } else {
+        setFormData({
+          ...formData,
+          customer_id: "",
+          name: "",
+          mobile: "",
+          email: "",
+          address1: "",
+          address2: "",
+          city: "",
+          pincode: "",
+          state: "",
+          state_code: "",
+          aadhar_card: "",
+          gst_in: "",
+          pan_card: "",
+        });
+      }
+    };
+    const handleBack = () => {
+        navigate('/urdpurchasetable');
+    };
 
-        const handleChange = (e) => {
-                const { name, value } = e.target;
-                setFormData({ ...formData, [name]: value });
-        };
+    const handleAddCustomer = () => {
+      navigate("/customermaster", { state: { from: "/urd_purchase" } });
+    };
 
-        const handleSubmit = async (e) => {
-                e.preventDefault();
-                try {
-                        const response = await axios.post("http://localhost:5000/post/purchase_form", formData);
-                        console.log("Form submitted successfully:", response.data);
-                        alert("Form submitted successfully!");
-                } catch (error) {
-                        console.error("Error submitting form:", error);
-                        alert("Error submitting form. Please try again.");
-                }
-        };
+  return (
+    <div className="main-container">
+    <div className="purchase-form-container">
+    <Form>
+        <div className="purchase-form">
+        <div className="purchase-form-left">
+          {/* Customer Details */}
+          <Col className="urd-form-section">
+            <h4 className="mb-4">Customer Details</h4>
+            <Row>
+            <Col xs={12} md={3} className="d-flex align-items-center">
+            <div style={{ flex: 1 }}>
+              <InputField
+                label="Mobile"
+                name="mobile"
+                type="select"
+                value={formData.customer_id || ""} // Use customer_id to match selected value
+                onChange={(e) => handleCustomerChange(e.target.value)}
+                options={[
+                  { value: "", label: "Select" }, // Placeholder option
+                  ...customers.map((customer) => ({
+                    value: customer.account_id, // Use account_id as the value
+                    label: customer.mobile, // Display mobile as the label
+                  })),
+                ]}
+              />
+            </div>
+            <AiOutlinePlus
+              size={20}
+              color="black"
+              onClick={handleAddCustomer}
+              style={{
+                marginLeft: "10px",
+                cursor: "pointer",
+                marginBottom: "20px",
+              }}
+            />
+          </Col>
+                <Col xs={12} md={3}>
+                <InputField
+                    label="Customer Name:"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={3}>
+                <InputField
+                    label="Email:"
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={3}>
+                <InputField
+                    label="Address1:"
+                    name="address1"
+                    value={formData.address1}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={3}>
+                <InputField
+                    label="Address2:"
+                    name="address2"
+                    value={formData.address2}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={3}>
+                <InputField
+                    label="City"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField 
+                  label="PinCode" 
+                  name="pincode"
+                  value={formData.pincode}
+                  onChange={handleChange}
+                  readOnly
+                  />
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="State Code:"  name="state_code" value={formData.state_code} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="GSTIN"name="gst_in" value={formData.gst_in} onChange={handleChange} readOnly />
+                </Col>
+                <Col xs={12} md={3}>
+                  <InputField label="PAN" name="pan_card" value={formData.pan_card} onChange={handleChange} readOnly />
+                </Col>
+                
+              </Row>
+            
+          </Col> 
+        </div>
+        <div className="purchase-form-right">
+          <Col className="urd-form-section">
+          <Row>
+          <Col xs={12} md={6} >  
+              <InputField label="Indent" />
+            </Col>
+            <Col xs={12} md={6} >
+              <InputField label="Bill No" />
+            </Col> 
+            <Col xs={12} md={6} >
+              <InputField label="Type" />
+            </Col> 
+            <Col xs={12} md={6} >
+              <InputField label="Rate-Cut" />
+            </Col> 
+            <Col xs={12} md={6} >
+              <InputField label="Date" type="date"  />
+            </Col> 
+            <Col xs={12} md={6} >
+              <InputField label="Bill Date" type="date"  />
+            </Col> 
+            <Col xs={12} md={6} >
+              <InputField label="Due Date" type="date" />
+            </Col> 
+            <Col xs={12} md={6} >
+              <InputField label="Rate" />
+            </Col> 
+           
+          </Row>
+           
+            
+          </Col>
+        </div>
+      </div>
 
+      <div className="urd-form-section">
+        {/* <h4>Purchase Details</h4> */}
+        <Row>
+        <Col xs={12} md={1}>
+        <InputField label="P ID" />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Product Name "
+            type="select"
+            value={product}
+            onChange={(e) => setProduct(e.target.value)}
+            options={[
+              { value: "PRODUCT1", label: "Product1" },
+              { value: "PRODUCT2", label: "Product2" },
+              { value: "PRODUCT3", label: "Product3" },
+              { value: "PRODUCT4", label: "Product4" },
+            ]}
+          />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField
+            label="Metal Type"
+            type="select"
+            value={metal}
+            onChange={(e) => setMetal(e.target.value)}
+            options={[
+              { value: "GOLD", label: "Gold" },
+              { value: "SILVER", label: "Silver" },
+              { value: "PLATINUM", label: "Platinum" },
+            ]}
+          />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField
+            label="Design Name"
+            type="select"
+            value={metal}
+            onChange={(e) => setMetal(e.target.value)}
+            options={[
+              { value: "GOLD", label: "Gold" },
+              { value: "SILVER", label: "Silver" },
+              { value: "PLATINUM", label: "Platinum" },
+            ]}
+          />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField
+            label="Purity:"
+            type="select"
+            value={purity}
+            onChange={(e) => setPurity(e.target.value)}
+            options={[
+              { value: "24K", label: "24K" },
+              { value: "22K", label: "22K (916)" },
+              { value: "22KHM", label: "22K (916HM)" },
+              { value: "18K", label: "18K (750)" },
+              { value: "14K", label: "14K (585)" },
+              { value: "10K", label: "10K (417)" },
+              { value: "9K", label: "9K (375)" },
+            ]}
+          />
+          </Col>          
+          <Col xs={12} md={1}>
+          <InputField label="HSN" type="text" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Type" type="text" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Stock Type" type="text" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="PCs" type="text" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Gross" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Stone" type="number" />
+          </Col> 
+          <Col xs={12} md={1}>
+          <InputField label="Net" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Rate" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Unit" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="W%" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Waste" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Pure Wt" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Alloy" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Cost" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Total Wt" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="WT*Rate Amt" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="MC/Gm" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="MC" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Stn.Amt" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Total" type="number" />
+          </Col>
+          </Row>
+          <Row>
+          <Col xs={12} md={2}>
+          <InputField label="Stone"/>
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="PCs" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="CT" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Gms" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="CWP" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Rate" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Clear"/>
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Class" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Cut" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="Clarity"/>
+          </Col>
+          <Col xs={12} md={1}>
+            <Button style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
+          </Col>
+          </Row>
+      </div>
 
-        const navigate = useNavigate();
-  const handleBack = () => {
-    navigate('/purchasetable'); 
-  };
+        <div className="form-buttons">
+          <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
 
-        const [metal, setMetal] = useState("");
-        return (
-                <div className="main-container ">
-                        <div className="box-last first ">
-                                <div className="row  mar-left">
-                                        {/* Name Input */}
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2">
-                                                {/* <InputField label=" Name:" /> */}
-                                                <InputField
-                                                        label="Name:"
-                                                        name="name"
-                                                        value={formData.name}
-                                                        onChange={handleChange}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2">
-                                                {/* <InputField
-                                                        label="Metal:"
-                                                        type="select"
-                                                        value={metal}
-                                                        onChange={(e) => setMetal(e.target.value)}
-                                                        options={[
-                                                                { value: "gold", label: "gold" },
-                                                                { value: "silver", label: "silver" },
-                                                                { value: "platinum", label: "platinum" },
-                                                        ]}
-                                                /> */}
-                                                <InputField
-                                                        label="Metal:"
-                                                        name="metal"
-                                                        type="select"
-                                                        value={formData.metal}
-                                                        onChange={handleChange}
-                                                        options={[
-                                                                { value: "Gold", label: "Gold" },
-                                                                { value: "Silver", label: "Silver" },
-                                                                { value: "Platinum", label: "Platinum" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2">
-                                                {/* <InputField
-                                                        label="Purity:"
-                                                        type="select"
-                                                        value={metal}
-                                                        onChange={(e) => setMetal(e.target.value)}
-                                                        options={[
-                                                                { value: "918HM", label: "918HM" },
-                                                                { value: "916KDM", label: "916KDM" },
-                                                                { value: "24K", label: "24K" },
-                                                        ]}
-                                                /> */}
-                                                <InputField
-                                                        label="Purity:"
-                                                        type="select"
-                                                        name="purity"
-                                                        value={formData.purity}
-                                                        onChange={handleChange}
-                                                        options={[
-                                                                { value: "22.5", label: "22.5" },
-                                                                { value: "24", label: "24" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-3 mb-2">
-                                                <InputField
-                                                        label="A/C Address:"
-                                                        name="a_c_address"
-                                                        value={formData.a_c_address}
-                                                        onChange={handleChange}
-                                                />                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-3 mb-2">
-                                                <InputField
-                                                        label="GSTIN:"
-                                                        name="gst_in"
-                                                        value={formData.gst_in}
-                                                        onChange={handleChange}
-                                                />                                        </div>
-                                </div>
-                        </div>
-                        <div className="box-last">
-                                <div className="row mar-left">
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 one-width">
-                                                {/* <InputField label=" Indent:" /> */}
-                                                <InputField
-                                                        label="Indent:"
-                                                        name="indent"
-                                                        value={formData.indent}
-                                                        onChange={handleChange}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 one-width">
-                                                {/* <InputField label=" Bill No:" /> */}
-                                                <InputField
-                                                        label="Bill No:"
-                                                        name="bill_no"
-                                                        value={formData.bill_no}
-                                                        onChange={handleChange}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 one-width">
-                                                {/* <InputField
-                                                        label="Type:"
-                                                        type="select"
-                                                        value={metal}
-                                                        onChange={(e) => setMetal(e.target.value)}
-                                                        options={[
-                                                                { value: "Within State", label: "Within State" },
-                                                                { value: "Out of State", label: "Out of State" },
-                                                        ]}
-                                                /> */}
-
-
-                                                <InputField
-                                                        label="Type:"
-                                                        type="select"
-                                                        name="type"
-                                                        value={formData.type}
-                                                        onChange={handleChange}
-                                                        options={[
-                                                                { value: "Within State", label: "Within State" },
-                                                                { value: "Out of State", label: "Out of State" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 one-width">
-                                                <InputField
-                                                        label="Rate-Cut:"
-                                                        name="rate_cut"
-                                                        type="select"
-                                                        value={formData.rate_cut}
-                                                        onChange={handleChange}
-                                                        options={[
-                                                                { value: "RATE-CUT 1", label: "RATE-CUT 1" },
-                                                                { value: "RATE-CUT 2", label: "RATE-CUT 2" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 one-width">
-                                                {/* <InputField label=" Date:" type="date" /> */}
-                                                <InputField
-                                                        label="Date:"
-                                                        name="date"
-                                                        type="date"
-                                                        value={formData.date}
-                                                        onChange={handleChange}
-                                                />
-
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 one-width">
-                                                {/* <InputField label=" Bill Date:" type="date" /> */}
-                                                <InputField
-                                                        label="Bill Date:"
-                                                        name="bill_date"
-                                                        type="date"
-                                                        value={formData.bill_date}
-                                                        onChange={handleChange}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 one-width">
-                                                <InputField
-                                                        label="Category:"
-                                                        name="category"
-                                                        type="select"
-                                                        value={formData.category}
-                                                        onChange={handleChange}
-                                                        options={[
-                                                                { value: "NEW", label: "NEW" },
-                                                                { value: "OLD", label: "OLD" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 one-width">
-                                                {/* <InputField label=" Due Date:" type="date" /> */}
-                                                <InputField
-                                                        label="Due Date:"
-                                                        name="due_date"
-                                                        type="date"
-                                                        value={formData.due_date}
-                                                        onChange={handleChange}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 one-width">
-                                                {/* <InputField label="Rate:" /> */}
-                                                <InputField
-                                                        label="Rate:"
-                                                        name="rate"
-                                                        value={formData.rate}
-                                                        onChange={handleChange}
-                                                />
-                                        </div>
-                                </div>
-                        </div>
-                        <div className="main-sec">
-                                <div className="row mar-left ">
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                {/* <InputField label="Item Name:" /> */}
-                                                <InputField
-                                                        label="Item Name:"
-                                                        name="item_name"
-                                                        value={formData.item_name}
-                                                        onChange={handleChange}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                {/* <InputField label="Design Code:" /> */}
-                                                <InputField
-                                                        label="Design Code:"
-                                                        name="item_name"
-                                                        value={formData.item_name}
-                                                        onChange={handleChange}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" HSN:" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField
-                                                        label="Type:"
-                                                        type="select"
-                                                        value={metal}
-                                                        onChange={(e) => setMetal(e.target.value)}
-                                                        options={[
-                                                                { value: "Finished", label: "Finished" },
-                                                                { value: "Raw", label: "Raw" },
-                                                                { value: "Semi-Finished", label: "Semi-Finished" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField
-                                                        label="Stock Type:"
-                                                        type="select"
-                                                        value={metal}
-                                                        onChange={(e) => setMetal(e.target.value)}
-                                                        options={[
-                                                                { value: "In Stock", label: "In Stock" },
-                                                                { value: "Out of Stock", label: "Out of Stock" },
-                                                                { value: "Reserved", label: "Reserved" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Pcs:" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Gross:" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Stone:" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Net:" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Purity:" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Rate:" />
-                                        </div>
-                                </div>
-                                <div className="row mar-left">
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Unit:" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" W% :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Waste :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Pure Wt :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Alloy :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Cost :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Tot Wt :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width ">
-                                                <InputField label=" WT*Rate Amt :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" MC/GM :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" MC :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label=" Stn. Amt :" />
-                                        </div>
-                                </div>
-                                <div className="row mar-left">
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label="Total :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField
-                                                        label="Stone :"
-                                                        type="select"
-                                                        value={metal}
-                                                        onChange={(e) => setMetal(e.target.value)}
-                                                        options={[
-                                                                { value: "Diamond", label: "Diamond" },
-                                                                { value: "Ruby", label: "Ruby" },
-                                                                { value: "Emerald", label: "Emerald" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label="Pcs :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label="CT :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label="Gms :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField
-                                                        label="CWP :"
-                                                        type="select"
-                                                        value={metal}
-                                                        onChange={(e) => setMetal(e.target.value)}
-                                                        options={[
-                                                                { value: "Yes", label: "Yes" },
-                                                                { value: "No", label: "No" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label="Rate :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label="Clear :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField
-                                                        label="Class :"
-                                                        type="select"
-                                                        value={metal}
-                                                        onChange={(e) => setMetal(e.target.value)}
-                                                        options={[
-                                                                { value: "Class A", label: "Class A" },
-                                                                { value: "Class B", label: "Class B" },
-                                                                { value: "Class C", label: "Class C" },
-                                                        ]}
-                                                />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width">
-                                                <InputField label="Cut :" />
-                                        </div>
-                                        <div className="col-12 col-md-6 col-lg-2 mb-2 r_width ">
-                                                <InputField label="Clarity :" />
-                                        </div>
-                                </div>
-                        </div>
-                        {/* <button type="submit" className="pur-submit-btn">Save</button> */}
-                        <div className="sup-button-container">
-                                <button
-                                        type="button"
-                                        className="pur-cus-back-btn"
-                                        onClick={handleBack}
-                                >
-                                        Back
-                                </button>
-                                <button
-                                        type="submit"
-                                        className="pur-submit-btn"
-                                        style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-                                >
-                                        Save
-                                </button>
-                        </div>
-                </div>
-        );
+          <Button
+            variant="secondary"
+            onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
+          >
+          cancel
+          </Button>
+          
+        </div>
+        </Form>
+    </div>
+    </div>
+  );
 };
-export default Purchase;
+
+export default URDPurchase;
