@@ -111,7 +111,7 @@ const URDPurchase = () => {
     };
 
     const handleAddCustomer = () => {
-      navigate("/customermaster", { state: { from: "/urd_purchase" } });
+      navigate("/customermaster", { state: { from: "/purchase" } });
     };
 
   return (

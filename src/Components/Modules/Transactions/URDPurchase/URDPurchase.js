@@ -38,7 +38,6 @@ const URDPurchase = () => {
         [name]: value
       }));
     };
-  
 
     useEffect(() => {
       const fetchData = async () => {
