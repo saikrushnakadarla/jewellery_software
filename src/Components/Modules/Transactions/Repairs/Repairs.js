@@ -364,10 +364,10 @@ const handleSubmit = async (e) => {
                     ]}
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={3}>
                   <InputField label="Item:" name="item" value={formData.item} onChange={handleChange} />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Tag No:" name="tag_no" value={formData.tag_no} onChange={handleChange} />
                 </Col>
                 <Col xs={12} md={3}>
@@ -418,7 +418,7 @@ const handleSubmit = async (e) => {
         </div>
       
         {/* Extra Charges */}
-        <Row className="form-section">
+        {/* <Row className="form-section">
             <h4>Extra Charges</h4>
             <Col xs={12} md={2}>
               <InputField label="Extra Weight:" name="extra_weight" value={formData.extra_weight} onChange={handleChange} />
@@ -435,7 +435,7 @@ const handleSubmit = async (e) => {
             <Col xs={12} md={2}>
               <InputField label="Total:" name="total" value={formData.total} onChange={handleChange} />
             </Col>
-          </Row>
+          </Row> */}
           
         {/* Buttons */}
         <div className="form-buttons">

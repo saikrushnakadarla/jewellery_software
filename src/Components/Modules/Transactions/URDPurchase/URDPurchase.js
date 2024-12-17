@@ -128,37 +128,37 @@ const URDPurchase = () => {
         <div className="urdpurchase-form-left">
           {/* Customer Details */}
           <Col className="urd-form-section">
-            <h4 className="mb-2">Customer Details</h4>
+            <h4 className="mb-3">Customer Details</h4>
             <Row>
             <Col xs={12} md={2} className="d-flex align-items-center">
-    <div style={{ flex: 1 }}>
-      <InputField
-        label="Mobile"
-        name="mobile"
-        type="select"
-        value={formData.customer_id || ""} // Use customer_id to match selected value
-        onChange={(e) => handleCustomerChange(e.target.value)}
-        options={[
-          { value: "", label: "Select" }, // Placeholder option
-          ...customers.map((customer) => ({
-            value: customer.account_id, // Use account_id as the value
-            label: customer.mobile, // Display mobile as the label
-          })),
-        ]}
-      />
-    </div>
-    <AiOutlinePlus
-      size={20}
-      color="black"
-      onClick={handleAddCustomer}
-      style={{
-        marginLeft: "10px",
-        cursor: "pointer",
-        marginBottom: "20px",
-      }}
-    />
-  </Col>
-                <Col xs={12} md={4}>
+            <div style={{ flex: 1 }}>
+              <InputField
+                label="Mobile"
+                name="mobile"
+                type="select"
+                value={formData.customer_id || ""} // Use customer_id to match selected value
+                onChange={(e) => handleCustomerChange(e.target.value)}
+                options={[
+                  { value: "", label: "Select" }, // Placeholder option
+                  ...customers.map((customer) => ({
+                    value: customer.account_id, // Use account_id as the value
+                    label: customer.mobile, // Display mobile as the label
+                  })),
+                ]}
+              />
+            </div>
+            <AiOutlinePlus
+              size={20}
+              color="black"
+              onClick={handleAddCustomer}
+              style={{
+                marginLeft: "10px",
+                cursor: "pointer",
+                marginBottom: "20px",
+              }}
+            />
+          </Col>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Customer Name:"
                     name="name"
@@ -167,7 +167,7 @@ const URDPurchase = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Email:"
                     name="email"
@@ -177,7 +177,7 @@ const URDPurchase = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Address1:"
                     name="address1"
@@ -186,7 +186,7 @@ const URDPurchase = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                 <InputField
                     label="Address2:"
                     name="address2"
@@ -217,15 +217,15 @@ const URDPurchase = () => {
                   <InputField label="State:"  name="state" value={formData.state} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={2}>
-                  <InputField label="State Code:"  name="state" value={formData.state_code} onChange={handleChange} readOnly/>
+                  <InputField label="State Code:"  name="state_code" value={formData.state_code} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={2}>
                   <InputField label="Aadhar" name="aadhar_card" value={formData.aadhar_card} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="GSTIN"name="gst_in" value={formData.gst_in} onChange={handleChange} readOnly />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="PAN" name="pan_card" value={formData.pan_card} onChange={handleChange} readOnly />
                 </Col>
                 
@@ -236,165 +236,139 @@ const URDPurchase = () => {
         {/* Right Section */}
         <div className="urdpurchase-form-right">
           <div className="urd-form-section">
-          
-            <div className="urd-form-row mt-4">
-            <InputField label="Entry Type:" value="REPAIR" readOnly />
-            </div>
-            <div className="urd-form-row">
-            <InputField label="Code:" />
-            </div>
-            <div className="urd-form-row">
-            <InputField label="Date:" type="date" />
-            </div>
+            <Row className="mt-5">  
+              <InputField label="Date" type="date" />
+            </Row>
+            <Row>
+              <InputField label="URD Purchase No" />
+            </Row> 
+            
           </div>
         </div>
       </form>
        
-        <div className="urd-form-section">
-        <h4>Purchase Details</h4> 
-          <div className="urd-form-row">
+      <div className="urd-form-section">
+        <h4>Purchase Details</h4>
+        <Row>
+        <Col xs={12} md={2}>
+        <InputField label="P ID" />
+        </Col>
+        <Col xs={12} md={2}>
           <InputField
-              label="Metal:"
-              type="select"
-              value={metal}
-              onChange={(e) => setMetal(e.target.value)}
-              options={[
-                { value: "GOLD", label: "Gold" },
-                { value: "SILVER", label: "Silver" },
-                { value: "PLATINUM", label: "Platinum" },
-              ]}
-            />
-
-<InputField
-              label="Purity:"
-              type="select"
-              value={purity}
-              onChange={(e) => setPurity(e.target.value)}
-              options={[
-                { value: "24K", label: "24K" },
-                { value: "22K", label: "22K (916)" },
-                { value: "22KHM", label: "22K (916HM)" },
-                { value: "18K", label: "18K (750)" },
-                { value: "14K", label: "14K (585)" },
-                { value: "10K", label: "10K (417)" },
-                { value: "9K", label: "9K (375)" },
-              ]}
-            />
-
-
-<InputField
-              label="Product:"
-              type="select"
-              value={product}
-              onChange={(e) => setProduct(e.target.value)}
-              options={[
-                { value: "PRODUCT1", label: "Product1" },
-                { value: "PRODUCT2", label: "Product2" },
-                { value: "PRODUCT3", label: "Product3" },
-                { value: "PRODUCT4", label: "Product4" },
-               
-              ]}
-            />
-
-<InputField label="Item:" />
-
-<InputField
-              label="HSN Code:"
-              type="select"
-              value={hsnCode}
-              onChange={(e) => setHsnCode(e.target.value)}
-              options={[
-                { value: "HSNCODE1", label: "HsnCode1" },
-                { value: "HSNCODE2", label: "HsnCode2" },
-                { value: "HSNCODE3", label: "HsnCode3" },
-                { value: "HSNCODE4", label: "HsnCode4" },
-               
-              ]}
-            />
-             
-          </div>
+            label="Product:"
+            type="select"
+            value={product}
+            onChange={(e) => setProduct(e.target.value)}
+            options={[
+              { value: "PRODUCT1", label: "Product1" },
+              { value: "PRODUCT2", label: "Product2" },
+              { value: "PRODUCT3", label: "Product3" },
+              { value: "PRODUCT4", label: "Product4" },
+            ]}
+          />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField
+            label="Metal:"
+            type="select"
+            value={metal}
+            onChange={(e) => setMetal(e.target.value)}
+            options={[
+              { value: "GOLD", label: "Gold" },
+              { value: "SILVER", label: "Silver" },
+              { value: "PLATINUM", label: "Platinum" },
+            ]}
+          />
+          </Col>
           
-       
-        
-        {/* Repair Item Details */}
-        
-          {/* <h4>Repair Item Details</h4> */}
-          <div className="urd-form-row">
-            <InputField label="Gross:"  />
-            <InputField label="Dust:" />
-            <InputField label="Touch %:" />
-            <InputField label="ML %:" />
-            <InputField label="Eqv WT:" />
-            <InputField label="Remarks:" />
-            <InputField label="Rate:" />
-            <InputField label="value:" />
-            
-          </div>
-          <div className="urd-form-row">
-            <InputField
-              label="Stone Type:"
-              type="select"
-              value={stoneType}
-              onChange={(e) => setStoneType(e.target.value)}
-              options={[
-                { value: "STONETYPE1", label: "StoneType1" },
-                { value: "STONETYPE2", label: "StoneType2" },
-                { value: "STONETYPE3", label: "StoneType3" },
-              ]}
-            />
-              <InputField label="Pieces:" />
-              <InputField label="Gms/CT:" />
-              <InputField label="Rate:" />
-              <InputField label="Stn Amt:" />
-
-
-              <div className="form-checkbox">
-    <label>
-      <input
-        type="checkbox"
-        value={isChecked}
-        onChange={(e) => setIsChecked(e.target.checked)}
-      />
-      &nbsp; Hall Mark
-    </label>
-  </div>
-            </div>
-            <div className="urd-form-row">
-            <InputField
-             
-              type="select"
-              value={stoneType2}
-              onChange={(e) => setStoneType2(e.target.value)}
-              options={[
-                { value: "STONETYPE1", label: "StoneType1" },
-                { value: "STONETYPE2", label: "StoneType2" },
-                { value: "STONETYPE3", label: "StoneType3" },
-              ]}
-            />
-              <InputField  />
-              <InputField />
-              <InputField />
-              <InputField  />
-
-
-              <div className="form-add-button">
-  <button 
-    type="button" 
-    className="btn-primary" 
-    onClick={() => {
-      // Add your functionality here
-      console.log("Add button clicked");
-    }}
-  >
-    Add
-  </button>
-</div>
-
-            </div>
-
-            </div>
-            
-                  {/* Extra Charges */}
+          <Col xs={12} md={2}>
+          <InputField
+            label="Purity:"
+            type="select"
+            value={purity}
+            onChange={(e) => setPurity(e.target.value)}
+            options={[
+              { value: "24K", label: "24K" },
+              { value: "22K", label: "22K (916)" },
+              { value: "22KHM", label: "22K (916HM)" },
+              { value: "18K", label: "18K (750)" },
+              { value: "14K", label: "14K (585)" },
+              { value: "10K", label: "10K (417)" },
+              { value: "9K", label: "9K (375)" },
+            ]}
+          />
+          </Col>
+          
+          <Col xs={12} md={2}>
+          <InputField label="HSN Code" type="text" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Gross" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Dust" type="number" />
+          </Col> 
+          <Col xs={12} md={1}>
+          <InputField label="Touch %" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="ML %" type="number" />
+          </Col>    
+          <Col xs={12} md={1}>
+          <InputField label="Eqv WT" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Remarks:" type="text" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Rate" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Value" type="number" />
+          </Col>
+          {/* <Col xs={12} md={2}>
+          <InputField
+            label="Stone Type:"
+            type="select"
+            value={stoneType}
+            onChange={(e) => setStoneType(e.target.value)}
+            options={[
+              { value: "STONETYPE1", label: "StoneType1" },
+              { value: "STONETYPE2", label: "StoneType2" },
+              { value: "STONETYPE3", label: "StoneType3" },
+            ]}
+          />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Pieces" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Gms/CT" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Rate" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Stone Amt" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="cashCheckbox"
+                value="cash"
+              />
+            <label className="form-check-label" htmlFor="cashCheckbox">
+              HallMark
+            </label>
+            </div>           
+          </Col> */}
+          <Col xs={12} md={1}>
+            <Button style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
+          </Col>
+        </Row>
+      </div>
         <div className="urd-form-section">
           <h4>Item Details</h4>
           
@@ -439,22 +413,16 @@ const URDPurchase = () => {
             </tbody>
           </Table>
         </div>
-       
-
-
-
-        {/* Buttons */}
         <div className="form-buttons">
-          <Button type="submit" variant="success">Save</Button>
-          <button
-                                type="button"
-                                className="cus-back-btn"
-                                variant="secondary"
-                                onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
-                            >
-                                cancel
-                            </button>
-          <Button type="submit" variant="primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
+          <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
+          <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
+          <Button
+            variant="secondary"
+            onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
+          >
+          cancel
+          </Button>
+          
         </div>
      
     </div>

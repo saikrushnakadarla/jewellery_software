@@ -5,8 +5,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 import './Customers_Table.css';
 
-import baseURL from "../../../../Url/NodeBaseURL";
-
+import baseURL from '../../../../Url/NodeBaseURL';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -114,8 +113,17 @@ const RepairsTable = () => {
     []
   );
 
-  // Fetch data and filter where account_group = "customer"
+  // Utility function to format date to dd/mm/yyyy
+  const formatDate = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
+  // Fetch data and filter where account_group = "CUSTOMERS"
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -124,12 +132,16 @@ const RepairsTable = () => {
           throw new Error('Failed to fetch data');
         }
         const result = await response.json();
-  
-        // Filter only suppliers
-        const customers = result.filter(
-          (item) => item.account_group === 'CUSTOMERS'
-        );
-  
+
+        // Filter only customers and format dates
+        const customers = result
+          .filter((item) => item.account_group === 'CUSTOMERS')
+          .map((item) => ({
+            ...item,
+            birthday: formatDate(item.birthday),
+            anniversary: formatDate(item.anniversary),
+          }));
+
         setData(customers);
         setLoading(false);
       } catch (error) {
@@ -137,10 +149,9 @@ const RepairsTable = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
-  
 
   // Delete a customer
   const handleDelete = async (id) => {
@@ -152,7 +163,7 @@ const RepairsTable = () => {
 
         if (response.ok) {
           alert('Customer deleted successfully!');
-          setData((prevData) => prevData.filter((customer) => customer.id !== id));
+          setData((prevData) => prevData.filter((customer) => customer.account_id !== id));
         } else {
           console.error('Failed to delete customer');
           alert('Failed to delete customer.');
@@ -179,7 +190,11 @@ const RepairsTable = () => {
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Customers</h3>
-            <Button className="create_but" onClick={handleCreate} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+            <Button
+              className="create_but"
+              onClick={handleCreate}
+              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+            >
               + Create
             </Button>
           </Col>
