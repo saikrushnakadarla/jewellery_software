@@ -190,6 +190,16 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
 
               <div className="mt-4">
 
+                {/* <div className="col-md-12 d-flex justify-content-end" style={{ marginTop: '30px', marginLeft: '-15px' }}>
+                  <div className="me-3">
+                    <InputField label="Total Weight:" value={totalweight} readOnly />
+                  </div>
+                  <div>
+                    <InputField label="Total Price:" value={totalprice} readOnly />
+                  </div>
+                </div> */}
+                <h6 className="fw-bold">Stone List</h6>
+                <DataTable columns={columns} data={data} />
                 <div className="col-md-12 d-flex justify-content-end" style={{ marginTop: '30px', marginLeft: '-15px' }}>
                   <div className="me-3">
                     <InputField label="Total Weight:" value={totalweight} readOnly />
@@ -198,9 +208,8 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
                     <InputField label="Total Price:" value={totalprice} readOnly />
                   </div>
                 </div>
-                <h6 className="fw-bold">Stone List</h6>
-                <DataTable columns={columns} data={data} />
               </div>
+
             </div>
 
             <div className="modal-footer">
