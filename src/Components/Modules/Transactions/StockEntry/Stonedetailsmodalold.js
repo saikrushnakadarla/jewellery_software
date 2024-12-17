@@ -2,27 +2,31 @@ import React, { useState } from 'react';
 import InputField from "../../Masters/ItemMaster/Inputfield";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Adjust the path as needed
 import { FaEdit, FaTrash } from "react-icons/fa";
-import axios from "axios";
+import axios from "axios"; // Import Axios for making API requests
 
 const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
+  // Define state for the input fields
   const [subproductname, setSubProductName] = useState("");
   const [weight, setWeight] = useState("");
   const [ratepergram, setRatePerGram] = useState("");
   const [amount, setAmount] = useState("");
-  const [totalweight, setTotalWeight] = useState(0); // Initial total weight as 0
-  const [totalprice, setTotalPrice] = useState(0); // Initial total price as 0
+  const [totalweight, setTotalWeight] = useState("");
+  const [totalprice, setTotalPrice] = useState("");
 
+  // Define state for the data table and editing
   const [data, setData] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
+  // Define columns for the DataTable
   const columns = React.useMemo(
     () => [
       { Header: "Sub Product Name", accessor: "subproductname" },
       { Header: "Weight", accessor: "weight" },
       { Header: "Rate per Gram", accessor: "ratepergram" },
       { Header: "Amount", accessor: "amount" },
-
+      { Header: "Total Weight", accessor: "totalweight" },
+      { Header: "Total Price", accessor: "totalprice" },
       {
         Header: "Actions",
         accessor: "actions",
@@ -47,30 +51,25 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
     []
   );
 
+  // Handle adding or updating data in the table
   const handleAddOrUpdate = () => {
     const payload = {
       subproductname,
-      weight: parseFloat(weight), // Ensure weight is treated as a number
-      ratepergram: parseFloat(ratepergram),
-      amount: parseFloat(amount),
+      weight,
+      ratepergram,
+      amount,
+      totalweight,
+      totalprice,
     };
 
     if (isEditing) {
       // Update existing row
       setData((prevData) =>
-        prevData.map((item) => {
-          if (item.id === editId) {
-            // Adjust total weight and total price
-            const weightDifference = payload.weight - item.weight;
-            const amountDifference = payload.amount - item.amount;
-
-            setTotalWeight((prevTotalWeight) => prevTotalWeight + weightDifference);
-            setTotalPrice((prevTotalPrice) => prevTotalPrice + amountDifference);
-
-            return { ...item, ...payload };
-          }
-          return item;
-        })
+        prevData.map((item) =>
+          item.id === editId
+            ? { ...item, ...payload }
+            : item
+        )
       );
       setIsEditing(false);
       setEditId(null);
@@ -81,10 +80,6 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
         ...payload,
       };
       setData((prevData) => [...prevData, newRow]);
-
-      // Update total weight and total price
-      setTotalWeight((prevTotalWeight) => prevTotalWeight + parseFloat(weight || 0));
-      setTotalPrice((prevTotalPrice) => prevTotalPrice + parseFloat(amount || 0));
     }
 
     // Clear input fields after saving
@@ -92,9 +87,11 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
     setWeight("");
     setRatePerGram("");
     setAmount("");
+    setTotalWeight("");
+    setTotalPrice("");
   };
 
-
+  // Edit handler
   const handleEdit = (rowData) => {
     setIsEditing(true);
     setEditId(rowData.id);
@@ -102,20 +99,16 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
     setWeight(rowData.weight);
     setRatePerGram(rowData.ratepergram);
     setAmount(rowData.amount);
+    setTotalWeight(rowData.totalweight);
+    setTotalPrice(rowData.totalprice);
   };
 
+  // Delete handler
   const handleDelete = (id) => {
-    const rowToDelete = data.find((item) => item.id === id);
-
-    if (rowToDelete) {
-      // Update total weight and total price after deletion
-      setTotalWeight((prevTotalWeight) => prevTotalWeight - rowToDelete.weight);
-      setTotalPrice((prevTotalPrice) => prevTotalPrice - rowToDelete.amount);
-    }
-
     setData((prevData) => prevData.filter((item) => item.id !== id));
   };
 
+  // Save changes handler (to save all data in the table to the DB)
   const handleSaveChanges = async () => {
     try {
       for (const row of data) {
@@ -126,6 +119,10 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
       console.error("Error saving changes to DB", error);
     }
   };
+
+  if (!showModal) return null;
+
+
 
   const handleWeightChange = (e) => {
     const newWeight = e.target.value;
@@ -144,8 +141,6 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
     setAmount(calculatedAmount);
   };
 
-  if (!showModal) return null;
-
   return (
     <div className="modal show d-block" tabIndex="-1" role="dialog" style={{ marginTop: "-30px" }}>
       <div className="modal-dialog modal-lg" role="document">
@@ -161,38 +156,44 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
                   <InputField label="Sub Product Name:" value={subproductname} onChange={(e) => setSubProductName(e.target.value)} />
                 </div>
                 <div className="col-md-4">
-                  <InputField label="Weight:" value={weight} onChange={handleWeightChange} />
+                  <InputField
+                    label="Weight:"
+                    value={weight}
+                    onChange={handleWeightChange}
+                  />
                 </div>
                 <div className="col-md-4">
-                  <InputField label="Rate per Gram:" value={ratepergram} onChange={handleRatePerGramChange} />
+                  <InputField
+                    label="Rate per Gram:"
+                    value={ratepergram}
+                    onChange={handleRatePerGramChange}
+                  />
                 </div>
                 <div className="col-md-4">
-                  <InputField label="Amount:" value={amount} readOnly />
+                  <InputField
+                    label="Amount:"
+                    value={amount}
+                    readOnly
+                  />
                 </div>
-
+                <div className="col-md-4">
+                  <InputField label="Total Weight:" value={totalweight} onChange={(e) => setTotalWeight(e.target.value)} />
+                </div>
+                <div className="col-md-4">
+                  <InputField label="Total Price:" value={totalprice} onChange={(e) => setTotalPrice(e.target.value)} />
+                </div>
                 <div className="col-md-4">
                   <button type="button" className="btn btn-primary" onClick={handleAddOrUpdate}>
                     {isEditing ? "Update" : "Add"}
                   </button>
                 </div>
-
               </div>
-
+              {/* Table Section */}
               <div className="mt-4">
-
-                <div className="col-md-12 d-flex justify-content-end" style={{ marginTop: '30px', marginLeft: '-15px' }}>
-                  <div className="me-3">
-                    <InputField label="Total Weight:" value={totalweight} readOnly />
-                  </div>
-                  <div>
-                    <InputField label="Total Price:" value={totalprice} readOnly />
-                  </div>
-                </div>
                 <h6 className="fw-bold">Stone List</h6>
                 <DataTable columns={columns} data={data} />
               </div>
             </div>
-
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
                 Close
