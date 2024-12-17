@@ -119,13 +119,23 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
   const handleSaveChanges = async () => {
     try {
       for (const row of data) {
-        await axios.post("http://localhost:5000/post/addProductstonedetails", row);
+        const payload = {
+          subproductname: row.subproductname,
+          weight: row.weight,
+          ratepergram: row.ratepergram,
+          amount: row.amount,
+          totalweight: totalweight, // Send the total weight
+          totalprice: totalprice,  // Send the total price
+        };
+  
+        await axios.post("http://localhost:5000/post/addProductstonedetails", payload);
       }
       alert("Data saved successfully!");
     } catch (error) {
       console.error("Error saving changes to DB", error);
     }
   };
+  
 
   const handleWeightChange = (e) => {
     const newWeight = e.target.value;
