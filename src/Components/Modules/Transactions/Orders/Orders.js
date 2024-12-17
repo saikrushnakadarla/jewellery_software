@@ -55,9 +55,10 @@ const RepairForm = () => {
     tax_amt: "",
     total_price: "",
     transaction_status: "Orders",
+    qty:"",
   });
   const [paymentDetails, setPaymentDetails] = useState({
-    cash: 0, card: 0,
+    cash_amount: 0,
 
     card_amt: 0,
     chq: "",
@@ -67,9 +68,31 @@ const RepairForm = () => {
 
 
   });
-  const [repairDetails, setRepairDetails] = useState([]);
+
 
   useEffect(() => {
+    const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
+    setFormData((prevData) => ({ ...prevData, date: today }));
+  }, []);
+
+
+  const [repairDetails, setRepairDetails] = useState([]);
+  const [isQtyEditable, setIsQtyEditable] = useState(false);
+  useEffect(() => {
+    const fetchLastInvoiceNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
+        setFormData({ ...formData, invoice_number: response.data.lastInvoiceNumber });
+      } catch (error) {
+        console.error("Error fetching invoice number:", error);
+      }
+    };
+
+    fetchLastInvoiceNumber();
+  }, []);
+
+  useEffect(() => {
+   
     const fetchProducts = async () => {
       try {
         const response = await fetch(`${baseURL}/get/products`);
@@ -149,6 +172,62 @@ const RepairForm = () => {
       [name]: value
     }));
   };
+
+  const handleMetalTypeChange = (metalType) => {
+    const product = products.find((prod) => String(prod.Category) === String(metalType));
+
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode || "",
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        
+      }));
+    }
+  };
+
+  const handleDesignNameChange = (designName) => {
+    const product = products.find((prod) => String(prod.design_master) === String(designName));
+
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode || "",
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        
+      }));
+    }
+  };
   
   const handleProductNameChange = (productName) => {
     const product = products.find((prod) => String(prod.product_name) === String(productName));
@@ -156,7 +235,9 @@ const RepairForm = () => {
     if (product) {
       setFormData((prevData) => ({
         ...prevData,
-        code: "",
+
+        code: product.rbarcode,
+
         product_id: product.product_id || "",
         product_name: product.product_name || "",
         metal_type: product.Category || "",
@@ -287,7 +368,9 @@ const RepairForm = () => {
           mc_per_gram: "",
           making_charges: "",
           tax_percent:product.tax_slab ,
+          qty: 1, // Set qty to 1 for product
         }));
+        setIsQtyEditable(false); // Set qty as read-only
       } else {
         // Check if tag exists by code
         const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
@@ -316,7 +399,9 @@ const RepairForm = () => {
             mc_per_gram: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
             tax_percent:productDetails?.tax_slab || "",
+            qty: 1, // Allow qty to be editable for tag
           }));
+          setIsQtyEditable(true); // Allow editing of qty
         } else {
           // Reset form if no tag is found
           setFormData((prevData) => ({
@@ -343,7 +428,9 @@ const RepairForm = () => {
             tax_percent: "",
             tax_amt: "",
             total_price: "",
+            qty: "", // Reset qty
           }));
+          setIsQtyEditable(true); // Default to editable
         }
       }
     } catch (error) {
@@ -380,14 +467,14 @@ const RepairForm = () => {
       tax_percent: "",
       tax_amt: "",
       total_price: "",
+      qty:"",
     }));
   };
   
-
   const handleSave = async () => {
     const dataToSave = repairDetails.map((item) => ({
       ...item,
-      cash_amount: paymentDetails.cash || 0,
+      cash_amount: paymentDetails.cash_amount || 0,
       card_amount: paymentDetails.card || 0,
       card_amt: paymentDetails.card_amt || 0,
       chq: paymentDetails.chq || "",
@@ -397,7 +484,7 @@ const RepairForm = () => {
     }));
 
     try {
-      await axios.post(`${baseURL}/save-repair-details`, {
+      await axios.post("${baseURL}/save-repair-details", {
         repairDetails: dataToSave,
       });
       alert("Data saved successfully");
@@ -420,7 +507,7 @@ const RepairForm = () => {
         invoice_number: "",
       });
       setPaymentDetails({
-        cash: 0, card: 0, card_amt: 0,
+        cash_amount: 0,  card_amt: 0,
         chq: "",
         chq_amt: 0,
         online: "",
@@ -436,7 +523,7 @@ const RepairForm = () => {
   };
 
   const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/orders" } });
+    navigate("/customermaster", { state: { from: "/sales" } });
   };
 
   useEffect(() => {
@@ -649,6 +736,7 @@ const RepairForm = () => {
                     name="date"
                     type="date"
                     value={formData.date}
+                    max={new Date().toISOString().split("T")[0]} 
                     onChange={(e) =>
                       setFormData({ ...formData, date: e.target.value })
                     }
@@ -739,8 +827,12 @@ const RepairForm = () => {
                     label="Metal Type"
                     name="metal_type"
                     value={formData.metal_type}
-                    onChange={handleChange}
-                    readOnly
+                    onChange={(e) => handleMetalTypeChange(e.target.value)}                    
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.Category,
+                      label: product.Category,
+                    }))}                    
                   />
                 </Col>
                 <Col xs={12} md={2}>
@@ -748,8 +840,12 @@ const RepairForm = () => {
                     label="Design Name"
                     name="design_name"
                     value={formData.design_name}
-                    onChange={handleChange}
-                    readOnly
+                    onChange={(e) => handleDesignNameChange(e.target.value)}
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.design_master,
+                      label: product.design_master,
+                    }))}
                   />
                 </Col>
                 <Col xs={12} md={1}>
@@ -864,12 +960,21 @@ const RepairForm = () => {
                     onChange={handleChange}
                   />
                 </Col>
-                <Col xs={12} md={2}>
+                <Col xs={12} md={1}>
                   <InputField label="Rate" name="rate"
                     value={formData.rate}
                     onChange={handleChange} 
                   />
                 </Col>
+                <Col xs={12} md={1}>
+                <InputField
+                  label="Qty"
+                  name="qty"
+                  value={formData.qty}
+                  onChange={handleChange}
+                  readOnly={!isQtyEditable} // Make it editable when isQtyEditable is true
+                />
+              </Col>
                 <Col xs={12} md={2}>
                 <InputField
                   label="Amount"
@@ -1114,7 +1219,7 @@ const RepairForm = () => {
                           name="cash_amount"
                           value={paymentDetails.cash_amount}
                           onChange={(e) =>
-                            setPaymentDetails({ ...paymentDetails, cash: e.target.value })
+                            setPaymentDetails({ ...paymentDetails, cash_amount: e.target.value })
                           }
                         />
                       </Col>                      

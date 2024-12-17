@@ -839,6 +839,7 @@ const RepairForm = () => {
                   <InputField
                     label="Design Name"
                     name="design_name"
+                    value={formData.design_name}
                     onChange={(e) => handleDesignNameChange(e.target.value)}
                     type="select"
                     options={products.map((product) => ({
