@@ -756,24 +756,7 @@ const FormWithTable = () => {
 
             </form>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-              <button
-                type="button"
-                className="cus-back-btn"
-                variant="secondary"
-                onClick={handleBack}
-                style={{ backgroundColor: 'gray', marginRight: '10px' }}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary"
-                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-                onClick={handleSave}
-              >
-                Save
-              </button>
-            </div>
+            
 
 
             {/* table Section */}
@@ -812,7 +795,24 @@ const FormWithTable = () => {
                 </tbody>
               </table>
             </div>
-
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+              <button
+                type="button"
+                className="cus-back-btn"
+                variant="secondary"
+                onClick={handleBack}
+                style={{ backgroundColor: 'gray', marginRight: '10px' }}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            </div>
             <StoneDetailsModal
               showModal={showModal}
               handleCloseModal={handleCloseModal}
