@@ -857,9 +857,9 @@ const RepairForm = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={2}>
+                <Col xs={12} md={1}>
                   <InputField
-                    label="Gross Weight"
+                    label="Gross Wt"
                     name="gross_weight"
                     value={formData.gross_weight || ""} // Default to "0" if undefined
                     onChange={handleChange}
@@ -867,7 +867,7 @@ const RepairForm = () => {
                 </Col>
                 <Col xs={12} md={1}>
                   <InputField
-                    label="St Weight"
+                    label="Stone Wt"
                     name="stone_weight"
                     value={formData.stone_weight || ""}
                     onChange={handleChange}
@@ -890,7 +890,7 @@ const RepairForm = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={1}>
+                <Col xs={12} md={2}>
                   <InputField
                     label="VA On"
                     name="va_on"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./SalesForm.css";
-import InputField from "../../../Pages/InputField/InputField";
+import InputField from "../../Masters/ItemMaster/Inputfield";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";

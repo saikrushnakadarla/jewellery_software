@@ -7,15 +7,14 @@
     background: #f9f9f9;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: fixed;
-    /* height: 60px; */
-    z-index: 1;
+ z-index: 1001;
     width: 100%;
     margin-top: -10px;
 }
 
 .active {
   background-color: #a36e29;
-  color: #fff;  /* Highlight text color */
+  color: #fff;
 }
 
 
@@ -86,18 +85,16 @@
 }
   
 .navbar-dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #fff;
-    color: #333;
-    padding: 1rem;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-    top: 100%;
-    left: 0;
-    width: 250px;
-
-    
+  display: none;
+  position: absolute; /* Ensures it is positioned relative to the dropdown container */
+  background-color: #fff;
+  color: #333;
+  padding: 0.5rem 1rem; /* Reduce padding for better appearance */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 1000; /* High z-index to ensure dropdown appears on top */
+  top: 100%;
+  left: 0;
+  min-width: 200px; /* Ensures dropdown has a minimum width */
 }
   
 .navbar-dropdown-content a {
