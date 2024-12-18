@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./URDPurchase.css";
 import InputField from "../../../Pages/InputField/InputField";
-import { Container, Row, Col, Button,Table, Form } from "react-bootstrap";
-import { renderMatches, useNavigate } from 'react-router-dom';
+import { Container, Row, Col, Button,Table } from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -13,62 +13,32 @@ const URDPurchase = () => {
     const [type, setType] = useState("");
     const [purity, setPurity] = useState("");
     const [product, setProduct] = useState("");
- 
-    const [gross, setGross] = useState(0);
-    const [dust, setDust] = useState(0);
-
-    const [rate, setRate] = useState(0);
-    const [totalAmount, setTotalAmount] = useState(0);
+    const [hsnCode, setHsnCode] = useState("");
+    const [stoneType, setStoneType] = useState("");
+    const [stoneType2, setStoneType2] = useState("");
+    const [isChecked, setIsChecked] = useState("");
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [customers, setCustomers] = useState([]);
-    const [items, setItems] = useState(
-      JSON.parse(localStorage.getItem("purchaseItems")) || []
-    );
     const [formData, setFormData] = useState({
-      customer_id: "",
-      account_name: "",
+      name: "",
       mobile: "",
       email: "",
       address1: "",
       address2: "",
       address3: "",
       city: "",
-      state: "",
-          state_code: "",
-          aadhar_card: "",
-          gst_in: "",
-          pan_card: "",
-          date: "",
-          puchase_number: "",
-
       
     });
-    const [productDetails, setProductDetails] = useState({
-      product_id: "",
-      product_name: "",
-      metal: "",
-      purity: "",
-      hsn_code: "",
-      gross: 0,
-      dust: 0,
-      touch_percent: 0,
-      ml_percent: 0,
-      eqt_wt: 0,
-      remarks: "",
-      rate: 0,
-      total_amount: 0,
-    });
-
-    const handleInputChange = (e) => {
+  
+    const handleChange = (e) => {
       const { name, value } = e.target;
-      setProductDetails((prevDetails) => ({
-        ...prevDetails,
-        [name]: value,
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value
       }));
     };
   
-   
 
     useEffect(() => {
       const fetchData = async () => {
@@ -109,7 +79,7 @@ const URDPurchase = () => {
         setFormData({
           ...formData,
           customer_id: customerId, // Ensure this is correctly set
-          account_name: customer.account_name, // Set the name field to the selected customer
+          name: customer.account_name, // Set the name field to the selected customer
           mobile: customer.mobile || "",
           email: customer.email || "",
           address1: customer.address1 || "",
@@ -127,7 +97,7 @@ const URDPurchase = () => {
         setFormData({
           ...formData,
           customer_id: "",
-          account_name: "",
+          name: "",
           mobile: "",
           email: "",
           address1: "",
@@ -139,8 +109,6 @@ const URDPurchase = () => {
           aadhar_card: "",
           gst_in: "",
           pan_card: "",
-          date: "",
-          purchase_number: "",
         });
       }
     };
@@ -152,66 +120,10 @@ const URDPurchase = () => {
       navigate("/customermaster", { state: { from: "/urd_purchase" } });
     };
 
-    useEffect(() => {
-      localStorage.setItem("purchaseItems", JSON.stringify(items));
-    }, [items]);
-  
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      setFormData({ ...formData, [name]: value });
-    };
-  
-    const handleAddItem = () => {
-      // Ensure product_name and metal are selected before adding the item
-      if (productDetails.product_name && productDetails.metal) {
-        // Create a new item with the current productDetails
-        const newItem = { ...productDetails };
-    
-        // Update the items array with the new item
-        setItems([...items, newItem]);
-    
-        // Clear the productDetails state after adding the item
-        setProductDetails({
-          product_id: "",
-          product_name: "",
-          metal: "",
-          purity: "",
-          hsn_code: "",
-          gross: 0,
-          dust: 0,
-          touch_percent: 0,
-          ml_percent: 0,
-          eqt_wt: 0,
-          remarks: "",
-          rate: 0,
-          total_amount: 0,
-        });
-      }
-    };
-    
-  
-    const handleSubmit = async () => {
-      const payload = {
-        customerDetails: formData,
-        items: items,
-      };
-  
-      try {
-        await axios.post("http://localhost:4000/save-purchase", payload);
-        alert("Purchase saved successfully!");
-        localStorage.removeItem("purchaseItems");
-        setItems([]);
-        navigate("/urdpurchasetable");
-      } catch (error) {
-        console.error("Error saving purchase:", error);
-      }
-    };
-
   return (
     <div className="main-container">
     <div className="urdpurchase-form-container">
-      <Form>
-        <div className="urdpurchase-form">
+        <form className="urdpurchase-form">
         {/* Left Section */}
         <div className="urdpurchase-form-left">
           {/* Customer Details */}
@@ -249,8 +161,8 @@ const URDPurchase = () => {
                 <Col xs={12} md={2}>
                 <InputField
                     label="Customer Name:"
-                    name="account_name"
-                    value={formData.account_name}
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
                     readOnly
                   />
@@ -325,34 +237,28 @@ const URDPurchase = () => {
         <div className="urdpurchase-form-right">
           <div className="urd-form-section">
             <Row className="mt-5">  
-              <InputField label="Date" type="date" name="date" value={formData.date} onChange={handleChange} />
+              <InputField label="Date" type="date" />
             </Row>
             <Row>
-              <InputField label="URD Purchase No" name="purchase_number"  value={formData.purchase_number} onChange={handleChange}/>
+              <InputField label="URD Purchase No" />
             </Row> 
             
           </div>
         </div>
-      </div>
+      </form>
        
       <div className="urd-form-section">
-      <h4>Purchase Details</h4>
-      <Row>
+        <h4>Purchase Details</h4>
+        <Row>
         <Col xs={12} md={2}>
-          <InputField
-            label="P ID"
-            name="product_id"
-            value={productDetails.product_id}
-            onChange={handleInputChange}
-          />
+        <InputField label="P ID" />
         </Col>
         <Col xs={12} md={2}>
           <InputField
-            label="Product"
+            label="Product:"
             type="select"
-            name="product_name"
-            value={productDetails.product_name}
-            onChange={handleInputChange}
+            value={product}
+            onChange={(e) => setProduct(e.target.value)}
             options={[
               { value: "PRODUCT1", label: "Product1" },
               { value: "PRODUCT2", label: "Product2" },
@@ -360,28 +266,27 @@ const URDPurchase = () => {
               { value: "PRODUCT4", label: "Product4" },
             ]}
           />
-        </Col>
-        <Col xs={12} md={2}>
+          </Col>
+          <Col xs={12} md={2}>
           <InputField
-            label="Metal"
+            label="Metal:"
             type="select"
-            name="metal"
-            value={productDetails.metal}
-            onChange={handleInputChange}
+            value={metal}
+            onChange={(e) => setMetal(e.target.value)}
             options={[
               { value: "GOLD", label: "Gold" },
               { value: "SILVER", label: "Silver" },
               { value: "PLATINUM", label: "Platinum" },
             ]}
           />
-        </Col>
-        <Col xs={12} md={2}>
+          </Col>
+          
+          <Col xs={12} md={2}>
           <InputField
-            label="Purity"
+            label="Purity:"
             type="select"
-            name="purity"
-            value={productDetails.purity}
-            onChange={handleInputChange}
+            value={purity}
+            onChange={(e) => setPurity(e.target.value)}
             options={[
               { value: "24K", label: "24K" },
               { value: "22K", label: "22K (916)" },
@@ -392,98 +297,78 @@ const URDPurchase = () => {
               { value: "9K", label: "9K (375)" },
             ]}
           />
-        </Col>
-        <Col xs={12} md={2}>
+          </Col>
+          
+          <Col xs={12} md={2}>
+          <InputField label="HSN Code" type="text" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Gross" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Dust" type="number" />
+          </Col> 
+          <Col xs={12} md={1}>
+          <InputField label="Touch %" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+          <InputField label="ML %" type="number" />
+          </Col>    
+          <Col xs={12} md={1}>
+          <InputField label="Eqv WT" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Remarks:" type="text" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Rate" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Value" type="number" />
+          </Col>
+          {/* <Col xs={12} md={2}>
           <InputField
-            label="HSN Code"
-            type="text"
-            name="hsn_code"
-            value={productDetails.hsn_code}
-            onChange={handleInputChange}
+            label="Stone Type:"
+            type="select"
+            value={stoneType}
+            onChange={(e) => setStoneType(e.target.value)}
+            options={[
+              { value: "STONETYPE1", label: "StoneType1" },
+              { value: "STONETYPE2", label: "StoneType2" },
+              { value: "STONETYPE3", label: "StoneType3" },
+            ]}
           />
-        </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Gross"
-            type="number"
-            name="gross"
-            value={productDetails.gross}
-            onChange={handleInputChange}
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Dust"
-            type="number"
-            name="dust"
-            value={productDetails.dust}
-            onChange={handleInputChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Touch %"
-            type="number"
-            name="touch_percent"
-            value={productDetails.touch_percent}
-            onChange={handleInputChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="ML %"
-            type="number"
-            name="ml_percent"
-            value={productDetails.ml_percent}
-            onChange={handleInputChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Eqv WT"
-            type="number"
-            name="eqt_wt"
-            value={productDetails.eqt_wt}
-            onChange={handleInputChange}
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Remarks"
-            type="text"
-            name="remarks"
-            value={productDetails.remarks}
-            onChange={handleInputChange}
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Rate"
-            type="number"
-            name="rate"
-            value={productDetails.rate}
-            onChange={handleInputChange}
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Value"
-            type="number"
-            name="total_amount"
-            value={productDetails.total_amount}
-            onChange={handleInputChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <Button
-            style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
-            onClick={handleAddItem}
-          >
-            Add
-          </Button>
-        </Col>
-      </Row>
-    </div>
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Pieces" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Gms/CT" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Rate" type="number" />
+          </Col>
+          <Col xs={12} md={2}>
+          <InputField label="Stone Amt" type="number" />
+          </Col>
+          <Col xs={12} md={1}>
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="cashCheckbox"
+                value="cash"
+              />
+            <label className="form-check-label" htmlFor="cashCheckbox">
+              HallMark
+            </label>
+            </div>           
+          </Col> */}
+          <Col xs={12} md={1}>
+            <Button style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
+          </Col>
+        </Row>
+      </div>
         <div className="urd-form-section">
           <h4>Item Details</h4>
           
@@ -491,55 +376,45 @@ const URDPurchase = () => {
             <thead>
               <tr>
                 <th>S.No</th>
-                <th>product ID</th>
-                <th>Product Name</th>
-                <th>Metal</th>
-                <th>Purity</th>
-              
-                <th>HSN</th>
-                <th>Gross</th>
+                <th>Item</th>
+                <th>WT</th>
                 <th>Dust</th>
+                <th>Purity</th>
                 <th>Touch%</th>
                 <th>ML%</th>
                 <th>Eqv WT</th>
-                <th>Remark</th>
                 <th>Rate</th>
-                <th>Total Value</th>
+                <th>HSN</th>
+                <th>Stone</th>
+                <th>CT</th>
+                <th>PCS</th>
+                <th>Stone Value</th>
+                <th>M.Value</th>
               </tr>
             </thead>
             <tbody>
-            {items.map((item, index) => (
-            <tr key={index}>
-              <td>{index + 1}</td>
-              <td>{item.product_id}</td>
-              <td>{item.product_name}</td>
-              <td>{item.metal}</td>
-              <td>{item.purity}</td>
-              <td>{item.hsn_code}</td>
-              <td>{item.gross}</td>
-              <td>{item.dust}</td>
-              <td>{item.touch_percent}</td>
-              <td>{item.ml_percent}</td>
-              <td>{item.eqt_wt}</td>
-              <td>{item.remarks}</td>
-              <td>{item.rate}</td>
-              <td>{item.total_amount}</td>
-            </tr>
-          ))}
+              <tr>
+                <td>1</td>
+                <td>Sample Item</td>
+                <td>10</td>
+                <td>0.5</td>
+                <td>22K</td>
+                <td>95%</td>
+                <td>2%</td>
+                <td>9.5</td>
+                <td>4500</td>
+                <td>HSN1234</td>
+                <td>Ruby</td>
+                <td>0.2</td>
+                <td>5</td>
+                <td>500</td>
+                <td>50</td>
+              </tr>
             </tbody>
           </Table>
-          <div className="d-flex justify-content-between px-2 mt-2">
-    <h5>Total Amount:</h5>
-    <h5>
-      ₹{" "}
-      {items
-        .reduce((sum, item) => sum + parseFloat(item.total_amount || 0), 0)
-        .toFixed(2)}
-    </h5>
-  </div>
         </div>
         <div className="form-buttons">
-          <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSubmit}>Save</Button>
+          <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
           <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
           <Button
             variant="secondary"
@@ -549,7 +424,7 @@ const URDPurchase = () => {
           </Button>
           
         </div>
-        </Form>
+     
     </div>
     </div>
   );
