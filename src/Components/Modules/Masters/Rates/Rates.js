@@ -40,6 +40,7 @@ const Rates = () => {
                         gold24: result.rate_24crt,
                         silverRate: result.silver_rate,
                     });
+                    console.log("Rates=",rates)
                 } else {
                     console.error('Error fetching rates:', result);
                 }
