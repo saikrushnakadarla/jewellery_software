@@ -1,17 +1,12 @@
 
+
 import React, { useState, useEffect } from 'react';
 import './Rates.css';
 import InputField from '../../../Pages/InputField/InputField';
 
 const Rates = () => {
-    // Get today's date in YYYY-MM-DD format
-    const getCurrentDate = () => {
-        const today = new Date();
-        return today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    };
-
     const [rates, setRates] = useState({
-        currentDate: getCurrentDate(),
+        currentDate: '',
         gold16: '',
         gold18: '',
         gold22: '',
@@ -25,13 +20,13 @@ const Rates = () => {
             try {
                 const response = await fetch('http://localhost:5000/get/current-rates');
                 const result = await response.json();
-    
+
                 if (response.ok) {
-                    // Convert UTC date to local date
-                    const dbDate = new Date(result.rate_date);
-                    const localDate = new Date(dbDate.getTime() + dbDate.getTimezoneOffset() * 60000);
-                    const formattedDate = localDate.toISOString().split('T')[0]; // Adjusted to local date
-    
+                    // Adjust UTC date to the local timezone
+                    const utcDate = new Date(result.rate_date);
+                    const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000); // Adjust to local timezone
+                    const formattedDate = localDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
                     setRates({
                         currentDate: formattedDate,
                         gold16: result.rate_16crt,
@@ -47,10 +42,9 @@ const Rates = () => {
                 console.error('An error occurred while fetching rates:', error);
             }
         };
-    
+
         fetchRates();
     }, []);
-    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -108,7 +102,7 @@ const Rates = () => {
                         name="currentDate"
                         type="date"
                         value={rates.currentDate}
-                        readOnly={true}
+                        onChange={handleInputChange}
                     />
                 </div>
 
@@ -170,3 +164,5 @@ const Rates = () => {
 };
 
 export default Rates;
+
+
