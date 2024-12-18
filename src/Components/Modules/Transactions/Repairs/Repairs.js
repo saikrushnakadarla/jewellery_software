@@ -10,6 +10,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { id } = useParams(); 
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
@@ -162,17 +163,29 @@ const RepairForm = () => {
     }
   };
 
+  useEffect(() => {
+    if (id) {
+      const fetchRepairDetails = async () => {
+        try {
+          const response = await axios.get(`${baseURL}/get/repairs/${id}`);
+          setFormData(response.data); // Populate form with fetched data
+        } catch (error) {
+          console.error("Error fetching repair details:", error);
+        }
+      };
+
+      fetchRepairDetails();
+    }
+  }, [id]);
+
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  // Format date to dd-mm-yyyy
-  const formattedDate = formData.date
-    ? new Date(formData.date).toLocaleDateString("en-GB")
-    : ""; // Convert date to dd-mm-yyyy format if it exists
+
 
   const updatedFormData = {
     ...formData,
-    date: formattedDate, // Replace date with the formatted date
+
   };
 
   try {
@@ -186,8 +199,6 @@ const handleSubmit = async (e) => {
     alert("Failed to submit the repair entry");
   }
 };
-
-  
 
   const handleAddCustomer = () => {
     navigate("/customermaster", { state: { from: "/repairs" } });
@@ -211,7 +222,7 @@ const handleSubmit = async (e) => {
         label="Mobile"
         name="mobile"
         type="select"
-        value={formData.customer_id || ""} // Use customer_id to match selected value
+        value={formData.mobile || ""} // Use customer_id to match selected value
         onChange={(e) => handleCustomerChange(e.target.value)}
         options={[
           { value: "", label: "Select" }, // Placeholder option
