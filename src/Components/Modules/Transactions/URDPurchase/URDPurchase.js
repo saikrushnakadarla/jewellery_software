@@ -197,7 +197,7 @@ const URDPurchase = () => {
       };
   
       try {
-        await axios.post("http://localhost:4000/save-purchase", payload);
+        await axios.post("http://localhost:5000/save-purchase", payload);
         alert("Purchase saved successfully!");
         localStorage.removeItem("purchaseItems");
         setItems([]);
