@@ -89,10 +89,7 @@ function Customer_Master() {
       alert('Mobile number is required.');
       return;
     }
-    if (!formData.phone.trim()) {
-      alert('Phone number is required.');
-      return;
-    }
+
   
     try {
       const method = id ? "PUT" : "POST";
@@ -170,7 +167,7 @@ function Customer_Master() {
         name="address1"
         value={formData.address1}
         onChange={handleChange}
-        required
+        
       />
     </Col>
 
@@ -180,7 +177,7 @@ function Customer_Master() {
         name="address2"
         value={formData.address2}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={4}>
@@ -189,7 +186,7 @@ function Customer_Master() {
         name="city"
         value={formData.city}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={2}>
@@ -198,7 +195,7 @@ function Customer_Master() {
         name="pincode"
         value={formData.pincode}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={2}>
@@ -208,7 +205,7 @@ function Customer_Master() {
         type="select"
         value={formData.state}
         onChange={handleChange}
-        required
+        
         options={[
           { value: 'Telangana', label: 'Telangana' },
           { value: 'Andhra Pradesh', label: 'Andhra Pradesh' },
@@ -228,7 +225,7 @@ function Customer_Master() {
         name="state_code"
         value={formData.state_code}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={3}>
@@ -237,7 +234,7 @@ function Customer_Master() {
         name="phone"
         value={formData.phone}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={3}>
@@ -255,7 +252,7 @@ function Customer_Master() {
         name="email"
         value={formData.email}
         onChange={handleChange}
-        required
+        
       />
     </Col>
 
@@ -266,7 +263,7 @@ function Customer_Master() {
         type="date"
         value={formData.birthday}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={2}>
@@ -276,7 +273,7 @@ function Customer_Master() {
         type="date"
         value={formData.anniversary}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={4}>
@@ -285,7 +282,7 @@ function Customer_Master() {
         name="bank_account_no"
         value={formData.bank_account_no}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={3}>
@@ -294,7 +291,7 @@ function Customer_Master() {
         name="bank_name"
         value={formData.bank_name}
         onChange={handleChange}
-        required
+        
       />
     </Col>
 
@@ -304,7 +301,7 @@ function Customer_Master() {
         name="ifsc_code"
         value={formData.ifsc_code}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={3}>
@@ -313,7 +310,7 @@ function Customer_Master() {
         name="branch"
         value={formData.branch}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={3}>
@@ -322,7 +319,7 @@ function Customer_Master() {
         name="gst_in"
         value={formData.gst_in}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={4}>
@@ -331,7 +328,7 @@ function Customer_Master() {
         name="aadhar_card"
         value={formData.aadhar_card}
         onChange={handleChange}
-        required
+        
       />
     </Col>
     <Col md={4}>
@@ -340,7 +337,7 @@ function Customer_Master() {
         name="pan_card"
         value={formData.pan_card}
         onChange={handleChange}
-        required
+        
       />
     </Col>
   </Row>

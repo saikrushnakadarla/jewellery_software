@@ -138,6 +138,7 @@ const RepairForm = () => {
                 name="account_name"
                 value={formData.account_name}
                 onChange={handleChange}
+                required
               />
             </Col>
             <Col xs={12} md={4}>
@@ -146,6 +147,7 @@ const RepairForm = () => {
                 name="print_name"
                 value={formData.print_name}
                 onChange={handleChange}
+                required
               />
             </Col>
             <Col xs={12} md={4}>
@@ -257,6 +259,7 @@ const RepairForm = () => {
                 type="number"
                 value={formData.mobile}
                 onChange={handleChange}
+                required
               />
             </Col>
             <Col xs={12} md={3}>
@@ -300,7 +303,7 @@ const RepairForm = () => {
         name="gst_in"
         value={formData.gst_in}
         onChange={handleChange}
-        required
+        
       />
     </Col>
             <Col xs={12} md={3}>

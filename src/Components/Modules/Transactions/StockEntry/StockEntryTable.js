@@ -78,7 +78,7 @@ const StockEntryTable = () => {
       })
       .catch((error) => {
         console.error('Error fetching stock entries:', error);
-        alert('Failed to fetch stock entries. Please try again later.');
+        
       });
   }, []);
   
