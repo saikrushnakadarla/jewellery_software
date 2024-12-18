@@ -539,15 +539,15 @@ function Purity() {
       {
         Header: "Action",
         Cell: ({ row }) => (
-          <div>
+          <div className="d-flex align-items-center">
             <button
-              className="edit-btn edit-button"
+              className="action-button edit-button"
               onClick={() => handleEdit(row.original)}
             >
               <FaEdit />
             </button>
             <button
-              className="delete-btn delete-button"
+              className="action-button delete-button"
               onClick={() => handleDelete(row.original.purity_id)}
             >
               <FaTrash />

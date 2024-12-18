@@ -36,6 +36,14 @@ const StockEntry = () => {
         Weight_BW: "",
     });
 
+    const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
+        setFormData({
+          ...formData,
+          Stones_Weight: totalWeight.toFixed(2),
+          Stones_Price: totalPrice.toFixed(2),
+        });
+      };
+
     const [showModal, setShowModal] = useState(false);
 
     const handleOpenModal = () => setShowModal(true);
@@ -432,7 +440,11 @@ const StockEntry = () => {
                     </div>
                 </div>
             </div>
-            <StoneDetailsModal showModal={showModal} handleCloseModal={handleCloseModal} />
+            <StoneDetailsModal
+              showModal={showModal}
+              handleCloseModal={handleCloseModal}
+              handleUpdateStoneDetails={handleUpdateStoneDetails}
+            />
         </div>
     );
 };

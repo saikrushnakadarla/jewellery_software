@@ -59,6 +59,16 @@ const FormWithTable = () => {
   const navigate = useNavigate();
   const [isMaintainTagsChecked, setIsMaintainTagsChecked] = useState(false);
 
+  
+
+  const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
+    setFormData({
+      ...formData,
+      Stones_Weight: totalWeight.toFixed(2),
+      Stones_Price: totalPrice.toFixed(2),
+    });
+  };
+
   const handleCheckboxChange = () => {
     setIsMaintainTagsChecked((prev) => {
       const newCheckedState = !prev;
@@ -226,77 +236,9 @@ const FormWithTable = () => {
     handleMakingChargesCalculation();
   }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
 
-
-  const handleSave = async () => {
-    try {
-      const { product_name, Category, design_master, purity } = formData;
-  
-      // Check if the product exists
-      const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
-        product_name,
-        Category,
-        design_master,
-        purity,
-      });
-  
-      if (checkResponse.data.exists) {
-        alert('This product already exists.');
-        return;
-      }
-  
-      // Ensure Category and other fields are not empty
-      const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
-  
-      // Save product details, now including tax_slab_id
-      const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
-      const { product_id } = productResponse.data;
-  
-      // Append product_id to openTagsEntries
-      const entriesWithProductId = openTagsEntries.map((entry) => ({
-        ...entry,
-        product_id, // Append product_id to entries
-      }));
-  
-      // Save opening tag entries
-      const saveEntriesPromises = entriesWithProductId.map((entry) =>
-        axios.post(`${baseURL}/post/opening-tags-entry`, entry)
-      );
-  
-      await Promise.all(saveEntriesPromises);
-      alert("Data saved successfully!");
-  
-      // Reset the form fields
-      setFormData({
-        product_name: "",
-        rbarcode: "",
-        Category: "",
-        design_master: "",
-        purity: "",
-        item_prefix: "",
-        short_name: "",
-        sale_account_head: "",
-        purchase_account_head: "",
-        status: "",
-        tax_slab: "",
-        tax_slab_id: "", // Reset tax_slab_id
-        hsn_code: "",
-        op_qty: "",
-        op_value: "",
-        op_weight: "",
-        huid_no: "",
-      });
-  
-      // Clear the tag entries
-      setOpenTagsEntries([]);
-    } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Failed to save data. Please try again.");
-    }
-  };
-  
   const handleAddOpenTagEntry = (e) => {
     e.preventDefault();
-  
+
     const newEntry = {
       Pricing: formData.Pricing,
       Tag_ID: formData.Tag_ID,
@@ -312,7 +254,7 @@ const FormWithTable = () => {
       Wastage_On: formData.Wastage_On,
       Wastage_Percentage: formData.Wastage_Percentage,
       status: formData.status || "Available",
-      Source: formData.Source|| "Tag Entry",
+      Source: formData.Source || "Tag Entry",
       Stock_Point: formData.Stock_Point,
       Weight_BW: formData.Weight_BW,
       TotalWeight_AW: formData.TotalWeight_AW,
@@ -321,17 +263,17 @@ const FormWithTable = () => {
       Making_Charges: formData.Making_Charges,
       Design_Master: formData.Design_Master,
     };
-  
+
     // Update the `op_qty` and `op_weight` fields
     setFormData((prev) => ({
       ...prev,
       op_qty: prev.op_qty + 1, // Increment op_qty
       op_weight: parseFloat(prev.op_weight || 0) + parseFloat(formData.Gross_Weight || 0), // Add Gross_Weight
     }));
-  
+
     // Add the new entry to the table
     setOpenTagsEntries((prev) => [...prev, newEntry]);
-  
+
     // Reset other form fields
     setFormData((prev) => ({
       ...prev,
@@ -348,7 +290,7 @@ const FormWithTable = () => {
       HUID_No: "",
       Wastage_On: "",
       Wastage_Percentage: "",
-      status: "",
+      status: "Avalible",
       Source: "",
       Stock_Point: "",
       Weight_BW: "",
@@ -359,7 +301,76 @@ const FormWithTable = () => {
       Design_Master: "",
     }));
   };
-  
+
+  const handleSave = async () => {
+    try {
+      const { product_name, Category, design_master, purity } = formData;
+
+      // Check if the product exists
+      const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
+        product_name,
+        Category,
+        design_master,
+        purity,
+      });
+
+      if (checkResponse.data.exists) {
+        alert('This product already exists.');
+        return;
+      }
+
+      // Ensure Category and other fields are not empty
+      const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
+
+      // Save product details, now including tax_slab_id
+      const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
+      const { product_id } = productResponse.data;
+
+      // Append product_id to openTagsEntries
+      const entriesWithProductId = openTagsEntries.map((entry) => ({
+        ...entry,
+        product_id, // Append product_id to entries
+      }));
+
+      // Save opening tag entries
+      const saveEntriesPromises = entriesWithProductId.map((entry) =>
+        axios.post(`${baseURL}/post/opening-tags-entry`, entry)
+      );
+
+      await Promise.all(saveEntriesPromises);
+      alert("Data saved successfully!");
+
+      // Reset the form fields
+      setFormData({
+        product_name: "",
+        rbarcode: "",
+        Category: "",
+        design_master: "",
+        purity: "",
+        item_prefix: "",
+        short_name: "",
+        sale_account_head: "Sale",
+        purchase_account_head: "Purchase",
+        status: "",
+        tax_slab: "",
+        tax_slab_id: "", // Reset tax_slab_id
+        hsn_code: "",
+        op_qty: "",
+        op_value: "",
+        op_weight: "",
+        huid_no: "",
+      });
+
+      // Clear the tag entries
+      setOpenTagsEntries([]);
+    } catch (error) {
+      console.error("Error saving data:", error);
+      alert("Failed to save data. Please try again.");
+    }
+  };
+
+
+
   const handleBack = () => {
     navigate("/itemmastertable");
   };
@@ -620,14 +631,13 @@ const FormWithTable = () => {
                   value={formData.Stones_Weight}
                   onChange={handleChange}
                   readOnly={!isMaintainTagsChecked}
-                  style={openingTagsStyle}
                 />
                 <button
                   type="button"
-                  style={{ backgroundColor: '#a36e29' }}
+                  style={{ backgroundColor: "#a36e29" }}
                   className="stone-details-btn"
                   onClick={handleOpenModal}
-                  readOnly={!isMaintainTagsChecked}
+                  disabled={!isMaintainTagsChecked}
                 >
                   Stone Details
                 </button>
@@ -637,7 +647,6 @@ const FormWithTable = () => {
                   value={formData.Stones_Price}
                   onChange={handleChange}
                   readOnly={!isMaintainTagsChecked}
-                  style={openingTagsStyle}
                 />
                 <InputField
                   label="Weight BW:"
@@ -756,7 +765,7 @@ const FormWithTable = () => {
 
             </form>
 
-            
+
 
 
             {/* table Section */}
@@ -816,6 +825,7 @@ const FormWithTable = () => {
             <StoneDetailsModal
               showModal={showModal}
               handleCloseModal={handleCloseModal}
+              handleUpdateStoneDetails={handleUpdateStoneDetails}
             />
           </div>
         </div>

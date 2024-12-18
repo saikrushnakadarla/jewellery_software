@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import InputField from "../../Masters/ItemMaster/Inputfield";
-import DataTable from "../../../Pages/InputField/TableLayout"; // Adjust the path as needed
+import DataTable from "./StoneTableLayout"; // Adjust the path as needed
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 
-const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
+const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetails }) => {
   const [subproductname, setSubProductName] = useState("");
   const [weight, setWeight] = useState("");
   const [ratepergram, setRatePerGram] = useState("");
@@ -48,13 +48,17 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
   );
 
   const handleAddOrUpdate = () => {
+    if (!validateForm()) {
+      return;
+    }
+  
     const payload = {
       subproductname,
       weight: parseFloat(weight), // Ensure weight is treated as a number
       ratepergram: parseFloat(ratepergram),
       amount: parseFloat(amount),
     };
-
+  
     if (isEditing) {
       // Update existing row
       setData((prevData) =>
@@ -63,10 +67,10 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
             // Adjust total weight and total price
             const weightDifference = payload.weight - item.weight;
             const amountDifference = payload.amount - item.amount;
-
+  
             setTotalWeight((prevTotalWeight) => prevTotalWeight + weightDifference);
             setTotalPrice((prevTotalPrice) => prevTotalPrice + amountDifference);
-
+  
             return { ...item, ...payload };
           }
           return item;
@@ -81,18 +85,39 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
         ...payload,
       };
       setData((prevData) => [...prevData, newRow]);
-
+  
       // Update total weight and total price
       setTotalWeight((prevTotalWeight) => prevTotalWeight + parseFloat(weight || 0));
       setTotalPrice((prevTotalPrice) => prevTotalPrice + parseFloat(amount || 0));
     }
-
+  
     // Clear input fields after saving
     setSubProductName("");
     setWeight("");
     setRatePerGram("");
     setAmount("");
   };
+  
+  const validateForm = () => {
+    if (!subproductname.trim()) {
+      alert("Sub Product Name is required.");
+      return false;
+    }
+    if (!weight || parseFloat(weight) <= 0) {
+      alert("Weight must be greater than 0.");
+      return false;
+    }
+    if (!ratepergram || parseFloat(ratepergram) <= 0) {
+      alert("Rate per Gram must be greater than 0.");
+      return false;
+    }
+    if (!amount || parseFloat(amount) <= 0) {
+      alert("Amount must be greater than 0.");
+      return false;
+    }
+    return true;
+  };
+  
 
 
   const handleEdit = (rowData) => {
@@ -117,15 +142,61 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
   };
 
   const handleSaveChanges = async () => {
+    if (data.length === 0) {
+      alert("No data to save. Please add stone details before saving.");
+      return;
+    }
+  
     try {
       for (const row of data) {
-        await axios.post("http://localhost:5000/post/addProductstonedetails", row);
+        // Validate each row before sending it to the server
+        if (!row.subproductname.trim()) {
+          alert(`Row with Sub Product Name is required.`);
+          return;
+        }
+        if (!row.weight || parseFloat(row.weight) <= 0) {
+          alert(`Row with Weight must be greater than 0.`);
+          return;
+        }
+        if (!row.ratepergram || parseFloat(row.ratepergram) <= 0) {
+          alert(`Row with Rate per Gram must be greater than 0.`);
+          return;
+        }
+        if (!row.amount || parseFloat(row.amount) <= 0) {
+          alert(`Row with Amount must be greater than 0.`);
+          return;
+        }
+  
+        const payload = {
+          subproductname: row.subproductname,
+          weight: row.weight,
+          ratepergram: row.ratepergram,
+          amount: row.amount,
+          totalweight: totalweight, // Send the total weight
+          totalprice: totalprice,  // Send the total price
+        };
+  
+        await axios.post("http://localhost:5000/post/addProductstonedetails", payload);
       }
+      
       alert("Data saved successfully!");
+      handleUpdateStoneDetails(totalweight, totalprice);
+      // Clear table data and reset totals
+      setData([]);
+      setTotalWeight(0);
+      setTotalPrice(0);
+  
+      // Close the modal
+      handleCloseModal();
     } catch (error) {
       console.error("Error saving changes to DB", error);
+      alert("Failed to save data. Please try again.");
     }
   };
+  
+  
+  
+  
 
   const handleWeightChange = (e) => {
     const newWeight = e.target.value;
@@ -180,6 +251,16 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
 
               <div className="mt-4">
 
+                {/* <div className="col-md-12 d-flex justify-content-end" style={{ marginTop: '30px', marginLeft: '-15px' }}>
+                  <div className="me-3">
+                    <InputField label="Total Weight:" value={totalweight} readOnly />
+                  </div>
+                  <div>
+                    <InputField label="Total Price:" value={totalprice} readOnly />
+                  </div>
+                </div> */}
+                <h6 className="fw-bold">Stone List</h6>
+                <DataTable columns={columns} data={data} />
                 <div className="col-md-12 d-flex justify-content-end" style={{ marginTop: '30px', marginLeft: '-15px' }}>
                   <div className="me-3">
                     <InputField label="Total Weight:" value={totalweight} readOnly />
@@ -188,9 +269,8 @@ const StoneDetailsModal = ({ showModal, handleCloseModal }) => {
                     <InputField label="Total Price:" value={totalprice} readOnly />
                   </div>
                 </div>
-                <h6 className="fw-bold">Stone List</h6>
-                <DataTable columns={columns} data={data} />
               </div>
+
             </div>
 
             <div className="modal-footer">

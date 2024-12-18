@@ -458,12 +458,12 @@ function MetalType() {
       {
         Header: "Action",
         Cell: ({ row }) => (
-          <div>
-            <button className="edit-btn edit-button" onClick={() => handleEdit(row.original.metal_type_id)}>
+          <div className="d-flex align-items-center">
+            <button className="action-button edit-button" onClick={() => handleEdit(row.original.metal_type_id)}>
               <FaEdit />
             </button>
             <button
-              className="delete-btn delete-button"
+              className="action-button delete-button"
               onClick={() => handleDelete(row.original.metal_type_id)}
             >
               <FaTrash />
