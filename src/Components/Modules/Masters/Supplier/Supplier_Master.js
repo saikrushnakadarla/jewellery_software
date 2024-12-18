@@ -56,8 +56,13 @@ function Customer_Master() {
   const handleChange = (e) => {
     const { name, value } = e.target;
   
-    // Update both account_name and print_name if account_name is being typed
-    if (name === 'account_name') {
+    // Restrict the 'mobile' field to 10 numeric characters
+    if (name === 'mobile') {
+      const numericValue = value.replace(/\D/g, ''); // Remove non-numeric characters
+      if (numericValue.length <= 10) {
+        setFormData({ ...formData, [name]: numericValue });
+      }
+    } else if (name === 'account_name') {
       setFormData((prevData) => ({
         ...prevData,
         [name]: value,

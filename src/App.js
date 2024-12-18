@@ -56,6 +56,7 @@ function App() {
         <Route path="/" exact element={<Dashboard />} />
         <Route path="/itemmaster" exact element={<ItemMaster />} />
         <Route path="/repairs" element={<Repairs />} />
+        <Route path="/repairs/:id" element={<Repairs />} />
         <Route path="/repairstable" element={<RepairsTable />} />
         <Route path="/urd_purchase" element={<URDPurchase />} />
         <Route path="/itemmastertable" element={<ItemMasterTable />} />

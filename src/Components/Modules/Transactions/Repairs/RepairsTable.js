@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button, Row, Col, Modal, Form, Overlay, Popover, Table } from 'react-bootstrap';
-import { FaTrash } from 'react-icons/fa';
+import { FaEye, FaTrash} from 'react-icons/fa';
 import { FiAlignJustify } from 'react-icons/fi';
 import DataTable from '../../../Pages/InputField/TableLayout';
 import './RepairsTable.css';
@@ -66,9 +66,6 @@ const handlePopoverToggle = (event, repairId) => {
     setShowModal(true);
   };
 
-
-
-  // Update repair status
   const handleUpdateStatus = async (repairId, status) => {
     // Show confirmation dialog
     const isConfirmed = window.confirm("Are you sure you want to update the status?");
@@ -94,9 +91,7 @@ const handlePopoverToggle = (event, repairId) => {
       console.error('Error updating status:', error);
     }
   };
-  
 
-  // Define table columns
   const columns = React.useMemo(
     () => [
       { Header: 'Repair ID', accessor: 'repair_id' },
@@ -117,6 +112,12 @@ const handlePopoverToggle = (event, repairId) => {
             {/* <button className="action-button edit-button">
               <FaEdit />
             </button> */}
+            <button
+              className="action-button view-button"
+              onClick={() => navigate(`/repairs/${row.original.repair_id}`)}
+            >
+              <FaEye/>
+            </button>
             <button className="action-button delete-button">
               <FaTrash />
             </button>
@@ -132,7 +133,6 @@ const handlePopoverToggle = (event, repairId) => {
     ],
     [popoverData.repairId]
   );
-
 
   const handleAddToLocalDetails = () => {
     if (editIndex !== null) {
@@ -155,7 +155,6 @@ const handlePopoverToggle = (event, repairId) => {
     const updatedDetails = localDetails.filter((_, i) => i !== index);
     setLocalDetails(updatedDetails);
   };
-
 
   const handleSubmitDetails = async () => {
     if (localDetails.length === 0) {
@@ -185,7 +184,6 @@ const handlePopoverToggle = (event, repairId) => {
       console.error('Error submitting details:', error);
     }
   };
-
 
   return (
     <div className="main-container">
