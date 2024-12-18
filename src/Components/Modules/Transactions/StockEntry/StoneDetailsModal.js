@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import InputField from "../../Masters/ItemMaster/Inputfield";
-import DataTable from "../../../Pages/InputField/TableLayout"; // Adjust the path as needed
+import DataTable from "./StoneTableLayout"; // Adjust the path as needed
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 
