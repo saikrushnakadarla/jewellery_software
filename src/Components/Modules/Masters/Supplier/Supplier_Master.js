@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import InputField from '../../../Pages/InputField/InputField';
 import './Supplier_Master.css';
 
@@ -8,7 +8,9 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import { Row, Col } from 'react-bootstrap';
 
 
-function Customer_Master() {
+function Supplier_Master() {
+  const location = useLocation();
+
   const [formData, setFormData] = useState({
     account_name: '',
     print_name: '',
@@ -32,6 +34,7 @@ function Customer_Master() {
     aadhar_card: '',
     pan_card: '',
   });
+  const [existingMobiles, setExistingMobiles] = useState([]); // Track existing mobile numbers
 
   const [tcsApplicable, setTcsApplicable] = useState(false);
   const navigate = useNavigate();
@@ -78,6 +81,49 @@ function Customer_Master() {
     setTcsApplicable(!tcsApplicable);
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  
+  //   // Validation
+  //   if (!formData.account_name.trim()) {
+  //     alert('Customer Name is required.');
+  //     return;
+  //   }
+  //   if (!formData.mobile.trim()) {
+  //     alert('Mobile number is required.');
+  //     return;
+  //   }
+
+  
+  //   try {
+  //     const method = id ? 'PUT' : 'POST';
+  //     const endpoint = id
+  //       ? `${baseURL}/edit/account-details/${id}`
+  //       : `${baseURL}/account-details`;
+  
+  //     const response = await fetch(endpoint, {
+  //       method,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ ...formData, tcsApplicable }),
+  //     });
+  
+  //     if (response.ok) {
+  //       alert(`Supplier ${id ? 'updated' : 'created'} successfully!`);
+  //       navigate('/suppliertable');
+  //     } else {
+  //       console.error('Failed to save customer');
+  //       alert('Failed to save customer.');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //     alert('An error occurred.');
+  //   }
+  // };
+  
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -90,15 +136,32 @@ function Customer_Master() {
       alert('Mobile number is required.');
       return;
     }
-
   
     try {
+      // Fetch existing data to check for duplicate mobile numbers
+      const response = await fetch(`${baseURL}/get/account-details`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data for duplicate check.');
+      }
+      const result = await response.json();
+  
+      // Check if the mobile number already exists (excluding the current record if updating)
+      const isDuplicateMobile = result.some((item) => 
+        item.mobile === formData.mobile && (!id || item.id !== id)
+      );
+  
+      if (isDuplicateMobile) {
+        alert('This mobile number is already associated with another entry.');
+        return;
+      }
+  
+      // Proceed with saving the record
       const method = id ? 'PUT' : 'POST';
       const endpoint = id
         ? `${baseURL}/edit/account-details/${id}`
         : `${baseURL}/account-details`;
   
-      const response = await fetch(endpoint, {
+      const saveResponse = await fetch(endpoint, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -106,16 +169,16 @@ function Customer_Master() {
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
   
-      if (response.ok) {
+      if (saveResponse.ok) {
         alert(`Supplier ${id ? 'updated' : 'created'} successfully!`);
         navigate('/suppliertable');
       } else {
-        console.error('Failed to save customer');
-        alert('Failed to save customer.');
+        console.error('Failed to save supplier');
+        alert('Failed to save supplier.');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred.');
+      alert('An error occurred while processing the request.');
     }
   };
   
@@ -377,4 +440,4 @@ function Customer_Master() {
   );
 }
 
-export default Customer_Master;
+export default Supplier_Master;

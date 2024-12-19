@@ -97,13 +97,61 @@ const RepairForm = () => {
     }
   };
   
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const method = id ? "PUT" : "POST";
+  //     const url = id
+  //       ? `${baseURL}/edit/account-details/${id}`
+  //       : `${baseURL}/account-details`;
+  //     const response = await fetch(url, {
+  //       method: method,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
+  
+  //     if (!response.ok) {
+  //       const errorText = await response.text();
+  //       throw new Error(`Server error: ${errorText}`);
+  //     }
+  
+  //     const result = await response.json();
+  //     alert(id ? "Account updated successfully!" : "Account created successfully!");
+  //     navigate("/accountstable");
+  //   } catch (err) {
+  //     console.error("Error submitting form:", err.message);
+  //     alert(`Error: ${err.message}`);
+  //   }
+  // };
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     try {
+      // Step 1: Check for duplicate mobile number
+      const duplicateCheckResponse = await fetch(`${baseURL}/get/account-details`);
+      if (!duplicateCheckResponse.ok) {
+        throw new Error("Failed to fetch accounts data for duplicate check");
+      }
+      const accounts = await duplicateCheckResponse.json();
+  
+      // Check if the mobile number already exists
+      const isDuplicate = accounts.some((account) => account.mobile === formData.mobile);
+      if (isDuplicate) {
+        alert("This mobile number already exists. Please use a different number.");
+        return;
+      }
+  
+      // Step 2: Proceed with form submission
       const method = id ? "PUT" : "POST";
       const url = id
         ? `${baseURL}/edit/account-details/${id}`
         : `${baseURL}/account-details`;
+  
       const response = await fetch(url, {
         method: method,
         headers: {
@@ -125,7 +173,7 @@ const RepairForm = () => {
       alert(`Error: ${err.message}`);
     }
   };
-
+  
   return (
     <div className="main-container">
       <Container className="accounts-form-container">
