@@ -26,7 +26,7 @@ const FormWithTable = () => {
     Tag_ID: "",
     Prefix: "Gold",
     item_prefix: "",
-    Category: "Gold", // Set a default value for Category
+    Category: "", // Set a default value for Category
     Purity: "",
     purity: "",
     PCode_BarCode: "",
@@ -280,7 +280,7 @@ const FormWithTable = () => {
       Pricing: "",
       Tag_ID: "",
       Prefix: "Gold",
-      Category: "Gold",
+      // Category: "Gold",
       Purity: "",
       PCode_BarCode: "",
       Gross_Weight: "",
