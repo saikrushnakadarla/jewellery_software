@@ -642,7 +642,7 @@ const RepairForm = () => {
         value={formData.customer_id || ""} // Use customer_id to match selected value
         onChange={(e) => handleCustomerChange(e.target.value)}
         options={[
-          { value: "", label: "Select" }, // Placeholder option
+         
           ...customers.map((customer) => ({
             value: customer.account_id, // Use account_id as the value
             label: customer.mobile, // Display mobile as the label
