@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import "./Estimate.css";
 import InputField from "../../../Pages/InputField/InputField";
@@ -7,11 +8,10 @@ import DataTable from '../../../Pages/InputField/TableLayout';
 import baseURL from "../../../../Url/NodeBaseURL";
 
 const RepairForm = () => {
-  // Get today's date in yyyy-mm-dd format
   const today = new Date().toISOString().split('T')[0];
 
   const initialFormData = {
-    date: today,  // Set default date to today's date
+    date: today,
     pcode: "",
     estimate_number: "",
     product_id: "",
@@ -28,6 +28,7 @@ const RepairForm = () => {
     mc_per_gram: "",
     total_mc: "",
     rate: "",
+    rate_amt:"",
     tax_percent: "",
     tax_vat_amount: "",
     total_rs: "",
@@ -41,7 +42,6 @@ const RepairForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Function to handle form submission and send data to API
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -49,7 +49,7 @@ const RepairForm = () => {
       const response = await axios.post(`${baseURL}/add/estimate`, formData);
       if (response.status === 200) {
         alert("Estimate added successfully!");
-        setFormData(initialFormData); // Clear the form after successful submission
+        setFormData(initialFormData);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -61,15 +61,116 @@ const RepairForm = () => {
     const fetchEstimates = async () => {
       try {
         const response = await axios.get(`${baseURL}/get/estimates`);
-        setEstimates(response.data); // Set the fetched estimates in state
+        setEstimates(response.data);
       } catch (error) {
         console.error("Error fetching estimates:", error);
       }
     };
 
-    fetchEstimates(); // Call function to fetch estimates
+    fetchEstimates();
   }, []);
 
+  // Calculation Hooks
+  useEffect(() => {
+    const grossWeight = parseFloat(formData.gross_weight) || 0;
+    const stonesWeight = parseFloat(formData.stones_weight) || 0;
+    const weightBW = grossWeight - stonesWeight;
+
+    setFormData((prev) => ({
+      ...prev,
+      weight_bw: weightBW.toFixed(2),
+    }));
+  }, [formData.gross_weight, formData.stones_weight]);
+
+  useEffect(() => {
+    const wastagePercentage = parseFloat(formData.wastage_percent) || 0;
+    const grossWeight = parseFloat(formData.gross_weight) || 0;
+    const weightBW = parseFloat(formData.weight_bw) || 0;
+
+    let wastageWeight = 0;
+    let totalWeight = 0;
+
+    if (formData.wastage_on === "Gross Weight") {
+      wastageWeight = (grossWeight * wastagePercentage) / 100;
+      totalWeight = weightBW + wastageWeight;
+    } else if (formData.wastage_on === "Weight BW") {
+      wastageWeight = (weightBW * wastagePercentage) / 100;
+      totalWeight = weightBW + wastageWeight;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      wastage_weight: wastageWeight.toFixed(2),
+      total_weight: totalWeight.toFixed(2),
+    }));
+  }, [formData.wastage_on, formData.wastage_percent, formData.gross_weight, formData.weight_bw]);
+
+  useEffect(() => {
+    const totalWeight = parseFloat(formData.total_weight) || 0;
+    const mcPerGram = parseFloat(formData.mc_per_gram) || 0;
+    const makingCharges = parseFloat(formData.total_mc) || 0;
+
+    if (formData.making_charges_on === "By Weight") {
+      const calculatedMakingCharges = totalWeight * mcPerGram;
+      setFormData((prev) => ({
+        ...prev,
+        total_mc: calculatedMakingCharges.toFixed(2),
+      }));
+    } else if (formData.making_charges_on === "Fixed") {
+      if (totalWeight > 0) {
+        const calculatedMcPerGram = makingCharges / totalWeight;
+        setFormData((prev) => ({
+          ...prev,
+          mc_per_gram: calculatedMcPerGram.toFixed(2),
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          mc_per_gram: "0.00",
+        }));
+      }
+    }
+  }, [formData.making_charges_on, formData.mc_per_gram, formData.total_mc, formData.total_weight]);
+
+  useEffect(() => {
+    const rate = parseFloat(formData.rate) || 0;
+    const totalWeight = parseFloat(formData.total_weight) || 0;
+
+    const rateAmt = rate * totalWeight;
+
+    setFormData((prev) => ({
+      ...prev,
+      rate_amt: rateAmt.toFixed(2),
+    }));
+  }, [formData.rate, formData.total_weight]);
+
+  useEffect(() => {
+    const taxPercent = parseFloat(formData.tax_percent) || 0;
+    const rateAmt = parseFloat(formData.rate_amt) || 0;
+
+    const taxAmt = (rateAmt * taxPercent) / 100;
+
+    setFormData((prev) => ({
+      ...prev,
+      tax_vat_amount: taxAmt.toFixed(2),
+    }));
+  }, [formData.tax_percent, formData.rate_amt]);
+
+  useEffect(() => {
+    const rateAmt = parseFloat(formData.rate_amt) || 0;
+    const taxAmt = parseFloat(formData.tax_vat_amount) || 0;
+    const stonesPrice = parseFloat(formData.stones_price) || 0;
+    const totalMC = parseFloat(formData.total_mc) || 0;
+
+    const totalRs = rateAmt + taxAmt + stonesPrice + totalMC;
+
+    setFormData((prev) => ({
+      ...prev,
+      total_rs: totalRs.toFixed(2),
+    }));
+  }, [formData.rate_amt, formData.tax_vat_amount, formData.stones_price, formData.total_mc]);
+
+  // Table Columns
   const columns = React.useMemo(
     () => [
       { Header: "Sr. No.", Cell: ({ row }) => row.index + 1 },
@@ -92,14 +193,27 @@ const RepairForm = () => {
       { Header: "Rate", accessor: "rate" },
       { Header: "Tax %", accessor: "tax_percent" },
       { Header: "Tax VAT Amount", accessor: "tax_vat_amount" },
-      { Header: "Total Rs", accessor: "total_rs" }
+      { Header: "Total Rs", accessor: "total_rs" },
     ],
     [estimates]
   );
-  
-  
-  
 
+  useEffect(() => {
+    const fetchLastEstimateNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastEstimateNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          estimate_number: response.data.lastEstimateNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastEstimateNumber();
+  }, []);
+  
   return (
     <div className="main-container">
       <Container className="estimate-form-container">
@@ -110,7 +224,7 @@ const RepairForm = () => {
             <InputField label="Date:" name="date" value={formData.date} type="date" onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
-            <InputField label="Estimate Number:" name="estimate_number" value={formData.estimate_number} onChange={handleInputChange} />
+            <InputField label="Estimate Number:" name="estimate_number" value={formData.estimate_number} onChange={handleInputChange} readOnly />
           </Col>
           <Col xs={12} md={2}>
             <InputField label="P ID:" name="pcode" value={formData.pcode} onChange={handleInputChange} />
@@ -147,8 +261,8 @@ const RepairForm = () => {
           </Col>
           <Col xs={12} md={2}>
             <InputField label="Making Charges On:" name="making_charges_on" type="select" value={formData.making_charges_on} onChange={handleInputChange} options={[
-              { value: "Gross Weight", label: "Gross Weight" },
-              { value: "Weight WW", label: "Weight WW" },
+              { value: "By Weight", label: "By Weight" },
+              { value: "Fixed", label: "Fixed" },
             ]} />
           </Col>
           <Col xs={12} md={2}>
@@ -160,11 +274,20 @@ const RepairForm = () => {
           <Col xs={12} md={2}>
             <InputField label="Rate:" name="rate" value={formData.rate} onChange={handleInputChange} />
           </Col>
-          <Col xs={12} md={1}>
+          <Col xs={12} md={2}>
+                <InputField
+                  label="Amount"
+                  name="rate_amt"
+                  value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+                  onChange={handleInputChange} // Optional, since it's auto-calculated
+                  readOnly
+                />
+                </Col>
+          <Col xs={12} md={2}>
             <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
-            <InputField label="Tax VAT Amount:" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
+            <InputField label="Tax VAT Amt:" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
             <InputField label="Total Rs:" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
