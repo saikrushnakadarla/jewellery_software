@@ -557,17 +557,17 @@ const FormWithTable = () => {
             {/* maintain tags section */}
             <div className="form-container" style={{ marginTop: "15px" }}>
               {/* Maintain Tags Section */}
-              <div className="main-tags-row" style={{ marginBottom: "15px" }}>
+              <div className="main-tags-row" style={{ marginBottom: "0px",display:"flex" }}>
                 <input
                   type="checkbox"
                   id="main-tags"
                   name="maintain_tags"
-                  style={{ width: "35px" }}
+                  style={{ width: "15px",marginTop:"-15px" }}
                   checked={isMaintainTagsChecked}
                   onChange={handleCheckboxChange}
                   value={formData.maintain_tags}
                 />
-                <label htmlFor="main-tags">
+                <label htmlFor="main-tags" style={{marginLeft:"10px"}}>
                   <h4>Maintain Tags</h4>
                 </label>
               </div>
