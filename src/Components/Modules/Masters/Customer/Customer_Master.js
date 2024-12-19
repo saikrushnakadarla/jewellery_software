@@ -89,8 +89,6 @@ function Customer_Master() {
       alert('Mobile number is required.');
       return;
     }
-
-  
     try {
       const method = id ? "PUT" : "POST";
       const endpoint = id
