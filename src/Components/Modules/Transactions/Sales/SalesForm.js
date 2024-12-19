@@ -547,7 +547,7 @@ const RepairForm = () => {
   
     if (formData.va_on === "Gross Weight") {
       wastageWeight = (grossWeight * wastagePercentage) / 100;
-      totalWeight = grossWeight + wastageWeight;
+      totalWeight = weightBW + wastageWeight;
     } else if (formData.va_on === "Weight BW") {
       wastageWeight = (weightBW * wastagePercentage) / 100;
       totalWeight = weightBW + wastageWeight;
@@ -595,7 +595,7 @@ const RepairForm = () => {
     const totalWeight = parseFloat(formData.total_weight_av) || 0; // Default to 0
     const stonePrice = parseFloat(formData.stone_price) || 0; // Default to 0
     const makingCharges = parseFloat(formData.making_charges) || 0; // Default to 0  
-    const rateAmt = rate * totalWeight + stonePrice + makingCharges; 
+    const rateAmt = rate * totalWeight; 
     setFormData((prev) => ({
       ...prev,
       rate_amt: rateAmt.toFixed(2), // Ensures two decimal places
@@ -615,7 +615,9 @@ const RepairForm = () => {
   useEffect(() => {
     const rateAmt = parseFloat(formData.rate_amt) || 0; // Default to 0
     const taxAmt = parseFloat(formData.tax_amt) || 0; // Default to 0
-    const totalPrice = rateAmt + taxAmt; 
+    const stonePrice = parseFloat(formData.stone_price) || 0; // Default to 0
+    const makingCharges = parseFloat(formData.making_charges) || 0; // Default to 0 
+    const totalPrice = rateAmt + taxAmt+stonePrice+makingCharges; 
     setFormData((prev) => ({
       ...prev,
       total_price: totalPrice.toFixed(2), // Ensures two decimal places
@@ -873,9 +875,9 @@ const RepairForm = () => {
                     onChange={handleChange}
                   />
                 </Col>
-                <Col xs={12} md={2}>
+                <Col xs={12} md={1}>
                   <InputField
-                    label="Stones Price"
+                    label="St Price"
                     name="stone_price"
                     value={formData.stone_price || ""}
                     onChange={handleChange}
@@ -891,19 +893,23 @@ const RepairForm = () => {
                   />
                 </Col>
                 <Col xs={12} md={2}>
-                  <InputField
-                    label="VA On"
-                    name="va_on"
-                    type="select"
-                    value={formData.va_on || ""} // Default to "Gross Weight"
-                    onChange={handleChange}
-                    options={[
-                      ...(formData.va_on ? [{ value: formData.va_on, label: formData.va_on }] : []),
-                      { value: "Gross Weight", label: "Gross Weight" },
-                      { value: "Weight BW", label: "Weight BW" },
-                    ]}
-                  />
-                </Col>
+                <InputField
+                  label="VA On"
+                  name="va_on"
+                  type="select"
+                  value={formData.va_on || ""} // Default to "Gross Weight"
+                  onChange={handleChange}
+                  options={[
+                    { value: "Gross Weight", label: "Gross Weight" },
+                    { value: "Weight BW", label: "Weight BW" },
+                    ...(formData.va_on &&
+                    !["Gross Weight", "Weight BW"].includes(formData.va_on)
+                      ? [{ value: formData.va_on, label: formData.va_on }]
+                      : []),
+                  ]}
+                />
+              </Col>
+
                 <Col xs={12} md={1}>
                   <InputField
                     label="VA%"
@@ -930,17 +936,20 @@ const RepairForm = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={1}>
+                <Col xs={12} md={2}>
                   <InputField
-                    label="MC on"
+                    label="MC On"
                     name="mc_on"
-                    type="select"                    
-                    value={formData.mc_on || ""} // Default to "Gross Weight"
+                    type="select"
+                    value={formData.mc_on || ""} // Default to "By Weight"
                     onChange={handleChange}
                     options={[
-                      ...(formData.mc_on ? [{ value: formData.mc_on, label: formData.mc_on }] : []),
                       { value: "By Weight", label: "By Weight" },
                       { value: "Fixed", label: "Fixed" },
+                      ...(formData.mc_on &&
+                      !["By Weight", "Fixed"].includes(formData.mc_on)
+                        ? [{ value: formData.mc_on, label: formData.mc_on }]
+                        : []),
                     ]}
                   />
                 </Col>
