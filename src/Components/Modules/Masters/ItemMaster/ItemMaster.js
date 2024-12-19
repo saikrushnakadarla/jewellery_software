@@ -241,9 +241,9 @@ const FormWithTable = () => {
 
     const newEntry = {
       Pricing: formData.Pricing,
-      Tag_ID: formData.Tag_ID,
-      Prefix: formData.Prefix || "Gold",
-      Category: formData.Category,
+      // Tag_ID: formData.Tag_ID,
+      // Prefix: formData.Prefix || "Gold",
+      // Category: formData.Category,
       Purity: formData.Purity,
       PCode_BarCode: formData.PCode_BarCode,
       Gross_Weight: formData.Gross_Weight,
@@ -261,7 +261,7 @@ const FormWithTable = () => {
       MC_Per_Gram: formData.MC_Per_Gram,
       Making_Charges_On: formData.Making_Charges_On,
       Making_Charges: formData.Making_Charges,
-      Design_Master: formData.Design_Master,
+      // Design_Master: formData.Design_Master,
     };
 
     // Update the `op_qty` and `op_weight` fields
