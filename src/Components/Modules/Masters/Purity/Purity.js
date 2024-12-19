@@ -324,50 +324,59 @@ function Purity() {
   //   setErrors({ ...errors, [name]: error });
   // };
 
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+
+   
+  //   if (name === "name" && validateName(value)) {
+  //     setFormData({ ...formData, [name]: value });
+  //     setErrors({ ...errors, [name]: "" }); 
+  //   } else if (name === "name") {
+  //     setErrors({ ...errors, [name]: "Invalid name format. Only letters, numbers, and spaces are allowed." });
+    
+  //   } else if (name === "metal" && validateMetal(value)) {
+  //     setFormData({ ...formData, [name]: value });
+  //     setErrors({ ...errors, [name]: "" }); 
+  //   } else if (name === "purity_percentage" && validatePurityPercentage(value)) {
+  //     setFormData({ ...formData, [name]: value });
+  //     setErrors({ ...errors, [name]: "" }); 
+  //   } else if (name === "purity" && validatePurity(value)) {
+  //     setFormData({ ...formData, [name]: value });
+  //     setErrors({ ...errors, [name]: "" }); 
+
+  //   } else if (name === "urd_purity" && validateURDPurity(value)) {
+  //     setFormData({ ...formData, [name]: value });
+  //     setErrors({ ...errors, [name]: "" });
+  //   } else if (name === "desc" && validateDescription(value)) {
+  //     setFormData({ ...formData, [name]: value });
+  //     setErrors({ ...errors, [name]: "" }); 
+  //   } else if (name === "old_purity_desc" && validateOldPurityDesc(value)) {
+  //     setFormData({ ...formData, [name]: value });
+  //     setErrors({ ...errors, [name]: "" }); 
+  //   } else if (name === "cut_issue" && validateCutIssue(value)) {
+  //     setFormData({ ...formData, [name]: value });
+  //     setErrors({ ...errors, [name]: "" }); 
+  //   } else if (name === "skin_print" && validateSkinPrint(value)) {
+  //     setFormData({ ...formData, [name]: value });
+  //     setErrors({ ...errors, [name]: "" });
+
+
+  //   } else {
+    
+  //     setErrors({ ...errors, [name]: `Invalid ${name}. Only alphabets allowed.` });
+  //   }
+  // };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Validate input based on its name
-    if (name === "name" && validateName(value)) {
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: "" }); // Clear error if valid
-    } else if (name === "name") {
-      setErrors({ ...errors, [name]: "Invalid name format. Only letters, numbers, and spaces are allowed." });
-    
-    } else if (name === "metal" && validateMetal(value)) {
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: "" }); // Clear error if valid
-    } else if (name === "purity_percentage" && validatePurityPercentage(value)) {
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: "" }); // Clear error if valid
-    } else if (name === "purity" && validatePurity(value)) {
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: "" }); // Clear error if valid
+    // Update formData state
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
 
-    } else if (name === "urd_purity" && validateURDPurity(value)) {
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: "" }); // Clear error if valid
-    } else if (name === "desc" && validateDescription(value)) {
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: "" }); // Clear error if valid
-    } else if (name === "old_purity_desc" && validateOldPurityDesc(value)) {
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: "" }); // Clear error if valid
-    } else if (name === "cut_issue" && validateCutIssue(value)) {
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: "" }); // Clear error if valid
-    } else if (name === "skin_print" && validateSkinPrint(value)) {
-      setFormData({ ...formData, [name]: value });
-      setErrors({ ...errors, [name]: "" }); // Clear error if valid
-
-
-    } else {
-      // Set an error for invalid input without updating formData
-      setErrors({ ...errors, [name]: `Invalid ${name}. Only alphabets allowed.` });
-    }
-  };
-
-
+  }
 
 
 
@@ -411,9 +420,9 @@ function Purity() {
     e.preventDefault();
 
     // Validate form before submitting
-    if (!validateForm()) {
-      return; // Stop if there are validation errors
-    }
+    // if (!validateForm()) {
+    //   return; 
+    // }
 
     if (editMode) {
       // Edit functionality
