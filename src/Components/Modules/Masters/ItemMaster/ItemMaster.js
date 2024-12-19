@@ -329,7 +329,8 @@ const FormWithTable = () => {
       // Append product_id to openTagsEntries
       const entriesWithProductId = openTagsEntries.map((entry) => ({
         ...entry,
-        product_id, // Append product_id to entries
+        product_id,
+        product_Name:product_name // Append product_id to entries
       }));
 
       // Save opening tag entries
