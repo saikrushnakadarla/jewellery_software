@@ -213,14 +213,14 @@ function Supplier_Master() {
         required
       />
     </Col>
-    <Col md={4}>
+    {/* <Col md={4}>
       <InputField
         label="Account Group:"
         name="account_group"
         value="SUPPLIER"
         readOnly
       />
-    </Col>
+    </Col> */}
     <Col md={4}>
       <InputField
         label="Address1"
