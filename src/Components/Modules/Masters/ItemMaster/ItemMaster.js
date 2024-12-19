@@ -59,7 +59,7 @@ const FormWithTable = () => {
   const navigate = useNavigate();
   const [isMaintainTagsChecked, setIsMaintainTagsChecked] = useState(false);
 
-  
+
 
   const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
     setFormData({
@@ -305,7 +305,7 @@ const FormWithTable = () => {
   const handleSave = async () => {
     try {
       const { product_name, Category, design_master, purity } = formData;
-  
+
       // Check if the product exists
       const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
         product_name,
@@ -313,34 +313,34 @@ const FormWithTable = () => {
         design_master,
         purity,
       });
-  
+
       if (checkResponse.data.exists) {
         alert('This product already exists.');
         return;
       }
-  
+
       // Ensure Category and other fields are not empty
       const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
-  
+
       // Save product details, now including tax_slab_id
       const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
       const { product_id } = productResponse.data;
-  
+
       // Append product_id to openTagsEntries
       const entriesWithProductId = openTagsEntries.map((entry) => ({
         ...entry,
         product_id,
         product_Name: product_name, // Append product_id to entries
       }));
-  
+
       // Save opening tag entries
       const saveEntriesPromises = entriesWithProductId.map((entry) =>
         axios.post(`${baseURL}/post/opening-tags-entry`, entry)
       );
-  
+
       await Promise.all(saveEntriesPromises);
       alert("Data saved successfully!");
- 
+
       // Reset the form fields
       setFormData({
         product_name: "",
@@ -361,11 +361,11 @@ const FormWithTable = () => {
         op_weight: "0",
         huid_no: "",
       });
-  
+
       // Clear the tag entries
       setOpenTagsEntries([]);
-    // Refresh the window
-    window.location.reload();
+      // Refresh the window
+      window.location.reload();
       // Reset the checkbox state
       setIsMaintainTagsChecked(false); // Reset checkbox
     } catch (error) {
@@ -373,12 +373,71 @@ const FormWithTable = () => {
       alert("Failed to save data. Please try again.");
     }
   };
-  
+
 
 
   const handleBack = () => {
     navigate("/itemmastertable");
   };
+
+  const [metalOptions, setmetalOptions] = useState([]);
+  const [designOptions, setdesignOptions] = useState([]);
+  const [dropdownOptions, setDropdownOptions] = useState([]);
+
+  // Fetch metal types from the API
+  useEffect(() => {
+    const fetchMetalTypes = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/metaltype');
+        const metalTypes = response.data.map(item => ({
+          value: item.metal_name, // Assuming the column name is "metal_name"
+          label: item.metal_name
+        }));
+        setmetalOptions(metalTypes);
+      } catch (error) {
+        console.error('Error fetching metal types:', error);
+      }
+    };
+
+    fetchMetalTypes();
+  }, []);
+
+  // Fetch design master options from the API
+  useEffect(() => {
+    const fetchDesignMaster = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/designmaster');
+        const designMasters = response.data.map((item) => ({
+          value: item.design_name, // Assuming the column name is "design_name"
+          label: item.design_name,
+        }));
+        setdesignOptions(designMasters);
+      } catch (error) {
+        console.error('Error fetching design masters:', error);
+      }
+    };
+
+    fetchDesignMaster();
+  }, []);
+
+  // Fetch purity options from the API
+  useEffect(() => {
+    const fetchPurity = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/purity');
+        const purityOptions = response.data.map((item) => ({
+          value: item.name, // Assuming the column name is "name"
+          label: item.name,
+        }));
+        setDropdownOptions(purityOptions);
+      } catch (error) {
+        console.error('Error fetching purity options:', error);
+      }
+    };
+
+    fetchPurity();
+  }, []);
+
 
   return (
     <div style={{ paddingTop: "90px" }}>
@@ -409,41 +468,28 @@ const FormWithTable = () => {
                   onChange={handleChange}
                 />
                 <InputField
-                  label="Categories:"
+                  label="Metal Type:"
                   name="Category"
                   type="select"
                   value={formData.Category}
                   onChange={handleChange}
-                  options={[
-                    { value: "Jewellery", label: "Jewellery" },
-                    { value: "Gold", label: "Gold" },
-                    { value: "Silver", label: "Silver" },
-                  ]}
+                  options={metalOptions}
                 />
                 <InputField
-
                   label="Design Master:"
                   name="design_master"
                   type="select"
                   value={formData.design_master}
                   onChange={handleChange}
-                  options={[
-                    { value: "Priyanka", label: "Priyanka" },
-                    { value: "Soundarya", label: "Soundarya" },
-                    { value: "gopi chain", label: "gopi chain" },
-                  ]}
+                  options={designOptions}
                 />
                 <InputField
                   label="Purity:"
-                  type="select"
                   name="purity"
+                  type="select"
                   value={formData.purity}
                   onChange={handleChange}
-                  options={[
-                    { value: "91.6HM", label: "91.6HM" },
-                    { value: "22K", label: "22K" },
-                    { value: "18K", label: "18K" },
-                  ]}
+                  options={dropdownOptions}
                 />
                 <InputField
                   label="Item Prefix:"
