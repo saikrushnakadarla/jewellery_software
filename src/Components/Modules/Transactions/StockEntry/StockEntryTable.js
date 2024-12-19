@@ -37,25 +37,25 @@ const StockEntryTable = () => {
       { Header: 'Stock Point', accessor: 'Stock_Point' },
 
 
-      {
-        Header: 'Action',
-        Cell: ({ row }) => (
-          <div className="d-flex align-items-center">
-            <button
-              className="action-button edit-button"
-              onClick={() => navigate(`/edit-stock/${row.original.product_id}`)}
-            >
-              <FaEdit />
-            </button>
-            <button
-              className="action-button delete-button"
-              onClick={() => handleDelete(row.original.product_id)}
-            >
-              <FaTrash />
-            </button>
-          </div>
-        ),
-      },
+      // {
+      //   Header: 'Action',
+      //   Cell: ({ row }) => (
+      //     <div className="d-flex align-items-center">
+      //       <button
+      //         className="action-button edit-button"
+      //         onClick={() => navigate(`/edit-stock/${row.original.product_id}`)}
+      //       >
+      //         <FaEdit />
+      //       </button>
+      //       <button
+      //         className="action-button delete-button"
+      //         onClick={() => handleDelete(row.original.product_id)}
+      //       >
+      //         <FaTrash />
+      //       </button>
+      //     </div>
+      //   ),
+      // },
     ],
     [navigate]
   );

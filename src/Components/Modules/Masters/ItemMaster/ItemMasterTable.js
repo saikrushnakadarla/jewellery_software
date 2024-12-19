@@ -22,7 +22,7 @@ const ItemMasterTable = () => {
     { Header: 'Short Name:', accessor: 'short_name' }, 
     { Header: 'Sale Account Head', accessor: 'sale_account_head' }, 
     { Header: 'Purchase Account Head:', accessor: 'purchase_account_head' }, 
-    { Header: 'Status', accessor: 'status' }, 
+    // { Header: 'Status', accessor: 'status' }, 
     { Header: 'Tax Slab', accessor: 'tax_slab' }, 
     { Header: 'HSN Code', accessor: 'hsn_code' }, 
     { Header: 'Maintain Tags', accessor: 'maintain_tags' }, 

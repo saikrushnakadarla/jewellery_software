@@ -79,7 +79,7 @@ const StockEntry = () => {
 
         if (formData.Wastage_On === "Gross Weight") {
             wastageWeight = (grossWeight * wastagePercentage) / 100;
-            totalWeight = grossWeight + wastageWeight;
+            totalWeight = weightBW + wastageWeight;
         } else if (formData.Wastage_On === "Weight BW") {
             wastageWeight = (weightBW * wastagePercentage) / 100;
             totalWeight = weightBW + wastageWeight;

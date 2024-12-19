@@ -241,9 +241,9 @@ const FormWithTable = () => {
 
     const newEntry = {
       Pricing: formData.Pricing,
-      Tag_ID: formData.Tag_ID,
-      Prefix: formData.Prefix || "Gold",
-      Category: formData.Category,
+      // Tag_ID: formData.Tag_ID,
+      // Prefix: formData.Prefix || "Gold",
+      // Category: formData.Category,
       Purity: formData.Purity,
       PCode_BarCode: formData.PCode_BarCode,
       Gross_Weight: formData.Gross_Weight,
@@ -261,7 +261,7 @@ const FormWithTable = () => {
       MC_Per_Gram: formData.MC_Per_Gram,
       Making_Charges_On: formData.Making_Charges_On,
       Making_Charges: formData.Making_Charges,
-      Design_Master: formData.Design_Master,
+      // Design_Master: formData.Design_Master,
     };
 
     // Update the `op_qty` and `op_weight` fields
@@ -305,7 +305,7 @@ const FormWithTable = () => {
   const handleSave = async () => {
     try {
       const { product_name, Category, design_master, purity } = formData;
-
+  
       // Check if the product exists
       const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
         product_name,
@@ -313,34 +313,34 @@ const FormWithTable = () => {
         design_master,
         purity,
       });
-
+  
       if (checkResponse.data.exists) {
         alert('This product already exists.');
         return;
       }
-
+  
       // Ensure Category and other fields are not empty
       const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
-
+  
       // Save product details, now including tax_slab_id
       const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
       const { product_id } = productResponse.data;
-
+  
       // Append product_id to openTagsEntries
       const entriesWithProductId = openTagsEntries.map((entry) => ({
         ...entry,
         product_id,
-        product_Name:product_name // Append product_id to entries
+        product_Name: product_name, // Append product_id to entries
       }));
-
+  
       // Save opening tag entries
       const saveEntriesPromises = entriesWithProductId.map((entry) =>
         axios.post(`${baseURL}/post/opening-tags-entry`, entry)
       );
-
+  
       await Promise.all(saveEntriesPromises);
       alert("Data saved successfully!");
-
+ 
       // Reset the form fields
       setFormData({
         product_name: "",
@@ -356,20 +356,24 @@ const FormWithTable = () => {
         tax_slab: "",
         tax_slab_id: "", // Reset tax_slab_id
         hsn_code: "",
-        op_qty: "",
+        op_qty: "0",
         op_value: "",
-        op_weight: "",
+        op_weight: "0",
         huid_no: "",
       });
-
+  
       // Clear the tag entries
       setOpenTagsEntries([]);
+    // Refresh the window
+    window.location.reload();
+      // Reset the checkbox state
+      setIsMaintainTagsChecked(false); // Reset checkbox
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Failed to save data. Please try again.");
     }
   };
-
+  
 
 
   const handleBack = () => {
