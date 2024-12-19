@@ -51,6 +51,7 @@ const RepairForm = () => {
         alert("Estimate added successfully!");
         setFormData(initialFormData);
       }
+      window.location.reload();
     } catch (error) {
       console.error("Error submitting data:", error);
       alert("Failed to add estimate. Please try again.");
@@ -170,14 +171,14 @@ const RepairForm = () => {
     }));
   }, [formData.rate_amt, formData.tax_vat_amount, formData.stones_price, formData.total_mc]);
 
-  // Table Columns
+
   const columns = React.useMemo(
     () => [
       { Header: "Sr. No.", Cell: ({ row }) => row.index + 1 },
       { Header: "Date", accessor: "date", Cell: ({ value }) => new Date(value).toLocaleDateString('en-GB') },
-      { Header: "P Code", accessor: "pcode" },
+      // { Header: "P Code", accessor: "pcode" },
       { Header: "Estimate Number", accessor: "estimate_number" },
-      { Header: "Product ID", accessor: "product_id" },
+      // { Header: "Product ID", accessor: "product_id" },
       { Header: "Product Name", accessor: "product_name" },
       { Header: "Gross Weight", accessor: "gross_weight" },
       { Header: "Stones Weight", accessor: "stones_weight" },
@@ -226,9 +227,9 @@ const RepairForm = () => {
           <Col xs={12} md={2}>
             <InputField label="Estimate Number:" name="estimate_number" value={formData.estimate_number} onChange={handleInputChange} readOnly />
           </Col>
-          <Col xs={12} md={2}>
+          {/* <Col xs={12} md={2}>
             <InputField label="P ID:" name="pcode" value={formData.pcode} onChange={handleInputChange} />
-          </Col>
+          </Col> */}
           <Col xs={12} md={2}>
             <InputField label="Product Name:" name="product_name" value={formData.product_name} onChange={handleInputChange} />
           </Col>
@@ -247,7 +248,7 @@ const RepairForm = () => {
           <Col xs={12} md={2}>
             <InputField label="Wastage On:" name="wastage_on" type="select" value={formData.wastage_on} onChange={handleInputChange} options={[
               { value: "Gross Weight", label: "Gross Weight" },
-              { value: "Weight WW", label: "Weight WW" },
+              { value: "Weight BW", label: "Weight BW" },
             ]} />
           </Col>
           <Col xs={12} md={2}>
@@ -297,6 +298,12 @@ const RepairForm = () => {
               Add
             </Button>
           </Col>
+
+          {/* <Col xs={12} md={2}>
+            <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSubmit}>
+              Print
+            </Button>
+          </Col> */}
         </Row>
 
         <Row className="estimate-form-section2">

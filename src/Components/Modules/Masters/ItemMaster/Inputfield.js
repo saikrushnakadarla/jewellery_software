@@ -57,10 +57,13 @@ const InputField = ({
             isDisabled={readOnly}
             value={options.find((opt) => opt.value === value)}
             onChange={(selectedOption) =>
-              onChange({ target: { name, value: selectedOption.value } })
+              onChange({
+                target: { name, value: selectedOption ? selectedOption.value : "" },
+              })
             }
             styles={customStyles}
             menuPortalTarget={document.body} // Render dropdown to body
+            isClearable // Enables the "X" symbol to clear the selection
           />
         ) : (
           <input
