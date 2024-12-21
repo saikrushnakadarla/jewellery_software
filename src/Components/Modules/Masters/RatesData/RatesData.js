@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
+import DataTable from '../../../Pages/InputField/DataTable'; // Import the reusable DataTable component
 import { Row, Col } from 'react-bootstrap';
 import { format } from 'date-fns'; // Import date-fns for date formatting
 
@@ -9,15 +9,46 @@ const RepairsTable = () => {
   const [data, setData] = useState([]); // State to store table data
   const [loading, setLoading] = useState(true); // State to handle loading
 
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/get/rates');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        
+        // Map rate_date to date before passing to DataTable
+        const modifiedData = result.map(item => ({
+          ...item,
+          date: item.rate_date, // Rename rate_date to date
+        }));
+
+        setData(modifiedData); // Set the modified data
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false); // Stop loading spinner
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const columns = React.useMemo(
     () => [
       {
-        Header: 'S No', // Serial Number
-        accessor: 'sno', // The key for S No in the data
+        Header: 'S No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
       {
         Header: 'Date',
-        accessor: 'rate_date',
+        accessor: 'date', // Access the renamed date field
+        Cell: ({ value }) => {
+          const date = new Date(value);
+          return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
+        },
       },
       {
         Header: '16 Crt',
@@ -42,38 +73,6 @@ const RepairsTable = () => {
     ],
     []
   );
-
-  useEffect(() => {
-    // Fetch data from API
-    const fetchData = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/get/rates');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const result = await response.json();
-
-        // Format the date and add serial number (S No)
-        const formattedData = result.map((item, index) => ({
-          sno: index + 1, // Serial number, incrementing from 1
-          rate_date: format(new Date(item.rate_date), 'dd-MM-yyyy'), // Format the date to dd-MM-yyyy
-          rate_16crt: item.rate_16crt,
-          rate_18crt: item.rate_18crt,
-          rate_22crt: item.rate_22crt,
-          rate_24crt: item.rate_24crt,
-          silver_rate: item.silver_rate,
-        }));
-
-        setData(formattedData); // Populate the table data
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false); // Stop loading spinner
-      }
-    };
-
-    fetchData();
-  }, []);
 
   return (
     <div className="main-container">
