@@ -11,7 +11,7 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Date.',
+        Header: 'Date',
         accessor: 'rate_date',
       },
       {
@@ -34,7 +34,6 @@ const RepairsTable = () => {
         Header: 'SilverRate',
         accessor: 'silver_rate',
       },
- 
     ],
     []
   );
@@ -48,7 +47,14 @@ const RepairsTable = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        setData(result); // Populate the table data
+
+        // Format the date to YYYY-MM-DD
+        const formattedData = result.map((item) => ({
+          ...item,
+          rate_date: item.rate_date.split('T')[0], // Extract the date part
+        }));
+
+        setData(formattedData); // Populate the table data
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
