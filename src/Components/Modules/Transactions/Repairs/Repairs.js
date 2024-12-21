@@ -206,6 +206,22 @@ const handleSubmit = async (e) => {
   const handleBack = () => {
     navigate("/repairstable");
   };
+
+  useEffect(() => {
+    const fetchLastRPNNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastRPNNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          repair_no: response.data.lastRPNNumber,  // Update the RPN number in the form data
+        }));
+      } catch (error) {
+        console.error('Error fetching RPN number:', error);
+      }
+    };
+
+    fetchLastRPNNumber();
+  }, []);
   
   return (
     <div className="main-container">
