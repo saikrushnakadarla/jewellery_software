@@ -161,8 +161,8 @@ function Customer_Master() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate required fields
+  
+    // Validation
     if (!formData.account_name.trim()) {
       alert('Customer Name is required.');
       return;
@@ -171,39 +171,50 @@ function Customer_Master() {
       alert('Mobile number is required.');
       return;
     }
-
-    // Check for duplicate mobile number
-    if (existingMobiles.includes(formData.mobile)) {
-      alert('This mobile number already exists. Please use a unique number.');
-      return;
-    }
-
+  
     try {
+      // Only check for duplicates if this is a new record (POST request)
+      if (!id) {
+        // Fetch existing data to check for duplicate mobile numbers
+        const response = await fetch(`${baseURL}/get/account-details`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data for duplicate check.');
+        }
+        const result = await response.json();
+  
+        // Check if the mobile number already exists
+        const isDuplicateMobile = result.some((item) => item.mobile === formData.mobile);
+  
+        if (isDuplicateMobile) {
+          alert('This mobile number is already associated with another entry.');
+          return;
+        }
+      }
+  
+      // Proceed with saving the record (POST or PUT based on id)
       const method = id ? 'PUT' : 'POST';
       const endpoint = id
         ? `${baseURL}/edit/account-details/${id}`
         : `${baseURL}/account-details`;
-
-      const response = await fetch(endpoint, {
+  
+      const saveResponse = await fetch(endpoint, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
-
-      if (response.ok) {
+  
+      if (saveResponse.ok) {
         alert(`Customer ${id ? 'updated' : 'created'} successfully!`);
-
-        // Check where to navigate back
-        const from = location.state?.from || '/customerstable';
-        navigate(from); // Redirect to the origin page or default to the customers table
+        navigate('/customerstable');
       } else {
-        alert('Failed to save customer.');
+        console.error('Failed to save supplier');
+        alert('Failed to save supplier.');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred.');
+      alert('An error occurred while processing the request.');
     }
   };
   

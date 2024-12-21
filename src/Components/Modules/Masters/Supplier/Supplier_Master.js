@@ -138,24 +138,25 @@ function Supplier_Master() {
     }
   
     try {
-      // Fetch existing data to check for duplicate mobile numbers
-      const response = await fetch(`${baseURL}/get/account-details`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch data for duplicate check.');
+      // Only check for duplicates if this is a new record (POST request)
+      if (!id) {
+        // Fetch existing data to check for duplicate mobile numbers
+        const response = await fetch(`${baseURL}/get/account-details`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data for duplicate check.');
+        }
+        const result = await response.json();
+  
+        // Check if the mobile number already exists
+        const isDuplicateMobile = result.some((item) => item.mobile === formData.mobile);
+  
+        if (isDuplicateMobile) {
+          alert('This mobile number is already associated with another entry.');
+          return;
+        }
       }
-      const result = await response.json();
   
-      // Check if the mobile number already exists (excluding the current record if updating)
-      const isDuplicateMobile = result.some((item) => 
-        item.mobile === formData.mobile && (!id || item.id !== id)
-      );
-  
-      if (isDuplicateMobile) {
-        alert('This mobile number is already associated with another entry.');
-        return;
-      }
-  
-      // Proceed with saving the record
+      // Proceed with saving the record (POST or PUT based on id)
       const method = id ? 'PUT' : 'POST';
       const endpoint = id
         ? `${baseURL}/edit/account-details/${id}`
@@ -181,6 +182,7 @@ function Supplier_Master() {
       alert('An error occurred while processing the request.');
     }
   };
+  
   
 
   const handleBack = () => {
