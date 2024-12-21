@@ -15,7 +15,7 @@ const URDPurchase = () => {
     const [loading, setLoading] = useState(true);
     const [customers, setCustomers] = useState([]);
     const [formData, setFormData] = useState({
-      name: "",
+      account_name: "",
       mobile: "",
       email: "",
       address1: "",
@@ -33,7 +33,6 @@ const URDPurchase = () => {
       }));
     };
   
-
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -73,7 +72,7 @@ const URDPurchase = () => {
         setFormData({
           ...formData,
           customer_id: customerId, // Ensure this is correctly set
-          name: customer.account_name, // Set the name field to the selected customer
+          account_name: customer.account_name, // Set the name field to the selected customer
           mobile: customer.mobile || "",
           email: customer.email || "",
           address1: customer.address1 || "",
@@ -91,7 +90,7 @@ const URDPurchase = () => {
         setFormData({
           ...formData,
           customer_id: "",
-          name: "",
+          account_name: "",
           mobile: "",
           email: "",
           address1: "",
@@ -155,8 +154,8 @@ const URDPurchase = () => {
                 <Col xs={12} md={3}>
                 <InputField
                     label="Customer Name:"
-                    name="name"
-                    value={formData.name}
+                    name="account_name"
+                    value={formData.account_name}
                     onChange={handleChange}
                     readOnly
                   />
