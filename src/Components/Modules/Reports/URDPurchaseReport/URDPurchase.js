@@ -1,107 +1,99 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/DataTable'; // Import the reusable DataTable component
-import { FaEdit, FaTrash } from 'react-icons/fa';
-import { Button, Row, Col, Form } from 'react-bootstrap';
-// import './EstimateTable.css';
+import { Button, Row, Col } from 'react-bootstrap';
 
 const RepairsTable = () => {
-  const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store table data
+  const [loading, setLoading] = useState(true); // Loading state
 
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/get-purchases');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        setData(Array.isArray(result) ? result : [result]); // Ensure the result is an array
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false); // Stop loading spinner
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Columns definition for the DataTable
   const columns = React.useMemo(
     () => [
       {
-        Header: 'ID.',
-        accessor: 'product_id',
+        Header: 'Account Name',
+        accessor: 'account_name',
       },
-
       {
-        Header: 'Product Code',
-        accessor: 'pcode',
+        Header: 'Mobile',
+        accessor: 'mobile',
+      },
+      {
+        Header: 'Email',
+        accessor: 'email',
+      },
+      {
+        Header: 'Date',
+        accessor: 'date',
+        Cell: ({ value }) => {
+          const date = new Date(value);
+          return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
+        },
+      },
+      {
+        Header: 'Purchase No',
+        accessor: 'purchase_number',
       },
       {
         Header: 'Product Name',
         accessor: 'product_name',
       },
       {
+        Header: 'Metal',
+        accessor: 'metal',
+      },
+      {
+        Header: 'Purity',
+        accessor: 'purity',
+      },
+      {
         Header: 'Gross Weight',
-        accessor: 'gross_weight',
+        accessor: 'gross',
       },
       {
-        Header: 'Stone Weight',
-        accessor: 'stones_weight',
+        Header: 'Dust Weight',
+        accessor: 'dust',
       },
       {
-        Header: 'Stone Price',
-        accessor: 'stones_price',
+        Header: 'Touch Percent',
+        accessor: 'touch_percent',
       },
       {
-        Header: 'Weight WW',
-        accessor: 'weight_ww',
+        Header: 'ML Percent',
+        accessor: 'ml_percent',
       },
       {
-        Header: 'Wastage Percent',
-        accessor: 'wastage_percent',
+        Header: 'EQT Weight',
+        accessor: 'eqt_wt',
       },
       {
-        Header: 'Wastage',
-        accessor: 'wastage',
+        Header: 'Rate',
+        accessor: 'rate',
       },
       {
-        Header: 'Net Weight',
-        accessor: 'nett_weight',
+        Header: 'Total Amount',
+        accessor: 'total_amount',
       },
-      {
-        Header: 'Rate Average',
-        accessor: 'rate_av',
-      },
-      {
-        Header: 'Rate (10g)',
-        accessor: 'rate_10g',
-      },
-      {
-        Header: 'Rate (1g)',
-        accessor: 'rate_1g',
-      },
-      {
-        Header: 'MC Per Gram',
-        accessor: 'mc_per_gram',
-      },
-      {
-        Header: 'Total Before Tax',
-        accessor: 'total_b4_tax',
-      },
-      {
-        Header: 'Total MC',
-        accessor: 'total_mc',
-      },
-      {
-        Header: 'Tax Percent',
-        accessor: 'tax_percent',
-      },
-      {
-        Header: 'Tax VAT Amount',
-        accessor: 'tax_vat_amount',
-      },
-      {
-        Header: 'Total Rs',
-        accessor: 'total_rs',
-      },
-      {
-        Header: 'From Date',
-        accessor: 'from_date',
-      },
-      {
-        Header: 'To Date',
-        accessor: 'to_date',
-      },
-      {
-        Header: 'Action',
-
-
-      },
-
     ],
     []
   );
@@ -109,15 +101,19 @@ const RepairsTable = () => {
 
   return (
     <div className="main-container">
-    <div className="sales-table-container">
-      <Row className="mb-3">
-        <Col className="d-flex justify-content-between align-items-center">
-          <h3>URDPurchase Report</h3>        
-        </Col>
-      </Row>
-      <DataTable columns={columns} data={data} />
+      <div className="payments-table-container">
+        <Row className="mb-3">
+          <Col className="d-flex justify-content-between align-items-center">
+            <h3>URD Purchase Report</h3>
+          </Col>
+        </Row>
+        {loading ? (
+          <div>Loading...</div> // Show loading state while fetching
+        ) : (
+          <DataTable columns={columns} data={data} /> // Display the table with fetched data
+        )}
+      </div>
     </div>
-  </div>
   );
 };
 

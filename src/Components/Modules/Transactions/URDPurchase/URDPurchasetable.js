@@ -7,7 +7,6 @@ const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
   const [data, setData] = useState([]); // State to store fetched data
 
-  // Utility function to format date as dd/mm/yyyy
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
     const day = String(date.getDate()).padStart(2, '0');
@@ -16,7 +15,6 @@ const RepairsTable = () => {
     return `${day}/${month}/${year}`;
   };
 
-  // Columns definition for the DataTable
   const columns = React.useMemo(
     () => [
       {
@@ -83,7 +81,6 @@ const RepairsTable = () => {
     []
   );
 
-  // Fetch the URD purchase data when the component mounts
   useEffect(() => {
     const fetchUrdPurchases = async () => {
       try {

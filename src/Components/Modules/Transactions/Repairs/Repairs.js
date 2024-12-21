@@ -8,6 +8,7 @@ import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
 
 const RepairForm = () => {
+  const today = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams(); 
@@ -27,7 +28,7 @@ const RepairForm = () => {
     entry_type: "Repair",
     receipt_no: "",
     repair_no: "",
-    date: "",
+    date: today,
     metal_type: "",
     item: "",
     tag_no: "",
@@ -206,6 +207,22 @@ const handleSubmit = async (e) => {
   const handleBack = () => {
     navigate("/repairstable");
   };
+
+  useEffect(() => {
+    const fetchLastRPNNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastRPNNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          repair_no: response.data.lastRPNNumber,  // Update the RPN number in the form data
+        }));
+      } catch (error) {
+        console.error('Error fetching RPN number:', error);
+      }
+    };
+
+    fetchLastRPNNumber();
+  }, []);
   
   return (
     <div className="main-container">
@@ -319,6 +336,7 @@ const handleSubmit = async (e) => {
                   name="repair_no"
                   value={formData.repair_no}
                   onChange={handleChange}
+                  readOnly
                 />
               </Row>
               <Row>

@@ -87,8 +87,12 @@ const RepairsTable = () => {
       {
         Header: 'Date',
         accessor: 'date',
-        Cell: ({ value }) => new Date(value).toLocaleDateString(), // Format date
+        Cell: ({ value }) => {
+          const date = new Date(value);
+          return date.toLocaleDateString('en-GB'); // 'en-GB' formats as dd/mm/yyyy
+        },
       },
+      
       {
         Header: 'Metal Type',
         accessor: 'metal_type',

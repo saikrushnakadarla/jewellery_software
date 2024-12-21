@@ -48,13 +48,13 @@ export default function DataTable({ columns, data }) {
   const handleDateFilter = (fromDate, toDate) => {
     if (fromDate || toDate) {
       const filtered = data.filter((item) => {
-        const itemDate = new Date(item.date); // Assuming data items have a `date` field
-        const from = fromDate ? new Date(fromDate) : null;
-        const to = toDate ? new Date(toDate) : null;
-
+        const itemDate = new Date(item.date).setHours(0, 0, 0, 0); // Normalize to midnight for accurate comparison
+        const from = fromDate ? new Date(fromDate).setHours(0, 0, 0, 0) : null;
+        const to = toDate ? new Date(toDate).setHours(0, 0, 0, 0) : null;
+  
         return (
-          (!from || itemDate >= from) &&
-          (!to || itemDate <= to)
+          (!from || itemDate >= from) && // Include the fromDate
+          (!to || itemDate <= to) // Include the toDate
         );
       });
       setFilteredData(filtered);
@@ -62,7 +62,7 @@ export default function DataTable({ columns, data }) {
       setFilteredData(data); // Reset to original data if no date filters
     }
   };
-
+  
   const {
     getTableProps,
     getTableBodyProps,

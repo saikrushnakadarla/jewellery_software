@@ -132,25 +132,27 @@ const RepairForm = () => {
     e.preventDefault();
   
     try {
-      // Step 1: Check for duplicate mobile number
-      const duplicateCheckResponse = await fetch(`${baseURL}/get/account-details`);
-      if (!duplicateCheckResponse.ok) {
-        throw new Error("Failed to fetch accounts data for duplicate check");
-      }
-      const accounts = await duplicateCheckResponse.json();
+      // Step 1: Check for duplicate mobile number only when creating a new account (POST request)
+      if (!id) {
+        const duplicateCheckResponse = await fetch(`${baseURL}/get/account-details`);
+        if (!duplicateCheckResponse.ok) {
+          throw new Error("Failed to fetch accounts data for duplicate check");
+        }
+        const accounts = await duplicateCheckResponse.json();
   
-      // Check if the mobile number already exists
-      const isDuplicate = accounts.some((account) => account.mobile === formData.mobile);
-      if (isDuplicate) {
-        alert("This mobile number already exists. Please use a different number.");
-        return;
+        // Check if the mobile number already exists
+        const isDuplicate = accounts.some((account) => account.mobile === formData.mobile);
+        if (isDuplicate) {
+          alert("This mobile number already exists. Please use a different number.");
+          return;
+        }
       }
   
-      // Step 2: Proceed with form submission
+      // Step 2: Proceed with form submission (POST or PUT)
       const method = id ? "PUT" : "POST";
       const url = id
-        ? `${baseURL}/edit/account-details/${id}`
-        : `${baseURL}/account-details`;
+        ? `${baseURL}/edit/account-details/${id}`  // Update the account if ID exists
+        : `${baseURL}/account-details`;           // Create a new account if no ID
   
       const response = await fetch(url, {
         method: method,
@@ -173,7 +175,7 @@ const RepairForm = () => {
       alert(`Error: ${err.message}`);
     }
   };
-  
+   
   return (
     <div className="main-container">
       <Container className="accounts-form-container">
