@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "./Estimate.css";
 import InputField from "../../../Pages/InputField/InputField";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button,Table } from "react-bootstrap";
 import axios from "axios";
-import DataTable from '../../../Pages/InputField/TableLayout';
+import DataTable from "../../../Pages/InputField/TableLayout";
 import baseURL from "../../../../Url/NodeBaseURL";
+import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const RepairForm = () => {
-  // Get today's date in yyyy-mm-dd format
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
 
   const initialFormData = {
-    date: today,  // Set default date to today's date
+    date: today,
     pcode: "",
     estimate_number: "",
     product_id: "",
@@ -28,78 +28,206 @@ const RepairForm = () => {
     mc_per_gram: "",
     total_mc: "",
     rate: "",
+    rate_amt: "",
     tax_percent: "",
     tax_vat_amount: "",
     total_rs: "",
   };
 
   const [formData, setFormData] = useState(initialFormData);
-  const [estimates, setEstimates] = useState([]);
+  const [entries, setEntries] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Function to handle form submission and send data to API
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleAdd = () => {
+    if (isEditing) {
+      // Update the entry being edited
+      const updatedEntries = entries.map((entry, index) =>
+        index === editIndex ? formData : entry
+      );
+      setEntries(updatedEntries);
+      setIsEditing(false);
+      setEditIndex(null);
+    } else {
+      // Add new entry
+      setEntries([...entries, formData]);
+    }
 
+    // Reset the form data
+    setFormData((prev) => ({
+      ...initialFormData,
+      date: today,
+      estimate_number: prev.estimate_number,
+    }));
+  };
+
+
+
+  const handleEdit = (index) => {
+    setFormData(entries[index]);
+    setIsEditing(true);
+    setEditIndex(index);
+  };
+
+  const handleDelete = (index) => {
+    const updatedEntries = entries.filter((_, i) => i !== index);
+    setEntries(updatedEntries);
+  };
+
+  const handlePrint = async () => {
     try {
-      const response = await axios.post(`${baseURL}/add/estimate`, formData);
-      if (response.status === 200) {
-        alert("Estimate added successfully!");
-        setFormData(initialFormData); // Clear the form after successful submission
-      }
+      await Promise.all(
+        entries.map((entry) => axios.post(`${baseURL}/add/estimate`, entry))
+      );
+
+      alert("All entries saved successfully!");
+      setEntries([]);
+      setFormData(initialFormData);
     } catch (error) {
-      console.error("Error submitting data:", error);
-      alert("Failed to add estimate. Please try again.");
+      console.error("Error saving data:", error);
+      alert("Failed to save entries. Please try again.");
     }
   };
 
   useEffect(() => {
-    const fetchEstimates = async () => {
+    const fetchLastEstimateNumber = async () => {
       try {
-        const response = await axios.get(`${baseURL}/get/estimates`);
-        setEstimates(response.data); // Set the fetched estimates in state
+        const response = await axios.get(`${baseURL}/lastEstimateNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          estimate_number: response.data.lastEstimateNumber,
+        }));
       } catch (error) {
-        console.error("Error fetching estimates:", error);
+        console.error("Error fetching estimate number:", error);
       }
     };
 
-    fetchEstimates(); // Call function to fetch estimates
+    fetchLastEstimateNumber();
   }, []);
 
-  const columns = React.useMemo(
-    () => [
-      { Header: "Sr. No.", Cell: ({ row }) => row.index + 1 },
-      { Header: "Date", accessor: "date", Cell: ({ value }) => new Date(value).toLocaleDateString('en-GB') },
-      { Header: "P Code", accessor: "pcode" },
-      { Header: "Estimate Number", accessor: "estimate_number" },
-      { Header: "Product ID", accessor: "product_id" },
-      { Header: "Product Name", accessor: "product_name" },
-      { Header: "Gross Weight", accessor: "gross_weight" },
-      { Header: "Stones Weight", accessor: "stones_weight" },
-      { Header: "Stones Price", accessor: "stones_price" },
-      { Header: "Weight BW", accessor: "weight_bw" },
-      { Header: "Wastage On", accessor: "wastage_on" },
-      { Header: "Wastage %", accessor: "wastage_percent" },
-      { Header: "Wastage Weight", accessor: "wastage_weight" },
-      { Header: "Total Weight", accessor: "total_weight" },
-      { Header: "Making Charges On", accessor: "making_charges_on" },
-      { Header: "MC Per Gram", accessor: "mc_per_gram" },
-      { Header: "Total MC", accessor: "total_mc" },
-      { Header: "Rate", accessor: "rate" },
-      { Header: "Tax %", accessor: "tax_percent" },
-      { Header: "Tax VAT Amount", accessor: "tax_vat_amount" },
-      { Header: "Total Rs", accessor: "total_rs" }
-    ],
-    [estimates]
-  );
-  
-  
-  
 
+
+  useEffect(() => {
+    const grossWeight = parseFloat(formData.gross_weight) || 0;
+    const stonesWeight = parseFloat(formData.stones_weight) || 0;
+    const weightBW = grossWeight - stonesWeight;
+
+    setFormData((prev) => ({
+      ...prev,
+      weight_bw: weightBW.toFixed(2),
+    }));
+  }, [formData.gross_weight, formData.stones_weight]);
+
+  useEffect(() => {
+    const wastagePercentage = parseFloat(formData.wastage_percent) || 0;
+    const grossWeight = parseFloat(formData.gross_weight) || 0;
+    const weightBW = parseFloat(formData.weight_bw) || 0;
+
+    let wastageWeight = 0;
+    let totalWeight = 0;
+
+    if (formData.wastage_on === "Gross Weight") {
+      wastageWeight = (grossWeight * wastagePercentage) / 100;
+      totalWeight = weightBW + wastageWeight;
+    } else if (formData.wastage_on === "Weight BW") {
+      wastageWeight = (weightBW * wastagePercentage) / 100;
+      totalWeight = weightBW + wastageWeight;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      wastage_weight: wastageWeight.toFixed(2),
+      total_weight: totalWeight.toFixed(2),
+    }));
+  }, [formData.wastage_on, formData.wastage_percent, formData.gross_weight, formData.weight_bw]);
+
+  useEffect(() => {
+    const totalWeight = parseFloat(formData.total_weight) || 0;
+    const mcPerGram = parseFloat(formData.mc_per_gram) || 0;
+    const makingCharges = parseFloat(formData.total_mc) || 0;
+
+    if (formData.making_charges_on === "By Weight") {
+      const calculatedMakingCharges = totalWeight * mcPerGram;
+      setFormData((prev) => ({
+        ...prev,
+        total_mc: calculatedMakingCharges.toFixed(2),
+      }));
+    } else if (formData.making_charges_on === "Fixed") {
+      if (totalWeight > 0) {
+        const calculatedMcPerGram = makingCharges / totalWeight;
+        setFormData((prev) => ({
+          ...prev,
+          mc_per_gram: calculatedMcPerGram.toFixed(2),
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          mc_per_gram: "0.00",
+        }));
+      }
+    }
+  }, [formData.making_charges_on, formData.mc_per_gram, formData.total_mc, formData.total_weight]);
+
+  useEffect(() => {
+    const rate = parseFloat(formData.rate) || 0;
+    const totalWeight = parseFloat(formData.total_weight) || 0;
+
+    const rateAmt = rate * totalWeight;
+
+    setFormData((prev) => ({
+      ...prev,
+      rate_amt: rateAmt.toFixed(2),
+    }));
+  }, [formData.rate, formData.total_weight]);
+
+  useEffect(() => {
+    const taxPercent = parseFloat(formData.tax_percent) || 0;
+    const rateAmt = parseFloat(formData.rate_amt) || 0;
+
+    const taxAmt = (rateAmt * taxPercent) / 100;
+
+    setFormData((prev) => ({
+      ...prev,
+      tax_vat_amount: taxAmt.toFixed(2),
+    }));
+  }, [formData.tax_percent, formData.rate_amt]);
+
+  useEffect(() => {
+    const rateAmt = parseFloat(formData.rate_amt) || 0;
+    const taxAmt = parseFloat(formData.tax_vat_amount) || 0;
+    const stonesPrice = parseFloat(formData.stones_price) || 0;
+    const totalMC = parseFloat(formData.total_mc) || 0;
+
+    const totalRs = rateAmt + taxAmt + stonesPrice + totalMC;
+
+    setFormData((prev) => ({
+      ...prev,
+      total_rs: totalRs.toFixed(2),
+    }));
+  }, [formData.rate_amt, formData.tax_vat_amount, formData.stones_price, formData.total_mc]);
+
+  useEffect(() => {
+    const fetchLastEstimateNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastEstimateNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          estimate_number: response.data.lastEstimateNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastEstimateNumber();
+  }, []);
+  
   return (
     <div className="main-container">
       <Container className="estimate-form-container">
@@ -110,11 +238,11 @@ const RepairForm = () => {
             <InputField label="Date:" name="date" value={formData.date} type="date" onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
-            <InputField label="Estimate Number:" name="estimate_number" value={formData.estimate_number} onChange={handleInputChange} />
+            <InputField label="Estimate Number:" name="estimate_number" value={formData.estimate_number} onChange={handleInputChange} readOnly />
           </Col>
-          <Col xs={12} md={2}>
+          {/* <Col xs={12} md={2}>
             <InputField label="P ID:" name="pcode" value={formData.pcode} onChange={handleInputChange} />
-          </Col>
+          </Col> */}
           <Col xs={12} md={2}>
             <InputField label="Product Name:" name="product_name" value={formData.product_name} onChange={handleInputChange} />
           </Col>
@@ -133,7 +261,7 @@ const RepairForm = () => {
           <Col xs={12} md={2}>
             <InputField label="Wastage On:" name="wastage_on" type="select" value={formData.wastage_on} onChange={handleInputChange} options={[
               { value: "Gross Weight", label: "Gross Weight" },
-              { value: "Weight WW", label: "Weight WW" },
+              { value: "Weight BW", label: "Weight BW" },
             ]} />
           </Col>
           <Col xs={12} md={2}>
@@ -147,8 +275,8 @@ const RepairForm = () => {
           </Col>
           <Col xs={12} md={2}>
             <InputField label="Making Charges On:" name="making_charges_on" type="select" value={formData.making_charges_on} onChange={handleInputChange} options={[
-              { value: "Gross Weight", label: "Gross Weight" },
-              { value: "Weight WW", label: "Weight WW" },
+              { value: "By Weight", label: "By Weight" },
+              { value: "Fixed", label: "Fixed" },
             ]} />
           </Col>
           <Col xs={12} md={2}>
@@ -160,24 +288,92 @@ const RepairForm = () => {
           <Col xs={12} md={2}>
             <InputField label="Rate:" name="rate" value={formData.rate} onChange={handleInputChange} />
           </Col>
-          <Col xs={12} md={1}>
+          <Col xs={12} md={2}>
+                <InputField
+                  label="Amount"
+                  name="rate_amt"
+                  value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+                  onChange={handleInputChange} // Optional, since it's auto-calculated
+                  readOnly
+                />
+                </Col>
+          <Col xs={12} md={2}>
             <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
-            <InputField label="Tax VAT Amount:" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
+            <InputField label="Tax VAT Amt:" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
             <InputField label="Total Rs:" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
-            <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSubmit}>
-              Add
+          <Button
+              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+              onClick={handleAdd}
+            >
+              {isEditing ? "Update" : "Add"}
             </Button>
           </Col>
+          
         </Row>
-
+       
         <Row className="estimate-form-section2">
-        <DataTable columns={columns} data={estimates} />
+        <Table striped bordered hover className="mt-3">
+            <thead>
+              <tr>
+                <th>S No</th>
+                <th>Product Name</th>
+                <th>Gross Weight</th>
+                <th>Stones Weight</th>
+                <th>Total Weight</th>
+                <th>Rate</th>
+                <th>Total Rs</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.length > 0 ? (
+                entries.map((entry, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td>{entry.product_name}</td>
+                    <td>{entry.gross_weight}</td>
+                    <td>{entry.stones_weight}</td>
+                    <td>{entry.total_weight}</td>
+                    <td>{entry.rate}</td>
+                    <td>{entry.total_rs}</td>
+                    <td>                      
+                      <div className="d-flex align-items-center">
+                        <FaEdit
+                          className="action-icon edit-icon"
+                          onClick={() => handleEdit(index)}
+                          style={{ cursor: 'pointer', marginRight: 10 }}
+                        />
+                        <FaTrash
+                          className="action-icon delete-icon"
+                          onClick={() => handleDelete(index)}
+                        />
+                        </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="text-center">
+                    No entries added yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+          <Col xs={12} md={12} className="d-flex justify-content-end">
+            <Button
+              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29",  }}
+              onClick={handlePrint}
+            >
+              Print
+            </Button>
+          </Col>
         </Row>
       </Container>
     </div>

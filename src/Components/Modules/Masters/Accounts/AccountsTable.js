@@ -59,54 +59,43 @@ const RepairsTable = () => {
 
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'Sr. No.',
-        Cell: ({ row }) => row.index + 1, 
-      },
-      { Header: 'Account Name', accessor: 'account_name' },
-      { Header: 'Print Name', accessor: 'print_name' },
-      { Header: 'Group', accessor: 'account_group' },
-      { Header: 'Op. Bal.', accessor: 'op_bal' },
-      { Header: 'Dr/Cr', accessor: 'dr_cr' },
-      { Header: 'Metal Balance', accessor: 'metal_balance' },
-      { Header: 'Address', accessor: 'address1' },
-      { Header: 'Address2', accessor: 'address2' },
-      { Header: 'City', accessor: 'city' },
-      {
-        Header: 'GSTIN',
-        accessor: 'gst_in',
-      },
-      { Header: 'Pincode', accessor: 'pincode' },
-      { Header: 'State', accessor: 'state' },
-      { Header: 'State Code', accessor: 'state_code' },
-      { Header: 'Phone', accessor: 'phone' },
-      { Header: 'Mobile', accessor: 'mobile' },
-      { Header: 'Contact Person', accessor: 'contact_person' },
-      { Header: 'Email', accessor: 'email' },
-      { Header: 'Birthday On', accessor: 'birthday' },
-      { Header: 'Anniversary', accessor: 'anniversary' },
-      { Header: 'Bank Account No.', accessor: 'bank_account_no' },
-      { Header: 'Bank Name', accessor: 'bank_name' },
-      { Header: 'IFSC Code', accessor: 'ifsc_code' },
-      { Header: 'Branch', accessor: 'branch' },
+      { Header: 'Sr. No.', Cell: ({ row }) => row.index + 1 },
+      { Header: 'Account Name', accessor: 'account_name', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Print Name', accessor: 'print_name', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Group', accessor: 'account_group', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Op. Bal.', accessor: 'op_bal', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Dr/Cr', accessor: 'dr_cr', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Metal Balance', accessor: 'metal_balance', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Address', accessor: 'address1', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Address2', accessor: 'address2', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'City', accessor: 'city', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'GSTIN', accessor: 'gst_in', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Pincode', accessor: 'pincode', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'State', accessor: 'state', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'State Code', accessor: 'state_code', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Phone', accessor: 'phone', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Mobile', accessor: 'mobile', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Contact Person', accessor: 'contact_person', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Email', accessor: 'email', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Birthday On', accessor: 'birthday', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Anniversary', accessor: 'anniversary', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Bank Account No.', accessor: 'bank_account_no', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Bank Name', accessor: 'bank_name', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'IFSC Code', accessor: 'ifsc_code', Cell: ({ value }) => value || 'N/A' },
+      { Header: 'Branch', accessor: 'branch', Cell: ({ value }) => value || 'N/A' },
       {
         Header: 'Actions',
         Cell: ({ row }) => (
           <div>
-            <FaEdit 
-              style={{ cursor: 'pointer', marginRight: 10 }} 
-              onClick={() => handleEdit(row.original.account_id)} 
-            />
-            <FaTrash 
-              style={{ cursor: 'pointer' }} 
-              onClick={() => handleDelete(row.original.account_id)} 
-            />
+            <FaEdit style={{ cursor: 'pointer', marginRight: 10 }} onClick={() => handleEdit(row.original.account_id)} />
+            <FaTrash style={{ cursor: 'pointer' }} onClick={() => handleDelete(row.original.account_id)} />
           </div>
-        )
-      }
+        ),
+      },
     ],
     []
   );
+  
 
   if (loading) {
     return <div>Loading...</div>;

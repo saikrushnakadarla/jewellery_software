@@ -28,7 +28,7 @@ const RepairForm = () => {
     receipt_no: "",
     repair_no: "",
     date: "",
-    type: "",
+    metal_type: "",
     item: "",
     tag_no: "",
     description: "",
@@ -90,6 +90,7 @@ const RepairForm = () => {
       try {
         const response = await axios.get(`${baseURL}/metaltype`);
         setMetalTypes(response.data);
+        console.log("Metal Type=",response.data)
       } catch (error) {
         console.error("Error fetching metal types:", error);
       }
@@ -181,8 +182,6 @@ const RepairForm = () => {
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-
-
   const updatedFormData = {
     ...formData,
 
@@ -203,8 +202,11 @@ const handleSubmit = async (e) => {
   const handleAddCustomer = () => {
     navigate("/customermaster", { state: { from: "/repairs" } });
   };
-  
 
+  const handleBack = () => {
+    navigate("/repairstable");
+  };
+  
   return (
     <div className="main-container">
     <Container className="repair-form-container">
@@ -216,35 +218,35 @@ const handleSubmit = async (e) => {
           <Col className="form-section">
             <h4 className="mb-4">Customer Details</h4>
             <Row>
-            <Col xs={12} md={2} className="d-flex align-items-center">
-    <div style={{ flex: 1 }}>
-      <InputField
-        label="Mobile"
-        name="mobile"
-        type="select"
-        value={formData.mobile || ""} // Use customer_id to match selected value
-        onChange={(e) => handleCustomerChange(e.target.value)}
-        options={[
-          { value: "", label: "Select" }, // Placeholder option
-          ...customers.map((customer) => ({
-            value: customer.account_id, // Use account_id as the value
-            label: customer.mobile, // Display mobile as the label
-          })),
-        ]}
-      />
-    </div>
-    <AiOutlinePlus
-      size={20}
-      color="black"
-      onClick={handleAddCustomer}
-      style={{
-        marginLeft: "10px",
-        cursor: "pointer",
-        marginBottom: "20px",
-      }}
-    />
-  </Col>
-                <Col xs={12} md={4}>
+            <Col xs={12} md={3} className="d-flex align-items-center">
+            <div style={{ flex: 1 }}>
+              <InputField
+                label="Mobile"
+                name="mobile"
+                type="select"
+                value={formData.mobile || ""} // Use customer_id to match selected value
+                onChange={(e) => handleCustomerChange(e.target.value)}
+                options={[
+                  { value: "", label: "Select" }, // Placeholder option
+                  ...customers.map((customer) => ({
+                    value: customer.account_id, // Use account_id as the value
+                    label: customer.mobile, // Display mobile as the label
+                  })),
+                ]}
+              />
+            </div>
+            <AiOutlinePlus
+              size={20}
+              color="black"
+              onClick={handleAddCustomer}
+              style={{
+                marginLeft: "10px",
+                cursor: "pointer",
+                marginBottom: "20px",
+              }}
+            />
+          </Col>
+                <Col xs={12} md={3}>
                 <InputField
                     label="Customer Name:"
                     name="name"
@@ -253,7 +255,7 @@ const handleSubmit = async (e) => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={3}>
                   <InputField
                     label="Email:"
                     name="email"
@@ -263,7 +265,7 @@ const handleSubmit = async (e) => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={3}>
                   <InputField
                     label="Address1:"
                     name="address1"
@@ -272,7 +274,7 @@ const handleSubmit = async (e) => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={3}>
                   <InputField
                     label="Address2:"
                     name="address2"
@@ -281,7 +283,7 @@ const handleSubmit = async (e) => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={4}>
+                <Col xs={12} md={3}>
                   <InputField
                     label="City:"
                     name="city"
@@ -335,21 +337,7 @@ const handleSubmit = async (e) => {
             <Col xs={12} md={3}>
               <InputField label="Place:" name="place" value={formData.place} onChange={handleChange} />
             </Col>
-            <Col xs={12} md={2}>
-              <InputField
-                label="Metal:"
-                name="metal"
-                type="select"
-                value={formData.metal}
-                onChange={handleChange}
-                options={[
-                  ...metalTypes.map((metal) => ({
-                    value: metal.id,
-                    label: metal.metal_name
-                  }))
-                ]}
-              />
-            </Col>
+           
             <Col xs={12} md={3}>
               <InputField label="Counter:" name="counter" value={formData.counter} onChange={handleChange} />
             </Col>
@@ -365,11 +353,11 @@ const handleSubmit = async (e) => {
                     label="Metal Type:"
                     name="metal_type"
                     type="select"
-                    value={formData.type}
+                    value={formData.metal_type}
                     onChange={handleChange}
                     options={[
                       ...metalTypes.map((metal) => ({
-                        value: metal.id,
+                        value: metal.metal_name,
                         label: metal.metal_name
                       }))
                     ]}
@@ -393,8 +381,8 @@ const handleSubmit = async (e) => {
                     onChange={handleChange}
                     options={[
                       ...purityData.map((item) => ({
-                        value: item.id,
-                        label: item.purity
+                        value: item.name,
+                        label: item.name
                       }))
                     ]}
                   />
@@ -450,7 +438,7 @@ const handleSubmit = async (e) => {
           
         {/* Buttons */}
         <div className="form-buttons">
-          <Button type="submit" className="cus-back-btn" variant="secondary" onClick={() => navigate("/repairstable")}>cancel</Button>
+          <Button className="cus-back-btn" variant="secondary"  onClick={handleBack}>cancel</Button>
           <Button type="submit" variant="primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
         </div>
         </Form>

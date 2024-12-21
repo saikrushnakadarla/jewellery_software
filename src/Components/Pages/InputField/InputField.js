@@ -51,20 +51,21 @@ const InputField = ({
         {label && <label className="floating-label">{label}</label>}
         {type === "select" ? (
           <Select
-            name={name}
-            options={options}
-            placeholder={placeholder || "Select"}
-            isDisabled={readOnly}
-            value={options.find((opt) => opt.value === value)}
-            onChange={(selectedOption) =>
-              onChange({
-                target: { name, value: selectedOption ? selectedOption.value : "" },
-              })
-            }
-            styles={customStyles}
-            menuPortalTarget={document.body} // Render dropdown to body
-            isClearable // Enables the "X" symbol to clear the selection
-          />
+          name={name}
+          options={options}
+          placeholder={placeholder || "Select"}
+          isDisabled={readOnly}
+          value={value ? options.find((opt) => opt.value === value) : null} // Handle reset
+          onChange={(selectedOption) =>
+            onChange({
+              target: { name, value: selectedOption ? selectedOption.value : "" },
+            })
+          }
+          styles={customStyles}
+          menuPortalTarget={document.body}
+          isClearable
+        />
+        
         ) : (
           <input
             className="styled-input"

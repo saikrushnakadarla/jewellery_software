@@ -87,6 +87,8 @@ function Navbar() {
               <Link to="/designmaster" onClick={handleItemClick} className={isActive('/designmaster')}>Design Master</Link>
               <Link to="/accountstable" onClick={handleItemClick} className={isActive('/accountstable')}>Accounts</Link>
               <Link to="/rates" onClick={handleItemClick} className={isActive('/rates')}>Rates</Link>
+              
+
             </div>
           )}
         </div>
@@ -116,7 +118,7 @@ function Navbar() {
               <Link to="/repairstable" onClick={handleItemClick} className={isActive('/repairstable')}>Repairs</Link>
               <Link to="/orderstable" onClick={handleItemClick} className={isActive('/orderstable')}>Orders</Link>
               <Link to="/urdpurchasetable" onClick={handleItemClick} className={isActive('/urdpurchasetable')}>URD Purchase</Link>
-
+              
              
 
             </div>
@@ -143,7 +145,7 @@ function Navbar() {
               <Link to="/purchaseReport" onClick={handleItemClick} className={isActive('/purchaseReport')}>Purchase Report</Link>
               <Link to="/repairsReport" onClick={handleItemClick} className={isActive('/repairsReport')}>Repairs Report</Link>
               <Link to="/urdPurchaseReport" onClick={handleItemClick} className={isActive('/urdPurchaseReport')}>URDPurchase Report</Link>
-              {/* <Link to="/stockReport" onClick={handleItemClick} className={isActive('/stockReport')}>Stock Report</Link> */}
+              <Link to="/ratesdata" onClick={handleItemClick} className={isActive('/ratesdata')}>Rates Report</Link>
               <Link to="/barcodeprinting" onClick={handleItemClick} className={isActive('/barcodeprinting')}>Barcode Printing Report</Link>
               {/* <Link to="/cashReport" onClick={handleItemClick} className={isActive('/cashReport')}>Cash Report</Link> */}
             </div>

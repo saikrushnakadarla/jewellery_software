@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from "react-route
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Repairs from "./Components/Modules/Transactions/Repairs/Repairs"; 
+import RepairsView from "./Components/Modules/Transactions/Repairs/RepairsView"; 
 import URDPurchase from "./Components/Modules/Transactions/URDPurchase/URDPurchase";
 import ItemMaster from "./Components/Modules/Masters/ItemMaster/ItemMaster";
 import Supplier_Table from './Components/Modules/Masters/Supplier/Supplier_Table';
@@ -35,6 +36,7 @@ import MetalType from './Components/Modules/Masters/MetalType/MetalType';
 import DesignMaster from './Components/Modules/Masters/DesignMaster/DesignMaster';
 import Purity from './Components/Modules/Masters/Purity/Purity';
 import Rates from './Components/Modules/Masters/Rates/Rates';
+import RatesData from './Components/Modules/Masters/RatesData/RatesData';
 import SalesTable from './Components/Modules/Transactions/Sales/SalesTable';
 import URDPurchasetable from './Components/Modules/Transactions/URDPurchase/URDPurchasetable';
 import PurityTable from './Components/Modules/Masters/Purity/PurityTable';
@@ -56,7 +58,7 @@ function App() {
         <Route path="/" exact element={<Dashboard />} />
         <Route path="/itemmaster" exact element={<ItemMaster />} />
         <Route path="/repairs" element={<Repairs />} />
-        <Route path="/repairs/:id" element={<Repairs />} />
+        <Route path="/repairsview/:id" element={<RepairsView />} />
         <Route path="/repairstable" element={<RepairsTable />} />
         <Route path="/urd_purchase" element={<URDPurchase />} />
         <Route path="/itemmastertable" element={<ItemMasterTable />} />
@@ -89,6 +91,7 @@ function App() {
         <Route path="/metaltype" element={<MetalType />}/>
         <Route path="/purity" element={<Purity />}/>
         <Route path="/rates" element={<Rates />}/>
+        <Route path="/ratesdata" element={<RatesData />}/>
         <Route path="/designmaster" element={<DesignMaster />}/>
         {/* <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/> */}
         <Route path="/salestable" element={<SalesTable />} />

@@ -33,25 +33,64 @@ function Customer_Master() {
     aadhar_card: '',
     pan_card: '',
   });
+  const [existingMobiles, setExistingMobiles] = useState([]); // Track existing mobile numbers
 
   const [tcsApplicable, setTcsApplicable] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams(); // Get ID from URL
 
+
   useEffect(() => {
-    if (id) {
-      const fetchCustomer = async () => {
+    // Fetch existing customers to check for duplicate mobile numbers
+    const fetchCustomers = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/account-details`);
+        if (response.ok) {
+          const result = await response.json();
+          const mobiles = result
+            .filter((item) => item.account_group === 'CUSTOMERS')
+            .map((item) => item.mobile);
+          setExistingMobiles(mobiles);
+        }
+      } catch (error) {
+        console.error('Error fetching customers:', error);
+      }
+    };
+
+    // Fetch specific customer if editing
+    const fetchCustomer = async () => {
+      if (id) {
         try {
           const response = await fetch(`${baseURL}/get/account-details/${id}`);
-          const result = await response.json();
-          setFormData(result);
+          if (response.ok) {
+            const result = await response.json();
+            setFormData(result);
+          }
         } catch (error) {
           console.error('Error fetching customer:', error);
         }
-      };
-      fetchCustomer();
-    }
+      }
+    };
+
+    fetchCustomers();
+    fetchCustomer();
   }, [id]);
+
+  
+  // useEffect(() => {
+  //   if (id) {
+  //     const fetchCustomer = async () => {
+  //       try {
+  //         const response = await fetch(`${baseURL}/get/account-details/${id}`);
+  //         const result = await response.json();
+  //         setFormData(result);
+  //       } catch (error) {
+  //         console.error('Error fetching customer:', error);
+  //       }
+  //     };
+  //     fetchCustomer();
+  //   }
+  // }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,9 +117,52 @@ function Customer_Master() {
     setTcsApplicable(!tcsApplicable);
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  
+  //   if (!formData.account_name.trim()) {
+  //     alert('Customer Name is required.');
+  //     return;
+  //   }
+  //   if (!formData.mobile.trim()) {
+  //     alert('Mobile number is required.');
+  //     return;
+  //   }
+  //   try {
+  //     const method = id ? "PUT" : "POST";
+  //     const endpoint = id
+  //       ? `${baseURL}/edit/account-details/${id}`
+  //       : `${baseURL}/account-details`;
+  
+  //     const response = await fetch(endpoint, {
+  //       method,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ ...formData, tcsApplicable }),
+  //     });
+  
+  //     if (response.ok) {
+  //       alert(`Customer ${id ? "updated" : "created"} successfully!`);
+        
+  //       // Check where to navigate back
+  //       const from = location.state?.from || "/customerstable";
+  //       navigate(from); // Redirect to the origin page or default to the customers table
+  //     } else {
+  //       alert("Failed to save customer.");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     alert("An error occurred.");
+  //   }
+  // };
+  
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
+    // Validate required fields
     if (!formData.account_name.trim()) {
       alert('Customer Name is required.');
       return;
@@ -89,35 +171,41 @@ function Customer_Master() {
       alert('Mobile number is required.');
       return;
     }
+
+    // Check for duplicate mobile number
+    if (existingMobiles.includes(formData.mobile)) {
+      alert('This mobile number already exists. Please use a unique number.');
+      return;
+    }
+
     try {
-      const method = id ? "PUT" : "POST";
+      const method = id ? 'PUT' : 'POST';
       const endpoint = id
         ? `${baseURL}/edit/account-details/${id}`
         : `${baseURL}/account-details`;
-  
+
       const response = await fetch(endpoint, {
         method,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
-  
+
       if (response.ok) {
-        alert(`Customer ${id ? "updated" : "created"} successfully!`);
-        
+        alert(`Customer ${id ? 'updated' : 'created'} successfully!`);
+
         // Check where to navigate back
-        const from = location.state?.from || "/customerstable";
+        const from = location.state?.from || '/customerstable';
         navigate(from); // Redirect to the origin page or default to the customers table
       } else {
-        alert("Failed to save customer.");
+        alert('Failed to save customer.');
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred.");
+      console.error('Error:', error);
+      alert('An error occurred.');
     }
   };
-  
   
 
   const handleBack = () => {
@@ -151,14 +239,14 @@ function Customer_Master() {
         required
       />
     </Col>
-    <Col md={4}>
+    {/* <Col md={4}>
       <InputField
         label="Account Group:"
         name="account_group"
         value="CUSTOMER"
         readOnly
       />
-    </Col>
+    </Col> */}
     <Col md={4}>
       <InputField
         label="Address1"

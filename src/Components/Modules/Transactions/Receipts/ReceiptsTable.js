@@ -54,11 +54,11 @@ const ReceiptsTable = () => {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => (
-          <div>
-            <FaEdit
+          <div >
+            {/* <FaEdit
               className="action-icon edit-icon"
               onClick={() => handleEdit(row.original)}
-            />
+            /> */}
             <FaTrash
               className="action-icon delete-icon"
               onClick={() => handleDelete(row.original.receipt_id)}

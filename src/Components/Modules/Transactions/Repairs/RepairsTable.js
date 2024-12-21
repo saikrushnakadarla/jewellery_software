@@ -94,31 +94,43 @@ const handlePopoverToggle = (event, repairId) => {
 
   const columns = React.useMemo(
     () => [
-      { Header: 'Repair ID', accessor: 'repair_id' },
-      { Header: 'NAME', accessor: 'name' },
+      { Header: 'Repair No', accessor: 'repair_no' },
+      { Header: 'Customer Name', accessor: 'name' },
       { Header: 'Mobile', accessor: 'mobile' },
       { Header: 'Email', accessor: 'email' },
       { Header: 'Staff', accessor: 'staff' },
-      { Header: 'Delivery Date', accessor: 'delivery_date' },      
-      { Header: 'Metal', accessor: 'metal' },
+      { Header: 'Item Name', accessor: 'item' },
+      { Header: 'Metal Type', accessor: 'metal_type' },
+      { Header: 'Purity', accessor: 'purity' },
+      {
+        Header: 'Delivery Date',
+        accessor: 'delivery_date',
+        Cell: ({ value }) => {
+          if (!value) return '-';
+          const formattedDate = new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          }).format(new Date(value));
+          return formattedDate;
+        },
+      },
       { Header: 'Counter', accessor: 'counter' },
-      { Header: 'Repair No', accessor: 'repair_no' },
       { Header: 'Status', accessor: 'status' },
-      { Header: 'Total', accessor: 'total' },
       {
         Header: 'ACTION',
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
-            {/* <button className="action-button edit-button">
-              <FaEdit />
-            </button> */}
             <button
               className="action-button view-button"
-              onClick={() => navigate(`/repairs/${row.original.repair_id}`)}
+              onClick={() => navigate(`/repairsview/${row.original.repair_id}`)}
             >
-              <FaEye/>
+              <FaEye />
             </button>
-            <button className="action-button delete-button">
+            <button
+              className="action-button delete-button"
+              onClick={() => handleDeleteRepair(row.original.repair_id)}
+            >
               <FaTrash />
             </button>
             <button
@@ -130,9 +142,32 @@ const handlePopoverToggle = (event, repairId) => {
           </div>
         ),
       },
+      
     ],
     [popoverData.repairId]
   );
+
+  const handleDeleteRepair = async (repairId) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this repair?");
+    if (!isConfirmed) {
+      return; // Exit if the user cancels
+    }
+  
+    try {
+      const response = await axios.delete(`${baseURL}/delete/repairs/${repairId}`);
+      if (response.status === 200) {
+        alert(response.data.message);
+  
+        // Update the state to remove the deleted repair
+        setRepairs((prevRepairs) => prevRepairs.filter((repair) => repair.repair_id !== repairId));
+      }
+    } catch (error) {
+      console.error('Error deleting repair:', error.message);
+      alert('Failed to delete repair entry. Please try again.');
+    }
+  };
+  
+  
 
   const handleAddToLocalDetails = () => {
     if (editIndex !== null) {

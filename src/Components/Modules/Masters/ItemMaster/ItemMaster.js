@@ -382,6 +382,65 @@ const FormWithTable = () => {
     navigate("/itemmastertable");
   };
 
+  const [metalOptions, setmetalOptions] = useState([]);
+  const [designOptions, setdesignOptions] = useState([]);
+  const [dropdownOptions, setDropdownOptions] = useState([]);
+
+  // Fetch metal types from the API
+  useEffect(() => {
+    const fetchMetalTypes = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/metaltype');
+        const metalTypes = response.data.map(item => ({
+          value: item.metal_name, // Assuming the column name is "metal_name"
+          label: item.metal_name
+        }));
+        setmetalOptions(metalTypes);
+      } catch (error) {
+        console.error('Error fetching metal types:', error);
+      }
+    };
+
+    fetchMetalTypes();
+  }, []);
+
+  // Fetch design master options from the API
+  useEffect(() => {
+    const fetchDesignMaster = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/designmaster');
+        const designMasters = response.data.map((item) => ({
+          value: item.design_name, // Assuming the column name is "design_name"
+          label: item.design_name,
+        }));
+        setdesignOptions(designMasters);
+      } catch (error) {
+        console.error('Error fetching design masters:', error);
+      }
+    };
+
+    fetchDesignMaster();
+  }, []);
+
+  // Fetch purity options from the API
+  useEffect(() => {
+    const fetchPurity = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/purity');
+        const purityOptions = response.data.map((item) => ({
+          value: item.name, // Assuming the column name is "name"
+          label: item.name,
+        }));
+        setDropdownOptions(purityOptions);
+      } catch (error) {
+        console.error('Error fetching purity options:', error);
+      }
+    };
+
+    fetchPurity();
+  }, []);
+
+
   return (
     <div style={{ paddingTop: "90px" }}>
       <div className="container mt-4">
@@ -413,41 +472,28 @@ const FormWithTable = () => {
                 />
 
                 <InputField
-                  label="Categories:"
+                  label="Metal Type:"
                   name="Category"
                   type="select"
                   value={formData.Category}
                   onChange={handleChange}
-                  options={[
-                    { value: "Jewellery", label: "Jewellery" },
-                    { value: "Gold", label: "Gold" },
-                    { value: "Silver", label: "Silver" },
-                  ]}
+                  options={metalOptions}
                 />
                 <InputField
-
                   label="Design Master:"
                   name="design_master"
                   type="select"
                   value={formData.design_master}
                   onChange={handleChange}
-                  options={[
-                    { value: "Priyanka", label: "Priyanka" },
-                    { value: "Soundarya", label: "Soundarya" },
-                    { value: "gopi chain", label: "gopi chain" },
-                  ]}
+                  options={designOptions}
                 />
                 <InputField
                   label="Purity:"
-                  type="select"
                   name="purity"
+                  type="select"
                   value={formData.purity}
                   onChange={handleChange}
-                  options={[
-                    { value: "91.6HM", label: "91.6HM" },
-                    { value: "22K", label: "22K" },
-                    { value: "18K", label: "18K" },
-                  ]}
+                  options={dropdownOptions}
                 />
                 <InputField
                   label="Item Prefix:"
@@ -515,17 +561,17 @@ const FormWithTable = () => {
             {/* maintain tags section */}
             <div className="form-container" style={{ marginTop: "15px" }}>
               {/* Maintain Tags Section */}
-              <div className="main-tags-row" style={{ marginBottom: "15px" }}>
+              <div className="main-tags-row" style={{ marginBottom: "0px",display:"flex" }}>
                 <input
                   type="checkbox"
                   id="main-tags"
                   name="maintain_tags"
-                  style={{ width: "35px" }}
+                  style={{ width: "15px",marginTop:"-15px" }}
                   checked={isMaintainTagsChecked}
                   onChange={handleCheckboxChange}
                   value={formData.maintain_tags}
                 />
-                <label htmlFor="main-tags">
+                <label htmlFor="main-tags" style={{marginLeft:"10px"}}>
                   <h4>Maintain Tags</h4>
                 </label>
               </div>
