@@ -5,11 +5,8 @@ import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import { useParams, useNavigate,useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
-import { AiOutlinePlus } from "react-icons/ai";
 
 const RepairForm = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { id } = useParams(); 
   const [formData, setFormData] = useState({
     name: "",
@@ -40,63 +37,7 @@ const RepairForm = () => {
     total: "",
     status:"Pending",
   });
-
-  const [customers, setCustomers] = useState([]);
-  const [metalTypes, setMetalTypes] = useState([]);
-  const [purityData, setPurityData] = useState([]);
   const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${baseURL}/get/account-details`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        const result = await response.json();
-  
-        // Filter only suppliers
-        const customers = result.filter(
-          (item) => item.account_group === 'CUSTOMERS'
-        );
-  
-        setCustomers(customers);
-        // setLoading(false);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      }
-    };
-  
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchPurity = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        setPurityData(response.data);
-      } catch (error) {
-        console.error("Error fetching purity data:", error);
-      }
-    };
-
-    fetchPurity();
-  }, []);
-
-  useEffect(() => {
-    const fetchMetalTypes = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/metaltype`);
-        setMetalTypes(response.data);
-        console.log("Metal Type=",response.data)
-      } catch (error) {
-        console.error("Error fetching metal types:", error);
-      }
-    };
-    fetchMetalTypes();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -104,53 +45,6 @@ const RepairForm = () => {
       ...prevData,
       [name]: value
     }));
-  };
-
-  const handleCustomerChange = (customerId) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      customer_id: customerId, // Ensure customer_id is correctly updated
-    }));
-  
-    const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
-    console.log("Customer Id=",customer)
-  
-    if (customer) {
-      setFormData({
-        ...formData,
-        customer_id: customerId, // Ensure this is correctly set
-        name: customer.account_name, // Set the name field to the selected customer
-        mobile: customer.mobile || "",
-        email: customer.email || "",
-        address1: customer.address1 || "",
-        address2: customer.address2 || "",
-        city: customer.city || "",
-        pincode: customer.pincode || "",
-        state: customer.state || "",
-        state_code: customer.state_code || "",
-        aadhar_card: customer.aadhar_card || "",
-        gst_in: customer.gst_in || "",
-        pan_card: customer.pan_card || "",
-
-      });
-    } else {
-      setFormData({
-        ...formData,
-        customer_id: "",
-        name: "",
-        mobile: "",
-        email: "",
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        state: "",
-        state_code: "",
-        aadhar_card: "",
-        gst_in: "",
-        pan_card: "",
-      });
-    }
   };
 
   const handleImageChange = (e) => {
@@ -169,82 +63,44 @@ const RepairForm = () => {
       const fetchRepairDetails = async () => {
         try {
           const response = await axios.get(`${baseURL}/get/repairs/${id}`);
-          setFormData(response.data); // Populate form with fetched data
+          const data = response.data;
+  
+          // Format the date field
+          const formattedDate = new Date(data.date).toLocaleDateString("en-GB"); // Formats to dd/mm/yyyy
+          const formattedDeliveryDate = new Date(data.delivery_date).toLocaleDateString("en-GB");
+  
+          setFormData({
+            ...data,
+            date: formattedDate,
+            delivery_date: formattedDeliveryDate,
+          });
         } catch (error) {
           console.error("Error fetching repair details:", error);
         }
       };
-
+  
       fetchRepairDetails();
     }
   }, [id]);
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const updatedFormData = {
-    ...formData,
-
-  };
-
-  try {
-    const response = await axios.post(`${baseURL}/add/repairs`, updatedFormData);
-    if (response.status === 201) {
-      alert("Repair entry added successfully!");
-      navigate("/repairstable");
-    }
-  } catch (error) {
-    console.error("Error submitting the form:", error);
-    alert("Failed to submit the repair entry");
-  }
-};
-
-  const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/repairs" } });
-  };
-
-  const handleBack = () => {
-    navigate("/repairstable");
-  };
   
+
   return (
     <div className="main-container">
     <Container className="repair-form-container">
-      <Form onSubmit={handleSubmit}>
+      <Form>
     <div className="repair-form" >
-        {/* Left Section */}
         <div className="repair-form-left">
-          {/* Customer Details */}
           <Col className="form-section">
             <h4 className="mb-4">Customer Details</h4>
             <Row>
-            <Col xs={12} md={3} className="d-flex align-items-center">
-            <div style={{ flex: 1 }}>
-              <InputField
+            <Col xs={12} md={3} >
+            <InputField
                 label="Mobile"
                 name="mobile"
-                type="select"
-                value={formData.mobile || ""} // Use customer_id to match selected value
-                onChange={(e) => handleCustomerChange(e.target.value)}
-                options={[
-                  { value: "", label: "Select" }, // Placeholder option
-                  ...customers.map((customer) => ({
-                    value: customer.account_id, // Use account_id as the value
-                    label: customer.mobile, // Display mobile as the label
-                  })),
-                ]}
-              />
-            </div>
-            <AiOutlinePlus
-              size={20}
-              color="black"
-              onClick={handleAddCustomer}
-              style={{
-                marginLeft: "10px",
-                cursor: "pointer",
-                marginBottom: "20px",
-              }}
-            />
+                value={formData.mobile}
+                onChange={handleChange}
+                readOnly
+            />            
           </Col>
                 <Col xs={12} md={3}>
                 <InputField
@@ -293,24 +149,17 @@ const handleSubmit = async (e) => {
                   />
                 </Col>
               </Row>
-            </Col>
-         
+            </Col>         
         </div>
-        {/* Right Section */}
         <div className="repair-form-right">
           <Col className="form-section">          
           <Row>
                 <InputField
                   label="Entry Type:"
                   name="entry_type"
-                  type="select"
                   value={formData.entry_type}
                   onChange={handleChange}
-                  options={[
-                    { value: "Repair", label: "Repair" },
-                    { value: "Poolish", label: "Poolish" },
-                    { value: "Other", label: "Other" }
-                  ]}
+                  readOnly
                 />
               </Row>
               <Row>
@@ -319,30 +168,29 @@ const handleSubmit = async (e) => {
                   name="repair_no"
                   value={formData.repair_no}
                   onChange={handleChange}
+                  readOnly
                 />
               </Row>
               <Row>
-                <InputField label="Date:" name="date" type="date" value={formData.date} onChange={handleChange} />
+                <InputField label="Date:" name="date"  value={formData.date} onChange={handleChange} readOnly/>
               </Row>            
           </Col>
         </div>
       </div>
       <Row className="form-section pt-4">
       <Col xs={12} md={2}>
-              <InputField label="Staff:" name="staff" value={formData.staff} onChange={handleChange} />
+              <InputField label="Staff:" name="staff" value={formData.staff} onChange={handleChange} readOnly/>
             </Col>
             <Col xs={12} md={2}>
-              <InputField label="Delivery Date:" type="date" name="delivery_date" value={formData.delivery_date} onChange={handleChange} />
+              <InputField label="Delivery Date:" name="delivery_date" value={formData.delivery_date} onChange={handleChange} readOnly/>
             </Col>
             <Col xs={12} md={3}>
-              <InputField label="Place:" name="place" value={formData.place} onChange={handleChange} />
-            </Col>
-           
+              <InputField label="Place:" name="place" value={formData.place} onChange={handleChange} readOnly/>
+            </Col>           
             <Col xs={12} md={3}>
-              <InputField label="Counter:" name="counter" value={formData.counter} onChange={handleChange} />
+              <InputField label="Counter:" name="counter" value={formData.counter} onChange={handleChange} readOnly/>
             </Col>
       </Row>
-
       <div className="repair-form2">      
         <div className="repair-form-left">
         <Col className="form-section">
@@ -351,41 +199,28 @@ const handleSubmit = async (e) => {
                 <Col xs={12} md={2}>
                   <InputField
                     label="Metal Type:"
-                    name="metal_type"
-                    type="select"
+                    name="metal_type"                   
                     value={formData.metal_type}
-                    onChange={handleChange}
-                    options={[
-                      ...metalTypes.map((metal) => ({
-                        value: metal.metal_name,
-                        label: metal.metal_name
-                      }))
-                    ]}
+                    readOnly
                   />
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="Item:" name="item" value={formData.item} onChange={handleChange} />
+                  <InputField label="Item:" name="item" value={formData.item} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={2}>
-                  <InputField label="Tag No:" name="tag_no" value={formData.tag_no} onChange={handleChange} />
+                  <InputField label="Tag No:" name="tag_no" value={formData.tag_no} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={3}>
-                  <InputField label="Description:" name="description" value={formData.description} onChange={handleChange} />
+                  <InputField label="Description:" name="description" value={formData.description} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={2}>
-                  <InputField
-                    label="Purity:"
-                    name="purity"
-                    type="select"
+                <InputField
+                    label="Purity"
+                    name="purity"                    
                     value={formData.purity}
                     onChange={handleChange}
-                    options={[
-                      ...purityData.map((item) => ({
-                        value: item.name,
-                        label: item.name
-                      }))
-                    ]}
-                  />
+                    readOnly
+                />
                 </Col>
               </Row>
         </Col>
@@ -414,8 +249,7 @@ const handleSubmit = async (e) => {
               </Row>
         </Col>
         </div>
-        </div>
-      
+        </div>  
         {/* Extra Charges */}
         {/* <Row className="form-section">
             <h4>Extra Charges</h4>
@@ -435,12 +269,6 @@ const handleSubmit = async (e) => {
               <InputField label="Total:" name="total" value={formData.total} onChange={handleChange} />
             </Col>
           </Row> */}
-          
-        {/* Buttons */}
-        <div className="form-buttons">
-          <Button className="cus-back-btn" variant="secondary"  onClick={handleBack}>cancel</Button>
-          <Button type="submit" variant="primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
-        </div>
         </Form>
       </Container>
       </div>

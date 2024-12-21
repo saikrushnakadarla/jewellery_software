@@ -100,11 +100,11 @@ const handlePopoverToggle = (event, repairId) => {
       { Header: 'Email', accessor: 'email' },
       { Header: 'Staff', accessor: 'staff' },
       { Header: 'Delivery Date', accessor: 'delivery_date' },      
-      { Header: 'Metal', accessor: 'metal' },
+      { Header: 'Metal Type', accessor: 'metal_type' },
+      { Header: 'Purity', accessor: 'purity' },
       { Header: 'Counter', accessor: 'counter' },
       { Header: 'Repair No', accessor: 'repair_no' },
       { Header: 'Status', accessor: 'status' },
-      { Header: 'Total', accessor: 'total' },
       {
         Header: 'ACTION',
         Cell: ({ row }) => (
@@ -114,7 +114,7 @@ const handlePopoverToggle = (event, repairId) => {
             </button> */}
             <button
               className="action-button view-button"
-              onClick={() => navigate(`/repairs/${row.original.repair_id}`)}
+              onClick={() => navigate(`/repairsview/${row.original.repair_id}`)}
             >
               <FaEye/>
             </button>

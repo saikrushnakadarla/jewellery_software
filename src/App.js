@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from "react-route
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Repairs from "./Components/Modules/Transactions/Repairs/Repairs"; 
+import RepairsView from "./Components/Modules/Transactions/Repairs/RepairsView"; 
 import URDPurchase from "./Components/Modules/Transactions/URDPurchase/URDPurchase";
 import ItemMaster from "./Components/Modules/Masters/ItemMaster/ItemMaster";
 import Supplier_Table from './Components/Modules/Masters/Supplier/Supplier_Table';
@@ -57,7 +58,7 @@ function App() {
         <Route path="/" exact element={<Dashboard />} />
         <Route path="/itemmaster" exact element={<ItemMaster />} />
         <Route path="/repairs" element={<Repairs />} />
-        <Route path="/repairs/:id" element={<Repairs />} />
+        <Route path="/repairsview/:id" element={<RepairsView />} />
         <Route path="/repairstable" element={<RepairsTable />} />
         <Route path="/urd_purchase" element={<URDPurchase />} />
         <Route path="/itemmastertable" element={<ItemMasterTable />} />
