@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Repairs.css";
 import InputField from "../../../Pages/InputField/InputField";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Table, Form } from "react-bootstrap";
 import { useParams, useNavigate,useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
@@ -38,6 +38,7 @@ const RepairForm = () => {
     status:"Pending",
   });
   const [image, setImage] = useState(null);
+  const [repairDetails, setRepairDetails] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,26 +63,31 @@ const RepairForm = () => {
     if (id) {
       const fetchRepairDetails = async () => {
         try {
-          const response = await axios.get(`${baseURL}/get/repairs/${id}`);
-          const data = response.data;
-  
-          // Format the date field
-          const formattedDate = new Date(data.date).toLocaleDateString("en-GB"); // Formats to dd/mm/yyyy
-          const formattedDeliveryDate = new Date(data.delivery_date).toLocaleDateString("en-GB");
-  
-          setFormData({
-            ...data,
-            date: formattedDate,
-            delivery_date: formattedDeliveryDate,
-          });
+          const response = await axios.get(`${baseURL}/repair-details/${id}`);
+          setRepairDetails(response.data); // Store repair details for the table
         } catch (error) {
           console.error("Error fetching repair details:", error);
         }
       };
-  
+
+      const fetchCustomerDetails = async () => {
+        try {
+          const response = await axios.get(`${baseURL}/get/repairs/${id}`);
+          const data = response.data;
+
+          setFormData({
+            ...data,
+          });
+        } catch (error) {
+          console.error("Error fetching customer details:", error);
+        }
+      };
+
       fetchRepairDetails();
+      fetchCustomerDetails();
     }
   }, [id]);
+
   
 
   return (
@@ -251,24 +257,42 @@ const RepairForm = () => {
         </div>
         </div>  
         {/* Extra Charges */}
-        {/* <Row className="form-section">
+        <Row className="form-section">
             <h4>Extra Charges</h4>
-            <Col xs={12} md={2}>
-              <InputField label="Extra Weight:" name="extra_weight" value={formData.extra_weight} onChange={handleChange} />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField label="Stone Value:" name="stone_value" value={formData.stone_value} onChange={handleChange} />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField label="Making Charge (MC):" name="making_charge" value={formData.making_charge} onChange={handleChange} />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField label="Handling Charge (HC):" name="handling_charge" value={formData.handling_charge} onChange={handleChange} />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField label="Total:" name="total" value={formData.total} onChange={handleChange} />
-            </Col>
-          </Row> */}
+            <Table striped bordered hover responsive>
+          <thead>
+            <tr>
+              <th>Metal Type</th>
+              <th>Description</th>
+              <th>Weight</th>
+              <th>Quantity</th>
+              <th>Rate Type</th>
+              <th>Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            {repairDetails.length > 0 ? (
+              repairDetails.map((detail, index) => (
+                <tr key={index}>
+                  <td>{detail.metal_type}</td>
+                  <td>{detail.description}</td>
+                  <td>{detail.weight}</td>
+                  <td>{detail.qty}</td>
+                  <td>{detail.rate_type}</td>
+                  <td>{detail.rate}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="7" className="text-center">
+                  No repair details available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+          </Row>
+
         </Form>
       </Container>
       </div>

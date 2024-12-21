@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { Row, Col } from 'react-bootstrap';
+import { format } from 'date-fns'; // Import date-fns for date formatting
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -11,27 +12,31 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
+        Header: 'S No', // Serial Number
+        accessor: 'sno', // The key for S No in the data
+      },
+      {
         Header: 'Date',
         accessor: 'rate_date',
       },
       {
-        Header: 'Gold16',
+        Header: '16 Crt',
         accessor: 'rate_16crt',
       },
       {
-        Header: 'Gold18',
+        Header: '18 Crt',
         accessor: 'rate_18crt',
       },
       {
-        Header: 'Gold22',
+        Header: '22 Crt',
         accessor: 'rate_22crt',
       },
       {
-        Header: 'Gold24',
+        Header: '24 Crt',
         accessor: 'rate_24crt',
       },
       {
-        Header: 'SilverRate',
+        Header: 'Silver',
         accessor: 'silver_rate',
       },
     ],
@@ -48,10 +53,15 @@ const RepairsTable = () => {
         }
         const result = await response.json();
 
-        // Format the date to YYYY-MM-DD
-        const formattedData = result.map((item) => ({
-          ...item,
-          rate_date: item.rate_date.split('T')[0], // Extract the date part
+        // Format the date and add serial number (S No)
+        const formattedData = result.map((item, index) => ({
+          sno: index + 1, // Serial number, incrementing from 1
+          rate_date: format(new Date(item.rate_date), 'dd-MM-yyyy'), // Format the date to dd-MM-yyyy
+          rate_16crt: item.rate_16crt,
+          rate_18crt: item.rate_18crt,
+          rate_22crt: item.rate_22crt,
+          rate_24crt: item.rate_24crt,
+          silver_rate: item.silver_rate,
         }));
 
         setData(formattedData); // Populate the table data
@@ -70,7 +80,7 @@ const RepairsTable = () => {
       <div className="sales-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Sales Report</h3>
+            <h3>Rates</h3>
           </Col>
         </Row>
         {loading ? (
