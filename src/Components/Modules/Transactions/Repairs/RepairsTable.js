@@ -392,6 +392,20 @@ const handlePopoverToggle = (event, repairId) => {
               ))}
             </tbody>
           </Table>
+
+          {/* Overall Totals */}
+          <div className="mt-3">
+            <p>
+              <strong>Total Weight:</strong> {localDetails.reduce((total, detail) => total + Number(detail.weight || 0), 0)} 
+            </p>
+            <p>
+              <strong>Total Quantity:</strong> {localDetails.reduce((total, detail) => total + Number(detail.qty || 0), 0)}
+            </p>
+            <p>
+              <strong> Total:</strong> {localDetails.reduce((total, detail) => total + (Number(detail.qty || 0) * Number(detail.rate || 0)), 0)}
+            </p>
+          </div>
+
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={handleSubmitDetails}>Submit</Button>
