@@ -341,7 +341,7 @@ const FormWithTable = () => {
       );
 
       await Promise.all(saveEntriesPromises);
-      alert("Data saved successfully!");
+      alert("Product added successfully!");
 
       // Reset the form fields
       setFormData({

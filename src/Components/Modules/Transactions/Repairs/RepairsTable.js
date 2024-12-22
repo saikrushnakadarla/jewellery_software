@@ -248,8 +248,7 @@ const handlePopoverToggle = (event, repairId) => {
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={repairs} />
-
+        <DataTable columns={columns} data={[...repairs].reverse()} />
         {/* Popover */}
         <Overlay
           show={showPopover}

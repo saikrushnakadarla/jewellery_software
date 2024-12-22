@@ -199,7 +199,7 @@ function Supplier_Master() {
   <Row>
     <Col md={4}>
       <InputField
-        label="Customer Name:"
+        label="Supplier Name:"
         name="account_name"
         value={formData.account_name}
         onChange={handleChange}

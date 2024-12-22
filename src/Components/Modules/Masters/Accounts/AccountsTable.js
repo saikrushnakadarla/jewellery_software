@@ -77,21 +77,56 @@ const RepairsTable = () => {
       { Header: 'Mobile', accessor: 'mobile', Cell: ({ value }) => value || 'N/A' },
       { Header: 'Contact Person', accessor: 'contact_person', Cell: ({ value }) => value || 'N/A' },
       { Header: 'Email', accessor: 'email', Cell: ({ value }) => value || 'N/A' },
-      { Header: 'Birthday On', accessor: 'birthday', Cell: ({ value }) => value || 'N/A' },
-      { Header: 'Anniversary', accessor: 'anniversary', Cell: ({ value }) => value || 'N/A' },
+      {
+        Header: 'Birthday On',
+        accessor: 'birthday', Cell: ({ value }) => value || 'N/A',
+        Cell: ({ value }) => {
+          if (!value) return '-';
+          const formattedDate = new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          }).format(new Date(value));
+          return formattedDate;
+        },
+      },
+      {
+        Header: 'Anniversary',
+        accessor: 'anniversary', Cell: ({ value }) => value || 'N/A',
+        Cell: ({ value }) => {
+          if (!value) return '-';
+          const formattedDate = new Intl.DateTimeFormat('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          }).format(new Date(value));
+          return formattedDate;
+        },
+      },
       { Header: 'Bank Account No.', accessor: 'bank_account_no', Cell: ({ value }) => value || 'N/A' },
       { Header: 'Bank Name', accessor: 'bank_name', Cell: ({ value }) => value || 'N/A' },
       { Header: 'IFSC Code', accessor: 'ifsc_code', Cell: ({ value }) => value || 'N/A' },
       { Header: 'Branch', accessor: 'branch', Cell: ({ value }) => value || 'N/A' },
+      
       {
-        Header: 'Actions',
-        Cell: ({ row }) => (
-          <div>
-            <FaEdit style={{ cursor: 'pointer', marginRight: 10 }} onClick={() => handleEdit(row.original.account_id)} />
-            <FaTrash style={{ cursor: 'pointer' }} onClick={() => handleDelete(row.original.account_id)} />
-          </div>
-        ),
-      },
+              Header: 'Action',
+              Cell: ({ row }) => (
+                <div className="d-flex align-items-center">
+                  <button
+                    className="action-button edit-button"
+                    onClick={() => handleEdit(row.original.account_id)}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    className="action-button delete-button"
+                    onClick={() => handleDelete(row.original.account_id)}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              ),
+            },
     ],
     []
   );
@@ -116,7 +151,7 @@ const RepairsTable = () => {
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={[...data].reverse()} />
       </div>
     </div>
   );
