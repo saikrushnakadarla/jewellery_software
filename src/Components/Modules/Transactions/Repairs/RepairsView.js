@@ -88,6 +88,12 @@ const RepairForm = () => {
     }
   }, [id]);
 
+  const formatDate = (dateString) => {
+    if (!dateString) return ""; // Return empty string if dateString is invalid
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB"); // "en-GB" locale for dd-mm-yyyy format
+  };
+  
   
 
   return (
@@ -178,7 +184,7 @@ const RepairForm = () => {
                 />
               </Row>
               <Row>
-                <InputField label="Date:" name="date"  value={formData.date} onChange={handleChange} readOnly/>
+                <InputField label="Date:" name="date"  value={formatDate(formData.date)}  onChange={handleChange} readOnly/>
               </Row>            
           </Col>
         </div>
@@ -188,7 +194,7 @@ const RepairForm = () => {
               <InputField label="Staff:" name="staff" value={formData.staff} onChange={handleChange} readOnly/>
             </Col>
             <Col xs={12} md={2}>
-              <InputField label="Delivery Date:" name="delivery_date" value={formData.delivery_date} onChange={handleChange} readOnly/>
+              <InputField label="Delivery Date:" name="delivery_date" value={formatDate(formData.delivery_date)} onChange={handleChange} readOnly/>
             </Col>
             <Col xs={12} md={3}>
               <InputField label="Place:" name="place" value={formData.place} onChange={handleChange} readOnly/>
@@ -258,40 +264,55 @@ const RepairForm = () => {
         </div>  
         {/* Extra Charges */}
         <Row className="form-section">
-            <h4>Extra Charges</h4>
-            <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>Metal Type</th>
-              <th>Description</th>
-              <th>Weight</th>
-              <th>Quantity</th>
-              <th>Rate Type</th>
-              <th>Rate</th>
-            </tr>
-          </thead>
-          <tbody>
-            {repairDetails.length > 0 ? (
-              repairDetails.map((detail, index) => (
-                <tr key={index}>
-                  <td>{detail.metal_type}</td>
-                  <td>{detail.description}</td>
-                  <td>{detail.weight}</td>
-                  <td>{detail.qty}</td>
-                  <td>{detail.rate_type}</td>
-                  <td>{detail.rate}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="text-center">
-                  No repair details available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </Table>
-          </Row>
+  <h4>Extra Charges</h4>
+  <Table striped bordered hover responsive>
+    <thead>
+      <tr>
+        <th>Metal Type</th>
+        <th>Description</th>
+        <th>Weight</th>
+        <th>Quantity</th>
+        <th>Rate Type</th>
+        <th>Rate</th>
+      </tr>
+    </thead>
+    <tbody>
+      {repairDetails.length > 0 ? (
+        repairDetails.map((detail, index) => (
+          <tr key={index}>
+            <td>{detail.metal_type}</td>
+            <td>{detail.description}</td>
+            <td>{detail.weight}</td>
+            <td>{detail.qty}</td>
+            <td>{detail.rate_type}</td>
+            <td>{detail.rate}</td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan="7" className="text-center">
+            No repair details available
+          </td>
+        </tr>
+      )}
+    </tbody>
+    {repairDetails.length > 0 && (
+      <tfoot>
+        <tr>
+          <td colSpan="5" className="text-end">
+            <strong>Total</strong>
+          </td>
+          <td>
+            <strong>
+              {repairDetails.reduce((sum, detail) => sum + parseFloat(detail.rate || 0), 0)}
+            </strong>
+          </td>
+        </tr>
+      </tfoot>
+    )}
+  </Table>
+</Row>
+
 
         </Form>
       </Container>

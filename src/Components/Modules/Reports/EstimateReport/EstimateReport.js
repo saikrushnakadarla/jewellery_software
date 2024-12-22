@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import DataTable from '../../../Pages/InputField/DataTable'; // Import the DataTable component
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const RepairsTable = () => {
   const [data, setData] = useState([]); // State to store table data
@@ -10,7 +11,7 @@ const RepairsTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/estimates');
+        const response = await fetch(`${baseURL}/get/estimates`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -30,8 +31,8 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Estimate ID',
-        accessor: 'estimate_id',
+        Header: 'Estimate Number',
+        accessor: 'estimate_number',
       },
       {
         Header: 'Date',
@@ -41,11 +42,7 @@ const RepairsTable = () => {
           return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
         },
       },
-      
-      {
-        Header: 'Product Code',
-        accessor: 'pcode',
-      },
+
       {
         Header: 'Product Name',
         accessor: 'product_name',
@@ -109,7 +106,7 @@ const RepairsTable = () => {
         {loading ? (
           <p>Loading...</p> // Show loading message while fetching data
         ) : (
-          <DataTable columns={columns} data={data} /> // Render the table
+          <DataTable columns={columns} data={[...data].reverse()} /> // Render the table
         )}
       </div>
     </div>

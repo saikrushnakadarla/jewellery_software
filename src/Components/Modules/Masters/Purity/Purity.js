@@ -439,6 +439,7 @@ function Purity() {
 
         // Reset the form and exit edit mode
         resetForm();
+        alert(`Purity updated successfully!`);
       } catch (error) {
         console.error("Error updating data:", error);
       }
@@ -453,6 +454,7 @@ function Purity() {
 
         // Reset the form
         resetForm();
+        alert(`Purity created successfully!`);
       } catch (error) {
         console.error("Error submitting data:", error);
       }
@@ -705,7 +707,7 @@ function Purity() {
 
         {/* Purity Table */}
         <div style={{ marginTop: "20px" }} className="purity-table-container">
-          <DataTable columns={columns} data={submittedData} />
+          <DataTable columns={columns} data={[...submittedData].reverse()} />
         </div>
       </div>
     </div>

@@ -31,7 +31,8 @@ import Payments from './Components/Modules/Transactions/Payments/Payments';
 import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTable';
 import Accounts from './Components/Modules/Masters/Accounts/Accounts';
 import AccountsTable from './Components/Modules/Masters/Accounts/AccountsTable';
-import Sales from './Components/Modules/Transactions/Sales/SalesForm';
+// import Sales from './Components/Modules/Transactions/Sales/SalesForm';
+import Sales from './Components/Modules/Transactions/SalesForm/SalesForm';
 import MetalType from './Components/Modules/Masters/MetalType/MetalType';
 import DesignMaster from './Components/Modules/Masters/DesignMaster/DesignMaster';
 import Purity from './Components/Modules/Masters/Purity/Purity';
@@ -41,9 +42,11 @@ import SalesTable from './Components/Modules/Transactions/Sales/SalesTable';
 import URDPurchasetable from './Components/Modules/Transactions/URDPurchase/URDPurchasetable';
 import PurityTable from './Components/Modules/Masters/Purity/PurityTable';
 import OrdersTable from './Components/Modules/Transactions/Orders/OrdersTable';
-import Orders from './Components/Modules/Transactions/Orders/Orders';
+// import Orders from './Components/Modules/Transactions/Orders/Orders';
+import Orders from './Components/Modules/Transactions/OrderSection/OrderForm';
 import BarCodePrinting from './Components/Modules/Reports/BarcodePrinting/BarCodePrinting';
 import SalesNew from './Components/Modules/Transactions/Sales/SalesNew';
+import RepairDetails from "./Components/Modules/Transactions/Sales/SalesDetailsModules";
 
 function App() {
   const location = useLocation();
@@ -100,7 +103,7 @@ function App() {
         <Route path="/orderstable" element={<OrdersTable />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/barcodeprinting" element={<BarCodePrinting />} />
-
+        <Route path="/sales/details/:invoice_number" element={<RepairDetails />} />
 
         <Route path="/salesNew" element={<SalesNew />} />
       </Routes>

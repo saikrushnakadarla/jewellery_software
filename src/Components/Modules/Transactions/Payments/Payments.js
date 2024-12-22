@@ -51,8 +51,6 @@ const RepairForm = () => {
     fetchAccountNames();
   }, []);
   
-
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -79,7 +77,6 @@ const RepairForm = () => {
     });
   };
 
-  // Submit form data to the backend
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -109,6 +106,7 @@ const RepairForm = () => {
         cash_amt: "",
         remarks: "",
       });
+      navigate("/paymentstable");
     } catch (err) {
       window.alert(`Error: ${err.message}`);
     }

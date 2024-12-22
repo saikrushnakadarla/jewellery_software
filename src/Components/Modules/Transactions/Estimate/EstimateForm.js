@@ -67,8 +67,6 @@ const RepairForm = () => {
     }));
   };
 
-
-
   const handleEdit = (index) => {
     setFormData(entries[index]);
     setIsEditing(true);
@@ -80,21 +78,97 @@ const RepairForm = () => {
     setEntries(updatedEntries);
   };
 
+  // const handlePrint = async () => {
+  //   try {
+  //     await Promise.all(
+  //       entries.map((entry) => axios.post(`${baseURL}/add/estimate`, entry))
+  //     );
+  //     alert("All entries saved successfully!");
+  //     setEntries([]);
+  //     setFormData(initialFormData);
+  //   } catch (error) {
+  //     console.error("Error saving data:", error);
+  //     alert("Failed to save entries. Please try again.");
+  //   }
+  // };
+
   const handlePrint = async () => {
     try {
+      // Save entries to the database
       await Promise.all(
         entries.map((entry) => axios.post(`${baseURL}/add/estimate`, entry))
       );
-
+  
+      // Prepare table data for the new tab
+      const tableHTML = `
+        <html>
+          <head>
+            <title>Estimate Details</title>
+            <style>
+              table {
+                width: 100%;
+                border-collapse: collapse;
+              }
+              th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: center;
+              }
+              th {
+                background-color: #f2f2f2;
+              }
+            </style>
+          </head>
+          <body>
+            <h2>Estimate Details</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>S No</th>
+                  <th>Product Name</th>
+                  <th>Gross Weight</th>
+                  <th>Stones Weight</th>
+                  <th>Total Weight</th>
+                  <th>Rate</th>
+                  <th>Total Rs</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${entries
+                  .map(
+                    (entry, index) => `
+                    <tr>
+                      <td>${index + 1}</td>
+                      <td>${entry.product_name}</td>
+                      <td>${entry.gross_weight}</td>
+                      <td>${entry.stones_weight}</td>
+                      <td>${entry.total_weight}</td>
+                      <td>${entry.rate}</td>
+                      <td>${entry.total_rs}</td>
+                    </tr>
+                  `
+                  )
+                  .join("")}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `;
+  
+      // Open new tab and display the table
+      const newTab = window.open("", "_blank");
+      newTab.document.write(tableHTML);
+      newTab.document.close();
+  
       alert("All entries saved successfully!");
-      setEntries([]);
+      setEntries([]); // Clear entries after saving
       setFormData(initialFormData);
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Failed to save entries. Please try again.");
     }
   };
-
+  
   useEffect(() => {
     const fetchLastEstimateNumber = async () => {
       try {
@@ -110,8 +184,6 @@ const RepairForm = () => {
 
     fetchLastEstimateNumber();
   }, []);
-
-
 
   useEffect(() => {
     const grossWeight = parseFloat(formData.gross_weight) || 0;
@@ -292,8 +364,8 @@ const RepairForm = () => {
                 <InputField
                   label="Amount"
                   name="rate_amt"
-                  value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
-                  onChange={handleInputChange} // Optional, since it's auto-calculated
+                  value={formData.rate_amt || "0.00"} 
+                  onChange={handleInputChange} 
                   readOnly
                 />
                 </Col>

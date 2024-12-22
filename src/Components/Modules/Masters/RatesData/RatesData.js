@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/DataTable'; // Import the reusable DataTable component
 import { Row, Col } from 'react-bootstrap';
 import { format } from 'date-fns'; // Import date-fns for date formatting
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const RepairsTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/rates');
+        const response = await fetch(`${baseURL}/get/rates`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
