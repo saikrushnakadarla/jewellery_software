@@ -1,74 +1,128 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
-import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
-import { FaEdit, FaTrash } from 'react-icons/fa';
-import { Button, Row, Col } from 'react-bootstrap'; 
-// import './PaymentsTable.css'
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import DataTable from '../../../Pages/InputField/TableLayout';
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
+import axios from 'axios';
+import baseURL from '../../../../Url/NodeBaseURL';
 
-const OdersTable = () => {
-  const navigate = useNavigate(); // Initialize navigate function
+const RepairsTable = () => {
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [repairDetails, setRepairDetails] = useState(null);
 
+  // Columns for the DataTable
   const columns = React.useMemo(
     () => [
       {
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+      },
+      {
         Header: 'Date',
-        accessor: 'date', // Key from the data
+        accessor: 'date',
+        Cell: ({ value }) => formatDate(value), // Format date value
       },
       {
-        Header: 'Order No',
-        accessor: 'order_no',
+        Header: 'Invoice Number',
+        accessor: 'invoice_number',
       },
-      {
-        Header: 'Mode',
-        accessor: 'mode',
-      },
-      {
-        Header: 'Cheque Number',
-        accessor: 'cheque_number',
-      },
-      
       {
         Header: 'Account Name',
         accessor: 'account_name',
       },
       {
         Header: 'Total Amt',
-        accessor: 'total_amt',
+        accessor: 'net_amount',
+        Cell: ({ value }) => value || '-', // Handle cases with missing values
       },
       {
-        Header: 'Discount Amt',
-        accessor: 'discount_amt',
-      },
-      {
-        Header: 'Cash Amt',
-        accessor: 'cash_amt',
-      },
-      {
-        Header: 'Remarks',
-        accessor: 'remarks',
+        Header: 'Paid Amount',
+        accessor: 'paid_amount',
+        Cell: ({ row }) => row.original.net_amount || '-', // Use `net_amount` for now
       },
       {
         Header: 'Actions',
         accessor: 'actions',
+        Cell: ({ row }) => (
+          <div>
+            {/* <FaEdit
+              style={{ cursor: 'pointer', marginRight: '10px', color: 'blue' }}
+              onClick={() => handleEdit(row.original.id)}
+            />
+            <FaTrash
+              style={{ cursor: 'pointer', color: 'red' }}
+              onClick={() => handleDelete(row.original.id)}
+            /> */}
+            <FaEye
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
+              onClick={() => handleViewDetails(row.original.invoice_number)} // Pass invoice_number
+            />
+          </div>
+        ),
       },
     ],
     []
   );
 
-  const data = React.useMemo(
-    () => [
-   
-    ],
-    []
-  );
+  // Function to format date in Indian format (DD-MM-YYYY)
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return `${String(date.getDate()).padStart(2, '0')}-${String(
+      date.getMonth() + 1
+    ).padStart(2, '0')}-${date.getFullYear()}`;
+  };
+
+  // Fetch unique repair details from the API
+  useEffect(() => {
+    const fetchRepairs = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+        
+        // Filter the data based on the 'transaction_status' column
+        const filteredData = response.data.filter(item => item.transaction_status === 'Orders');
+        
+        setData(filteredData); // Set the filtered data
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching repair details:', error);
+        setLoading(false);
+      }
+    };
+  
+    fetchRepairs();
+  }, []);
+  
+  const handleEdit = (id) => {
+    navigate(`/repairs/edit/${id}`);
+  };
 
   const handleDelete = (id) => {
     console.log('Delete record with id:', id);
-    // Implement your delete logic here
   };
 
   const handleCreate = () => {
-    navigate('/orders'); // Navigate to the /repairs page
+    navigate('/orders');
+  };
+
+  // Fetch and show repair details in modal
+  const handleViewDetails = async (invoice_number) => {
+    try {
+      const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
+      setRepairDetails(response.data);
+      setShowModal(true); // Show the modal with repair details
+    } catch (error) {
+      console.error('Error fetching repair details:', error);
+    }
+  };
+
+  // Close the modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setRepairDetails(null); // Clear repair details on modal close
   };
 
   return (
@@ -77,15 +131,114 @@ const OdersTable = () => {
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Orders</h3>
-            <Button className='create_but' variant="success" onClick={handleCreate} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+            <Button
+              className="create_but"
+              onClick={handleCreate}
+              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+            >
               + Create
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} />
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <DataTable columns={columns} data={data} />
+        )}
       </div>
+
+      {/* Modal to display repair details */}
+      <Modal show={showModal} onHide={handleCloseModal} size="xl" className='m-auto'>
+        <Modal.Header closeButton>
+          <Modal.Title>Orders Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {repairDetails && (
+            <>
+              <h5>Customer Info</h5>
+              <Table bordered>
+                <tbody>
+                  <tr>
+                    <td>Customer ID</td>
+                    <td>{repairDetails.uniqueData.customer_id}</td>
+                  </tr>
+                  <tr>
+                    <td>Mobile</td>
+                    <td>{repairDetails.uniqueData.mobile}</td>
+                  </tr>
+                  <tr>
+                    <td>Account Name</td>
+                    <td>{repairDetails.uniqueData.account_name}</td>
+                  </tr>
+                  <tr>
+                    <td>Email</td>
+                    <td>{repairDetails.uniqueData.email}</td>
+                  </tr>
+                  <tr>
+                    <td>Address</td>
+                    <td>{repairDetails.uniqueData.address1}</td>
+                  </tr>
+                  <tr>
+                    <td>Invoice Number</td>
+                    <td>{repairDetails.uniqueData.invoice_number}</td>
+                  </tr>
+                  <tr>
+                    <td>Total Amount</td>
+                    <td>{repairDetails.uniqueData.net_amount}</td>
+                  </tr>
+                </tbody>
+              </Table>
+
+              <h5>Products</h5>
+              <Table bordered>
+                <thead>
+                <tr>
+              <th>Code</th>
+              <th>Product Name</th>
+              <th>Metal</th>
+              <th>Metal Type</th>
+              <th>Purity</th>
+              <th>Gross Weight</th>
+              <th>Stone Weight</th>
+              <th>Wastage Weight</th>
+              <th>Total Weight</th>
+              <th>Making Charges</th>
+              <th>Rate</th>
+              <th>Tax Amount</th>
+              <th>Total Price</th>
+            </tr>
+                </thead>
+                <tbody>
+                  {repairDetails.repeatedData.map((product, index) => (
+                    <tr key={index}>
+                       <td>{product.code}</td>
+                <td>{product.product_name}</td>
+                <td>{product.metal || 'N/A'}</td>
+                <td>{product.metal_type}</td>
+                <td>{product.purity}</td>
+                <td>{product.gross_weight}</td>
+                <td>{product.stone_weight}</td>
+                <td>{product.wastage_weight}</td>
+                <td>{product.total_weight_av}</td>
+                <td>{product.making_charges}</td>
+                <td>{product.rate}</td>
+                <td>{product.tax_amt}</td>
+                <td>{product.total_price}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
 
-export default OdersTable;
+export default RepairsTable;
