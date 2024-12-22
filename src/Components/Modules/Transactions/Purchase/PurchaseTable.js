@@ -213,23 +213,20 @@ const PurchaseTable = () => {
     []
   );
 
-// Fetch data from API
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/get/purchases');
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/get/purchases`); // Fetch data from the endpoint
+        const result = await response.json();
+        if (result?.purchases) {
+          setData(result.purchases); // Set fetched data
+        }
+      } catch (error) {
+        console.error('Error fetching payments:', error);
       }
-      const result = await response.json();
-      setData(result); // Update state with API data
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-  fetchData();
-}, []);
+    };
+    fetchData();
+  }, []);
 
   const handleCreate = () => {
     navigate('/purchase'); // Navigate to the /suppliers page
