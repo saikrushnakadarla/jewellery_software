@@ -12,6 +12,7 @@ const ProductTable = ({ repairDetails, onDelete }) => {
   
   const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
+  console.log("Net Amount=",netAmount)
 
   return (
     <Table bordered hover responsive>
