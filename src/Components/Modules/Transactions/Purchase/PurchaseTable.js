@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
-import './PurchaseTable.css'
+import './PurchaseTable.css';
 
 const PurchaseTable = () => {
   const navigate = useNavigate();
@@ -213,7 +213,23 @@ const PurchaseTable = () => {
     []
   );
 
+// Fetch data from API
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/get/purchases');
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      const result = await response.json();
+      setData(result); // Update state with API data
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
+  fetchData();
+}, []);
 
   const handleCreate = () => {
     navigate('/purchase'); // Navigate to the /suppliers page
