@@ -33,8 +33,8 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Repair ID',
-        accessor: 'repair_id',
+        Header: 'Repair No',
+        accessor: 'repair_no',
       },
       {
         Header: 'Name',
@@ -48,42 +48,49 @@ const RepairsTable = () => {
         Header: 'Email',
         accessor: 'email',
       },
-      {
-        Header: 'Address 1',
-        accessor: 'address1',
-      },
-      {
-        Header: 'Address 2',
-        accessor: 'address2',
-      },
-      {
-        Header: 'Address 3',
-        accessor: 'address3',
-      },
-      {
-        Header: 'Staff',
-        accessor: 'staff',
-      },
-      {
-        Header: 'Delivery Date',
-        accessor: 'delivery_date',
-        Cell: ({ value }) => new Date(value).toLocaleDateString(), // Format delivery date
-      },
-      {
-        Header: 'Place',
-        accessor: 'place',
-      },
-      {
-        Header: 'Metal',
-        accessor: 'metal',
-      },
-      {
-        Header: 'Counter',
-        accessor: 'counter',
-      },
+      // {
+      //   Header: 'Address 1',
+      //   accessor: 'address1',
+      // },
+      // {
+      //   Header: 'Address 2',
+      //   accessor: 'address2',
+      // },
+      // {
+      //   Header: 'Staff',
+      //   accessor: 'staff',
+      // },
+      // {
+      //   Header: 'Delivery Date',
+      //   accessor: 'delivery_date',
+      //   Cell: ({ value }) => {
+      //     const date = new Date(value);
+      //     return date.toLocaleDateString('en-GB'); // 'en-GB' formats as dd/mm/yyyy
+      //   },
+      // },
+      // {
+      //   Header: 'Place',
+      //   accessor: 'place',
+      // },
+      // {
+      //   Header: 'Counter',
+      //   accessor: 'counter',
+      // },
       {
         Header: 'Entry Type',
         accessor: 'entry_type',
+      },
+      {
+        Header: 'Item Name',
+        accessor: 'item',
+      },            
+      {
+        Header: 'Metal Type',
+        accessor: 'metal_type',
+      },
+      {
+        Header: 'Purity',
+        accessor: 'purity',
       },
       {
         Header: 'Date',
@@ -93,54 +100,9 @@ const RepairsTable = () => {
           return date.toLocaleDateString('en-GB'); // 'en-GB' formats as dd/mm/yyyy
         },
       },
-      
-      {
-        Header: 'Metal Type',
-        accessor: 'metal_type',
-      },
-      {
-        Header: 'Item',
-        accessor: 'item',
-      },
-      {
-        Header: 'Tag No',
-        accessor: 'tag_no',
-      },
-      {
-        Header: 'Description',
-        accessor: 'description',
-      },
-      {
-        Header: 'Purity',
-        accessor: 'purity',
-      },
-      {
-        Header: 'Extra Weight',
-        accessor: 'extra_weight',
-      },
-      {
-        Header: 'Stone Value',
-        accessor: 'stone_value',
-      },
-      {
-        Header: 'Making Charge',
-        accessor: 'making_charge',
-      },
-      {
-        Header: 'Handling Charge',
-        accessor: 'handling_charge',
-      },
       {
         Header: 'Total',
         accessor: 'total',
-      },
-      {
-        Header: 'City',
-        accessor: 'city',
-      },
-      {
-        Header: 'Repair No',
-        accessor: 'repair_no',
       },
       {
         Header: 'Status',

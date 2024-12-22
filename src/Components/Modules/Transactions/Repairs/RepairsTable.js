@@ -99,10 +99,11 @@ const handlePopoverToggle = (event, repairId) => {
       { Header: 'Customer Name', accessor: 'name' },
       { Header: 'Mobile', accessor: 'mobile' },
       { Header: 'Email', accessor: 'email' },
-      { Header: 'Staff', accessor: 'staff' },
+      { Header: 'Entry Type', accessor: 'entry_type' },
       { Header: 'Item Name', accessor: 'item' },
       { Header: 'Metal Type', accessor: 'metal_type' },
       { Header: 'Purity', accessor: 'purity' },
+      { Header: 'Total', accessor: 'total' },
       {
         Header: 'Delivery Date',
         accessor: 'delivery_date',
@@ -231,9 +232,6 @@ const handlePopoverToggle = (event, repairId) => {
         console.error('Error submitting details:', error);
     }
 };
-
-
-  
 
   return (
     <div className="main-container">
