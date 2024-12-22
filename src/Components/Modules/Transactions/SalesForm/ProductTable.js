@@ -2,7 +2,14 @@ import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 
 const ProductTable = ({ repairDetails, onDelete }) => {
-  const taxableAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.rate_amt || 0), 0);
+  const taxableAmount = repairDetails.reduce((sum, item) => {
+    const stonePrice = parseFloat(item.stone_price) || 0;
+    const makingCharges = parseFloat(item.making_charges) || 0;
+    const rateAmt = parseFloat(item.rate_amt) || 0;
+    return sum + stonePrice + makingCharges + rateAmt;
+  }, 0);
+  console.log("Total Price=",taxableAmount)
+  
   const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
 

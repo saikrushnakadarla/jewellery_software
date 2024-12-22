@@ -123,7 +123,7 @@ const RepairsTable = () => {
         {loading ? (
           <p>Loading...</p> // Show loading message while fetching data
         ) : (
-          <DataTable columns={columns} data={data} /> // Render the table
+          <DataTable columns={columns} data={[...data].reverse()}/> // Render the table
         )}
       </div>
     </div>
