@@ -246,7 +246,7 @@ const URDPurchase = () => {
     }
   };
   const handleBack = () => {
-    navigate('/urdpurchasetable');
+    navigate('/purchasetable');
   };
 
   const handleAddCustomer = () => {
