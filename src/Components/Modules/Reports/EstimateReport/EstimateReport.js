@@ -31,8 +31,8 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Estimate ID',
-        accessor: 'estimate_id',
+        Header: 'Estimate Number',
+        accessor: 'estimate_number',
       },
       {
         Header: 'Date',
@@ -42,11 +42,7 @@ const RepairsTable = () => {
           return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
         },
       },
-      
-      {
-        Header: 'Product Code',
-        accessor: 'pcode',
-      },
+
       {
         Header: 'Product Name',
         accessor: 'product_name',
