@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import './Rates.css';
 import InputField from '../../../Pages/InputField/InputField';
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const Rates = () => {
     const [rates, setRates] = useState({
@@ -18,7 +19,7 @@ const Rates = () => {
     useEffect(() => {
         const fetchRates = async () => {
             try {
-                const response = await fetch('http://localhost:5000/get/current-rates');
+                const response = await fetch(`${baseURL}/get/current-rates`);
                 const result = await response.json();
 
                 if (response.ok) {
@@ -69,7 +70,7 @@ const Rates = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:5000/post/rates', {
+            const response = await fetch(`${baseURL}/post/rates`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

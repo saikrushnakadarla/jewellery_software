@@ -27,7 +27,7 @@ const RepairsTable = () => {
   const [editIndex, setEditIndex] = useState(null);
 
   // Fetch repairs
-  useEffect(() => {
+
     const fetchRepairs = async () => {
       try {
         const response = await axios.get(`${baseURL}/get/repairs`);
@@ -36,7 +36,7 @@ const RepairsTable = () => {
         console.error('Error fetching repairs:', error);
       }
     };
-
+  useEffect(() => {
     fetchRepairs();
   }, []);
 
@@ -87,6 +87,7 @@ const handlePopoverToggle = (event, repairId) => {
           )
         );
       }
+      window.location.reload();
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -167,8 +168,6 @@ const handlePopoverToggle = (event, repairId) => {
     }
   };
   
-  
-
   const handleAddToLocalDetails = () => {
     if (editIndex !== null) {
       const updatedDetails = [...localDetails];
@@ -193,32 +192,48 @@ const handlePopoverToggle = (event, repairId) => {
 
   const handleSubmitDetails = async () => {
     if (localDetails.length === 0) {
-      alert('No details to submit');
-      return;
+        alert('No details to submit');
+        return;
     }
+
+    // Calculate totals
+    const totalWeight = localDetails.reduce((total, detail) => total + Number(detail.weight || 0), 0);
+    const totalQty = localDetails.reduce((total, detail) => total + Number(detail.qty || 0), 0);
+    const totalPrice = localDetails.reduce((total, detail) => total + (Number(detail.qty || 0) * Number(detail.rate || 0)), 0);
+
+    const updatedDetails = localDetails.map((detail) => ({
+        ...detail,
+        overall_weight: totalWeight,
+        overall_qty: totalQty,
+        overall_total: totalPrice,
+    }));
 
     try {
-      await axios.post(`${baseURL}/add/repair-details`, {
-        repair_id: popoverData.repairId,
-        details: localDetails,
-      });
+        await axios.post(`${baseURL}/add/repair-details`, {
+            repair_id: popoverData.repairId,
+            details: updatedDetails,
+        });
 
-      // Clear local storage and local state
-      clearLocalStorage('repairDetails');
-      setLocalDetails([]);
-      setRepairs((prev) =>
-        prev.map((repair) =>
-          repair.repair_id === popoverData.repairId
-            ? { ...repair, status: 'Receive from Workshop' }
-            : repair
-        )
-      );
+        clearLocalStorage('repairDetails');
+        setLocalDetails([]);
+        setRepairs((prev) =>
+            prev.map((repair) =>
+                repair.repair_id === popoverData.repairId
+                    ? { ...repair, status: 'Receive from Workshop' }
+                    : repair
+            )
+        );
 
-      setShowModal(false);
+        setShowModal(false);
+        // Refresh the page after successful submission
+        window.location.reload();
     } catch (error) {
-      console.error('Error submitting details:', error);
+        console.error('Error submitting details:', error);
     }
-  };
+};
+
+
+  
 
   return (
     <div className="main-container">
@@ -277,139 +292,164 @@ const handlePopoverToggle = (event, repairId) => {
             <Modal.Title>Receive from Workshop</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form >
-              <Row>
-                <Col md={6}>
-                  <Form.Group controlId="formMetalType">
-                    <Form.Label>Metal Type</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="metal_type"
-                      value={formData.metal_type}
-                      onChange={handleInputChange}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group controlId="formDescription">
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={6}>
-                  <Form.Group controlId="formWeight">
-                    <Form.Label>Weight</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="weight"
-                      value={formData.weight}
-                      onChange={handleInputChange}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group controlId="formQty">
-                    <Form.Label>Qty</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="qty"
-                      value={formData.qty}
-                      onChange={handleInputChange}
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={6}>
-                  <Form.Group controlId="formRateType">
-                    <Form.Label>Rate Type</Form.Label>
-                    <Form.Select
-                      name="rate_type"
-                      value={formData.rate_type}
-                      onChange={handleInputChange}
-                    >
-                      <option value="">Select </option>
-                      <option value="per_item">Per Qty</option>
-                      <option value="per_weight">Per Weight</option>
-                    </Form.Select>
-                  </Form.Group>
-                </Col>
-                <Col md={6}>
-                  <Form.Group controlId="formRate">
-                    <Form.Label>Rate</Form.Label>
-                    <Form.Control
-                      type="number"
-                      name="rate"
-                      value={formData.rate}
-                      onChange={handleInputChange}
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-              <Button className="mt-3" onClick={handleAddToLocalDetails}>
-              Add
+  <Form>
+    <Row>
+      <Col md={6}>
+        <Form.Group controlId="formMetalType">
+          <Form.Label>Metal Type</Form.Label>
+          <Form.Control
+            type="text"
+            name="metal_type"
+            value={formData.metal_type}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group controlId="formDescription">
+          <Form.Label>Description</Form.Label>
+          <Form.Control
+            type="text"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
+      </Col>
+    </Row>
+    <Row>
+      <Col md={6}>
+        <Form.Group controlId="formWeight">
+          <Form.Label>Weight</Form.Label>
+          <Form.Control
+            type="number"
+            name="weight"
+            value={formData.weight}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group controlId="formQty">
+          <Form.Label>Qty</Form.Label>
+          <Form.Control
+            type="number"
+            name="qty"
+            value={formData.qty}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
+      </Col>
+    </Row>
+    <Row>
+      <Col md={6}>
+        <Form.Group controlId="formRateType">
+          <Form.Label>Rate Type</Form.Label>
+          <Form.Select
+            name="rate_type"
+            value={formData.rate_type}
+            onChange={handleInputChange}
+          >
+            <option value="">Select</option>
+            <option value="Per Qty">Per Qty</option>
+            <option value="Per Weight">Per Weight</option>
+          </Form.Select>
+        </Form.Group>
+      </Col>
+      <Col md={6}>
+        <Form.Group controlId="formRate">
+          <Form.Label>Rate</Form.Label>
+          <Form.Control
+            type="number"
+            name="rate"
+            value={formData.rate}
+            onChange={handleInputChange}
+          />
+        </Form.Group>
+      </Col>
+    </Row>
+    <Button className="mt-3" onClick={handleAddToLocalDetails}>
+      Add
+    </Button>
+  </Form>
+
+  <Table striped bordered hover className="mt-4">
+    <thead>
+      <tr>
+        <th>S No</th>
+        <th>Metal Type</th>
+        <th>Description</th>
+        <th>Weight</th>
+        <th>Qty</th>
+        <th>Rate Type</th>
+        <th>Rate</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {localDetails.map((detail, index) => (
+        <tr key={index}>
+          <td>{index + 1}</td>
+          <td>{detail.metal_type}</td>
+          <td>{detail.description}</td>
+          <td>{detail.weight}</td>
+          <td>{detail.qty}</td>
+          <td>{detail.rate_type}</td>
+          <td>{detail.rate}</td>
+          <td>
+            <Button variant="warning" size="sm" onClick={() => handleEdit(index)}>
+              Edit
+            </Button>{' '}
+            <Button variant="danger" size="sm" onClick={() => handleDelete(index)}>
+              Delete
             </Button>
-            </Form>
-            <Table striped bordered hover className="mt-4">
-            <thead>
-              <tr>
-                <th>S No</th>
-                <th>Metal Type</th>
-                <th>Description</th>
-                <th>Weight</th>
-                <th>Qty</th>
-                <th>Rate Type</th>
-                <th>Rate</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {localDetails.map((detail, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{detail.metal_type}</td>
-                  <td>{detail.description}</td>
-                  <td>{detail.weight}</td>
-                  <td>{detail.qty}</td>
-                  <td>{detail.rate_type}</td>
-                  <td>{detail.rate}</td>
-                  <td>
-                    <Button variant="warning" size="sm" onClick={() => handleEdit(index)}>
-                      Edit
-                    </Button>{' '}
-                    <Button variant="danger" size="sm" onClick={() => handleDelete(index)}>
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </Table>
 
-          {/* Overall Totals */}
-          <div className="mt-3">
-            <p>
-              <strong>Total Weight:</strong> {localDetails.reduce((total, detail) => total + Number(detail.weight || 0), 0)} 
-            </p>
-            <p>
-              <strong>Total Quantity:</strong> {localDetails.reduce((total, detail) => total + Number(detail.qty || 0), 0)}
-            </p>
-            <p>
-              <strong> Total:</strong> {localDetails.reduce((total, detail) => total + (Number(detail.qty || 0) * Number(detail.rate || 0)), 0)}
-            </p>
-          </div>
+  {/* Display totals */}
+  <Row className="mt-4">
+    <Col md={4}>
+      <Form.Group>
+        <Form.Label>Total Weight</Form.Label>
+        <Form.Control
+          type="text"
+          value={localDetails.reduce((total, detail) => total + Number(detail.weight || 0), 0)}
+          readOnly
+        />
+      </Form.Group>
+    </Col>
+    <Col md={4}>
+      <Form.Group>
+        <Form.Label>Total Qty</Form.Label>
+        <Form.Control
+          type="text"
+          value={localDetails.reduce((total, detail) => total + Number(detail.qty || 0), 0)}
+          readOnly
+        />
+      </Form.Group>
+    </Col>
+    <Col md={4}>
+      <Form.Group>
+        <Form.Label>Total Price</Form.Label>
+        <Form.Control
+          type="text"
+          value={localDetails.reduce(
+            (total, detail) => total + Number(detail.qty || 0) * Number(detail.rate || 0),
+            0
+          )}
+          readOnly
+        />
+      </Form.Group>
+    </Col>
+  </Row>
+</Modal.Body>
+<Modal.Footer>
+  <Button onClick={handleSubmitDetails}>Submit</Button>
+</Modal.Footer>
 
-        </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={handleSubmitDetails}>Submit</Button>
-        </Modal.Footer>
         </Modal>
       </div>
     </div>

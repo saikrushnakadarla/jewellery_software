@@ -7,6 +7,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
 
+
 const URDPurchase = () => {
 
     const [metal, setMetal] = useState("");
@@ -68,8 +69,6 @@ const URDPurchase = () => {
       }));
     };
   
-   
-
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -197,7 +196,7 @@ const URDPurchase = () => {
       };
   
       try {
-        await axios.post("http://localhost:5000/save-purchase", payload);
+        await axios.post(`http://localhost:5000/save-purchase`, payload);
         alert("Purchase saved successfully!");
         localStorage.removeItem("purchaseItems");
         setItems([]);

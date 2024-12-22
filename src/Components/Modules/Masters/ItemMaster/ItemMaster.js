@@ -390,7 +390,7 @@ const FormWithTable = () => {
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/metaltype');
+        const response = await axios.get(`${baseURL}/metaltype`);
         const metalTypes = response.data.map(item => ({
           value: item.metal_name, // Assuming the column name is "metal_name"
           label: item.metal_name
@@ -408,7 +408,7 @@ const FormWithTable = () => {
   useEffect(() => {
     const fetchDesignMaster = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/designmaster');
+        const response = await axios.get(`${baseURL}/designmaster`);
         const designMasters = response.data.map((item) => ({
           value: item.design_name, // Assuming the column name is "design_name"
           label: item.design_name,
@@ -426,7 +426,7 @@ const FormWithTable = () => {
   useEffect(() => {
     const fetchPurity = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/purity');
+        const response = await axios.get(`${baseURL}/purity`);
         const purityOptions = response.data.map((item) => ({
           value: item.name, // Assuming the column name is "name"
           label: item.name,

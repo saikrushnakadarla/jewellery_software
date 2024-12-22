@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/DataTable'; // Import the reusable DataTable component
 import { Button, Row, Col } from 'react-bootstrap';
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const RepairsTable = () => {
   const [data, setData] = useState([]); // State to store table data
@@ -11,7 +12,7 @@ const RepairsTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get-purchases');
+        const response = await fetch(`${baseURL}/get-purchases`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
