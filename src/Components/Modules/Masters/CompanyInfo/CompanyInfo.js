@@ -28,6 +28,7 @@ function Purity() {
     branch: "",
     bank_url: "",
   });
+  const [states, setStates] = useState([]);
 
   const formRef = useRef(null); // Create a reference for the form
   const [submittedData, setSubmittedData] = useState([]); // Store fetched and submitted form entries
@@ -39,7 +40,7 @@ function Purity() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${baseURL}/purity`);
+        const response = await axios.get(`${baseURL}/get/companies`);
         setSubmittedData(response.data); // Populate table with fetched data
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -48,6 +49,28 @@ function Purity() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/get/states');
+        setStates(response.data); // Assuming `states` is a state variable to store states data
+      } catch (error) {
+        console.error("Error fetching states:", error);
+      }
+    };
+    fetchStates();
+  }, []);
+
+  const handleStateChange = (e) => {
+    const selectedState = states.find((state) => state.state_name === e.target.value);
+    setFormData({
+      ...formData,
+      state: selectedState?.state_name || "",
+      state_code: selectedState?.state_code || "",
+    });
+  };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,7 +85,7 @@ function Purity() {
 
     if (editMode) {
       try {
-        const response = await axios.put(`${baseURL}/purity/${editId}`, formData);
+        const response = await axios.put(`${baseURL}/api/companies/${editId}`, formData);
         setSubmittedData(
           submittedData.map((item) =>
             item.purity_id === editId ? { ...formData, purity_id: editId } : item
@@ -70,16 +93,16 @@ function Purity() {
         );
 
         resetForm();
-        alert(`Purity updated successfully!`);
+        alert(`CompanyInfo updated successfully!`);
       } catch (error) {
         console.error("Error updating data:", error);
       }
     } else {
       try {
-        const response = await axios.post(`${baseURL}/purity`, formData);
+        const response = await axios.post(`${baseURL}/api/companies/`, formData);
         setSubmittedData([...submittedData, { ...formData, purity_id: response.data.id }]);
         resetForm();
-        alert(`Purity created successfully!`);
+        alert(`CompanyInfo created successfully!`);
       } catch (error) {
         console.error("Error submitting data:", error);
       }
@@ -164,7 +187,7 @@ function Purity() {
         Header: "Action",
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
-            <button className="action-button edit-button" onClick={() => handleEdit(row.original)}>
+            <button className="action-button edit-button" >
               <FaEdit />
             </button>
             <button
@@ -182,91 +205,105 @@ function Purity() {
 
   return (
     <div className="main-container">
-            <div className="customer-master-container">
+      <div className="customer-master-container">
 
-      <h3 style={{ textAlign: "center", marginBottom: "30px" }}>
-        {editMode ? "Edit Company Info" : "Company Info"}
-      </h3>
-      <form ref={formRef} className="customer-master-form" onSubmit={handleSubmit}>
-  <Row>
-    <Col md={3}>
-      <InputField label="Company Name:" name="company_name" value={formData.company_name} onChange={handleChange} />
-    </Col>
-    <Col md={3}>
-      <InputField label="Address:" name="address" value={formData.address} onChange={handleChange} />
-    </Col>
-    <Col md={3}>
-      <InputField label="Address 2:" name="address2" value={formData.address2} onChange={handleChange} />
-    </Col>
-    <Col md={3}>
-      <InputField label="City:" name="city" value={formData.city} onChange={handleChange} />
-    </Col>
-  </Row>
+        <h3 style={{ textAlign: "center", marginBottom: "30px" }}>
+          {editMode ? "Edit Company Info" : "Company Info"}
+        </h3>
+        <form ref={formRef} className="customer-master-form" onSubmit={handleSubmit}>
+          <Row>
+            <Col md={3}>
+              <InputField label="Company Name:" name="company_name" value={formData.company_name} onChange={handleChange} />
+            </Col>
+            <Col md={3}>
+              <InputField label="Address:" name="address" value={formData.address} onChange={handleChange} />
+            </Col>
+            <Col md={3}>
+              <InputField label="Address 2:" name="address2" value={formData.address2} onChange={handleChange} />
+            </Col>
+            <Col md={3}>
+              <InputField label="City:" name="city" value={formData.city} onChange={handleChange} />
+            </Col>
+          </Row>
 
-  <Row>
-    <Col md={3}>
-      <InputField label="Pincode:" name="pincode" value={formData.pincode} onChange={handleChange} />
-    </Col>
-    <Col md={3}>
-      <InputField label="State:" name="state" value={formData.state} onChange={handleChange} />
-    </Col>
-    <Col md={3}>
-      <InputField label="State Code:" name="state_code" value={formData.state_code} onChange={handleChange} />
-    </Col>
-    <Col md={3}>
-      <InputField label="Country:" name="country" value={formData.country} onChange={handleChange} />
-    </Col>
-  </Row>
+          <Row>
+            <Col md={3}>
+              <InputField label="Pincode:" name="pincode" value={formData.pincode} onChange={handleChange} />
+            </Col>
+            <Col md={3}>
+              <label>State:</label>
+              <select
+                name="state"
+                value={formData.state}
+                onChange={handleStateChange}
+                className="form-control"
+              >
+                <option value="">Select State</option>
+                {states.map((state) => (
+                  <option key={state.state_id} value={state.state_name}>
+                    {state.state_name}
+                  </option>
+                ))}
+              </select>
+            </Col>
 
-  <Row>
-    <Col md={3}>
-      <InputField label="Mobile:" name="mobile" value={formData.mobile} onChange={handleChange} />
-    </Col>
-    <Col md={3}>
-      <InputField label="Phone:" name="phone" value={formData.phone} onChange={handleChange} />
-    </Col>
-    <Col md={3}>
-      <InputField label="Website:" name="website" value={formData.website} onChange={handleChange} />
-    </Col>
-    <Col md={3}>
-      <InputField label="GST No:" name="gst_no" value={formData.gst_no} onChange={handleChange} />
-    </Col>
-  </Row>
+            <Col md={3}>
+              <InputField label="State Code:" name="state_code" value={formData.state_code} onChange={handleChange} />
+            </Col>
+            <Col md={3}>
+              <InputField label="Country:" name="country" value={formData.country} onChange={handleChange} />
+            </Col>
+          </Row>
 
-  <Row>
-    <Col md={2}>
-      <InputField label="PAN No:" name="pan_no" value={formData.pan_no} onChange={handleChange} />
-    </Col>
-    <Col md={2}>
-      <InputField label="Bank Name:" name="bank_name" value={formData.bank_name} onChange={handleChange} />
-    </Col>
-    <Col md={2}>
-      <InputField label="Branch:" name="branch" value={formData.branch} onChange={handleChange} />
-    </Col>
-    <Col md={2}>
-      <InputField label="Bank URL:" name="bank_url" value={formData.bank_url} onChange={handleChange} />
-    </Col>
-    <Col md={2}>
-      <InputField label="Account No:" name="bank_account_no" value={formData.bank_account_no} onChange={handleChange} />
-    </Col>
-    <Col md={2}>
-      <InputField label="IFSC Code:" name="ifsc_code" value={formData.ifsc_code} onChange={handleChange} />
-    </Col>
-  </Row>
+          <Row>
+            <Col md={3}>
+              <InputField label="Mobile:" name="mobile" value={formData.mobile} onChange={handleChange} />
+            </Col>
+            <Col md={3}>
+              <InputField label="Phone:" name="phone" value={formData.phone} onChange={handleChange} />
+            </Col>
+            <Col md={3}>
+              <InputField label="Website:" name="website" value={formData.website} onChange={handleChange} />
+            </Col>
+            <Col md={3}>
+              <InputField label="GST No:" name="gst_no" value={formData.gst_no} onChange={handleChange} />
+            </Col>
+          </Row>
 
- 
+          <Row>
+            <Col md={2}>
+              <InputField label="PAN No:" name="pan_no" value={formData.pan_no} onChange={handleChange} />
+            </Col>
+            <Col md={2}>
+              <InputField label="Bank Name:" name="bank_name" value={formData.bank_name} onChange={handleChange} />
+            </Col>
+            <Col md={2}>
+              <InputField label="Branch:" name="branch" value={formData.branch} onChange={handleChange} />
+            </Col>
+            <Col md={2}>
+              <InputField label="Bank URL:" name="bank_url" value={formData.bank_url} onChange={handleChange} />
+            </Col>
+            <Col md={2}>
+              <InputField label="Account No:" name="bank_account_no" value={formData.bank_account_no} onChange={handleChange} />
+            </Col>
+            <Col md={2}>
+              <InputField label="IFSC Code:" name="ifsc_code" value={formData.ifsc_code} onChange={handleChange} />
+            </Col>
+          </Row>
 
-  <div className="sup-button-container">
-    <button type="submit" className="cus-submit-btn">
-      {editMode ? "Update" : "Save"}
-    </button>
-  </div>
-</form>
 
-      <div style={{ marginTop: "20px" }} className="purity-table-container">
-        <DataTable columns={columns} data={[...submittedData].reverse()} />
+
+          <div className="sup-button-container">
+            <button type="submit" className="cus-submit-btn">
+              {editMode ? "Update" : "Save"}
+            </button>
+          </div>
+        </form>
+
+        <div style={{ marginTop: "20px" }} className="purity-table-container">
+          <DataTable columns={columns} data={[...submittedData].reverse()} />
+        </div>
       </div>
-    </div>
     </div>
 
   );

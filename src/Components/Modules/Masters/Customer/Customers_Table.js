@@ -19,7 +19,7 @@ const RepairsTable = () => {
         Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
       {
-        Header: 'Customer Name',
+        Header: 'Trade Name',
         accessor: 'account_name',
       },
       {

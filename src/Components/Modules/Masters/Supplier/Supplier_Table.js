@@ -20,7 +20,7 @@ const RepairsTable = () => {
         Cell: ({ row }) => row.index + 1, 
       },
       {
-        Header: 'Supplier Name',
+        Header: 'Trade Name',
         accessor: 'account_name',
       },
       {
