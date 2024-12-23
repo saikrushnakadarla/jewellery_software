@@ -57,6 +57,17 @@ const RepairsTable = () => {
     }
   };
 
+  const formatDate = (date) => {
+    if (!date) return ''; // Return an empty string if no date is provided
+  
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');  // Pad single digit days with 0
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Pad months with 0
+    const year = d.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  };
+
   const columns = React.useMemo(
     () => [
       { Header: 'Sr. No.', Cell: ({ row }) => row.index + 1 },
@@ -78,30 +89,14 @@ const RepairsTable = () => {
       { Header: 'Contact Person', accessor: 'contact_person', Cell: ({ value }) => value || 'N/A' },
       { Header: 'Email', accessor: 'email', Cell: ({ value }) => value || 'N/A' },
       {
-        Header: 'Birthday On',
-        accessor: 'birthday', Cell: ({ value }) => value || 'N/A',
-        Cell: ({ value }) => {
-          if (!value) return '-';
-          const formattedDate = new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          }).format(new Date(value));
-          return formattedDate;
-        },
+        Header: 'Birthday',
+        accessor: 'birthday',
+        Cell: ({ value }) => <span>{formatDate(value)}</span>, // Format birthday date
       },
       {
         Header: 'Anniversary',
-        accessor: 'anniversary', Cell: ({ value }) => value || 'N/A',
-        Cell: ({ value }) => {
-          if (!value) return '-';
-          const formattedDate = new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          }).format(new Date(value));
-          return formattedDate;
-        },
+        accessor: 'anniversary',
+        Cell: ({ value }) => <span>{formatDate(value)}</span>, // Format anniversary date
       },
       { Header: 'Bank Account No.', accessor: 'bank_account_no', Cell: ({ value }) => value || 'N/A' },
       { Header: 'Bank Name', accessor: 'bank_name', Cell: ({ value }) => value || 'N/A' },

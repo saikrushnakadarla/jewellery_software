@@ -93,6 +93,17 @@ const handlePopoverToggle = (event, repairId) => {
     }
   };
 
+  const formatDate = (date) => {
+    if (!date) return ''; // Return an empty string if no date is provided
+  
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');  // Pad single digit days with 0
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Pad months with 0
+    const year = d.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  };
+
   const columns = React.useMemo(
     () => [
       { Header: 'Repair No', accessor: 'repair_no' },
@@ -104,18 +115,11 @@ const handlePopoverToggle = (event, repairId) => {
       { Header: 'Metal Type', accessor: 'metal_type' },
       { Header: 'Purity', accessor: 'purity' },
       { Header: 'Total', accessor: 'total' },
+
       {
         Header: 'Delivery Date',
         accessor: 'delivery_date',
-        Cell: ({ value }) => {
-          if (!value) return '-';
-          const formattedDate = new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-          }).format(new Date(value));
-          return formattedDate;
-        },
+        Cell: ({ value }) => <span>{formatDate(value)}</span>, // Format birthday date
       },
       { Header: 'Counter', accessor: 'counter' },
       { Header: 'Status', accessor: 'status' },

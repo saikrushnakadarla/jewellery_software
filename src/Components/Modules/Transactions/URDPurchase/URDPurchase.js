@@ -9,17 +9,6 @@ import { AiOutlinePlus } from "react-icons/ai";
 
 
 const URDPurchase = () => {
-
-    const [metal, setMetal] = useState("");
-    const [type, setType] = useState("");
-    const [purity, setPurity] = useState("");
-    const [product, setProduct] = useState("");
- 
-    const [gross, setGross] = useState(0);
-    const [dust, setDust] = useState(0);
-
-    const [rate, setRate] = useState(0);
-    const [totalAmount, setTotalAmount] = useState(0);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [customers, setCustomers] = useState([]);
@@ -60,6 +49,8 @@ const URDPurchase = () => {
       rate: 0,
       total_amount: 0,
     });
+    const [purity, setPurity] = useState([]);
+    const [metalType, setMetalType] = useState([]);
 
     const handleInputChange = (e) => {
       const { name, value } = e.target;
@@ -206,6 +197,52 @@ const URDPurchase = () => {
       }
     };
 
+    useEffect(() => {
+      const fetchPurity = async () => {
+        try {
+          const response = await axios.get(`${baseURL}/purity`);
+          setPurity(response.data); // Populate table with fetched data
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+  
+      fetchPurity();
+    }, []);
+
+      // Fetch data from the backend API when the component mounts
+  useEffect(() => {
+    const fetchMetalTypes = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/metaltype`);
+        setMetalType(response.data); // Populate table with fetched data
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchMetalTypes();
+  }, []);
+
+  useEffect(() => {
+    if (productDetails.metal === 'Gold') {
+      setProductDetails((prevState) => ({
+        ...prevState,
+        ml_percent: 1, // Set default value for Gold
+      }));
+    } else if (productDetails.metal === 'Silver') {
+      setProductDetails((prevState) => ({
+        ...prevState,
+        ml_percent: 3, // Set default value for Silver
+      }));
+    } else if (!productDetails.metal) {
+      setProductDetails((prevState) => ({
+        ...prevState,
+        ml_percent: '', // Clear ml_percent if metal is cleared
+      }));
+    }
+  }, [productDetails.metal]); 
+
   return (
     <div className="main-container">
     <div className="urdpurchase-form-container">
@@ -218,42 +255,48 @@ const URDPurchase = () => {
             <h4 className="mb-3">Customer Details</h4>
             <Row>
             <Col xs={12} md={2} className="d-flex align-items-center">
-            <div style={{ flex: 1 }}>
-              <InputField
-                label="Mobile"
-                name="mobile"
-                type="select"
-                value={formData.customer_id || ""} // Use customer_id to match selected value
-                onChange={(e) => handleCustomerChange(e.target.value)}
-                options={[
-                  { value: "", label: "Select" }, // Placeholder option
-                  ...customers.map((customer) => ({
-                    value: customer.account_id, // Use account_id as the value
-                    label: customer.mobile, // Display mobile as the label
-                  })),
-                ]}
-              />
-            </div>
-            <AiOutlinePlus
-              size={20}
-              color="black"
-              onClick={handleAddCustomer}
-              style={{
-                marginLeft: "10px",
-                cursor: "pointer",
-                marginBottom: "20px",
-              }}
-            />
-          </Col>
-                <Col xs={12} md={2}>
-                <InputField
-                    label="Customer Name:"
-                    name="account_name"
-                    value={formData.account_name}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
+                    <div style={{ flex: 1 }}>
+                      <InputField
+                        label="Mobile"
+                        name="mobile"
+                        type="select"
+                        value={formData.customer_id || ""} // Use customer_id to match selected value
+                        onChange={(e) => handleCustomerChange(e.target.value)}
+                        options={[
+                          ...customers.map((customer) => ({
+                            value: customer.account_id, // Use account_id as the value
+                            label: customer.mobile, // Display mobile as the label
+                          })),
+                        ]}
+                      />
+                    </div>
+                    <AiOutlinePlus
+                      size={20}
+                      color="black"
+                      onClick={handleAddCustomer}
+                      style={{
+                        marginLeft: "10px",
+                        cursor: "pointer",
+                        marginBottom: "20px",
+                      }}
+                    />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Customer Name:"
+                      name="account_name"
+                      type="select"
+                        value={formData.customer_id || ""} // Use customer_id to match selected value
+                        onChange={(e) => handleCustomerChange(e.target.value)}
+                        options={[
+                          ...customers.map((customer) => ({
+                            value: customer.account_id, // Use account_id as the value
+                            label: customer.account_name, // Display mobile as the label
+                          })),
+                        ]}
+
+                    />
+                  </Col>
                 <Col xs={12} md={2}>
                 <InputField
                     label="Email:"
@@ -337,27 +380,21 @@ const URDPurchase = () => {
       <div className="urd-form-section">
       <h4>Purchase Details</h4>
       <Row>
-        <Col xs={12} md={2}>
+        {/* <Col xs={12} md={2}>
           <InputField
             label="P ID"
             name="product_id"
             value={productDetails.product_id}
             onChange={handleInputChange}
           />
-        </Col>
+        </Col> */}
         <Col xs={12} md={2}>
           <InputField
             label="Product"
-            type="select"
             name="product_name"
             value={productDetails.product_name}
             onChange={handleInputChange}
-            options={[
-              { value: "PRODUCT1", label: "Product1" },
-              { value: "PRODUCT2", label: "Product2" },
-              { value: "PRODUCT3", label: "Product3" },
-              { value: "PRODUCT4", label: "Product4" },
-            ]}
+            
           />
         </Col>
         <Col xs={12} md={2}>
@@ -367,11 +404,10 @@ const URDPurchase = () => {
             name="metal"
             value={productDetails.metal}
             onChange={handleInputChange}
-            options={[
-              { value: "GOLD", label: "Gold" },
-              { value: "SILVER", label: "Silver" },
-              { value: "PLATINUM", label: "Platinum" },
-            ]}
+            options={metalType.map((metal) => ({
+              value: metal.metal_name, 
+              label: metal.metal_name,
+            }))}
           />
         </Col>
         <Col xs={12} md={2}>
@@ -381,15 +417,10 @@ const URDPurchase = () => {
             name="purity"
             value={productDetails.purity}
             onChange={handleInputChange}
-            options={[
-              { value: "24K", label: "24K" },
-              { value: "22K", label: "22K (916)" },
-              { value: "22KHM", label: "22K (916HM)" },
-              { value: "18K", label: "18K (750)" },
-              { value: "14K", label: "14K (585)" },
-              { value: "10K", label: "10K (417)" },
-              { value: "9K", label: "9K (375)" },
-            ]}
+            options={purity.map((purity) => ({
+              value: purity.name, 
+              label: purity.name,
+            }))}
           />
         </Col>
         <Col xs={12} md={2}>
@@ -421,15 +452,6 @@ const URDPurchase = () => {
         </Col>
         <Col xs={12} md={1}>
           <InputField
-            label="Touch %"
-            type="number"
-            name="touch_percent"
-            value={productDetails.touch_percent}
-            onChange={handleInputChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
             label="ML %"
             type="number"
             name="ml_percent"
@@ -437,24 +459,25 @@ const URDPurchase = () => {
             onChange={handleInputChange}
           />
         </Col>
-        <Col xs={12} md={1}>
+        <Col xs={12} md={2}>
           <InputField
-            label="Eqv WT"
+            label="Net WT"
             type="number"
             name="eqt_wt"
             value={productDetails.eqt_wt}
             onChange={handleInputChange}
           />
         </Col>
-        <Col xs={12} md={2}>
+        <Col xs={12} md={1}>
           <InputField
-            label="Remarks"
-            type="text"
-            name="remarks"
-            value={productDetails.remarks}
+            label="Touch %"
+            type="number"
+            name="touch_percent"
+            value={productDetails.touch_percent}
             onChange={handleInputChange}
           />
         </Col>
+
         <Col xs={12} md={2}>
           <InputField
             label="Rate"
@@ -466,10 +489,19 @@ const URDPurchase = () => {
         </Col>
         <Col xs={12} md={2}>
           <InputField
-            label="Value"
+            label="Amount"
             type="number"
             name="total_amount"
             value={productDetails.total_amount}
+            onChange={handleInputChange}
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Remarks"
+            type="text"
+            name="remarks"
+            value={productDetails.remarks}
             onChange={handleInputChange}
           />
         </Col>
@@ -493,8 +525,7 @@ const URDPurchase = () => {
                 <th>product ID</th>
                 <th>Product Name</th>
                 <th>Metal</th>
-                <th>Purity</th>
-              
+                <th>Purity</th>             
                 <th>HSN</th>
                 <th>Gross</th>
                 <th>Dust</th>
