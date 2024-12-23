@@ -269,7 +269,6 @@ const URDPurchase = () => {
                         value={formData.customer_id || ""} // Use customer_id to match selected value
                         onChange={(e) => handleCustomerChange(e.target.value)}
                         options={[
-                          { value: "", label: "Select" }, // Placeholder option
                           ...customers.map((customer) => ({
                             value: customer.account_id, // Use account_id as the value
                             label: customer.mobile, // Display mobile as the label
@@ -291,8 +290,16 @@ const URDPurchase = () => {
                   <Col xs={12} md={3}>
                     <InputField
                       label="Customer Name:"
-                      value={formData.account_name}
-                      onChange={(e) => handleChange("account_name", e.target.value)}
+                      name="account_name"
+                      type="select"
+                        value={formData.customer_id || ""} // Use customer_id to match selected value
+                        onChange={(e) => handleCustomerChange(e.target.value)}
+                        options={[
+                          ...customers.map((customer) => ({
+                            value: customer.account_id, // Use account_id as the value
+                            label: customer.account_name, // Display mobile as the label
+                          })),
+                        ]}
 
                     />
                   </Col>
