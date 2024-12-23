@@ -927,7 +927,7 @@ const FormWithTable = () => {
     Tag_ID: "",
     Prefix: "Gold",
     item_prefix: "",
-    Category: "Gold", // Set a default value for Category
+    Category: "", // Set a default value for Category
     Purity: "",
     purity: "",
     PCode_BarCode: "",
@@ -951,6 +951,8 @@ const FormWithTable = () => {
     product_name: "",
   });
 
+  
+
   const [editingIndex, setEditingIndex] = useState(null);
 
   const [showModal, setShowModal] = useState(false);
@@ -959,6 +961,16 @@ const FormWithTable = () => {
   const [openTagsEntries, setOpenTagsEntries] = useState([]);
   const navigate = useNavigate();
   const [isMaintainTagsChecked, setIsMaintainTagsChecked] = useState(false);
+
+
+
+  const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
+    setFormData({
+      ...formData,
+      Stones_Weight: totalWeight.toFixed(2),
+      Stones_Price: totalPrice.toFixed(2),
+    });
+  };
 
   const handleCheckboxChange = () => {
     setIsMaintainTagsChecked((prev) => {
@@ -1068,7 +1080,7 @@ const FormWithTable = () => {
 
     if (formData.Wastage_On === "Gross Weight") {
       wastageWeight = (grossWeight * wastagePercentage) / 100;
-      totalWeight = grossWeight + wastageWeight;
+      totalWeight = weightBW + wastageWeight;
     } else if (formData.Wastage_On === "Weight BW") {
       wastageWeight = (weightBW * wastagePercentage) / 100;
       totalWeight = weightBW + wastageWeight;
@@ -1127,82 +1139,14 @@ const FormWithTable = () => {
     handleMakingChargesCalculation();
   }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
 
-
-  const handleSave = async () => {
-    try {
-      const { product_name, Category, design_master, purity } = formData;
-  
-      // Check if the product exists
-      const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
-        product_name,
-        Category,
-        design_master,
-        purity,
-      });
-  
-      if (checkResponse.data.exists) {
-        alert('This product already exists.');
-        return;
-      }
-  
-      // Ensure Category and other fields are not empty
-      const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
-  
-      // Save product details, now including tax_slab_id
-      const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
-      const { product_id } = productResponse.data;
-  
-      // Append product_id to openTagsEntries
-      const entriesWithProductId = openTagsEntries.map((entry) => ({
-        ...entry,
-        product_id, // Append product_id to entries
-      }));
-  
-      // Save opening tag entries
-      const saveEntriesPromises = entriesWithProductId.map((entry) =>
-        axios.post(`${baseURL}/post/opening-tags-entry`, entry)
-      );
-  
-      await Promise.all(saveEntriesPromises);
-      alert("Data saved successfully!");
-  
-      // Reset the form fields
-      setFormData({
-        product_name: "",
-        rbarcode: "",
-        Category: "",
-        design_master: "",
-        purity: "",
-        item_prefix: "",
-        short_name: "",
-        sale_account_head: "",
-        purchase_account_head: "",
-        status: "",
-        tax_slab: "",
-        tax_slab_id: "", // Reset tax_slab_id
-        hsn_code: "",
-        op_qty: "",
-        op_value: "",
-        op_weight: "",
-        huid_no: "",
-      });
-  
-      // Clear the tag entries
-      setOpenTagsEntries([]);
-    } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Failed to save data. Please try again.");
-    }
-  };
-  
   const handleAddOpenTagEntry = (e) => {
     e.preventDefault();
-  
+
     const newEntry = {
       Pricing: formData.Pricing,
-      Tag_ID: formData.Tag_ID,
-      Prefix: formData.Prefix || "Gold",
-      Category: formData.Category,
+      // Tag_ID: formData.Tag_ID,
+      // Prefix: formData.Prefix || "Gold",
+      // Category: formData.Category,
       Purity: formData.Purity,
       PCode_BarCode: formData.PCode_BarCode,
       Gross_Weight: formData.Gross_Weight,
@@ -1213,33 +1157,33 @@ const FormWithTable = () => {
       Wastage_On: formData.Wastage_On,
       Wastage_Percentage: formData.Wastage_Percentage,
       status: formData.status || "Available",
-      Source: formData.Source|| "Tag Entry",
+      Source: formData.Source || "Tag Entry",
       Stock_Point: formData.Stock_Point,
       Weight_BW: formData.Weight_BW,
       TotalWeight_AW: formData.TotalWeight_AW,
       MC_Per_Gram: formData.MC_Per_Gram,
       Making_Charges_On: formData.Making_Charges_On,
       Making_Charges: formData.Making_Charges,
-      Design_Master: formData.Design_Master,
+      // Design_Master: formData.Design_Master,
     };
-  
+
     // Update the `op_qty` and `op_weight` fields
     setFormData((prev) => ({
       ...prev,
       op_qty: prev.op_qty + 1, // Increment op_qty
       op_weight: parseFloat(prev.op_weight || 0) + parseFloat(formData.Gross_Weight || 0), // Add Gross_Weight
     }));
-  
+
     // Add the new entry to the table
     setOpenTagsEntries((prev) => [...prev, newEntry]);
-  
+
     // Reset other form fields
     setFormData((prev) => ({
       ...prev,
       Pricing: "",
       Tag_ID: "",
       Prefix: "Gold",
-      Category: "Gold",
+      // Category: "Gold",
       Purity: "",
       PCode_BarCode: "",
       Gross_Weight: "",
@@ -1249,7 +1193,7 @@ const FormWithTable = () => {
       HUID_No: "",
       Wastage_On: "",
       Wastage_Percentage: "",
-      status: "",
+      status: "Avalible",
       Source: "",
       Stock_Point: "",
       Weight_BW: "",
@@ -1260,10 +1204,143 @@ const FormWithTable = () => {
       Design_Master: "",
     }));
   };
-  
+
+  const handleSave = async () => {
+    try {
+      const { product_name, Category, design_master, purity } = formData;
+
+      // Check if the product exists
+      const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
+        product_name,
+        Category,
+        design_master,
+        purity,
+      });
+
+      if (checkResponse.data.exists) {
+        alert('This product already exists.');
+        return;
+      }
+
+      // Ensure Category and other fields are not empty
+      const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
+
+      // Save product details, now including tax_slab_id
+      const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
+      const { product_id } = productResponse.data;
+
+      // Append product_id to openTagsEntries
+      const entriesWithProductId = openTagsEntries.map((entry) => ({
+        ...entry,
+        product_id,
+        product_Name: product_name, // Append product_id to entries
+      }));
+
+      // Save opening tag entries
+      const saveEntriesPromises = entriesWithProductId.map((entry) =>
+        axios.post(`${baseURL}/post/opening-tags-entry`, entry)
+      );
+
+      await Promise.all(saveEntriesPromises);
+      alert("Product added successfully!");
+
+      // Reset the form fields
+      setFormData({
+        product_name: "",
+        rbarcode: "",
+        Category: "",
+        design_master: "",
+        purity: "",
+        item_prefix: "",
+        short_name: "",
+        sale_account_head: "Sale",
+        purchase_account_head: "Purchase",
+        status: "",
+        tax_slab: "",
+        tax_slab_id: "", // Reset tax_slab_id
+        hsn_code: "",
+        op_qty: "0",
+        op_value: "",
+        op_weight: "0",
+        huid_no: "",
+      });
+
+      // Clear the tag entries
+      setOpenTagsEntries([]);
+      // Refresh the window
+      window.location.reload();
+      // Reset the checkbox state
+      setIsMaintainTagsChecked(false); // Reset checkbox
+    } catch (error) {
+      console.error("Error saving data:", error);
+      alert("Failed to save data. Please try again.");
+    }
+  };
+
+
+
   const handleBack = () => {
     navigate("/itemmastertable");
   };
+
+  const [metalOptions, setmetalOptions] = useState([]);
+  const [designOptions, setdesignOptions] = useState([]);
+  const [dropdownOptions, setDropdownOptions] = useState([]);
+
+  // Fetch metal types from the API
+  useEffect(() => {
+    const fetchMetalTypes = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/metaltype`);
+        const metalTypes = response.data.map(item => ({
+          value: item.metal_name, // Assuming the column name is "metal_name"
+          label: item.metal_name
+        }));
+        setmetalOptions(metalTypes);
+      } catch (error) {
+        console.error('Error fetching metal types:', error);
+      }
+    };
+
+    fetchMetalTypes();
+  }, []);
+
+  // Fetch design master options from the API
+  useEffect(() => {
+    const fetchDesignMaster = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/designmaster`);
+        const designMasters = response.data.map((item) => ({
+          value: item.design_name, // Assuming the column name is "design_name"
+          label: item.design_name,
+        }));
+        setdesignOptions(designMasters);
+      } catch (error) {
+        console.error('Error fetching design masters:', error);
+      }
+    };
+
+    fetchDesignMaster();
+  }, []);
+
+  // Fetch purity options from the API
+  useEffect(() => {
+    const fetchPurity = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+        const purityOptions = response.data.map((item) => ({
+          value: item.name, // Assuming the column name is "name"
+          label: item.name,
+        }));
+        setDropdownOptions(purityOptions);
+      } catch (error) {
+        console.error('Error fetching purity options:', error);
+      }
+    };
+
+    fetchPurity();
+  }, []);
+
 
   return (
     <div style={{ paddingTop: "90px" }}>
@@ -1292,43 +1369,32 @@ const FormWithTable = () => {
                   name="rbarcode"
                   value={formData.rbarcode}
                   onChange={handleChange}
+                  disabled
                 />
+
                 <InputField
-                  label="Categories:"
+                  label="Metal Type:"
                   name="Category"
                   type="select"
                   value={formData.Category}
                   onChange={handleChange}
-                  options={[
-                    { value: "Jewellery", label: "Jewellery" },
-                    { value: "Gold", label: "Gold" },
-                    { value: "Silver", label: "Silver" },
-                  ]}
+                  options={metalOptions}
                 />
                 <InputField
-
                   label="Design Master:"
                   name="design_master"
                   type="select"
                   value={formData.design_master}
                   onChange={handleChange}
-                  options={[
-                    { value: "Priyanka", label: "Priyanka" },
-                    { value: "Soundarya", label: "Soundarya" },
-                    { value: "gopi chain", label: "gopi chain" },
-                  ]}
+                  options={designOptions}
                 />
                 <InputField
                   label="Purity:"
-                  type="select"
                   name="purity"
+                  type="select"
                   value={formData.purity}
                   onChange={handleChange}
-                  options={[
-                    { value: "91.6HM", label: "91.6HM" },
-                    { value: "22K", label: "22K" },
-                    { value: "18K", label: "18K" },
-                  ]}
+                  options={dropdownOptions}
                 />
                 <InputField
                   label="Item Prefix:"
@@ -1396,17 +1462,17 @@ const FormWithTable = () => {
             {/* maintain tags section */}
             <div className="form-container" style={{ marginTop: "15px" }}>
               {/* Maintain Tags Section */}
-              <div className="main-tags-row" style={{ marginBottom: "15px" }}>
+              <div className="main-tags-row" style={{ marginBottom: "0px",display:"flex" }}>
                 <input
                   type="checkbox"
                   id="main-tags"
                   name="maintain_tags"
-                  style={{ width: "35px" }}
+                  style={{ width: "15px",marginTop:"-15px" }}
                   checked={isMaintainTagsChecked}
                   onChange={handleCheckboxChange}
                   value={formData.maintain_tags}
                 />
-                <label htmlFor="main-tags">
+                <label htmlFor="main-tags" style={{marginLeft:"10px"}}>
                   <h4>Maintain Tags</h4>
                 </label>
               </div>
@@ -1521,14 +1587,13 @@ const FormWithTable = () => {
                   value={formData.Stones_Weight}
                   onChange={handleChange}
                   readOnly={!isMaintainTagsChecked}
-                  style={openingTagsStyle}
                 />
                 <button
                   type="button"
-                  style={{ backgroundColor: '#a36e29' }}
+                  style={{ backgroundColor: "#a36e29" }}
                   className="stone-details-btn"
                   onClick={handleOpenModal}
-                  readOnly={!isMaintainTagsChecked}
+                  disabled={!isMaintainTagsChecked}
                 >
                   Stone Details
                 </button>
@@ -1538,7 +1603,6 @@ const FormWithTable = () => {
                   value={formData.Stones_Price}
                   onChange={handleChange}
                   readOnly={!isMaintainTagsChecked}
-                  style={openingTagsStyle}
                 />
                 <InputField
                   label="Weight BW:"
@@ -1657,24 +1721,7 @@ const FormWithTable = () => {
 
             </form>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-              <button
-                type="button"
-                className="cus-back-btn"
-                variant="secondary"
-                onClick={handleBack}
-                style={{ backgroundColor: 'gray', marginRight: '10px' }}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary"
-                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-                onClick={handleSave}
-              >
-                Save
-              </button>
-            </div>
+
 
 
             {/* table Section */}
@@ -1713,10 +1760,28 @@ const FormWithTable = () => {
                 </tbody>
               </table>
             </div>
-
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+              <button
+                type="button"
+                className="cus-back-btn"
+                variant="secondary"
+                onClick={handleBack}
+                style={{ backgroundColor: 'gray', marginRight: '10px' }}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+                onClick={handleSave}
+              >
+                Save
+              </button>
+            </div>
             <StoneDetailsModal
               showModal={showModal}
               handleCloseModal={handleCloseModal}
+              handleUpdateStoneDetails={handleUpdateStoneDetails}
             />
           </div>
         </div>

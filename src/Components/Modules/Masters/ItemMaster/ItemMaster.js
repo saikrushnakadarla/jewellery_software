@@ -10,7 +10,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 const FormWithTable = () => {
   const [formData, setFormData] = useState({
     product_id: "",
-    Pricing: "",
+    Pricing: "By Weight",
     rbarcode: "",
     design_master: "",
     short_name: "",
@@ -48,9 +48,12 @@ const FormWithTable = () => {
     Making_Charges: "",
     Design_Master: "gold",
     product_name: "",
+    selling_price: "",
+    making_on : "",
+    dropdown : ""
   });
 
-  
+
 
   const [editingIndex, setEditingIndex] = useState(null);
 
@@ -61,8 +64,10 @@ const FormWithTable = () => {
   const navigate = useNavigate();
   const [isMaintainTagsChecked, setIsMaintainTagsChecked] = useState(false);
 
+  const [isSellingPriceDisabled, setIsSellingPriceDisabled] = useState(false);
+  const [areOtherFieldsDisabled, setAreOtherFieldsDisabled] = useState(false);
 
-
+  const isByFixedSelected = formData.Pricing === "By Fixed";
   const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
     setFormData({
       ...formData,
@@ -93,6 +98,19 @@ const FormWithTable = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    if (name === "Pricing") {
+      if (value === "By Weight") {
+        setIsSellingPriceDisabled(true);
+        setAreOtherFieldsDisabled(false);
+      } else if (value === "By Fixed") {
+        setIsSellingPriceDisabled(false);
+        setAreOtherFieldsDisabled(true);
+      } else {
+        setIsSellingPriceDisabled(false);
+        setAreOtherFieldsDisabled(false);
+      }
+    }
+
     if (name === "tax_slab") {
       // Fetch the TaxSlabID based on the selected TaxSlab name
       const selectedTaxSlab = taxOptions.find((option) => option.value === value);
@@ -120,6 +138,7 @@ const FormWithTable = () => {
     setFormData(entryToEdit); // Populate the form with the selected entry
     setEditingIndex(index); // Save the index for the update operation
   };
+
 
   const handleUpdateOpenTagEntry = (e) => {
     e.preventDefault();
@@ -246,7 +265,7 @@ const FormWithTable = () => {
       // Tag_ID: formData.Tag_ID,
       // Prefix: formData.Prefix || "Gold",
       // Category: formData.Category,
-      Purity: formData.Purity,
+      // Purity: formData.Purity,
       PCode_BarCode: formData.PCode_BarCode,
       Gross_Weight: formData.Gross_Weight,
       Stones_Weight: formData.Stones_Weight,
@@ -264,6 +283,9 @@ const FormWithTable = () => {
       Making_Charges_On: formData.Making_Charges_On,
       Making_Charges: formData.Making_Charges,
       // Design_Master: formData.Design_Master,
+      dropdown: formData.dropdown,
+      making_on: formData.making_on,
+      selling_price: formData.selling_price,
     };
 
     // Update the `op_qty` and `op_weight` fields
@@ -441,6 +463,8 @@ const FormWithTable = () => {
   }, []);
 
 
+
+
   return (
     <div style={{ paddingTop: "90px" }}>
       <div className="container mt-4">
@@ -561,17 +585,17 @@ const FormWithTable = () => {
             {/* maintain tags section */}
             <div className="form-container" style={{ marginTop: "15px" }}>
               {/* Maintain Tags Section */}
-              <div className="main-tags-row" style={{ marginBottom: "0px",display:"flex" }}>
+              <div className="main-tags-row" style={{ marginBottom: "0px", display: "flex" }}>
                 <input
                   type="checkbox"
                   id="main-tags"
                   name="maintain_tags"
-                  style={{ width: "15px",marginTop:"-15px" }}
+                  style={{ width: "15px", marginTop: "-15px" }}
                   checked={isMaintainTagsChecked}
                   onChange={handleCheckboxChange}
                   value={formData.maintain_tags}
                 />
-                <label htmlFor="main-tags" style={{marginLeft:"10px"}}>
+                <label htmlFor="main-tags" style={{ marginLeft: "10px" }}>
                   <h4>Maintain Tags</h4>
                 </label>
               </div>
@@ -630,8 +654,9 @@ const FormWithTable = () => {
                     { value: "By Fixed", label: "By Fixed" },
                   ]}
                   readOnly={!isMaintainTagsChecked}
-                  style={openingTagsStyle}
                 />
+
+
                 {/* <InputField
                   label="Tag ID:"
                   name="Tag_ID"
@@ -647,7 +672,7 @@ const FormWithTable = () => {
                   readOnly
                   style={openingTagsStyle}
                 /> */}
-                <InputField
+                {/* <InputField
                   label="Purity:"
                   type="select"
                   name="Purity"
@@ -660,24 +685,22 @@ const FormWithTable = () => {
                   ]}
                   readOnly={!isMaintainTagsChecked}
                   style={openingTagsStyle}
-                />
+                /> */}
                 <InputField
                   label="PCode/BarCode:"
                   name="PCode_BarCode"
                   type="text"
                   value={formData.PCode_BarCode}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
-              </div>
-              <div className="form-row">
                 <InputField
                   label="Gross Weight:"
                   name="Gross_Weight"
                   value={formData.Gross_Weight}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
                 <InputField
@@ -685,14 +708,14 @@ const FormWithTable = () => {
                   name="Stones_Weight"
                   value={formData.Stones_Weight}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                 />
                 <button
                   type="button"
                   style={{ backgroundColor: "#a36e29" }}
                   className="stone-details-btn"
                   onClick={handleOpenModal}
-                  disabled={!isMaintainTagsChecked}
+                  disabled={isByFixedSelected || !isMaintainTagsChecked}
                 >
                   Stone Details
                 </button>
@@ -701,14 +724,18 @@ const FormWithTable = () => {
                   name="Stones_Price"
                   value={formData.Stones_Price}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                 />
+              </div>
+              <div className="form-row">
+
+
                 <InputField
-                  label="Weight BW:"
+                  label="Net Weight:"
                   name="Weight_BW"
                   value={formData.Weight_BW}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
                 <InputField
@@ -716,18 +743,59 @@ const FormWithTable = () => {
                   name="HUID_No"
                   value={formData.HUID_No}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
+                />
+                <InputField
+                  label="Making On:"
+                  type="select"
+                  name="making_on"
+                  value={formData.making_on}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  options={[
+                    { value: "Gross Weight", label: "Gross Weight" },
+                    { value: "Net Weight", label: "Net Weight" },
+                  ]}
+                />
+                <InputField
+                  label="dropdown:"
+                  type="select"
+                  name="dropdown"
+                  value={formData.dropdown}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  options={[
+                    { value: "pc cost(fixed)", label: "pc cost(fixed)" },
+                    { value: "percentage", label: "percentage" },
+                    { value: "pergram", label: "pergram" },
+                  ]}
+                />
+                <InputField
+                  label="Making Charges On:"
+                  type="select"
+                  value={formData.Making_Charges_On}
+                  onChange={handleChange}
+                  name="Making_Charges_On"
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  options={[
+                    { value: "By Weight", label: "By Weight" },
+                    { value: "Fixed", label: "Fixed" },
+                  ]}
                 />
               </div>
               <div className="form-row" style={{ marginBottom: '-20px' }}>
+
                 <InputField
                   label="Wastage On:"
                   type="select"
                   name="Wastage_On"
                   value={formData.Wastage_On}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                   options={[
                     { value: "Gross Weight", label: "Gross Weight" },
@@ -738,7 +806,7 @@ const FormWithTable = () => {
                   label="Wastage %:"
                   value={formData.Wastage_Percentage}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                   name="Wastage_Percentage"
                 />
@@ -747,7 +815,7 @@ const FormWithTable = () => {
                   name="WastageWeight"
                   value={formData.WastageWeight}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
                 <InputField
@@ -755,28 +823,16 @@ const FormWithTable = () => {
                   name="TotalWeight_AW"
                   value={formData.TotalWeight_AW}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
-                <InputField
-                  label="Making Charges On:"
-                  type="select"
-                  value={formData.Making_Charges_On}
-                  onChange={handleChange}
-                  name="Making_Charges_On"
-                  readOnly={!isMaintainTagsChecked}
-                  style={openingTagsStyle}
-                  options={[
-                    { value: "By Weight", label: "By Weight" },
-                    { value: "Fixed", label: "Fixed" },
-                  ]}
-                />
+
                 <InputField
                   label="Mc Per Gram:"
                   name="MC_Per_Gram"
                   value={formData.MC_Per_Gram}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
                 <InputField
@@ -784,7 +840,7 @@ const FormWithTable = () => {
                   name="Making_Charges"
                   value={formData.Making_Charges}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
                 <InputField
@@ -793,12 +849,21 @@ const FormWithTable = () => {
                   name="Stock_Point"
                   value={formData.Stock_Point}
                   onChange={handleChange}
-                  readOnly={!isMaintainTagsChecked}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                   options={[
-                    { value: "Main Store", label: "Main Store" },
-                    { value: "Secondary Store", label: "Secondary Store" },
+                    { value: "Floor1", label: "Floor1" },
+                    { value: "Floor2", label: "Floor2" },
+                    { value: "strong room", label: "strong room" },
                   ]}
+                />
+                <InputField
+                  label="Selling price:"
+                  value={formData.selling_price}
+                  onChange={handleChange}
+                  readOnly={!isMaintainTagsChecked || !isByFixedSelected}
+                  style={openingTagsStyle}
+                  name="selling_price"
                 />
               </div>
               <button
