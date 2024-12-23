@@ -240,7 +240,7 @@
 
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef  } from "react";
 import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
 import { FaEdit, FaTrash } from "react-icons/fa";
@@ -271,6 +271,8 @@ function Purity() {
     cut_issue: "",
     skin_print: "",
   });
+  const formRef = useRef(null); // Create a reference for the form
+  const containerRef = useRef(null); // Create a reference for the container
 
   const [submittedData, setSubmittedData] = useState([]); // Store fetched and submitted form entries
   const [editMode, setEditMode] = useState(false); // Toggle between add and edit modes
@@ -466,6 +468,10 @@ function Purity() {
     setEditId(row.purity_id); // Set the ID of the record being edited
     setFormData({ ...row }); // Pre-fill the form with the selected record's data
     setErrors({}); // Clear any previous errors
+    
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
 
   };
 
@@ -576,7 +582,7 @@ function Purity() {
         <h3 style={{ textAlign: "center", marginBottom: "30px" }}>
           {editMode ? "Edit Purity" : "Add Purity"}
         </h3>
-        <form className="customer-master-form" onSubmit={handleSubmit}>
+        <form  ref={formRef} className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
             {/* <InputField

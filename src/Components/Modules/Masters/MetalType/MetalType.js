@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import InputField from "../../../Pages/InputField/InputField";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Reusable table component
 import { FaEdit, FaTrash } from "react-icons/fa";
@@ -19,7 +19,8 @@ function MetalType() {
   const [submittedData, setSubmittedData] = useState([]); // Store submitted form entries
   const [editing, setEditing] = useState(null); // Track whether we're editing a record
   const [errors, setErrors] = useState({}); // State for tracking validation errors
-
+  const formRef = useRef(null); // Create a reference for the form
+  const containerRef = useRef(null); // Create a reference for the container
 
   // Fetch data from the backend API when the component mounts
   useEffect(() => {
@@ -35,19 +36,19 @@ function MetalType() {
     fetchData();
   }, []);
 
-   // Validation functions
-   const validateMetalName = (value) => /^[A-Za-z\s]+$/.test(value);
+  // Validation functions
+  const validateMetalName = (value) => /^[A-Za-z\s]+$/.test(value);
   //  const validateItemType = (value) => value.trim() !== ""; 
-   const validateDescription = (value) => value.trim() !== "";
-   const validatePurity = (value) => /^[0-9.]+$/.test(value);
- 
+  const validateDescription = (value) => value.trim() !== "";
+  const validatePurity = (value) => /^[0-9.]+$/.test(value);
 
-   const handleChange = (e) => {
+
+  const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     // Initialize a variable to store validation error
     let error = "";
-  
+
     // Validate specific fields based on the input's name
     if (name === "metal_name" && !validateMetalName(value)) {
       error = "Metal type should contain only alphabets.";
@@ -62,7 +63,7 @@ function MetalType() {
     } else if (name === "default_issue_purity" && !validatePurity(value)) {
       error = "Issue Purity should be selected.";
     }
-  
+
     // Update formData and errors state
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: error });
@@ -71,41 +72,38 @@ function MetalType() {
 
   const validateForm = () => {
     const formErrors = {};
-  
+
     // Validate Metal Name
     if (!validateMetalName(formData.metal_name)) {
       formErrors.metal_name = "Metal Name should contain only alphabets.";
     }
-     
+
     // if (!validateItemType(formData.item_type)) {
     //   formErrors.item_type = "Item Type should contain only alphabets.";
     // }
-  
+
     // Validate Description
     if (!validateDescription(formData.description)) {
       formErrors.description = "Description is required.";
     }
-  
+
     // Validate Purity Fields
     ["default_purity", "default_purity_for_rate_entry", "default_purity_for_old_metal", "default_issue_purity"].forEach((field) => {
       if (!validatePurity(formData[field])) {
         formErrors[field] = "Purity should be a valid number.";
       }
     });
-  
+
     // Set errors in state
     setErrors(formErrors);
-  
+
     // Return true if no errors, otherwise false
     return Object.keys(formErrors).length === 0;
   };
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-
-
       // if (!validateForm()) {
       //   return; 
       // }
@@ -168,6 +166,10 @@ function MetalType() {
     const itemToEdit = submittedData.find((item) => item.metal_type_id === id);
     setFormData({ ...itemToEdit });
     setEditing(id); // Set the current ID to editing state
+
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
   };
 
   const columns = React.useMemo(
@@ -228,7 +230,7 @@ function MetalType() {
     <div className="main-container">
       <div className="customer-master-container">
         <h3 style={{ textAlign: 'center', marginBottom: '30px' }}>Metal Type</h3>
-        <form className="customer-master-form" onSubmit={handleSubmit}>
+        <form ref={formRef} className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
             <InputField
@@ -239,7 +241,7 @@ function MetalType() {
               required={true}
               error={errors.metal_name}
             />
-        
+
 
             {/* <InputField
               label="Item Type:"
@@ -257,7 +259,7 @@ function MetalType() {
               required={true}
               error={errors.description}
             />
-            {errors.description && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.description}</p>}
+            {errors.description && <p style={{ color: 'red', fontSize: '15px' }} className="error-message">{errors.description}</p>}
 
             <InputField
               label="Default Purity:"
@@ -275,7 +277,7 @@ function MetalType() {
 
             />
           </div>
-          {errors.default_purity && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.default_purity}</p>}
+          {errors.default_purity && <p style={{ color: 'red', fontSize: '15px' }} className="error-message">{errors.default_purity}</p>}
 
 
           {/* Row 2 */}
@@ -295,7 +297,7 @@ function MetalType() {
               error={errors.default_purity_for_rate_entry}
 
             />
-            {errors.default_purity_for_rate_entry && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.default_purity_for_rate_entry}</p>}
+            {errors.default_purity_for_rate_entry && <p style={{ color: 'red', fontSize: '15px' }} className="error-message">{errors.default_purity_for_rate_entry}</p>}
 
             <InputField
               label="Default Purity for Old Metal:"
@@ -325,7 +327,7 @@ function MetalType() {
               error={errors.default_purity_for_old_metal}
 
             />
-            {errors.default_purity_for_old_metal && <p style={{color:'red', fontSize:'15px'}}  className="error-message">{errors.default_purity_for_old_metal}</p>}
+            {errors.default_purity_for_old_metal && <p style={{ color: 'red', fontSize: '15px' }} className="error-message">{errors.default_purity_for_old_metal}</p>}
 
           </div>
 
