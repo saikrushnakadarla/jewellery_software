@@ -76,12 +76,9 @@ const URDPurchase = () => {
 
   const [tableData, setTableData] = useState([]);
 
-
-
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-
 
   const handleAdd = () => {
     setTableData((prev) => [...prev, formData]);
@@ -133,7 +130,7 @@ const URDPurchase = () => {
         tableData,
       };
 
-      const response = await axios.post("http://localhost:5000/post/purchase", dataToSave);
+      const response = await axios.post(`${baseURL}/post/purchase`, dataToSave);
 
       if (response.status === 201) {
         alert(response.data.message);

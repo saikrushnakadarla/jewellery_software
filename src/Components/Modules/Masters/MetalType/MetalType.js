@@ -105,10 +105,10 @@ function MetalType() {
     e.preventDefault();
 
 
-      // Validate form before submitting
-      if (!validateForm()) {
-        return; // Stop if there are validation errors
-      }
+
+      // if (!validateForm()) {
+      //   return; 
+      // }
 
     try {
       if (editing) {
@@ -265,7 +265,7 @@ function MetalType() {
               type="select"
               value={formData.default_purity}
               onChange={handleChange}
-              required={true}
+              // required={true}
               options={[
                 { value: '99.9', label: '99.9%' },
                 { value: '99.5', label: '99.5%' },
@@ -286,7 +286,7 @@ function MetalType() {
               type="select"
               value={formData.default_purity_for_rate_entry}
               onChange={handleChange}
-              required={true}
+              // required={true}
               options={[
                 { value: '99.9', label: '99.9%' },
                 { value: '99.5', label: '99.5%' },
@@ -303,7 +303,7 @@ function MetalType() {
               type="select"
               value={formData.default_purity_for_old_metal}
               onChange={handleChange}
-              required={true}
+              // required={true}
               options={[
                 { value: '99.9', label: '99.9%' },
                 { value: '99.5', label: '99.5%' },
@@ -316,7 +316,7 @@ function MetalType() {
               type="select"
               value={formData.default_issue_purity}
               onChange={handleChange}
-              required={true}
+              // required={true}
               options={[
                 { value: '99.9', label: '99.9%' },
                 { value: '99.5', label: '99.5%' },

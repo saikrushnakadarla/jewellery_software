@@ -4,6 +4,7 @@ import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reu
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 import './PurchaseTable.css';
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const PurchaseTable = () => {
   const navigate = useNavigate();
@@ -71,11 +72,10 @@ const PurchaseTable = () => {
     []
   );
   
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/get/purchases`); // Fetch data from the endpoint
+        const response = await fetch(`${baseURL}/get/purchases`); // Fetch data from the endpoint
         const result = await response.json();
         if (result?.purchases) {
           setData(result.purchases); // Set fetched data
