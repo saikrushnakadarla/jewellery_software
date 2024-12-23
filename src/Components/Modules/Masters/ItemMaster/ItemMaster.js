@@ -16,7 +16,7 @@ const FormWithTable = () => {
     short_name: "",
     sale_account_head: "Sales",
     purchase_account_head: "Purchase",
-    tax_slab: "",
+    tax_slab: "03% GST",
     tax_slab_id: "",
     hsn_code: "",
     op_qty: 0,
