@@ -38,6 +38,7 @@ import DesignMaster from './Components/Modules/Masters/DesignMaster/DesignMaster
 import Purity from './Components/Modules/Masters/Purity/Purity';
 import Rates from './Components/Modules/Masters/Rates/Rates';
 import RatesData from './Components/Modules/Masters/RatesData/RatesData';
+import Company_Info from './Components/Modules/Masters/CompanyInfo/CompanyInfo';
 import SalesTable from './Components/Modules/Transactions/Sales/SalesTable';
 import URDPurchasetable from './Components/Modules/Transactions/URDPurchase/URDPurchasetable';
 import PurityTable from './Components/Modules/Masters/Purity/PurityTable';
@@ -95,6 +96,7 @@ function App() {
         <Route path="/purity" element={<Purity />}/>
         <Route path="/rates" element={<Rates />}/>
         <Route path="/ratesdata" element={<RatesData />}/>
+        <Route path="/company_info" element={<Company_Info />}/>
         <Route path="/designmaster" element={<DesignMaster />}/>
         {/* <Route path="/suppliereditform/:id" element={<SupplierEditForm />}/> */}
         <Route path="/salestable" element={<SalesTable />} />
