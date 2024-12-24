@@ -10,6 +10,17 @@ const PurchaseTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store table data
 
+  const formatDate = (date) => {
+    if (!date) return ''; // Return an empty string if no date is provided
+  
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');  // Pad single digit days with 0
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Pad months with 0
+    const year = d.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  };
+
   const columns = React.useMemo(
     () => [
       { Header: 'Name', accessor: 'account_name' },
@@ -28,9 +39,9 @@ const PurchaseTable = () => {
       // { Header: 'Bill No:', accessor: 'bill_no' },
       // { Header: 'Type', accessor: 'type' },
       // { Header: 'Rate Cut', accessor: 'rate_cut' },
-      { Header: 'Date', accessor: 'date' },
-      { Header: 'Bill Date:', accessor: 'bill_date' },
-      { Header: 'Due Date', accessor: 'due_date' },
+      { Header: 'Date', accessor: 'date',Cell: ({ value }) => <span>{formatDate(value)}</span>, },
+      { Header: 'Bill Date:', accessor: 'bill_date',Cell: ({ value }) => <span>{formatDate(value)}</span>, },
+      { Header: 'Due Date', accessor: 'due_date',Cell: ({ value }) => <span>{formatDate(value)}</span>, },
       // { Header: 'Purchase Rate', accessor: 'Purchase_rate' },
       // { Header: 'Product ID', accessor: 'product_id' },
       { Header: 'Product Name', accessor: 'product_name' },
