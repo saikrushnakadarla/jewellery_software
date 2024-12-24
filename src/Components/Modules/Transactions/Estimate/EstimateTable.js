@@ -1,165 +1,256 @@
 import React, { useEffect, useState } from 'react';
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
+import DataTable from '../../../Pages/InputField/TableLayout'; // Import the DataTable component
+import baseURL from "../../../../Url/NodeBaseURL";
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
-import { FaEdit, FaTrash } from 'react-icons/fa';
-import { Button, Row, Col } from 'react-bootstrap';
-import './EstimateTable.css';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store table data
+  const [loading, setLoading] = useState(true); // Loading state
+    const [repairDetails, setRepairDetails] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-unique-estimates`);
+        
+        // Filter the data based on the 'transaction_status' column
+        const filteredData = response.data
+        
+        setData(filteredData); // Set the filtered data
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching repair details:', error);
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, []);
 
+  const formatDate = (date) => {
+    if (!date) return ''; // Return an empty string if no date is provided
+  
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');  // Pad single digit days with 0
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Pad months with 0
+    const year = d.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  };
+
+
+  // Define columns for the table
   const columns = React.useMemo(
     () => [
       {
-        Header: 'ID',
-        accessor: 'product_id',
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
-        
+
       {
-        Header: 'Product Code',
-        accessor: 'pcode',
+        Header: 'Date',
+        accessor: 'date',
+        Cell: ({ value }) => {
+          const date = new Date(value);
+          return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
+        },
       },
+      {
+        Header: 'Estimate Number',
+        accessor: 'estimate_number',
+      },
+
       {
         Header: 'Product Name',
         accessor: 'product_name',
       },
       {
-        Header: 'Gross Weight',
-        accessor: 'gross_weight',
+        Header: 'Total Amount',
+        accessor: 'total_amount',
       },
+
+      // {
+      //   Header: 'Gross Weight',
+      //   accessor: 'gross_weight',
+      // },
+      // {
+      //   Header: 'Stone Weight',
+      //   accessor: 'stones_weight',
+      // },
+      // {
+      //   Header: 'Stone Price',
+      //   accessor: 'stones_price',
+      // },
+      // {
+      //   Header: 'Wastage Percent',
+      //   accessor: 'wastage_percent',
+      // },
+      // {
+      //   Header: 'Wastage Weight',
+      //   accessor: 'wastage_weight',
+      // },
+      // {
+      //   Header: 'Net Weight',
+      //   accessor: 'total_weight',
+      // },
+      // {
+      //   Header: 'MC Per Gram',
+      //   accessor: 'mc_per_gram',
+      // },
+      // {
+      //   Header: 'Total MC',
+      //   accessor: 'total_mc',
+      // },
+      // {
+      //   Header: 'Tax Percent',
+      //   accessor: 'tax_percent',
+      // },
+      // {
+      //   Header: 'Tax VAT Amount',
+      //   accessor: 'tax_vat_amount',
+      // },
+      // {
+      //   Header: 'Total Rs',
+      //   accessor: 'total_rs',
+      // },
       {
-        Header: 'Stone Weight',
-        accessor: 'stones_weight',
-      },
-      {
-        Header: 'Stone Price',
-        accessor: 'stones_price',
-      },
-      {
-        Header: 'Weight WW',
-        accessor: 'weight_ww',
-      },
-      {
-        Header: 'Wastage Percent',
-        accessor: 'wastage_percent',
-      },
-      {
-        Header: 'Wastage',
-        accessor: 'wastage',
-      },
-      {
-        Header: 'Net Weight',
-        accessor: 'nett_weight',
-      },
-      {
-        Header: 'Rate Average',
-        accessor: 'rate_av',
-      },
-      {
-        Header: 'Rate (10g)',
-        accessor: 'rate_10g',
-      },
-      {
-        Header: 'Rate (1g)',
-        accessor: 'rate_1g',
-      },
-      {
-        Header: 'MC Per Gram',
-        accessor: 'mc_per_gram',
-      },
-      {
-        Header: 'Total Before Tax',
-        accessor: 'total_b4_tax',
-      },
-      {
-        Header: 'Total MC',
-        accessor: 'total_mc',
-      },
-      {
-        Header: 'Tax Percent',
-        accessor: 'tax_percent',
-      },
-      {
-        Header: 'Tax VAT Amount',
-        accessor: 'tax_vat_amount',
-      },
-      {
-        Header: 'Total Rs',
-        accessor: 'total_rs',
-      },
-      {
-        Header: 'Action',
+        Header: 'Actions',
+        accessor: 'actions',
         Cell: ({ row }) => (
-            <div className="d-flex align-items-center">
-              <button
-                className="action-button edit-button"
-                onClick={() => navigate(`/estimates/${row.original.product_id}`)}
-              >
-                <FaEdit />
-              </button>
-              <button
-                className="action-button delete-button"
-                onClick={() => handleDelete(row.original.product_id)}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          ),
-          
+          <div>
+            <FaEye
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
+              onClick={() => handleViewDetails(row.original.estimate_number)} // Pass estimate_number
+            />
+          </div>
+        ),
       },
-      
     ],
     []
   );
 
-  useEffect(() => {
-    fetch('http://localhost:4000/get-estimates')
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data); // Set the fetched data to state
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }, []);
+    const handleViewDetails = async (estimate_number) => {
+      try {
+        const response = await axios.get(`${baseURL}/get-estimates/${estimate_number}`);
+        setRepairDetails(response.data);
+        setShowModal(true); // Show the modal with repair details
+      } catch (error) {
+        console.error('Error fetching repair details:', error);
+      }
+    };
+  
+    // Close the modal
+    const handleCloseModal = () => {
+      setShowModal(false);
+      setRepairDetails(null); // Clear repair details on modal close
+    };
 
-  const handleDelete = (product_id) => {
-    if (window.confirm('Are you sure you want to delete this estimate?')) {
-      fetch(`http://localhost:4000/delete-estimate/${product_id}`, {
-        method: 'DELETE',
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data.message); // Success message
-          // Refresh data after deletion
-          setData((prevData) => prevData.filter((item) => item.product_id !== product_id));
-        })
-        .catch((error) => {
-          console.error('Error deleting record:', error);
-          alert('Failed to delete estimate. Please try again.');
-        });
-    }
-  };
-
-  const handleCreate = () => {
-    navigate('/estimates'); // Navigate to the /estimates page
-  };
+    const handleCreate = () => {
+      navigate('/estimates'); // Navigate to the /suppliers page
+    };
 
   return (
-    <>
-      {/* <div className="estimates-table-container"> */}
-        {/* <Row className="mb-3">
+    <div className="main-container">
+      <div className="sales-table-container">
+        <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Estimates</h3>
-            <Button variant="success" onClick={handleCreate}>
+            <Button  className='create_but' onClick={handleCreate} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
               + Create
             </Button>
           </Col>
-        </Row> */}
-        <DataTable columns={columns} data={data} />
-      {/* </div> */}
-      </>
+        </Row>
+        {loading ? (
+          <p>Loading...</p> // Show loading message while fetching data
+        ) : (
+          <DataTable columns={columns} data={[...data].reverse()} /> // Render the table
+        )}
+      </div>
+
+      <Modal show={showModal} onHide={handleCloseModal} size="xl" className='m-auto'>
+        <Modal.Header closeButton>
+          <Modal.Title>Estimate Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {repairDetails && (
+            <>             
+              <Table bordered>
+                <tbody>
+                <tr>
+                  <td>Date</td>
+                  <td>{formatDate(repairDetails.uniqueData.date)}</td>
+                </tr>
+                  <tr>
+                    <td>Invoice Number</td>
+                    <td>{repairDetails.uniqueData.estimate_number}</td>
+                  </tr>    
+                  <tr>
+                    <td>Total Amount</td>
+                    <td>{repairDetails.uniqueData.total_amount}</td>
+                  </tr>               
+                </tbody>
+              </Table>
+
+              <h5>Products</h5>
+              <Table bordered>
+              <thead>
+              <tr>
+                <th>RbarCode/BarCode</th>
+                <th>Product Name</th>
+                <th>Metal Type</th>
+                <th>Design Name</th>
+                <th>Purity</th>
+                <th>Gross Weight</th>
+                <th>Stone Weight</th>
+                <th>Wastage Weight</th>
+                <th>Total Weight</th>
+                <th>Making Charges</th>
+                <th>Rate</th>
+                <th>Tax Amount</th>
+                <th>Total Price</th>
+              </tr>
+                </thead>
+                <tbody>
+                {repairDetails.repeatedData.map((product, index) => (
+
+                <tr key={index}>
+                  <td>{product.code}</td>
+                  <td>{product.product_name}</td>
+                  <td>{product.metal_type}</td>
+                  <td>{product.design_master}</td>
+                  <td>{product.purity}</td>
+                  <td>{product.gross_weight}</td>
+                  <td>{product.stones_weight}</td>  
+                  <td>{product.wastage_weight}</td>
+                  <td>{product.total_weight}</td>
+                  <td>{product.total_mc}</td>
+                  <td>{product.rate}</td>
+                  <td>{product.tax_vat_amount}</td>
+                  <td>{product.total_rs}</td>                
+                </tr>
+
+                ))}
+               <tr style={{fontWeight:'bold'}}>
+                  <td colSpan="12" className="text-end">Total Amount</td>
+                  <td>{repairDetails.uniqueData.total_amount}</td>
+                </tr> 
+                </tbody>
+                
+              </Table>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
   );
 };
 

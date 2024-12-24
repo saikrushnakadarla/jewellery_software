@@ -35,7 +35,7 @@ const RepairsTable = () => {
       },
       {
         Header: 'Purchase No',
-        accessor: 'purchase_no',
+        accessor: 'urdpurchase_number',
       },
       {
         Header: 'Product Name',
@@ -103,7 +103,7 @@ const RepairsTable = () => {
             gst_in: purchase.gst_in,
             pan_card: purchase.pan_card,
             date: formatDate(purchase.date), // Format the date
-            purchase_no: purchase.purchase_number,
+            urdpurchase_number: purchase.urdpurchase_number,
             product_id: purchase.product_id,
             product_name: purchase.product_name,
             metal: purchase.metal,

@@ -10,6 +10,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 
 const URDPurchase = () => {
     const navigate = useNavigate();
+    const today = new Date().toISOString().split("T")[0];
     const [loading, setLoading] = useState(true);
     const [customers, setCustomers] = useState([]);
     const [items, setItems] = useState(
@@ -25,12 +26,12 @@ const URDPurchase = () => {
       address3: "",
       city: "",
       state: "",
-          state_code: "",
-          aadhar_card: "",
-          gst_in: "",
-          pan_card: "",
-          date: "",
-          puchase_number: "",
+      state_code: "",
+      aadhar_card: "",
+      gst_in: "",
+      pan_card: "",
+      date: today,
+      urdpurchase_number: "",
 
       
     });
@@ -130,7 +131,7 @@ const URDPurchase = () => {
           gst_in: "",
           pan_card: "",
           date: "",
-          purchase_number: "",
+          urdpurchase_number: "",
         });
       }
     };
@@ -242,6 +243,22 @@ const URDPurchase = () => {
       }));
     }
   }, [productDetails.metal]); 
+
+  useEffect(() => {
+    const fetchLastURDPurchaseNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastURDPurchaseNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          urdpurchase_number: response.data.lastURDPurchaseNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastURDPurchaseNumber();
+  }, []);
 
   return (
     <div className="main-container">
@@ -370,7 +387,7 @@ const URDPurchase = () => {
               <InputField label="Date" type="date" name="date" value={formData.date} onChange={handleChange} />
             </Row>
             <Row>
-              <InputField label="URD Purchase No" name="purchase_number"  value={formData.purchase_number} onChange={handleChange}/>
+              <InputField label="URD Purchase No" name="urdpurchase_number"  value={formData.urdpurchase_number} onChange={handleChange}/>
             </Row> 
             
           </div>

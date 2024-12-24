@@ -6,8 +6,10 @@ import axios from "axios";
 import DataTable from "../../../Pages/InputField/TableLayout";
 import baseURL from "../../../../Url/NodeBaseURL";
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 const RepairForm = () => {
+  const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
   const initialFormData = {
     date: today,
@@ -400,6 +402,7 @@ const RepairForm = () => {
       setEntries([]);
       setFormData(initialFormData);
       window.location.reload();
+      navigate("/estimatetable");
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Failed to save entries. Please try again.");
