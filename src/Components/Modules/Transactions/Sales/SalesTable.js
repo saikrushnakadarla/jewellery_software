@@ -35,13 +35,13 @@ const RepairsTable = () => {
       },
       {
         Header: 'Total Amt',
-        accessor: 'total_price',
+        accessor: 'net_amount',
         Cell: ({ value }) => value || '-', // Handle cases with missing values
       },
       {
         Header: 'Paid Amount',
         accessor: 'paid_amount',
-        Cell: ({ row }) => row.original.total_price || '-', // Use `net_amount` for now
+        Cell: ({ row }) => row.original.net_amount || '-', // Use `net_amount` for now
       },
       {
         Header: 'Actions',

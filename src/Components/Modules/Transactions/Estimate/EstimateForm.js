@@ -35,6 +35,7 @@ const RepairForm = () => {
     tax_percent: "",
     tax_vat_amount: "",
     total_rs: "",
+    total_amount:"0.00",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -382,12 +383,19 @@ const RepairForm = () => {
     const updatedEntries = entries.filter((_, i) => i !== index);
     setEntries(updatedEntries);
   };
-
   const handlePrint = async () => {
     try {
+      const totalAmount = entries.reduce((sum, entry) => sum + parseFloat(entry.total_rs || 0), 0).toFixed(2);
+  
       await Promise.all(
-        entries.map((entry) => axios.post(`${baseURL}/add/estimate`, entry))
+        entries.map((entry) =>
+          axios.post(`${baseURL}/add/estimate`, {
+            ...entry,
+            total_amount: totalAmount, // Include total_amount
+          })
+        )
       );
+  
       alert("Estimates added successfully!");
       setEntries([]);
       setFormData(initialFormData);
@@ -397,6 +405,7 @@ const RepairForm = () => {
       alert("Failed to save entries. Please try again.");
     }
   };
+  
   
   useEffect(() => {
     const fetchLastEstimateNumber = async () => {
@@ -736,53 +745,67 @@ const RepairForm = () => {
        
         <Row className="estimate-form-section2">
         <Table striped bordered hover className="mt-3">
-            <thead>
-              <tr>
-                <th>S No</th>
-                <th>Product Name</th>
-                <th>Gross Weight</th>
-                <th>Stones Weight</th>
-                <th>Total Weight</th>
-                <th>Rate</th>
-                <th>Total Rs</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.length > 0 ? (
-                entries.map((entry, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{entry.product_name}</td>
-                    <td>{entry.gross_weight}</td>
-                    <td>{entry.stones_weight}</td>
-                    <td>{entry.total_weight}</td>
-                    <td>{entry.rate}</td>
-                    <td>{entry.total_rs}</td>
-                    <td>                      
-                      <div className="d-flex align-items-center">
-                        <FaEdit
-                          className="action-icon edit-icon"
-                          onClick={() => handleEdit(index)}
-                          style={{ cursor: 'pointer', marginRight: 10 }}
-                        />
-                        <FaTrash
-                          className="action-icon delete-icon"
-                          onClick={() => handleDelete(index)}
-                        />
-                        </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="8" className="text-center">
-                    No entries added yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
+  <thead>
+    <tr>
+      <th>S No</th>
+      <th>Product Name</th>
+      <th>Gross Weight</th>
+      <th>Stones Weight</th>
+      <th>Total Weight</th>
+      <th>Rate</th>
+      <th>Total Rs</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {entries.length > 0 ? (
+      entries.map((entry, index) => (
+        <tr key={index}>
+          <td>{index + 1}</td>
+          <td>{entry.product_name}</td>
+          <td>{entry.gross_weight}</td>
+          <td>{entry.stones_weight}</td>
+          <td>{entry.total_weight}</td>
+          <td>{entry.rate}</td>
+          <td>{entry.total_rs}</td>
+          <td>
+            <div className="d-flex align-items-center">
+              <FaEdit
+                className="action-icon edit-icon"
+                onClick={() => handleEdit(index)}
+                style={{ cursor: 'pointer', marginRight: 10 }}
+              />
+              <FaTrash
+                className="action-icon delete-icon"
+                onClick={() => handleDelete(index)}
+              />
+            </div>
+          </td>
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan="8" className="text-center">
+          No entries added yet.
+        </td>
+      </tr>
+    )}
+
+    {/* Total Row */}
+    {entries.length > 0 && (
+      <tr style={{fontWeight:'bold'}}>
+        <td colSpan="6" className="text-end" > 
+          Total Amount
+        </td>
+        <td className="font-weight-bold">
+          {entries.reduce((sum, entry) => sum + parseFloat(entry.total_rs || 0), 0).toFixed(2)}
+        </td>
+        <td></td>
+      </tr>
+    )}
+  </tbody>
+</Table>
+
           <Col xs={12} md={12} className="d-flex justify-content-end">
             <Button
               style={{ backgroundColor: "#a36e29", borderColor: "#a36e29",  }}

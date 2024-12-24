@@ -45,9 +45,10 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Estimate Number',
-        accessor: 'estimate_number',
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
+
       {
         Header: 'Date',
         accessor: 'date',
@@ -56,55 +57,64 @@ const RepairsTable = () => {
           return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
         },
       },
+      {
+        Header: 'Estimate Number',
+        accessor: 'estimate_number',
+      },
 
       {
         Header: 'Product Name',
         accessor: 'product_name',
       },
       {
-        Header: 'Gross Weight',
-        accessor: 'gross_weight',
+        Header: 'Total Amount',
+        accessor: 'total_amount',
       },
-      {
-        Header: 'Stone Weight',
-        accessor: 'stones_weight',
-      },
-      {
-        Header: 'Stone Price',
-        accessor: 'stones_price',
-      },
-      {
-        Header: 'Wastage Percent',
-        accessor: 'wastage_percent',
-      },
-      {
-        Header: 'Wastage Weight',
-        accessor: 'wastage_weight',
-      },
-      {
-        Header: 'Net Weight',
-        accessor: 'total_weight',
-      },
-      {
-        Header: 'MC Per Gram',
-        accessor: 'mc_per_gram',
-      },
-      {
-        Header: 'Total MC',
-        accessor: 'total_mc',
-      },
-      {
-        Header: 'Tax Percent',
-        accessor: 'tax_percent',
-      },
-      {
-        Header: 'Tax VAT Amount',
-        accessor: 'tax_vat_amount',
-      },
-      {
-        Header: 'Total Rs',
-        accessor: 'total_rs',
-      },
+
+      // {
+      //   Header: 'Gross Weight',
+      //   accessor: 'gross_weight',
+      // },
+      // {
+      //   Header: 'Stone Weight',
+      //   accessor: 'stones_weight',
+      // },
+      // {
+      //   Header: 'Stone Price',
+      //   accessor: 'stones_price',
+      // },
+      // {
+      //   Header: 'Wastage Percent',
+      //   accessor: 'wastage_percent',
+      // },
+      // {
+      //   Header: 'Wastage Weight',
+      //   accessor: 'wastage_weight',
+      // },
+      // {
+      //   Header: 'Net Weight',
+      //   accessor: 'total_weight',
+      // },
+      // {
+      //   Header: 'MC Per Gram',
+      //   accessor: 'mc_per_gram',
+      // },
+      // {
+      //   Header: 'Total MC',
+      //   accessor: 'total_mc',
+      // },
+      // {
+      //   Header: 'Tax Percent',
+      //   accessor: 'tax_percent',
+      // },
+      // {
+      //   Header: 'Tax VAT Amount',
+      //   accessor: 'tax_vat_amount',
+      // },
+      // {
+      //   Header: 'Total Rs',
+      //   accessor: 'total_rs',
+      // },
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -158,8 +168,7 @@ const RepairsTable = () => {
         </Modal.Header>
         <Modal.Body>
           {repairDetails && (
-            <>
-              
+            <>             
               <Table bordered>
                 <tbody>
                 <tr>
@@ -169,8 +178,11 @@ const RepairsTable = () => {
                   <tr>
                     <td>Invoice Number</td>
                     <td>{repairDetails.uniqueData.estimate_number}</td>
-                  </tr>
-                  
+                  </tr>    
+                  <tr>
+                    <td>Total Amount</td>
+                    <td>{repairDetails.uniqueData.total_amount}</td>
+                  </tr>               
                 </tbody>
               </Table>
 
@@ -195,24 +207,30 @@ const RepairsTable = () => {
                 </thead>
                 <tbody>
                 {repairDetails.repeatedData.map((product, index) => (
+
                 <tr key={index}>
-                <td>{product.code}</td>
-                <td>{product.product_name}</td>
-                <td>{product.metal_type}</td>
-                <td>{product.design_master}</td>
-                <td>{product.purity}</td>
-                <td>{product.gross_weight}</td>
-                <td>{product.stones_weight}</td>  
-                <td>{product.wastage_weight}</td>
-                <td>{product.total_weight}</td>
-                <td>{product.total_mc}</td>
-                <td>{product.rate}</td>
-                <td>{product.tax_vat_amount}</td>
-                <td>{product.total_rs}</td>
-                
-                    </tr>
-                  ))}
+                  <td>{product.code}</td>
+                  <td>{product.product_name}</td>
+                  <td>{product.metal_type}</td>
+                  <td>{product.design_master}</td>
+                  <td>{product.purity}</td>
+                  <td>{product.gross_weight}</td>
+                  <td>{product.stones_weight}</td>  
+                  <td>{product.wastage_weight}</td>
+                  <td>{product.total_weight}</td>
+                  <td>{product.total_mc}</td>
+                  <td>{product.rate}</td>
+                  <td>{product.tax_vat_amount}</td>
+                  <td>{product.total_rs}</td>                
+                </tr>
+
+                ))}
+               <tr style={{fontWeight:'bold'}}>
+                  <td colSpan="12" className="text-end">Total Amount</td>
+                  <td>{repairDetails.uniqueData.total_amount}</td>
+                </tr> 
                 </tbody>
+                
               </Table>
             </>
           )}
