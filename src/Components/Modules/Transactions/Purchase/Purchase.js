@@ -274,7 +274,7 @@ const URDPurchase = () => {
         metal_type: product.Category || "",
         design_name: product.design_master || "",
         purity: product.purity || "",
-        
+        hsn: product.hsn_code || "",
       }));
     } else {
       setFormData((prevData) => ({
@@ -285,7 +285,7 @@ const URDPurchase = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        
+        hsn:"",
       }));
     }
   };
@@ -302,7 +302,7 @@ const URDPurchase = () => {
         metal_type: product.Category || "",
         design_name: product.design_master || "",
         purity: product.purity || "",
-        
+        hsn: product.hsn_code || "",
       }));
     } else {
       setFormData((prevData) => ({
@@ -313,7 +313,7 @@ const URDPurchase = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        
+        hsn:"",
       }));
     }
   };
@@ -332,7 +332,7 @@ const URDPurchase = () => {
         metal_type: product.Category || "",
         design_name: product.design_master || "",
         purity: product.purity || "",
-        
+        hsn: product.hsn_code || "",
       }));
     } else {
       setFormData((prevData) => ({
@@ -343,7 +343,7 @@ const URDPurchase = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        
+        hsn:"",
       }));
     }
   };
@@ -387,6 +387,7 @@ const URDPurchase = () => {
           metal_type: product.Category,
           design_name: product.design_master,
           purity: product.purity,
+          hsn: product.hsn_code || "",
           gross_weight: "",
           stone_weight: "",
           stone_price: "",
@@ -410,6 +411,7 @@ const URDPurchase = () => {
         metal_type: "",
         design_name: "",
         purity: "",
+        hsn:"",
         gross_weight: "",
         stone_weight: "",
         stone_price: "",
@@ -445,6 +447,7 @@ const URDPurchase = () => {
           metal_type: product.Category,
           design_name: product.design_master,
           purity: product.purity,
+          hsn: product.hsn_code || "",
           gross_weight: "",
           stone_weight: "",
           stone_price: "",
@@ -501,6 +504,7 @@ const URDPurchase = () => {
             metal_type: "",
             design_name: "",
             purity: "",
+            hsn:"",
             gross_weight: "",
             stone_weight: "",
             stone_price: "",
