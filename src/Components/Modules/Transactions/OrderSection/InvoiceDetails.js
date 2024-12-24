@@ -13,14 +13,20 @@ const InvoiceDetails = ({ formData, setFormData }) => {
   return (
     <Col className="sales-form-section">
       <Row>
-        <InputField
-          label="Date"
-          name="date"
-          type="date"
-          value={formData.date}
-          max={new Date().toISOString().split("T")[0]} // Ensuring the max date is today
-          onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+      <Col xs={12} md={6}>
+        <InputField label="Terms" type="select" value={formData.terms} name="terms"
+          onChange={(e) => setFormData({ ...formData, terms: e.target.value })} 
+          options={[
+            { value: "Cash", label: "Cash" },
+            { value: "Credit", label: "Credit" },
+          ]}
         />
+      </Col>
+      <Col xs={12} md={6}>
+        <InputField label="Date:" name="date" value={formData.date} type="date" 
+          onChange={(e) => setFormData({ ...formData, date: e.target.value })} 
+          max={new Date().toISOString().split("T")[0]}/>
+      </Col>
       </Row>
       <Row>
         <InputField
