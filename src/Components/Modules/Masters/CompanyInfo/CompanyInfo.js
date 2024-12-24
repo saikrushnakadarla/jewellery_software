@@ -187,15 +187,15 @@ function Purity() {
         Header: "Action",
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
-            <button className="action-button edit-button" >
+            {/* <button className="action-button edit-button" >
               <FaEdit />
-            </button>
-            <button
+            </button> */}
+            {/* <button
               className="action-button delete-button"
               onClick={() => handleDelete(row.original.purity_id)}
             >
               <FaTrash />
-            </button>
+            </button> */}
           </div>
         ),
       },
@@ -231,20 +231,20 @@ function Purity() {
               <InputField label="Pincode:" name="pincode" value={formData.pincode} onChange={handleChange} />
             </Col>
             <Col md={2}>
-            <InputField
-              label="State:"
-              name="state"
-              type="select"
-              value={formData.state}
-              onChange={handleStateChange} // Use handleStateChange to update the state and state_code
-              options={states.map((state) => ({
-                value: state.state_name,
-                label: state.state_name,
-              }))}
-            />
-          </Col>
+              <InputField
+                label="State:"
+                name="state"
+                type="select"
+                value={formData.state}
+                onChange={handleStateChange} // Use handleStateChange to update the state and state_code
+                options={states.map((state) => ({
+                  value: state.state_name,
+                  label: state.state_name,
+                }))}
+              />
+            </Col>
             <Col md={3}>
-              <InputField label="State Code:" name="state_code" value={formData.state_code} onChange={handleChange} readOnly/>
+              <InputField label="State Code:" name="state_code" value={formData.state_code} onChange={handleChange} readOnly />
             </Col>
             <Col md={3}>
               <InputField label="Country:" name="country" value={formData.country} onChange={handleChange} />

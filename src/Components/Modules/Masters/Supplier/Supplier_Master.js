@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import InputField from '../../../Pages/InputField/InputField';
 import './Supplier_Master.css';
+import axios from "axios";
 
 import baseURL from "../../../../Url/NodeBaseURL";
 import { Row, Col } from 'react-bootstrap';
@@ -39,6 +40,7 @@ function Supplier_Master() {
   const [tcsApplicable, setTcsApplicable] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams(); // Get ID from URL
+  const [states, setStates] = useState([]);
 
   useEffect(() => {
     if (id) {
@@ -188,7 +190,26 @@ function Supplier_Master() {
   const handleBack = () => {
     navigate('/suppliertable'); 
   };
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/states`);
+        setStates(response.data); // Assuming `states` is a state variable to store states data
+      } catch (error) {
+        console.error("Error fetching states:", error);
+      }
+    };
+    fetchStates();
+  }, []);
 
+  const handleStateChange = (e) => {
+    const selectedState = states.find((state) => state.state_name === e.target.value);
+    setFormData({
+      ...formData,
+      state: selectedState?.state_name || "",
+      state_code: selectedState?.state_code || "",
+    });
+  };
 
   return (
     <div className="main-container">
@@ -248,7 +269,7 @@ function Supplier_Master() {
         onChange={handleChange}
       />
     </Col>
-    <Col md={2}>
+    <Col md={4}>
       <InputField
         label="Pincode:"
         name="pincode"
@@ -257,36 +278,23 @@ function Supplier_Master() {
         
       />
     </Col>
-    <Col md={2}>
-      <InputField
-        label="State:"
-        name="state"
-        type="select"
-        value={formData.state}
-        onChange={handleChange}
-        
-        options={[
-          { value: 'Telangana', label: 'Telangana' },
-          { value: 'Andhra Pradesh', label: 'Andhra Pradesh' },
-          { value: 'Bihar', label: 'Bihar' },
-          { value: 'Delhi', label: 'Delhi' },
-          { value: 'Goa', label: 'Goa' },
-          { value: 'Maharashtra', label: 'Maharashtra' },
-          { value: 'Tamil Nadu', label: 'Tamil Nadu' },
-          { value: 'West Bengal', label: 'West Bengal' },
-        ]}
-      />
-    </Col>
-
-    <Col md={2}>
-      <InputField
-        label="State Code:"
-        name="state_code"
-        value={formData.state_code}
-        onChange={handleChange}
-        
-      />
-    </Col>
+   
+<Col md={3}>
+              <InputField
+                label="State:"
+                name="state"
+                type="select"
+                value={formData.state}
+                onChange={handleStateChange} // Use handleStateChange to update the state and state_code
+                options={states.map((state) => ({
+                  value: state.state_name,
+                  label: state.state_name,
+                }))}
+              />
+            </Col>
+            <Col md={3}>
+              <InputField label="State Code:" name="state_code" value={formData.state_code} onChange={handleChange} readOnly />
+            </Col>
     <Col md={3}>
       <InputField
         label="Phone:"
