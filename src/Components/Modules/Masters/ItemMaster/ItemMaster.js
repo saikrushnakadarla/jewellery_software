@@ -284,7 +284,7 @@ const FormWithTable = () => {
       Making_Charges: formData.Making_Charges,
       // Design_Master: formData.Design_Master,
       dropdown: formData.dropdown,
-      making_on: formData.making_on,
+      // making_on: formData.making_on,
       selling_price: formData.selling_price,
     };
 
@@ -746,7 +746,7 @@ const FormWithTable = () => {
                   readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
-                <InputField
+                {/* <InputField
                   label="Making On:"
                   type="select"
                   name="making_on"
@@ -758,7 +758,7 @@ const FormWithTable = () => {
                     { value: "Gross Weight", label: "Gross Weight" },
                     { value: "Net Weight", label: "Net Weight" },
                   ]}
-                />
+                /> */}
                 <InputField
                   label="dropdown:"
                   type="select"
