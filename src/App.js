@@ -33,6 +33,7 @@ import Accounts from './Components/Modules/Masters/Accounts/Accounts';
 import AccountsTable from './Components/Modules/Masters/Accounts/AccountsTable';
 // import Sales from './Components/Modules/Transactions/Sales/SalesForm';
 import Sales from './Components/Modules/Transactions/SalesForm/SalesForm';
+// import Sales from "./Components/Modules/Transactions/Salesmodule/SalesForm"
 import MetalType from './Components/Modules/Masters/MetalType/MetalType';
 import DesignMaster from './Components/Modules/Masters/DesignMaster/DesignMaster';
 import Purity from './Components/Modules/Masters/Purity/Purity';
