@@ -75,6 +75,9 @@ const URDPurchase = () => {
     });
 
   const [tableData, setTableData] = useState([]);
+    const [isQtyEditable, setIsQtyEditable] = useState(false);
+     const [products, setProducts] = useState([]);
+      const [data, setData] = useState([]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -242,6 +245,288 @@ const URDPurchase = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/products`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const result = await response.json();
+        setProducts(result);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const handleMetalTypeChange = (metalType) => {
+    const product = products.find((prod) => String(prod.Category) === String(metalType));
+
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode || "",
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        
+      }));
+    }
+  };
+
+  const handleDesignNameChange = (designName) => {
+    const product = products.find((prod) => String(prod.design_master) === String(designName));
+
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode || "",
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        
+      }));
+    }
+  };
+  
+  const handleProductNameChange = (productName) => {
+    const product = products.find((prod) => String(prod.product_name) === String(productName));
+
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+
+        code: product.rbarcode,
+
+        product_id: product.product_id || "",
+        product_name: product.product_name || "",
+        metal_type: product.Category || "",
+        design_name: product.design_master || "",
+        purity: product.purity || "",
+        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        
+      }));
+    }
+  };
+
+  const handleProductChange = (productId) => {
+    const product = products.find((prod) => String(prod.product_id) === String(productId));
+  
+    if (product) {
+      // Find the corresponding tag entry from the open-tags-entry
+      const tag = data.find((tag) => String(tag.product_id) === String(productId));
+      
+      // If tag is found, populate the form with the tag's details
+      if (tag) {
+        setFormData((prevData) => ({
+          ...prevData,
+          code: '', // Priority to tag code if available
+          product_id: product.product_id,
+          product_name: product.product_name,
+          metal_type: product.Category,
+          design_name: product.design_master,
+          purity: product.purity,
+          gross_weight: "", // Use tag's gross weight
+          stone_weight: "",
+          stone_price:"",
+          weight_bw: "",
+          va_on: "",
+          va_percent:  "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gram: "",
+          making_charges: "",
+        }));
+      } else {
+        // If no tag is found, just fill product details
+        setFormData((prevData) => ({
+          ...prevData,
+          code: product.rbarcode,
+          product_id: product.product_id,
+          product_name: product.product_name,
+          metal_type: product.Category,
+          design_name: product.design_master,
+          purity: product.purity,
+          gross_weight: "",
+          stone_weight: "",
+          stone_price: "",
+          weight_bw: "",
+          va_on: "",
+          va_percent: "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gram: "",
+          making_charges: "",
+        }));
+      }
+    } else {
+      // Reset form data if no product is selected
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        gross_weight: "",
+        stone_weight: "",
+        stone_price: "",
+        weight_bw: "",
+        va_on: "",
+        va_percent: "",
+        wastage_weight: "",
+        total_weight_aw: "",
+        mc_on: "",
+        mc_per_gram: "",
+        making_charges: "",
+        rate: "",
+        rate_amt: "",
+        tax_percent: "",
+        tax_amt: "",
+        total_price: "",
+      }));
+    }
+  };
+  
+  const handleBarcodeChange = async (code) => {
+    try {
+      // Check for product by code
+      const product = products.find((prod) => String(prod.rbarcode) === String(code));
+  
+      if (product) {
+        // If product found by code, populate the form
+        setFormData((prevData) => ({
+          ...prevData,
+          code: product.rbarcode,
+          product_id: product.product_id,
+          product_name: product.product_name,
+          metal_type: product.Category,
+          design_name: product.design_master,
+          purity: product.purity,
+          gross_weight: "",
+          stone_weight: "",
+          stone_price: "",
+          weight_bw: "",
+          va_on: "",
+          va_percent: "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gram: "",
+          making_charges: "",
+          tax_percent:product.tax_slab ,
+          qty: 1, // Set qty to 1 for product
+        }));
+        setIsQtyEditable(false); // Set qty as read-only
+      } else {
+        // Check if tag exists by code
+        const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
+  
+        if (tag) {
+          const productId = tag.product_id;
+          const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
+  
+          setFormData((prevData) => ({
+            ...prevData,
+            code: tag.PCode_BarCode || "",
+            product_id: tag.product_id || "",
+            product_name: productDetails?.product_name || "",
+            metal_type: productDetails?.Category || "",
+            design_name: productDetails?.design_master || "",
+            purity: productDetails?.purity || "",
+            gross_weight: tag.Gross_Weight || "",
+            stone_weight: tag.Stones_Weight || "",
+            stone_price: tag.Stones_Price || "",
+            weight_bw: tag.Weight_BW || "",
+            va_on: tag.Wastage_On || "",
+            va_percent: tag.Wastage_Percentage || "",
+            wastage_weight: tag.WastageWeight || "",
+            total_weight_aw: tag.TotalWeight_AW || "",
+            mc_on: tag.Making_Charges_On || "",
+            mc_per_gram: tag.MC_Per_Gram || "",
+            making_charges: tag.Making_Charges || "",
+            tax_percent:productDetails?.tax_slab || "",
+            qty: 1, // Allow qty to be editable for tag
+          }));
+          setIsQtyEditable(true); // Allow editing of qty
+        } else {
+          // Reset form if no tag is found
+          setFormData((prevData) => ({
+            ...prevData,
+            code: "",
+            product_id: "",
+            product_name: "",
+            metal_type: "",
+            design_name: "",
+            purity: "",
+            gross_weight: "",
+            stone_weight: "",
+            stone_price: "",
+            weight_bw: "",
+            va_on: "",
+            va_percent: "",
+            wastage_weight: "",
+            total_weight_aw: "",
+            mc_on: "",
+            mc_per_gram: "",
+            making_charges: "",
+            rate: "",
+            rate_amt: "",
+            tax_percent: "",
+            tax_amt: "",
+            total_price: "",
+            qty: "", // Reset qty
+          }));
+          setIsQtyEditable(true); // Default to editable
+        }
+      }
+    } catch (error) {
+      console.error("Error handling code change:", error);
+    }
+  };
+
   const handleBack = () => {
     navigate('/purchasetable');
   };
@@ -420,55 +705,95 @@ const URDPurchase = () => {
           <div className="urd-form-section">
             {/* <h4>Purchase Details</h4> */}
             <Row>
-              <Col xs={12} md={1}>
+            <Col xs={12} md={2}>
                 <InputField
-                  label="P ID"
-                  type="text"
-                  value={formData.product_id}
-                  onChange={(e) => handleChange("product_id", e.target.value)}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Product Name"
+                  label="BarCode/Rbarcode"
+                  name="code"
+                  value={formData.code}
+                  onChange={(e) => handleBarcodeChange(e.target.value)}
                   type="select"
-                  value={formData.product_name}
-                  onChange={(e) => handleChange('product_name', e.target.value)}
-                  options={[
-                    { value: 'PRODUCT1', label: 'Product1' },
-                    { value: 'PRODUCT2', label: 'Product2' },
-                    { value: 'PRODUCT3', label: 'Product3' },
-                    { value: 'PRODUCT4', label: 'Product4' },
-                  ]}
+                  options={
+                    !formData.product_id
+                      ? [
+                          ...products.map((product) => ({
+                            value: product.rbarcode,
+                            label: product.rbarcode,
+                          })),
+                          ...data.map((tag) => ({
+                            value: tag.PCode_BarCode,
+                            label: tag.PCode_BarCode,
+                          })),
+                        ]
+                      : [
+                          ...products
+                            .filter((product) => String(product.product_id) === String(formData.product_id))
+                            .map((product) => ({
+                              value: product.rbarcode,
+                              label: product.rbarcode,
+                            })),
+                          ...data
+                            .filter((tag) => String(tag.product_id) === String(formData.product_id))
+                            .map((tag) => ({
+                              value: tag.PCode_BarCode,
+                              label: tag.PCode_BarCode,
+                            })),
+                        ]
+                  }
                 />
               </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Metal Type"
-                  type="select"
-                  value={formData.metal_type}
-                  onChange={(e) => handleChange('metal_type', e.target.value)}
-                  options={[
-                    { value: "GOLD", label: "Gold" },
-                    { value: "SILVER", label: "Silver" },
-                    { value: "PLATINUM", label: "Platinum" },
-                  ]}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Design Master"
-                  type="select"
-                  value={formData.design_name}
-                  onChange={(e) => handleChange('design_name', e.target.value)}
-                  options={[
-                    { value: "GOLD", label: "Gold" },
-                    { value: "SILVER", label: "Silver" },
-                    { value: "PLATINUM", label: "Platinum" },
-                  ]}
-                />
-              </Col>
-              <Col xs={12} md={1}>
+                <Col xs={12} md={2}>
+                  <InputField
+                    label="P ID"
+                    name="product_id"
+                    value={formData.product_id}
+                    onChange={(e) => handleProductChange(e.target.value)}
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.product_id,
+                      label: product.product_id,
+                    }))}
+                  />
+                </Col>
+                <Col xs={12} md={2}>
+                  <InputField
+                    label="Product Name"
+                    name="product_name"
+                    value={formData.product_name}
+                    onChange={(e) => handleProductNameChange(e.target.value)}
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.product_name,
+                      label: product.product_name,
+                    }))}
+                  />
+                </Col>
+                <Col xs={12} md={2}>
+                  <InputField
+                    label="Metal Type"
+                    name="metal_type"
+                    value={formData.metal_type}
+                    onChange={(e) => handleMetalTypeChange(e.target.value)}                    
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.Category,
+                      label: product.Category,
+                    }))}                    
+                  />
+                </Col>
+                <Col xs={12} md={2}>
+                  <InputField
+                    label="Design Name"
+                    name="design_name"
+                    value={formData.design_name}
+                    onChange={(e) => handleDesignNameChange(e.target.value)}
+                    type="select"
+                    options={products.map((product) => ({
+                      value: product.design_master,
+                      label: product.design_master,
+                    }))}
+                  />
+                </Col>
+              {/* <Col xs={12} md={2}>
                 <InputField
                   label="Purity:"
                   type="select"
@@ -484,7 +809,16 @@ const URDPurchase = () => {
                     { value: "9K", label: "9K (375)" },
                   ]}
                 />
-              </Col>
+              </Col> */}
+              <Col xs={12} md={2}>
+                  <InputField
+                    label="Purity"
+                    name="purity"
+                    value={formData.purity}
+                    onChange={handleChange}
+                    readOnly
+                  />
+                </Col>
               <Col xs={12} md={1}>
                 <InputField label="HSN" type="text" value={formData.hsn}
                   onChange={(e) => handleChange("hsn", e.target.value)} />
