@@ -53,7 +53,7 @@ function Purity() {
   useEffect(() => {
     const fetchStates = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/get/states');
+        const response = await axios.get(`${baseURL}/get/states`);
         setStates(response.data); // Assuming `states` is a state variable to store states data
       } catch (error) {
         console.error("Error fetching states:", error);
@@ -230,25 +230,21 @@ function Purity() {
             <Col md={3}>
               <InputField label="Pincode:" name="pincode" value={formData.pincode} onChange={handleChange} />
             </Col>
+            <Col md={2}>
+            <InputField
+              label="State:"
+              name="state"
+              type="select"
+              value={formData.state}
+              onChange={handleStateChange} // Use handleStateChange to update the state and state_code
+              options={states.map((state) => ({
+                value: state.state_name,
+                label: state.state_name,
+              }))}
+            />
+          </Col>
             <Col md={3}>
-              <label>State:</label>
-              <select
-                name="state"
-                value={formData.state}
-                onChange={handleStateChange}
-                className="form-control"
-              >
-                <option value="">Select State</option>
-                {states.map((state) => (
-                  <option key={state.state_id} value={state.state_name}>
-                    {state.state_name}
-                  </option>
-                ))}
-              </select>
-            </Col>
-
-            <Col md={3}>
-              <InputField label="State Code:" name="state_code" value={formData.state_code} onChange={handleChange} />
+              <InputField label="State Code:" name="state_code" value={formData.state_code} onChange={handleChange} readOnly/>
             </Col>
             <Col md={3}>
               <InputField label="Country:" name="country" value={formData.country} onChange={handleChange} />

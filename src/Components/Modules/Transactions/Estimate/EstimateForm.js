@@ -86,6 +86,7 @@ const RepairForm = () => {
       alert("All entries saved successfully!");
       setEntries([]);
       setFormData(initialFormData);
+      window.location.reload();
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Failed to save entries. Please try again.");
