@@ -261,15 +261,15 @@ const validateSkinPrint = (skin_print) => skin_print === "" || skin_print.trim()
 
 function Purity() {
   const [formData, setFormData] = useState({
-    name: "",
-    metal: "",
-    purity_percentage: "",
-    purity: "",
-    urd_purity: "",
-    desc: "",
-    old_purity_desc: "",
-    cut_issue: "",
-    skin_print: "",
+    "name": "",
+    "metal": "",
+    "purity_percentage": "",
+    "purity": "",
+    "urd_purity": "",
+    "desc": "",
+    "old_purity_desc": "",
+    "cut_issue": "",
+    "skin_print": ""
   });
   const formRef = useRef(null); // Create a reference for the form
   const containerRef = useRef(null); // Create a reference for the container
@@ -607,7 +607,7 @@ function Purity() {
               name="metal"
               value={formData.metal}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.metal} />
             {/* <InputField
               label="Item Name:"
@@ -631,7 +631,7 @@ function Purity() {
               name="purity_percentage"
               value={formData.purity_percentage}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.purity_percentage}
             />
 
@@ -640,7 +640,7 @@ function Purity() {
               name="purity"
               value={formData.purity}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.purity}
 
             />
@@ -654,7 +654,7 @@ function Purity() {
               name="urd_purity"
               value={formData.urd_purity}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.urd_purity}
 
             />
@@ -664,7 +664,7 @@ function Purity() {
               name="desc"
               value={formData.desc}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.desc}
 
             />
@@ -674,7 +674,7 @@ function Purity() {
               name="old_purity_desc"
               value={formData.old_purity_desc}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.old_purity_desc}
 
             />
@@ -684,7 +684,7 @@ function Purity() {
               name="cut_issue"
               value={formData.cut_issue}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.cut_issue}
 
             />
@@ -694,7 +694,7 @@ function Purity() {
               name="skin_print"
               value={formData.skin_print}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.skin_print}
 
             />

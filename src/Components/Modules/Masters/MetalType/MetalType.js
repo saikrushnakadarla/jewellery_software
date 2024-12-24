@@ -7,13 +7,12 @@ import baseURL from "../../../../Url/NodeBaseURL";
 
 function MetalType() {
   const [formData, setFormData] = useState({
-    metal_name: '',
-    // item_type: '',
-    description: '',
-    default_purity: '',
-    default_purity_for_rate_entry: '',
-    default_purity_for_old_metal: '',
-    default_issue_purity: '',
+    "metal_name": "",
+    "description": "",
+    "default_purity": "",
+    "default_purity_for_rate_entry": "",
+    "default_purity_for_old_metal": "",
+    "default_issue_purity": ""
   });
 
   const [submittedData, setSubmittedData] = useState([]); // Store submitted form entries
@@ -256,7 +255,7 @@ function MetalType() {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.description}
             />
             {errors.description && <p style={{ color: 'red', fontSize: '15px' }} className="error-message">{errors.description}</p>}

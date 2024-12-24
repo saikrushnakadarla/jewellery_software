@@ -120,10 +120,6 @@ const useProductHandlers = () => {
     setIsQtyEditable(true);
   };
 
-
-
-
-
     const handleMetalTypeChange = (metalType) => {
     const product = products.find((prod) => String(prod.Category) === String(metalType));
 
@@ -221,7 +217,7 @@ const useProductHandlers = () => {
       if (tag) {
         setFormData((prevData) => ({
           ...prevData,
-          code: '', // Priority to tag code if available
+          code: product.rbarcode, // Priority to tag code if available
           product_id: product.product_id,
           product_name: product.product_name,
           metal_type: product.Category,
@@ -293,65 +289,101 @@ const useProductHandlers = () => {
   };
   
   const handleBarcodeChange = async (code) => {
-  try {
-    const product = products?.find(
-      (prod) => String(prod.rbarcode) === String(code)
-    );
-
-    if (product) {
-      // Populate form for product
-      setFormData((prevData) => ({
-        ...prevData,
-        code: product.rbarcode,
-        product_id: product.product_id,
-        product_name: product.product_name,
-        metal_type: product.Category,
-        design_name: product.design_master,
-        purity: product.purity,
-        qty: 1, // Set qty to 1 for product
-        tax_percent: product.tax_slab,
-      }));
-      setIsQtyEditable(false);
-    } else {
-      const tag = data?.find(
-        (tag) => String(tag.PCode_BarCode) === String(code)
-      );
-
-      if (tag) {
-        const productDetails = products?.find(
-          (prod) => String(prod.product_id) === String(tag.product_id)
-        );
-
+    try {
+      // Check for product by code
+      const product = products.find((prod) => String(prod.rbarcode) === String(code));
+  
+      if (product) {
+        // If product found by code, populate the form
         setFormData((prevData) => ({
           ...prevData,
-          code: tag.PCode_BarCode || "",
-          product_id: tag.product_id || "",
-          product_name: productDetails?.product_name || "",
-          metal_type: productDetails?.Category || "",
-          design_name: productDetails?.design_master || "",
-          purity: productDetails?.purity || "",
-          qty: 1,
+          code: product.rbarcode,
+          product_id: product.product_id,
+          product_name: product.product_name,
+          metal_type: product.Category,
+          design_name: product.design_master,
+          purity: product.purity,
+          gross_weight: "",
+          stone_weight: "",
+          stone_price: "",
+          weight_bw: "",
+          va_on: "",
+          va_percent: "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gram: "",
+          making_charges: "",
+          tax_percent:product.tax_slab ,
+          qty: 1, // Set qty to 1 for product
         }));
-        setIsQtyEditable(true);
+        setIsQtyEditable(false); // Set qty as read-only
       } else {
-        // Reset form
-        setFormData((prevData) => ({
-          ...prevData,
-          code: "",
-          product_id: "",
-          product_name: "",
-          metal_type: "",
-          design_name: "",
-          purity: "",
-          qty: "",
-        }));
-        setIsQtyEditable(true);
+        // Check if tag exists by code
+        const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
+  
+        if (tag) {
+          const productId = tag.product_id;
+          const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
+  
+          setFormData((prevData) => ({
+            ...prevData,
+            code: tag.PCode_BarCode || "",
+            product_id: tag.product_id || "",
+            product_name: productDetails?.product_name || "",
+            metal_type: productDetails?.Category || "",
+            design_name: productDetails?.design_master || "",
+            purity: productDetails?.purity || "",
+            gross_weight: tag.Gross_Weight || "",
+            stone_weight: tag.Stones_Weight || "",
+            stone_price: tag.Stones_Price || "",
+            weight_bw: tag.Weight_BW || "",
+            va_on: tag.Wastage_On || "",
+            va_percent: tag.Wastage_Percentage || "",
+            wastage_weight: tag.WastageWeight || "",
+            total_weight_aw: tag.TotalWeight_AW || "",
+            mc_on: tag.Making_Charges_On || "",
+            mc_per_gram: tag.MC_Per_Gram || "",
+            making_charges: tag.Making_Charges || "",
+            tax_percent:productDetails?.tax_slab || "",
+            qty: 1, // Allow qty to be editable for tag
+          }));
+          setIsQtyEditable(true); // Allow editing of qty
+        } else {
+          // Reset form if no tag is found
+          setFormData((prevData) => ({
+            ...prevData,
+            code: "",
+            product_id: "",
+            product_name: "",
+            metal_type: "",
+            design_name: "",
+            purity: "",
+            gross_weight: "",
+            stone_weight: "",
+            stone_price: "",
+            weight_bw: "",
+            va_on: "",
+            va_percent: "",
+            wastage_weight: "",
+            total_weight_aw: "",
+            mc_on: "",
+            mc_per_gram: "",
+            making_charges: "",
+            rate: "",
+            rate_amt: "",
+            tax_percent: "",
+            tax_amt: "",
+            total_price: "",
+            qty: "", // Reset qty
+          }));
+          setIsQtyEditable(true); // Default to editable
+        }
       }
+    } catch (error) {
+      console.error("Error handling code change:", error);
     }
-  } catch (error) {
-    console.error("Error handling code change:", error);
-  }
-};
+  };
 
 
 

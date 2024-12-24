@@ -4,7 +4,7 @@ import InputField from './../../../Pages/InputField/InputField';
 
 const ProductDetails = ({ 
   formData, 
-  data = [],
+  data,
   handleChange, 
   handleBarcodeChange,
   handleProductChange,
@@ -12,14 +12,11 @@ const ProductDetails = ({
   handleMetalTypeChange,
   handleDesignNameChange,
   handleAdd,
-  products = [],
- 
-  
+  products,
+
   isQtyEditable
 }) => {
 
-
-  
   return (
     <Col >
     <Row>

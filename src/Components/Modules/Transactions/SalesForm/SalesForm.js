@@ -35,6 +35,7 @@ const SalesForm = () => {
     formData,
     setFormData,
     products,
+    data,
     isQtyEditable,
     handleChange,
     handleBarcodeChange,
@@ -91,13 +92,20 @@ const SalesForm = () => {
 
   // Handle customer change
   const handleCustomerChange = (customerId) => {
-    const customer = customers.find(cust => String(cust.account_id) === String(customerId));
+    setFormData((prevData) => ({
+      ...prevData,
+      customer_id: customerId, // Ensure customer_id is correctly updated
+    }));
+
+    const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
+    console.log("Customer Id=", customer)
+
     if (customer) {
-      setFormData(prev => ({
-        ...prev,
-        customer_id: customerId,
+      setFormData({
+        ...formData,
+        customer_id: customerId, // Ensure this is correctly set
+        account_name: customer.account_name, // Set the name field to the selected customer
         mobile: customer.mobile || "",
-        account_name: customer.account_name || "",
         email: customer.email || "",
         address1: customer.address1 || "",
         address2: customer.address2 || "",
@@ -108,7 +116,25 @@ const SalesForm = () => {
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
-      }));
+
+      });
+    } else {
+      setFormData({
+        ...formData,
+        customer_id: "",
+        account_name: "",
+        mobile: "",
+        email: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        state_code: "",
+        aadhar_card: "",
+        gst_in: "",
+        pan_card: "",
+      });
     }
   };
 
@@ -255,8 +281,8 @@ const SalesForm = () => {
               handleDesignNameChange={handleDesignNameChange}
               handleAdd={handleAdd}
               products={products}
-              isQtyEditable={isQtyEditable}
-             
+              data={data}
+              isQtyEditable={isQtyEditable}             
             />
           </div>
 
