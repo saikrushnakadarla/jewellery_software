@@ -111,7 +111,7 @@ function Purity() {
 
   const handleEdit = (row) => {
     setEditMode(true);
-    setEditId(row.purity_id); // Set the ID of the record being edited
+    setEditId(row.id); // Set the ID of the record being edited
     setFormData({ ...row }); // Pre-fill the form with the selected record's data
     setErrors({}); // Clear any previous errors
 
@@ -129,8 +129,8 @@ function Purity() {
     }
 
     try {
-      await axios.delete(`${baseURL}/purity/${id}`);
-      setSubmittedData(submittedData.filter((item) => item.purity_id !== id));
+      await axios.delete(`${baseURL}/api/companies/${id}`);
+      setSubmittedData(submittedData.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Error deleting record:", error);
     }
@@ -187,15 +187,17 @@ function Purity() {
         Header: "Action",
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
-            {/* <button className="action-button edit-button" >
+            <button className="action-button edit-button"
+                          onClick={() => handleEdit(row.original.id)}
+                          >
               <FaEdit />
-            </button> */}
-            {/* <button
+            </button>
+            <button
               className="action-button delete-button"
-              onClick={() => handleDelete(row.original.purity_id)}
+              onClick={() => handleDelete(row.original.id)}
             >
               <FaTrash />
-            </button> */}
+            </button>
           </div>
         ),
       },
