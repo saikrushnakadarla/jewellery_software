@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTable, usePagination, useGlobalFilter, useSortBy } from 'react-table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -34,7 +34,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter, handleDateFilter }) {
         className="form-control"
         style={{ maxWidth: '150px' }}
       />
-      <button onClick={applyDateFilter} className="btn btn-primary" >
+      <button onClick={applyDateFilter} className="btn btn-primary">
         OK
       </button>
     </div>
@@ -45,24 +45,25 @@ function GlobalFilter({ globalFilter, setGlobalFilter, handleDateFilter }) {
 export default function DataTable({ columns, data }) {
   const [filteredData, setFilteredData] = useState(data);
 
+  useEffect(() => {
+    setFilteredData(data); // Sync filteredData with data whenever data changes
+  }, [data]);
+
   const handleDateFilter = (fromDate, toDate) => {
     if (fromDate || toDate) {
       const filtered = data.filter((item) => {
         const itemDate = new Date(item.date).setHours(0, 0, 0, 0); // Normalize to midnight for accurate comparison
         const from = fromDate ? new Date(fromDate).setHours(0, 0, 0, 0) : null;
         const to = toDate ? new Date(toDate).setHours(0, 0, 0, 0) : null;
-  
-        return (
-          (!from || itemDate >= from) && // Include the fromDate
-          (!to || itemDate <= to) // Include the toDate
-        );
+
+        return (!from || itemDate >= from) && (!to || itemDate <= to);
       });
       setFilteredData(filtered);
     } else {
       setFilteredData(data); // Reset to original data if no date filters
     }
   };
-  
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -90,10 +91,8 @@ export default function DataTable({ columns, data }) {
 
   return (
     <div className="dataTable_wrapper container-fluid">
-      {/* Global Search Filter */}
       <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} handleDateFilter={handleDateFilter} />
 
-      {/* Table */}
       <div className="table-responsive">
         <table {...getTableProps()} className="table table-striped">
           <thead>
@@ -130,7 +129,6 @@ export default function DataTable({ columns, data }) {
         </table>
       </div>
 
-      {/* Pagination Controls */}
       <div className="d-flex align-items-center justify-content-between mt-3">
         <div className="dataTable_pageInfo">
           Page{' '}

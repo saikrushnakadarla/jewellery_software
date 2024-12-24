@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
+import DataTable from '../../../Pages/InputField/DataTable'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 
