@@ -3,6 +3,7 @@ import "./Accounts.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 import baseURL from "../../../../Url/NodeBaseURL";
 
@@ -35,6 +36,7 @@ const RepairForm = () => {
     bank_name: "",
     ifsc_code: "",
   });
+  const [states, setStates] = useState([]);
 
   // Fetch data if editing an existing account
   useEffect(() => {
@@ -79,7 +81,7 @@ const RepairForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     // Restrict the 'mobile' field to 10 numeric characters
     if (name === 'mobile') {
       const numericValue = value.replace(/\D/g, ''); // Remove non-numeric characters
@@ -96,7 +98,7 @@ const RepairForm = () => {
       setFormData({ ...formData, [name]: value });
     }
   };
-  
+
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
   //   try {
@@ -111,12 +113,12 @@ const RepairForm = () => {
   //       },
   //       body: JSON.stringify(formData),
   //     });
-  
+
   //     if (!response.ok) {
   //       const errorText = await response.text();
   //       throw new Error(`Server error: ${errorText}`);
   //     }
-  
+
   //     const result = await response.json();
   //     alert(id ? "Account updated successfully!" : "Account created successfully!");
   //     navigate("/accountstable");
@@ -130,7 +132,7 @@ const RepairForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       // Step 1: Check for duplicate mobile number only when creating a new account (POST request)
       if (!id) {
@@ -139,7 +141,7 @@ const RepairForm = () => {
           throw new Error("Failed to fetch accounts data for duplicate check");
         }
         const accounts = await duplicateCheckResponse.json();
-  
+
         // Check if the mobile number already exists
         const isDuplicate = accounts.some((account) => account.mobile === formData.mobile);
         if (isDuplicate) {
@@ -147,13 +149,13 @@ const RepairForm = () => {
           return;
         }
       }
-  
+
       // Step 2: Proceed with form submission (POST or PUT)
       const method = id ? "PUT" : "POST";
       const url = id
         ? `${baseURL}/edit/account-details/${id}`  // Update the account if ID exists
         : `${baseURL}/account-details`;           // Create a new account if no ID
-  
+
       const response = await fetch(url, {
         method: method,
         headers: {
@@ -161,12 +163,12 @@ const RepairForm = () => {
         },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Server error: ${errorText}`);
       }
-  
+
       const result = await response.json();
       alert(id ? "Account updated successfully!" : "Account created successfully!");
       navigate("/accountstable");
@@ -175,13 +177,35 @@ const RepairForm = () => {
       alert(`Error: ${err.message}`);
     }
   };
-   
+
+
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/states`);
+        setStates(response.data); // Assuming `states` is a state variable to store states data
+      } catch (error) {
+        console.error("Error fetching states:", error);
+      }
+    };
+    fetchStates();
+  }, []);
+
+  const handleStateChange = (e) => {
+    const selectedState = states.find((state) => state.state_name === e.target.value);
+    setFormData({
+      ...formData,
+      state: selectedState?.state_name || "",
+      state_code: selectedState?.state_code || "",
+    });
+  };
+
   return (
     <div className="main-container">
       <Container className="accounts-form-container">
         <form onSubmit={handleSubmit}>
           <Row className="accounts-form-section">
-          <h4 className="mb-4">{id ? "Edit Account" : "Create Account"}</h4>
+            <h4 className="mb-4">{id ? "Edit Account" : "Create Account"}</h4>
             <Col xs={12} md={4}>
               <InputField
                 label="Account Name"
@@ -219,7 +243,7 @@ const RepairForm = () => {
                 onChange={handleChange}
               />
             </Col>
-          
+
             <Col xs={12} md={2}>
               <InputField
                 label="Metal Balance"
@@ -266,7 +290,7 @@ const RepairForm = () => {
                 onChange={handleChange}
               />
             </Col>
-           
+
             <Col xs={12} md={2}>
               <InputField
                 label="Pincode"
@@ -276,7 +300,7 @@ const RepairForm = () => {
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={12} md={2}>
+            {/* <Col xs={12} md={2}>
               <InputField
                 label="State"
                 name="state"
@@ -292,7 +316,24 @@ const RepairForm = () => {
                 value={formData.state_code}
                 onChange={handleChange}
               />
+            </Col> */}
+            <Col xs={12} md={2}>
+              <InputField
+                label="State:"
+                name="state"
+                type="select"
+                value={formData.state}
+                onChange={handleStateChange} // Use handleStateChange to update the state and state_code
+                options={states.map((state) => ({
+                  value: state.state_name,
+                  label: state.state_name,
+                }))}
+              />
             </Col>
+            <Col xs={12} md={2}>
+              <InputField label="State Code:" name="state_code" value={formData.state_code} onChange={handleChange} readOnly />
+            </Col>
+
             <Col xs={12} md={3}>
               <InputField
                 label="Phone"
@@ -347,15 +388,15 @@ const RepairForm = () => {
                 onChange={handleChange}
               />
             </Col>
-            <Col  xs={12} md={3}>
-      <InputField
-        label="GSTIN:"
-        name="gst_in"
-        value={formData.gst_in}
-        onChange={handleChange}
-        
-      />
-    </Col>
+            <Col xs={12} md={3}>
+              <InputField
+                label="GSTIN:"
+                name="gst_in"
+                value={formData.gst_in}
+                onChange={handleChange}
+
+              />
+            </Col>
             <Col xs={12} md={3}>
               <InputField
                 label="Bank Account No."
@@ -400,7 +441,7 @@ const RepairForm = () => {
               Cancel
             </Button>
             <Button type="submit" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
-              
+
               {id ? "Update" : "Save"}
             </Button>
           </div>
