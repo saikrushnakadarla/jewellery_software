@@ -186,7 +186,7 @@ const URDPurchase = () => {
 
         // Filter only suppliers
         const customers = result.filter(
-          (item) => item.account_group === 'CUSTOMERS'
+          (item) => item.account_group === 'SUPPLIERS'
         );
 
         setCustomers(customers);
@@ -549,7 +549,7 @@ const URDPurchase = () => {
             <div className="purchase-form-left">
               {/* Customer Details */}
               <Col className="urd-form-section">
-                <h4 className="mb-4">Customer Details</h4>
+                <h4 className="mb-4">Supplier Details</h4>
                 <Row>
                   <Col xs={12} md={3} className="d-flex align-items-center">
                     <div style={{ flex: 1 }}>
