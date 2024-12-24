@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
+import TagEntry from "./TagEntry";
+import { Modal } from "react-bootstrap";
 
 const URDPurchase = () => {
   const [metal, setMetal] = useState("");
@@ -29,7 +31,7 @@ const URDPurchase = () => {
       aadhar_card: "",
       gst_in: "",
       pan_card: "",
-      terms:"Cash",
+      terms: "Cash",
       indent: "",
       bill_no: "",
       type: "",
@@ -76,18 +78,30 @@ const URDPurchase = () => {
     });
 
   const [tableData, setTableData] = useState([]);
-    const [isQtyEditable, setIsQtyEditable] = useState(false);
-     const [products, setProducts] = useState([]);
-      const [data, setData] = useState([]);
+  const [isQtyEditable, setIsQtyEditable] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [data, setData] = useState([]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const [editingIndex, setEditingIndex] = useState(null);
+
   const handleAdd = () => {
-    setTableData((prev) => [...prev, formData]);
-    setFormData((prev) => ({
-      ...prev,
+    if (editingIndex !== null) {
+      // Update the existing row
+      const updatedTableData = [...tableData];
+      updatedTableData[editingIndex] = formData;
+      setTableData(updatedTableData);
+      setEditingIndex(null); // Reset editing state
+    } else {
+      // Add new row
+      setTableData((prev) => [...prev, formData]);
+    }
+
+    setFormData({
+      code: "",
       product_id: "",
       product_name: "",
       metal_type: "",
@@ -123,7 +137,7 @@ const URDPurchase = () => {
       clear: "",
       class: "",
       cut: "",
-    }));
+    });
   };
 
 
@@ -153,7 +167,7 @@ const URDPurchase = () => {
           aadhar_card: "",
           gst_in: "",
           pan_card: "",
-          terms:"Cash",
+          terms: "Cash",
           indent: "",
           bill_no: "",
           type: "",
@@ -174,6 +188,15 @@ const URDPurchase = () => {
     }
   };
 
+  const handleEdit = (index) => {
+    setFormData(tableData[index]); // Populate the form with selected row data
+    setEditingIndex(index); // Track the index being edited
+  };
+
+  const handleDelete = (index) => {
+    const updatedTableData = tableData.filter((_, i) => i !== index);
+    setTableData(updatedTableData); // Remove the selected row
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -287,7 +310,7 @@ const URDPurchase = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        hsn:"",
+        hsn: "",
       }));
     }
   };
@@ -315,11 +338,11 @@ const URDPurchase = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        hsn:"",
+        hsn: "",
       }));
     }
   };
-  
+
   const handleProductNameChange = (productName) => {
     const product = products.find((prod) => String(prod.product_name) === String(productName));
 
@@ -345,18 +368,18 @@ const URDPurchase = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        hsn:"",
+        hsn: "",
       }));
     }
   };
 
   const handleProductChange = (productId) => {
     const product = products.find((prod) => String(prod.product_id) === String(productId));
-  
+
     if (product) {
       // Find the corresponding tag entry from the open-tags-entry
       const tag = data.find((tag) => String(tag.product_id) === String(productId));
-      
+
       // If tag is found, populate the form with the tag's details
       if (tag) {
         setFormData((prevData) => ({
@@ -369,10 +392,10 @@ const URDPurchase = () => {
           purity: product.purity,
           gross_weight: "", // Use tag's gross weight
           stone_weight: "",
-          stone_price:"",
+          stone_price: "",
           weight_bw: "",
           va_on: "",
-          va_percent:  "",
+          va_percent: "",
           wastage_weight: "",
           total_weight_aw: "",
           mc_on: "",
@@ -413,7 +436,7 @@ const URDPurchase = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        hsn:"",
+        hsn: "",
         gross_weight: "",
         stone_weight: "",
         stone_price: "",
@@ -433,12 +456,12 @@ const URDPurchase = () => {
       }));
     }
   };
-  
+
   const handleBarcodeChange = async (code) => {
     try {
       // Check for product by code
       const product = products.find((prod) => String(prod.rbarcode) === String(code));
-  
+
       if (product) {
         // If product found by code, populate the form
         setFormData((prevData) => ({
@@ -461,18 +484,18 @@ const URDPurchase = () => {
           mc_on: "",
           mc_per_gram: "",
           making_charges: "",
-          tax_percent:product.tax_slab ,
+          tax_percent: product.tax_slab,
           qty: 1, // Set qty to 1 for product
         }));
         setIsQtyEditable(false); // Set qty as read-only
       } else {
         // Check if tag exists by code
         const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
-  
+
         if (tag) {
           const productId = tag.product_id;
           const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-  
+
           setFormData((prevData) => ({
             ...prevData,
             code: tag.PCode_BarCode || "",
@@ -492,7 +515,7 @@ const URDPurchase = () => {
             mc_on: tag.Making_Charges_On || "",
             mc_per_gram: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
-            tax_percent:productDetails?.tax_slab || "",
+            tax_percent: productDetails?.tax_slab || "",
             qty: 1, // Allow qty to be editable for tag
           }));
           setIsQtyEditable(true); // Allow editing of qty
@@ -506,7 +529,7 @@ const URDPurchase = () => {
             metal_type: "",
             design_name: "",
             purity: "",
-            hsn:"",
+            hsn: "",
             gross_weight: "",
             stone_weight: "",
             stone_price: "",
@@ -539,6 +562,30 @@ const URDPurchase = () => {
 
   const handleAddCustomer = () => {
     navigate("/customermaster", { state: { from: "/purchase" } });
+  };
+
+  const [showModal1, setShowModal] = useState(false);
+
+  // Prevent modal from closing unintentionally
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (showModal1) {
+        e.preventDefault();
+        e.returnValue = ""; // This triggers the confirmation dialog in some browsers.
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [showModal1]);
+
+  const handleOpenModal = () => setShowModal(true);
+
+
+
+
+  const handleCloseModal1 = () => {
+    setShowModal(false); // Close the modal
   };
 
   return (
@@ -583,14 +630,14 @@ const URDPurchase = () => {
                       label="Customer Name:"
                       name="account_name"
                       type="select"
-                        value={formData.customer_id || ""} // Use customer_id to match selected value
-                        onChange={(e) => handleCustomerChange(e.target.value)}
-                        options={[
-                          ...customers.map((customer) => ({
-                            value: customer.account_id, // Use account_id as the value
-                            label: customer.account_name, // Display mobile as the label
-                          })),
-                        ]}
+                      value={formData.customer_id || ""} // Use customer_id to match selected value
+                      onChange={(e) => handleCustomerChange(e.target.value)}
+                      options={[
+                        ...customers.map((customer) => ({
+                          value: customer.account_id, // Use account_id as the value
+                          label: customer.account_name, // Display mobile as the label
+                        })),
+                      ]}
 
                     />
                   </Col>
@@ -664,15 +711,15 @@ const URDPurchase = () => {
             <div className="purchase-form-right">
               <Col className="urd-form-section">
                 <Row>
-                <Col xs={12} md={4}>
-                <InputField label="Terms" type="select" value={formData.terms}
-                  onChange={(e) => handleChange("terms", e.target.value)}
-                  options={[
-                    { value: "Cash", label: "Cash" },
-                    { value: "Credit", label: "Credit" },
-                  ]}
-                   />
-              </Col>
+                  <Col xs={12} md={4}>
+                    <InputField label="Terms" type="select" value={formData.terms}
+                      onChange={(e) => handleChange("terms", e.target.value)}
+                      options={[
+                        { value: "Cash", label: "Cash" },
+                        { value: "Credit", label: "Credit" },
+                      ]}
+                    />
+                  </Col>
                   <Col xs={12} md={4} >
                     <InputField label="Indent" value={formData.indent}
                       onChange={(e) => handleChange("indent", e.target.value)} />
@@ -720,7 +767,7 @@ const URDPurchase = () => {
           <div className="urd-form-section">
             {/* <h4>Purchase Details</h4> */}
             <Row>
-            <Col xs={12} md={2}>
+              <Col xs={12} md={2}>
                 <InputField
                   label="BarCode/Rbarcode"
                   name="code"
@@ -730,33 +777,33 @@ const URDPurchase = () => {
                   options={
                     !formData.product_id
                       ? [
-                          ...products.map((product) => ({
+                        ...products.map((product) => ({
+                          value: product.rbarcode,
+                          label: product.rbarcode,
+                        })),
+                        ...data.map((tag) => ({
+                          value: tag.PCode_BarCode,
+                          label: tag.PCode_BarCode,
+                        })),
+                      ]
+                      : [
+                        ...products
+                          .filter((product) => String(product.product_id) === String(formData.product_id))
+                          .map((product) => ({
                             value: product.rbarcode,
                             label: product.rbarcode,
                           })),
-                          ...data.map((tag) => ({
+                        ...data
+                          .filter((tag) => String(tag.product_id) === String(formData.product_id))
+                          .map((tag) => ({
                             value: tag.PCode_BarCode,
                             label: tag.PCode_BarCode,
                           })),
-                        ]
-                      : [
-                          ...products
-                            .filter((product) => String(product.product_id) === String(formData.product_id))
-                            .map((product) => ({
-                              value: product.rbarcode,
-                              label: product.rbarcode,
-                            })),
-                          ...data
-                            .filter((tag) => String(tag.product_id) === String(formData.product_id))
-                            .map((tag) => ({
-                              value: tag.PCode_BarCode,
-                              label: tag.PCode_BarCode,
-                            })),
-                        ]
+                      ]
                   }
                 />
               </Col>
-                {/* <Col xs={12} md={2}>
+              {/* <Col xs={12} md={2}>
                   <InputField
                     label="P ID"
                     name="product_id"
@@ -769,45 +816,45 @@ const URDPurchase = () => {
                     }))}
                   />
                 </Col> */}
-                <Col xs={12} md={2}>
-                  <InputField
-                    label="Product Name"
-                    name="product_name"
-                    value={formData.product_name}
-                    onChange={(e) => handleProductNameChange(e.target.value)}
-                    type="select"
-                    options={products.map((product) => ({
-                      value: product.product_name,
-                      label: product.product_name,
-                    }))}
-                  />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField
-                    label="Metal Type"
-                    name="metal_type"
-                    value={formData.metal_type}
-                    onChange={(e) => handleMetalTypeChange(e.target.value)}                    
-                    type="select"
-                    options={products.map((product) => ({
-                      value: product.Category,
-                      label: product.Category,
-                    }))}                    
-                  />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField
-                    label="Design Name"
-                    name="design_name"
-                    value={formData.design_name}
-                    onChange={(e) => handleDesignNameChange(e.target.value)}
-                    type="select"
-                    options={products.map((product) => ({
-                      value: product.design_master,
-                      label: product.design_master,
-                    }))}
-                  />
-                </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Product Name"
+                  name="product_name"
+                  value={formData.product_name}
+                  onChange={(e) => handleProductNameChange(e.target.value)}
+                  type="select"
+                  options={products.map((product) => ({
+                    value: product.product_name,
+                    label: product.product_name,
+                  }))}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Metal Type"
+                  name="metal_type"
+                  value={formData.metal_type}
+                  onChange={(e) => handleMetalTypeChange(e.target.value)}
+                  type="select"
+                  options={products.map((product) => ({
+                    value: product.Category,
+                    label: product.Category,
+                  }))}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Design Name"
+                  name="design_name"
+                  value={formData.design_name}
+                  onChange={(e) => handleDesignNameChange(e.target.value)}
+                  type="select"
+                  options={products.map((product) => ({
+                    value: product.design_master,
+                    label: product.design_master,
+                  }))}
+                />
+              </Col>
               {/* <Col xs={12} md={2}>
                 <InputField
                   label="Purity:"
@@ -825,7 +872,7 @@ const URDPurchase = () => {
                   ]}
                 />
               </Col> */}
-              
+
               <Col xs={12} md={1}>
                 <InputField label="HSN" type="text" value={formData.hsn}
                   onChange={(e) => handleChange("hsn", e.target.value)} />
@@ -855,15 +902,15 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("net_weight", e.target.value)} />
               </Col>
               <Col xs={12} md={2}>
-                  <InputField
-                    label="Purity"
-                    name="purity"
-                    value={formData.purity}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
-                <Col xs={12} md={1}>
+                <InputField
+                  label="Purity"
+                  name="purity"
+                  value={formData.purity}
+                  onChange={handleChange}
+                  readOnly
+                />
+              </Col>
+              <Col xs={12} md={1}>
                 <InputField label="Pure Wt" type="number" value={formData.pure_weight}
                   onChange={(e) => handleChange("pure_weight", e.target.value)} />
               </Col>
@@ -883,7 +930,7 @@ const URDPurchase = () => {
                 <InputField label="Waste" type="number" value={formData.waste_amount}
                   onChange={(e) => handleChange("waste_amount", e.target.value)} />
               </Col>
-              
+
               <Col xs={12} md={1}>
                 <InputField label="Alloy" value={formData.alloy}
                   onChange={(e) => handleChange("alloy", e.target.value)} />
@@ -938,7 +985,7 @@ const URDPurchase = () => {
                     { value: "weight", label: "weight" },
                     { value: "piece", label: "piece" },
                   ]}
-                   />
+                />
               </Col>
               <Col xs={12} md={1}>
                 <InputField label="Rate" type="number" value={formData.rate}
@@ -968,21 +1015,18 @@ const URDPurchase = () => {
                 <InputField label="CT" type="number" value={formData.stone_ct}
                   onChange={(e) => handleChange("stone_ct", e.target.value)} />
               </Col>
-             
+
               <Col xs={12} md={1}>
-                <Button
-                  style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-                  onClick={handleAdd}
-                >
-                  Add
-                </Button>
+              <Button onClick={handleAdd}>
+            {editingIndex !== null ? "Update" : "Add"}
+          </Button>
               </Col>
             </Row>
             <div style={{ overflowX: "scroll" }}>
               <Table striped bordered hover className="mt-4">
                 <thead>
                   <tr>
-                  <th>BarCode/Rbarcode</th>
+                    <th>BarCode/Rbarcode</th>
                     <th>Product ID</th>
                     <th>Product Name</th>
                     <th>Metal Type</th>
@@ -1018,6 +1062,7 @@ const URDPurchase = () => {
                     <th>Clear</th>
                     <th>Class</th>
                     <th>Cut</th>
+                    <th>Action</th> {/* New Action column */}
                   </tr>
                 </thead>
                 <tbody>
@@ -1059,10 +1104,26 @@ const URDPurchase = () => {
                       <td>{data.clear}</td>
                       <td>{data.class}</td>
                       <td>{data.cut}</td>
+                      <td>
+                        <button className="btn btn-primary" onClick={handleOpenModal}>Tag Entry</button> {/* New Action button */}
+                      </td>
+                      <button
+                    className="btn btn-warning me-2"
+                    onClick={() => handleEdit(index)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleDelete(index)}
+                  >
+                    Delete
+                  </button>
                     </tr>
                   ))}
                 </tbody>
               </Table>
+
             </div>
           </div>
 
@@ -1079,6 +1140,29 @@ const URDPurchase = () => {
           </div>
         </Form>
       </div>
+
+      {/* Modal containing the TagEntry component */}
+      <Modal
+        show={showModal1}
+        onHide={handleCloseModal1}
+        size="lg"
+        backdrop="static" // Prevent closing by clicking outside
+        keyboard={false}  // Prevent closing with Esc key
+
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Tag Entry</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* Render the TagEntry component inside the modal */}
+          <TagEntry handleCloseModal={handleCloseModal1} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal1}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
