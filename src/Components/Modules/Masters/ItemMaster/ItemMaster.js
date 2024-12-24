@@ -49,8 +49,8 @@ const FormWithTable = () => {
     Design_Master: "gold",
     product_name: "",
     selling_price: "",
-    making_on : "",
-    dropdown : ""
+    making_on: "",
+    dropdown: ""
   });
 
 
@@ -462,7 +462,37 @@ const FormWithTable = () => {
     fetchPurity();
   }, []);
 
+  // useEffect(() => {
+  //   const fetchLastRbarcode = async () => {
+  //     try {
+  //       const response = await axios.get("/api/products/last-rbarcode");
+  //       setFormData(prevState => ({
+  //         ...prevState,
+  //         rbarcode: response.data.nextRbarcode,
+  //       }));
+  //     } catch (error) {
+  //       console.error("Error fetching last rbarcode:", error);
+  //     }
+  //   };
 
+  //   fetchLastRbarcode();
+  // }, []);
+
+  useEffect(() => {
+    const fetchLastRbarcode = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/last-rbarcode`);
+        setFormData((prev) => ({
+          ...prev,
+          rbarcode: response.data.lastrbNumbers,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastRbarcode();
+  }, []);
 
 
   return (
@@ -492,8 +522,9 @@ const FormWithTable = () => {
                   name="rbarcode"
                   value={formData.rbarcode}
                   onChange={handleChange}
-                  disabled
+                 
                 />
+
 
                 <InputField
                   label="Metal Type:"
