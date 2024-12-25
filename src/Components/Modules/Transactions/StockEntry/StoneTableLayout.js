@@ -48,7 +48,7 @@ export default function DataTable({ columns, data }) {
   return (
     <div className="dataTable_wrapper container-fluid">
       {/* Global Search Filter */}
-      <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} />
+      {/* <GlobalFilter globalFilter={globalFilter} setGlobalFilter={setGlobalFilter} /> */}
 
       {/* Table */}
       <div className="table-responsive">

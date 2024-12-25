@@ -462,22 +462,6 @@ const FormWithTable = () => {
     fetchPurity();
   }, []);
 
-  // useEffect(() => {
-  //   const fetchLastRbarcode = async () => {
-  //     try {
-  //       const response = await axios.get("/api/products/last-rbarcode");
-  //       setFormData(prevState => ({
-  //         ...prevState,
-  //         rbarcode: response.data.nextRbarcode,
-  //       }));
-  //     } catch (error) {
-  //       console.error("Error fetching last rbarcode:", error);
-  //     }
-  //   };
-
-  //   fetchLastRbarcode();
-  // }, []);
-
   useEffect(() => {
     const fetchLastRbarcode = async () => {
       try {

@@ -118,3 +118,15 @@
     text-decoration: underline;
   }
   
+
+  .custom-modal-width .modal-dialog {
+    max-width: 80%; /* Adjust as needed */
+    width: 80%;
+  }
+  
+  .custom-modal-width .modal-content {
+    padding: 20px; /* Optional: Adjust padding for better layout */
+    width: 266%;
+    margin-left: -418px;
+  }
+  

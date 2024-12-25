@@ -5,6 +5,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 import InputField from '../../../Modules/Masters/ItemMaster/Inputfield'; // Assuming you have this reusable input field component
 import './StockEntryTable.css';
+import StoneDetailsModal from "./StoneDetailsModal";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
 
@@ -15,6 +16,7 @@ const StockEntryTable = () => {
   const [isEditMode, setIsEditMode] = useState(false); // State to toggle form visibility
   const [formData, setFormData] = useState({}); // State to store the form data
 
+  const handleCloseModal = () => setShowModal(false);
   // Fetch data from the API
   useEffect(() => {
     fetch(`${baseURL}/get/opening-tags-entry`) // Correct URL
@@ -178,6 +180,15 @@ const StockEntryTable = () => {
         );
     }
   };
+
+  const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
+    setFormData({
+      ...formData,
+      Stones_Weight: totalWeight.toFixed(2),
+      Stones_Price: totalPrice.toFixed(2),
+    });
+  };
+
   return (
     <div className="main-container">
       {!isEditMode ? (
@@ -432,6 +443,11 @@ const StockEntryTable = () => {
 
         </div>
       )}
+       <StoneDetailsModal
+              showModal={showModal}
+              handleCloseModal={handleCloseModal}
+              handleUpdateStoneDetails={handleUpdateStoneDetails}
+            />
     </div>
   );
 };
