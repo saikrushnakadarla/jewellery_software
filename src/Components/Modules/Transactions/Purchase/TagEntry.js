@@ -197,7 +197,7 @@ const TagEntry = ({handleCloseModal1 }) => {
 
 
     return (
-        <div style={{ paddingTop: "79px" }}>
+        <div style={{ paddingTop: "0px" }}>
             <div className="container mt-4">
                 <div className="row mt-3">
                     <div className="col-12">

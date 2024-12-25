@@ -8,6 +8,7 @@ import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
 import TagEntry from "./TagEntry";
 import { Modal } from "react-bootstrap";
+import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const URDPurchase = () => {
   const [metal, setMetal] = useState("");
@@ -1062,7 +1063,7 @@ const URDPurchase = () => {
                     <th>Clear</th>
                     <th>Class</th>
                     <th>Cut</th>
-                    <th>Action</th> {/* New Action column */}
+                    <th>Actions</th> {/* New Action column */}
                   </tr>
                 </thead>
                 <tbody>
@@ -1104,21 +1105,22 @@ const URDPurchase = () => {
                       <td>{data.clear}</td>
                       <td>{data.class}</td>
                       <td>{data.cut}</td>
-                      <td>
-                        <button className="btn btn-primary" onClick={handleOpenModal}>Tag Entry</button> {/* New Action button */}
-                      </td>
-                      <button
-                    className="btn btn-warning me-2"
+                      <td style={{display:'flex'}}>
+                        <button className="btn btn-primary" style={{backgroundColor:'rgb(163, 110, 41)',width:'102px'}} onClick={handleOpenModal}>Tag Entry</button> {/* New Action button */}
+                        <button
+                    className="action-button edit-button"
                     onClick={() => handleEdit(index)}
                   >
-                    Edit
+                    <FaEdit />
                   </button>
                   <button
-                    className="btn btn-danger"
+                     className="action-button delete-button"
                     onClick={() => handleDelete(index)}
                   >
-                    Delete
+                    <FaTrash />
                   </button>
+                      </td>
+                     
                     </tr>
                   ))}
                 </tbody>
@@ -1143,26 +1145,26 @@ const URDPurchase = () => {
 
       {/* Modal containing the TagEntry component */}
       <Modal
-        show={showModal1}
-        onHide={handleCloseModal1}
-        size="lg"
-        backdrop="static" // Prevent closing by clicking outside
-        keyboard={false}  // Prevent closing with Esc key
-
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Tag Entry</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {/* Render the TagEntry component inside the modal */}
-          <TagEntry handleCloseModal={handleCloseModal1} />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal1}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+  show={showModal1}
+  onHide={handleCloseModal1}
+  size="lg"
+  backdrop="static" // Prevent closing by clicking outside
+  keyboard={false}  // Prevent closing with Esc key
+  dialogClassName="custom-tagentrymodal-width"
+>
+  <Modal.Header closeButton>
+    <Modal.Title>Tag Entry</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {/* Render the TagEntry component inside the modal */}
+    <TagEntry handleCloseModal={handleCloseModal1} />
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={handleCloseModal1}>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
     </div>
   );
 };

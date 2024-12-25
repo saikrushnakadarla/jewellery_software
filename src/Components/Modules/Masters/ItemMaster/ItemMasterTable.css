@@ -130,3 +130,16 @@
     margin-left: -418px;
   }
   
+
+  .custom-tagentrymodal-width .modal-dialog {
+    max-width: 80%; /* Adjust as needed */
+    width: 80%;
+  }
+  
+  .custom-tagentrymodal-width .modal-content {
+    padding: 0px; /* Optional: Adjust padding for better layout */
+    width: 150%;
+    margin-left: -218px;
+  }
+
+  
