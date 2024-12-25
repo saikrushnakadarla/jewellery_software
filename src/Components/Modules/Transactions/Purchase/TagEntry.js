@@ -24,7 +24,7 @@ const TagEntry = ({handleCloseModal1 }) => {
         Wastage_On: "",
         Wastage_Percentage: "",
         Status: "sold",
-        Source: "Transactions",
+        Source: "Purchase",
         Stock_Point: "",
         WastageWeight: "",
         TotalWeight_AW: "",
