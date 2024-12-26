@@ -7,7 +7,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import { Row, Col } from 'react-bootstrap';
 
 
-function Purity() {
+function CompanyInfo() {
   const [formData, setFormData] = useState({
     company_name: "",
     address: "",
@@ -86,9 +86,11 @@ function Purity() {
     if (editMode) {
       try {
         const response = await axios.put(`${baseURL}/api/companies/${editId}`, formData);
+        console.log("Data updated:", response.data);
+
         setSubmittedData(
           submittedData.map((item) =>
-            item.purity_id === editId ? { ...formData, purity_id: editId } : item
+            item.company_id === editId ? { ...formData, company_id: editId } : item
           )
         );
 
@@ -100,7 +102,7 @@ function Purity() {
     } else {
       try {
         const response = await axios.post(`${baseURL}/api/companies/`, formData);
-        setSubmittedData([...submittedData, { ...formData, purity_id: response.data.id }]);
+        setSubmittedData([...submittedData, { ...formData, company_id: response.data.id }]);
         resetForm();
         alert(`CompanyInfo created successfully!`);
       } catch (error) {
@@ -111,7 +113,7 @@ function Purity() {
 
   const handleEdit = (row) => {
     setEditMode(true);
-    setEditId(row.id); // Set the ID of the record being edited
+    setEditId(row.company_id); // Set the ID of the record being edited
     setFormData({ ...row }); // Pre-fill the form with the selected record's data
     setErrors({}); // Clear any previous errors
 
@@ -130,7 +132,7 @@ function Purity() {
 
     try {
       await axios.delete(`${baseURL}/api/companies/${id}`);
-      setSubmittedData(submittedData.filter((item) => item.id !== id));
+      setSubmittedData(submittedData.filter((item) => item.company_id !== id));
     } catch (error) {
       console.error("Error deleting record:", error);
     }
@@ -188,13 +190,13 @@ function Purity() {
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
             <button className="action-button edit-button"
-                          onClick={() => handleEdit(row.original.id)}
+                          onClick={() => handleEdit(row.original.company_id)}
                           >
               <FaEdit />
             </button>
             <button
               className="action-button delete-button"
-              onClick={() => handleDelete(row.original.id)}
+              onClick={() => handleDelete(row.original.company_id)}
             >
               <FaTrash />
             </button>
@@ -307,4 +309,4 @@ function Purity() {
   );
 }
 
-export default Purity;
+export default CompanyInfo;
