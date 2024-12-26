@@ -107,7 +107,7 @@ const URDPurchase = () => {
       product_name: "",
       metal_type: "",
       design_name: "",
-      purity: "",
+      purity: "916 HM",
       hsn: "",
       product_type: "",
       stock_type: "",
