@@ -2,14 +2,16 @@ import React, { useState, useEffect } from "react";
 import "./Payments.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 
 const RepairForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const repairData = location.state?.repairData;
 
-  // State variables for form fields and account names
   const [formData, setFormData] = useState({
+    transaction_type: "Payment",
     date: "",
     mode: "",
     cheque_number: "",
@@ -21,6 +23,14 @@ const RepairForm = () => {
     remarks: "",
   });
 
+  useEffect(() => {
+    if (repairData) {
+      setFormData(repairData);
+    } else {
+      const today = new Date().toISOString().split("T")[0];
+      setFormData(prev => ({ ...prev, date: today }));
+    }
+  }, [repairData]);
   const [accountOptions, setAccountOptions] = useState([]);
 
   // Fetch account names on component mount
@@ -50,7 +60,6 @@ const RepairForm = () => {
   
     fetchAccountNames();
   }, []);
-  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -79,36 +88,19 @@ const RepairForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await fetch(`${baseURL}/post/payments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const endpoint = repairData ? `${baseURL}/edit/payments/${repairData.id}` : `${baseURL}/post/payments`;
+      const method = repairData ? "PUT" : "POST";
+      const response = await fetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to save payment data.");
-      }
-
-      window.alert("Payment data saved successfully!");
-      setFormData({
-        date: "",
-        mode: "",
-        cheque_number: "",
-        receipt_no: "",
-        account_name: "",
-        total_amt: "",
-        discount_amt: "",
-        cash_amt: "",
-        remarks: "",
-      });
+      if (!response.ok) throw new Error("Failed to save data");
+      window.alert("Data saved successfully!");
       navigate("/paymentstable");
-    } catch (err) {
-      window.alert(`Error: ${err.message}`);
+    } catch (error) {
+      window.alert(`Error: ${error.message}`);
     }
   };
 

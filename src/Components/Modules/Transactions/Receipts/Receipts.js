@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
 import "./Receipts.css";
-import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation for passing data
 import baseURL from "../../../../Url/NodeBaseURL";
+import InputField from "../../../Pages/InputField/InputField";
 
 const RepairForm = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // To get passed data
+  const repairData = location.state?.repairData || {}; // Default to empty object if no data is passed
 
   const [formData, setFormData] = useState({
-    date: "",
+    transaction_type: "Receipt",
+    date: "", // Ensure this field is properly set
     mode: "",
     cheque_number: "",
     receipt_no: "",
@@ -23,9 +26,15 @@ const RepairForm = () => {
   const [accountNames, setAccountNames] = useState([]);
 
   useEffect(() => {
-    // Set default date to today
+    // Set default date to today or use the passed repairData
     const today = new Date().toISOString().split("T")[0];
-    setFormData((prevData) => ({ ...prevData, date: today }));
+    setFormData((prevData) => ({
+      ...prevData,
+      ...repairData,
+      date: repairData.date
+        ? new Date(repairData.date).toISOString().split("T")[0]
+        : today, // Ensure date is in YYYY-MM-DD format
+    }));
 
     // Fetch account names when the component mounts
     const fetchAccountNames = async () => {
@@ -43,7 +52,7 @@ const RepairForm = () => {
     };
 
     fetchAccountNames();
-  }, []);
+  }, [repairData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -75,8 +84,14 @@ const RepairForm = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${baseURL}/add-receipt`, {
-        method: "POST",
+      const url = repairData.id
+        ? `${baseURL}/edit/payments/${repairData.id}`
+        : `${baseURL}/post/payments`; // Use the correct API endpoint
+
+      const method = repairData.id ? "PUT" : "POST"; // PUT for edit, POST for create
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
@@ -86,15 +101,19 @@ const RepairForm = () => {
       const result = await response.json();
 
       if (response.ok) {
-        alert("Receipt added successfully!");
+        alert(
+          repairData.id
+            ? "Receipt updated successfully!"
+            : "Receipt added successfully!"
+        );
         navigate("/receiptstable");
       } else {
-        console.error("Error adding receipt:", result.message);
-        alert(result.message || "Failed to add receipt.");
+        console.error("Error saving receipt:", result.message);
+        alert(result.message || "Failed to save receipt.");
       }
     } catch (error) {
-      console.error("Error adding receipt:", error);
-      alert("An error occurred while adding the receipt.");
+      console.error("Error saving receipt:", error);
+      alert("An error occurred while saving the receipt.");
     }
   };
 
@@ -103,17 +122,17 @@ const RepairForm = () => {
       <Container className="receipt-form-container">
         <form onSubmit={handleSubmit}>
           <Row className="receipt-form-section">
-            <h4 className="mb-4">Receipts</h4>
+          <h2>{repairData.id ? "Edit Receipt" : "Create Receipt"}</h2>
             <Col xs={12} md={2}>
-  <InputField
-    label="Date"
-    type="date"
-    name="date"
-    value={formData.date}
-    onChange={handleChange}
-    max={new Date().toISOString().split("T")[0]} // Restricts future dates
-  />
-</Col>
+              <InputField
+                label="Date"
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                max={new Date().toISOString().split("T")[0]} // Restricts future dates
+              />
+            </Col>
 
 
             <Col xs={12} md={2}>
@@ -146,7 +165,7 @@ const RepairForm = () => {
                 onChange={handleChange}
               />
             </Col>
-           
+
             <Col xs={12} md={3}>
               <InputField
                 label="Account Name"
@@ -205,13 +224,11 @@ const RepairForm = () => {
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
-            >
-              Save
-            </Button>
+           
+            <Button variant="primary" 
+            style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }} type="submit">
+          {repairData.id ? "Update Receipt" : "Create Receipt"}
+        </Button>
           </div>
         </form>
       </Container>

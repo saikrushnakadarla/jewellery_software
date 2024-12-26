@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaEdit } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 import './PaymentsTable.css';
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -31,7 +31,7 @@ const RepairsTable = () => {
         accessor: 'account_name',
       },
       {
-        Header: 'Cheque Number',
+        Header: 'Reference Number',
         accessor: 'cheque_number',
         Cell: ({ value }) => (value ? value : 'N/A'), // Display 'N/A' if null
       },
@@ -55,15 +55,22 @@ const RepairsTable = () => {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => (
+          <div>
+          <FaEdit
+            className="edit-icon"
+            style={{ color: 'blue', cursor: 'pointer', marginRight: '10px' }}
+            onClick={() => handleEdit(row.original)}
+          />
           <FaTrash
             className="delete-icon"
             style={{ color: 'red', cursor: 'pointer' }}
-            onClick={() => handleDelete(row.original.payment_id)}
+            onClick={() => handleDelete(row.original.id)}
           />
+        </div>
         ),
       },
     ],
-    []
+    [data]
   );
 
   // Fetch payments data from API
@@ -84,24 +91,30 @@ const RepairsTable = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this payment?')) return;
-
+  
     try {
       const response = await fetch(`${baseURL}/delete/payments/${id}`, {
         method: 'DELETE',
       });
-
+  
       if (response.ok) {
+        // Success message
         alert('Payment deleted successfully');
-        setData((prevData) => prevData.filter((payment) => payment.payment_id !== id));
+        
+        // Update state after successful deletion
+        setData((prevData) => prevData.filter((payment) => payment.id !== id));
       } else {
         const result = await response.json();
-        console.error('Error deleting payment:', result.message);
-        alert('Failed to delete payment. Please try again.');
+        console.error('Error deleting payment:', result.message || 'Unknown error');
+        alert(result.message || 'Failed to delete payment. Please try again.');
       }
     } catch (error) {
       console.error('Error deleting payment:', error);
-      alert('An error occurred while deleting the payment.');
+      alert('An error occurred while deleting the payment. Please try again.');
     }
+  };
+  const handleEdit = (rowData) => {
+    navigate('/payments', { state: { repairData: rowData } });
   };
 
   const handleCreate = () => {

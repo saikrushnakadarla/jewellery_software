@@ -15,10 +15,14 @@ const ReceiptsTable = () => {
       {
         Header: 'Date',
         accessor: 'date', // Key from the data
-        Cell: ({ value }) => new Date(value).toLocaleDateString('en-IN'), // Format the date
+        Cell: ({ value }) => new Date(value).toLocaleDateString('en-IN'), // Format date
       },
       {
-        Header: 'Receipt No',
+        Header: 'Mode',
+        accessor: 'mode',
+      },
+      {
+        Header: 'Payment No',
         accessor: 'receipt_no',
       },
       {
@@ -26,13 +30,9 @@ const ReceiptsTable = () => {
         accessor: 'account_name',
       },
       {
-        Header: 'Mode',
-        accessor: 'mode',
-      },
-      {
-        Header: 'Cheque Number',
+        Header: 'Reference Number',
         accessor: 'cheque_number',
-        Cell: ({ value }) => (value ? value : 'N/A'), // Handle null values
+        Cell: ({ value }) => (value ? value : 'N/A'), // Display 'N/A' if null
       },
       {
         Header: 'Total Amt',
@@ -54,70 +54,70 @@ const ReceiptsTable = () => {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => (
-          <div >
-            {/* <FaEdit
-              className="action-icon edit-icon"
-              onClick={() => handleEdit(row.original)}
-            /> */}
-            <FaTrash
-              className="action-icon delete-icon"
-              onClick={() => handleDelete(row.original.receipt_id)}
-            />
-          </div>
+          <div>
+          <FaEdit
+            className="edit-icon"
+            style={{ color: 'blue', cursor: 'pointer', marginRight: '10px' }}
+            onClick={() => handleEdit(row.original)}
+          />
+          <FaTrash
+            className="delete-icon"
+            style={{ color: 'red', cursor: 'pointer' }}
+            onClick={() => handleDelete(row.original.id)}
+          />
+        </div>
         ),
       },
     ],
-    []
+    [data]
   );
 
+  // Fetch payments data from API
   useEffect(() => {
-    // Fetch data from the API
-    const fetchReceipts = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${baseURL}/get/receipts`); // API endpoint
+        const response = await fetch(`${baseURL}/get/payments`); // Fetch data from the endpoint
         const result = await response.json();
-        console.log('Fetched Data:', result);
-        if (response.ok) {
-          setData(result || []); // Use the array from the response
-        } else {
-          console.error('Error fetching receipts:', result.message);
+        if (result?.payments) {
+          setData(result.payments); // Set fetched data
         }
       } catch (error) {
-        console.error('Error fetching receipts:', error);
+        console.error('Error fetching Receipts:', error);
       }
     };
-
-    fetchReceipts();
+    fetchData();
   }, []);
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this receipt?')) {
-      try {
-        const response = await fetch(`${baseURL}/delete/receipts/${id}`, {
-          method: 'DELETE',
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to delete receipt.');
-        }
-
-        // Update the data state to remove the deleted receipt
-        setData((prevData) => prevData.filter((item) => item.receipt_id !== id));
-        window.alert('Receipt deleted successfully!');
-      } catch (error) {
-        window.alert(`Error: ${error.message}`);
+    if (!window.confirm('Are you sure you want to delete this Receipt?')) return;
+  
+    try {
+      const response = await fetch(`${baseURL}/delete/payments/${id}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        // Success message
+        alert('Receipt deleted successfully');
+        
+        // Update state after successful deletion
+        setData((prevData) => prevData.filter((payment) => payment.id !== id));
+      } else {
+        const result = await response.json();
+        console.error('Error deleting Receipt:', result.message || 'Unknown error');
+        alert(result.message || 'Failed to delete Receipt. Please try again.');
       }
+    } catch (error) {
+      console.error('Error deleting Receipt:', error);
+      alert('An error occurred while deleting the Receipt. Please try again.');
     }
   };
-
-  const handleEdit = (record) => {
-    console.log('Edit record:', record);
-    // Implement your edit logic here
+  const handleEdit = (rowData) => {
+    navigate('/receipts', { state: { repairData: rowData } });
   };
 
   const handleCreate = () => {
-    navigate('/receipts'); // Navigate to the /receipts page
+    navigate('/receipts'); // Navigate to the payments creation page
   };
 
   return (
