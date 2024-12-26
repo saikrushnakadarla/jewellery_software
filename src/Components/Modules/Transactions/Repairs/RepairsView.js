@@ -74,10 +74,14 @@ const RepairForm = () => {
         try {
           const response = await axios.get(`${baseURL}/get/repairs/${id}`);
           const data = response.data;
-
           setFormData({
             ...data,
           });
+  
+          // Set image if available
+          if (data.image) {
+            setImage(data.image); // Assuming `data.image` contains the Base64 string
+          }
         } catch (error) {
           console.error("Error fetching customer details:", error);
         }
@@ -204,7 +208,7 @@ const RepairForm = () => {
             </Col>
       </Row>
       <div className="repair-form2">      
-        <div className="repair-form-left">
+        {/* <div className="repair-form"> */}
         <Col className="form-section">
           <h4>Repair Item Details</h4>
           <Row>
@@ -216,13 +220,13 @@ const RepairForm = () => {
                     readOnly
                   />
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Item:" name="item" value={formData.item} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={2}>
                   <InputField label="Tag No:" name="tag_no" value={formData.tag_no} onChange={handleChange} readOnly/>
                 </Col>
-                <Col xs={12} md={3}>
+                <Col xs={12} md={2}>
                   <InputField label="Description:" name="description" value={formData.description} onChange={handleChange} readOnly/>
                 </Col>
                 <Col xs={12} md={2}>
@@ -234,33 +238,32 @@ const RepairForm = () => {
                     readOnly
                 />
                 </Col>
-              </Row>
-        </Col>
-        </div>
-        <div className="repair-form-right">
-        <Col className="form-section">
-        <h4>Upload Image</h4>
-        <Row>
-                <Col xs={12} md={4}>
-                  <div className="image-upload-container">
-                    <label htmlFor="image-upload" className="upload-button">Upload</label>
-                    <input
-                      type="file"
-                      id="image-upload"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      style={{ display: "none" }}
-                    />
-                    {image && (
-                      <div className="image-preview">
-                        <img src={image} alt="Uploaded" className="img-thumbnail" />
-                      </div>
-                    )}
-                  </div>
+                <Col xs={12} md={2}>
+                <label>Image</label>
+                {image && (
+              <div className="image-view">
+                <img src={image} alt="Uploaded" className="img-thumbnail" />
+              </div>
+            )}
                 </Col>
               </Row>
         </Col>
-        </div>
+        
+        {/* <div className="repair-form-right">
+        <Col className="form-section">        
+        <Row>
+        <Col xs={12} md={4}>
+          <div className="image-upload-container">
+            {image && (
+              <div className="image-view">
+                <img src={image} alt="Uploaded" className="img-thumbnail" />
+              </div>
+            )}
+          </div>
+        </Col>
+      </Row>
+        </Col>
+        </div> */}
         </div>  
         {/* Extra Charges */}
         <Row className="form-section">

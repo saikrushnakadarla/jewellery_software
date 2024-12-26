@@ -85,12 +85,12 @@ function CompanyInfo() {
 
     if (editMode) {
       try {
-        const response = await axios.put(`${baseURL}/api/companies/${editId}`, formData);
+        const response = await axios.put(`${baseURL}/edit/companies/${editId}`, formData);
         console.log("Data updated:", response.data);
 
         setSubmittedData(
           submittedData.map((item) =>
-            item.company_id === editId ? { ...formData, company_id: editId } : item
+            item.id === editId ? { ...formData, id: editId } : item
           )
         );
 
@@ -101,8 +101,8 @@ function CompanyInfo() {
       }
     } else {
       try {
-        const response = await axios.post(`${baseURL}/api/companies/`, formData);
-        setSubmittedData([...submittedData, { ...formData, company_id: response.data.id }]);
+        const response = await axios.post(`${baseURL}/post/companies`, formData);
+        setSubmittedData([...submittedData, { ...formData, id: response.data.id }]);
         resetForm();
         alert(`CompanyInfo created successfully!`);
       } catch (error) {
@@ -113,7 +113,7 @@ function CompanyInfo() {
 
   const handleEdit = (row) => {
     setEditMode(true);
-    setEditId(row.company_id); // Set the ID of the record being edited
+    setEditId(row.id); // Set the ID of the record being edited
     setFormData({ ...row }); // Pre-fill the form with the selected record's data
     setErrors({}); // Clear any previous errors
 
@@ -131,8 +131,8 @@ function CompanyInfo() {
     }
 
     try {
-      await axios.delete(`${baseURL}/api/companies/${id}`);
-      setSubmittedData(submittedData.filter((item) => item.company_id !== id));
+      await axios.delete(`${baseURL}/delete/companies/${id}`);
+      setSubmittedData(submittedData.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Error deleting record:", error);
     }
@@ -190,13 +190,13 @@ function CompanyInfo() {
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
             <button className="action-button edit-button"
-                          onClick={() => handleEdit(row.original.company_id)}
-                          >
+              onClick={() => handleEdit(row.original)}
+            >
               <FaEdit />
             </button>
             <button
               className="action-button delete-button"
-              onClick={() => handleDelete(row.original.company_id)}
+              onClick={() => handleDelete(row.original.id)}
             >
               <FaTrash />
             </button>

@@ -180,25 +180,26 @@ const RepairForm = () => {
     }
   }, [id]);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const updatedFormData = {
-    ...formData,
-
-  };
-
-  try {
-    const response = await axios.post(`${baseURL}/add/repairs`, updatedFormData);
-    if (response.status === 201) {
-      alert("Repair entry added successfully!");
-      navigate("/repairstable");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const updatedFormData = {
+      ...formData,
+      image, // Include the image data as Base64
+    };
+  
+    try {
+      const response = await axios.post(`${baseURL}/add/repairs`, updatedFormData);
+      if (response.status === 201) {
+        alert("Repair entry added successfully!");
+        navigate("/repairstable");
+      }
+    } catch (error) {
+      console.error("Error submitting the form:", error);
+      alert("Failed to submit the repair entry");
     }
-  } catch (error) {
-    console.error("Error submitting the form:", error);
-    alert("Failed to submit the repair entry");
-  }
-};
+  };
+  
 
   const handleAddCustomer = () => {
     navigate("/customermaster", { state: { from: "/repairs" } });
