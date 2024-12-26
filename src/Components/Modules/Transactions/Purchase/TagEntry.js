@@ -7,7 +7,7 @@ import StoneDetailsModal from "./PurchaseStoneDetails";
 import { useNavigate } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 
-const TagEntry = ({handleCloseModal1 }) => {
+const TagEntry = ({ handleCloseModal1 }) => {
     const [productOptions, setProductOptions] = useState([]);
     const [formData, setFormData] = useState({
         product_id: "",
@@ -193,7 +193,7 @@ const TagEntry = ({handleCloseModal1 }) => {
         }
     };
 
-    
+
 
 
     return (

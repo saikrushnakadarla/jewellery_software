@@ -696,7 +696,7 @@ const URDPurchase = () => {
                     <InputField label="Aadhar" value={formData.aadhar_card}
                       onChange={(e) => handleChange("aadhar_card", e.target.value)} />
                   </Col> */}
-                 
+
                   <Col xs={12} md={4}>
                     <InputField label="GSTIN" value={formData.gst_in}
                       onChange={(e) => handleChange("gst_in", e.target.value)} />
@@ -1019,12 +1019,12 @@ const URDPurchase = () => {
               </Col>
 
               <Col xs={12} md={1}>
-              <Button onClick={handleAdd}>
-            {editingIndex !== null ? "Update" : "Add"}
-          </Button>
+                <Button onClick={handleAdd}>
+                  {editingIndex !== null ? "Update" : "Add"}
+                </Button>
               </Col>
             </Row>
-            <div style={{ overflowX: "scroll",marginTop:'-27px'}}>
+            <div style={{ overflowX: "scroll", marginTop: '-27px' }}>
               <Table striped bordered hover className="mt-4">
                 <thead>
                   <tr>
@@ -1106,22 +1106,24 @@ const URDPurchase = () => {
                       <td>{data.clear}</td>
                       <td>{data.class}</td>
                       <td>{data.cut}</td>
-                      <td style={{display:'flex'}}>
-                        <button className="btn btn-primary" style={{backgroundColor:'rgb(163, 110, 41)',width:'102px'}} onClick={handleOpenModal}>Tag Entry</button> {/* New Action button */}
+                      <td style={{ display: 'flex' }}>
+                        <button type="button" className="btn btn-primary" style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }} onClick={handleOpenModal}>Tag Entry</button> {/* New Action button */}
                         <button
-                    className="action-button edit-button"
-                    onClick={() => handleEdit(index)}
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                     className="action-button delete-button"
-                    onClick={() => handleDelete(index)}
-                  >
-                    <FaTrash />
-                  </button>
+                          type="button"
+                          className="action-button edit-button"
+                          onClick={() => handleEdit(index)}
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          type="button"
+                          className="action-button delete-button"
+                          onClick={() => handleDelete(index)}
+                        >
+                          <FaTrash />
+                        </button>
                       </td>
-                     
+
                     </tr>
                   ))}
                 </tbody>
@@ -1146,26 +1148,27 @@ const URDPurchase = () => {
 
       {/* Modal containing the TagEntry component */}
       <Modal
-  show={showModal1}
-  onHide={handleCloseModal1}
-  size="lg"
-  backdrop="static" // Prevent closing by clicking outside
-  keyboard={false}  // Prevent closing with Esc key
-  dialogClassName="custom-tagentrymodal-width"
->
-  <Modal.Header closeButton>
-    <Modal.Title>Tag Entry</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    {/* Render the TagEntry component inside the modal */}
-    <TagEntry handleCloseModal={handleCloseModal1} />
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={handleCloseModal1}>
-      Close
-    </Button>
-  </Modal.Footer>
-</Modal>
+        show={showModal1}
+        onHide={handleCloseModal1}
+        size="lg"
+        backdrop="static" // Prevent closing by clicking outside
+        keyboard={false}  // Prevent closing with Esc key
+        dialogClassName="custom-tagentrymodal-width"
+
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Tag Entry</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* Render the TagEntry component inside the modal */}
+          <TagEntry handleCloseModal={handleCloseModal1} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal1}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

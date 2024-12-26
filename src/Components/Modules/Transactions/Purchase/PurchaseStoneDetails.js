@@ -3,6 +3,7 @@ import InputField from "../../Masters/ItemMaster/Inputfield";
 import DataTable from "../StockEntry/StoneTableLayout";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
+import "../StockEntry/StockEntry.css";
 
 const PurchaseStoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetails }) => {
   const [subproductname, setSubProductName] = useState("");
