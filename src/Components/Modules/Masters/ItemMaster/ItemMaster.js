@@ -127,6 +127,17 @@ const FormWithTable = () => {
         [name]: value,
       }));
     }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      // Automatically update PCode_BarCode when item_prefix changes
+      ...(name === "item_prefix" ? { PCode_BarCode: value } : {}),
+    }));
+     // Prevent "RB" as input for "item_prefix"
+     if (name === "item_prefix" && value === "RB") {
+      alert("The value 'RB' is not allowed for Item Prefix.");
+      return;
+    }
   };
 
   const handleDeleteOpenTagEntry = (index) => {
@@ -478,6 +489,17 @@ const FormWithTable = () => {
     fetchLastRbarcode();
   }, []);
 
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //     // Automatically update PCode_BarCode when item_prefix changes
+  //     ...(name === "item_prefix" ? { PCode_BarCode: value } : {}),
+  //   }));
+  // };
+
 
   return (
     <div style={{ paddingTop: "90px" }}>
@@ -506,7 +528,7 @@ const FormWithTable = () => {
                   name="rbarcode"
                   value={formData.rbarcode}
                   onChange={handleChange}
-                 
+
                 />
 
 

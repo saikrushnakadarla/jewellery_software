@@ -282,6 +282,7 @@ const [taxOptions, setTaxOptions] = useState([]);
               name="rbarcode"
               value={formData.rbarcode}
               onChange={handleChange}
+              readOnly
             />
             <InputField
               label="Metal Type:"
