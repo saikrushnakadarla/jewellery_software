@@ -170,30 +170,49 @@ const RepairForm = () => {
       const fetchRepairDetails = async () => {
         try {
           const response = await axios.get(`${baseURL}/get/repairs/${id}`);
-          setFormData(response.data); // Populate form with fetched data
+          const repairData = response.data;
+  
+          setFormData((prev) => ({
+            ...prev,
+            ...repairData, // Populate with fetched data
+          }));
+  
+          // Pre-populate customer-related fields
+          if (repairData.customer_id) {
+            handleCustomerChange(repairData.customer_id); 
+          }
         } catch (error) {
           console.error("Error fetching repair details:", error);
         }
       };
-
+  
       fetchRepairDetails();
     }
   }, [id]);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
     const updatedFormData = {
       ...formData,
-      image, // Include the image data as Base64
+      image,
     };
-  
+
     try {
-      const response = await axios.post(`${baseURL}/add/repairs`, updatedFormData);
-      if (response.status === 201) {
-        alert("Repair entry added successfully!");
-        navigate("/repairstable");
+      if (id) {
+        // Update existing repair record
+        const response = await axios.put(`${baseURL}/update/repairs/${id}`, updatedFormData);
+        if (response.status === 200) {
+          alert("Repair entry updated successfully!");
+        }
+      } else {
+        // Create a new repair record
+        const response = await axios.post(`${baseURL}/add/repairs`, updatedFormData);
+        if (response.status === 201) {
+          alert("Repair entry added successfully!");
+        }
       }
+      navigate("/repairstable");
     } catch (error) {
       console.error("Error submitting the form:", error);
       alert("Failed to submit the repair entry");
@@ -464,7 +483,13 @@ const RepairForm = () => {
         {/* Buttons */}
         <div className="form-buttons">
           <Button className="cus-back-btn" variant="secondary"  onClick={handleBack}>cancel</Button>
-          <Button type="submit" variant="primary" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Save</Button>
+          <Button
+              type="submit"
+              variant="primary"
+              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+            >
+              {id ? "Update" : "Save"}
+            </Button>
         </div>
         </Form>
       </Container>

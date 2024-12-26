@@ -48,6 +48,8 @@ import Orders from './Components/Modules/Transactions/OrderSection/OrderForm';
 import BarCodePrinting from './Components/Modules/Reports/BarcodePrinting/BarCodePrinting';
 import SalesNew from './Components/Modules/Transactions/Sales/SalesNew';
 import RepairDetails from "./Components/Modules/Transactions/Sales/SalesDetailsModules";
+import Worker_Master from './Components/Modules/Masters/Worker/Worker';
+import Worker_Table from './Components/Modules/Masters/Worker/WorkerTable';
 
 function App() {
   const location = useLocation();
@@ -62,6 +64,7 @@ function App() {
         <Route path="/" exact element={<Dashboard />} />
         <Route path="/itemmaster" exact element={<ItemMaster />} />
         <Route path="/repairs" element={<Repairs />} />
+        <Route path="/repairs/:id" element={<Repairs />} />
         <Route path="/repairsview/:id" element={<RepairsView />} />
         <Route path="/repairstable" element={<RepairsTable />} />
         <Route path="/urd_purchase" element={<URDPurchase />} />
@@ -74,6 +77,9 @@ function App() {
         <Route path="/customermaster/:id" element={<Customer_Master />} />
         <Route path="/suppliermaster" element={<Supplier_Master />} />
         <Route path="/suppliermaster/:id" element={<Supplier_Master />} />
+        <Route path="/workermaster" element={<Worker_Master />} />
+        <Route path="/workermaster/:id" element={<Worker_Master />} />
+        <Route path="/workerstable" element={<Worker_Table />} />
         <Route path="/stockEntry" element={<StockEntry />} />
         <Route path="/stockEntryTable" element={<StockEntryTable />} />
         <Route path="/estimates/:product_id" element={<Estimate />} />

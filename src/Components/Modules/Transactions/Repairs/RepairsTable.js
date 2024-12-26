@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button, Row, Col, Modal, Form, Overlay, Popover, Table } from 'react-bootstrap';
-import { FaEye, FaTrash} from 'react-icons/fa';
+import { FaEye, FaTrash,FaEdit} from 'react-icons/fa';
 import { FiAlignJustify } from 'react-icons/fi';
 import DataTable from '../../../Pages/InputField/TableLayout';
 import './RepairsTable.css';
@@ -134,6 +134,12 @@ const handlePopoverToggle = (event, repairId) => {
               <FaEye />
             </button>
             <button
+              className="action-button edit-button"
+              onClick={() => handleRepairEdit(row.original.repair_id)}
+            >
+              <FaEdit />
+            </button>
+            <button
               className="action-button delete-button"
               onClick={() => handleDeleteRepair(row.original.repair_id)}
             >
@@ -152,6 +158,10 @@ const handlePopoverToggle = (event, repairId) => {
     ],
     [popoverData.repairId]
   );
+
+  const handleRepairEdit = (id) => {
+    navigate(`/repairs/${id}`);
+  };
 
   const handleDeleteRepair = async (repairId) => {
     const isConfirmed = window.confirm("Are you sure you want to delete this repair?");
