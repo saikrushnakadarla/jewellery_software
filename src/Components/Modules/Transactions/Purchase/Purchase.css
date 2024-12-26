@@ -39,6 +39,26 @@
       }
     
       .urd-form-section {
+        margin-top: -15px;
+        margin-bottom: 10px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: rgba(163, 110, 41, 0.08);
+      }
+      .urd-form1-section {
+        height: 85%;
+        width: 60%;
+        margin-bottom: 10px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: rgba(163, 110, 41, 0.08);
+      }
+      .urd-form2-section {
+        height: 131px;
+        width: 158%;
+        margin-left: -350px;
         margin-bottom: 10px;
         padding: 15px;
         border: 1px solid #ddd;

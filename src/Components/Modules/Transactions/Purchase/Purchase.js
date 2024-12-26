@@ -596,10 +596,10 @@ const URDPurchase = () => {
           <div className="purchase-form">
             <div className="purchase-form-left">
               {/* Customer Details */}
-              <Col className="urd-form-section">
+              <Col className="urd-form1-section">
                 <h4 className="mb-4">Supplier Details</h4>
                 <Row>
-                  <Col xs={12} md={3} className="d-flex align-items-center">
+                  <Col xs={12} md={4} className="d-flex align-items-center">
                     <div style={{ flex: 1 }}>
                       <InputField
                         label="Mobile"
@@ -626,7 +626,7 @@ const URDPurchase = () => {
                       }}
                     />
                   </Col>
-                  <Col xs={12} md={3}>
+                  <Col xs={12} md={4}>
                     <InputField
                       label="Customer Name:"
                       name="account_name"
@@ -642,7 +642,7 @@ const URDPurchase = () => {
 
                     />
                   </Col>
-                  <Col xs={12} md={3}>
+                  {/* <Col xs={12} md={3}>
                     <InputField
                       label="Email:"
 
@@ -695,24 +695,25 @@ const URDPurchase = () => {
                   <Col xs={12} md={3}>
                     <InputField label="Aadhar" value={formData.aadhar_card}
                       onChange={(e) => handleChange("aadhar_card", e.target.value)} />
-                  </Col>
-                  <Col xs={12} md={3}>
+                  </Col> */}
+                 
+                  <Col xs={12} md={4}>
                     <InputField label="GSTIN" value={formData.gst_in}
                       onChange={(e) => handleChange("gst_in", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={3}>
+                  {/* <Col xs={12} md={3}>
                     <InputField label="PAN" value={formData.pan_card}
                       onChange={(e) => handleChange("pan_card", e.target.value)} />
-                  </Col>
+                  </Col> */}
 
                 </Row>
 
               </Col>
             </div>
             <div className="purchase-form-right">
-              <Col className="urd-form-section">
+              <Col className="urd-form2-section">
                 <Row>
-                  <Col xs={12} md={4}>
+                  <Col xs={12} md={3}>
                     <InputField label="Terms" type="select" value={formData.terms}
                       onChange={(e) => handleChange("terms", e.target.value)}
                       options={[
@@ -721,23 +722,23 @@ const URDPurchase = () => {
                       ]}
                     />
                   </Col>
-                  <Col xs={12} md={4} >
+                  <Col xs={12} md={3} >
                     <InputField label="Indent" value={formData.indent}
                       onChange={(e) => handleChange("indent", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={4} >
+                  <Col xs={12} md={2} >
                     <InputField label="Bill No" value={formData.bill_no}
                       onChange={(e) => handleChange("bill_no", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={6} >
+                  <Col xs={12} md={2} >
                     <InputField label="Type" value={formData.type}
                       onChange={(e) => handleChange("type", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={6} >
+                  <Col xs={12} md={2} >
                     <InputField label="Rate-Cut" value={formData.rate_cut}
                       onChange={(e) => handleChange("rate_cut", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={6}>
+                  <Col xs={12} md={3}>
                     <InputField
                       label="Date"
                       type="date"
@@ -745,15 +746,15 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("date", e.target.value)}
                     />
                   </Col>
-                  <Col xs={12} md={6} >
+                  <Col xs={12} md={3} >
                     <InputField label="Bill Date" type="date" value={formData.bill_date}
                       onChange={(e) => handleChange("bill_date", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={6} >
+                  <Col xs={12} md={3} >
                     <InputField label="Due Date" type="date" value={formData.due_date}
                       onChange={(e) => handleChange("due_date", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={6} >
+                  <Col xs={12} md={3} >
                     <InputField label="Rate" value={formData.Purchase_rate}
                       onChange={(e) => handleChange("Purchase_rate", e.target.value)} />
                   </Col>
@@ -1023,7 +1024,7 @@ const URDPurchase = () => {
           </Button>
               </Col>
             </Row>
-            <div style={{ overflowX: "scroll" }}>
+            <div style={{ overflowX: "scroll",marginTop:'-27px'}}>
               <Table striped bordered hover className="mt-4">
                 <thead>
                   <tr>
