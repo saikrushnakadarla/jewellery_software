@@ -45,7 +45,8 @@ const URDPurchase = () => {
       product_name: "",
       metal_type: "",
       design_name: "",
-      purity: "916 HM",
+      purity: "",
+      purityPercentage: "",
       hsn: "",
       product_type: "",
       stock_type: "",
@@ -78,14 +79,110 @@ const URDPurchase = () => {
       cut: "",
     });
 
+  // Fetch purity percentage when purity changes
+  useEffect(() => {
+    const fetchPurityPercentage = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/purity");
+        const purityData = Array.isArray(response.data) ? response.data : [response.data]; // Ensure response is an array
+
+        console.log("API Data:", purityData); // Log the API data for debugging
+
+        // Find the matching purity
+        const matchedPurity = purityData.find(
+          (item) => item.purity === formData.purity
+        );
+
+        if (matchedPurity) {
+          console.log("Matched Purity:", matchedPurity); // Log the matched purity
+          setFormData((prevData) => ({
+            ...prevData,
+            purityPercentage: matchedPurity.purity_percentage,
+          }));
+        } else {
+          console.warn("Purity not found in API data");
+        }
+      } catch (error) {
+        console.error("Error fetching purity data:", error);
+      }
+    };
+
+    fetchPurityPercentage();
+  }, [formData.purity]); // Re-run when `purity` changes
+
   const [tableData, setTableData] = useState([]);
   const [isQtyEditable, setIsQtyEditable] = useState(false);
   const [products, setProducts] = useState([]);
   const [data, setData] = useState([]);
 
   const handleChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const updatedFormData = { ...prev, [field]: value };
+  
+      // Automatically calculate net_weight
+      if (field === "gross_weight" || field === "stone_weight") {
+        const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
+        const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
+        updatedFormData.net_weight = grossWeight - stoneWeight;
+      }
+  
+      // Always calculate pure_weight when net_weight or purityPercentage changes
+      const netWeight = parseFloat(updatedFormData.net_weight) || 0;
+      const purityPercentage = parseFloat(updatedFormData.purityPercentage) || 0;
+      updatedFormData.pure_weight = (netWeight * purityPercentage) / 100;
+  
+      // Automatically calculate waste_amount
+      const pureWeight = parseFloat(updatedFormData.pure_weight) || 0;
+      const wastePercentage = parseFloat(updatedFormData.waste_percentage) || 0;
+      updatedFormData.waste_amount = (pureWeight * wastePercentage) / 100;
+  
+      // Automatically calculate total_weight
+      const wasteAmount = parseFloat(updatedFormData.waste_amount) || 0;
+      updatedFormData.total_weight = pureWeight + wasteAmount;
+  
+      // Automatically calculate wt_rate_amount
+      const totalWeight = parseFloat(updatedFormData.total_weight) || 0;
+      const stoneRate = parseFloat(updatedFormData.stone_rate) || 0;
+      updatedFormData.wt_rate_amount = totalWeight * stoneRate;
+  
+      // Automatically calculate mc
+      const mcPerGram = parseFloat(updatedFormData.mc_per_gram) || 0;
+      updatedFormData.mc = totalWeight * mcPerGram;
+  
+      // Automatically calculate total_amount (before adding stone_amount)
+      const wtRateAmount = parseFloat(updatedFormData.wt_rate_amount) || 0;
+      const mc = parseFloat(updatedFormData.mc) || 0;
+      updatedFormData.total_amount = wtRateAmount + mc;
+  
+      // Case 1: If "ct" is selected in CWP, calculate stone_amount = stone_ct * rate
+      if (updatedFormData.cwp === "ct") {
+        const stoneCt = parseFloat(updatedFormData.stone_ct) || 0;
+        const rate = parseFloat(updatedFormData.rate) || 0;
+        updatedFormData.stone_amount = stoneCt * rate;
+      }
+  
+      // Case 2: If "weight" is selected in CWP, calculate stone_amount = gms * rate
+      if (updatedFormData.cwp === "weight") {
+        const gms = parseFloat(updatedFormData.gms) || 0;
+        const rate = parseFloat(updatedFormData.rate) || 0;
+        updatedFormData.stone_amount = gms * rate;
+      }
+  
+      // Case 3: If "piece" is selected in CWP, calculate stone_amount = stone_pcs * rate
+      if (updatedFormData.cwp === "piece") {
+        const stonePcs = parseFloat(updatedFormData.stone_pcs) || 0;
+        const rate = parseFloat(updatedFormData.rate) || 0;
+        updatedFormData.stone_amount = stonePcs * rate;
+      }
+  
+      // Automatically add stone_amount to total_amount
+      const stoneAmount = parseFloat(updatedFormData.stone_amount) || 0;
+      updatedFormData.total_amount += stoneAmount;
+  
+      return updatedFormData;
+    });
   };
+  
 
   const [editingIndex, setEditingIndex] = useState(null);
 
@@ -107,7 +204,8 @@ const URDPurchase = () => {
       product_name: "",
       metal_type: "",
       design_name: "",
-      purity: "916 HM",
+      purity: "",
+      purityPercentage: "",
       hsn: "",
       product_type: "",
       stock_type: "",
@@ -188,6 +286,8 @@ const URDPurchase = () => {
       alert("Failed to save data.");
     }
   };
+
+
 
   const handleEdit = (index) => {
     setFormData(tableData[index]); // Populate the form with selected row data
@@ -771,7 +871,7 @@ const URDPurchase = () => {
             <Row>
               <Col xs={12} md={2}>
                 <InputField
-                  label="BarCode/Rbarcode"
+                  label="Rbarcode"
                   name="code"
                   value={formData.code}
                   onChange={(e) => handleBarcodeChange(e.target.value)}
@@ -912,14 +1012,19 @@ const URDPurchase = () => {
                   readOnly
                 />
               </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Purity Percentage"
+                  name="purityPercentage"
+                  value={formData.purityPercentage}
+                  readOnly
+                />
+              </Col>
               <Col xs={12} md={1}>
                 <InputField label="Pure Wt" type="number" value={formData.pure_weight}
                   onChange={(e) => handleChange("pure_weight", e.target.value)} />
               </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Rate" type="number" value={formData.stone_rate}
-                  onChange={(e) => handleChange("stone_rate", e.target.value)} />
-              </Col>
+              
               <Col xs={12} md={1}>
                 <InputField label="Unit" type="number" value={formData.unit_weight}
                   onChange={(e) => handleChange("unit_weight", e.target.value)} />
@@ -945,6 +1050,10 @@ const URDPurchase = () => {
                 <InputField label="Total Wt" type="number" value={formData.total_weight}
                   onChange={(e) => handleChange("total_weight", e.target.value)} />
               </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Rate" type="number" value={formData.stone_rate}
+                  onChange={(e) => handleChange("stone_rate", e.target.value)} />
+              </Col>
               <Col xs={12} md={2}>
                 <InputField label="WT*Rate Amt" type="number" value={formData.wt_rate_amount}
                   onChange={(e) => handleChange("wt_rate_amount", e.target.value)} />
@@ -956,10 +1065,6 @@ const URDPurchase = () => {
               <Col xs={12} md={1}>
                 <InputField label="MC" type="number" value={formData.mc}
                   onChange={(e) => handleChange("mc", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Total" type="number" value={formData.total_amount}
-                  onChange={(e) => handleChange("total_amount", e.target.value)} />
               </Col>
             </Row>
             <Row>
@@ -1013,9 +1118,13 @@ const URDPurchase = () => {
                 <InputField label="Cut" value={formData.cut}
                   onChange={(e) => handleChange("cut", e.target.value)} />
               </Col>
-              <Col xs={12} md={1}>
+              {/* <Col xs={12} md={1}>
                 <InputField label="CT" type="number" value={formData.stone_ct}
                   onChange={(e) => handleChange("stone_ct", e.target.value)} />
+              </Col> */}
+              <Col xs={12} md={1}>
+                <InputField label="Total" type="number" value={formData.total_amount}
+                  onChange={(e) => handleChange("total_amount", e.target.value)} />
               </Col>
 
               <Col xs={12} md={1}>
@@ -1034,6 +1143,7 @@ const URDPurchase = () => {
                     <th>Metal Type</th>
                     <th>Design Name</th>
                     <th>Purity</th>
+                    <th>purityPercentage</th>
                     <th>HSN</th>
                     <th>Product Type</th>
                     <th>Stock Type</th>
@@ -1076,6 +1186,7 @@ const URDPurchase = () => {
                       <td>{data.metal_type}</td>
                       <td>{data.design_name}</td>
                       <td>{data.purity}</td>
+                      <td>{data.purityPercentage}</td>
                       <td>{data.hsn}</td>
                       <td>{data.product_type}</td>
                       <td>{data.stock_type}</td>

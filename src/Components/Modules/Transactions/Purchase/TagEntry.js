@@ -203,7 +203,7 @@ const TagEntry = ({ handleCloseModal1 }) => {
                     <div className="col-12">
                         <form className="p-4 border rounded form-container-stockentry" onSubmit={handleSubmit}>
                             <div className="mb-4">
-                                <h4>Stock Entry</h4>
+                                {/* <h4>Stock Entry</h4> */}
                                 <div className="row g-3">
                                     <div className="col-md-2">
                                         <InputField
@@ -218,7 +218,7 @@ const TagEntry = ({ handleCloseModal1 }) => {
                                             ]}
                                         />
                                     </div>
-                                    <div className="col-md-2">
+                                    {/* <div className="col-md-2">
                                         <InputField
                                             label="P ID:"
                                             name="product_id"
@@ -227,14 +227,6 @@ const TagEntry = ({ handleCloseModal1 }) => {
                                             onChange={handleChange}
                                             options={productOptions}
                                         />
-                                        {/* <InputField
-                                            label="P ID:"
-                                            name="product_id"
-                                            type="text"
-                                            value={formData.product_id}
-                                            onChange={handleChange}
-                                            
-                        /> */}
                                     </div>
                                     <div className="col-md-2">
                                         <InputField
@@ -278,7 +270,7 @@ const TagEntry = ({ handleCloseModal1 }) => {
                                             value={formData.Purity}
                                             readOnly
                                         />
-                                    </div>
+                                    </div> */}
                                     <div className="col-md-3">
                                         <InputField
                                             label="PCode/BarCode:"
