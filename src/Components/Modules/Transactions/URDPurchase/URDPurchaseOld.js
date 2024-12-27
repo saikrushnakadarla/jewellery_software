@@ -53,65 +53,8 @@ const URDPurchase = () => {
     const [purity, setPurity] = useState([]);
     const [metalType, setMetalType] = useState([]);
 
-    const [purityOptions, setPurityOptions] = useState([]);
-
-     // Function to parse purity value to percentage
-  const parsePurityToPercentage = (purity) => {
-    if (!purity) return null;
-
-    const match = purity.match(/(\d+)(k|K)/); // Match formats like "22K", "24k", etc.
-    if (match) {
-      const caratValue = parseInt(match[1], 10); // Extract carat number
-      return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
-    }
-
-    // Handle other formats like "916HM" directly if required
-    if (purity.toLowerCase() === "916hm") return 91.6;
-
-    return null; // Default if no match
-  };
-
     const handleInputChange = (e) => {
       const { name, value } = e.target;
-
-       // Update the product details
-    const updatedDetails = {
-      ...productDetails,
-      [name]: value,
-    };
-
-    // Calculate Net WT based on updated details
-    if (
-      updatedDetails.gross &&
-      updatedDetails.dust &&
-      updatedDetails.ml_percent &&
-      updatedDetails.purity
-    ) {
-      const purityValue = parsePurityToPercentage(updatedDetails.purity);
-
-      if (purityValue) {
-        const gross = parseFloat(updatedDetails.gross) || 0;
-        const dust = parseFloat(updatedDetails.dust) || 0;
-        const mlPercent = parseFloat(updatedDetails.ml_percent) || 0;
-
-        const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
-
-        updatedDetails.eqt_wt = netWeight.toFixed(2); // Display as a string with 2 decimal points
-      }
-    }
-
-      // Recalculate Amount when Net WT or Rate changes
-      if (updatedDetails.eqt_wt && updatedDetails.rate) {
-        const netWT = parseFloat(updatedDetails.eqt_wt) || 0;
-        const rate = parseFloat(updatedDetails.rate) || 0;
-  
-        const totalAmount = netWT * rate; // Calculate Amount
-        updatedDetails.total_amount = totalAmount.toFixed(2); // Display as a string with 2 decimal points
-      }
-  
-      setProductDetails(updatedDetails);
-
-    setProductDetails(updatedDetails);
       setProductDetails((prevDetails) => ({
         ...prevDetails,
         [name]: value,
@@ -255,26 +198,13 @@ const URDPurchase = () => {
       }
     };
 
-    // useEffect(() => {
-    //   const fetchPurity = async () => {
-    //     try {
-    //       const response = await axios.get(`${baseURL}/purity`);
-    //       setPurity(response.data); // Populate table with fetched data
-    //     } catch (error) {
-    //       console.error("Error fetching data:", error);
-    //     }
-    //   };
-  
-    //   fetchPurity();
-    // }, []);
-
     useEffect(() => {
       const fetchPurity = async () => {
         try {
           const response = await axios.get(`${baseURL}/purity`);
-          setPurityOptions(response.data); // Populate purity options dynamically
+          setPurity(response.data); // Populate table with fetched data
         } catch (error) {
-          console.error("Error fetching purity options:", error);
+          console.error("Error fetching data:", error);
         }
       };
   
@@ -504,7 +434,7 @@ const URDPurchase = () => {
             name="purity"
             value={productDetails.purity}
             onChange={handleInputChange}
-            options={purityOptions.map((purity) => ({
+            options={purity.map((purity) => ({
               value: purity.name, 
               label: purity.name,
             }))}
@@ -547,42 +477,42 @@ const URDPurchase = () => {
           />
         </Col>
         <Col xs={12} md={2}>
-        <InputField
-          label="Net WT"
-          type="number"
-          name="eqt_wt"
-          value={productDetails.eqt_wt}
-          onChange={handleInputChange}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Touch %"
-          type="number"
-          name="touch_percent"
-          value={productDetails.touch_percent}
-          onChange={handleInputChange}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Rate"
-          type="number"
-          name="rate"
-          value={productDetails.rate}
-          onChange={handleInputChange}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Amount"
-          type="number"
-          name="total_amount"
-          value={productDetails.total_amount}
-          onChange={handleInputChange}
-          readOnly
-        />
-      </Col>
+          <InputField
+            label="Net WT"
+            type="number"
+            name="eqt_wt"
+            value={productDetails.eqt_wt}
+            onChange={handleInputChange}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField
+            label="Touch %"
+            type="number"
+            name="touch_percent"
+            value={productDetails.touch_percent}
+            onChange={handleInputChange}
+          />
+        </Col>
+
+        <Col xs={12} md={2}>
+          <InputField
+            label="Rate"
+            type="number"
+            name="rate"
+            value={productDetails.rate}
+            onChange={handleInputChange}
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Amount"
+            type="number"
+            name="total_amount"
+            value={productDetails.total_amount}
+            onChange={handleInputChange}
+          />
+        </Col>
         <Col xs={12} md={2}>
           <InputField
             label="Remarks"

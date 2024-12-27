@@ -131,7 +131,9 @@ const FormWithTable = () => {
       ...prev,
       [name]: value,
       // Automatically update PCode_BarCode when item_prefix changes
-      ...(name === "item_prefix" ? { PCode_BarCode: value } : {}),
+      ...(name === "item_prefix"
+        ? { PCode_BarCode: `${value}${prev.suffix || "001"}` }
+        : {}),
     }));
      // Prevent "RB" or "rb" (case insensitive) as input for "item_prefix"
      if (name === "item_prefix" && value.toLowerCase() === "rb") {
@@ -500,6 +502,23 @@ const FormWithTable = () => {
   //     ...(name === "item_prefix" ? { PCode_BarCode: value } : {}),
   //   }));
   // };
+  useEffect(() => {
+    const getLastPcode = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/last-pbarcode`);
+        const suffix = response.data.lastPCode_BarCode || "001"; // Fallback to "001" if no value is fetched
+        setFormData((prev) => ({
+          ...prev,
+          PCode_BarCode: `${prev.item_prefix || ""}${suffix}`,
+          suffix, // Store the suffix for future use
+        }));
+      } catch (error) {
+        console.error("Error fetching last PCode_BarCode:", error);
+      }
+    };
+  
+    getLastPcode();
+  }, []);
 
 
   return (
