@@ -50,18 +50,20 @@ import SalesNew from './Components/Modules/Transactions/Sales/SalesNew';
 import RepairDetails from "./Components/Modules/Transactions/Sales/SalesDetailsModules";
 import Worker_Master from './Components/Modules/Masters/Worker/Worker';
 import Worker_Table from './Components/Modules/Masters/Worker/WorkerTable';
+import Login from './Components/Pages/Login/Login';
 
 function App() {
   const location = useLocation();
 
   // Check if the current route is login or signup
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/Signup";
+  const isAuthPage = location.pathname === "/" || location.pathname === "/";
 
   return (
     <>
       {!isAuthPage && <Navbar />}
       <Routes>
-        <Route path="/" exact element={<Dashboard />} />
+      <Route path="/" exact element={<Login />} />
+        <Route path="/dashboard" exact element={<Dashboard />} />
         <Route path="/itemmaster" exact element={<ItemMaster />} />
         <Route path="/repairs" element={<Repairs />} />
         <Route path="/repairs/:id" element={<Repairs />} />
