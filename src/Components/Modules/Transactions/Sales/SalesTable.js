@@ -193,9 +193,9 @@ const RepairsTable = () => {
               <Table bordered>
                 <thead>
                 <tr>
-              <th>Code</th>
+              <th>Bar Code</th>
               <th>Product Name</th>
-              <th>Metal</th>
+              {/* <th>Metal</th> */}
               <th>Metal Type</th>
               <th>Purity</th>
               <th>Gross Weight</th>
@@ -211,19 +211,19 @@ const RepairsTable = () => {
                 <tbody>
                   {repairDetails.repeatedData.map((product, index) => (
                     <tr key={index}>
-                       <td>{product.code}</td>
-                <td>{product.product_name}</td>
-                <td>{product.metal || 'N/A'}</td>
-                <td>{product.metal_type}</td>
-                <td>{product.purity}</td>
-                <td>{product.gross_weight}</td>
-                <td>{product.stone_weight}</td>
-                <td>{product.wastage_weight}</td>
-                <td>{product.total_weight_av}</td>
-                <td>{product.making_charges}</td>
-                <td>{product.rate}</td>
-                <td>{product.tax_amt}</td>
-                <td>{product.total_price}</td>
+                      <td>{product.code}</td>
+                      <td>{product.product_name}</td>
+                      {/* <td>{product.metal || 'N/A'}</td> */}
+                      <td>{product.metal_type}</td>
+                      <td>{product.purity}</td>
+                      <td>{product.gross_weight}</td>
+                      <td>{product.stone_weight}</td>
+                      <td>{product.wastage_weight}</td>
+                      <td>{product.total_weight_av}</td>
+                      <td>{product.making_charges}</td>
+                      <td>{product.rate}</td>
+                      <td>{product.tax_amt}</td>
+                      <td>{product.total_price}</td>
                     </tr>
                   ))}
                 </tbody>
