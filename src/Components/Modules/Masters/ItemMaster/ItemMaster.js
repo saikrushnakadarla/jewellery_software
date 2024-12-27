@@ -136,6 +136,7 @@ const FormWithTable = () => {
      // Prevent "RB" or "rb" (case insensitive) as input for "item_prefix"
      if (name === "item_prefix" && value.toLowerCase() === "rb") {
       alert("The value 'RB' is not allowed for Item Prefix.");
+      setFormData((prev) => ({ ...prev, item_prefix: "",PCode_BarCode: "" })); // Reset field value
       return;
     }
   };
