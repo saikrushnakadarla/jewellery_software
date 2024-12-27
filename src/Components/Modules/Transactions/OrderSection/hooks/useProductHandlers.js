@@ -48,6 +48,7 @@ const useProductHandlers = () => {
     total_price: "",
     transaction_status: "Orders",
     qty: "",
+    opentag_id:"",
   });
 
   // Fetch products and tags data
@@ -331,6 +332,7 @@ const useProductHandlers = () => {
             ...prevData,
             code: tag.PCode_BarCode || "",
             product_id: tag.product_id || "",
+            opentag_id:tag.opentag_id || "",
             product_name: productDetails?.product_name || "",
             metal_type: productDetails?.Category || "",
             design_name: productDetails?.design_master || "",

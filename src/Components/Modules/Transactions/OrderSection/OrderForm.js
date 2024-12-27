@@ -251,7 +251,7 @@ const SalesForm = () => {
       <Container className="sales-form-container">
         <Form>
           <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>
-            Sales
+            Orders
           </h3>
           <div className="sales-form">
             <div className="sales-form-left">

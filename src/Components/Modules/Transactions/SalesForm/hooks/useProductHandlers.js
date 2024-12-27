@@ -48,6 +48,7 @@ const useProductHandlers = () => {
     total_price: "",
     transaction_status: "Sales",
     qty: "",
+    opentag_id:"",
   });
 
   // Fetch products and tags data
@@ -315,7 +316,7 @@ const useProductHandlers = () => {
           mc_on: "",
           mc_per_gram: "",
           making_charges: "",
-          tax_percent:product.tax_slab ,
+          tax_percent: product.tax_slab,
           qty: 1, // Set qty to 1 for product
         }));
         setIsQtyEditable(false); // Set qty as read-only
@@ -327,10 +328,14 @@ const useProductHandlers = () => {
           const productId = tag.product_id;
           const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
   
+          // Log opentag_id for debugging
+          console.log("opentag_id:", tag.opentag_id);
+  
           setFormData((prevData) => ({
             ...prevData,
             code: tag.PCode_BarCode || "",
             product_id: tag.product_id || "",
+            opentag_id: tag.opentag_id || "",
             product_name: productDetails?.product_name || "",
             metal_type: productDetails?.Category || "",
             design_name: productDetails?.design_master || "",
@@ -346,7 +351,7 @@ const useProductHandlers = () => {
             mc_on: tag.Making_Charges_On || "",
             mc_per_gram: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
-            tax_percent:productDetails?.tax_slab || "",
+            tax_percent: productDetails?.tax_slab || "",
             qty: 1, // Allow qty to be editable for tag
           }));
           setIsQtyEditable(true); // Allow editing of qty
@@ -385,6 +390,7 @@ const useProductHandlers = () => {
       console.error("Error handling code change:", error);
     }
   };
+  
 
 
 
