@@ -390,9 +390,6 @@ const useProductHandlers = () => {
       console.error("Error handling code change:", error);
     }
   };
-  
-
-
 
   return {
     formData,
