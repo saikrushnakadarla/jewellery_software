@@ -292,6 +292,38 @@ const useProductHandlers = () => {
   
   const handleBarcodeChange = async (code) => {
     try {
+      if (!code) {
+        // If barcode is cleared, reset all related fields
+        setFormData((prevData) => ({
+          ...prevData,
+          code: "",
+          product_id: "",
+          product_name: "",
+          metal_type: "",
+          design_name: "",
+          purity: "",
+          gross_weight: "",
+          stone_weight: "",
+          stone_price: "",
+          weight_bw: "",
+          va_on: "",
+          va_percent: "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gram: "",
+          making_charges: "",
+          rate: "",
+          rate_amt: "",
+          tax_percent: "",
+          tax_amt: "",
+          total_price: "",
+          qty: "", // Reset qty
+        }));
+        setIsQtyEditable(true); // Default to editable if barcode is cleared
+        return; // Exit early
+      }
+  
       // Check for product by code
       const product = products.find((prod) => String(prod.rbarcode) === String(code));
   
@@ -390,6 +422,7 @@ const useProductHandlers = () => {
       console.error("Error handling code change:", error);
     }
   };
+  
 
   return {
     formData,
