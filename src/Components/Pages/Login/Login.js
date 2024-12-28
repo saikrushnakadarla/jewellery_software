@@ -15,28 +15,44 @@ function Login() {
     setShowPassword(!showPassword);
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    console.log('Submitting credentials:', { email, password }); // Debug log
-    setErrorMessage('');
+const handleLogin = async (e) => {
+  e.preventDefault();
+  console.log('Submitting credentials:', { email, password }); // Debug log
+  setErrorMessage(''); // Clear any previous error message
 
-    try {
-      const response = await axios.post('http://localhost:5000/api/login', {
-        email,
-        password,
-      });
-      console.log('Login response:', response.data); // Debug log
-      if (response.data.success) {
-        navigate('/dashboard');
-      } else {
-        setErrorMessage('You do not have admin access.');
-      }
-    } catch (error) {
-      console.error('Login error:', error.response?.data); // Debug log
-      setErrorMessage(error.response?.data?.message || 'An error occurred. Please try again.');
+  if (!email || !password) {
+    setErrorMessage('Please provide both email and password.');
+    return;
+  }
+
+  try {
+    // Send login request
+    const response = await axios.post('http://localhost:5000/login', {
+      email,
+      password,
+    });
+
+    console.log('Login response:', response.data); // Debug log
+
+    // Handle success response from backend
+    if (response.data.success) {
+      navigate('/dashboard');
+    } else {
+      setErrorMessage(response.data.message || 'You do not have admin access.');
     }
-  };
+  } catch (error) {
+    // Improved error handling
+    console.error('Login error:', error); // Debug log for the entire error object
 
+    const errorMessage = 
+      error.response?.data?.message || // Server-provided error message
+      (error.response ? 'An error occurred. Please try again.' : 'Network error. Please check your connection.');
+
+    setErrorMessage(errorMessage);
+  }
+};
+
+  
   return (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
       <div className="card" style={{ width: '36rem', marginTop: '100px' }}>
