@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // React Router for navigation
 import axios from 'axios';
-import logo from '../Login/Logo/logo_white.png';
+import logo from '../Login/Logo/logo_dark.png';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -39,7 +39,7 @@ function Login() {
   return (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
       <div className="card" style={{ width: '36rem', marginTop: '100px' }}>
-        <div className="card-body" style={{backgroundColor:'#a36e29'}}>
+        <div className="card-body">
           <div className="text-center mb-4">
           <img src={logo} alt="Logo" className="mb-3"  style={{width:"250px",height:"100px"}}/>
             <h3>Login</h3>
