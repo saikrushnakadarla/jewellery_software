@@ -45,9 +45,6 @@ const ProductDetails = ({
     formData.purity === "18K" ? rates.rate_18crt :
     formData.purity === "16K" ? rates.rate_16crt :
     "";
-  
-
-  
 
   return (
     <Col >

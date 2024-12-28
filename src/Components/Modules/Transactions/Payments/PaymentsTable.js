@@ -79,8 +79,11 @@ const RepairsTable = () => {
       try {
         const response = await fetch(`${baseURL}/get/payments`); // Fetch data from the endpoint
         const result = await response.json();
+        
         if (result?.payments) {
-          setData(result.payments); // Set fetched data
+          // Filter the data where transaction_type === "Payment"
+          const filteredPayments = result.payments.filter(payment => payment.transaction_type === "Payment");
+          setData(filteredPayments); // Set filtered data
         }
       } catch (error) {
         console.error('Error fetching payments:', error);
@@ -88,6 +91,7 @@ const RepairsTable = () => {
     };
     fetchData();
   }, []);
+  
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this payment?')) return;

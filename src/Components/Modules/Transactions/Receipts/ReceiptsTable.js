@@ -78,11 +78,14 @@ const ReceiptsTable = () => {
       try {
         const response = await fetch(`${baseURL}/get/payments`); // Fetch data from the endpoint
         const result = await response.json();
+        
         if (result?.payments) {
-          setData(result.payments); // Set fetched data
+          // Filter the data where transaction_type === "Payment"
+          const filteredPayments = result.payments.filter(payment => payment.transaction_type === "Receipt");
+          setData(filteredPayments); // Set filtered data
         }
       } catch (error) {
-        console.error('Error fetching Receipts:', error);
+        console.error('Error fetching payments:', error);
       }
     };
     fetchData();
