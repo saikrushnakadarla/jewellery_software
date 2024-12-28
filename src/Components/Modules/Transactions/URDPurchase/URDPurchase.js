@@ -332,31 +332,31 @@ const URDPurchase = () => {
 
   const [rateOptions, setRateOptions] = useState([]);
 
-  useEffect(() => {
-    // Fetch rates from API dynamically
-    const fetchRates = async () => {
-      try {
-        const response = await axios.get("http://localhost:5000/get/current-rates");
-        const data = response.data;
-  
-        // Only fetch the specific rate fields you want
-        const dynamicRates = [
-          { value: data.rate_16crt, label: `16CRT - ₹${data.rate_16crt}` },
-          { value: data.rate_18crt, label: `18CRT - ₹${data.rate_18crt}` },
-          { value: data.rate_22crt, label: `22CRT - ₹${data.rate_22crt}` },
-          { value: data.rate_24crt, label: `24CRT - ₹${data.rate_24crt}` },
-          { value: data.silver_rate, label: `SILVER - ₹${data.silver_rate}` },
-        ];
-  
-        setRateOptions(dynamicRates); // Set the options for the dropdown
-      } catch (error) {
-        console.error("Error fetching rates:", error);
-      }
-    };
-  
-    fetchRates(); // Fetch the rates when the component mounts
-  }, []);
-  
+useEffect(() => {
+  // Fetch rates from API dynamically
+  const fetchRates = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/get/current-rates");
+      const data = response.data;
+
+      // Only fetch the specific rate fields you want
+      const dynamicRates = [
+        { value: data.rate_16crt, label: `16CRT - ₹${data.rate_16crt}` },
+        { value: data.rate_18crt, label: `18CRT - ₹${data.rate_18crt}` },
+        { value: data.rate_22crt, label: `22CRT - ₹${data.rate_22crt}` },
+        { value: data.rate_24crt, label: `24CRT - ₹${data.rate_24crt}` },
+        { value: data.silver_rate, label: `SILVER - ₹${data.silver_rate}` },
+      ];
+
+      setRateOptions(dynamicRates); // Set the options for the dropdown
+    } catch (error) {
+      console.error("Error fetching rates:", error);
+    }
+  };
+
+  fetchRates(); // Fetch the rates when the component mounts
+}, []);
+
 
 
   return (
