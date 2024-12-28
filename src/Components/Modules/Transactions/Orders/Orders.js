@@ -56,6 +56,7 @@ const RepairForm = () => {
     total_price: "",
     transaction_status: "Orders",
     qty:"",
+    opentag_id:"",
   });
   const [paymentDetails, setPaymentDetails] = useState({
     cash_amount: 0,

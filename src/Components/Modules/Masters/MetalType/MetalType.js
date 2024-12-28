@@ -8,6 +8,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 function MetalType() {
   const [formData, setFormData] = useState({
     "metal_name": "",
+    "hsn_code":"",
     "description": "",
     "default_purity": "",
     "default_purity_for_rate_entry": "",
@@ -130,6 +131,7 @@ function MetalType() {
       setFormData({
         metal_name: '',
         // item_type: '',
+        hsn_code:'',
         description: '',
         default_purity: '',
         default_purity_for_rate_entry: '',
@@ -181,14 +183,18 @@ function MetalType() {
         Header: "Metal Name",
         accessor: "metal_name",
       },
+      {
+        Header: "HSN Code",
+        accessor: "hsn_code",
+      },
       // {
       //   Header: "Item Type",
       //   accessor: "item_type",
       // },
-      {
-        Header: "Description",
-        accessor: "description",
-      },
+      // {
+      //   Header: "Description",
+      //   accessor: "description",
+      // },
       {
         Header: "Default Purity",
         accessor: "default_purity",
@@ -205,22 +211,22 @@ function MetalType() {
         Header: "Default Issue Purity",
         accessor: "default_issue_purity",
       },
-      {
-        Header: "Action",
-        Cell: ({ row }) => (
-          <div className="d-flex align-items-center">
-            <button className="action-button edit-button" onClick={() => handleEdit(row.original.metal_type_id)}>
-              <FaEdit />
-            </button>
-            <button
-              className="action-button delete-button"
-              onClick={() => handleDelete(row.original.metal_type_id)}
-            >
-              <FaTrash />
-            </button>
-          </div>
-        ),
-      },
+      // {
+      //   Header: "Action",
+      //   Cell: ({ row }) => (
+      //     <div className="d-flex align-items-center">
+      //       <button className="action-button edit-button" onClick={() => handleEdit(row.original.metal_type_id)}>
+      //         <FaEdit />
+      //       </button>
+      //       <button
+      //         className="action-button delete-button"
+      //         onClick={() => handleDelete(row.original.metal_type_id)}
+      //       >
+      //         <FaTrash />
+      //       </button>
+      //     </div>
+      //   ),
+      // },
     ],
     [submittedData]
   );
@@ -241,6 +247,15 @@ function MetalType() {
               error={errors.metal_name}
             />
 
+            <InputField
+              label="HSN Code:"
+              name="hsn_code"
+              value={formData.hsn_code}
+              onChange={handleChange}
+              required={true}
+              error={errors.hsn_code}
+            />
+
 
             {/* <InputField
               label="Item Type:"
@@ -250,7 +265,7 @@ function MetalType() {
               required={true}
               error={errors.item_type}
             /> */}
-            <InputField
+            {/* <InputField
               label="Description:"
               name="description"
               value={formData.description}
@@ -258,7 +273,7 @@ function MetalType() {
               // required={true}
               error={errors.description}
             />
-            {errors.description && <p style={{ color: 'red', fontSize: '15px' }} className="error-message">{errors.description}</p>}
+            {errors.description && <p style={{ color: 'red', fontSize: '15px' }} className="error-message">{errors.description}</p>} */}
 
             <InputField
               label="Default Purity:"
