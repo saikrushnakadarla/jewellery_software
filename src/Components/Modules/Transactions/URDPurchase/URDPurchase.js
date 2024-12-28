@@ -332,31 +332,38 @@ const URDPurchase = () => {
 
   const [rateOptions, setRateOptions] = useState([]);
 
-useEffect(() => {
-  // Fetch rates from API dynamically
-  const fetchRates = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/get/current-rates");
-      const data = response.data;
+  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt:"" });
 
-      // Only fetch the specific rate fields you want
-      const dynamicRates = [
-        { value: data.rate_16crt, label: `16CRT - ₹${data.rate_16crt}` },
-        { value: data.rate_18crt, label: `18CRT - ₹${data.rate_18crt}` },
-        { value: data.rate_22crt, label: `22CRT - ₹${data.rate_22crt}` },
-        { value: data.rate_24crt, label: `24CRT - ₹${data.rate_24crt}` },
-        { value: data.silver_rate, label: `SILVER - ₹${data.silver_rate}` },
-      ];
-
-      setRateOptions(dynamicRates); // Set the options for the dropdown
-    } catch (error) {
-      console.error("Error fetching rates:", error);
-    }
-  };
-
-  fetchRates(); // Fetch the rates when the component mounts
-}, []);
-
+  useEffect(() => {
+    const fetchCurrentRates = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/get/current-rates');
+        console.log('API Response:', response.data);
+  
+        // Log the 24crt rate separately
+        console.log('24crt Rate:', response.data.rate_24crt); 
+  
+        // Dynamically set the rates based on response
+        setRates({
+          rate_24crt: response.data.rate_24crt || "",
+          rate_22crt: response.data.rate_22crt || "",
+          rate_18crt: response.data.rate_18crt || "",
+          rate_16crt: response.data.rate_16crt || "",
+        });
+      } catch (error) {
+        console.error('Error fetching current rates:', error);
+      }
+    };
+    fetchCurrentRates();
+  }, []);
+  
+  
+  const currentRate =
+  productDetails.purity === "24K" ? rates.rate_24crt :
+  productDetails.purity === "22K" ? rates.rate_22crt :
+  productDetails.purity === "18K" ? rates.rate_18crt :
+  productDetails.purity === "16K" ? rates.rate_16crt :
+    "";
 
 
   return (
@@ -594,13 +601,19 @@ useEffect(() => {
         />
       </Col>
       <Col xs={12} md={2}>
-      <InputField
+      {/* <InputField
             label="Rate"
             type="select"
             name="rate"
             value={productDetails.rate}
             onChange={handleInputChange}
             options={rateOptions} // Dynamic dropdown from API
+          /> */}
+            <InputField
+            label="Rate"
+            name="rate"
+            value={productDetails.rate || currentRate}
+            onChange={handleInputChange}
           />
       </Col>
       <Col xs={12} md={2}>
