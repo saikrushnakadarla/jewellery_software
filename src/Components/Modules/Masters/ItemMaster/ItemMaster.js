@@ -286,13 +286,13 @@ const FormWithTable = () => {
 
   const handleAddOpenTagEntry = (e) => {
     e.preventDefault();
-
+  
+    // Extract current suffix and calculate the next one
+    const currentSuffix = parseInt(formData.suffix || "001", 10);
+    const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
+  
     const newEntry = {
       Pricing: formData.Pricing,
-      // Tag_ID: formData.Tag_ID,
-      // Prefix: formData.Prefix || "Gold",
-      // Category: formData.Category,
-      // Purity: formData.Purity,
       PCode_BarCode: formData.PCode_BarCode,
       Gross_Weight: formData.Gross_Weight,
       Stones_Weight: formData.Stones_Weight,
@@ -309,31 +309,29 @@ const FormWithTable = () => {
       MC_Per_Gram: formData.MC_Per_Gram,
       Making_Charges_On: formData.Making_Charges_On,
       Making_Charges: formData.Making_Charges,
-      // Design_Master: formData.Design_Master,
       dropdown: formData.dropdown,
-      // making_on: formData.making_on,
       selling_price: formData.selling_price,
     };
-
+  
     // Update the `op_qty` and `op_weight` fields
     setFormData((prev) => ({
       ...prev,
       op_qty: prev.op_qty + 1, // Increment op_qty
       op_weight: parseFloat(prev.op_weight || 0) + parseFloat(formData.Gross_Weight || 0), // Add Gross_Weight
     }));
-
+  
     // Add the new entry to the table
     setOpenTagsEntries((prev) => [...prev, newEntry]);
-
-    // Reset other form fields
+  
+    // Reset the form fields and update the suffix and PCode_BarCode
     setFormData((prev) => ({
       ...prev,
       Pricing: "",
       Tag_ID: "",
       Prefix: "Gold",
-      // Category: "Gold",
       Purity: "",
-      PCode_BarCode: "",
+      PCode_BarCode: `${prev.item_prefix || ""}${nextSuffix}`,
+      suffix: nextSuffix, // Update the suffix
       Gross_Weight: "",
       Stones_Weight: "",
       Stones_Price: "",
@@ -341,7 +339,7 @@ const FormWithTable = () => {
       HUID_No: "",
       Wastage_On: "",
       Wastage_Percentage: "",
-      status: "Avalible",
+      status: "Available",
       Source: "",
       Stock_Point: "",
       Weight_BW: "",
@@ -352,7 +350,7 @@ const FormWithTable = () => {
       Design_Master: "",
     }));
   };
-
+  
   const handleSave = async () => {
     try {
       const { product_name, Category, design_master, purity } = formData;
