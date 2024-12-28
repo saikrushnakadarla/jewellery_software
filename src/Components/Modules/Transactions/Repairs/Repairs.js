@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Repairs.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
-import { useParams, useNavigate,useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -11,7 +11,7 @@ const RepairForm = () => {
   const today = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
   const location = useLocation();
-  const { id } = useParams(); 
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
@@ -39,7 +39,7 @@ const RepairForm = () => {
     making_charge: "",
     handling_charge: "",
     total: "",
-    status:"Pending",
+    status: "Pending",
   });
 
   const [customers, setCustomers] = useState([]);
@@ -56,12 +56,12 @@ const RepairForm = () => {
           throw new Error('Failed to fetch data');
         }
         const result = await response.json();
-  
+
         // Filter only suppliers
         const customers = result.filter(
           (item) => item.account_group === 'CUSTOMERS'
         );
-  
+
         setCustomers(customers);
         // setLoading(false);
       } catch (error) {
@@ -69,7 +69,7 @@ const RepairForm = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -91,7 +91,7 @@ const RepairForm = () => {
       try {
         const response = await axios.get(`${baseURL}/metaltype`);
         setMetalTypes(response.data);
-        console.log("Metal Type=",response.data)
+        console.log("Metal Type=", response.data)
       } catch (error) {
         console.error("Error fetching metal types:", error);
       }
@@ -112,10 +112,10 @@ const RepairForm = () => {
       ...prevData,
       customer_id: customerId, // Ensure customer_id is correctly updated
     }));
-  
+
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
-    console.log("Customer Id=",customer)
-  
+    console.log("Customer Id=", customer)
+
     if (customer) {
       setFormData({
         ...formData,
@@ -171,25 +171,25 @@ const RepairForm = () => {
         try {
           const response = await axios.get(`${baseURL}/get/repairs/${id}`);
           const repairData = response.data;
-  
+
           setFormData((prev) => ({
             ...prev,
             ...repairData, // Populate with fetched data
           }));
-  
+
           // Pre-populate customer-related fields
           if (repairData.customer_id) {
-            handleCustomerChange(repairData.customer_id); 
+            handleCustomerChange(repairData.customer_id);
           }
         } catch (error) {
           console.error("Error fetching repair details:", error);
         }
       };
-  
+
       fetchRepairDetails();
     }
   }, [id]);
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -218,7 +218,7 @@ const RepairForm = () => {
       alert("Failed to submit the repair entry");
     }
   };
-  
+
 
   const handleAddCustomer = () => {
     navigate("/customermaster", { state: { from: "/repairs" } });
@@ -243,19 +243,19 @@ const RepairForm = () => {
 
     fetchLastRPNNumber();
   }, []);
-  
+
   return (
     <div className="main-container">
-    <Container className="repair-form-container">
-      <Form onSubmit={handleSubmit}>
-    <div className="repair-form" >
-        {/* Left Section */}
-        <div className="repair-form-left">
-          {/* Customer Details */}
-          <Col className="form-section">
-            <h4 className="mb-4">Customer Details</h4>
-            <Row>
-            <Col xs={12} md={3} className="d-flex align-items-center">
+      <Container className="repair-form-container">
+        <Form onSubmit={handleSubmit}>
+          <div className="repair-form" >
+            {/* Left Section */}
+            <div className="repair-form-left">
+              {/* Customer Details */}
+              <Col className="form-section">
+                <h4 className="mb-4">Customer Details</h4>
+                <Row>
+                  <Col xs={12} md={3} className="d-flex align-items-center">
                     <div style={{ flex: 1 }}>
                       <InputField
                         label="Mobile"
@@ -282,97 +282,97 @@ const RepairForm = () => {
                       }}
                     />
                   </Col>
-          <Col xs={12} md={3}>
+                  <Col xs={12} md={3}>
                     <InputField
                       label="Customer Name:"
                       name="account_name"
                       type="select"
-                        value={formData.customer_id || ""} // Use customer_id to match selected value
-                        onChange={(e) => handleCustomerChange(e.target.value)}
-                        options={[
-                          ...customers.map((customer) => ({
-                            value: customer.account_id, // Use account_id as the value
-                            label: customer.account_name, // Display mobile as the label
-                          })),
-                        ]}
+                      value={formData.customer_id || ""} // Use customer_id to match selected value
+                      onChange={(e) => handleCustomerChange(e.target.value)}
+                      options={[
+                        ...customers.map((customer) => ({
+                          value: customer.account_id, // Use account_id as the value
+                          label: customer.account_name, // Display mobile as the label
+                        })),
+                      ]}
 
                     />
                   </Col>
-                <Col xs={12} md={3}>
+                  <Col xs={12} md={3}>
+                    <InputField
+                      label="Email:"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </Col>
+                  <Col xs={12} md={3}>
+                    <InputField
+                      label="Address1:"
+                      name="address1"
+                      value={formData.address1}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </Col>
+                  <Col xs={12} md={3}>
+                    <InputField
+                      label="Address2:"
+                      name="address2"
+                      value={formData.address2}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </Col>
+                  <Col xs={12} md={3}>
+                    <InputField
+                      label="City:"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </Col>
+                </Row>
+              </Col>
+
+            </div>
+            {/* Right Section */}
+            <div className="repair-form-right">
+              <Col className="form-section">
+                <Row>
                   <InputField
-                    label="Email:"
-                    name="email"
-                    type="email"
-                    value={formData.email}
+                    label="Entry Type:"
+                    name="entry_type"
+                    type="select"
+                    value={formData.entry_type}
+                    onChange={handleChange}
+                    options={[
+                      { value: "Repair", label: "Repair" },
+                      { value: "Poolish", label: "Poolish" },
+                      { value: "Other", label: "Other" }
+                    ]}
+                  />
+                </Row>
+                <Row>
+                  <InputField
+                    label="Repair No:"
+                    name="repair_no"
+                    value={formData.repair_no}
                     onChange={handleChange}
                     readOnly
                   />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField
-                    label="Address1:"
-                    name="address1"
-                    value={formData.address1}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField
-                    label="Address2:"
-                    name="address2"
-                    value={formData.address2}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField
-                    label="City:"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    readOnly
-                  />
-                </Col>
-              </Row>
-            </Col>
-         
-        </div>
-        {/* Right Section */}
-        <div className="repair-form-right">
-          <Col className="form-section">          
-          <Row>
-                <InputField
-                  label="Entry Type:"
-                  name="entry_type"
-                  type="select"
-                  value={formData.entry_type}
-                  onChange={handleChange}
-                  options={[
-                    { value: "Repair", label: "Repair" },
-                    { value: "Poolish", label: "Poolish" },
-                    { value: "Other", label: "Other" }
-                  ]}
-                />
-              </Row>
-              <Row>
-                <InputField
-                  label="Repair No:"
-                  name="repair_no"
-                  value={formData.repair_no}
-                  onChange={handleChange}
-                  readOnly
-                />
-              </Row>
-              <Row>
-                <InputField label="Date:" name="date" type="date" value={formData.date} onChange={handleChange} />
-              </Row>            
-          </Col>
-        </div>
-      </div>
-      <Row className="form-section pt-4">
-      <Col xs={12} md={2}>
+                </Row>
+                <Row>
+                  <InputField label="Date:" name="date" type="date" value={formData.date} onChange={handleChange} />
+                </Row>
+              </Col>
+            </div>
+          </div>
+          <Row className="form-section pt-4">
+            <Col xs={12} md={2}>
               <InputField label="Staff:" name="staff" value={formData.staff} onChange={handleChange} />
             </Col>
             <Col xs={12} md={2}>
@@ -381,87 +381,87 @@ const RepairForm = () => {
             <Col xs={12} md={3}>
               <InputField label="Place:" name="place" value={formData.place} onChange={handleChange} />
             </Col>
-           
+
             <Col xs={12} md={3}>
               <InputField label="Counter:" name="counter" value={formData.counter} onChange={handleChange} />
             </Col>
-      </Row>
+          </Row>
 
-      <div className="repair-form2">      
-        <div className="repair-form-left">
-        <Col className="form-section">
-          <h4>Repair Item Details</h4>
-          <Row>
-                <Col xs={12} md={2}>
-                  <InputField
-                    label="Metal Type:"
-                    name="metal_type"
-                    type="select"
-                    value={formData.metal_type}
-                    onChange={handleChange}
-                    options={[
-                      ...metalTypes.map((metal) => ({
-                        value: metal.metal_name,
-                        label: metal.metal_name
-                      }))
-                    ]}
-                  />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="Item:" name="item" value={formData.item} onChange={handleChange} />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField label="Tag No:" name="tag_no" value={formData.tag_no} onChange={handleChange} />
-                </Col>
-                <Col xs={12} md={3}>
-                  <InputField label="Description:" name="description" value={formData.description} onChange={handleChange} />
-                </Col>
-                <Col xs={12} md={2}>
-                  <InputField
-                    label="Purity:"
-                    name="purity"
-                    type="select"
-                    value={formData.purity}
-                    onChange={handleChange}
-                    options={[
-                      ...purityData.map((item) => ({
-                        value: item.name,
-                        label: item.name
-                      }))
-                    ]}
-                  />
-                </Col>
-              </Row>
-        </Col>
-        </div>
-        <div className="repair-form-right">
-        <Col className="form-section">
-        <h4>Upload Image</h4>
-        <Row>
-                <Col xs={12} md={4}>
-                  <div className="image-upload-container">
-                    <label htmlFor="image-upload" className="upload-button">Upload</label>
-                    <input
-                      type="file"
-                      id="image-upload"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      style={{ display: "none" }}
+          <div className="repair-form2">
+            <div className="repair-form-left">
+              <Col className="form-section">
+                <h4>Repair Item Details</h4>
+                <Row>
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Metal Type:"
+                      name="metal_type"
+                      type="select"
+                      value={formData.metal_type}
+                      onChange={handleChange}
+                      options={[
+                        ...metalTypes.map((metal) => ({
+                          value: metal.metal_name,
+                          label: metal.metal_name
+                        }))
+                      ]}
                     />
-                    {image && (
-                      <div className="image-preview">
-                        <img src={image} alt="Uploaded" className="img-thumbnail" />
-                      </div>
-                    )}
-                  </div>
-                </Col>
-              </Row>
-        </Col>
-        </div>
-        </div>
-      
-        {/* Extra Charges */}
-        {/* <Row className="form-section">
+                  </Col>
+                  <Col xs={12} md={3}>
+                    <InputField label="Item:" name="item" value={formData.item} onChange={handleChange} />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField label="Tag No:" name="tag_no" value={formData.tag_no} onChange={handleChange} />
+                  </Col>
+                  <Col xs={12} md={3}>
+                    <InputField label="Description:" name="description" value={formData.description} onChange={handleChange} />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Purity:"
+                      name="purity"
+                      type="select"
+                      value={formData.purity}
+                      onChange={handleChange}
+                      options={[
+                        ...purityData.map((item) => ({
+                          value: item.name,
+                          label: item.name
+                        }))
+                      ]}
+                    />
+                  </Col>
+                </Row>
+              </Col>
+            </div>
+            <div className="repair-form-right">
+              <Col className="form-section">
+                <h4>Upload Image</h4>
+                <Row>
+                  <Col xs={12} md={4}>
+                    <div className="image-upload-container">
+                      <label htmlFor="image-upload" className="upload-button">Upload</label>
+                      <input
+                        type="file"
+                        id="image-upload"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        style={{ display: "none" }}
+                      />
+                      {image && (
+                        <div className="image-preview">
+                          <img src={image} alt="Uploaded" className="img-thumbnail" />
+                        </div>
+                      )}
+                    </div>
+                  </Col>
+                </Row>
+              </Col>
+            </div>
+          </div>
+
+          {/* Extra Charges */}
+          {/* <Row className="form-section">
             <h4>Extra Charges</h4>
             <Col xs={12} md={2}>
               <InputField label="Extra Weight:" name="extra_weight" value={formData.extra_weight} onChange={handleChange} />
@@ -479,21 +479,21 @@ const RepairForm = () => {
               <InputField label="Total:" name="total" value={formData.total} onChange={handleChange} />
             </Col>
           </Row> */}
-          
-        {/* Buttons */}
-        <div className="form-buttons">
-          <Button className="cus-back-btn" variant="secondary"  onClick={handleBack}>cancel</Button>
-          <Button
+
+          {/* Buttons */}
+          <div className="form-buttons">
+            <Button className="cus-back-btn" variant="secondary" onClick={handleBack}>cancel</Button>
+            <Button
               type="submit"
               variant="primary"
               style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
             >
               {id ? "Update" : "Save"}
             </Button>
-        </div>
+          </div>
         </Form>
       </Container>
-      </div>
+    </div>
   );
 };
 

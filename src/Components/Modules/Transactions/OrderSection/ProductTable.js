@@ -38,6 +38,7 @@ const ProductTable = ({ repairDetails, onDelete }) => {
           <th>Tax %</th>
           <th>Tax Amount</th>
           <th>Total Price</th>
+          <th>image</th>
           <th>Action</th> {/* Add Action column for delete */}
         </tr>
       </thead>
@@ -69,6 +70,21 @@ const ProductTable = ({ repairDetails, onDelete }) => {
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>
               <td>
+                {detail.product_image ? (
+                  <img
+                    src={detail.product_image instanceof File ? URL.createObjectURL(detail.product_image) : detail.product_image}
+                    alt="Product"
+                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'placeholder-image-url.jpg'; // Add a placeholder image URL
+                    }}
+                  />
+                ) : (
+                  'No Image'
+                )}
+              </td>
+              <td>
                 {/* Add delete button */}
                 <Button variant="danger" onClick={() => onDelete(index)}>Delete</Button>
               </td>
@@ -76,7 +92,7 @@ const ProductTable = ({ repairDetails, onDelete }) => {
           ))
         ) : (
           <tr>
-            <td colSpan="24" className="text-center">
+            <td colSpan="25" className="text-center">
               No data available
             </td>
           </tr>
@@ -85,15 +101,15 @@ const ProductTable = ({ repairDetails, onDelete }) => {
       <tfoot>
         <tr>
           <td colSpan="20" className="text-right">Taxable Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{taxableAmount.toFixed(2)}</td>
+          <td colSpan="5">{taxableAmount.toFixed(2)}</td>
         </tr>
         <tr>
           <td colSpan="20" className="text-right">Tax Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{taxAmount.toFixed(2)}</td>
+          <td colSpan="5">{taxAmount.toFixed(2)}</td>
         </tr>
         <tr>
           <td colSpan="20" className="text-right">Net Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{netAmount.toFixed(2)}</td>
+          <td colSpan="5">{netAmount.toFixed(2)}</td>
         </tr>
       </tfoot>
     </Table>

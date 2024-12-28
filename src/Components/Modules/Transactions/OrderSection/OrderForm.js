@@ -94,7 +94,7 @@ const SalesForm = () => {
   const handleCustomerChange = (customerId) => {
     setFormData((prevData) => ({
       ...prevData,
-      customer_id: customerId, // Ensure customer_id is correctly updated
+      customer_id: customerId,
     }));
 
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
@@ -138,13 +138,26 @@ const SalesForm = () => {
     }
   };
 
+
+  
+  const handleImageUpload = (file) => {
+    setFormData(prev => ({
+      ...prev,
+      product_image: file, // Store the uploaded image in formData
+    }));
+  };
+
   // Add product to repair details
   const handleAdd = () => {
-    setRepairDetails([...repairDetails, { ...formData }]);
+    setRepairDetails((prevDetails) => {
+      const updatedDetails = [...prevDetails, { ...formData }];
+      console.log("Updated repair details:", updatedDetails);
+      return updatedDetails;
+    });
     resetProductFields();
     alert("Product added successfully");
   };
-
+  
   // Handle product delete
   const handleDelete = (indexToDelete) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
@@ -181,6 +194,7 @@ const SalesForm = () => {
       tax_amt: "",
       total_price: "",
       qty: "",
+      product_image: null,
     }));
   };
 
@@ -188,7 +202,11 @@ const SalesForm = () => {
   const totalPrice = repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
   const handleSave = async () => {
-    const dataToSave = repairDetails.map(item => ({
+    // Create a FormData object
+    const formData = new FormData();
+  
+    // Map `repairDetails` to include payment details and append them as JSON
+    const dataToSave = repairDetails.map((item) => ({
       ...item,
       cash_amount: paymentDetails.cash_amount || 0,
       card_amount: paymentDetails.card || 0,
@@ -198,10 +216,27 @@ const SalesForm = () => {
       online: paymentDetails.online || "",
       online_amt: paymentDetails.online_amt || 0,
     }));
-
+  
+    // Append the JSON data
+    formData.append("repairDetails", JSON.stringify(dataToSave));
+  
+    // Append files for each repair item if they exist
+    repairDetails.forEach((item, index) => {
+      if (item.product_image) {
+        formData.append(`product_image`, item.product_image); // Multer will handle multiple files
+      }
+    });
+  
     try {
-      await axios.post(`${baseURL}/save-repair-details`, { repairDetails: dataToSave });
+      // Make POST request with FormData
+      await axios.post(`${baseURL}/save-repair-details`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       alert("Data saved successfully");
+  
+      // Clear form data and reset state
       setRepairDetails([]);
       resetForm();
     } catch (error) {
@@ -209,7 +244,7 @@ const SalesForm = () => {
       alert("Error saving data");
     }
   };
-
+  
   const resetForm = () => {
     setFormData({
       customer_id: "",
@@ -279,6 +314,7 @@ const SalesForm = () => {
               handleProductNameChange={handleProductNameChange}
               handleMetalTypeChange={handleMetalTypeChange}
               handleDesignNameChange={handleDesignNameChange}
+              handleImageUpload={handleImageUpload} 
               handleAdd={handleAdd}
               products={products}
               data={data}
