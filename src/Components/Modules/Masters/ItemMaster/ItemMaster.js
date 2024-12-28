@@ -98,6 +98,19 @@ const FormWithTable = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+     // Update formData state
+     setFormData(prevState => {
+      const updatedData = { ...prevState, [name]: value };
+
+      // If "Category" changes, update the "hsn_code" based on selected metal type
+      if (name === 'Category') {
+        const selectedMetal = metalOptions.find(option => option.value === value);
+        updatedData.hsn_code = selectedMetal ? selectedMetal.hsn_code : '';
+      }
+
+      return updatedData;
+    });
+
     if (name === "Pricing") {
       if (value === "By Weight") {
         setIsSellingPriceDisabled(true);
@@ -135,10 +148,10 @@ const FormWithTable = () => {
         ? { PCode_BarCode: `${value}${prev.suffix || "001"}` }
         : {}),
     }));
-     // Prevent "RB" or "rb" (case insensitive) as input for "item_prefix"
-     if (name === "item_prefix" && value.toLowerCase() === "rb") {
+    // Prevent "RB" or "rb" (case insensitive) as input for "item_prefix"
+    if (name === "item_prefix" && value.toLowerCase() === "rb") {
       alert("The value 'RB' is not allowed for Item Prefix.");
-      setFormData((prev) => ({ ...prev, item_prefix: "",PCode_BarCode: "" })); // Reset field value
+      setFormData((prev) => ({ ...prev, item_prefix: "", PCode_BarCode: "" })); // Reset field value
       return;
     }
   };
@@ -423,13 +436,31 @@ const FormWithTable = () => {
   const [dropdownOptions, setDropdownOptions] = useState([]);
 
   // Fetch metal types from the API
+  // useEffect(() => {
+  //   const fetchMetalTypes = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/metaltype`);
+  //       const metalTypes = response.data.map(item => ({
+  //         value: item.metal_name, // Assuming the column name is "metal_name"
+  //         label: item.metal_name
+  //       }));
+  //       setmetalOptions(metalTypes);
+  //     } catch (error) {
+  //       console.error('Error fetching metal types:', error);
+  //     }
+  //   };
+
+  //   fetchMetalTypes();
+  // }, []);
+
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
         const response = await axios.get(`${baseURL}/metaltype`);
         const metalTypes = response.data.map(item => ({
-          value: item.metal_name, // Assuming the column name is "metal_name"
-          label: item.metal_name
+          value: item.metal_name, // Metal name for the dropdown
+          label: item.metal_name, // Display value
+          hsn_code: item.hsn_code, // Store HSN Code for reference
         }));
         setmetalOptions(metalTypes);
       } catch (error) {
@@ -440,6 +471,7 @@ const FormWithTable = () => {
     fetchMetalTypes();
   }, []);
 
+ 
   // Fetch design master options from the API
   useEffect(() => {
     const fetchDesignMaster = async () => {
@@ -492,16 +524,7 @@ const FormWithTable = () => {
     fetchLastRbarcode();
   }, []);
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     [name]: value,
-  //     // Automatically update PCode_BarCode when item_prefix changes
-  //     ...(name === "item_prefix" ? { PCode_BarCode: value } : {}),
-  //   }));
-  // };
+ 
   useEffect(() => {
     const getLastPcode = async () => {
       try {
@@ -516,7 +539,7 @@ const FormWithTable = () => {
         console.error("Error fetching last PCode_BarCode:", error);
       }
     };
-  
+
     getLastPcode();
   }, []);
 
@@ -558,7 +581,7 @@ const FormWithTable = () => {
                   type="select"
                   value={formData.Category}
                   onChange={handleChange}
-                  options={metalOptions}
+                  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
                 <InputField
                   label="Design Master:"
@@ -631,10 +654,12 @@ const FormWithTable = () => {
                   onChange={handleChange}
                   options={taxOptions}
                 />
-                <InputField label="HSN Code:"
+                <InputField
+                  label="HSN Code:"
                   name="hsn_code"
                   value={formData.hsn_code}
                   onChange={handleChange}
+                  readOnly // HSN Code should be read-only if auto-filled
                 />
               </div>
             </div>
