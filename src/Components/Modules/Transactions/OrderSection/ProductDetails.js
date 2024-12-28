@@ -11,11 +11,32 @@ const ProductDetails = ({
   handleProductNameChange,
   handleMetalTypeChange,
   handleDesignNameChange,
+  handleImageUpload,
   handleAdd,
   products,
 
   isQtyEditable
 }) => {
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file');
+        return;
+      }
+      
+      // Check file size (e.g., 5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        alert('File size should be less than 5MB');
+        return;
+      }
+
+      // Create a preview URL and pass the file to parent
+      handleImageUpload(file);
+    }
+  };
 
   return (
     <Col >
@@ -282,6 +303,26 @@ const ProductDetails = ({
           readOnly
         />
       </Col>
+      <Col xs={12} md={3}>
+          <div className="mb-3">
+            <label className="form-label">Product Image</label>
+            <input
+              type="file"
+              className="form-control"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            {formData.product_image && (
+              <div className="mt-2">
+                <img
+                  src={URL.createObjectURL(formData.product_image)}
+                  alt="Preview"
+                  style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                />
+              </div>
+            )}
+          </div>
+        </Col>
         <Col xs={12} md={1}>
           <Button onClick={handleAdd} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
         </Col>
