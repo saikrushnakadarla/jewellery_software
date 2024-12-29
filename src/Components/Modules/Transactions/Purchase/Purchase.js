@@ -118,71 +118,71 @@ const URDPurchase = () => {
   const handleChange = (field, value) => {
     setFormData((prev) => {
       const updatedFormData = { ...prev, [field]: value };
-  
+
       // Automatically calculate net_weight
       if (field === "gross_weight" || field === "stone_weight") {
         const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
         const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
         updatedFormData.net_weight = grossWeight - stoneWeight;
       }
-  
+
       // Always calculate pure_weight when net_weight or purityPercentage changes
       const netWeight = parseFloat(updatedFormData.net_weight) || 0;
       const purityPercentage = parseFloat(updatedFormData.purityPercentage) || 0;
       updatedFormData.pure_weight = (netWeight * purityPercentage) / 100;
-  
+
       // Automatically calculate waste_amount
       const pureWeight = parseFloat(updatedFormData.pure_weight) || 0;
       const wastePercentage = parseFloat(updatedFormData.waste_percentage) || 0;
       updatedFormData.waste_amount = (pureWeight * wastePercentage) / 100;
-  
+
       // Automatically calculate total_weight
       const wasteAmount = parseFloat(updatedFormData.waste_amount) || 0;
       updatedFormData.total_weight = pureWeight + wasteAmount;
-  
+
       // Automatically calculate wt_rate_amount
       const totalWeight = parseFloat(updatedFormData.total_weight) || 0;
       const stoneRate = parseFloat(updatedFormData.stone_rate) || 0;
       updatedFormData.wt_rate_amount = totalWeight * stoneRate;
-  
+
       // Automatically calculate mc
       const mcPerGram = parseFloat(updatedFormData.mc_per_gram) || 0;
       updatedFormData.mc = totalWeight * mcPerGram;
-  
+
       // Automatically calculate total_amount (before adding stone_amount)
       const wtRateAmount = parseFloat(updatedFormData.wt_rate_amount) || 0;
       const mc = parseFloat(updatedFormData.mc) || 0;
       updatedFormData.total_amount = wtRateAmount + mc;
-  
+
       // Case 1: If "ct" is selected in CWP, calculate stone_amount = stone_ct * rate
       if (updatedFormData.cwp === "ct") {
         const stoneCt = parseFloat(updatedFormData.stone_ct) || 0;
         const rate = parseFloat(updatedFormData.rate) || 0;
         updatedFormData.stone_amount = stoneCt * rate;
       }
-  
+
       // Case 2: If "weight" is selected in CWP, calculate stone_amount = gms * rate
       if (updatedFormData.cwp === "weight") {
         const gms = parseFloat(updatedFormData.gms) || 0;
         const rate = parseFloat(updatedFormData.rate) || 0;
         updatedFormData.stone_amount = gms * rate;
       }
-  
+
       // Case 3: If "piece" is selected in CWP, calculate stone_amount = stone_pcs * rate
       if (updatedFormData.cwp === "piece") {
         const stonePcs = parseFloat(updatedFormData.stone_pcs) || 0;
         const rate = parseFloat(updatedFormData.rate) || 0;
         updatedFormData.stone_amount = stonePcs * rate;
       }
-  
+
       // Automatically add stone_amount to total_amount
       const stoneAmount = parseFloat(updatedFormData.stone_amount) || 0;
       updatedFormData.total_amount += stoneAmount;
-  
+
       return updatedFormData;
     });
   };
-  
+
 
   const [editingIndex, setEditingIndex] = useState(null);
 
@@ -558,13 +558,15 @@ const URDPurchase = () => {
     }
   };
 
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+
   const handleBarcodeChange = async (code) => {
     try {
-      // Check for product by code
       const product = products.find((prod) => String(prod.rbarcode) === String(code));
 
       if (product) {
-        // If product found by code, populate the form
+        // Set form data as before
         setFormData((prevData) => ({
           ...prevData,
           code: product.rbarcode,
@@ -574,25 +576,21 @@ const URDPurchase = () => {
           design_name: product.design_master,
           purity: product.purity,
           hsn: product.hsn_code || "",
-          gross_weight: "",
-          stone_weight: "",
-          stone_price: "",
-          weight_bw: "",
-          va_on: "",
-          va_percent: "",
-          wastage_weight: "",
-          total_weight_aw: "",
-          mc_on: "",
-          mc_per_gram: "",
-          making_charges: "",
-          tax_percent: product.tax_slab,
           qty: 1, // Set qty to 1 for product
         }));
-        setIsQtyEditable(false); // Set qty as read-only
-      } else {
-        // Check if tag exists by code
-        const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
+        setIsQtyEditable(false);
 
+        // Update selected product data
+        setSelectedProduct({
+          product_id: product.product_id,
+          product_name: product.product_name,
+          metal_type: product.Category,
+          design_name: product.design_master,
+          purity: product.purity,
+          hsn: product.hsn_code || "",
+        });
+      } else {
+        const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
         if (tag) {
           const productId = tag.product_id;
           const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
@@ -605,23 +603,23 @@ const URDPurchase = () => {
             metal_type: productDetails?.Category || "",
             design_name: productDetails?.design_master || "",
             purity: productDetails?.purity || "",
-            gross_weight: tag.Gross_Weight || "",
-            stone_weight: tag.Stones_Weight || "",
-            stone_price: tag.Stones_Price || "",
-            weight_bw: tag.Weight_BW || "",
-            va_on: tag.Wastage_On || "",
-            va_percent: tag.Wastage_Percentage || "",
-            wastage_weight: tag.WastageWeight || "",
-            total_weight_aw: tag.TotalWeight_AW || "",
-            mc_on: tag.Making_Charges_On || "",
-            mc_per_gram: tag.MC_Per_Gram || "",
-            making_charges: tag.Making_Charges || "",
-            tax_percent: productDetails?.tax_slab || "",
-            qty: 1, // Allow qty to be editable for tag
+            qty: 1,
           }));
-          setIsQtyEditable(true); // Allow editing of qty
+          setIsQtyEditable(true);
+
+          // Update selected product data
+          setSelectedProduct({
+            product_id: tag.product_id || "",
+            product_name: productDetails?.product_name || "",
+            metal_type: productDetails?.Category || "",
+            design_name: productDetails?.design_master || "",
+            purity: productDetails?.purity || "",
+            hsn: productDetails?.hsn_code || "",
+            
+            
+          });
         } else {
-          // Reset form if no tag is found
+          // Reset the form and state if no product or tag is found
           setFormData((prevData) => ({
             ...prevData,
             code: "",
@@ -631,31 +629,17 @@ const URDPurchase = () => {
             design_name: "",
             purity: "",
             hsn: "",
-            gross_weight: "",
-            stone_weight: "",
-            stone_price: "",
-            weight_bw: "",
-            va_on: "",
-            va_percent: "",
-            wastage_weight: "",
-            total_weight_aw: "",
-            mc_on: "",
-            mc_per_gram: "",
-            making_charges: "",
-            rate: "",
-            rate_amt: "",
-            tax_percent: "",
-            tax_amt: "",
-            total_price: "",
-            qty: "", // Reset qty
+            qty: "",
           }));
-          setIsQtyEditable(true); // Default to editable
+          setIsQtyEditable(true);
+          setSelectedProduct(null); // Reset selected product
         }
       }
     } catch (error) {
       console.error("Error handling code change:", error);
     }
   };
+
 
   const handleBack = () => {
     navigate('/purchasetable');
@@ -680,7 +664,20 @@ const URDPurchase = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [showModal1]);
 
-  const handleOpenModal = () => setShowModal(true);
+  const handleOpenModal = (data) => {
+    setSelectedProduct({
+      product_id: data.product_id,
+      product_name: data.product_name,
+      metal_type: data.metal_type,
+      design_name: data.design_name,
+      purity: data.purity,
+      hsn: data.hsn,
+      pcs: data.pcs, // Adding pcs
+      gross_weight: data.gross_weight, // Adding gross_weight
+    });
+    setShowModal(true); // This shows the modal
+  };
+  
 
 
 
@@ -1024,7 +1021,7 @@ const URDPurchase = () => {
                 <InputField label="Pure Wt" type="number" value={formData.pure_weight}
                   onChange={(e) => handleChange("pure_weight", e.target.value)} />
               </Col>
-              
+
               <Col xs={12} md={1}>
                 <InputField label="Unit" type="number" value={formData.unit_weight}
                   onChange={(e) => handleChange("unit_weight", e.target.value)} />
@@ -1218,7 +1215,7 @@ const URDPurchase = () => {
                       <td>{data.class}</td>
                       <td>{data.cut}</td>
                       <td style={{ display: 'flex' }}>
-                        <button type="button" className="btn btn-primary" style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }} onClick={handleOpenModal}>Tag Entry</button> {/* New Action button */}
+                        <button type="button" className="btn btn-primary" style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }} onClick={() => handleOpenModal(data)}>Tag Entry</button> {/* New Action button */}
                         <button
                           type="button"
                           className="action-button edit-button"
@@ -1262,17 +1259,15 @@ const URDPurchase = () => {
         show={showModal1}
         onHide={handleCloseModal1}
         size="lg"
-        backdrop="static" // Prevent closing by clicking outside
-        keyboard={false}  // Prevent closing with Esc key
+        backdrop="static"
+        keyboard={false}
         dialogClassName="custom-tagentrymodal-width"
-
       >
         <Modal.Header closeButton>
           <Modal.Title>Tag Entry</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {/* Render the TagEntry component inside the modal */}
-          <TagEntry handleCloseModal={handleCloseModal1} />
+          <TagEntry handleCloseModal={handleCloseModal1} selectedProduct={selectedProduct} />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal1}>
@@ -1280,6 +1275,7 @@ const URDPurchase = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
     </div>
   );
 };

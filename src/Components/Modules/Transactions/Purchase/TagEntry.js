@@ -7,15 +7,16 @@ import StoneDetailsModal from "./PurchaseStoneDetails";
 import { useNavigate } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 
-const TagEntry = ({ handleCloseModal1 }) => {
+const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
+    const { pcs, gross_weight  } = selectedProduct;
     const [productOptions, setProductOptions] = useState([]);
     const [formData, setFormData] = useState({
-        product_id: "",
+        product_id: selectedProduct.product_id,
         Pricing: "",
         Tag_ID: "",
         Prefix: "tag",
-        Category: "",
-        Purity: "",
+        Category: selectedProduct.metal_type,
+        Purity: selectedProduct.purity,
         PCode_BarCode: "",
         Gross_Weight: "",
         Stones_Weight: "",
@@ -31,8 +32,8 @@ const TagEntry = ({ handleCloseModal1 }) => {
         MC_Per_Gram: "",
         Making_Charges_On: "",
         Making_Charges: "",
-        Design_Master: "",
-        product_Name: "",
+        Design_Master: selectedProduct.design_name,
+        product_Name: selectedProduct.product_name,
         Weight_BW: "",
     });
 
@@ -126,10 +127,14 @@ const TagEntry = ({ handleCloseModal1 }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
+        const updatedGrossWeight = gross_weight - formData.Gross_Weight; // Calculate updated gross weight
+        const updatedPcs = pcs - 1; // Decrease the pieces count by 1
+    
         console.log("Submitting formData:", formData);
-
+    
         try {
+            // Save the form data for the open tag
             const response = await axios.post(
                 `${baseURL}/post/opening-tags-entry`,
                 formData,
@@ -137,10 +142,17 @@ const TagEntry = ({ handleCloseModal1 }) => {
                     headers: { "Content-Type": "application/json" },
                 }
             );
-
+    
             console.log("Data saved successfully:", response.data);
             alert("Data saved successfully!");
-            // navigate("/stockEntryTable");
+    
+            // Update the gross weight and pieces in the database
+            await axios.post(`${baseURL}/post/update-values`, {
+                gross_weight: updatedGrossWeight,
+                pieces: updatedPcs,
+            });
+    
+            console.log("Updated gross weight and pieces saved successfully.");
         } catch (error) {
             if (error.response) {
                 console.error("Response error:", error.response.data);
@@ -154,6 +166,9 @@ const TagEntry = ({ handleCloseModal1 }) => {
             }
         }
     };
+
+    
+    
 
     // Fetch product options for P ID dropdown (product_id)
     useEffect(() => {
@@ -193,11 +208,32 @@ const TagEntry = ({ handleCloseModal1 }) => {
         }
     };
 
+    // const [apiData, setApiData] = useState(null); // State to store fetched data
 
+    // useEffect(() => {
+    //   // Fetch data from the API directly (without filtering by product_id)
+    //   fetch('http://localhost:5000/get/update-values')
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //       // Directly update state with the fetched API data (assuming the data includes gross_weight and pieces)
+    //       setApiData(data);
+    //     })
+    //     .catch((error) => console.error('Error fetching data:', error));
+    // }, []); // Empty dependency array means this will run once when the component mounts
+  
+    // // If API data exists, use it; otherwise, fall back to selectedProduct values
+    // const displayGrossWeight = apiData?.gross_weight || 0;
+    // const displayPieces = apiData?.pieces || 0;
 
 
     return (
         <div style={{ paddingTop: "0px" }}>
+            <div>
+            <h4>Pieces: {pcs || 0}</h4>
+            <h4>Gross Weight: {gross_weight-formData.Gross_Weight || 0}</h4>
+            {/* <h4>Pieces: {displayPieces}</h4> 
+            <h4>Gross Weight: {displayGrossWeight}</h4>  */}
+            </div>
             <div className="container mt-4">
                 <div className="row mt-3">
                     <div className="col-12">
