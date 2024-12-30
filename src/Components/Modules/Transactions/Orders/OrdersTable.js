@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout';
-import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
-import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
+import { FaEye } from 'react-icons/fa';
+import { Button, Row, Col, Modal, Table, Form } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from '../../../../Url/NodeBaseURL';
 
@@ -12,69 +12,7 @@ const RepairsTable = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [repairDetails, setRepairDetails] = useState(null);
-
-  // Columns for the DataTable
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: 'Sr. No.',
-        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
-      },
-      {
-        Header: 'Date',
-        accessor: 'date',
-        Cell: ({ value }) => formatDate(value), // Format date value
-      },
-      {
-        Header: 'Invoice Number',
-        accessor: 'invoice_number',
-      },
-      {
-        Header: 'Account Name',
-        accessor: 'account_name',
-      },
-      {
-        Header: 'Total Amt',
-        accessor: 'net_amount',
-        Cell: ({ value }) => value || '-', // Handle cases with missing values
-      },
-      {
-        Header: 'Paid Amount',
-        accessor: 'paid_amount',
-        Cell: ({ row }) => row.original.net_amount || '-', // Use `net_amount` for now
-      },
-      {
-        Header: 'Actions',
-        accessor: 'actions',
-        Cell: ({ row }) => (
-          <div>
-            {/* <FaEdit
-              style={{ cursor: 'pointer', marginRight: '10px', color: 'blue' }}
-              onClick={() => handleEdit(row.original.id)}
-            />
-            <FaTrash
-              style={{ cursor: 'pointer', color: 'red' }}
-              onClick={() => handleDelete(row.original.id)}
-            /> */}
-            <FaEye
-              style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
-              onClick={() => handleViewDetails(row.original.invoice_number)} // Pass invoice_number
-            />
-          </div>
-        ),
-      },
-    ],
-    []
-  );
-
-  // Function to format date in Indian format (DD-MM-YYYY)
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return `${String(date.getDate()).padStart(2, '0')}-${String(
-      date.getMonth() + 1
-    ).padStart(2, '0')}-${date.getFullYear()}`;
-  };
+  const [accounts, setAccounts] = useState([]); // Ensure accounts is an array
 
   // Fetch unique repair details from the API
   useEffect(() => {
@@ -92,23 +30,28 @@ const RepairsTable = () => {
         setLoading(false);
       }
     };
-  
+
     fetchRepairs();
   }, []);
-  
-  const handleEdit = (id) => {
-    navigate(`/repairs/edit/${id}`);
-  };
 
-  const handleDelete = (id) => {
-    console.log('Delete record with id:', id);
-  };
+  // Fetch accounts for "Employee Compensation" when the "Assigning" is "Pending"
+  useEffect(() => {
+    const fetchEmployeeCompensationAccounts = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-employee-compensation-accounts`);
+        if (Array.isArray(response.data)) {
+          setAccounts(response.data); // Set accounts for the dropdown
+        } else {
+          console.error('Expected an array but got:', response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching accounts:', error);
+      }
+    };
 
-  const handleCreate = () => {
-    navigate('/orders');
-  };
+    fetchEmployeeCompensationAccounts();
+  }, []);
 
-  // Fetch and show repair details in modal
   const handleViewDetails = async (invoice_number) => {
     try {
       const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
@@ -119,10 +62,64 @@ const RepairsTable = () => {
     }
   };
 
-  // Close the modal
   const handleCloseModal = () => {
     setShowModal(false);
     setRepairDetails(null); // Clear repair details on modal close
+  };
+
+  // Columns for the DataTable
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1,
+      },
+      {
+        Header: 'Date',
+        accessor: 'date',
+        Cell: ({ value }) => formatDate(value),
+      },
+      {
+        Header: 'Invoice Number',
+        accessor: 'invoice_number',
+      },
+      {
+        Header: 'Account Name',
+        accessor: 'account_name',
+      },
+      {
+        Header: 'Total Amt',
+        accessor: 'net_amount',
+        Cell: ({ value }) => value || '-',
+      },
+      {
+        Header: 'Paid Amount',
+        accessor: 'paid_amount',
+        Cell: ({ row }) => row.original.net_amount || '-',
+      },
+      {
+        Header: 'Actions',
+        accessor: 'actions',
+        Cell: ({ row }) => (
+          <div>
+            <FaEye
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
+              onClick={() => handleViewDetails(row.original.invoice_number)}
+            />
+          </div>
+        ),
+      },
+    ],
+    []
+  );
+
+  // Function to format date in Indian format (DD-MM-YYYY)
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return `${String(date.getDate()).padStart(2, '0')}-${String(
+      date.getMonth() + 1
+    ).padStart(2, '0')}-${date.getFullYear()}`;
   };
 
   return (
@@ -133,7 +130,7 @@ const RepairsTable = () => {
             <h3>Orders</h3>
             <Button
               className="create_but"
-              onClick={handleCreate}
+              onClick={() => navigate('/orders')}
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
             >
               + Create
@@ -148,7 +145,7 @@ const RepairsTable = () => {
       </div>
 
       {/* Modal to display repair details */}
-      <Modal show={showModal} onHide={handleCloseModal} size="xl" className='m-auto'>
+      <Modal show={showModal} onHide={handleCloseModal} size="xl" className="m-auto">
         <Modal.Header closeButton>
           <Modal.Title>Orders Details</Modal.Title>
         </Modal.Header>
@@ -190,58 +187,70 @@ const RepairsTable = () => {
               </Table>
 
               <h5>Products</h5>
-<Table bordered>
-  <thead>
-    <tr>
-      <th>Code</th>
-      <th>Product Image</th>
-      <th>Product Name</th>
-      <th>Metal</th>
-      <th>Metal Type</th>
-      <th>Purity</th>
-      <th>Gross Weight</th>
-      <th>Stone Weight</th>
-      <th>Wastage Weight</th>
-      <th>Total Weight</th>
-      <th>Making Charges</th>
-      <th>Rate</th>
-      <th>Tax Amount</th>
-      <th>Total Price</th>
-    </tr>
-  </thead>
-  <tbody>
-    {repairDetails.repeatedData.map((product, index) => (
-      <tr key={index}>
-        <td>{product.code}</td>
-        <td>
-          {/* Display image */}
-          {product.product_image ? (
-            <img
-              src={`http://localhost:5000/uploads/${product.product_image}`} // Image path constructed with filename
-              alt={product.product_name}
-              style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-            />
-          ) : (
-            'No Image'
-          )}
-        </td>
-        <td>{product.product_name}</td>
-        <td>{product.metal || 'N/A'}</td>
-        <td>{product.metal_type}</td>
-        <td>{product.purity}</td>
-        <td>{product.gross_weight}</td>
-        <td>{product.stone_weight}</td>
-        <td>{product.wastage_weight}</td>
-        <td>{product.total_weight_av}</td>
-        <td>{product.making_charges}</td>
-        <td>{product.rate}</td>
-        <td>{product.tax_amt}</td>
-        <td>{product.total_price}</td>
-      </tr>
-    ))}
-  </tbody>
-</Table>
-
+              <Table bordered>
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Metal</th>
+                    <th>Metal Type</th>
+                    <th>Purity</th>
+                    <th>Gross Weight</th>
+                    <th>Stone Weight</th>
+                    <th>Wastage Weight</th>
+                    <th>Total Weight</th>
+                    <th>Making Charges</th>
+                    <th>Rate</th>
+                    <th>Tax Amount</th>
+                    <th>Total Price</th>
+                    <th>Assigning</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {repairDetails.repeatedData.map((product, index) => (
+                    <tr key={index}>
+                      <td>{product.code}</td>
+                      <td>
+                        {product.product_image ? (
+                          <img
+                            src={`http://localhost:5000/uploads/${product.product_image}`}
+                            alt={product.product_name}
+                            style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          'No Image'
+                        )}
+                      </td>
+                      <td>{product.product_name}</td>
+                      <td>{product.metal || 'N/A'}</td>
+                      <td>{product.metal_type}</td>
+                      <td>{product.purity}</td>
+                      <td>{product.gross_weight}</td>
+                      <td>{product.stone_weight}</td>
+                      <td>{product.wastage_weight}</td>
+                      <td>{product.total_weight_av}</td>
+                      <td>{product.making_charges}</td>
+                      <td>{product.rate}</td>
+                      <td>{product.tax_amt}</td>
+                      <td>{product.total_price}</td>
+                      <td>
+                        {product.assigning === 'pending' && (
+                          <Form.Select>
+                            <option>Select Account</option>
+                            {Array.isArray(accounts) &&
+                              accounts.map((account, index) => (
+                                <option key={index} value={account.account_name}>
+                                  {account.account_name}
+                                </option>
+                              ))}
+                          </Form.Select>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
             </>
           )}
         </Modal.Body>
