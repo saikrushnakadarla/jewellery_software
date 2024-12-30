@@ -254,7 +254,7 @@ const [taxOptions, setTaxOptions] = useState([]);
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} /> {/* Render the table with fetched data */}
+        <DataTable columns={columns} data={[...data].reverse()} /> {/* Render the table with fetched data */}
       </div>
 
       {/* Update Modal */}
