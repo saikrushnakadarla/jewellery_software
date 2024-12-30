@@ -49,6 +49,7 @@ const useProductHandlers = () => {
     transaction_status: "Sales",
     qty: "",
     opentag_id:"",
+    product_image: null,
   });
 
   // Fetch products and tags data
