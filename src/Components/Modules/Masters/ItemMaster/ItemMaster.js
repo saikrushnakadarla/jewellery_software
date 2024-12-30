@@ -948,7 +948,7 @@ useEffect(() => {
                   style={openingTagsStyle}
                   options={[
                     { value: "Gross Weight", label: "Gross Weight" },
-                    { value: "Weight BW", label: "Weight BW" },
+                    { value: "Net Weight", label: "Net Weight" },
                   ]}
                 />
                 <InputField
