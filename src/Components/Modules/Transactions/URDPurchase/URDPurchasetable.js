@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { Button, Row, Col } from 'react-bootstrap';
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
@@ -84,7 +85,7 @@ const RepairsTable = () => {
   useEffect(() => {
     const fetchUrdPurchases = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get-purchases'); // Replace with your actual API endpoint
+        const response = await fetch(`${baseURL}/get-purchases`); // Replace with your actual API endpoint
         const result = await response.json();
 
         if (response.ok) {

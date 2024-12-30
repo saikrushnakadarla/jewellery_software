@@ -51,6 +51,7 @@ import RepairDetails from "./Components/Modules/Transactions/Sales/SalesDetailsM
 import Worker_Master from './Components/Modules/Masters/Worker/Worker';
 import Worker_Table from './Components/Modules/Masters/Worker/WorkerTable';
 import Login from './Components/Pages/Login/Login';
+import SalesReturn from './Components/Modules/Transactions/SalesReturn/SalesForm';
 
 function App() {
   const location = useLocation();
@@ -116,6 +117,8 @@ function App() {
         <Route path="/sales/details/:invoice_number" element={<RepairDetails />} />
 
         <Route path="/salesNew" element={<SalesNew />} />
+
+        <Route path="/salesreturn" element={<SalesReturn />} />
       </Routes>
     </>
   );

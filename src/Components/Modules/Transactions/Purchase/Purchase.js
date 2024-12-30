@@ -725,7 +725,7 @@ const URDPurchase = () => {
                   </Col>
                   <Col xs={12} md={4}>
                     <InputField
-                      label="Customer Name:"
+                      label="Suplier Name:"
                       name="account_name"
                       type="select"
                       value={formData.customer_id || ""} // Use customer_id to match selected value

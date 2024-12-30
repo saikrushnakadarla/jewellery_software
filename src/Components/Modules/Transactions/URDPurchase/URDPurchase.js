@@ -312,7 +312,7 @@ const URDPurchase = () => {
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/metaltype');
+        const response = await axios.get(`${baseURL}/metaltype`);
         const metalTypes = response.data.map(item => ({
           value: item.metal_name, // Metal name for dropdown
           label: item.metal_name, // Display value
@@ -369,7 +369,7 @@ const URDPurchase = () => {
   useEffect(() => {
     const fetchCurrentRates = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/get/current-rates');
+        const response = await axios.get(`${baseURL}/get/current-rates`);
         console.log('API Response:', response.data);
   
         // Log the 24crt rate separately
