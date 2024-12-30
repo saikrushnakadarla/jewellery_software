@@ -695,7 +695,7 @@ function DesignMaster() {
 
         {/* Purity Table */}
         <div style={{ marginTop: "20px" }} className="purity-table-container">
-          <DataTable columns={columns} data={submittedData} />
+          <DataTable columns={columns}  data={[...submittedData].reverse()} />
         </div>
       </div>
     </div>
