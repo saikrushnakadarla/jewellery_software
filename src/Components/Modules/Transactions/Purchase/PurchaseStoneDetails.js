@@ -4,6 +4,7 @@ import DataTable from "../StockEntry/StoneTableLayout";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import axios from "axios";
 import "../StockEntry/StockEntry.css";
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const PurchaseStoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetails }) => {
   const [subproductname, setSubProductName] = useState("");
@@ -177,7 +178,7 @@ const PurchaseStoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateSt
           totalprice: totalprice,  // Send the total price
         };
   
-        await axios.post("http://localhost:5000/post/addProductstonedetails", payload);
+        await axios.post(`${baseURL}/post/addProductstonedetails`, payload);
       }
       
       alert("Data saved successfully!");

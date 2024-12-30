@@ -83,7 +83,7 @@ const URDPurchase = () => {
   useEffect(() => {
     const fetchPurityPercentage = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/purity");
+        const response = await axios.get(`${baseURL}/purity`);
         const purityData = Array.isArray(response.data) ? response.data : [response.data]; // Ensure response is an array
 
         console.log("API Data:", purityData); // Log the API data for debugging

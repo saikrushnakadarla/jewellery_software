@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'; // React Router for navigation
 import axios from 'axios';
 import logo from '../Login/Logo/logo_dark.png';
 import InputField from '../InputField/InputField';
+import baseURL from "../../../Url/NodeBaseURL";
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ const handleLogin = async (e) => {
 
   try {
     // Send login request
-    const response = await axios.post('http://localhost:5000/login', {
+    const response = await axios.post(`${baseURL}/login`, {
       email,
       password,
     });
