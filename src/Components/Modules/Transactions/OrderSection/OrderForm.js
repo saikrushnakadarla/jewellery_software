@@ -229,7 +229,7 @@ const SalesForm = () => {
   
     try {
       // Make POST request with FormData
-      await axios.post(`${baseURL}/save-repair-details`, formData, {
+      await axios.post(`${baseURL}/save-order-details`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
