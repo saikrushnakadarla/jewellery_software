@@ -90,9 +90,8 @@ const URDPurchase = () => {
 
         // Find the matching purity
         const matchedPurity = purityData.find(
-          (item) => item.name === formData.purity
+          (item) => item.purity === formData.purity
         );
-        console.log("Matched Purity:", matchedPurity);
 
         if (matchedPurity) {
           console.log("Matched Purity:", matchedPurity); // Log the matched purity
@@ -726,7 +725,7 @@ const URDPurchase = () => {
                   </Col>
                   <Col xs={12} md={4}>
                     <InputField
-                      label="Customer Name:"
+                      label="Suplier Name:"
                       name="account_name"
                       type="select"
                       value={formData.customer_id || ""} // Use customer_id to match selected value
