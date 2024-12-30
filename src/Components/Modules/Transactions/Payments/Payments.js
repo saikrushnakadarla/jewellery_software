@@ -4,6 +4,7 @@ import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
+import axios from 'axios';
 
 const RepairForm = () => {
   const navigate = useNavigate();
@@ -22,6 +23,23 @@ const RepairForm = () => {
     cash_amt: "",
     remarks: "",
   });
+
+  useEffect(() => {
+    const fetchLastPaymentNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastPaymentNumber`);
+        // setFormData(prev => ({ ...prev, receipt_no: response.data.lastPaymentNumber }));
+        setFormData((prev) => ({
+          ...prev,
+          receipt_no: repairData ? repairData.receipt_no : response.data.lastPaymentNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching invoice number:", error);
+      }
+    };
+
+    fetchLastPaymentNumber();
+  }, []);
 
   useEffect(() => {
     if (repairData) {
@@ -97,7 +115,7 @@ const RepairForm = () => {
         body: JSON.stringify(formData),
       });
       if (!response.ok) throw new Error("Failed to save data");
-      window.alert("Data saved successfully!");
+      window.alert("Payment saved successfully!");
       navigate("/paymentstable");
     } catch (error) {
       window.alert(`Error: ${error.message}`);
@@ -213,7 +231,7 @@ const RepairForm = () => {
             style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
             onClick={handleSubmit}
           >
-            Save
+            {repairData ? "Update" : "Save"}
           </Button>
         </div>
       </Container>

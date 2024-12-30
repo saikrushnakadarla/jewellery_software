@@ -22,7 +22,7 @@ const ReceiptsTable = () => {
         accessor: 'mode',
       },
       {
-        Header: 'Payment No',
+        Header: 'Receipt No',
         accessor: 'receipt_no',
       },
       {
@@ -139,7 +139,7 @@ const ReceiptsTable = () => {
           </Col>
         </Row>
         {data.length > 0 ? (
-          <DataTable columns={columns} data={data} />
+          <DataTable columns={columns} data={[...data].reverse()} />
         ) : (
           <p>No receipts found.</p>
         )}

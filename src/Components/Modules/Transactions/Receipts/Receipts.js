@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "./Receipts.css";
-import { Container, Row, Col, Button } from "react-bootstrap";
-import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation for passing data
-import baseURL from "../../../../Url/NodeBaseURL";
 import InputField from "../../../Pages/InputField/InputField";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import { useNavigate, useLocation } from "react-router-dom";
+import baseURL from "../../../../Url/NodeBaseURL";
+import axios from "axios";
 
 const RepairForm = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // To get passed data
-  const repairData = location.state?.repairData || {}; // Default to empty object if no data is passed
+  const location = useLocation();
+  const repairData = location.state?.repairData; // Passed from the previous screen
 
   const [formData, setFormData] = useState({
     transaction_type: "Receipt",
-    date: "", // Ensure this field is properly set
+    date: "",
     mode: "",
     cheque_number: "",
     receipt_no: "",
@@ -23,38 +24,58 @@ const RepairForm = () => {
     remarks: "",
   });
 
-  const [accountNames, setAccountNames] = useState([]);
+  const [accountOptions, setAccountOptions] = useState([]);
 
+  // Fetch last receipt number for new entries
   useEffect(() => {
-    // Set default date to today or use the passed repairData
-    const today = new Date().toISOString().split("T")[0];
-    setFormData((prevData) => ({
-      ...prevData,
-      ...repairData,
-      date: repairData.date
-        ? new Date(repairData.date).toISOString().split("T")[0]
-        : today, // Ensure date is in YYYY-MM-DD format
-    }));
+    const fetchLastReceiptNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastReceiptNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          receipt_no: repairData ? repairData.receipt_no : response.data.lastReceiptNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching receipt number:", error);
+      }
+    };
 
-    // Fetch account names when the component mounts
+    fetchLastReceiptNumber();
+  }, [repairData]);
+
+  // Initialize formData with repairData if editing
+  useEffect(() => {
+    if (repairData) {
+      setFormData((prev) => ({
+        ...prev,
+        ...repairData, // Override with existing repair data
+      }));
+    } else {
+      const today = new Date().toISOString().split("T")[0];
+      setFormData((prev) => ({ ...prev, date: today }));
+    }
+  }, [repairData]);
+
+  // Fetch account names
+  useEffect(() => {
     const fetchAccountNames = async () => {
       try {
-        const response = await fetch(`${baseURL}/account-names`);
-        if (response.ok) {
-          const data = await response.json();
-          setAccountNames(data);
-        } else {
-          console.error("Error fetching account names:", response.statusText);
-        }
+        const response = await axios.get(`${baseURL}/account-names`);
+        const formattedOptions = response.data.map((item) => ({
+          value: item.account_name,
+          label: item.account_name,
+        }));
+        setAccountOptions(formattedOptions);
       } catch (error) {
         console.error("Error fetching account names:", error);
       }
     };
 
     fetchAccountNames();
-  }, [repairData]);
+  }, []);
 
-  const handleChange = (e) => {
+  // Handle input changes
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
 
     setFormData((prevData) => {
@@ -80,157 +101,137 @@ const RepairForm = () => {
     });
   };
 
+  // Submit form data
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const url = repairData.id
-        ? `${baseURL}/edit/payments/${repairData.id}`
-        : `${baseURL}/post/payments`; // Use the correct API endpoint
-
-      const method = repairData.id ? "PUT" : "POST"; // PUT for edit, POST for create
-
-      const response = await fetch(url, {
+      const endpoint = repairData ? `${baseURL}/edit/payments/${repairData.id}` : `${baseURL}/post/payments`;
+      const method = repairData ? "PUT" : "POST";
+      const response = await axios({
+        url: endpoint,
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        data: formData,
       });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(
-          repairData.id
-            ? "Receipt updated successfully!"
-            : "Receipt added successfully!"
-        );
-        navigate("/receiptstable");
-      } else {
-        console.error("Error saving receipt:", result.message);
-        alert(result.message || "Failed to save receipt.");
-      }
+      if (response.status !== 200) throw new Error("Failed to save data");
+      window.alert("Receipt saved successfully!");
+      navigate("/receiptstable");
     } catch (error) {
-      console.error("Error saving receipt:", error);
-      alert("An error occurred while saving the receipt.");
+      window.alert(`Error: ${error.message}`);
     }
   };
 
   return (
     <div className="main-container">
-      <Container className="receipt-form-container">
-        <form onSubmit={handleSubmit}>
-          <Row className="receipt-form-section">
-          <h2>{repairData.id ? "Edit Receipt" : "Create Receipt"}</h2>
-            <Col xs={12} md={2}>
-              <InputField
-                label="Date"
-                type="date"
-                name="date"
-                value={formData.date}
-                onChange={handleChange}
-                max={new Date().toISOString().split("T")[0]} // Restricts future dates
-              />
-            </Col>
+      <Container className="payments-form-container">
+        <Row className="payments-form-section">
+          <h4 className="mb-4">Receipts</h4>
 
+          <Col xs={12} md={2}>
+            <InputField
+              label="Date"
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+              max={new Date().toISOString().split("T")[0]}
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="Receipt No."
+              name="receipt_no"
+              value={formData.receipt_no}
+              onChange={handleInputChange}
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="Mode"
+              type="select"
+              name="mode"
+              value={formData.mode}
+              onChange={handleInputChange}
+              options={[
+                { value: "Cash", label: "Cash" },
+                { value: "Cheque", label: "Cheque" },
+                { value: "Online", label: "Online" },
+              ]}
+            />
+          </Col>
+          <Col xs={12} md={3}>
+            <InputField
+              label="Reference Number"
+              name="cheque_number"
+              value={formData.cheque_number}
+              onChange={handleInputChange}
+            />
+          </Col>
 
-            <Col xs={12} md={2}>
-              <InputField
-                label="Receipt No."
-                name="receipt_no"
-                value={formData.receipt_no}
-                onChange={handleChange}
-              />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField
-                label="Mode"
-                type="select"
-                name="mode"
-                value={formData.mode}
-                onChange={handleChange}
-                options={[
-                  { value: "Cash", label: "Cash" },
-                  { value: "Cheque", label: "Cheque" },
-                  { value: "Online", label: "Online" },
-                ]}
-              />
-            </Col>
-            <Col xs={12} md={3}>
-              <InputField
-                label="Reference Number"
-                name="cheque_number"
-                value={formData.cheque_number}
-                onChange={handleChange}
-              />
-            </Col>
+          <Col xs={12} md={3}>
+            <InputField
+              label="Account Name"
+              type="select"
+              name="account_name"
+              value={formData.account_name}
+              onChange={handleInputChange}
+              options={accountOptions}
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="Total Amt"
+              type="number"
+              name="total_amt"
+              value={formData.total_amt}
+              onChange={handleInputChange}
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="Discount Amt"
+              type="number"
+              name="discount_amt"
+              value={formData.discount_amt}
+              onChange={handleInputChange}
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="Cash Amt"
+              type="number"
+              name="cash_amt"
+              value={formData.cash_amt}
+              readOnly
+            />
+          </Col>
+          <Col xs={12} md={3}>
+            <InputField
+              label="Remarks"
+              name="remarks"
+              value={formData.remarks}
+              onChange={handleInputChange}
+            />
+          </Col>
+        </Row>
 
-            <Col xs={12} md={3}>
-              <InputField
-                label="Account Name"
-                type="select"
-                name="account_name"
-                value={formData.account_name}
-                onChange={handleChange}
-                options={accountNames.map((name) => ({
-                  value: name.account_name, // Access the correct field from your API response
-                  label: name.account_name,
-                }))}
-              />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField
-                label="Total Amt"
-                type="number"
-                name="total_amt"
-                value={formData.total_amt}
-                onChange={handleChange}
-              />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField
-                label="Discount Amt"
-                type="number"
-                name="discount_amt"
-                value={formData.discount_amt}
-                onChange={handleChange}
-              />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField
-                label="Cash Amt"
-                type="number"
-                name="cash_amt"
-                value={formData.cash_amt}
-                readOnly
-              />
-            </Col>
-            <Col xs={12} md={3}>
-              <InputField
-                label="Remarks"
-                name="remarks"
-                value={formData.remarks}
-                onChange={handleChange}
-              />
-            </Col>
-          </Row>
-          <div className="form-buttons">
-            <Button
-              variant="secondary"
-              className="cus-back-btn"
-              type="button"
-              onClick={() => navigate("/receiptstable")}
-            >
-              Cancel
-            </Button>
-           
-            <Button variant="primary" 
-            style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }} type="submit">
-          {repairData.id ? "Update Receipt" : "Create Receipt"}
-        </Button>
-          </div>
-        </form>
+        <div className="form-buttons">
+          <Button
+            variant="secondary"
+            className="cus-back-btn"
+            type="button"
+            onClick={() => navigate("/receiptstable")}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+            onClick={handleSubmit}
+          >
+            {repairData ? "Update" : "Save"}
+          </Button>
+        </div>
       </Container>
     </div>
   );

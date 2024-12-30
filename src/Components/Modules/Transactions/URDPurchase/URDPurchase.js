@@ -74,6 +74,30 @@ const URDPurchase = () => {
     const handleInputChange = (e) => {
       const { name, value } = e.target;
 
+      setFormData(prevState => {
+        const updatedData = { ...prevState, [name]: value };
+
+        if (name === "purity") {
+          // Update the rate based on the selected purity
+          const rate =
+            value === "24K" ? rates.rate_24crt :
+            value === "22K" ? rates.rate_22crt :
+            value === "18K" ? rates.rate_18crt :
+            value === "16K" ? rates.rate_16crt :
+            "";
+  
+          updatedDetails.rate = rate;
+        }
+  
+        // Update HSN Code based on selected metal
+        if (name === 'metal') {
+          const selectedMetal = metalOptions.find(option => option.value === value);
+          updatedData.hsn_code = selectedMetal ? selectedMetal.hsn_code : '';
+        }
+  
+        return updatedData;
+      });
+
        // Update the product details
     const updatedDetails = {
       ...productDetails,
@@ -281,14 +305,22 @@ const URDPurchase = () => {
       fetchPurity();
     }, []);
 
+    const [metalOptions, setMetalOptions] = useState([]);
+
       // Fetch data from the backend API when the component mounts
+  // Fetch metal types on component mount
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
-        const response = await axios.get(`${baseURL}/metaltype`);
-        setMetalType(response.data); // Populate table with fetched data
+        const response = await axios.get('http://localhost:5000/metaltype');
+        const metalTypes = response.data.map(item => ({
+          value: item.metal_name, // Metal name for dropdown
+          label: item.metal_name, // Display value
+          hsn_code: item.hsn_code, // Associated HSN Code
+        }));
+        setMetalOptions(metalTypes);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error('Error fetching metal types:', error);
       }
     };
 
@@ -521,17 +553,14 @@ const URDPurchase = () => {
           />
         </Col>
         <Col xs={12} md={2}>
-          <InputField
-            label="Metal"
-            type="select"
-            name="metal"
-            value={productDetails.metal}
-            onChange={handleInputChange}
-            options={metalType.map((metal) => ({
-              value: metal.metal_name, 
-              label: metal.metal_name,
-            }))}
-          />
+        <InputField
+        label="Metal"
+        name="metal"
+        type="select"
+        value={formData.metal}
+        onChange={handleInputChange}
+        options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+      />
         </Col>
         <Col xs={12} md={2}>
           <InputField
@@ -547,13 +576,14 @@ const URDPurchase = () => {
           />
         </Col>
         <Col xs={12} md={2}>
-          <InputField
-            label="HSN Code"
-            type="text"
-            name="hsn_code"
-            value={productDetails.hsn_code}
-            onChange={handleInputChange}
-          />
+        <InputField
+          label="HSN Code"
+          name="hsn_code"
+          type="text"
+          value={formData.hsn_code}
+          onChange={handleInputChange}
+          readOnly // Make it read-only
+        />
         </Col>
         <Col xs={12} md={2}>
           <InputField
