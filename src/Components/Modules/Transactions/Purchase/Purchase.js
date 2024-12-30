@@ -90,8 +90,9 @@ const URDPurchase = () => {
 
         // Find the matching purity
         const matchedPurity = purityData.find(
-          (item) => item.purity === formData.purity
+          (item) => item.name === formData.purity
         );
+        console.log("Matched Purity:", matchedPurity);
 
         if (matchedPurity) {
           console.log("Matched Purity:", matchedPurity); // Log the matched purity
