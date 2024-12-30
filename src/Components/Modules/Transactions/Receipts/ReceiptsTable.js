@@ -22,7 +22,7 @@ const ReceiptsTable = () => {
         accessor: 'mode',
       },
       {
-        Header: 'Payment No',
+        Header: 'Receipt No',
         accessor: 'receipt_no',
       },
       {

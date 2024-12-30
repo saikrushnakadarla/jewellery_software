@@ -4,11 +4,12 @@ import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
+import axios from "axios";
 
 const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const repairData = location.state?.repairData;
+  const repairData = location.state?.repairData; // Passed from the previous screen
 
   const [formData, setFormData] = useState({
     transaction_type: "Receipt",
@@ -23,43 +24,57 @@ const RepairForm = () => {
     remarks: "",
   });
 
-  useEffect(() => {
-    if (repairData) {
-      setFormData(repairData);
-    } else {
-      const today = new Date().toISOString().split("T")[0];
-      setFormData(prev => ({ ...prev, date: today }));
-    }
-  }, [repairData]);
   const [accountOptions, setAccountOptions] = useState([]);
 
-  // Fetch account names on component mount
+  // Fetch last receipt number for new entries
   useEffect(() => {
-     // Set default date to today
-     const today = new Date().toISOString().split("T")[0];
-     setFormData((prevData) => ({ ...prevData, date: today }));
+    const fetchLastReceiptNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastReceiptNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          receipt_no: repairData ? repairData.receipt_no : response.data.lastReceiptNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching receipt number:", error);
+      }
+    };
+
+    fetchLastReceiptNumber();
+  }, [repairData]);
+
+  // Initialize formData with repairData if editing
+  useEffect(() => {
+    if (repairData) {
+      setFormData((prev) => ({
+        ...prev,
+        ...repairData, // Override with existing repair data
+      }));
+    } else {
+      const today = new Date().toISOString().split("T")[0];
+      setFormData((prev) => ({ ...prev, date: today }));
+    }
+  }, [repairData]);
+
+  // Fetch account names
+  useEffect(() => {
     const fetchAccountNames = async () => {
       try {
-        const response = await fetch(`${baseURL}/account-names`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch account names");
-        }
-        const data = await response.json();
-  
-        // Map API response to match the options structure
-        const formattedOptions = data.map((item) => ({
+        const response = await axios.get(`${baseURL}/account-names`);
+        const formattedOptions = response.data.map((item) => ({
           value: item.account_name,
           label: item.account_name,
         }));
-  
         setAccountOptions(formattedOptions);
       } catch (error) {
         console.error("Error fetching account names:", error);
       }
     };
-  
+
     fetchAccountNames();
   }, []);
+
+  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -86,18 +101,19 @@ const RepairForm = () => {
     });
   };
 
+  // Submit form data
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const endpoint = repairData ? `${baseURL}/edit/payments/${repairData.id}` : `${baseURL}/post/payments`;
       const method = repairData ? "PUT" : "POST";
-      const response = await fetch(endpoint, {
+      const response = await axios({
+        url: endpoint,
         method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        data: formData,
       });
-      if (!response.ok) throw new Error("Failed to save data");
-      window.alert("Data saved successfully!");
+      if (response.status !== 200) throw new Error("Failed to save data");
+      window.alert("Receipt saved successfully!");
       navigate("/receiptstable");
     } catch (error) {
       window.alert(`Error: ${error.message}`);
@@ -150,7 +166,7 @@ const RepairForm = () => {
               onChange={handleInputChange}
             />
           </Col>
-         
+
           <Col xs={12} md={3}>
             <InputField
               label="Account Name"
@@ -199,24 +215,23 @@ const RepairForm = () => {
         </Row>
 
         <div className="form-buttons">
-  <Button
-    variant="secondary"
-    className="cus-back-btn"
-    type="button"
-    onClick={() => navigate("/receiptstable")}
-  >
-    Cancel
-  </Button>
-  <Button
-    type="submit"
-    variant="primary"
-    style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
-    onClick={handleSubmit}
-  >
-    {repairData ? "Update" : "Save"}
-  </Button>
-</div>
-
+          <Button
+            variant="secondary"
+            className="cus-back-btn"
+            type="button"
+            onClick={() => navigate("/receiptstable")}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+            onClick={handleSubmit}
+          >
+            {repairData ? "Update" : "Save"}
+          </Button>
+        </div>
       </Container>
     </div>
   );
