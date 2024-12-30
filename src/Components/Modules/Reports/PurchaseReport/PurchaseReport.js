@@ -133,7 +133,7 @@ const PurchaseTable = () => {
             </Button> */}
           </Col>
         </Row>
-        <DataTable columns={columns} data={[...data].reverse()} />
+        <DataTable columns={columns} data={data} />
       </div>
     </div>
   );
