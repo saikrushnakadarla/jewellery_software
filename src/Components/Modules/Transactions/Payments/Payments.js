@@ -213,7 +213,7 @@ const RepairForm = () => {
             style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
             onClick={handleSubmit}
           >
-            Save
+            {repairData ? "Update" : "Save"}
           </Button>
         </div>
       </Container>

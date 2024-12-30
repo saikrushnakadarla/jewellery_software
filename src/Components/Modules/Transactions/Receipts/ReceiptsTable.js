@@ -139,7 +139,7 @@ const ReceiptsTable = () => {
           </Col>
         </Row>
         {data.length > 0 ? (
-          <DataTable columns={columns} data={data} />
+          <DataTable columns={columns} data={[...data].reverse()} />
         ) : (
           <p>No receipts found.</p>
         )}
