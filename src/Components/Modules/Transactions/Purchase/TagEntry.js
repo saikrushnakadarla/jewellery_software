@@ -8,7 +8,11 @@ import { useNavigate } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 
 const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
-    const { pcs, gross_weight  } = selectedProduct;
+    const [productDetails, setProductDetails] = useState({
+        pcs: selectedProduct?.pcs || 0,
+        gross_weight: selectedProduct?.gross_weight || 0,
+    });
+    
     const [productOptions, setProductOptions] = useState([]);
     const [formData, setFormData] = useState({
         product_id: selectedProduct.product_id,
@@ -124,49 +128,6 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const handleBack = () => {
         navigate("/stockEntryTable");
     };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-    
-        const updatedGrossWeight = gross_weight - formData.Gross_Weight; // Calculate updated gross weight
-        const updatedPcs = pcs - 1; // Decrease the pieces count by 1
-    
-        console.log("Submitting formData:", formData);
-    
-        try {
-            // Save the form data for the open tag
-            const response = await axios.post(
-                `${baseURL}/post/opening-tags-entry`,
-                formData,
-                {
-                    headers: { "Content-Type": "application/json" },
-                }
-            );
-    
-            console.log("Data saved successfully:", response.data);
-            alert("Data saved successfully!");
-    
-            // Update the gross weight and pieces in the database
-            await axios.post(`${baseURL}/post/update-values`, {
-                gross_weight: updatedGrossWeight,
-                pieces: updatedPcs,
-            });
-    
-            console.log("Updated gross weight and pieces saved successfully.");
-        } catch (error) {
-            if (error.response) {
-                console.error("Response error:", error.response.data);
-                alert(`Error: ${error.response.data.message || "Invalid input data"}`);
-            } else if (error.request) {
-                console.error("Request error:", error.request);
-                alert("No response received from server. Please try again.");
-            } else {
-                console.error("Error:", error.message);
-                alert("An error occurred. Please check the console for details.");
-            }
-        }
-    };
-
     
     
 
@@ -207,30 +168,82 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 );
         }
     };
+   
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    // const [apiData, setApiData] = useState(null); // State to store fetched data
+        const updatedGrossWeight = productDetails.gross_weight - (parseFloat(formData.Gross_Weight) || 0);
+        const updatedPcs = productDetails.pcs - 1; // Decrement by 1
 
-    // useEffect(() => {
-    //   // Fetch data from the API directly (without filtering by product_id)
-    //   fetch('http://localhost:5000/get/update-values')
-    //     .then((response) => response.json())
-    //     .then((data) => {
-    //       // Directly update state with the fetched API data (assuming the data includes gross_weight and pieces)
-    //       setApiData(data);
-    //     })
-    //     .catch((error) => console.error('Error fetching data:', error));
-    // }, []); // Empty dependency array means this will run once when the component mounts
-  
-    // // If API data exists, use it; otherwise, fall back to selectedProduct values
-    // const displayGrossWeight = apiData?.gross_weight || 0;
-    // const displayPieces = apiData?.pieces || 0;
+        try {
+            // Save the form data
+            await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            // Update the gross weight and pieces count
+            await axios.post(`${baseURL}/post/update-values`, {
+                gross_weight: updatedGrossWeight,
+                pieces: updatedPcs,
+                product_id: selectedProduct.product_id, // Store product ID with the data
+            });
+
+            // Update UI with new data
+            setProductDetails((prevDetails) => ({
+                ...prevDetails,
+                pcs: updatedPcs,
+                gross_weight: updatedGrossWeight,
+            }));
+
+            alert('Data and updated values saved successfully!');
+        } catch (error) {
+            if (error.response) {
+                alert(`Error: ${error.response.data.message || 'Invalid input data'}`);
+            } else if (error.request) {
+                alert('No response received from the server. Please try again.');
+            } else {
+                alert('An error occurred. Please check the console for details.');
+            }
+            console.error(error);
+        }
+    };
+    
+
+   useEffect(() => {
+        if (selectedProduct?.product_id) {
+            fetch(`${baseURL}/get/update-values?product_id=${selectedProduct.product_id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch product details');
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    const fetchedData = data?.data?.[0] || {};
+                    setProductDetails({
+                        pcs: fetchedData.pieces || selectedProduct.pcs,
+                        gross_weight: fetchedData.gross_weight || selectedProduct.gross_weight,
+                    });
+                })
+                .catch((error) => {
+                    console.error('Error fetching product details:', error);
+                    alert('Failed to fetch product details. Please try again later.');
+                });
+        }
+    }, [selectedProduct, baseURL]);
 
 
     return (
         <div style={{ paddingTop: "0px" }}>
             <div>
-            <h4>Pieces: {pcs || 0}</h4>
-            <h4>Gross Weight: {gross_weight-formData.Gross_Weight || 0}</h4>
+            <h4>Pieces: {productDetails.pcs}</h4>
+            <h4>Gross Weight: {productDetails.gross_weight}</h4>
+
             {/* <h4>Pieces: {displayPieces}</h4> 
             <h4>Gross Weight: {displayGrossWeight}</h4>  */}
             </div>

@@ -666,17 +666,17 @@ const URDPurchase = () => {
 
   const handleOpenModal = (data) => {
     setSelectedProduct({
-      product_id: data.product_id,
-      product_name: data.product_name,
-      metal_type: data.metal_type,
-      design_name: data.design_name,
-      purity: data.purity,
-      hsn: data.hsn,
-      pcs: data.pcs, // Adding pcs
-      gross_weight: data.gross_weight, // Adding gross_weight
+        product_id: data.product_id,
+        product_name: data.product_name,
+        metal_type: data.metal_type,
+        design_name: data.design_name,
+        purity: data.purity,
+        hsn: data.hsn,
+        pcs: data.pcs,
+        gross_weight: data.gross_weight,
     });
     setShowModal(true); // This shows the modal
-  };
+};
   
 
 
@@ -820,7 +820,7 @@ const URDPurchase = () => {
                     />
                   </Col>
                   <Col xs={12} md={3} >
-                    <InputField label="Indent" value={formData.indent}
+                    <InputField label="Invoice" value={formData.indent}
                       onChange={(e) => handleChange("indent", e.target.value)} />
                   </Col>
                   <Col xs={12} md={2} >
