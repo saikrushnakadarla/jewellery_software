@@ -273,7 +273,7 @@ const URDPurchase = () => {
         alert("Purchase saved successfully!");
         localStorage.removeItem("purchaseItems");
         setItems([]);
-        navigate("/urdpurchasetable");
+        navigate("/urdpurchasetable"); // Navigate to the desired page
       } catch (error) {
         console.error("Error saving purchase:", error);
       }
@@ -729,7 +729,14 @@ const URDPurchase = () => {
   </div>
         </div>
         <div className="form-buttons">
-          <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSubmit}>Save</Button>
+        <Button
+      type="submit"
+      variant="success"
+      style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+      onClick={handleSubmit}
+    >
+      Save
+    </Button>
           <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
           <Button
             variant="secondary"
