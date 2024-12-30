@@ -70,6 +70,65 @@ const StockEntryTable = () => {
   // };
 
   // Handle form submission
+
+ // Automatically calculate Weight_BW when Gross_Weight or Stones_Weight changes
+    useEffect(() => {
+        const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+        const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
+        const weightBW = grossWeight - stonesWeight;
+
+        setFormData((prev) => ({
+            ...prev,
+            Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
+        }));
+    }, [formData.Gross_Weight, formData.Stones_Weight]);
+    // Automatically calculate WastageWeight and TotalWeight_AW
+    useEffect(() => {
+        const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
+        const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+        const weightBW = parseFloat(formData.Weight_BW) || 0;
+
+        let wastageWeight = 0;
+        let totalWeight = 0;
+
+        if (formData.Wastage_On === "Gross Weight") {
+            wastageWeight = (grossWeight * wastagePercentage) / 100;
+            totalWeight = weightBW + wastageWeight;
+        } else if (formData.Wastage_On === "Weight BW") {
+            wastageWeight = (weightBW * wastagePercentage) / 100;
+            totalWeight = weightBW + wastageWeight;
+        }
+
+        setFormData((prev) => ({
+            ...prev,
+            WastageWeight: wastageWeight.toFixed(2),
+            TotalWeight_AW: totalWeight.toFixed(2),
+        }));
+    }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
+
+    const handleMakingChargesCalculation = () => {
+        const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
+        const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
+        const makingCharges = parseFloat(formData.Making_Charges) || 0;
+
+        if (formData.Making_Charges_On === "By Weight") {
+            const calculatedMakingCharges = totalWeight * mcPerGram;
+            setFormData((prev) => ({
+                ...prev,
+                Making_Charges: calculatedMakingCharges.toFixed(2),
+            }));
+        } else if (formData.Making_Charges_On === "Fixed") {
+            const calculatedMcPerGram = makingCharges / totalWeight;
+            setFormData((prev) => ({
+                ...prev,
+                MC_Per_Gram: calculatedMcPerGram.toFixed(2),
+            }));
+        }
+    };
+  useEffect(() => {
+        handleMakingChargesCalculation();
+    }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     fetch(`${baseURL}/update/opening-tags-entry/${formData.opentag_id}`, {
@@ -206,7 +265,7 @@ const StockEntryTable = () => {
             </Col>
           </Row>
           {/* DataTable component */}
-          <DataTable columns={columns} data={data} />
+          <DataTable columns={columns} data={[...data].reverse()} />
         </div>
       ) : (
         <div className="container mt-4">

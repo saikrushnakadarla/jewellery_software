@@ -38,11 +38,11 @@ const StockEntry = () => {
 
     const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
         setFormData({
-          ...formData,
-          Stones_Weight: totalWeight.toFixed(2),
-          Stones_Price: totalPrice.toFixed(2),
+            ...formData,
+            Stones_Weight: totalWeight.toFixed(2),
+            Stones_Price: totalPrice.toFixed(2),
         });
-      };
+    };
 
     const [showModal, setShowModal] = useState(false);
 
@@ -418,8 +418,9 @@ const StockEntry = () => {
                                             value={formData.Stock_Point}
                                             onChange={handleChange}
                                             options={[
-                                                { value: "Main Store", label: "Main Store" },
-                                                { value: "Secondary Store", label: "Secondary Store" },
+                                                { value: "Floor1", label: "Floor1" },
+                                                { value: "Floor2", label: "Floor2" },
+                                                { value: "strong room", label: "strong room" },
                                             ]}
                                         />
                                     </div>
@@ -441,9 +442,9 @@ const StockEntry = () => {
                 </div>
             </div>
             <StoneDetailsModal
-              showModal={showModal}
-              handleCloseModal={handleCloseModal}
-              handleUpdateStoneDetails={handleUpdateStoneDetails}
+                showModal={showModal}
+                handleCloseModal={handleCloseModal}
+                handleUpdateStoneDetails={handleUpdateStoneDetails}
             />
         </div>
     );
