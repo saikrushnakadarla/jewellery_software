@@ -11,9 +11,6 @@ import { Modal } from "react-bootstrap";
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const URDPurchase = () => {
-  const [metal, setMetal] = useState("");
-  const [purity, setPurity] = useState("");
-  const [product, setProduct] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
@@ -78,12 +75,22 @@ const URDPurchase = () => {
       class: "",
       cut: "",
     });
+    
+  const [tableData, setTableData] = useState([]);
+  const [isQtyEditable, setIsQtyEditable] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [data, setData] = useState([]);
+  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
+  const [purityOptions, setPurityOptions] = useState([]);
+  const [showModal1, setShowModal] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Fetch purity percentage when purity changes
   useEffect(() => {
     const fetchPurityPercentage = async () => {
       try {
         const response = await axios.get(`${baseURL}/purity`);
+        setPurityOptions(response.data);
         const purityData = Array.isArray(response.data) ? response.data : [response.data]; // Ensure response is an array
 
         console.log("API Data:", purityData); // Log the API data for debugging
@@ -108,28 +115,7 @@ const URDPurchase = () => {
     };
 
     fetchPurityPercentage();
-  }, [formData.purity]); // Re-run when `purity` changes
-
-  const [tableData, setTableData] = useState([]);
-  const [isQtyEditable, setIsQtyEditable] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [data, setData] = useState([]);
-
-  // Function to parse purity value to percentage
-  const parsePurityToPercentage = (purity) => {
-    if (!purity) return null;
-
-    const match = purity.match(/(\d+)(k|K)/); // Match formats like "22K", "24k", etc.
-    if (match) {
-      const caratValue = parseInt(match[1], 10); // Extract carat number
-      return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
-    }
-
-    // Handle other formats like "916HM" directly if required
-    if (purity.toLowerCase() === "916hm") return 91.6;
-
-    return null; // Default if no match
-  };
+  }, [formData.purity]); 
 
   const handleChange = (field, value) => {
     setFormData((prev) => {
@@ -200,10 +186,6 @@ const URDPurchase = () => {
     });
   };
 
-
-
-  const [editingIndex, setEditingIndex] = useState(null);
-
   const handleAdd = () => {
     if (editingIndex !== null) {
       // Update the existing row
@@ -257,7 +239,6 @@ const URDPurchase = () => {
     });
   };
 
-
   const handleSave = async () => {
     try {
       const dataToSave = {
@@ -304,9 +285,7 @@ const URDPurchase = () => {
       alert("Failed to save data.");
     }
   };
-
-
-
+  
   const handleEdit = (index) => {
     setFormData(tableData[index]); // Populate the form with selected row data
     setEditingIndex(index); // Track the index being edited
@@ -406,179 +385,6 @@ const URDPurchase = () => {
     fetchProducts();
   }, []);
 
-  const handleMetalTypeChange = (metalType) => {
-    const product = products.find((prod) => String(prod.Category) === String(metalType));
-
-    if (product) {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: product.rbarcode || "",
-        product_id: product.product_id || "",
-        product_name: product.product_name || "",
-        metal_type: product.Category || "",
-        design_name: product.design_master || "",
-        purity: product.purity || "",
-        hsn: product.hsn_code || "",
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        hsn: "",
-      }));
-    }
-  };
-
-  const handleDesignNameChange = (designName) => {
-    const product = products.find((prod) => String(prod.design_master) === String(designName));
-
-    if (product) {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: product.rbarcode || "",
-        product_id: product.product_id || "",
-        product_name: product.product_name || "",
-        metal_type: product.Category || "",
-        design_name: product.design_master || "",
-        purity: product.purity || "",
-        hsn: product.hsn_code || "",
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        hsn: "",
-      }));
-    }
-  };
-
-  const handleProductNameChange = (productName) => {
-    const product = products.find((prod) => String(prod.product_name) === String(productName));
-
-    if (product) {
-      setFormData((prevData) => ({
-        ...prevData,
-
-        code: product.rbarcode,
-
-        product_id: product.product_id || "",
-        product_name: product.product_name || "",
-        metal_type: product.Category || "",
-        design_name: product.design_master || "",
-        purity: product.purity || "",
-        hsn: product.hsn_code || "",
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        hsn: "",
-      }));
-    }
-  };
-
-  const handleProductChange = (productId) => {
-    const product = products.find((prod) => String(prod.product_id) === String(productId));
-
-    if (product) {
-      // Find the corresponding tag entry from the open-tags-entry
-      const tag = data.find((tag) => String(tag.product_id) === String(productId));
-
-      // If tag is found, populate the form with the tag's details
-      if (tag) {
-        setFormData((prevData) => ({
-          ...prevData,
-          code: '', // Priority to tag code if available
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          gross_weight: "", // Use tag's gross weight
-          stone_weight: "",
-          stone_price: "",
-          weight_bw: "",
-          va_on: "",
-          va_percent: "",
-          wastage_weight: "",
-          total_weight_aw: "",
-          mc_on: "",
-          mc_per_gram: "",
-          making_charges: "",
-        }));
-      } else {
-        // If no tag is found, just fill product details
-        setFormData((prevData) => ({
-          ...prevData,
-          code: product.rbarcode,
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          hsn: product.hsn_code || "",
-          gross_weight: "",
-          stone_weight: "",
-          stone_price: "",
-          weight_bw: "",
-          va_on: "",
-          va_percent: "",
-          wastage_weight: "",
-          total_weight_aw: "",
-          mc_on: "",
-          mc_per_gram: "",
-          making_charges: "",
-        }));
-      }
-    } else {
-      // Reset form data if no product is selected
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        hsn: "",
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        mc_on: "",
-        mc_per_gram: "",
-        making_charges: "",
-        rate: "",
-        rate_amt: "",
-        tax_percent: "",
-        tax_amt: "",
-        total_price: "",
-      }));
-    }
-  };
-
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
-
   const handleBarcodeChange = async (code) => {
     try {
       const product = products.find((prod) => String(prod.rbarcode) === String(code));
@@ -656,6 +462,7 @@ const URDPurchase = () => {
       console.error("Error handling code change:", error);
     }
   };
+
   const handleBack = () => {
     navigate('/purchasetable');
   };
@@ -664,9 +471,6 @@ const URDPurchase = () => {
     navigate("/customermaster", { state: { from: "/purchase" } });
   };
 
-  const [showModal1, setShowModal] = useState(false);
-
-  // Prevent modal from closing unintentionally
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (showModal1) {
@@ -697,21 +501,6 @@ const URDPurchase = () => {
     setShowModal(false); // Close the modal
   };
 
-  const [purityOptions, setPurityOptions] = useState([]);
-  useEffect(() => {
-    const fetchPurity = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        setPurityOptions(response.data); // Populate purity options dynamically
-      } catch (error) {
-        console.error("Error fetching purity options:", error);
-      }
-    };
-
-    fetchPurity();
-  }, []);
-
-
   useEffect(() => {
     const fetchCurrentRates = async () => {
       try {
@@ -734,18 +523,6 @@ const URDPurchase = () => {
     };
     fetchCurrentRates();
   }, []);
-  const [rateOptions, setRateOptions] = useState([]);
-
-  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
-
-  const currentRate =
-    formData.purity === "24K" ? rates.rate_24crt :
-      formData.purity === "22K" ? rates.rate_22crt :
-        formData.purity === "18K" ? rates.rate_18crt :
-          formData.purity === "16K" ? rates.rate_16crt :
-            "";
-
-
   return (
     <div className="main-container">
       <div className="purchase-form-container">
@@ -999,43 +776,19 @@ const URDPurchase = () => {
               <Table striped bordered hover className="mt-4">
                 <thead>
                   <tr>
-                    <th>BarCode/Rbarcode</th>
-                    <th>Product ID</th>
-                    <th>Product Name</th>
-                    <th>Metal Type</th>
-                    <th>Design Name</th>
-                    <th>Purity</th>
-                    <th>purityPercentage</th>
-                    <th>HSN</th>
-                    <th>Product Type</th>
-                    <th>Stock Type</th>
+                    <th>Rbarcode</th>                    
+                    <th>Category</th>
                     <th>Pieces</th>
-                    <th>Gross Weight</th>
-                    <th>Stone Weight</th>
-                    <th>Net Weight</th>
-                    <th>Unit Weight</th>
-                    <th>Waste Percentage</th>
-                    <th>Waste Amount</th>
-                    <th>Pure Weight</th>
-                    <th>Alloy</th>
-                    <th>Cost</th>
-                    <th>Total Weight</th>
-                    <th>Weight Rate Amount</th>
-                    <th>MC Per Gram</th>
-                    <th>Making Charges</th>
-                    <th>Stone Amount</th>
-                    <th>Total Amount</th>
+                    <th>Gross</th>
                     <th>Stone</th>
-                    <th>Stone Pieces</th>
-                    <th>Stone Carat</th>
-                    <th>CWP</th>
-                    <th>GMS</th>
-                    <th>Stone Rate</th>
-                    <th>Clarity</th>
+                    <th>Net</th>
+                    <th>HM Charges</th>
+                    <th>Other Charges</th>
+                    <th>Charges</th>
+                    <th>Purity</th>
+                    <th>Pure Wt</th>
                     <th>Rate</th>
-                    <th>Clear</th>
-                    <th>Class</th>
-                    <th>Cut</th>
+                    <th>Total Amount</th>
                     <th>Actions</th> {/* New Action column */}
                   </tr>
                 </thead>
@@ -1043,42 +796,25 @@ const URDPurchase = () => {
                   {tableData.map((data, index) => (
                     <tr key={index}>
                       <td>{data.code}</td>
-                      <td>{data.product_id}</td>
-                      <td>{data.product_name}</td>
-                      <td>{data.metal_type}</td>
-                      <td>{data.design_name}</td>
-                      <td>{data.purity}</td>
-                      <td>{data.purityPercentage}</td>
-                      <td>{data.hsn}</td>
-                      <td>{data.product_type}</td>
-                      <td>{data.stock_type}</td>
+                      <td>{data.category}</td>
                       <td>{data.pcs}</td>
                       <td>{data.gross_weight}</td>
+                      <td>{data.stone_weight}</td>
+                      <td>{data.net_weight}</td>
+                      <td>{data.hm_charges}</td>
+                      <td>{data.other_charges}</td>
+                      <td>{data.charges}</td>
+                      <td>{data.purity}</td>
+                      <td>{data.pcs}</td>
+                      <td>{data.pure_weight}</td>
                       <td>{data.stone_weight}</td>
                       <td>{data.net_weight}</td>
                       <td>{data.unit_weight}</td>
                       <td>{data.waste_percentage}</td>
                       <td>{data.waste_amount}</td>
                       <td>{data.pure_weight}</td>
-                      <td>{data.alloy}</td>
-                      <td>{data.cost}</td>
-                      <td>{data.total_weight}</td>
-                      <td>{data.wt_rate_amount}</td>
-                      <td>{data.mc_per_gram}</td>
-                      <td>{data.mc}</td>
-                      <td>{data.stone_amount}</td>
-                      <td>{data.total_amount}</td>
-                      <td>{data.stone}</td>
-                      <td>{data.stone_pcs}</td>
-                      <td>{data.stone_ct}</td>
-                      <td>{data.cwp}</td>
-                      <td>{data.gms}</td>
-                      <td>{data.stone_rate}</td>
-                      <td>{data.clarity}</td>
                       <td>{data.rate}</td>
-                      <td>{data.clear}</td>
-                      <td>{data.class}</td>
-                      <td>{data.cut}</td>
+                      <td>{data.total_amount}</td>                      
                       <td style={{ display: 'flex' }}>
                         <button type="button" className="btn btn-primary" style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }} onClick={() => handleOpenModal(data)}>Tag Entry</button> {/* New Action button */}
                         <button
