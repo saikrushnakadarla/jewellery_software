@@ -7,6 +7,9 @@ import DataTable from "../../../Pages/InputField/TableLayout";
 import baseURL from "../../../../Url/NodeBaseURL";
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import PDFContent from "./EstimateReceipt";
 
 const RepairForm = () => {
   const navigate = useNavigate();
@@ -75,7 +78,7 @@ const RepairForm = () => {
     const fetchCurrentRates = async () => {
       try {
         const response = await axios.get(`${baseURL}/get/current-rates`);
-        console.log('API Response:', response.data);
+        // console.log('API Response:', response.data);
 
         setRates({
           rate_24crt: response.data.rate_24crt || "",
@@ -428,27 +431,46 @@ const RepairForm = () => {
     const updatedEntries = entries.filter((_, i) => i !== index);
     setEntries(updatedEntries);
   };
+
+
   const handlePrint = async () => {
     try {
-      const totalAmount = entries.reduce((sum, entry) => sum + parseFloat(entry.total_rs || 0), 0).toFixed(2);
+      const totalAmount = entries.reduce(
+        (sum, entry) => sum + parseFloat(entry.total_rs || 0),
+        0
+      ).toFixed(2);
   
+      // Save to the database
       await Promise.all(
         entries.map((entry) =>
           axios.post(`${baseURL}/add/estimate`, {
             ...entry,
-            total_amount: totalAmount, // Include total_amount
+            total_amount: totalAmount,
           })
         )
       );
   
-      alert("Estimates added successfully!");
+      // Generate PDF
+      const pdfDoc = pdf(
+        <PDFContent
+          entries={entries}
+          totalAmount={totalAmount}
+          date={today}
+          estimateNumber="02" // Replace with dynamic estimate number
+          sellerName="Sadashri Jewels"
+        />
+      );
+  
+      const blob = await pdfDoc.toBlob();
+      saveAs(blob, `estimate_${Date.now()}.pdf`);
+  
+      alert("Estimates saved and PDF generated successfully!");
       setEntries([]);
       setFormData(initialFormData);
-      window.location.reload();
-      navigate("/estimatetable");
+      navigate("/estimatetable"); // Redirect to another page if needed
     } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Failed to save entries. Please try again.");
+      console.error("Error:", error);
+      alert("Failed to save or generate PDF. Please try again.");
     }
   };
   
