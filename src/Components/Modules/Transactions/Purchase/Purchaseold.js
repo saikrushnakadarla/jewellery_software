@@ -827,10 +827,10 @@ const URDPurchase = () => {
                     <InputField label="Bill No" value={formData.bill_no}
                       onChange={(e) => handleChange("bill_no", e.target.value)} />
                   </Col>
-                  {/* <Col xs={12} md={2} >
+                  <Col xs={12} md={2} >
                     <InputField label="Type" value={formData.type}
                       onChange={(e) => handleChange("type", e.target.value)} />
-                  </Col> */}
+                  </Col>
                   <Col xs={12} md={2} >
                     <InputField label="Rate-Cut" value={formData.rate_cut}
                       onChange={(e) => handleChange("rate_cut", e.target.value)} />
@@ -851,10 +851,10 @@ const URDPurchase = () => {
                     <InputField label="Due Date" type="date" value={formData.due_date}
                       onChange={(e) => handleChange("due_date", e.target.value)} />
                   </Col>
-                  {/* <Col xs={12} md={3} >
+                  <Col xs={12} md={3} >
                     <InputField label="Rate" value={formData.Purchase_rate}
                       onChange={(e) => handleChange("Purchase_rate", e.target.value)} />
-                  </Col> */}
+                  </Col>
 
                 </Row>
 
@@ -866,14 +866,6 @@ const URDPurchase = () => {
           <div className="urd-form-section">
             {/* <h4>Purchase Details</h4> */}
             <Row>
-            <Col xs={12} md={2}>
-            <InputField
-                  label="Category:"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={handleChange}
-                />
-                 </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Rbarcode"
@@ -980,14 +972,14 @@ const URDPurchase = () => {
                 />
               </Col> */}
 
-              {/* <Col xs={12} md={1}>
+              <Col xs={12} md={1}>
                 <InputField label="HSN" type="text" value={formData.hsn}
                   onChange={(e) => handleChange("hsn", e.target.value)} />
-              </Col> */}
-              {/* <Col xs={12} md={1}>
+              </Col>
+              <Col xs={12} md={1}>
                 <InputField label="Type" type="text" value={formData.product_type}
                   onChange={(e) => handleChange("product_type", e.target.value)} />
-              </Col> */}
+              </Col>
               <Col xs={12} md={2}>
                 <InputField label="Stock Type" type="text" value={formData.stock_type}
                   onChange={(e) => handleChange("stock_type", e.target.value)} />
@@ -1008,18 +1000,6 @@ const URDPurchase = () => {
                 <InputField label="Net" type="number" value={formData.net_weight}
                   onChange={(e) => handleChange("net_weight", e.target.value)} />
               </Col>
-              <Col xs={12} md={1}>
-                <InputField label="HM Charges" type="number" value={formData.total_weight}
-                  onChange={(e) => handleChange("total_weight", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Others Charges" type="number" value={formData.total_weight}
-                  onChange={(e) => handleChange("total_weight", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Charges" type="number" value={formData.total_weight}
-                  onChange={(e) => handleChange("total_weight", e.target.value)} />
-              </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Purity"
@@ -1029,23 +1009,23 @@ const URDPurchase = () => {
                   readOnly
                 />
               </Col>
-              {/* <Col xs={12} md={2}>
+              <Col xs={12} md={2}>
                 <InputField
                   label="Purity Percentage"
                   name="purityPercentage"
                   value={formData.purityPercentage}
                   readOnly
                 />
-              </Col> */}
+              </Col>
               <Col xs={12} md={1}>
                 <InputField label="Pure Wt" type="number" value={formData.pure_weight}
                   onChange={(e) => handleChange("pure_weight", e.target.value)} />
               </Col>
 
-              {/* <Col xs={12} md={1}>
+              <Col xs={12} md={1}>
                 <InputField label="Unit" type="number" value={formData.unit_weight}
                   onChange={(e) => handleChange("unit_weight", e.target.value)} />
-              </Col> */}
+              </Col>
               <Col xs={12} md={1}>
                 <InputField label="W%" type="number" value={formData.waste_percentage}
                   onChange={(e) => handleChange("waste_percentage", e.target.value)} />
@@ -1055,14 +1035,14 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("waste_amount", e.target.value)} />
               </Col>
 
-              {/* <Col xs={12} md={1}>
+              <Col xs={12} md={1}>
                 <InputField label="Alloy" value={formData.alloy}
                   onChange={(e) => handleChange("alloy", e.target.value)} />
-              </Col> */}
-              {/* <Col xs={12} md={1}>
+              </Col>
+              <Col xs={12} md={1}>
                 <InputField label="Cost" type="number" value={formData.cost}
                   onChange={(e) => handleChange("cost", e.target.value)} />
-              </Col> */}
+              </Col>
               <Col xs={12} md={1}>
                 <InputField label="Total Wt" type="number" value={formData.total_weight}
                   onChange={(e) => handleChange("total_weight", e.target.value)} />
@@ -1085,7 +1065,7 @@ const URDPurchase = () => {
               </Col>
             </Row>
             <Row>
-              {/* <Col xs={12} md={2}>
+              <Col xs={12} md={2}>
                 <InputField label="Stone" value={formData.stone}
                   onChange={(e) => handleChange("stone", e.target.value)} />
               </Col>
@@ -1119,7 +1099,10 @@ const URDPurchase = () => {
                 <InputField label="Stn.Amt" type="number" value={formData.stone_amount}
                   onChange={(e) => handleChange("stone_amount", e.target.value)} />
               </Col>
-            
+              {/* <Col xs={12} md={1}>
+                <InputField label="Clear" value={formData.clear}
+                  onChange={(e) => handleChange("clear", e.target.value)} />
+              </Col> */}
               <Col xs={12} md={1}>
                 <InputField label="Clarity" value={formData.clarity}
                   onChange={(e) => handleChange("clarity", e.target.value)} />
@@ -1131,7 +1114,7 @@ const URDPurchase = () => {
               <Col xs={12} md={1}>
                 <InputField label="Cut" value={formData.cut}
                   onChange={(e) => handleChange("cut", e.target.value)} />
-              </Col> */}
+              </Col>
               {/* <Col xs={12} md={1}>
                 <InputField label="CT" type="number" value={formData.stone_ct}
                   onChange={(e) => handleChange("stone_ct", e.target.value)} />
@@ -1140,14 +1123,7 @@ const URDPurchase = () => {
                 <InputField label="Total" type="number" value={formData.total_amount}
                   onChange={(e) => handleChange("total_amount", e.target.value)} />
               </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Actions" type="number" value={formData.total_amount}
-                  onChange={(e) => handleChange("total_amount", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Pure Bal" type="number" value={formData.total_amount}
-                  onChange={(e) => handleChange("total_amount", e.target.value)} />
-              </Col>
+
               <Col xs={12} md={1}>
                 <Button onClick={handleAdd}>
                   {editingIndex !== null ? "Update" : "Add"}
