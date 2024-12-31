@@ -38,7 +38,7 @@ const URDPurchase = () => {
       type: "",
       rate_cut: "",
       date: new Date().toISOString().split("T")[0],
-      bill_date: "",
+      bill_date: new Date().toISOString().split("T")[0],
       due_date: "",
       Purchase_rate: "",
       product_id: "",
@@ -115,71 +115,138 @@ const URDPurchase = () => {
   const [products, setProducts] = useState([]);
   const [data, setData] = useState([]);
 
+  // Function to parse purity value to percentage
+  const parsePurityToPercentage = (purity) => {
+    if (!purity) return null;
+
+    const match = purity.match(/(\d+)(k|K)/); // Match formats like "22K", "24k", etc.
+    if (match) {
+      const caratValue = parseInt(match[1], 10); // Extract carat number
+      return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
+    }
+
+    // Handle other formats like "916HM" directly if required
+    if (purity.toLowerCase() === "916hm") return 91.6;
+
+    return null; // Default if no match
+  };
+
   const handleChange = (field, value) => {
     setFormData((prev) => {
       const updatedFormData = { ...prev, [field]: value };
 
-      // Automatically calculate net_weight
-      if (field === "gross_weight" || field === "stone_weight") {
-        const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
-        const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
-        updatedFormData.net_weight = grossWeight - stoneWeight;
+      let updatedDetails = { ...updatedFormData };
+
+      // Update rate based on purity
+      if (field === "purity") {
+        const rate =
+          value === "24K" ? rates.rate_24crt :
+            value === "22K" ? rates.rate_22crt :
+              value === "18K" ? rates.rate_18crt :
+                value === "16K" ? rates.rate_16crt :
+                  "";
+
+        updatedDetails.rate = rate;
       }
 
-      // Always calculate pure_weight when net_weight or purityPercentage changes
-      const netWeight = parseFloat(updatedFormData.net_weight) || 0;
-      const purityPercentage = parseFloat(updatedFormData.purityPercentage) || 0;
-      updatedFormData.pure_weight = (netWeight * purityPercentage) / 100;
+      // Calculate purity percentage from carats
+      const parsePurityToPercentage = (purity) => {
+        const caratValue = parseFloat(purity.replace("K", "")); // Extract number from "24K", "22K" etc.
+        return (caratValue / 24) * 100; // Convert carats to percentage
+      };
 
-      // Automatically calculate waste_amount
-      const pureWeight = parseFloat(updatedFormData.pure_weight) || 0;
-      const wastePercentage = parseFloat(updatedFormData.waste_percentage) || 0;
-      updatedFormData.waste_amount = (pureWeight * wastePercentage) / 100;
+      // Update pure weight when net weight or purity changes
+      if (field === "net_weight" || field === "purity") {
+        const netWeight = parseFloat(updatedDetails.net_weight) || 0;
+        const purityPercentage = parsePurityToPercentage(updatedDetails.purity) || 0;
 
-      // Automatically calculate total_weight
-      const wasteAmount = parseFloat(updatedFormData.waste_amount) || 0;
-      updatedFormData.total_weight = pureWeight + wasteAmount;
-
-      // Automatically calculate wt_rate_amount
-      const totalWeight = parseFloat(updatedFormData.total_weight) || 0;
-      const stoneRate = parseFloat(updatedFormData.stone_rate) || 0;
-      updatedFormData.wt_rate_amount = totalWeight * stoneRate;
-
-      // Automatically calculate mc
-      const mcPerGram = parseFloat(updatedFormData.mc_per_gram) || 0;
-      updatedFormData.mc = totalWeight * mcPerGram;
-
-      // Automatically calculate total_amount (before adding stone_amount)
-      const wtRateAmount = parseFloat(updatedFormData.wt_rate_amount) || 0;
-      const mc = parseFloat(updatedFormData.mc) || 0;
-      updatedFormData.total_amount = wtRateAmount + mc;
-
-      // Case 1: If "ct" is selected in CWP, calculate stone_amount = stone_ct * rate
-      if (updatedFormData.cwp === "ct") {
-        const stoneCt = parseFloat(updatedFormData.stone_ct) || 0;
-        const rate = parseFloat(updatedFormData.rate) || 0;
-        updatedFormData.stone_amount = stoneCt * rate;
+        updatedDetails.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
       }
 
-      // Case 2: If "weight" is selected in CWP, calculate stone_amount = gms * rate
-      if (updatedFormData.cwp === "weight") {
-        const gms = parseFloat(updatedFormData.gms) || 0;
-        const rate = parseFloat(updatedFormData.rate) || 0;
-        updatedFormData.stone_amount = gms * rate;
+      // Calculate total amount based on pure weight and rate
+      if (field === "pure_weight" || field === "rate") {
+        const pureWeight = parseFloat(updatedDetails.pure_weight) || 0;
+        const rate = parseFloat(updatedDetails.rate) || 0;
+
+        updatedDetails.total_amount = (pureWeight * rate).toFixed(2);
+      }
+      // Additional calculations for other fields (if applicable)
+      if (
+        updatedDetails.gross &&
+        updatedDetails.dust &&
+        updatedDetails.ml_percent &&
+        updatedDetails.purity
+      ) {
+        const purityValue = parsePurityToPercentage(updatedDetails.purity);
+
+        if (purityValue) {
+          const gross = parseFloat(updatedDetails.gross) || 0;
+          const dust = parseFloat(updatedDetails.dust) || 0;
+          const mlPercent = parseFloat(updatedDetails.ml_percent) || 0;
+
+          const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
+          updatedDetails.eqt_wt = netWeight.toFixed(2); // Display as a string with 2 decimal points
+        }
       }
 
-      // Case 3: If "piece" is selected in CWP, calculate stone_amount = stone_pcs * rate
-      if (updatedFormData.cwp === "piece") {
-        const stonePcs = parseFloat(updatedFormData.stone_pcs) || 0;
-        const rate = parseFloat(updatedFormData.rate) || 0;
-        updatedFormData.stone_amount = stonePcs * rate;
+      // Recalculate Amount when Net WT or Rate changes
+      if (updatedDetails.eqt_wt && updatedDetails.rate) {
+        const netWT = parseFloat(updatedDetails.eqt_wt) || 0;
+        const rate = parseFloat(updatedDetails.rate) || 0;
+
+        const totalAmount = netWT * rate; // Calculate Amount
+        updatedDetails.total_amount = totalAmount.toFixed(2); // Display as a string with 2 decimal points
       }
 
-      // Automatically add stone_amount to total_amount
-      const stoneAmount = parseFloat(updatedFormData.stone_amount) || 0;
-      updatedFormData.total_amount += stoneAmount;
+      // Other calculations for weights and amounts
+      const grossWeight = parseFloat(updatedDetails.gross_weight) || 0;
+      const stoneWeight = parseFloat(updatedDetails.stone_weight) || 0;
+      updatedDetails.net_weight = grossWeight - stoneWeight;
 
-      return updatedFormData;
+      const netWeight = parseFloat(updatedDetails.net_weight) || 0;
+      const purityPercentage = parsePurityToPercentage(updatedDetails.purity) || 0;
+      updatedDetails.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
+
+      const pureWeight = parseFloat(updatedDetails.pure_weight) || 0;
+      const wastePercentage = parseFloat(updatedDetails.waste_percentage) || 0;
+      updatedDetails.waste_amount = (pureWeight * wastePercentage) / 100;
+
+      const wasteAmount = parseFloat(updatedDetails.waste_amount) || 0;
+      updatedDetails.total_weight = pureWeight + wasteAmount;
+
+      const totalWeight = parseFloat(updatedDetails.total_weight) || 0;
+      const stoneRate = parseFloat(updatedDetails.stone_rate) || 0;
+      updatedDetails.wt_rate_amount = totalWeight * stoneRate;
+
+      const mcPerGram = parseFloat(updatedDetails.mc_per_gram) || 0;
+      updatedDetails.mc = totalWeight * mcPerGram;
+
+      // const wtRateAmount = parseFloat(updatedDetails.wt_rate_amount) || 0;
+      // const mc = parseFloat(updatedDetails.mc) || 0;
+      // updatedDetails.total_amount = wtRateAmount + mc;
+
+      if (updatedDetails.cwp === "ct") {
+        const stoneCt = parseFloat(updatedDetails.stone_ct) || 0;
+        const rate = parseFloat(updatedDetails.rate) || 0;
+        updatedDetails.stone_amount = stoneCt * rate;
+      }
+
+      if (updatedDetails.cwp === "weight") {
+        const gms = parseFloat(updatedDetails.gms) || 0;
+        const rate = parseFloat(updatedDetails.rate) || 0;
+        updatedDetails.stone_amount = gms * rate;
+      }
+
+      if (updatedDetails.cwp === "piece") {
+        const stonePcs = parseFloat(updatedDetails.stone_pcs) || 0;
+        const rate = parseFloat(updatedDetails.rate) || 0;
+        updatedDetails.stone_amount = stonePcs * rate;
+      }
+
+      // const stoneAmount = parseFloat(updatedDetails.stone_amount) || 0;
+      // updatedDetails.total_amount += stoneAmount;
+
+      return updatedDetails;
     });
   };
 
@@ -615,8 +682,7 @@ const URDPurchase = () => {
             design_name: productDetails?.design_master || "",
             purity: productDetails?.purity || "",
             hsn: productDetails?.hsn_code || "",
-            
-            
+
           });
         } else {
           // Reset the form and state if no product or tag is found
@@ -639,8 +705,6 @@ const URDPurchase = () => {
       console.error("Error handling code change:", error);
     }
   };
-
-
   const handleBack = () => {
     navigate('/purchasetable');
   };
@@ -666,25 +730,70 @@ const URDPurchase = () => {
 
   const handleOpenModal = (data) => {
     setSelectedProduct({
-        product_id: data.product_id,
-        product_name: data.product_name,
-        metal_type: data.metal_type,
-        design_name: data.design_name,
-        purity: data.purity,
-        hsn: data.hsn,
-        pcs: data.pcs,
-        gross_weight: data.gross_weight,
+      product_id: data.product_id,
+      product_name: data.product_name,
+      metal_type: data.metal_type,
+      design_name: data.design_name,
+      purity: data.purity,
+      hsn: data.hsn,
+      pcs: data.pcs,
+      gross_weight: data.gross_weight,
     });
     setShowModal(true); // This shows the modal
-};
-  
-
-
-
+  };
 
   const handleCloseModal1 = () => {
     setShowModal(false); // Close the modal
   };
+
+  const [purityOptions, setPurityOptions] = useState([]);
+  useEffect(() => {
+    const fetchPurity = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+        setPurityOptions(response.data); // Populate purity options dynamically
+      } catch (error) {
+        console.error("Error fetching purity options:", error);
+      }
+    };
+
+    fetchPurity();
+  }, []);
+
+
+  useEffect(() => {
+    const fetchCurrentRates = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/current-rates`);
+        console.log('API Response:', response.data);
+
+        // Log the 24crt rate separately
+        console.log('24crt Rate:', response.data.rate_24crt);
+
+        // Dynamically set the rates based on response
+        setRates({
+          rate_24crt: response.data.rate_24crt || "",
+          rate_22crt: response.data.rate_22crt || "",
+          rate_18crt: response.data.rate_18crt || "",
+          rate_16crt: response.data.rate_16crt || "",
+        });
+      } catch (error) {
+        console.error('Error fetching current rates:', error);
+      }
+    };
+    fetchCurrentRates();
+  }, []);
+  const [rateOptions, setRateOptions] = useState([]);
+
+  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
+
+  const currentRate =
+    formData.purity === "24K" ? rates.rate_24crt :
+      formData.purity === "22K" ? rates.rate_22crt :
+        formData.purity === "18K" ? rates.rate_18crt :
+          formData.purity === "16K" ? rates.rate_16crt :
+            "";
+
 
   return (
     <div className="main-container">
@@ -739,70 +848,11 @@ const URDPurchase = () => {
 
                     />
                   </Col>
-                  {/* <Col xs={12} md={3}>
-                    <InputField
-                      label="Email:"
-
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="Address1:"
-                      value={formData.address1}
-                      onChange={(e) => handleChange("address1", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="Address2:"
-                      value={formData.address2}
-                      onChange={(e) => handleChange("address2", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="City"
-                      value={formData.city}
-                      onChange={(e) => handleChange("city", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="PinCode"
-                      value={formData.pincode}
-                      onChange={(e) => handleChange("pincode", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField label="State:" value={formData.state}
-                      onChange={(e) => handleChange("state", e.target.value)} />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField label="State Code:" value={formData.state_code}
-                      onChange={(e) => handleChange("state_code", e.target.value)} />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField label="Aadhar" value={formData.aadhar_card}
-                      onChange={(e) => handleChange("aadhar_card", e.target.value)} />
-                  </Col> */}
 
                   <Col xs={12} md={4}>
                     <InputField label="GSTIN" value={formData.gst_in}
                       onChange={(e) => handleChange("gst_in", e.target.value)} />
                   </Col>
-                  {/* <Col xs={12} md={3}>
-                    <InputField label="PAN" value={formData.pan_card}
-                      onChange={(e) => handleChange("pan_card", e.target.value)} />
-                  </Col> */}
-
                 </Row>
 
               </Col>
@@ -823,26 +873,16 @@ const URDPurchase = () => {
                     <InputField label="Invoice" value={formData.indent}
                       onChange={(e) => handleChange("indent", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={2} >
+                  <Col xs={12} md={3} >
                     <InputField label="Bill No" value={formData.bill_no}
                       onChange={(e) => handleChange("bill_no", e.target.value)} />
                   </Col>
-                  {/* <Col xs={12} md={2} >
-                    <InputField label="Type" value={formData.type}
-                      onChange={(e) => handleChange("type", e.target.value)} />
-                  </Col> */}
-                  <Col xs={12} md={2} >
+
+                  <Col xs={12} md={3} >
                     <InputField label="Rate-Cut" value={formData.rate_cut}
                       onChange={(e) => handleChange("rate_cut", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="Date"
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) => handleChange("date", e.target.value)}
-                    />
-                  </Col>
+
                   <Col xs={12} md={3} >
                     <InputField label="Bill Date" type="date" value={formData.bill_date}
                       onChange={(e) => handleChange("bill_date", e.target.value)} />
@@ -851,14 +891,7 @@ const URDPurchase = () => {
                     <InputField label="Due Date" type="date" value={formData.due_date}
                       onChange={(e) => handleChange("due_date", e.target.value)} />
                   </Col>
-                  {/* <Col xs={12} md={3} >
-                    <InputField label="Rate" value={formData.Purchase_rate}
-                      onChange={(e) => handleChange("Purchase_rate", e.target.value)} />
-                  </Col> */}
-
                 </Row>
-
-
               </Col>
             </div>
           </div>
@@ -866,14 +899,14 @@ const URDPurchase = () => {
           <div className="urd-form-section">
             {/* <h4>Purchase Details</h4> */}
             <Row>
-            <Col xs={12} md={2}>
-            <InputField
+              <Col xs={12} md={2}>
+                <InputField
                   label="Category:"
-                  name="product_name"
-                  value={formData.product_name}
+                  name="category"
+                  value={formData.category}
                   onChange={handleChange}
                 />
-                 </Col>
+              </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Rbarcode"
@@ -910,88 +943,6 @@ const URDPurchase = () => {
                   }
                 />
               </Col>
-              {/* <Col xs={12} md={2}>
-                  <InputField
-                    label="P ID"
-                    name="product_id"
-                    value={formData.product_id}
-                    onChange={(e) => handleProductChange(e.target.value)}
-                    type="select"
-                    options={products.map((product) => ({
-                      value: product.product_id,
-                      label: product.product_id,
-                    }))}
-                  />
-                </Col> */}
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Product Name"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={(e) => handleProductNameChange(e.target.value)}
-                  type="select"
-                  options={products.map((product) => ({
-                    value: product.product_name,
-                    label: product.product_name,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Metal Type"
-                  name="metal_type"
-                  value={formData.metal_type}
-                  onChange={(e) => handleMetalTypeChange(e.target.value)}
-                  type="select"
-                  options={products.map((product) => ({
-                    value: product.Category,
-                    label: product.Category,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Design Name"
-                  name="design_name"
-                  value={formData.design_name}
-                  onChange={(e) => handleDesignNameChange(e.target.value)}
-                  type="select"
-                  options={products.map((product) => ({
-                    value: product.design_master,
-                    label: product.design_master,
-                  }))}
-                />
-              </Col>
-              {/* <Col xs={12} md={2}>
-                <InputField
-                  label="Purity:"
-                  type="select"
-                  value={formData.purity}
-                  onChange={(e) => handleChange('purity', e.target.value)}
-                  options={[
-                    { value: "24K", label: "24K" },
-                    { value: "22K", label: "22K (916)" },
-                    { value: "22KHM", label: "22K (916HM)" },
-                    { value: "18K", label: "18K (750)" },
-                    { value: "14K", label: "14K (585)" },
-                    { value: "10K", label: "10K (417)" },
-                    { value: "9K", label: "9K (375)" },
-                  ]}
-                />
-              </Col> */}
-
-              {/* <Col xs={12} md={1}>
-                <InputField label="HSN" type="text" value={formData.hsn}
-                  onChange={(e) => handleChange("hsn", e.target.value)} />
-              </Col> */}
-              {/* <Col xs={12} md={1}>
-                <InputField label="Type" type="text" value={formData.product_type}
-                  onChange={(e) => handleChange("product_type", e.target.value)} />
-              </Col> */}
-              <Col xs={12} md={2}>
-                <InputField label="Stock Type" type="text" value={formData.stock_type}
-                  onChange={(e) => handleChange("stock_type", e.target.value)} />
-              </Col>
               <Col xs={12} md={1}>
                 <InputField label="PCs" type="text" value={formData.pcs}
                   onChange={(e) => handleChange("pcs", e.target.value)} />
@@ -1005,154 +956,89 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("stone_weight", e.target.value)} />
               </Col>
               <Col xs={12} md={1}>
-                <InputField label="Net" type="number" value={formData.net_weight}
-                  onChange={(e) => handleChange("net_weight", e.target.value)} />
+                <InputField
+                  label="Net"
+                  type="number"
+                  value={formData.net_weight}
+                  onChange={(e) => handleChange("net_weight", e.target.value)}
+                />
               </Col>
-              <Col xs={12} md={1}>
-                <InputField label="HM Charges" type="number" value={formData.total_weight}
-                  onChange={(e) => handleChange("total_weight", e.target.value)} />
+              <Col xs={12} md={2}>
+                <InputField label="HM Charges" type="number" value={formData.hm_charges}
+                  onChange={(e) => handleChange("hm_charges", e.target.value)} />
               </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Others Charges" type="number" value={formData.total_weight}
-                  onChange={(e) => handleChange("total_weight", e.target.value)} />
+
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Other Charges:"
+                  type="select"
+                  value={formData.other_charges}
+                  onChange={(e) => handleChange("other_charges", e.target.value)}
+                  options={[
+                    { value: "cargo", label: "cargo" },
+                    { value: "transport", label: "transport" },
+                  ]}
+                />
               </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Charges" type="number" value={formData.total_weight}
-                  onChange={(e) => handleChange("total_weight", e.target.value)} />
+              <Col xs={12} md={2}>
+                <InputField label="Charges" type="number" value={formData.charges}
+                  onChange={(e) => handleChange("charges", e.target.value)} />
               </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Purity"
+                  type="select"
                   name="purity"
                   value={formData.purity}
-                  onChange={handleChange}
-                  readOnly
+                  onChange={(e) => handleChange("purity", e.target.value)}
+                  options={purityOptions.map((purity) => ({
+                    value: purity.name,
+                    label: purity.name,
+                  }))}
                 />
-              </Col>
-              {/* <Col xs={12} md={2}>
-                <InputField
-                  label="Purity Percentage"
-                  name="purityPercentage"
-                  value={formData.purityPercentage}
-                  readOnly
-                />
-              </Col> */}
-              <Col xs={12} md={1}>
-                <InputField label="Pure Wt" type="number" value={formData.pure_weight}
-                  onChange={(e) => handleChange("pure_weight", e.target.value)} />
               </Col>
 
-              {/* <Col xs={12} md={1}>
-                <InputField label="Unit" type="number" value={formData.unit_weight}
-                  onChange={(e) => handleChange("unit_weight", e.target.value)} />
-              </Col> */}
               <Col xs={12} md={1}>
-                <InputField label="W%" type="number" value={formData.waste_percentage}
-                  onChange={(e) => handleChange("waste_percentage", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Waste" type="number" value={formData.waste_amount}
-                  onChange={(e) => handleChange("waste_amount", e.target.value)} />
-              </Col>
 
-              {/* <Col xs={12} md={1}>
-                <InputField label="Alloy" value={formData.alloy}
-                  onChange={(e) => handleChange("alloy", e.target.value)} />
-              </Col> */}
-              {/* <Col xs={12} md={1}>
-                <InputField label="Cost" type="number" value={formData.cost}
-                  onChange={(e) => handleChange("cost", e.target.value)} />
-              </Col> */}
-              <Col xs={12} md={1}>
-                <InputField label="Total Wt" type="number" value={formData.total_weight}
-                  onChange={(e) => handleChange("total_weight", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Rate" type="number" value={formData.stone_rate}
-                  onChange={(e) => handleChange("stone_rate", e.target.value)} />
+              <InputField
+  label="Pure Wt"
+  type="number"
+  value={formData.pure_weight}
+  onChange={(e) => handleChange("pure_weight", e.target.value)}
+/>
+
               </Col>
               <Col xs={12} md={2}>
-                <InputField label="WT*Rate Amt" type="number" value={formData.wt_rate_amount}
-                  onChange={(e) => handleChange("wt_rate_amount", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="MC/Gm" type="number" value={formData.mc_per_gram}
-                  onChange={(e) => handleChange("mc_per_gram", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="MC" type="number" value={formData.mc}
-                  onChange={(e) => handleChange("mc", e.target.value)} />
-              </Col>
-            </Row>
-            <Row>
-              {/* <Col xs={12} md={2}>
-                <InputField label="Stone" value={formData.stone}
-                  onChange={(e) => handleChange("stone", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="PCs" type="number" value={formData.stone_pcs}
-                  onChange={(e) => handleChange("stone_pcs", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="CT" type="number" value={formData.stone_ct}
-                  onChange={(e) => handleChange("stone_ct", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Gms" type="number" value={formData.gms}
-                  onChange={(e) => handleChange("gms", e.target.value)} />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField label="CWP" type="select" value={formData.cwp}
-                  onChange={(e) => handleChange("cwp", e.target.value)}
-                  options={[
-                    { value: "ct", label: "ct" },
-                    { value: "weight", label: "weight" },
-                    { value: "piece", label: "piece" },
-                  ]}
-                />
-              </Col>
-              <Col xs={12} md={1}>
                 <InputField label="Rate" type="number" value={formData.rate}
                   onChange={(e) => handleChange("rate", e.target.value)} />
               </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Stn.Amt" type="number" value={formData.stone_amount}
-                  onChange={(e) => handleChange("stone_amount", e.target.value)} />
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Total Amount"
+                  type="number"
+                  value={formData.total_amount}
+                  onChange={(e) => handleChange("total_amount", e.target.value)}
+                />
+
               </Col>
-            
-              <Col xs={12} md={1}>
-                <InputField label="Clarity" value={formData.clarity}
-                  onChange={(e) => handleChange("clarity", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Colour" value={formData.class}
-                  onChange={(e) => handleChange("class", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Cut" value={formData.cut}
-                  onChange={(e) => handleChange("cut", e.target.value)} />
-              </Col> */}
+
+
               {/* <Col xs={12} md={1}>
-                <InputField label="CT" type="number" value={formData.stone_ct}
-                  onChange={(e) => handleChange("stone_ct", e.target.value)} />
-              </Col> */}
-              <Col xs={12} md={1}>
-                <InputField label="Total" type="number" value={formData.total_amount}
-                  onChange={(e) => handleChange("total_amount", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
                 <InputField label="Actions" type="number" value={formData.total_amount}
                   onChange={(e) => handleChange("total_amount", e.target.value)} />
               </Col>
               <Col xs={12} md={1}>
                 <InputField label="Pure Bal" type="number" value={formData.total_amount}
                   onChange={(e) => handleChange("total_amount", e.target.value)} />
-              </Col>
+              </Col> */}
               <Col xs={12} md={1}>
                 <Button onClick={handleAdd}>
                   {editingIndex !== null ? "Update" : "Add"}
                 </Button>
               </Col>
+            </Row>
+            <Row>
+
             </Row>
             <div style={{ overflowX: "scroll", marginTop: '-27px' }}>
               <Table striped bordered hover className="mt-4">
