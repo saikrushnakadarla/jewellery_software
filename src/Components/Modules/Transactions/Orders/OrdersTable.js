@@ -12,62 +12,7 @@ const RepairsTable = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [repairDetails, setRepairDetails] = useState(null);
-  const [accounts, setAccounts] = useState([]); // Ensure accounts is an array
-
-  // Fetch unique repair details from the API
-  useEffect(() => {
-    const fetchRepairs = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
-        
-        // Filter the data based on the 'transaction_status' column
-        const filteredData = response.data.filter(item => item.transaction_status === 'Orders');
-        
-        setData(filteredData); // Set the filtered data
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching repair details:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchRepairs();
-  }, []);
-
-  // Fetch accounts for "Employee Compensation" when the "Assigning" is "Pending"
-  useEffect(() => {
-    const fetchEmployeeCompensationAccounts = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get-employee-compensation-accounts`);
-        if (Array.isArray(response.data)) {
-          setAccounts(response.data); // Set accounts for the dropdown
-        } else {
-          console.error('Expected an array but got:', response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching accounts:', error);
-      }
-    };
-
-    fetchEmployeeCompensationAccounts();
-  }, []);
-
-  const handleViewDetails = async (invoice_number) => {
-    try {
-      const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
-      setRepairDetails(response.data);
-      setShowModal(true); // Show the modal with repair details
-    } catch (error) {
-      console.error('Error fetching repair details:', error);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setRepairDetails(null); // Clear repair details on modal close
-  };
-
-  // Columns for the DataTable
+  const [accounts, setAccounts] = useState([]);
   const columns = React.useMemo(
     () => [
       {
@@ -113,7 +58,102 @@ const RepairsTable = () => {
     []
   );
 
-  // Function to format date in Indian format (DD-MM-YYYY)
+
+  useEffect(() => {
+    const fetchRepairs = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+        const filteredData = response.data.filter(
+          (item) => item.transaction_status === 'Orders'
+        );
+        setData(filteredData);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching repair details:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchRepairs();
+  }, []);
+
+  useEffect(() => {
+    const fetchEmployeeCompensationAccounts = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-employee-compensation-accounts`);
+        if (Array.isArray(response.data)) {
+          setAccounts(response.data);
+        } else {
+          console.error('Expected an array but got:', response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching accounts:', error);
+      }
+    };
+
+    fetchEmployeeCompensationAccounts();
+  }, []);
+
+  const handleViewDetails = async (invoice_number) => {
+    try {
+      const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
+      setRepairDetails(response.data);
+      setShowModal(true);
+    } catch (error) {
+      console.error('Error fetching repair details:', error);
+    }
+  };
+
+  const handleWorkerAssignment = async (invoice_number, code, worker_name) => {
+    try {
+      // Find the selected account and get its account_id
+      const selectedAccount = accounts.find(account => account.account_name === worker_name);
+      const account_id = selectedAccount?.account_id;
+  
+      if (!account_id) {
+        alert('Account ID is not found for the selected worker.');
+        return;
+      }
+  
+      const response = await axios.post(`${baseURL}/assign-worker`, {
+        invoice_number,
+        code,
+        worker_name,
+        account_id, // Pass the account_id to the backend
+      });
+  
+      if (response.data.success) {
+        setRepairDetails(prev => ({
+          ...prev,
+          repeatedData: prev.repeatedData.map(product => {
+            if (product.code === code) {
+              return {
+                ...product,
+                assigning: 'assigned',
+                account_name: worker_name,
+                account_id
+              };
+            }
+            return product;
+          })
+        }));
+  
+        // Show success message
+        alert('Worker assigned successfully!');
+      }
+    } catch (error) {
+      console.error('Error assigning worker:', error);
+      alert('Failed to assign worker. Please try again.');
+    }
+  };
+  
+  
+  
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setRepairDetails(null);
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -187,6 +227,7 @@ const RepairsTable = () => {
               </Table>
 
               <h5>Products</h5>
+              <div className="table-responsive">
               <Table bordered>
                 <thead>
                   <tr>
@@ -205,6 +246,7 @@ const RepairsTable = () => {
                     <th>Tax Amount</th>
                     <th>Total Price</th>
                     <th>Assigning</th>
+                    <th>Worker Name</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -235,22 +277,31 @@ const RepairsTable = () => {
                       <td>{product.tax_amt}</td>
                       <td>{product.total_price}</td>
                       <td>
-                        {product.assigning === 'pending' && (
-                          <Form.Select>
-                            <option>Select Account</option>
-                            {Array.isArray(accounts) &&
-                              accounts.map((account, index) => (
-                                <option key={index} value={account.account_name}>
-                                  {account.account_name}
-                                </option>
-                              ))}
-                          </Form.Select>
-                        )}
-                      </td>
+        {product.assigning === 'pending' ? (
+          <Form.Select
+            onChange={(e) => handleWorkerAssignment(
+              repairDetails.uniqueData.invoice_number,
+              product.code,
+              e.target.value
+            )}
+          >
+            <option value="">Select Worker</option>
+            {Array.isArray(accounts) && accounts.map((account, idx) => (
+              <option key={idx} value={account.account_name}>
+                {account.account_name}
+              </option>
+            ))}
+          </Form.Select>
+        ) : (
+          <span>{product.account_name} (Assigned)</span>
+        )}
+      </td>
+      <td>{product.worker_name || "not Assigned"}</td>
                     </tr>
                   ))}
                 </tbody>
-              </Table>
+                </Table>
+                </div>
             </>
           )}
         </Modal.Body>
