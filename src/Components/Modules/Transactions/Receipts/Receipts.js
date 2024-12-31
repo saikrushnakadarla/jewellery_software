@@ -107,12 +107,12 @@ const RepairForm = () => {
     try {
       const endpoint = repairData ? `${baseURL}/edit/payments/${repairData.id}` : `${baseURL}/post/payments`;
       const method = repairData ? "PUT" : "POST";
-      const response = await axios({
-        url: endpoint,
+      const response = await fetch(endpoint, {
         method,
-        data: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
-      if (response.status !== 200) throw new Error("Failed to save data");
+      if (!response.ok) throw new Error("Failed to save data");
       window.alert("Receipt saved successfully!");
       navigate("/receiptstable");
     } catch (error) {
