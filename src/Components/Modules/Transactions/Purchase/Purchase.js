@@ -137,6 +137,12 @@ const URDPurchase = () => {
 
       let updatedDetails = { ...updatedFormData };
 
+      // Parse purity to percentage from carats (e.g., "24K" -> 100%)
+      const parsePurityToPercentage = (purity) => {
+        const caratValue = parseFloat(purity.replace("K", "")); // Extract number from "24K", "22K", etc.
+        return (caratValue / 24) * 100; // Convert carats to percentage
+      };
+
       // Update rate based on purity
       if (field === "purity") {
         const rate =
@@ -149,12 +155,6 @@ const URDPurchase = () => {
         updatedDetails.rate = rate;
       }
 
-      // Calculate purity percentage from carats
-      const parsePurityToPercentage = (purity) => {
-        const caratValue = parseFloat(purity.replace("K", "")); // Extract number from "24K", "22K" etc.
-        return (caratValue / 24) * 100; // Convert carats to percentage
-      };
-
       // Update pure weight when net weight or purity changes
       if (field === "net_weight" || field === "purity") {
         const netWeight = parseFloat(updatedDetails.net_weight) || 0;
@@ -163,14 +163,7 @@ const URDPurchase = () => {
         updatedDetails.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
       }
 
-      // Calculate total amount based on pure weight and rate
-      if (field === "pure_weight" || field === "rate") {
-        const pureWeight = parseFloat(updatedDetails.pure_weight) || 0;
-        const rate = parseFloat(updatedDetails.rate) || 0;
-
-        updatedDetails.total_amount = (pureWeight * rate).toFixed(2);
-      }
-      // Additional calculations for other fields (if applicable)
+      // Additional calculations for other fields
       if (
         updatedDetails.gross &&
         updatedDetails.dust &&
@@ -185,17 +178,8 @@ const URDPurchase = () => {
           const mlPercent = parseFloat(updatedDetails.ml_percent) || 0;
 
           const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
-          updatedDetails.eqt_wt = netWeight.toFixed(2); // Display as a string with 2 decimal points
+          updatedDetails.eqt_wt = netWeight.toFixed(2);
         }
-      }
-
-      // Recalculate Amount when Net WT or Rate changes
-      if (updatedDetails.eqt_wt && updatedDetails.rate) {
-        const netWT = parseFloat(updatedDetails.eqt_wt) || 0;
-        const rate = parseFloat(updatedDetails.rate) || 0;
-
-        const totalAmount = netWT * rate; // Calculate Amount
-        updatedDetails.total_amount = totalAmount.toFixed(2); // Display as a string with 2 decimal points
       }
 
       // Other calculations for weights and amounts
@@ -207,48 +191,15 @@ const URDPurchase = () => {
       const purityPercentage = parsePurityToPercentage(updatedDetails.purity) || 0;
       updatedDetails.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
 
+      // Calculate total amount based on pure weight and rate
       const pureWeight = parseFloat(updatedDetails.pure_weight) || 0;
-      const wastePercentage = parseFloat(updatedDetails.waste_percentage) || 0;
-      updatedDetails.waste_amount = (pureWeight * wastePercentage) / 100;
-
-      const wasteAmount = parseFloat(updatedDetails.waste_amount) || 0;
-      updatedDetails.total_weight = pureWeight + wasteAmount;
-
-      const totalWeight = parseFloat(updatedDetails.total_weight) || 0;
-      const stoneRate = parseFloat(updatedDetails.stone_rate) || 0;
-      updatedDetails.wt_rate_amount = totalWeight * stoneRate;
-
-      const mcPerGram = parseFloat(updatedDetails.mc_per_gram) || 0;
-      updatedDetails.mc = totalWeight * mcPerGram;
-
-      // const wtRateAmount = parseFloat(updatedDetails.wt_rate_amount) || 0;
-      // const mc = parseFloat(updatedDetails.mc) || 0;
-      // updatedDetails.total_amount = wtRateAmount + mc;
-
-      if (updatedDetails.cwp === "ct") {
-        const stoneCt = parseFloat(updatedDetails.stone_ct) || 0;
-        const rate = parseFloat(updatedDetails.rate) || 0;
-        updatedDetails.stone_amount = stoneCt * rate;
-      }
-
-      if (updatedDetails.cwp === "weight") {
-        const gms = parseFloat(updatedDetails.gms) || 0;
-        const rate = parseFloat(updatedDetails.rate) || 0;
-        updatedDetails.stone_amount = gms * rate;
-      }
-
-      if (updatedDetails.cwp === "piece") {
-        const stonePcs = parseFloat(updatedDetails.stone_pcs) || 0;
-        const rate = parseFloat(updatedDetails.rate) || 0;
-        updatedDetails.stone_amount = stonePcs * rate;
-      }
-
-      // const stoneAmount = parseFloat(updatedDetails.stone_amount) || 0;
-      // updatedDetails.total_amount += stoneAmount;
+      const rate = parseFloat(updatedDetails.rate) || 0;
+      updatedDetails.total_amount = (pureWeight * rate).toFixed(2);
 
       return updatedDetails;
     });
   };
+
 
 
   const [editingIndex, setEditingIndex] = useState(null);
@@ -1000,26 +951,29 @@ const URDPurchase = () => {
 
               <Col xs={12} md={1}>
 
-              <InputField
-  label="Pure Wt"
-  type="number"
-  value={formData.pure_weight}
-  onChange={(e) => handleChange("pure_weight", e.target.value)}
-/>
-
+                <InputField
+                  label="Pure Wt"
+                  type="number"
+                  value={formData.pure_weight}
+                  onChange={(e) => handleChange("pure_weight", e.target.value)}
+                />
               </Col>
               <Col xs={12} md={2}>
-                <InputField label="Rate" type="number" value={formData.rate}
-                  onChange={(e) => handleChange("rate", e.target.value)} />
+                <InputField
+                  label="Rate"
+                  type="number"
+                  value={formData.rate}
+                  onChange={(e) => handleChange("rate", e.target.value)}
+                />
+
               </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Total Amount"
                   type="number"
                   value={formData.total_amount}
-                  onChange={(e) => handleChange("total_amount", e.target.value)}
+                  readOnly // Prevent editing by the user
                 />
-
               </Col>
 
 
@@ -1033,6 +987,7 @@ const URDPurchase = () => {
               </Col> */}
               <Col xs={12} md={1}>
                 <Button onClick={handleAdd}>
+                  
                   {editingIndex !== null ? "Update" : "Add"}
                 </Button>
               </Col>
