@@ -6,6 +6,14 @@ const useProductHandlers = () => {
   const [products, setProducts] = useState([]);
   const [data, setData] = useState([]);
   const [isQtyEditable, setIsQtyEditable] = useState(false);
+
+  const [rates, setRates] = useState({
+    rate_24crt: "",
+    rate_22crt: "",
+    rate_18crt: "",
+    rate_16crt: ""
+  });
+
   const [formData, setFormData] = useState({
     customer_id: "value001",
     mobile: "",
@@ -20,7 +28,7 @@ const useProductHandlers = () => {
     aadhar_card: "",
     gst_in: "",
     pan_card: "",
-    terms:"Cash",
+    terms: "Cash",
     date: "",
     invoice_number: "",
     code: "",
@@ -48,9 +56,45 @@ const useProductHandlers = () => {
     total_price: "",
     transaction_status: "Sales",
     qty: "",
-    opentag_id:"",
+    opentag_id: "",
     product_image: null,
   });
+
+  // Determine the current rate based on purity
+  useEffect(() => {
+    const currentRate = 
+      formData.purity === "24K" ? rates.rate_24crt :
+      formData.purity === "22K" ? rates.rate_22crt :
+      formData.purity === "18K" ? rates.rate_18crt :
+      formData.purity === "16K" ? rates.rate_16crt :
+      "";
+
+    setFormData((prevData) => ({
+      ...prevData,
+      rate: currentRate
+    }));
+  }, [formData.purity, rates]);
+
+  // Fetch rates on mount
+  useEffect(() => {
+    const fetchCurrentRates = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/current-rates`);
+        console.log('API Response:', response.data);
+
+        setRates({
+          rate_24crt: response.data.rate_24crt || "",
+          rate_22crt: response.data.rate_22crt || "",
+          rate_18crt: response.data.rate_18crt || "",
+          rate_16crt: response.data.rate_16crt || "",
+        });
+      } catch (error) {
+        console.error('Error fetching current rates:', error);
+      }
+    };
+
+    fetchCurrentRates();
+  }, []);
 
   // Fetch products and tags data
   useEffect(() => {
@@ -82,12 +126,11 @@ const useProductHandlers = () => {
 
     fetchProducts();
     fetchTags();
-    
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
       [name]: value
     }));

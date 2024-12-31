@@ -19,37 +19,6 @@ const ProductDetails = ({
   isQtyEditable
 }) => {
   
-  // const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt:"" });
-
-  // useEffect(() => {
-  //   const fetchCurrentRates = async () => {
-  //     try {
-  //       const response = await axios.get(`${baseURL}/get/current-rates`);
-  //       console.log('API Response:', response.data); 
-  
-  //       // Dynamically set the rates based on response
-  //       setRates({
-  //         rate_24crt: response.data.rate_24crt || "",
-  //         rate_22crt: response.data.rate_22crt || "",
-  //         rate_18crt: response.data.rate_18crt || "",
-  //         rate_16crt: response.data.rate_16crt || "",
-  //       });
-  //     } catch (error) {
-  //       console.error('Error fetching current rates:', error);
-  //     }
-  //   };
-  //   fetchCurrentRates();
-  // }, []);
-  
-  // const currentRate =
-  //   formData.purity === "24K" ? rates.rate_24crt :
-  //   formData.purity === "22K" ? rates.rate_22crt :
-  //   formData.purity === "18K" ? rates.rate_18crt :
-  //   formData.purity === "16K" ? rates.rate_16crt :
-  //   "";
-  
-
-
   return (
     <Col >
     <Row>
