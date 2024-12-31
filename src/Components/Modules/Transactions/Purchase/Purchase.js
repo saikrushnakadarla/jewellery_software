@@ -15,71 +15,32 @@ const URDPurchase = () => {
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
   const [formData, setFormData] = useState(
-    {
-      account_name: "",
-      mobile: "",
-      account_name: "",
-      email: "",
-      address1: "",
-      address2: "",
-      city: "",
-      pincode: "",
-      state: "",
-      state_code: "",
-      aadhar_card: "",
-      gst_in: "",
-      pan_card: "",
+    {   
+      mobile: "", 
+      account_name: "",     
+      gst_in: "",      
       terms: "Cash",
-      indent: "",
-      bill_no: "",
-      type: "",
+      invoice: "",
+      bill_no: "",      
       rate_cut: "",
       date: new Date().toISOString().split("T")[0],
       bill_date: new Date().toISOString().split("T")[0],
       due_date: "",
-      Purchase_rate: "",
-      product_id: "",
-      product_name: "",
-      metal_type: "",
-      design_name: "",
-      purity: "",
-      purityPercentage: "",
-      hsn: "",
-      product_type: "",
-      stock_type: "",
+      category:"",
+      code: "",
       pcs: "",
       gross_weight: "",
       stone_weight: "",
       net_weight: "",
-      unit_weight: "",
-      waste_percentage: "",
-      waste_amount: "",
+      hm_charges: "",
+      other_charges: "",
+      charges: "",
+      purity: "",
       pure_weight: "",
-      alloy: "",
-      cost: "",
-      total_weight: "",
-      wt_rate_amount: "",
-      mc_per_gram: "",
-      mc: "",
-      stone_amount: "",
-      total_amount: "",
-      stone: "",
-      stone_pcs: "",
-      stone_ct: "",
-      cwp: "",
-      gms: "",
-      stone_rate: "",
-      clarity: "",
-      rate: "",
-      clear: "",
-      class: "",
-      cut: "",
-    });
-    
+      rate:"",
+      total_amount: "",      
+    });  
   const [tableData, setTableData] = useState([]);
-  const [isQtyEditable, setIsQtyEditable] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [data, setData] = useState([]);
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
   const [purityOptions, setPurityOptions] = useState([]);
   const [showModal1, setShowModal] = useState(false);
@@ -369,100 +330,6 @@ const URDPurchase = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch(`${baseURL}/get/products`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        const result = await response.json();
-        setProducts(result);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-    fetchProducts();
-  }, []);
-
-  const handleBarcodeChange = async (code) => {
-    try {
-      const product = products.find((prod) => String(prod.rbarcode) === String(code));
-
-      if (product) {
-        // Set form data as before
-        setFormData((prevData) => ({
-          ...prevData,
-          code: product.rbarcode,
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          hsn: product.hsn_code || "",
-          qty: 1, // Set qty to 1 for product
-        }));
-        setIsQtyEditable(false);
-
-        // Update selected product data
-        setSelectedProduct({
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          hsn: product.hsn_code || "",
-        });
-      } else {
-        const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
-        if (tag) {
-          const productId = tag.product_id;
-          const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-
-          setFormData((prevData) => ({
-            ...prevData,
-            code: tag.PCode_BarCode || "",
-            product_id: tag.product_id || "",
-            product_name: productDetails?.product_name || "",
-            metal_type: productDetails?.Category || "",
-            design_name: productDetails?.design_master || "",
-            purity: productDetails?.purity || "",
-            qty: 1,
-          }));
-          setIsQtyEditable(true);
-
-          // Update selected product data
-          setSelectedProduct({
-            product_id: tag.product_id || "",
-            product_name: productDetails?.product_name || "",
-            metal_type: productDetails?.Category || "",
-            design_name: productDetails?.design_master || "",
-            purity: productDetails?.purity || "",
-            hsn: productDetails?.hsn_code || "",
-
-          });
-        } else {
-          // Reset the form and state if no product or tag is found
-          setFormData((prevData) => ({
-            ...prevData,
-            code: "",
-            product_id: "",
-            product_name: "",
-            metal_type: "",
-            design_name: "",
-            purity: "",
-            hsn: "",
-            qty: "",
-          }));
-          setIsQtyEditable(true);
-          setSelectedProduct(null); // Reset selected product
-        }
-      }
-    } catch (error) {
-      console.error("Error handling code change:", error);
-    }
-  };
-
   const handleBack = () => {
     navigate('/purchasetable');
   };
@@ -523,13 +390,13 @@ const URDPurchase = () => {
     };
     fetchCurrentRates();
   }, []);
+
   return (
     <div className="main-container">
       <div className="purchase-form-container">
         <Form>
           <div className="purchase-form">
             <div className="purchase-form-left">
-              {/* Customer Details */}
               <Col className="urd-form1-section">
                 <h4 className="mb-4">Supplier Details</h4>
                 <Row>
@@ -582,7 +449,6 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("gst_in", e.target.value)} />
                   </Col>
                 </Row>
-
               </Col>
             </div>
             <div className="purchase-form-right">
@@ -598,7 +464,7 @@ const URDPurchase = () => {
                     />
                   </Col>
                   <Col xs={12} md={3} >
-                    <InputField label="Invoice" value={formData.indent}
+                    <InputField label="Invoice" value={formData.invoice}
                       onChange={(e) => handleChange("indent", e.target.value)} />
                   </Col>
                   <Col xs={12} md={3} >
@@ -623,9 +489,7 @@ const URDPurchase = () => {
               </Col>
             </div>
           </div>
-
           <div className="urd-form-section">
-            {/* <h4>Purchase Details</h4> */}
             <Row>
               <Col xs={12} md={2}>
                 <InputField
@@ -640,35 +504,7 @@ const URDPurchase = () => {
                   label="Rbarcode"
                   name="code"
                   value={formData.code}
-                  onChange={(e) => handleBarcodeChange(e.target.value)}
-                  type="select"
-                  options={
-                    !formData.product_id
-                      ? [
-                        ...products.map((product) => ({
-                          value: product.rbarcode,
-                          label: product.rbarcode,
-                        })),
-                        ...data.map((tag) => ({
-                          value: tag.PCode_BarCode,
-                          label: tag.PCode_BarCode,
-                        })),
-                      ]
-                      : [
-                        ...products
-                          .filter((product) => String(product.product_id) === String(formData.product_id))
-                          .map((product) => ({
-                            value: product.rbarcode,
-                            label: product.rbarcode,
-                          })),
-                        ...data
-                          .filter((tag) => String(tag.product_id) === String(formData.product_id))
-                          .map((tag) => ({
-                            value: tag.PCode_BarCode,
-                            label: tag.PCode_BarCode,
-                          })),
-                      ]
-                  }
+                  onChange={(e) => handleChange("code", e.target.value)}                 
                 />
               </Col>
               <Col xs={12} md={1}>
@@ -770,7 +606,6 @@ const URDPurchase = () => {
               </Col>
             </Row>
             <Row>
-
             </Row>
             <div style={{ overflowX: "scroll", marginTop: '-27px' }}>
               <Table striped bordered hover className="mt-4">
@@ -832,30 +667,24 @@ const URDPurchase = () => {
                           <FaTrash />
                         </button>
                       </td>
-
                     </tr>
                   ))}
                 </tbody>
               </Table>
-
             </div>
           </div>
-
           <div className="form-buttons">
             <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSave}>Save</Button>
-
             <Button
               variant="secondary"
               onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
             >
               cancel
             </Button>
-
           </div>
         </Form>
       </div>
 
-      {/* Modal containing the TagEntry component */}
       <Modal
         show={showModal1}
         onHide={handleCloseModal1}
