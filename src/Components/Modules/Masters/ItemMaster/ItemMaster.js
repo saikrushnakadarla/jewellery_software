@@ -393,7 +393,7 @@ const FormWithTable = () => {
   const handleSave = async () => {
     try {
       const { product_name, Category, design_master, purity, metal_type_id, design_id, purity_id } = formData;
-  
+
       // Check if the product exists
       const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
         product_name,
@@ -401,12 +401,12 @@ const FormWithTable = () => {
         design_master,
         purity,
       });
-  
+
       if (checkResponse.data.exists) {
         alert('This product already exists.');
         return;
       }
-  
+
       // Ensure Category and other fields are not empty
       const updatedFormData = {
         ...formData,
@@ -415,26 +415,26 @@ const FormWithTable = () => {
         design_id: design_master ? designOptions.find(option => option.value === design_master)?.id : '',
         purity_id: purity ? dropdownOptions.find(option => option.value === purity)?.id : '',
       };
-  
+
       // Save product details, now including design_id and purity_id
       const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
       const { product_id } = productResponse.data;
-  
+
       // Append product_id to openTagsEntries
       const entriesWithProductId = openTagsEntries.map((entry) => ({
         ...entry,
         product_id,
         product_Name: product_name, // Append product_id to entries
       }));
-  
+
       // Save opening tag entries
       const saveEntriesPromises = entriesWithProductId.map((entry) =>
         axios.post(`${baseURL}/post/opening-tags-entry`, entry)
       );
-  
+
       await Promise.all(saveEntriesPromises);
       alert("Product added successfully!");
-  
+
       // Reset the form fields
       setFormData({
         product_name: "",
@@ -458,7 +458,7 @@ const FormWithTable = () => {
         op_weight: "0",
         huid_no: "",
       });
-  
+
       // Clear the tag entries
       setOpenTagsEntries([]);
       // Refresh the window
@@ -470,7 +470,7 @@ const FormWithTable = () => {
       alert("Failed to save data. Please try again.");
     }
   };
-  
+
 
 
   const handleBack = () => {
@@ -519,49 +519,49 @@ const FormWithTable = () => {
     fetchMetalTypes();
   }, []);
 
- // Fetch design master options from the API
-useEffect(() => {
-  const fetchDesignMaster = async () => {
-    try {
-      const response = await axios.get(`${baseURL}/designmaster`);
-      const designMasters = response.data.map((item) => {
-        console.log('Design ID:', item.design_id); // Log design_id
-        return {
-          value: item.design_name, // Assuming the column name is "design_name"
-          label: item.design_name,
-          id: item.design_id, // Assuming the column name is "design_id"
-        };
-      });
-      setdesignOptions(designMasters);
-    } catch (error) {
-      console.error('Error fetching design masters:', error);
-    }
-  };
+  // Fetch design master options from the API
+  useEffect(() => {
+    const fetchDesignMaster = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/designmaster`);
+        const designMasters = response.data.map((item) => {
+          console.log('Design ID:', item.design_id); // Log design_id
+          return {
+            value: item.design_name, // Assuming the column name is "design_name"
+            label: item.design_name,
+            id: item.design_id, // Assuming the column name is "design_id"
+          };
+        });
+        setdesignOptions(designMasters);
+      } catch (error) {
+        console.error('Error fetching design masters:', error);
+      }
+    };
 
-  fetchDesignMaster();
-}, []);
+    fetchDesignMaster();
+  }, []);
 
-// Fetch purity options from the API
-useEffect(() => {
-  const fetchPurity = async () => {
-    try {
-      const response = await axios.get(`${baseURL}/purity`);
-      const purityOptions = response.data.map((item) => {
-        console.log('Purity ID:', item.purity_id); // Log purity_id
-        return {
-          value: item.name, // Assuming the column name is "name"
-          label: item.name,
-          id: item.purity_id, // Assuming the column name is "purity_id"
-        };
-      });
-      setDropdownOptions(purityOptions);
-    } catch (error) {
-      console.error('Error fetching purity options:', error);
-    }
-  };
+  // Fetch purity options from the API
+  useEffect(() => {
+    const fetchPurity = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+        const purityOptions = response.data.map((item) => {
+          console.log('Purity ID:', item.purity_id); // Log purity_id
+          return {
+            value: item.name, // Assuming the column name is "name"
+            label: item.name,
+            id: item.purity_id, // Assuming the column name is "purity_id"
+          };
+        });
+        setDropdownOptions(purityOptions);
+      } catch (error) {
+        console.error('Error fetching purity options:', error);
+      }
+    };
 
-  fetchPurity();
-}, []);
+    fetchPurity();
+  }, []);
 
 
   useEffect(() => {
@@ -613,11 +613,11 @@ useEffect(() => {
 
             {/* product details dection */}
             <div className="form-container">
-              <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
+              <h4 style={{ marginBottom: "15px" }}>Category Details</h4>
               <div className="form-row">
 
                 <InputField
-                  label="Product Name:"
+                  label="Category:"
                   name="product_name"
                   value={formData.product_name}
                   onChange={handleChange}
@@ -647,7 +647,7 @@ useEffect(() => {
                   onChange={handleChange}
                   options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
-                <InputField
+                {/* <InputField
                   label="Design Master:"
                   name="design_master"
                   type="select"
@@ -655,7 +655,7 @@ useEffect(() => {
                   onChange={handleChange}
                   // options={designOptions}
                   options={designOptions.map(option => ({ value: option.value, label: option.label }))}
-                />
+                /> */}
 
                 <InputField
                   label="Purity:"
@@ -789,10 +789,10 @@ useEffect(() => {
 
           {/* Opening Tags Entry Section */}
           <div className="form-container" style={{ marginTop: "15px" }}>
-            <h4 style={{ marginBottom: "15px" }}>Opening Tags Entry</h4>
+            <h4 style={{ marginBottom: "15px" }}>Sub Category</h4>
             <form onSubmit={editingIndex !== null ? handleUpdateOpenTagEntry : handleAddOpenTagEntry}>
               <div className="form-row">
-                <InputField
+                {/* <InputField
                   label="Pricing:"
                   type="select"
                   name="Pricing"
@@ -803,9 +803,60 @@ useEffect(() => {
                     { value: "By Fixed", label: "By Fixed" },
                   ]}
                   readOnly={!isMaintainTagsChecked}
+                /> */}
+
+<InputField
+                  label="Sub Category:"
+                  type="select"
+                  name="Sub_Category"
+                  value={formData.Sub_Category}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  options={[
+                    { value: "Gold", label: "Gold" },
+                    { value: "Silver", label: "Silver" },
+                    { value: "Platinum", label: "Platinum" },
+                  ]}
                 />
 
+                <InputField
+                  label="Category:"
+                  name="Tag_ID"
+                  type="text"
+                  value={formData.Tag_ID}
+                  onChange={handleChange}
+                  readOnly={!isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
 
+                <InputField
+                  label="Category Id:"
+                  name="Tag_ID"
+                  type="text"
+                  value={formData.Tag_ID}
+                  onChange={handleChange}
+                  readOnly={!isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+                <InputField
+                  label="Sub Category Id:"
+                  name="Tag_ID"
+                  type="text"
+                  value={formData.Tag_ID}
+                  onChange={handleChange}
+                  readOnly={!isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+                <InputField
+                  label="Design Master:"
+                  name="design_master"
+                  type="select"
+                  value={formData.design_master}
+                  onChange={handleChange}
+                  // options={designOptions}
+                  options={designOptions.map(option => ({ value: option.value, label: option.label }))}
+                />
                 {/* <InputField
                   label="Tag ID:"
                   name="Tag_ID"
@@ -844,7 +895,11 @@ useEffect(() => {
                   readOnly={isByFixedSelected || !isMaintainTagsChecked}
                   style={openingTagsStyle}
                 />
-                <InputField
+              
+              </div>
+              <div className="form-row">
+
+              <InputField
                   label="Gross Weight:"
                   name="Gross_Weight"
                   value={formData.Gross_Weight}
@@ -875,10 +930,6 @@ useEffect(() => {
                   onChange={handleChange}
                   readOnly={isByFixedSelected || !isMaintainTagsChecked}
                 />
-              </div>
-              <div className="form-row">
-
-
                 <InputField
                   label="Net Weight:"
                   name="Weight_BW"
@@ -922,7 +973,10 @@ useEffect(() => {
                     { value: "pergram", label: "pergram" },
                   ]}
                 />
-                <InputField
+               
+              </div>
+              <div className="form-row" style={{ marginBottom: '-20px' }}>
+              <InputField
                   label="Making Charges On:"
                   type="select"
                   value={formData.Making_Charges_On}
@@ -935,9 +989,6 @@ useEffect(() => {
                     { value: "Fixed", label: "Fixed" },
                   ]}
                 />
-              </div>
-              <div className="form-row" style={{ marginBottom: '-20px' }}>
-
                 <InputField
                   label="Wastage On:"
                   type="select"
@@ -1006,14 +1057,14 @@ useEffect(() => {
                     { value: "strong room", label: "strong room" },
                   ]}
                 />
-                <InputField
+                {/* <InputField
                   label="Selling price:"
                   value={formData.selling_price}
                   onChange={handleChange}
                   readOnly={!isMaintainTagsChecked || !isByFixedSelected}
                   style={openingTagsStyle}
                   name="selling_price"
-                />
+                /> */}
               </div>
               <button
                 type="submit"

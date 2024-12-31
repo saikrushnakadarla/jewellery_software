@@ -11,6 +11,8 @@ const FormWithTable = () => {
   const [formData, setFormData] = useState({
     product_id: "",
     metal_type_id: "",
+    design_id: "",
+    purity_id: "",
     Pricing: "By Weight",
     rbarcode: "",
     design_master: "",
@@ -99,8 +101,43 @@ const FormWithTable = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-     // Update formData state
-     setFormData(prevState => {
+    if (name === "design_master") {
+      const selectedOption = designOptions.find(option => option.value === value);
+      setFormData({
+        ...formData,
+        [name]: value,
+        design_id: selectedOption ? selectedOption.id : "" // Update design_id
+      });
+    } else if (name === "purity") {
+      const selectedOption = dropdownOptions.find(option => option.value === value);
+      setFormData({
+        ...formData,
+        [name]: value,
+        purity_id: selectedOption ? selectedOption.id : "" // Update purity_id
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+
+    if (name === "Category") {
+      const selectedOption = metalOptions.find(option => option.value === value);
+      setFormData({
+        ...formData,
+        [name]: value,
+        metal_type_id: selectedOption ? selectedOption.id : "" // Update metal_type_id
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+
+    // Update formData state
+    setFormData(prevState => {
       const updatedData = { ...prevState, [name]: value };
 
       // If "Category" changes, update the "hsn_code" based on selected metal type
@@ -287,11 +324,11 @@ const FormWithTable = () => {
 
   const handleAddOpenTagEntry = (e) => {
     e.preventDefault();
-  
+
     // Extract current suffix and calculate the next one
     const currentSuffix = parseInt(formData.suffix || "001", 10);
     const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
-  
+
     const newEntry = {
       Pricing: formData.Pricing,
       PCode_BarCode: formData.PCode_BarCode,
@@ -313,17 +350,17 @@ const FormWithTable = () => {
       dropdown: formData.dropdown,
       selling_price: formData.selling_price,
     };
-  
+
     // Update the `op_qty` and `op_weight` fields
     setFormData((prev) => ({
       ...prev,
       op_qty: prev.op_qty + 1, // Increment op_qty
       op_weight: parseFloat(prev.op_weight || 0) + parseFloat(formData.Gross_Weight || 0), // Add Gross_Weight
     }));
-  
+
     // Add the new entry to the table
     setOpenTagsEntries((prev) => [...prev, newEntry]);
-  
+
     // Reset the form fields and update the suffix and PCode_BarCode
     setFormData((prev) => ({
       ...prev,
@@ -351,11 +388,12 @@ const FormWithTable = () => {
       Design_Master: "",
     }));
   };
-  
+
+  // Save the product and related entries
   const handleSave = async () => {
     try {
-      const { product_name, Category, design_master, purity } = formData;
-
+      const { product_name, Category, design_master, purity, metal_type_id, design_id, purity_id } = formData;
+  
       // Check if the product exists
       const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
         product_name,
@@ -363,34 +401,40 @@ const FormWithTable = () => {
         design_master,
         purity,
       });
-
+  
       if (checkResponse.data.exists) {
         alert('This product already exists.');
         return;
       }
-
+  
       // Ensure Category and other fields are not empty
-      const updatedFormData = { ...formData, Category: formData.Category || "Gold" };
-
-      // Save product details, now including tax_slab_id
+      const updatedFormData = {
+        ...formData,
+        Category: formData.Category || "Gold",
+        // Use design_id and purity_id from the selected options
+        design_id: design_master ? designOptions.find(option => option.value === design_master)?.id : '',
+        purity_id: purity ? dropdownOptions.find(option => option.value === purity)?.id : '',
+      };
+  
+      // Save product details, now including design_id and purity_id
       const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
       const { product_id } = productResponse.data;
-
+  
       // Append product_id to openTagsEntries
       const entriesWithProductId = openTagsEntries.map((entry) => ({
         ...entry,
         product_id,
         product_Name: product_name, // Append product_id to entries
       }));
-
+  
       // Save opening tag entries
       const saveEntriesPromises = entriesWithProductId.map((entry) =>
         axios.post(`${baseURL}/post/opening-tags-entry`, entry)
       );
-
+  
       await Promise.all(saveEntriesPromises);
       alert("Product added successfully!");
-
+  
       // Reset the form fields
       setFormData({
         product_name: "",
@@ -398,6 +442,9 @@ const FormWithTable = () => {
         Category: "",
         design_master: "",
         purity: "",
+        design_id: "",
+        purity_id: "",
+        metal_type_id: "",
         item_prefix: "",
         short_name: "",
         sale_account_head: "Sale",
@@ -411,7 +458,7 @@ const FormWithTable = () => {
         op_weight: "0",
         huid_no: "",
       });
-
+  
       // Clear the tag entries
       setOpenTagsEntries([]);
       // Refresh the window
@@ -423,7 +470,7 @@ const FormWithTable = () => {
       alert("Failed to save data. Please try again.");
     }
   };
-
+  
 
 
   const handleBack = () => {
@@ -452,14 +499,16 @@ const FormWithTable = () => {
   //   fetchMetalTypes();
   // }, []);
 
+  // Fetch metal types on component mount
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
         const response = await axios.get(`${baseURL}/metaltype`);
         const metalTypes = response.data.map(item => ({
-          value: item.metal_name, // Metal name for the dropdown
-          label: item.metal_name, // Display value
-          hsn_code: item.hsn_code, // Store HSN Code for reference
+          value: item.metal_name,
+          label: item.metal_name,
+          id: item.metal_type_id, // Add metal_type_id for reference
+          hsn_code: item.hsn_code,
         }));
         setmetalOptions(metalTypes);
       } catch (error) {
@@ -470,42 +519,50 @@ const FormWithTable = () => {
     fetchMetalTypes();
   }, []);
 
- 
-  // Fetch design master options from the API
-  useEffect(() => {
-    const fetchDesignMaster = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/designmaster`);
-        const designMasters = response.data.map((item) => ({
+ // Fetch design master options from the API
+useEffect(() => {
+  const fetchDesignMaster = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/designmaster`);
+      const designMasters = response.data.map((item) => {
+        console.log('Design ID:', item.design_id); // Log design_id
+        return {
           value: item.design_name, // Assuming the column name is "design_name"
           label: item.design_name,
-        }));
-        setdesignOptions(designMasters);
-      } catch (error) {
-        console.error('Error fetching design masters:', error);
-      }
-    };
+          id: item.design_id, // Assuming the column name is "design_id"
+        };
+      });
+      setdesignOptions(designMasters);
+    } catch (error) {
+      console.error('Error fetching design masters:', error);
+    }
+  };
 
-    fetchDesignMaster();
-  }, []);
+  fetchDesignMaster();
+}, []);
 
-  // Fetch purity options from the API
-  useEffect(() => {
-    const fetchPurity = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        const purityOptions = response.data.map((item) => ({
+// Fetch purity options from the API
+useEffect(() => {
+  const fetchPurity = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/purity`);
+      const purityOptions = response.data.map((item) => {
+        console.log('Purity ID:', item.purity_id); // Log purity_id
+        return {
           value: item.name, // Assuming the column name is "name"
           label: item.name,
-        }));
-        setDropdownOptions(purityOptions);
-      } catch (error) {
-        console.error('Error fetching purity options:', error);
-      }
-    };
+          id: item.purity_id, // Assuming the column name is "purity_id"
+        };
+      });
+      setDropdownOptions(purityOptions);
+    } catch (error) {
+      console.error('Error fetching purity options:', error);
+    }
+  };
 
-    fetchPurity();
-  }, []);
+  fetchPurity();
+}, []);
+
 
   useEffect(() => {
     const fetchLastRbarcode = async () => {
@@ -523,7 +580,7 @@ const FormWithTable = () => {
     fetchLastRbarcode();
   }, []);
 
- 
+
   useEffect(() => {
     const getLastPcode = async () => {
       try {
@@ -574,6 +631,14 @@ const FormWithTable = () => {
                 />
 
 
+                {/* <InputField
+                  label="Metal Type:"
+                  name="Category"
+                  type="select"
+                  value={formData.Category}
+                  onChange={handleChange}
+                  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+                /> */}
                 <InputField
                   label="Metal Type:"
                   name="Category"
@@ -588,15 +653,18 @@ const FormWithTable = () => {
                   type="select"
                   value={formData.design_master}
                   onChange={handleChange}
-                  options={designOptions}
+                  // options={designOptions}
+                  options={designOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
+
                 <InputField
                   label="Purity:"
                   name="purity"
                   type="select"
                   value={formData.purity}
                   onChange={handleChange}
-                  options={dropdownOptions}
+                  // options={dropdownOptions}
+                  options={dropdownOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
                 <InputField
                   label="Item Prefix:"
@@ -880,7 +948,7 @@ const FormWithTable = () => {
                   style={openingTagsStyle}
                   options={[
                     { value: "Gross Weight", label: "Gross Weight" },
-                    { value: "Weight BW", label: "Weight BW" },
+                    { value: "Net Weight", label: "Net Weight" },
                   ]}
                 />
                 <InputField

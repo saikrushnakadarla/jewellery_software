@@ -58,16 +58,16 @@ const RepairsTable = () => {
         Header: 'Dust Weight',
         accessor: 'dust',
       },
+      // {
+      //   Header: 'Touch Percent',
+      //   accessor: 'touch_percent',
+      // },
       {
-        Header: 'Touch Percent',
-        accessor: 'touch_percent',
-      },
-      {
-        Header: 'ML Percent',
+        Header: 'ML%',
         accessor: 'ml_percent',
       },
       {
-        Header: 'EQT Weight',
+        Header: 'Net Weight',
         accessor: 'eqt_wt',
       },
       {

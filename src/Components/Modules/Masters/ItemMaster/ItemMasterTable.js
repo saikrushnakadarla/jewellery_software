@@ -243,7 +243,7 @@ const [taxOptions, setTaxOptions] = useState([]);
       <div className="itemmaster-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Products</h3>
+            <h3>Categories</h3>
             <Button
               className="create_but"
               onClick={handleCreate}
