@@ -1,6 +1,31 @@
 import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 
+// Helper function to format the date in dd-mm-yyyy format
+const formatDate = (date) => {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+// Helper function to get the current time in HH:mm:ss format
+const formatTime = (date) => {
+  let hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  // Determine AM/PM
+  const period = hours >= 12 ? "PM" : "AM";
+
+  // Convert to 12-hour format
+  hours = hours % 12;
+  hours = hours ? String(hours).padStart(2, "0") : "12"; // 0 should be 12
+
+  return `${hours}:${minutes}:${seconds} ${period}`;
+};
+
+
 // Styles optimized for thermal receipt printers
 const styles = StyleSheet.create({
   page: {
@@ -13,7 +38,6 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 14,
-    fontWeight: "bold",
     marginBottom: 8,
     textAlign: "center",
     textTransform: "uppercase",
@@ -30,8 +54,6 @@ const styles = StyleSheet.create({
     fontSize: 8,
     textAlign: "right",
   },
-
-
   timeText: {
     fontSize: 8,
     textAlign: 'right',
@@ -43,8 +65,6 @@ const styles = StyleSheet.create({
     marginTop: 3,
     paddingTop: 3,
   },
-
-
   tableHeader1: {
     flexDirection: "row",
     borderBottomWidth: 1,
@@ -52,13 +72,11 @@ const styles = StyleSheet.create({
     marginBottom: 3,
     paddingBottom: 3,
   },
-
   tableHeader2: {
     flexDirection: "row",
     marginBottom: 2,
     paddingBottom: 2,
   },
-
   tableHeader3: {
     flexDirection: "row",
     borderBottomWidth: 1,
@@ -71,18 +89,14 @@ const styles = StyleSheet.create({
   },
   snHeader: {
     width: "8%",
-    fontWeight: "bold",
   },
   itemHeader: {
     width: "70%",
-    fontWeight: "bold",
   },
   stAmtHeader: {
     width: "20%",
-    fontWeight: "bold",
     textAlign: "right",
   },
-
   grHeader: {
     width: "20%",
   },
@@ -94,14 +108,49 @@ const styles = StyleSheet.create({
   },
   mcHeader: {
     width: "8%",
-    marginRight:'30px'
+    marginRight: '30px',
   },
-  totalAmtHeader:{
+  totalAmtHeader: {
     width: "50%",
-    fontWeight: "bold",
     textAlign: "right",
+    fontFamily: "Helvetica-Bold",
   },
 
+  snBoldHeader: {
+    width: "8%",
+    fontFamily: "Helvetica-Bold",
+  },
+  itemBoldHeader: {
+    width: "70%",
+    fontFamily: "Helvetica-Bold",
+  },
+  stAmtBoldHeader: {
+    width: "20%",
+    textAlign: "right",
+    fontFamily: "Helvetica-Bold",
+  },
+  grBoldHeader: {
+    width: "20%",
+    fontFamily: "Helvetica-Bold",
+  },
+  ntBoldHeader: {
+    width: "20%",
+    fontFamily: "Helvetica-Bold",
+  },
+  vaBoldHeader: {
+    width: "20%",
+    fontFamily: "Helvetica-Bold",
+  },
+  mcBoldHeader: {
+    width: "8%",
+    marginRight: '30px',
+    fontFamily: "Helvetica-Bold",
+  },
+  totalAmtBoldHeader: {
+    width: "50%",
+    textAlign: "right",
+    fontFamily: "Helvetica-Bold",
+  },
   footerRow: {
     flexDirection: "row",
     marginTop: 3,
@@ -109,31 +158,31 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 8,
-    fontWeight: "bold",
   },
-
-
-
   rowContainer: {
     flexDirection: "row",
     justifyContent: "flex-end", // Aligns all content to the right
     marginBottom: 3,
-    fontWeight: "bold",
-
   },
   leftAlignedText: {
     fontSize: 8,
-    textAlign: "right", // Aligns left text to the right
+    textAlign: "right",
+    fontFamily: "Helvetica-Bold",
   },
   rightAlignedText: {
     fontSize: 8,
     textAlign: "right",
+    fontFamily: "Helvetica-Bold",
   },
-  
 });
 
-// PDF Document Component optimized for receipt printers
-const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) => (
+const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) => {
+  const currentDate = new Date(); // Current date
+  const formattedDate = formatDate(currentDate); // Format current date as dd-mm-yyyy
+  const currentTime = formatTime(currentDate); // Get current time in HH:mm:ss format
+
+  return (
+
   <Document>
     <Page size={[226, 500]} style={styles.page}>
       {/* Heading */}
@@ -148,28 +197,29 @@ const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) 
           </View>
           <View style={styles.row}>
             <Text style={styles.leftText}>Rate: {entries[0].rate}</Text>
-            <Text style={styles.rightText}>Date: {entries[0].date}</Text>
+            {/* <Text style={styles.rightText}>Date: {entries[0].date}</Text> */}
+            <Text style={styles.rightText}>Date: {formattedDate}</Text>
           </View>
         </View>
       )}
 
       <View>
-        <Text style={styles.timeText}>01:03:19PM</Text>
+      <Text style={styles.timeText}>{currentTime}</Text>
       </View>
 
       {/* Table Header */}
       <View style={styles.tableHeader}>
-        <Text style={[styles.tableCell, styles.snHeader]}>S.N</Text>
-        <Text style={[styles.tableCell, styles.itemHeader]}>Item</Text>
-        <Text style={[styles.tableCell, styles.stAmtHeader]}>st.Amt</Text>
+        <Text style={[styles.tableCell, styles.snBoldHeader]}>S.N</Text>
+        <Text style={[styles.tableCell, styles.itemBoldHeader]}>Item</Text>
+        <Text style={[styles.tableCell, styles.stAmtBoldHeader]}>st.Amt</Text>
       </View>
       <View style={styles.tableHeader1}>
         <Text style={[styles.tableCell, styles.snHeader]}></Text>
-        <Text style={[styles.tableCell, styles.grHeader]}>Gr.wt</Text>
-        <Text style={[styles.tableCell, styles.ntHeader]}>Nt.wt</Text>
-        <Text style={[styles.tableCell, styles.vaHeader]}>VA</Text>
-        <Text style={[styles.tableCell, styles.mcHeader]}>MC</Text>
-        <Text style={[styles.tableCell, styles.stAmtHeader]}>Amt</Text>
+        <Text style={[styles.tableCell, styles.grBoldHeader]}>Gr.wt</Text>
+        <Text style={[styles.tableCell, styles.ntBoldHeader]}>Nt.wt</Text>
+        <Text style={[styles.tableCell, styles.vaBoldHeader]}>VA</Text>
+        <Text style={[styles.tableCell, styles.mcBoldHeader]}>MC</Text>
+        <Text style={[styles.tableCell, styles.stAmtBoldHeader]}>Amt</Text>
       </View>
       <View>
       {entries.map((entry, index) => (
@@ -207,9 +257,9 @@ const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) 
     <>
       <View style={{ borderTopWidth: 1, borderTopColor: "#000", borderBottomWidth: 1, borderBottomColor: "#000", paddingVertical: 5 }}>
         <View style={styles.footerRow}>
-          <Text style={[styles.tableCell, styles.snHeader]}></Text>
-          <Text style={[styles.tableCell, styles.grHeader]}>{totalGrossWeight.toFixed(2)}</Text>
-          <Text style={[styles.tableCell, styles.ntHeader]}>{totalNetWeight.toFixed(2)}</Text>
+          <Text style={[styles.tableCell, styles.snBoldHeader]}></Text>
+          <Text style={[styles.tableCell, styles.grBoldHeader]}>{totalGrossWeight.toFixed(2)}</Text>
+          <Text style={[styles.tableCell, styles.ntBoldHeader]}>{totalNetWeight.toFixed(2)}</Text>
           <Text style={[styles.tableCell, styles.totalAmtHeader]}>{totalAmount.toFixed(2)}</Text>
         </View>
       </View>
@@ -241,6 +291,7 @@ const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) 
     </Page>
   </Document>
 );
+};
 
 export default PDFContent;
 

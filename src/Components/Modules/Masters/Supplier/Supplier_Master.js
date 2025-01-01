@@ -4,10 +4,8 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import InputField from '../../../Pages/InputField/InputField';
 import './Supplier_Master.css';
 import axios from "axios";
-
 import baseURL from "../../../../Url/NodeBaseURL";
 import { Row, Col } from 'react-bootstrap';
-
 
 function Supplier_Master() {
   const location = useLocation();
@@ -98,49 +96,7 @@ function Supplier_Master() {
     setTcsApplicable(!tcsApplicable);
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
   
-  //   // Validation
-  //   if (!formData.account_name.trim()) {
-  //     alert('Customer Name is required.');
-  //     return;
-  //   }
-  //   if (!formData.mobile.trim()) {
-  //     alert('Mobile number is required.');
-  //     return;
-  //   }
-
-  
-  //   try {
-  //     const method = id ? 'PUT' : 'POST';
-  //     const endpoint = id
-  //       ? `${baseURL}/edit/account-details/${id}`
-  //       : `${baseURL}/account-details`;
-  
-  //     const response = await fetch(endpoint, {
-  //       method,
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ ...formData, tcsApplicable }),
-  //     });
-  
-  //     if (response.ok) {
-  //       alert(`Supplier ${id ? 'updated' : 'created'} successfully!`);
-  //       navigate('/suppliertable');
-  //     } else {
-  //       console.error('Failed to save customer');
-  //       alert('Failed to save customer.');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //     alert('An error occurred.');
-  //   }
-  // };
-  
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -200,11 +156,15 @@ function Supplier_Master() {
     }
   };
   
-  
+  // const handleBack = () => {
+  //   navigate('/suppliertable'); 
+  // };
 
   const handleBack = () => {
-    navigate('/suppliertable'); 
+    const from = location.state?.from || "/suppliertable";
+    navigate(from);
   };
+
   useEffect(() => {
     const fetchStates = async () => {
       try {
