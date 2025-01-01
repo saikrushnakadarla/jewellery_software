@@ -160,92 +160,69 @@ const URDPurchase = () => {
     }
 
     setFormData({
+      category:"",
       rbarcode: "",
-      product_id: "",
-      product_name: "",
-      metal_type: "",
-      design_name: "",
-      purity: "",
-      purityPercentage: "",
-      hsn: "",
-      product_type: "",
-      stock_type: "",
       pcs: "",
       gross_weight: "",
       stone_weight: "",
       net_weight: "",
-      unit_weight: "",
-      waste_percentage: "",
-      waste_amount: "",
+      hm_charges: "",
+      other_charges: "",
+      charges: "",
+      purity: "",
       pure_weight: "",
-      alloy: "",
-      cost: "",
-      total_weight: "",
-      wt_rate_amount: "",
-      mc_per_gram: "",
-      mc: "",
-      stone_amount: "",
-      total_amount: "",
-      stone: "",
-      stone_pcs: "",
-      stone_ct: "",
-      cwp: "",
-      gms: "",
-      stone_rate: "",
-      clarity: "",
-      rate: "",
-      clear: "",
-      class: "",
-      cut: "",
+      rate:"",
+      total_amount: "",      
     });
   };
 
   const handleSave = async () => {
-    try {
-      const dataToSave = {
-        formData,
-        tableData,
-      };
+  try {
+    const dataToSave = {
+      formData,
+      tableData,
+    };
 
-      const response = await axios.post(`${baseURL}/post/purchase`, dataToSave);
+    console.log("Data to save:", dataToSave); // Debug log
 
-      if (response.status === 201) {
-        alert(response.data.message);
+    const response = await axios.post(`${baseURL}/post/purchases`, dataToSave);
 
-        // Reset formData and tableData
-        setFormData({
-          account_name: "",
-          mobile: "",
-          email: "",
-          address1: "",
-          address2: "",
-          city: "",
-          pincode: "",
-          state: "",
-          state_code: "",
-          aadhar_card: "",
-          gst_in: "",
-          pan_card: "",
-          terms: "Cash",
-          indent: "",
-          bill_no: "",
-          type: "",
-          rate_cut: "",
-          date: "",
-          bill_date: "",
-          due_date: "",
-          Purchase_rate: "",
-        });
-
-        setTableData([]);
-      } else {
-        alert("Unexpected response from server.");
-      }
-    } catch (error) {
-      console.error("Error saving data:", error.response?.data || error);
-      alert("Failed to save data.");
+    if (response.status === 201) {
+      alert(response.data.message);
+      // Reset formData and tableData
+      setFormData({
+        account_name: "",
+        mobile: "",
+        email: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        state_code: "",
+        aadhar_card: "",
+        gst_in: "",
+        pan_card: "",
+        terms: "Cash",
+        indent: "",
+        bill_no: "",
+        type: "",
+        rate_cut: "",
+        date: "",
+        bill_date: "",
+        due_date: "",
+        Purchase_rate: "",
+      });
+      setTableData([]);
+    } else {
+      alert("Unexpected response from server.");
     }
-  };
+  } catch (error) {
+    console.error("Error saving data:", error.response?.data || error);
+    alert("Failed to save data.");
+  }
+};
+
   
   const handleEdit = (index) => {
     setFormData(tableData[index]); // Populate the form with selected row data
@@ -530,7 +507,7 @@ const URDPurchase = () => {
                   label="Category:"
                   name="category"
                   value={formData.category}
-                  onChange={handleChange}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 />
               </Col>
               <Col xs={12} md={2}>
@@ -674,16 +651,9 @@ const URDPurchase = () => {
                       <td>{data.other_charges}</td>
                       <td>{data.charges}</td>
                       <td>{data.purity}</td>
-                      <td>{data.pcs}</td>
-                      <td>{data.pure_weight}</td>
-                      <td>{data.stone_weight}</td>
-                      <td>{data.net_weight}</td>
-                      <td>{data.unit_weight}</td>
-                      <td>{data.waste_percentage}</td>
-                      <td>{data.waste_amount}</td>
                       <td>{data.pure_weight}</td>
                       <td>{data.rate}</td>
-                      <td>{data.total_amount}</td>                      
+                      <td>{data.total_amount}</td>    
                       <td style={{ display: 'flex' }}>
                         <button type="button" className="btn btn-primary" style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }} onClick={() => handleOpenModal(data)}>Tag Entry</button> {/* New Action button */}
                         <button

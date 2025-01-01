@@ -62,7 +62,7 @@ const handleLogin = async (e) => {
    
   }}>
           <div className="text-center mb-4">
-            <img src={logo} alt="Logo" className="mb-3" style={{ width: "250px", height: "100px" }} />
+            <img src={logo} alt="Logo" className="mb-3" style={{ width: "350px", height: "100px" }} />
             <h3>Login</h3>
           </div>
           <form onSubmit={handleLogin}>
