@@ -5,17 +5,21 @@ import "../StockEntry/StockEntry.css";
 import InputField from "../../Masters/ItemMaster/Inputfield";
 import StoneDetailsModal from "./PurchaseStoneDetails";
 import { useNavigate } from "react-router-dom";
+import { AiOutlinePlus } from "react-icons/ai";
 import baseURL from "../../../../Url/NodeBaseURL";
+import { Form, Row, Col } from 'react-bootstrap';
 
 const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const [productDetails, setProductDetails] = useState({
         pcs: selectedProduct?.pcs || 0,
         gross_weight: selectedProduct?.gross_weight || 0,
     });
-    
+
     const [productOptions, setProductOptions] = useState([]);
     const [formData, setFormData] = useState({
         product_id: selectedProduct.product_id,
+        category: "",
+        sub_category: "",
         Pricing: "",
         Tag_ID: "",
         Prefix: "tag",
@@ -128,8 +132,8 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const handleBack = () => {
         navigate("/stockEntryTable");
     };
-    
-    
+
+
 
     // Fetch product options for P ID dropdown (product_id)
     useEffect(() => {
@@ -168,7 +172,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 );
         }
     };
-   
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -207,9 +211,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             console.error(error);
         }
     };
-    
 
-   useEffect(() => {
+
+    useEffect(() => {
         if (selectedProduct?.product_id) {
             fetch(`${baseURL}/get/update-values?product_id=${selectedProduct.product_id}`, {
                 method: 'GET',
@@ -237,249 +241,254 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }
     }, [selectedProduct, baseURL]);
 
+    const [subCategories, setSubCategories] = useState([
+        { id: 1, name: "Category 1" },
+        { id: 2, name: "Category 2" },
+    ]);
+
+    const handleAddSubCategory = () => {
+        const newCategoryName = prompt("Enter Sub Category:");
+        if (newCategoryName) {
+            const newCategory = {
+                id: subCategories.length + 1,
+                name: newCategoryName,
+            };
+            setSubCategories([...subCategories, newCategory]);
+        }
+    };
 
     return (
         <div style={{ paddingTop: "0px" }}>
             <div>
-            <h4>Pieces: {productDetails.pcs}</h4>
-            <h4>Gross Weight: {productDetails.gross_weight}</h4>
+                <h4>Pieces: {productDetails.pcs}</h4>
+                <h4>Gross Weight: {productDetails.gross_weight}</h4>
 
-            {/* <h4>Pieces: {displayPieces}</h4> 
+                {/* <h4>Pieces: {displayPieces}</h4> 
             <h4>Gross Weight: {displayGrossWeight}</h4>  */}
             </div>
             <div className="container mt-4">
                 <div className="row mt-3">
                     <div className="col-12">
-                        <form className="p-4 border rounded form-container-stockentry" onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                {/* <h4>Stock Entry</h4> */}
-                                <div className="row g-3">
-                                    <div className="col-md-2">
-                                        <InputField
-                                            label="Pricing:"
-                                            name="Pricing"
-                                            type="select"
-                                            value={formData.Pricing}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "By Weight", label: "By Weight" },
-                                                { value: "By fixed", label: "By fixed" },
-                                            ]}
-                                        />
-                                    </div>
-                                    {/* <div className="col-md-2">
-                                        <InputField
-                                            label="P ID:"
-                                            name="product_id"
-                                            type="select"
-                                            value={formData.product_id}
-                                            onChange={handleChange}
-                                            options={productOptions}
-                                        />
-                                    </div>
-                                    <div className="col-md-2">
-                                        <InputField
-                                            label="Tag ID:"
-                                            name="Tag_ID"
-                                            value={formData.Tag_ID}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Product Name:"
-                                            name="product_Name"
-                                            value={formData.product_Name}
-                                            readOnly
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Design Master:"
-                                            name="Design_Master"
-                                            value={formData.Design_Master}
-                                            readOnly
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Category:"
-                                            name="Category"
-                                            value={formData.Category}
-                                            readOnly
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField label="Prefix:" value="tag" readOnly />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Purity:"
-                                            name="Purity"
-                                            value={formData.Purity}
-                                            readOnly
-                                        />
-                                    </div> */}
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="PCode/BarCode:"
-                                            name="PCode_BarCode"
-                                            value={formData.PCode_BarCode}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
+                        <Form className="p-4 border rounded form-container-stockentry" onSubmit={handleSubmit}>
+                            <div className="stock-entry-form">
+                                <div className="stock-entry-form-left">
+                                    <Col className="stock-form-section">
+                                        <h4 className="mb-4">Stock Entry</h4>
+                                        <Row>
+                                          
+                                                <Col xs={12} md={3}>
+                                                    <InputField
+                                                        label="Category:"
+                                                        name="category"
+                                                        value={formData.category} // Bind formData.category
+                                                        onChange={(e) => handleChange(e)} // Pass the event to handleChange
+                                                    />
+                                                </Col>
 
+                                           
+                                            <Col xs={12} md={3} className="d-flex align-items-center">
+                                                <div style={{ flex: 1 }}>
+                                                    <InputField
+                                                        label="Sub Category:"
+                                                        name="sub_category"
+                                                        type="select"
+                                                        value={formData.sub_category || ""}
+                                                        onChange={(e) => handleChange("sub_category", e.target.value)}
+                                                        options={[
+                                                            ...subCategories.map((category) => ({
+                                                                value: category.id, // Use id as the value
+                                                                label: category.name, // Display name as the label
+                                                            })),
+                                                        ]}
+                                                    />
+                                                </div>
+                                                <AiOutlinePlus
+                                                    size={20}
+                                                    color="black"
+                                                    onClick={handleAddSubCategory}
+                                                    style={{
+                                                        marginLeft: "10px",
+                                                        cursor: "pointer",
+                                                        marginBottom: "20px",
+                                                    }}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Product Name:"
+                                                    name="product_name"
+                                                    value={formData.category}
+                                                    onChange={(e) => handleChange("product_name", e.target.value)}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Pricing:"
+                                                    name="Pricing"
+                                                    type="select"
+                                                    value={formData.Pricing}
+                                                    onChange={handleChange}
+                                                    options={[
+                                                        { value: "By Weight", label: "By Weight" },
+                                                        { value: "By fixed", label: "By fixed" },
+                                                    ]}
+                                                />
+                                            </Col>
+
+                                        </Row>
+                                        <Row>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="PCode/BarCode:"
+                                                    name="PCode_BarCode"
+                                                    value={formData.PCode_BarCode}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Gross Weight:"
+                                                    name="Gross_Weight"
+                                                    value={formData.Gross_Weight}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Stones Weight:"
+                                                    name="Stones_Weight"
+                                                    value={formData.Stones_Weight}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Stones Price:"
+                                                    name="Stones_Price"
+                                                    value={formData.Stones_Price}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Weight BW:"
+                                                    name="Weight_BW"
+                                                    value={formData.Weight_BW}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                        </Row>
+
+                                    </Col>
+                                </div>
+                                <div className="stock-entry-form-right">
+                                    <Col className="stock-form-section">
+                                        <Row>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Wastage On:"
+                                                    name="Wastage_On"
+                                                    type="select"
+                                                    value={formData.Wastage_On}
+                                                    onChange={handleChange}
+                                                    options={[
+                                                        { value: "Gross Weight", label: "Gross Weight" },
+                                                        { value: "Weight BW", label: "Weight BW" },
+                                                    ]}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Wastage %:"
+                                                    name="Wastage_Percentage"
+                                                    value={formData.Wastage_Percentage}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Wastage Weight:"
+                                                    name="WastageWeight"
+                                                    value={formData.WastageWeight}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Total Weight:"
+                                                    name="TotalWeight_AW"
+                                                    value={formData.TotalWeight_AW}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Making Charges On:"
+                                                    name="Making_Charges_On"
+                                                    type="select"
+                                                    value={formData.Making_Charges_On}
+                                                    onChange={handleChange}
+                                                    options={[
+                                                        { value: "By Weight", label: "By Weight" },
+                                                        { value: "Fixed", label: "Fixed" },
+                                                    ]}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="MC Per Gram:"
+                                                    name="MC_Per_Gram"
+                                                    value={formData.MC_Per_Gram}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Making Charges:"
+                                                    name="Making_Charges"
+                                                    value={formData.Making_Charges}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="HUID No:"
+                                                    name="HUID_No"
+                                                    value={formData.HUID_No}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Stock Point:"
+                                                    name="Stock_Point"
+                                                    type="select"
+                                                    value={formData.Stock_Point}
+                                                    onChange={handleChange}
+                                                    options={[
+                                                        { value: "Main Store", label: "Main Store" },
+                                                        { value: "Secondary Store", label: "Secondary Store" },
+                                                    ]}
+                                                />
+                                            </Col>
+                                        </Row>
+
+                                    </Col>
                                 </div>
                             </div>
-                            <div className="mb-4">
-                                <div className="row g-3">
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Gross Weight:"
-                                            name="Gross_Weight"
-                                            value={formData.Gross_Weight}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Stones Weight:"
-                                            name="Stones_Weight"
-                                            value={formData.Stones_Weight}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-2">
-                                        <button
-                                            type="button" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-                                            className="btn btn-primary w-100"
-                                            onClick={handleOpenModal}
-
-                                        >
-                                            Stone Details
-                                        </button>
-                                    </div>
-                                    <div className="col-md-2">
-                                        <InputField
-                                            label="Stones Price:"
-                                            name="Stones_Price"
-                                            value={formData.Stones_Price}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-2">
-                                        <InputField label="Weight BW:"
-                                            name="Weight_BW"
-                                            value={formData.Weight_BW}
-                                            onChange={handleChange}
-
-                                        />
-                                    </div>
-                                </div>
+                            <div className="text-end mt-4">
+                                <button
+                                    type="submit"
+                                    onClick={handleCloseModal1}
+                                    className="btn btn-primary"
+                                >
+                                    Save
+                                </button>
                             </div>
-                            <div>
-                                <div className="row g-3">
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Wastage On:"
-                                            name="Wastage_On"
-                                            type="select"
-                                            value={formData.Wastage_On}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "Gross Weight", label: "Gross Weight" },
-                                                { value: "Weight BW", label: "Weight BW" },
-                                            ]}
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Wastage %:"
-                                            name="Wastage_Percentage"
-                                            value={formData.Wastage_Percentage}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Wastage Weight:"
-                                            name="WastageWeight"
-                                            value={formData.WastageWeight}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Total Weight:"
-                                            name="TotalWeight_AW"
-                                            value={formData.TotalWeight_AW}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="Making Charges On:"
-                                            name="Making_Charges_On"
-                                            type="select"
-                                            value={formData.Making_Charges_On}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "By Weight", label: "By Weight" },
-                                                { value: "Fixed", label: "Fixed" },
-                                            ]}
-                                        />
-                                    </div>
-                                    <div className="col-md-3">
-                                        <InputField
-                                            label="MC Per Gram:"
-                                            name="MC_Per_Gram"
-                                            value={formData.MC_Per_Gram}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-2">
-                                        <InputField
-                                            label="Making Charges:"
-                                            name="Making_Charges"
-                                            value={formData.Making_Charges}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-2">
-                                        <InputField
-                                            label="HUID No:"
-                                            name="HUID_No"
-                                            value={formData.HUID_No}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="col-md-2">
-                                        <InputField
-                                            label="Stock Point:"
-                                            name="Stock_Point"
-                                            type="select"
-                                            value={formData.Stock_Point}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "Main Store", label: "Main Store" },
-                                                { value: "Secondary Store", label: "Secondary Store" },
-                                            ]}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            {/* <button
-                                type="button"
-                                className="cus-back-btn"
-                                onClick={handleCloseModal1}
-                                style={{ backgroundColor: "gray", marginRight: "10px" }}
-                            >
-                                Cancel
-                            </button> */}
-                            <button type="submit" onClick={handleCloseModal1} className="cus-submit-btn">
-                                Save
-                            </button>
-                        </form>
+                        </Form>
+
                     </div>
                 </div>
             </div>
