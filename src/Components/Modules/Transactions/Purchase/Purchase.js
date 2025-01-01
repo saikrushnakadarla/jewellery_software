@@ -27,7 +27,7 @@ const URDPurchase = () => {
       bill_date: new Date().toISOString().split("T")[0],
       due_date: "",
       category:"",
-      code: "",
+      rbarcode: "",
       pcs: "",
       gross_weight: "",
       stone_weight: "",
@@ -160,7 +160,7 @@ const URDPurchase = () => {
     }
 
     setFormData({
-      code: "",
+      rbarcode: "",
       product_id: "",
       product_name: "",
       metal_type: "",
@@ -391,6 +391,40 @@ const URDPurchase = () => {
     fetchCurrentRates();
   }, []);
 
+  useEffect(() => {
+    const fetchLastRbarcode = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastRbarcode`);
+        setFormData((prev) => ({
+          ...prev,
+          rbarcode: response.data.lastrbNumbers,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastRbarcode();
+  }, []);
+
+
+  useEffect(() => {
+    const fetchLastInvoice = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastInvoice`);
+        setFormData((prev) => ({
+          ...prev,
+          invoice: response.data.lastInvoiceNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastInvoice();
+  }, []);
+
+
   return (
     <div className="main-container">
       <div className="purchase-form-container">
@@ -502,9 +536,9 @@ const URDPurchase = () => {
               <Col xs={12} md={2}>
                 <InputField
                   label="Rbarcode"
-                  name="code"
-                  value={formData.code}
-                  onChange={(e) => handleChange("code", e.target.value)}                 
+                  name="rbarcode"
+                  value={formData.rbarcode}
+                  onChange={(e) => handleChange("rbarcode", e.target.value)}                 
                 />
               </Col>
               <Col xs={12} md={1}>
@@ -630,7 +664,7 @@ const URDPurchase = () => {
                 <tbody>
                   {tableData.map((data, index) => (
                     <tr key={index}>
-                      <td>{data.code}</td>
+                      <td>{data.rbarcode}</td>
                       <td>{data.category}</td>
                       <td>{data.pcs}</td>
                       <td>{data.gross_weight}</td>
