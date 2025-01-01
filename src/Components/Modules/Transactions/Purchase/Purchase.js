@@ -320,7 +320,7 @@ const URDPurchase = () => {
   };
 
   const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/purchase" } });
+    navigate("/suppliermaster", { state: { from: "/purchase" } });
   };
 
   useEffect(() => {
