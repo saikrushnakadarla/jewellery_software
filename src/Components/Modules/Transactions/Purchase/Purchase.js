@@ -27,7 +27,7 @@ const URDPurchase = () => {
       bill_date: new Date().toISOString().split("T")[0],
       due_date: "",
       category:"",
-      code: "",
+      rbarcode: "",
       pcs: "",
       gross_weight: "",
       stone_weight: "",
@@ -147,103 +147,88 @@ const URDPurchase = () => {
     });
   };
 
-  const handleAdd = () => {
-    if (editingIndex !== null) {
-      // Update the existing row
-      const updatedTableData = [...tableData];
-      updatedTableData[editingIndex] = formData;
-      setTableData(updatedTableData);
-      setEditingIndex(null); // Reset editing state
+  const handleAdd = (e) => {
+    e.preventDefault();
+
+    if (editingIndex === null) {
+      // Add new entry to the table
+      setTableData([...tableData, formData]);
     } else {
-      // Add new row
-      setTableData((prev) => [...prev, formData]);
+      // Edit existing entry in the table
+      const updatedTableData = tableData.map((row, index) =>
+        index === editingIndex ? formData : row
+      );
+      setTableData(updatedTableData);
+      setEditingIndex(null); // Reset edit mode
     }
 
+    // Reset formData only when needed (optional for editing scenarios)
     setFormData({
-      code: "",
-      product_id: "",
-      product_name: "",
-      metal_type: "",
-      design_name: "",
-      purity: "",
-      purityPercentage: "",
-      hsn: "",
-      product_type: "",
-      stock_type: "",
-      pcs: "",
-      gross_weight: "",
-      stone_weight: "",
-      net_weight: "",
-      unit_weight: "",
-      waste_percentage: "",
-      waste_amount: "",
-      pure_weight: "",
-      alloy: "",
-      cost: "",
-      total_weight: "",
-      wt_rate_amount: "",
-      mc_per_gram: "",
-      mc: "",
-      stone_amount: "",
-      total_amount: "",
-      stone: "",
-      stone_pcs: "",
-      stone_ct: "",
-      cwp: "",
-      gms: "",
-      stone_rate: "",
-      clarity: "",
-      rate: "",
-      clear: "",
-      class: "",
-      cut: "",
+      ...formData, // If necessary, keep persistent fields like mobile, etc.
+      category: '',
+      rbarcode: '',
+      pcs: '',
+      gross_weight: '',
+      stone_weight: '',
+      net_weight: '',
+      hm_charges: '',
+      other_charges: '',
+      charges: '',
+      purity: '',
+      pure_weight: '',
+      rate: '',
+      total_amount: '',
     });
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e) => {
+    e.preventDefault();
     try {
       const dataToSave = {
-        formData,
-        tableData,
+        formData: { ...formData }, // Explicitly spread to ensure values are intact
+        table_data: tableData, // Include table data
       };
 
-      const response = await axios.post(`${baseURL}/post/purchase`, dataToSave);
+      // Send the data to your backend
+      const response = await axios.post("http://localhost:5000/post/purchase", dataToSave, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-      if (response.status === 201) {
-        alert(response.data.message);
+      console.log("Data saved successfully:", response.data);
+      alert("Data saved successfully:")
 
-        // Reset formData and tableData
-        setFormData({
-          account_name: "",
-          mobile: "",
-          email: "",
-          address1: "",
-          address2: "",
-          city: "",
-          pincode: "",
-          state: "",
-          state_code: "",
-          aadhar_card: "",
-          gst_in: "",
-          pan_card: "",
-          terms: "Cash",
-          indent: "",
-          bill_no: "",
-          type: "",
-          rate_cut: "",
-          date: "",
-          bill_date: "",
-          due_date: "",
-          Purchase_rate: "",
-        });
+      // Optionally reset after successful save
+      setFormData({
+        mobile: "",
+        account_name: "",
+        gst_in: "",
+        terms: "Cash",
+        invoice: "",
+        bill_no: "",
+        rate_cut: "",
+        date: new Date().toISOString().split("T")[0],
+        bill_date: new Date().toISOString().split("T")[0],
+        due_date: "",
+        category: "",
+        rbarcode: "",
+        pcs: "",
+        gross_weight: "",
+        stone_weight: "",
+        net_weight: "",
+        hm_charges: "",
+        other_charges: "",
+        charges: "",
+        purity: "",
+        pure_weight: "",
+        rate: "",
+        total_amount: "",
+      });
 
-        setTableData([]);
-      } else {
-        alert("Unexpected response from server.");
-      }
+      setTableData([]); // Reset table data if needed
     } catch (error) {
-      console.error("Error saving data:", error.response?.data || error);
-      alert("Failed to save data.");
+      console.error("Error saving data:", error);
     }
   };
   
@@ -335,7 +320,7 @@ const URDPurchase = () => {
   };
 
   const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/purchase" } });
+    navigate("/suppliermaster", { state: { from: "/purchase" } });
   };
 
   useEffect(() => {
@@ -390,6 +375,40 @@ const URDPurchase = () => {
     };
     fetchCurrentRates();
   }, []);
+
+  useEffect(() => {
+    const fetchLastRbarcode = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastRbarcode`);
+        setFormData((prev) => ({
+          ...prev,
+          rbarcode: response.data.lastrbNumbers,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastRbarcode();
+  }, []);
+
+
+  useEffect(() => {
+    const fetchLastInvoice = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastInvoice`);
+        setFormData((prev) => ({
+          ...prev,
+          invoice: response.data.lastInvoiceNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastInvoice();
+  }, []);
+
 
   return (
     <div className="main-container">
@@ -496,15 +515,15 @@ const URDPurchase = () => {
                   label="Category:"
                   name="category"
                   value={formData.category}
-                  onChange={handleChange}
+                  onChange={(e) => handleChange("category", e.target.value)} 
                 />
               </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Rbarcode"
-                  name="code"
-                  value={formData.code}
-                  onChange={(e) => handleChange("code", e.target.value)}                 
+                  name="rbarcode"
+                  value={formData.rbarcode}
+                  onChange={(e) => handleChange("rbarcode", e.target.value)}                 
                 />
               </Col>
               <Col xs={12} md={1}>
@@ -630,7 +649,7 @@ const URDPurchase = () => {
                 <tbody>
                   {tableData.map((data, index) => (
                     <tr key={index}>
-                      <td>{data.code}</td>
+                      <td>{data.rbarcode}</td>
                       <td>{data.category}</td>
                       <td>{data.pcs}</td>
                       <td>{data.gross_weight}</td>
@@ -640,16 +659,9 @@ const URDPurchase = () => {
                       <td>{data.other_charges}</td>
                       <td>{data.charges}</td>
                       <td>{data.purity}</td>
-                      <td>{data.pcs}</td>
-                      <td>{data.pure_weight}</td>
-                      <td>{data.stone_weight}</td>
-                      <td>{data.net_weight}</td>
-                      <td>{data.unit_weight}</td>
-                      <td>{data.waste_percentage}</td>
-                      <td>{data.waste_amount}</td>
                       <td>{data.pure_weight}</td>
                       <td>{data.rate}</td>
-                      <td>{data.total_amount}</td>                      
+                      <td>{data.total_amount}</td>       
                       <td style={{ display: 'flex' }}>
                         <button type="button" className="btn btn-primary" style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }} onClick={() => handleOpenModal(data)}>Tag Entry</button> {/* New Action button */}
                         <button
