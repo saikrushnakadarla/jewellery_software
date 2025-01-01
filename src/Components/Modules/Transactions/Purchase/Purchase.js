@@ -15,18 +15,18 @@ const URDPurchase = () => {
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
   const [formData, setFormData] = useState(
-    {   
-      mobile: "", 
-      account_name: "",     
-      gst_in: "",      
+    {
+      mobile: "",
+      account_name: "",
+      gst_in: "",
       terms: "Cash",
       invoice: "",
-      bill_no: "",      
+      bill_no: "",
       rate_cut: "",
       date: new Date().toISOString().split("T")[0],
       bill_date: new Date().toISOString().split("T")[0],
       due_date: "",
-      category:"",
+      category: "",
       rbarcode: "",
       pcs: "",
       gross_weight: "",
@@ -37,9 +37,9 @@ const URDPurchase = () => {
       charges: "",
       purity: "",
       pure_weight: "",
-      rate:"",
-      total_amount: "",      
-    });  
+      rate: "",
+      total_amount: "",
+    });
   const [tableData, setTableData] = useState([]);
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
   const [purityOptions, setPurityOptions] = useState([]);
@@ -76,7 +76,7 @@ const URDPurchase = () => {
     };
 
     fetchPurityPercentage();
-  }, [formData.purity]); 
+  }, [formData.purity]);
 
   const handleChange = (field, value) => {
     setFormData((prev) => {
@@ -231,7 +231,7 @@ const URDPurchase = () => {
       console.error("Error saving data:", error);
     }
   };
-  
+
   const handleEdit = (index) => {
     setFormData(tableData[index]); // Populate the form with selected row data
     setEditingIndex(index); // Track the index being edited
@@ -336,22 +336,15 @@ const URDPurchase = () => {
   }, [showModal1]);
 
   const handleOpenModal = (data) => {
-    setSelectedProduct({
-      product_id: data.product_id,
-      product_name: data.product_name,
-      metal_type: data.metal_type,
-      design_name: data.design_name,
-      purity: data.purity,
-      hsn: data.hsn,
-      pcs: data.pcs,
-      gross_weight: data.gross_weight,
-    });
-    setShowModal(true); // This shows the modal
+    setSelectedProduct(data);
+    setShowModal(true);
   };
 
   const handleCloseModal1 = () => {
-    setShowModal(false); // Close the modal
+    setShowModal(false);
+    setSelectedProduct(null);
   };
+  
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -515,7 +508,7 @@ const URDPurchase = () => {
                   label="Category:"
                   name="category"
                   value={formData.category}
-                  onChange={(e) => handleChange("category", e.target.value)} 
+                  onChange={(e) => handleChange("category", e.target.value)}
                 />
               </Col>
               <Col xs={12} md={2}>
@@ -523,7 +516,7 @@ const URDPurchase = () => {
                   label="Rbarcode"
                   name="rbarcode"
                   value={formData.rbarcode}
-                  onChange={(e) => handleChange("rbarcode", e.target.value)}                 
+                  onChange={(e) => handleChange("rbarcode", e.target.value)}
                 />
               </Col>
               <Col xs={12} md={1}>
@@ -619,7 +612,7 @@ const URDPurchase = () => {
               </Col> */}
               <Col xs={12} md={1}>
                 <Button onClick={handleAdd}>
-                  
+
                   {editingIndex !== null ? "Update" : "Add"}
                 </Button>
               </Col>
@@ -630,7 +623,7 @@ const URDPurchase = () => {
               <Table striped bordered hover className="mt-4">
                 <thead>
                   <tr>
-                    <th>Rbarcode</th>                    
+                    <th>Rbarcode</th>
                     <th>Category</th>
                     <th>Pieces</th>
                     <th>Gross</th>
@@ -661,9 +654,16 @@ const URDPurchase = () => {
                       <td>{data.purity}</td>
                       <td>{data.pure_weight}</td>
                       <td>{data.rate}</td>
-                      <td>{data.total_amount}</td>       
+                      <td>{data.total_amount}</td>
                       <td style={{ display: 'flex' }}>
-                        <button type="button" className="btn btn-primary" style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }} onClick={() => handleOpenModal(data)}>Tag Entry</button> {/* New Action button */}
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }}
+                          onClick={() => handleOpenModal(data)} // Pass entire row data
+                        >
+                          Tag Entry
+                        </button>
                         <button
                           type="button"
                           className="action-button edit-button"
@@ -709,7 +709,12 @@ const URDPurchase = () => {
           <Modal.Title>Tag Entry</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <TagEntry handleCloseModal={handleCloseModal1} selectedProduct={selectedProduct} />
+          {selectedProduct && (
+            <TagEntry
+              handleCloseModal={handleCloseModal1}
+              selectedProduct={selectedProduct}
+            />
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal1}>
@@ -717,6 +722,7 @@ const URDPurchase = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
 
     </div>
   );

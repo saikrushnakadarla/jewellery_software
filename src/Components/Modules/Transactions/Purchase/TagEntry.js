@@ -45,6 +45,15 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         Weight_BW: "",
     });
 
+    useEffect(() => {
+        if (selectedProduct) {
+            setFormData((prevState) => ({
+                ...prevState,
+                category: selectedProduct.category || "", // Set category from selectedProduct
+            }));
+        }
+    }, [selectedProduct]);
+
     const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
         setFormData({
             ...formData,
@@ -275,17 +284,14 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                     <Col className="stock-form-section">
                                         <h4 className="mb-4">Stock Entry</h4>
                                         <Row>
-                                          
-                                                <Col xs={12} md={3}>
-                                                    <InputField
-                                                        label="Category:"
-                                                        name="category"
-                                                        value={formData.category} // Bind formData.category
-                                                        onChange={(e) => handleChange(e)} // Pass the event to handleChange
-                                                    />
-                                                </Col>
-
-                                           
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Category:"
+                                                    name="category"
+                                                    value={formData.category} // Bind formData.category
+                                                    onChange={(e) => handleChange(e)} // Update formData on change
+                                                />
+                                            </Col>
                                             <Col xs={12} md={3} className="d-flex align-items-center">
                                                 <div style={{ flex: 1 }}>
                                                     <InputField
