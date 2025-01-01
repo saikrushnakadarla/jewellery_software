@@ -349,6 +349,7 @@ const SalesForm = () => {
                 paymentDetails={paymentDetails}
                 setPaymentDetails={setPaymentDetails}
                 handleSave={handleSave}
+                repairDetails={repairDetails}
                 handleBack={handleBack}
                 totalPrice={totalPrice} // Pass totalPrice as a prop
               />

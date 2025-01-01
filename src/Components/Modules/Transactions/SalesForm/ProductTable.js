@@ -85,20 +85,20 @@ const ProductTable = ({ repairDetails, onDelete }) => {
           </tr>
         )}
       </tbody>
-      <tfoot>
+      {/* <tfoot>
         <tr>
-          <td colSpan="20" className="text-right">Taxable Amount</td> {/* Adjusted colspan to 20 */}
+          <td colSpan="20" className="text-right">Taxable Amount</td> 
           <td colSpan="4">{taxableAmount.toFixed(2)}</td>
         </tr>
         <tr>
-          <td colSpan="20" className="text-right">Tax Amount</td> {/* Adjusted colspan to 20 */}
+          <td colSpan="20" className="text-right">Tax Amount</td> 
           <td colSpan="4">{taxAmount.toFixed(2)}</td>
         </tr>
         <tr>
-          <td colSpan="20" className="text-right">Net Amount</td> {/* Adjusted colspan to 20 */}
+          <td colSpan="20" className="text-right">Net Amount</td> 
           <td colSpan="4">{netAmount.toFixed(2)}</td>
         </tr>
-      </tfoot>
+      </tfoot> */}
     </Table>
   );
 };
