@@ -1,6 +1,7 @@
 import React from 'react';
 import './Dashboard.css';
 import Repairs from './Repairs';
+import Customers from './Customers';
 
 function Dashboard() {
   return (
@@ -26,7 +27,7 @@ function Dashboard() {
         <div className="dashboard-customers-container">
           <h2 className="dashboard-section-title">TOP CUSTOMERS</h2>
           <div className="dashboard-table-wrapper">
-            <table className="dashboard-responsive-table">
+            {/* <table className="dashboard-responsive-table">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -59,7 +60,8 @@ function Dashboard() {
                   <td>davidbrown@example.com</td>
                 </tr>
               </tbody>
-            </table>
+            </table> */}
+            <Customers />
           </div>
         </div>
         <div className="dashboard-customers-container">
