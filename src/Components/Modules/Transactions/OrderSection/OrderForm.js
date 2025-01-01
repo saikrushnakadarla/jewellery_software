@@ -12,6 +12,9 @@ import useCalculations from './hooks/useCalculations';
 import './../Sales/SalesForm.css';
 import baseURL from './../../../../Url/NodeBaseURL';
 import SalesFormSection from "./SalesForm3Section";
+import { pdf } from '@react-pdf/renderer';
+
+import PDFLayout from './PDFLayout';
 
 const SalesForm = () => {
   const navigate = useNavigate();
@@ -235,7 +238,23 @@ const SalesForm = () => {
         },
       });
       alert("Data saved successfully");
-  
+   const pdfDoc = (
+          <PDFLayout
+            formData={formData}
+            repairDetails={repairDetails}
+            paymentDetails={paymentDetails}
+          />
+        );
+        const pdfBlob = await pdf(pdfDoc).toBlob();
+    
+        // Create a download link and trigger it
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(pdfBlob);
+        link.download = `invoice-${formData.invoice_number}.pdf`;
+        link.click();
+    
+        // Clean up
+        URL.revokeObjectURL(link.href);
       // Clear form data and reset state
       setRepairDetails([]);
       resetForm();

@@ -12,9 +12,13 @@ import useCalculations from './hooks/useCalculations';
 import './../Sales/SalesForm.css';
 import baseURL from './../../../../Url/NodeBaseURL';
 import SalesFormSection from "./SalesForm3Section";
+import { pdf } from '@react-pdf/renderer';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import PDFLayout from './PDFLayout';
 
 const SalesForm = () => {
   const navigate = useNavigate();
+  const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [metal, setMetal] = useState("");
   const [repairDetails, setRepairDetails] = useState(
@@ -198,10 +202,29 @@ const SalesForm = () => {
       online: paymentDetails.online || "",
       online_amt: paymentDetails.online_amt || 0,
     }));
-
+  
     try {
       await axios.post(`${baseURL}/save-repair-details`, { repairDetails: dataToSave });
       alert("Data saved successfully");
+  
+      // Generate PDF Blob
+      const pdfDoc = (
+        <PDFLayout
+          formData={formData}
+          repairDetails={repairDetails}
+          paymentDetails={paymentDetails}
+        />
+      );
+      const pdfBlob = await pdf(pdfDoc).toBlob();
+  
+      // Create a download link and trigger it
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(pdfBlob);
+      link.download = `invoice-${formData.invoice_number}.pdf`;
+      link.click();
+  
+      // Clean up
+      URL.revokeObjectURL(link.href);
       setRepairDetails([]);
       resetForm();
     } catch (error) {
@@ -209,6 +232,7 @@ const SalesForm = () => {
       alert("Error saving data");
     }
   };
+  
 
   const resetForm = () => {
     setFormData({
@@ -319,6 +343,22 @@ const SalesForm = () => {
               />
             </div>
           </div>
+          {showPDFDownload && (
+        <PDFDownloadLink
+          document={
+            <PDFLayout
+              formData={formData}
+              repairDetails={repairDetails}
+              paymentDetails={paymentDetails}
+            />
+          }
+          fileName={`invoice-${formData.invoice_number}.pdf`}
+        >
+          {({ blob, url, loading, error }) =>
+            loading ? "Generating PDF..." : "Download Invoice PDF"
+          }
+        </PDFDownloadLink>
+      )}
         </Form>
       </Container>
     </div>
