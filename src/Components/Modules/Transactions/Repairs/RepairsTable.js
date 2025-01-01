@@ -115,7 +115,11 @@ const handlePopoverToggle = (event, repairId) => {
       { Header: 'Metal Type', accessor: 'metal_type' },
       { Header: 'Purity', accessor: 'purity' },
       { Header: 'Total', accessor: 'total' },
-
+      {
+        Header: 'Date',
+        accessor: 'date',
+        Cell: ({ value }) => <span>{formatDate(value)}</span>, // Format birthday date
+      },
       {
         Header: 'Delivery Date',
         accessor: 'delivery_date',

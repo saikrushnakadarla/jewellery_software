@@ -108,15 +108,19 @@ const RepairForm = () => {
   };
 
   const handleCustomerChange = (customerId) => {
-    const customer = customers.find(
-      (cust) => String(cust.account_id) === String(customerId)
-    );
-  
+    setFormData((prevData) => ({
+      ...prevData,
+      customer_id: customerId, // Ensure customer_id is correctly updated
+    }));
+
+    const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
+    console.log("Customer Id=", customer)
+
     if (customer) {
-      setFormData((prevData) => ({
-        ...prevData,
-        customer_id: customerId,
-        name: customer.account_name,
+      setFormData({
+        ...formData,
+        customer_id: customerId, // Ensure this is correctly set
+        account_name: customer.account_name, // Set the name field to the selected customer
         mobile: customer.mobile || "",
         email: customer.email || "",
         address1: customer.address1 || "",
@@ -128,12 +132,13 @@ const RepairForm = () => {
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
-      }));
+
+      });
     } else {
-      setFormData((prevData) => ({
-        ...prevData,
+      setFormData({
+        ...formData,
         customer_id: "",
-        name: "",
+        account_name: "",
         mobile: "",
         email: "",
         address1: "",
@@ -145,7 +150,7 @@ const RepairForm = () => {
         aadhar_card: "",
         gst_in: "",
         pan_card: "",
-      }));
+      });
     }
   };
 
@@ -182,6 +187,7 @@ const RepairForm = () => {
               ...repairData,
               date: parseDate(repairData.date),
               delivery_date: parseDate(repairData.delivery_date),
+              repair_no: repairData.repair_no, // Ensure repair_no is set correctly
             }));
   
             if (repairData.customer_id) {
@@ -196,6 +202,7 @@ const RepairForm = () => {
       fetchRepairDetails();
     }
   }, [id]);
+  
   
 
 
@@ -237,20 +244,23 @@ const RepairForm = () => {
   };
 
   useEffect(() => {
-    const fetchLastRPNNumber = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/lastRPNNumber`);
-        setFormData((prev) => ({
-          ...prev,
-          repair_no: response.data.lastRPNNumber,  // Update the RPN number in the form data
-        }));
-      } catch (error) {
-        console.error('Error fetching RPN number:', error);
-      }
-    };
-
-    fetchLastRPNNumber();
-  }, []);
+    if (!id) {
+      const fetchLastRPNNumber = async () => {
+        try {
+          const response = await axios.get(`${baseURL}/lastRPNNumber`);
+          setFormData((prev) => ({
+            ...prev,
+            repair_no: response.data.lastRPNNumber, // Only set repair_no when creating a new repair
+          }));
+        } catch (error) {
+          console.error('Error fetching RPN number:', error);
+        }
+      };
+  
+      fetchLastRPNNumber();
+    }
+  }, [id]);
+  
 
   return (
     <div className="main-container">
@@ -259,25 +269,24 @@ const RepairForm = () => {
           <div className="repair-form" >
             {/* Left Section */}
             <div className="repair-form-left">
-              {/* Customer Details */}
               <Col className="form-section">
                 <h4 className="mb-4">Customer Details</h4>
                 <Row>
-                  <Col xs={12} md={3} className="d-flex align-items-center">
+                <Col xs={12} md={3} className="d-flex align-items-center">
                     <div style={{ flex: 1 }}>
-                    <InputField
-  label="Mobile"
-  name="mobile"
-  type="select"
-  value={formData.customer_id || ""}
-  onChange={(e) => handleCustomerChange(e.target.value)}
-  options={
-    customers.map((customer) => ({
-      value: customer.account_id,
-      label: customer.mobile,
-    }))
-  }
-/>
+                      <InputField
+                        label="Mobile"
+                        name="mobile"
+                        type="select"
+                        value={formData.customer_id || ""} // Use customer_id to match selected value
+                        onChange={(e) => handleCustomerChange(e.target.value)}
+                        options={[
+                          ...customers.map((customer) => ({
+                            value: customer.account_id, // Use account_id as the value
+                            label: customer.mobile, // Display mobile as the label
+                          })),
+                        ]}
+                      />
                     </div>
                     <AiOutlinePlus
                       size={20}
@@ -291,19 +300,20 @@ const RepairForm = () => {
                     />
                   </Col>
                   <Col xs={12} md={3}>
-                  <InputField
-  label="Customer Name:"
-  name="account_name"
-  type="select"
-  value={formData.customer_id || ""}
-  onChange={(e) => handleCustomerChange(e.target.value)}
-  options={
-    customers.map((customer) => ({
-      value: customer.account_id,
-      label: customer.account_name,
-    }))
-  }
-/>
+                    <InputField
+                      label="Customer Name:"
+                      name="account_name"
+                      type="select"
+                        value={formData.customer_id || ""} // Use customer_id to match selected value
+                        onChange={(e) => handleCustomerChange(e.target.value)}
+                        options={[
+                          ...customers.map((customer) => ({
+                            value: customer.account_id, // Use account_id as the value
+                            label: customer.account_name, // Display mobile as the label
+                          })),
+                        ]}
+
+                    />
                   </Col>
                   <Col xs={12} md={3}>
                     <InputField
@@ -344,9 +354,7 @@ const RepairForm = () => {
                   </Col>
                 </Row>
               </Col>
-
             </div>
-            {/* Right Section */}
             <div className="repair-form-right">
               <Col className="form-section">
                 <Row>
@@ -364,13 +372,14 @@ const RepairForm = () => {
                   />
                 </Row>
                 <Row>
-                  <InputField
-                    label="Repair No:"
-                    name="repair_no"
-                    value={formData.repair_no}
-                    onChange={handleChange}
-                    readOnly
-                  />
+                <InputField
+  label="Repair No:"
+  name="repair_no"
+  value={formData.repair_no}
+  onChange={handleChange}
+  readOnly
+/>
+
                 </Row>
                 <Row>
                   <InputField label="Date:" name="date" type="date" value={formData.date} onChange={handleChange} />
@@ -393,7 +402,6 @@ const RepairForm = () => {
               <InputField label="Counter:" name="counter" value={formData.counter} onChange={handleChange} />
             </Col>
           </Row>
-
           <div className="repair-form2">
             <div className="repair-form-left">
               <Col className="form-section">
@@ -425,18 +433,18 @@ const RepairForm = () => {
                   </Col>
                   <Col xs={12} md={2}>
                   <InputField
-  label="Purity:"
-  name="purity"
-  type="select"
-  value={formData.purity}
-  onChange={handleChange}
-  options={
-    purityData.map((item) => ({
-      value: item.name,
-      label: item.name,
-    }))
-  }
-/>
+                    label="Purity:"
+                    name="purity"
+                    type="select"
+                    value={formData.purity}
+                    onChange={handleChange}
+                    options={
+                      purityData.map((item) => ({
+                        value: item.name,
+                        label: item.name,
+                      }))
+                    }
+                  />
                   </Col>
                 </Row>
               </Col>
@@ -466,28 +474,6 @@ const RepairForm = () => {
               </Col>
             </div>
           </div>
-
-          {/* Extra Charges */}
-          {/* <Row className="form-section">
-            <h4>Extra Charges</h4>
-            <Col xs={12} md={2}>
-              <InputField label="Extra Weight:" name="extra_weight" value={formData.extra_weight} onChange={handleChange} />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField label="Stone Value:" name="stone_value" value={formData.stone_value} onChange={handleChange} />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField label="Making Charge (MC):" name="making_charge" value={formData.making_charge} onChange={handleChange} />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField label="Handling Charge (HC):" name="handling_charge" value={formData.handling_charge} onChange={handleChange} />
-            </Col>
-            <Col xs={12} md={2}>
-              <InputField label="Total:" name="total" value={formData.total} onChange={handleChange} />
-            </Col>
-          </Row> */}
-
-          {/* Buttons */}
           <div className="form-buttons">
             <Button className="cus-back-btn" variant="secondary" onClick={handleBack}>cancel</Button>
             <Button

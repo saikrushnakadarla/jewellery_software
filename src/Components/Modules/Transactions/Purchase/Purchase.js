@@ -40,12 +40,10 @@ const URDPurchase = () => {
       rate:"",
       total_amount: "",      
     });  
-  const [tableData, setTableData] = useState([]);
+
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
   const [purityOptions, setPurityOptions] = useState([]);
-  const [showModal1, setShowModal] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+
 
   useEffect(() => {
     const fetchPurityPercentage = async () => {
@@ -54,7 +52,7 @@ const URDPurchase = () => {
         setPurityOptions(response.data);
         const purityData = Array.isArray(response.data) ? response.data : [response.data]; // Ensure response is an array
 
-        console.log("API Data:", purityData); // Log the API data for debugging
+       
 
         // Find the matching purity
         const matchedPurity = purityData.find(
@@ -62,13 +60,13 @@ const URDPurchase = () => {
         );
 
         if (matchedPurity) {
-          console.log("Matched Purity:", matchedPurity); // Log the matched purity
+          
           setFormData((prevData) => ({
             ...prevData,
             purityPercentage: matchedPurity.purity_percentage,
           }));
         } else {
-          console.warn("Purity not found in API data");
+          // console.warn("Purity not found in API data");
         }
       } catch (error) {
         console.error("Error fetching purity data:", error);
@@ -147,91 +145,55 @@ const URDPurchase = () => {
     });
   };
 
-  const handleAdd = () => {
-    if (editingIndex !== null) {
-      // Update the existing row
-      const updatedTableData = [...tableData];
-      updatedTableData[editingIndex] = formData;
-      setTableData(updatedTableData);
-      setEditingIndex(null); // Reset editing state
-    } else {
-      // Add new row
-      setTableData((prev) => [...prev, formData]);
-    }
+  const [tableData, setTableData] = useState([]);
 
+  const handleAdd = () => {
+    setTableData([...tableData, { ...formData }]);
     setFormData({
-      category:"",
-      rbarcode: "",
-      pcs: "",
-      gross_weight: "",
-      stone_weight: "",
-      net_weight: "",
-      hm_charges: "",
-      other_charges: "",
-      charges: "",
-      purity: "",
-      pure_weight: "",
-      rate:"",
-      total_amount: "",      
+      mobile: '',
+      account_name: '',
+      gst_in: '',
+      terms: '',
+      invoice: '',
+      bill_no: '',
+      rate_cut: '',
+      bill_date: '',
+      due_date: '',
+      category: '',
+      rbarcode: '',
+      pcs: '',
+      gross_weight: '',
+      stone_weight: '',
+      net_weight: '',
+      hm_charges: '',
+      other_charges: '',
+      charges: '',
+      purity: '',
+      pure_weight: '',
+      rate: '',
+      total_amount: '',
     });
   };
 
   const handleSave = async () => {
-  try {
-    const dataToSave = {
-      formData,
-      tableData,
-    };
-
-    console.log("Data to save:", dataToSave); // Debug log
-
-    const response = await axios.post(`${baseURL}/post/purchases`, dataToSave);
-
-    if (response.status === 201) {
-      alert(response.data.message);
-      // Reset formData and tableData
-      setFormData({
-        account_name: "",
-        mobile: "",
-        email: "",
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        state: "",
-        state_code: "",
-        aadhar_card: "",
-        gst_in: "",
-        pan_card: "",
-        terms: "Cash",
-        indent: "",
-        bill_no: "",
-        type: "",
-        rate_cut: "",
-        date: "",
-        bill_date: "",
-        due_date: "",
-        Purchase_rate: "",
+    try {
+      const response = await fetch(`${baseURL}/post/purchases`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(tableData),
       });
-      setTableData([]);
-    } else {
-      alert("Unexpected response from server.");
+      const result = await response.json();
+      if (response.ok) {
+        alert('Data saved successfully!');
+        setTableData([]); // Clear the table after successful save
+      } else {
+        console.error('Error saving data:', result.message);
+        alert('Error saving data. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An unexpected error occurred.');
     }
-  } catch (error) {
-    console.error("Error saving data:", error.response?.data || error);
-    alert("Failed to save data.");
-  }
-};
-
-  
-  const handleEdit = (index) => {
-    setFormData(tableData[index]); // Populate the form with selected row data
-    setEditingIndex(index); // Track the index being edited
-  };
-
-  const handleDelete = (index) => {
-    const updatedTableData = tableData.filter((_, i) => i !== index);
-    setTableData(updatedTableData); // Remove the selected row
   };
 
   useEffect(() => {
@@ -250,7 +212,7 @@ const URDPurchase = () => {
 
         setCustomers(customers);
         // setLoading(false);
-        console.log("Customers=", customers)
+        
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
@@ -316,45 +278,9 @@ const URDPurchase = () => {
   };
 
   useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (showModal1) {
-        e.preventDefault();
-        e.returnValue = ""; // This triggers the confirmation dialog in some browsers.
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [showModal1]);
-
-  const handleOpenModal = (data) => {
-    setSelectedProduct({
-      product_id: data.product_id,
-      product_name: data.product_name,
-      metal_type: data.metal_type,
-      design_name: data.design_name,
-      purity: data.purity,
-      hsn: data.hsn,
-      pcs: data.pcs,
-      gross_weight: data.gross_weight,
-    });
-    setShowModal(true); // This shows the modal
-  };
-
-  const handleCloseModal1 = () => {
-    setShowModal(false); // Close the modal
-  };
-
-  useEffect(() => {
     const fetchCurrentRates = async () => {
       try {
         const response = await axios.get(`${baseURL}/get/current-rates`);
-        console.log('API Response:', response.data);
-
-        // Log the 24crt rate separately
-        console.log('24crt Rate:', response.data.rate_24crt);
-
-        // Dynamically set the rates based on response
         setRates({
           rate_24crt: response.data.rate_24crt || "",
           rate_22crt: response.data.rate_22crt || "",
@@ -384,7 +310,6 @@ const URDPurchase = () => {
     fetchLastRbarcode();
   }, []);
 
-
   useEffect(() => {
     const fetchLastInvoice = async () => {
       try {
@@ -400,7 +325,6 @@ const URDPurchase = () => {
 
     fetchLastInvoice();
   }, []);
-
 
   return (
     <div className="main-container">
@@ -610,9 +534,8 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("total_amount", e.target.value)} />
               </Col> */}
               <Col xs={12} md={1}>
-                <Button onClick={handleAdd}>
-                  
-                  {editingIndex !== null ? "Update" : "Add"}
+                <Button onClick={handleAdd}>                  
+                 Add
                 </Button>
               </Col>
             </Row>
@@ -639,41 +562,35 @@ const URDPurchase = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tableData.map((data, index) => (
-                    <tr key={index}>
-                      <td>{data.rbarcode}</td>
-                      <td>{data.category}</td>
-                      <td>{data.pcs}</td>
-                      <td>{data.gross_weight}</td>
-                      <td>{data.stone_weight}</td>
-                      <td>{data.net_weight}</td>
-                      <td>{data.hm_charges}</td>
-                      <td>{data.other_charges}</td>
-                      <td>{data.charges}</td>
-                      <td>{data.purity}</td>
-                      <td>{data.pure_weight}</td>
-                      <td>{data.rate}</td>
-                      <td>{data.total_amount}</td>    
-                      <td style={{ display: 'flex' }}>
-                        <button type="button" className="btn btn-primary" style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }} onClick={() => handleOpenModal(data)}>Tag Entry</button> {/* New Action button */}
-                        <button
-                          type="button"
-                          className="action-button edit-button"
-                          onClick={() => handleEdit(index)}
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          type="button"
-                          className="action-button delete-button"
-                          onClick={() => handleDelete(index)}
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+            {tableData.map((row, index) => (
+              <tr key={index}>
+                <td>{row.rbarcode}</td>
+                <td>{row.category}</td>
+                <td>{row.pcs}</td>
+                <td>{row.gross_weight}</td>
+                <td>{row.stone_weight}</td>
+                <td>{row.net_weight}</td>
+                <td>{row.hm_charges}</td>
+                <td>{row.other_charges}</td>
+                <td>{row.charges}</td>
+                <td>{row.purity}</td>
+                <td>{row.pure_weight}</td>
+                <td>{row.rate}</td>
+                <td>{row.total_amount}</td>
+                <td>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() =>
+                      setTableData(tableData.filter((_, i) => i !== index))
+                    }
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
               </Table>
             </div>
           </div>
@@ -689,26 +606,7 @@ const URDPurchase = () => {
         </Form>
       </div>
 
-      <Modal
-        show={showModal1}
-        onHide={handleCloseModal1}
-        size="lg"
-        backdrop="static"
-        keyboard={false}
-        dialogClassName="custom-tagentrymodal-width"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Tag Entry</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <TagEntry handleCloseModal={handleCloseModal1} selectedProduct={selectedProduct} />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal1}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+
 
     </div>
   );
