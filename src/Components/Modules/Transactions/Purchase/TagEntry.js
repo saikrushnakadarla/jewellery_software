@@ -162,6 +162,28 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     // Handle field changes
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        // Update the state
+        setFormData((prevData) => {
+            if (name === "sub_category") {
+                const selectedCategory = subCategories.find(
+                    (category) => category.subcategory_id === parseInt(value)
+                );
+                const newPrefix = selectedCategory ? selectedCategory.prefix : "";
+                return {
+                    ...prevData,
+                    [name]: value,
+                    item_prefix: newPrefix, // Store the prefix separately
+                    PCode_BarCode: `${newPrefix}${prevData.suffix || "001"}`, // Combine prefix with suffix
+                };
+            }
+
+            return {
+                ...prevData,
+                [name]: value,
+            };
+        });
+
         setFormData((prevFormData) => ({
             ...prevFormData,
             [name]: value,
@@ -257,10 +279,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }
     }, [selectedProduct, baseURL]);
 
-    const [subCategories, setSubCategories] = useState([
-        { id: 1, name: "Category 1" },
-        { id: 2, name: "Category 2" },
-    ]);
+
     //    // Function to handle modal open
     //    const handleOpenModal = () => {
     //     setShowModal(true);
@@ -286,33 +305,67 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     // Handle form submission to add new subcategory
     const handleAddSubCategory = async () => {
         try {
-          const data = {
-            subcategory_id: 1, // Assuming this is a static value or comes from somewhere else
-            sub_category_name: newSubCategory.name,
-            category: newSubCategory.category || formData.category,
-            prefix: newSubCategory.prefix
-          };
-      
-          // Make POST request to the API
-          const response = await axios.post('http://localhost:5000/post/subcategory', data);
-      
-          // Check the response status
-          if (response.status === 201) { // Use 201 instead of 200 for created status
-            // Successfully added the subcategory, close the modal and handle any additional logic (e.g., refresh list)
-            handleCloseModal();
-            console.log('Subcategory added successfully');
-            alert("Data saved successfully:")
+            const data = {
+                subcategory_id: 1, // Assuming this is a static value or comes from somewhere else
+                sub_category_name: newSubCategory.name,
+                category: newSubCategory.category || formData.category,
+                prefix: newSubCategory.prefix
+            };
 
-          } else {
-            // Handle error here (optional)
-            console.error('Error adding subcategory:', response);
-          }
+            // Make POST request to the API
+            const response = await axios.post('http://localhost:5000/post/subcategory', data);
+
+            // Check the response status
+            if (response.status === 201) { // Use 201 instead of 200 for created status
+                // Successfully added the subcategory, close the modal and handle any additional logic (e.g., refresh list)
+                handleCloseModal();
+                console.log('Subcategory added successfully');
+                alert("Data saved successfully:")
+
+            } else {
+                // Handle error here (optional)
+                console.error('Error adding subcategory:', response);
+            }
         } catch (error) {
-          // Handle any errors
-          console.error('Error during API request:', error);
+            // Handle any errors
+            console.error('Error during API request:', error);
         }
-      };
-      
+    };
+
+    const [subCategories, setSubCategories] = useState([]);
+
+    // Fetch the subcategories when the component mounts
+    useEffect(() => {
+        const fetchSubCategories = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/get/subcategories");
+                setSubCategories(response.data); // Assuming the response data is an array of subcategories
+            } catch (error) {
+                console.error("Error fetching subcategories:", error);
+            }
+        };
+
+        fetchSubCategories();
+    }, []);
+
+    useEffect(() => {
+        const getLastPcode = async () => {
+            try {
+                const response = await axios.get(`${baseURL}/last-pbarcode`);
+                const suffix = response.data.lastPCode_BarCode || "001"; // Fallback to "001" if no value is fetched
+                setFormData((prev) => ({
+                    ...prev,
+                    suffix, // Store the fetched suffix
+                    PCode_BarCode: `${prev.item_prefix || ""}${suffix}`, // Combine prefix with fetched suffix
+                }));
+            } catch (error) {
+                console.error("Error fetching last PCode_BarCode:", error);
+            }
+        };
+
+        getLastPcode();
+    }, []);
+
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -346,11 +399,11 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                         label="Sub Category:"
                                                         name="sub_category"
                                                         type="select"
-                                                        value={formData.sub_category || ""}
-                                                        onChange={handleChange}  // Pass the event handler correctly
+                                                        value={formData.sub_category}
+                                                        onChange={handleChange}
                                                         options={subCategories.map((category) => ({
-                                                            value: category.id,
-                                                            label: category.name,
+                                                            value: category.subcategory_id, // Use subcategory_id as the value
+                                                            label: category.sub_category_name, // Use sub_category_name as the label
                                                         }))}
                                                     />
                                                 </div>
@@ -392,14 +445,21 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                         <Row>
 
                                             <Col xs={12} md={2}>
+                                                {/* <InputField
+                                                    label="PCode/BarCode:"
+                                                    name="PCode_BarCode"
+                                                    type="text"
+                                                    value={formData.PCode_BarCode} // Default to formData.PCode_BarCode
+                                                    onChange={handleChange}
+                                                /> */}
                                                 <InputField
                                                     label="PCode/BarCode:"
                                                     name="PCode_BarCode"
-
-                                                    value={newSubCategory.prefix || formData.PCode_BarCode} // Default to formData.PCode_BarCode or use the prefix from the modal
+                                                    type="text"
+                                                    value={formData.PCode_BarCode}
                                                     onChange={handleChange}
-
                                                 />
+
                                             </Col>
 
                                             <Col xs={12} md={2}>
@@ -552,42 +612,42 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
             {/* Modal for adding a new sub category */}
             <Modal show={showModal} onHide={handleCloseModal}>
-      <Modal.Header closeButton>
-        <Modal.Title>Add New Sub Category</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group controlId="subCategoryName">
-            <Form.Label>Sub Category Name</Form.Label>
-            <Form.Control
-              type="text"
-              name="name"
-              value={newSubCategory.name}
-              onChange={handleModalChange}
-              placeholder="Enter sub category name"
-            />
-          </Form.Group>
-          <Form.Group controlId="subCategoryPrefix">
-            <Form.Label>Prefix</Form.Label>
-            <Form.Control
-              type="text"
-              name="prefix"
-              value={newSubCategory.prefix}
-              onChange={handleModalChange}
-              placeholder="Enter prefix"
-            />
-          </Form.Group>
-          <Form.Group controlId="categoryName">
-            <Form.Label>Category</Form.Label>
-            <Form.Control
-              type="text"
-              name="category"
-              value={newSubCategory.category || formData.category}
-              onChange={handleModalChange}
-              placeholder="Enter category"
-            />
-          </Form.Group>
-            {/* <Form.Group controlId="categoryName">
+                <Modal.Header closeButton>
+                    <Modal.Title>Add New Sub Category</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Form.Group controlId="subCategoryName">
+                            <Form.Label>Sub Category Name</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="name"
+                                value={newSubCategory.name}
+                                onChange={handleModalChange}
+                                placeholder="Enter sub category name"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="subCategoryPrefix">
+                            <Form.Label>Prefix</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="prefix"
+                                value={newSubCategory.prefix}
+                                onChange={handleModalChange}
+                                placeholder="Enter prefix"
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="categoryName">
+                            <Form.Label>Category</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="category"
+                                value={newSubCategory.category || formData.category}
+                                onChange={handleModalChange}
+                                placeholder="Enter category"
+                            />
+                        </Form.Group>
+                        {/* <Form.Group controlId="categoryName">
                 <Form.Label>Category</Form.Label>
                 <Form.Control
                     type="text"
@@ -597,17 +657,17 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                    readOnly
                 />
             </Form.Group> */}
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleCloseModal}>
-          Close
-        </Button>
-        <Button variant="primary" onClick={handleAddSubCategory}>
-          Save
-        </Button>
-      </Modal.Footer>
-    </Modal>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleAddSubCategory}>
+                        Save
+                    </Button>
+                </Modal.Footer>
+            </Modal>
 
         </div>
     );
