@@ -143,11 +143,29 @@ const SalesForm = () => {
   };
 
   // Add product to repair details
+  const [isEditing, setIsEditing] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+  
+  // Function to handle editing a product
   const handleAdd = () => {
     setRepairDetails([...repairDetails, { ...formData }]);
     resetProductFields();
-    alert("Product added successfully");
   };
+
+  const handleEdit = (index) => {
+    setEditIndex(index);
+    setFormData(repairDetails[index]); // Populate form with selected item
+  };
+
+  const handleUpdate = () => {
+    const updatedDetails = repairDetails.map((item, index) =>
+      index === editIndex ? { ...formData } : item
+    );
+    setRepairDetails(updatedDetails);
+    setEditIndex(null);
+    resetProductFields();
+  };
+
 
   // Handle product delete
   const handleDelete = (indexToDelete) => {
@@ -306,12 +324,14 @@ const SalesForm = () => {
               handleAdd={handleAdd}
               products={products}
               data={data}
-              isQtyEditable={isQtyEditable}             
+              isQtyEditable={isQtyEditable}  
+              handleUpdate={handleUpdate}
+              isEditing={editIndex !== null}           
             />
           </div>
 
           <div className="sales-form-section">
-            <ProductTable repairDetails={repairDetails}  onDelete={handleDelete}/>
+            <ProductTable repairDetails={repairDetails} onEdit={handleEdit}  onDelete={handleDelete}/>
           </div>
 
           {/* <div className="sales-form2">
