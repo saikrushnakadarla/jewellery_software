@@ -27,6 +27,7 @@ const URDPurchase = () => {
       bill_date: new Date().toISOString().split("T")[0],
       due_date: "",
       category: "",
+      hsn_code: "",
       rbarcode: "",
       pcs: "",
       gross_weight: "",
@@ -47,38 +48,56 @@ const URDPurchase = () => {
   const [editingIndex, setEditingIndex] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  useEffect(() => {
-    const fetchPurityPercentage = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        setPurityOptions(response.data);
-        const purityData = Array.isArray(response.data) ? response.data : [response.data]; // Ensure response is an array
+  // useEffect(() => {
+  //   const fetchPurityPercentage = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/purity`);
+  //       setPurityOptions(response.data);
+  //       const purityData = Array.isArray(response.data) ? response.data : [response.data]; // Ensure response is an array
 
-        console.log("API Data:", purityData); // Log the API data for debugging
+  //       console.log("API Data:", purityData); // Log the API data for debugging
 
-        // Find the matching purity
-        const matchedPurity = purityData.find(
-          (item) => item.name === formData.purity
-        );
+  //       // Find the matching purity
+  //       const matchedPurity = purityData.find(
+  //         (item) => item.name === formData.purity
+  //       );
 
-        if (matchedPurity) {
-          console.log("Matched Purity:", matchedPurity); // Log the matched purity
-          setFormData((prevData) => ({
-            ...prevData,
-            purityPercentage: matchedPurity.purity_percentage,
-          }));
-        } else {
-          console.warn("Purity not found in API data");
-        }
-      } catch (error) {
-        console.error("Error fetching purity data:", error);
-      }
-    };
+  //       if (matchedPurity) {
+  //         console.log("Matched Purity:", matchedPurity); // Log the matched purity
+  //         setFormData((prevData) => ({
+  //           ...prevData,
+  //           purityPercentage: matchedPurity.purity_percentage,
+  //         }));
+  //       } else {
+  //         console.warn("Purity not found in API data");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching purity data:", error);
+  //     }
+  //   };
 
-    fetchPurityPercentage();
-  }, [formData.purity]);
+  //   fetchPurityPercentage();
+  // }, [formData.purity]);
 
   const handleChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+
+    setFormData((prevFormData) => {
+      const updatedFormData = { ...prevFormData, [field]: value };
+
+      // If the category changes, update the hsn_code automatically
+      if (field === "category") {
+        const selectedCategory = categories.find(
+          (category) => category.value === value
+        );
+        if (selectedCategory) {
+          updatedFormData.hsn_code = selectedCategory.hsn_code;  // Set the hsn_code based on the selected category
+        }
+      }
+
+      return updatedFormData;
+    });
+
     setFormData((prev) => {
       const updatedFormData = { ...prev, [field]: value };
 
@@ -166,6 +185,7 @@ const URDPurchase = () => {
     setFormData({
       ...formData, // If necessary, keep persistent fields like mobile, etc.
       category: '',
+      hsn_code: '',
       rbarcode: '',
       pcs: '',
       gross_weight: '',
@@ -344,7 +364,7 @@ const URDPurchase = () => {
     setShowModal(false);
     setSelectedProduct(null);
   };
-  
+
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -401,6 +421,64 @@ const URDPurchase = () => {
 
     fetchLastInvoice();
   }, []);
+
+  const [categories, setCategories] = useState([]);
+  // Fetch categories from the API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/get/products");
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+
+        // Extract unique categories and map them into the required format with purity and hsn_code
+        const categorizedData = data.map((item) => ({
+          value: item.product_name,
+          label: item.product_name,
+          purity: item.purity,
+          hsn_code: item.hsn_code,
+        }));
+
+        // Remove duplicates
+        const uniqueCategories = [
+          ...new Map(categorizedData.map((item) => [item.value, item])).values(),
+        ];
+
+        setCategories(uniqueCategories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+  // Fetch purity options and hsn_code based on the selected category
+  // Update purity options and hsn_code when the category is changed
+  useEffect(() => {
+    const selectedCategory = categories.find(
+      (category) => category.value === formData.category
+    );
+
+    if (selectedCategory) {
+      // Filter purity options based on the selected category
+      const filteredPurityOptions = selectedCategory.purity
+        ? [{ value: selectedCategory.purity, label: selectedCategory.purity }]
+        : [];
+
+      setPurityOptions(filteredPurityOptions);
+
+      // Set hsn_code based on the selected category
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        hsn_code: selectedCategory.hsn_code,  // Set hsn_code automatically
+      }));
+    } else {
+      setPurityOptions([]); // If no category is selected, reset purity options
+    }
+  }, [formData.category, categories]);
+
 
 
   return (
@@ -505,10 +583,15 @@ const URDPurchase = () => {
             <Row>
               <Col xs={12} md={2}>
                 <InputField
-                  label="Category:"
+                  label="Category"
                   name="category"
+                  type="select"
                   value={formData.category}
                   onChange={(e) => handleChange("category", e.target.value)}
+                  options={categories.map((category) => ({
+                    value: category.value,
+                    label: category.label,
+                  }))}
                 />
               </Col>
               <Col xs={12} md={2}>
@@ -517,6 +600,15 @@ const URDPurchase = () => {
                   name="rbarcode"
                   value={formData.rbarcode}
                   onChange={(e) => handleChange("rbarcode", e.target.value)}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="HSN Code"
+                  name="hsn_code"
+                  value={formData.hsn_code}
+                  onChange={handleChange}
+                  readOnly
                 />
               </Col>
               <Col xs={12} md={1}>
@@ -567,10 +659,7 @@ const URDPurchase = () => {
                   name="purity"
                   value={formData.purity}
                   onChange={(e) => handleChange("purity", e.target.value)}
-                  options={purityOptions.map((purity) => ({
-                    value: purity.name,
-                    label: purity.name,
-                  }))}
+                  options={purityOptions}
                 />
               </Col>
 
