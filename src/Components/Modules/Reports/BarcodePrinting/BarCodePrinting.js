@@ -23,13 +23,13 @@ const RepairForm = () => {
         <div className="barcode-form-left">
           {/* Customer Details */}
           <Col className="form-section">
-            <h4 className="mb-2">Customer Details</h4>
+            
             <Row >
               <InputField label="Date" type="date"/>
             </Row>
-            <Row >
+            {/* <Row >
               <InputField label="P Code" />
-            </Row>
+            </Row> */}
             <Row >
               <InputField label="Product Name" />
             </Row>
