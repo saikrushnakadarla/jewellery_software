@@ -17,11 +17,16 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         gross_weight: selectedProduct?.gross_weight || 0,
     });
 
+    const [subCategories, setSubCategories] = useState([]);
+
     const [productOptions, setProductOptions] = useState([]);
     const [formData, setFormData] = useState({
         product_id: selectedProduct.product_id,
         category: "",
         sub_category: "",
+        subcategory_id: "",
+        // subcategory_id: "SB001",
+        product_Name: "",
         Pricing: "",
         Tag_ID: "",
         Prefix: "tag",
@@ -43,7 +48,6 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         Making_Charges_On: "",
         Making_Charges: "",
         Design_Master: selectedProduct.design_name,
-        product_Name: selectedProduct.product_name,
         Weight_BW: "",
     });
 
@@ -159,22 +163,23 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             .catch((error) => console.error("Error fetching products:", error));
     }, []);
 
-    // Handle field changes
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Update the state
         setFormData((prevData) => {
             if (name === "sub_category") {
                 const selectedCategory = subCategories.find(
-                    (category) => category.subcategory_id === parseInt(value)
+                    (category) => category.subcategory_id === parseInt(value) // Ensure correct type match
                 );
+
                 const newPrefix = selectedCategory ? selectedCategory.prefix : "";
+
                 return {
                     ...prevData,
-                    [name]: value,
-                    item_prefix: newPrefix, // Store the prefix separately
-                    PCode_BarCode: `${newPrefix}${prevData.suffix || "001"}`, // Combine prefix with suffix
+                    [name]: selectedCategory ? selectedCategory.sub_category_name : "",
+                    subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
+                    item_prefix: newPrefix,
+                    PCode_BarCode: `${newPrefix}${prevData.suffix || "001"}`,
                 };
             }
 
@@ -183,60 +188,29 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 [name]: value,
             };
         });
-
-        setFormData((prevFormData) => ({
-            ...prevFormData,
-            [name]: value,
-        }));
-
-        if (name === "product_id" && value) {
-            // Fetch details for the selected product ID
-            axios
-                .get(`${baseURL}/get/products/${value}`)
-                .then((response) => {
-                    const product = response.data;
-                    setFormData((prevFormData) => ({
-                        ...prevFormData,
-                        product_id: value,
-                        product_Name: product.product_name,
-                        Design_Master: product.design_master,
-                        Category: product.Category,
-                        Purity: product.purity,
-                    }));
-                })
-                .catch((error) =>
-                    console.error(`Error fetching product details for ID: ${value}`, error)
-                );
-        }
     };
+
+
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        const updatedGrossWeight = productDetails.gross_weight - (parseFloat(formData.Gross_Weight) || 0);
-        const updatedPcs = productDetails.pcs - 1; // Decrement by 1
-
+    
+        // Validate the required fields
+        if (!formData.sub_category || !formData.subcategory_id) {
+            alert("Please select a valid sub-category before submitting.");
+            return;
+        }
+    
+        // Log the selected sub_category and subcategory_id
+        console.log("Selected Sub Category:", formData.sub_category);
+        console.log("Selected Sub Category ID:", formData.subcategory_id);
+    
         try {
-            // Save the form data
             await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
-
-            // Update the gross weight and pieces count
-            await axios.post(`${baseURL}/post/update-values`, {
-                gross_weight: updatedGrossWeight,
-                pieces: updatedPcs,
-                product_id: selectedProduct.product_id, // Store product ID with the data
-            });
-
-            // Update UI with new data
-            setProductDetails((prevDetails) => ({
-                ...prevDetails,
-                pcs: updatedPcs,
-                gross_weight: updatedGrossWeight,
-            }));
-
+    
             alert('Data and updated values saved successfully!');
         } catch (error) {
             if (error.response) {
@@ -249,6 +223,8 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             console.error(error);
         }
     };
+    
+
 
 
     useEffect(() => {
@@ -332,7 +308,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }
     };
 
-    const [subCategories, setSubCategories] = useState([]);
+
 
     // Fetch the subcategories when the component mounts
     useEffect(() => {
@@ -347,6 +323,8 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
         fetchSubCategories();
     }, []);
+
+
 
     useEffect(() => {
         const getLastPcode = async () => {
@@ -406,6 +384,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                             label: category.sub_category_name, // Use sub_category_name as the label
                                                         }))}
                                                     />
+
                                                 </div>
                                                 <AiOutlinePlus
                                                     size={20}
@@ -421,8 +400,8 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             <Col xs={12} md={3}>
                                                 <InputField
                                                     label="Product Name:"
-                                                    name="product_name"
-                                                    value={formData.product_name}
+                                                    name="product_Name"
+                                                    value={formData.product_Name}
                                                     onChange={handleChange}  // Pass the event handler correctly
                                                 />
                                             </Col>
