@@ -55,13 +55,18 @@ const FormWithTable = () => {
     making_on: "",
     dropdown: ""
   });
+
+
+
   const [editingIndex, setEditingIndex] = useState(null);
+
   const [showModal, setShowModal] = useState(false);
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
   const [openTagsEntries, setOpenTagsEntries] = useState([]);
   const navigate = useNavigate();
   const [isMaintainTagsChecked, setIsMaintainTagsChecked] = useState(false);
+
   const [isSellingPriceDisabled, setIsSellingPriceDisabled] = useState(false);
   const [areOtherFieldsDisabled, setAreOtherFieldsDisabled] = useState(false);
 
@@ -387,90 +392,84 @@ const FormWithTable = () => {
   // Save the product and related entries
   const handleSave = async () => {
     try {
-        const { product_name, Category, purity, metal_type_id, design_id } = formData;
-
-        // Check if the product exists
-        const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
-            product_name,
-            Category,
-            purity,
-        });
-
-        if (checkResponse.data.exists) {
-            alert('This category already exists.');
-            return;
-        }
-
-        // Debugging: Log purity and dropdownOptions
-        console.log("Selected purity:", purity);
-        console.log("Dropdown options:", dropdownOptions);
-
-        // Ensure Category and other fields are not empty
-        const updatedFormData = {
-            ...formData,
-            Category: formData.Category || "Gold",
-            purity_id: purity ? dropdownOptions.find(option => option.value === purity)?.id || null : null, // Default to null if not found
-        };
-
-        if (!updatedFormData.purity_id) {
-            alert("Invalid purity selected. Please try again.");
-            return;
-        }
-
-        // Save product details, now including design_id and purity_id
-        const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
-        const { product_id } = productResponse.data;
-
-        // Append product_id to openTagsEntries
-        const entriesWithProductId = openTagsEntries.map((entry) => ({
-            ...entry,
-            product_id,
-            product_Name: product_name,
-        }));
-
-        // Save opening tag entries
-        const saveEntriesPromises = entriesWithProductId.map((entry) =>
-            axios.post(`${baseURL}/post/opening-tags-entry`, entry)
-        );
-
-        await Promise.all(saveEntriesPromises);
-        alert("Category added successfully!");
-
-        // Reset the form fields
-        setFormData({
-            product_name: "",
-            rbarcode: "",
-            Category: "",
-            design_master: "",
-            purity: "",
-            design_id: "",
-            purity_id: "",
-            metal_type_id: "",
-            item_prefix: "",
-            short_name: "",
-            sale_account_head: "Sale",
-            purchase_account_head: "Purchase",
-            status: "",
-            tax_slab: "",
-            tax_slab_id: "",
-            hsn_code: "",
-            op_qty: "0",
-            op_value: "",
-            op_weight: "0",
-            huid_no: "",
-        });
-
-        // Clear the tag entries
-        setOpenTagsEntries([]);
-        // Refresh the window
-        window.location.reload();
-        setIsMaintainTagsChecked(false); // Reset checkbox
+      const { product_name, Category, design_master, purity, metal_type_id, design_id, purity_id } = formData;
+  
+      // Check if the product exists
+      const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
+        product_name,
+        Category,
+        design_master,
+        purity,
+      });
+  
+      if (checkResponse.data.exists) {
+        alert('This product already exists.');
+        return;
+      }
+  
+      // Ensure Category and other fields are not empty
+      const updatedFormData = {
+        ...formData,
+        Category: formData.Category || "Gold",
+        // Use design_id and purity_id from the selected options
+        design_id: design_master ? designOptions.find(option => option.value === design_master)?.id : '',
+        purity_id: purity ? dropdownOptions.find(option => option.value === purity)?.id : '',
+      };
+  
+      // Save product details, now including design_id and purity_id
+      const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
+      const { product_id } = productResponse.data;
+  
+      // Append product_id to openTagsEntries
+      const entriesWithProductId = openTagsEntries.map((entry) => ({
+        ...entry,
+        product_id,
+        product_Name: product_name, // Append product_id to entries
+      }));
+  
+      // Save opening tag entries
+      const saveEntriesPromises = entriesWithProductId.map((entry) =>
+        axios.post(`${baseURL}/post/opening-tags-entry`, entry)
+      );
+  
+      await Promise.all(saveEntriesPromises);
+      alert("Product added successfully!");
+  
+      // Reset the form fields
+      setFormData({
+        product_name: "",
+        rbarcode: "",
+        Category: "",
+        design_master: "",
+        purity: "",
+        design_id: "",
+        purity_id: "",
+        metal_type_id: "",
+        item_prefix: "",
+        short_name: "",
+        sale_account_head: "Sale",
+        purchase_account_head: "Purchase",
+        status: "",
+        tax_slab: "",
+        tax_slab_id: "", // Reset tax_slab_id
+        hsn_code: "",
+        op_qty: "0",
+        op_value: "",
+        op_weight: "0",
+        huid_no: "",
+      });
+  
+      // Clear the tag entries
+      setOpenTagsEntries([]);
+      // Refresh the window
+      window.location.reload();
+      // Reset the checkbox state
+      setIsMaintainTagsChecked(false); // Reset checkbox
     } catch (error) {
-        console.error("Error saving data:", error);
-        alert("Failed to save data. Please try again.");
+      console.error("Error saving data:", error);
+      alert("Failed to save data. Please try again.");
     }
-};
-
+  };
   
 
 
@@ -481,6 +480,26 @@ const FormWithTable = () => {
   const [metalOptions, setmetalOptions] = useState([]);
   const [designOptions, setdesignOptions] = useState([]);
   const [dropdownOptions, setDropdownOptions] = useState([]);
+
+  // Fetch metal types from the API
+  // useEffect(() => {
+  //   const fetchMetalTypes = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/metaltype`);
+  //       const metalTypes = response.data.map(item => ({
+  //         value: item.metal_name, // Assuming the column name is "metal_name"
+  //         label: item.metal_name
+  //       }));
+  //       setmetalOptions(metalTypes);
+  //     } catch (error) {
+  //       console.error('Error fetching metal types:', error);
+  //     }
+  //   };
+
+  //   fetchMetalTypes();
+  // }, []);
+
+  // Fetch metal types on component mount
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
@@ -594,11 +613,11 @@ useEffect(() => {
 
             {/* product details dection */}
             <div className="form-container">
-              <h4 style={{ marginBottom: "15px" }}>Category Details</h4>
+              <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
               <div className="form-row">
 
                 <InputField
-                  label="Category:"
+                  label="Product Name:"
                   name="product_name"
                   value={formData.product_name}
                   onChange={handleChange}
@@ -610,6 +629,16 @@ useEffect(() => {
                   onChange={handleChange}
 
                 />
+
+
+                {/* <InputField
+                  label="Metal Type:"
+                  name="Category"
+                  type="select"
+                  value={formData.Category}
+                  onChange={handleChange}
+                  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+                /> */}
                 <InputField
                   label="Metal Type:"
                   name="Category"
@@ -618,28 +647,31 @@ useEffect(() => {
                   onChange={handleChange}
                   options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
-                {/* <InputField
+                <InputField
                   label="Design Master:"
                   name="design_master"
                   type="select"
                   value={formData.design_master}
                   onChange={handleChange}
+                  // options={designOptions}
                   options={designOptions.map(option => ({ value: option.value, label: option.label }))}
-                /> */}
+                />
+
                 <InputField
                   label="Purity:"
                   name="purity"
                   type="select"
                   value={formData.purity}
                   onChange={handleChange}
+                  // options={dropdownOptions}
                   options={dropdownOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
-                {/* <InputField
+                <InputField
                   label="Item Prefix:"
                   name="item_prefix"
                   value={formData.item_prefix}
                   onChange={handleChange}
-                /> */}
+                />
               </div>
               <div className="form-row">
                 <InputField
@@ -648,6 +680,39 @@ useEffect(() => {
                   value={formData.short_name}
                   onChange={handleChange}
                 />
+                {/* <InputField
+                  label="Sale Account Head:"
+                  name="sale_account_head"
+                  type="select"
+                  value={formData.sale_account_head}
+                  onChange={handleChange}
+                  options={[
+                    { value: "Sales", label: "Sales" },
+                    { value: "Purchase", label: "Purchase" },
+                  ]}
+                />
+                <InputField
+                  label="Purchase Account Head:"
+                  name="purchase_account_head"
+                  type="select"
+                  value={formData.purchase_account_head}
+                  onChange={handleChange}
+                  options={[
+                    { value: "Purchase", label: "Purchase" },
+                    { value: "Sales", label: "Sales" },
+                  ]}
+                /> */}
+                {/* <InputField
+                  label="Status:"
+                  name="status"
+                  type="select"
+                  value={formData.status}
+                  onChange={handleChange}
+                  options={[
+                    { value: "ACTIVE", label: "ACTIVE" },
+                    { value: "INACTIVE", label: "INACTIVE" },
+                  ]}
+                /> */}
                 <InputField
                   label="Tax Slab:"
                   name="tax_slab"
@@ -661,10 +726,354 @@ useEffect(() => {
                   name="hsn_code"
                   value={formData.hsn_code}
                   onChange={handleChange}
-                  readOnly
+                  readOnly // HSN Code should be read-only if auto-filled
                 />
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            </div>
+
+            {/* maintain tags section */}
+            <div className="form-container" style={{ marginTop: "15px" }}>
+              {/* Maintain Tags Section */}
+              <div className="main-tags-row" style={{ marginBottom: "0px", display: "flex" }}>
+                <input
+                  type="checkbox"
+                  id="main-tags"
+                  name="maintain_tags"
+                  style={{ width: "15px", marginTop: "-15px" }}
+                  checked={isMaintainTagsChecked}
+                  onChange={handleCheckboxChange}
+                  value={formData.maintain_tags}
+                />
+                <label htmlFor="main-tags" style={{ marginLeft: "10px" }}>
+                  <h4>Maintain Tags</h4>
+                </label>
+              </div>
+              <div className="form-row" style={{ marginBottom: "-20px" }}>
+                <InputField
+                  label="OP.Qty:"
+                  name="op_qty"
+                  value={formData.op_qty}
+                  onChange={handleChange}
+                  readOnly={isMaintainTagsChecked}
+                  style={maintainTagsStyle}
+                />
+                <InputField
+                  label="OP.Value:"
+                  name="op_value"
+                  value={formData.op_value}
+                  onChange={handleChange}
+                  readOnly={isMaintainTagsChecked}
+                  style={maintainTagsStyle}
+                />
+                <InputField
+                  label="OP.Weight:"
+                  name="op_weight"
+                  value={formData.op_weight}
+                  onChange={handleChange}
+                  readOnly={isMaintainTagsChecked}
+                  style={maintainTagsStyle}
+                />
+                <InputField
+                  label="HUID No:"
+                  name="huid_no"
+                  value={formData.huid_no}
+                  onChange={handleChange}
+                  readOnly={isMaintainTagsChecked}
+                  style={maintainTagsStyle}
+                />
+              </div>
+
+
+            </div>
+          </div>
+
+          {/* Opening Tags Entry Section */}
+          <div className="form-container" style={{ marginTop: "15px" }}>
+            <h4 style={{ marginBottom: "15px" }}>Opening Tags Entry</h4>
+            <form onSubmit={editingIndex !== null ? handleUpdateOpenTagEntry : handleAddOpenTagEntry}>
+              <div className="form-row">
+                <InputField
+                  label="Pricing:"
+                  type="select"
+                  name="Pricing"
+                  value={formData.Pricing}
+                  onChange={handleChange}
+                  options={[
+                    { value: "By Weight", label: "By Weight" },
+                    { value: "By Fixed", label: "By Fixed" },
+                  ]}
+                  readOnly={!isMaintainTagsChecked}
+                />
+
+
+                {/* <InputField
+                  label="Tag ID:"
+                  name="Tag_ID"
+                  type="text"
+                  value={formData.Tag_ID}
+                  onChange={handleChange}
+                  readOnly={!isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                /> */}
+                {/* <InputField
+                  label="Prefix:"
+                  value="Gold"
+                  readOnly
+                  style={openingTagsStyle}
+                /> */}
+                {/* <InputField
+                  label="Purity:"
+                  type="select"
+                  name="Purity"
+                  value={formData.Purity}
+                  onChange={handleChange}
+                  options={[
+                    { value: "916HM", label: "916HM" },
+                    { value: "22K", label: "22K" },
+                    { value: "18K", label: "18K" },
+                  ]}
+                  readOnly={!isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                /> */}
+                <InputField
+                  label="PCode/BarCode:"
+                  name="PCode_BarCode"
+                  type="text"
+                  value={formData.PCode_BarCode}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+                <InputField
+                  label="Gross Weight:"
+                  name="Gross_Weight"
+                  value={formData.Gross_Weight}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+                <InputField
+                  label="Stones Weight:"
+                  name="Stones_Weight"
+                  value={formData.Stones_Weight}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                />
+                <button
+                  type="button"
+                  style={{ backgroundColor: "#a36e29" }}
+                  className="stone-details-btn"
+                  onClick={handleOpenModal}
+                  disabled={isByFixedSelected || !isMaintainTagsChecked}
+                >
+                  Stone Details
+                </button>
+                <InputField
+                  label="Stones Price:"
+                  name="Stones_Price"
+                  value={formData.Stones_Price}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                />
+              </div>
+              <div className="form-row">
+
+
+                <InputField
+                  label="Net Weight:"
+                  name="Weight_BW"
+                  value={formData.Weight_BW}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+                <InputField
+                  label="HUID No:"
+                  name="HUID_No"
+                  value={formData.HUID_No}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+                {/* <InputField
+                  label="Making On:"
+                  type="select"
+                  name="making_on"
+                  value={formData.making_on}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  options={[
+                    { value: "Gross Weight", label: "Gross Weight" },
+                    { value: "Net Weight", label: "Net Weight" },
+                  ]}
+                /> */}
+                <InputField
+                  label="dropdown:"
+                  type="select"
+                  name="dropdown"
+                  value={formData.dropdown}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  options={[
+                    { value: "pc cost(fixed)", label: "pc cost(fixed)" },
+                    { value: "percentage", label: "percentage" },
+                    { value: "pergram", label: "pergram" },
+                  ]}
+                />
+                <InputField
+                  label="Making Charges On:"
+                  type="select"
+                  value={formData.Making_Charges_On}
+                  onChange={handleChange}
+                  name="Making_Charges_On"
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  options={[
+                    { value: "By Weight", label: "By Weight" },
+                    { value: "Fixed", label: "Fixed" },
+                  ]}
+                />
+              </div>
+              <div className="form-row" style={{ marginBottom: '-20px' }}>
+
+                <InputField
+                  label="Wastage On:"
+                  type="select"
+                  name="Wastage_On"
+                  value={formData.Wastage_On}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  options={[
+                    { value: "Gross Weight", label: "Gross Weight" },
+                    { value: "Net Weight", label: "Net Weight" },
+                  ]}
+                />
+                <InputField
+                  label="Wastage %:"
+                  value={formData.Wastage_Percentage}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  name="Wastage_Percentage"
+                />
+                <InputField
+                  label="Wastage Weight:"
+                  name="WastageWeight"
+                  value={formData.WastageWeight}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+                <InputField
+                  label="Total Weight AW:"
+                  name="TotalWeight_AW"
+                  value={formData.TotalWeight_AW}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+
+                <InputField
+                  label="Mc Per Gram:"
+                  name="MC_Per_Gram"
+                  value={formData.MC_Per_Gram}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+                <InputField
+                  label="Making Charges:"
+                  name="Making_Charges"
+                  value={formData.Making_Charges}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                />
+                <InputField
+                  label="Stock Point:"
+                  type="select"
+                  name="Stock_Point"
+                  value={formData.Stock_Point}
+                  onChange={handleChange}
+                  readOnly={isByFixedSelected || !isMaintainTagsChecked}
+                  style={openingTagsStyle}
+                  options={[
+                    { value: "Floor1", label: "Floor1" },
+                    { value: "Floor2", label: "Floor2" },
+                    { value: "strong room", label: "strong room" },
+                  ]}
+                />
+                <InputField
+                  label="Selling price:"
+                  value={formData.selling_price}
+                  onChange={handleChange}
+                  readOnly={!isMaintainTagsChecked || !isByFixedSelected}
+                  style={openingTagsStyle}
+                  name="selling_price"
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={!isMaintainTagsChecked}
+                style={{
+                  backgroundColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
+                  borderColor: isMaintainTagsChecked ? "#a36e29" : "#f5f5f5",
+                  marginLeft: "95%",
+                  marginTop: "15px",
+                  ...openingTagsStyle,
+                }}
+
+              >
+                {editingIndex !== null ? "Update" : "Add"}
+              </button>
+
+
+            </form>
+
+
+
+
+            {/* table Section */}
+            <div style={{ overflowX: "scroll" }}>
+              <table className="table mt-4">
+                <thead>
+                  <tr>
+                    {Object.keys(openTagsEntries[0] || {}).map((key) => (
+                      <th key={key}>{key.replace(/_/g, " ")}</th>
+                    ))}
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {openTagsEntries.map((entry, index) => (
+                    <tr key={index}>
+                      {Object.keys(entry).map((key) => (
+                        <td key={key}>{entry[key]}</td>
+                      ))}
+                      <td>
+                        <button
+                          onClick={() => handleEditOpenTagEntry(index)}
+                          className="btn btn-warning btn-sm"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteOpenTagEntry(index)}
+                          className="btn btn-danger btn-sm"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
               <button
                 type="button"
                 className="cus-back-btn"
@@ -682,11 +1091,12 @@ useEffect(() => {
                 Save
               </button>
             </div>
-            </div>
-           
+            <StoneDetailsModal
+              showModal={showModal}
+              handleCloseModal={handleCloseModal}
+              handleUpdateStoneDetails={handleUpdateStoneDetails}
+            />
           </div>
-          
-
         </div>
       </div>
     </div>
