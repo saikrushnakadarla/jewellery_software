@@ -193,90 +193,38 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
 
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        const currentSuffix = parseInt(formData.suffix || "001", 10);
-        const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
-    
+        // Validate the required fields
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
             return;
         }
     
-        try {
-            // If `prev` is available from the component state, props, or elsewhere:
-            const prev = {
-                item_prefix: "", // Replace this with your actual logic for prev
-            };
+        // Log the selected sub_category and subcategory_id
+        console.log("Selected Sub Category:", formData.sub_category);
+        console.log("Selected Sub Category ID:", formData.subcategory_id);
     
+        try {
             await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
     
             alert('Data and updated values saved successfully!');
-    
-            setFormData({
-                product_id: selectedProduct.product_id,
-              
-                sub_category: "",
-                subcategory_id: "",
-                product_Name: "",
-                Pricing: "",
-                Tag_ID: "",
-                Prefix: "tag",
-                Category: selectedProduct.metal_type,
-                Purity: selectedProduct.purity,
-                PCode_BarCode: `${prev?.item_prefix || ""}${nextSuffix}`,
-                suffix: nextSuffix,
-                Gross_Weight: "",
-                Stones_Weight: "",
-                Stones_Price: "",
-                HUID_No: "",
-                Wastage_On: "",
-                Wastage_Percentage: "",
-                Status: "sold",
-                Source: "Purchase",
-                Stock_Point: "",
-                WastageWeight: "",
-                TotalWeight_AW: "",
-                MC_Per_Gram: "",
-                Making_Charges_On: "",
-                Making_Charges: "",
-                Design_Master: selectedProduct.design_name,
-                Weight_BW: "",
-            });
         } catch (error) {
+            if (error.response) {
+                alert(`Error: ${error.response.data.message || 'Invalid input data'}`);
+            } else if (error.request) {
+                alert('No response received from the server. Please try again.');
+            } else {
+                alert('An error occurred. Please check the console for details.');
+            }
             console.error(error);
-            alert('An error occurred. Please try again.');
         }
     };
     
-    useEffect(() => {
-        const getLastPcode = async () => {
-            try {
-                const response = await axios.get(`${baseURL}/last-pbarcode`);
-                const suffix = response.data.lastPCode_BarCode || "001"; // Fallback to "001" if no value is fetched
-                setFormData((prev) => ({
-                    ...prev,
-                    suffix, // Store the fetched suffix
-                    PCode_BarCode: `${prev.item_prefix || ""}${suffix}`, // Combine prefix with fetched suffix
-                }));
-            } catch (error) {
-                console.error("Error fetching last PCode_BarCode:", error);
-            }
-        };
 
-        getLastPcode();
-    }, []);
 
 
     useEffect(() => {
@@ -378,7 +326,24 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
 
 
- 
+    useEffect(() => {
+        const getLastPcode = async () => {
+            try {
+                const response = await axios.get(`${baseURL}/last-pbarcode`);
+                const suffix = response.data.lastPCode_BarCode || "001"; // Fallback to "001" if no value is fetched
+                setFormData((prev) => ({
+                    ...prev,
+                    suffix, // Store the fetched suffix
+                    PCode_BarCode: `${prev.item_prefix || ""}${suffix}`, // Combine prefix with fetched suffix
+                }));
+            } catch (error) {
+                console.error("Error fetching last PCode_BarCode:", error);
+            }
+        };
+
+        getLastPcode();
+    }, []);
+
 
     return (
         <div style={{ paddingTop: "0px" }}>
