@@ -331,6 +331,12 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }));
     };
 
+    useEffect(() => {
+        if (selectedProduct) {
+          console.log("Product ID:", selectedProduct.product_id); // Use product_id as needed
+        }
+      }, [selectedProduct]);
+
 
     // Handle form submission to add new subcategory
     const handleAddSubCategory = async () => {
