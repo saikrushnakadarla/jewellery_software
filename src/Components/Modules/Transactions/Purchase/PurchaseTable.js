@@ -1,105 +1,76 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import DataTable from '../../../Pages/InputField/TableLayout'; // Reusable DataTable component
 import { Button, Row, Col } from 'react-bootstrap';
 import './PurchaseTable.css';
-import baseURL from "../../../../Url/NodeBaseURL";
+import baseURL from '../../../../Url/NodeBaseURL'; // Update with your base URL setup
 
 const PurchaseTable = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState([]); // State to store table data
+  const [data, setData] = useState([]); // State to store fetched table data
 
+  // Function to format date to DD/MM/YYYY
   const formatDate = (date) => {
-    if (!date) return ''; // Return an empty string if no date is provided
-  
+    if (!date) return '';
     const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');  // Pad single digit days with 0
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Pad months with 0
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    
     return `${day}/${month}/${year}`;
   };
 
+  // Define columns for the DataTable
   const columns = React.useMemo(
     () => [
       { Header: 'Name', accessor: 'account_name' },
+      { Header: 'Customer Id', accessor: 'customer_id' },
       { Header: 'Mobile', accessor: 'mobile' },
-      { Header: 'Email', accessor: 'email' },
-      // { Header: 'A/C Address:', accessor: 'address1' },
-      // { Header: 'Address 2', accessor: 'address2' },
-      // { Header: 'City', accessor: 'city' },
-      // { Header: 'Pincode', accessor: 'pincode' },
-      // { Header: 'State', accessor: 'state' },
-      // { Header: 'State Code', accessor: 'state_code' },
-      // { Header: 'Aadhar Card', accessor: 'aadhar_card' },
-      // { Header: 'GSTIN', accessor: 'gst_in' },
-      // { Header: 'PAN Card', accessor: 'pan_card' },
-      // { Header: 'Indent', accessor: 'indent' },
-      // { Header: 'Bill No:', accessor: 'bill_no' },
-      // { Header: 'Type', accessor: 'type' },
-      // { Header: 'Rate Cut', accessor: 'rate_cut' },
-      { Header: 'Date', accessor: 'date',Cell: ({ value }) => <span>{formatDate(value)}</span>, },
-      { Header: 'Bill Date:', accessor: 'bill_date',Cell: ({ value }) => <span>{formatDate(value)}</span>, },
-      { Header: 'Due Date', accessor: 'due_date',Cell: ({ value }) => <span>{formatDate(value)}</span>, },
-      // { Header: 'Purchase Rate', accessor: 'Purchase_rate' },
-      // { Header: 'Product ID', accessor: 'product_id' },
-      { Header: 'Product Name', accessor: 'product_name' },
-      { Header: 'Metal Type', accessor: 'metal_type' },
-      { Header: 'Design Name', accessor: 'design_name' },
-      { Header: 'Purity', accessor: 'purity' },
-      // { Header: 'HSN', accessor: 'hsn' },
-      // { Header: 'Product Type', accessor: 'product_type' },
-      // { Header: 'Stock Type', accessor: 'stock_type' },
-      // { Header: 'Pcs', accessor: 'pcs' },
+      { Header: 'GST IN', accessor: 'gst_in' },
+      { Header: 'Terms', accessor: 'terms' },
+      { Header: 'Invoice', accessor: 'invoice' },
+      { Header: 'Bill No', accessor: 'bill_no' },
+      { Header: 'Rate Cut', accessor: 'rate_cut' },
+      { Header: 'Date', accessor: 'date', Cell: ({ value }) => <span>{formatDate(value)}</span> },
+      { Header: 'Bill Date', accessor: 'bill_date', Cell: ({ value }) => <span>{formatDate(value)}</span> },
+      { Header: 'Due Date', accessor: 'due_date', Cell: ({ value }) => <span>{formatDate(value)}</span> },
+      { Header: 'Category', accessor: 'category' },
+      { Header: 'Barcode', accessor: 'rbarcode' },
+      { Header: 'Pcs', accessor: 'pcs' },
       { Header: 'Gross Weight', accessor: 'gross_weight' },
       { Header: 'Stone Weight', accessor: 'stone_weight' },
-      // { Header: 'Net Weight', accessor: 'net_weight' },
-      // { Header: 'Nit Weight', accessor: 'nit_weight' },
-      // { Header: 'Waste Percentage', accessor: 'waste_percentage' },
-      // { Header: 'Waste Amount', accessor: 'waste_amount' },
-      // { Header: 'Pure Weight', accessor: 'pure_weight' },
-      // { Header: 'Alloy', accessor: 'alloy' },
-      // { Header: 'Cost', accessor: 'cost' },
-      // { Header: 'Total Weight', accessor: 'total_weight' },
-      // { Header: 'WT*Rate Amount', accessor: 'wt_rate_amount' },
-      // { Header: 'MC/GM', accessor: 'mc_per_gram' },
-      // { Header: 'MC', accessor: 'mc' },
-      // { Header: 'Stone Amount', accessor: 'stone_amount' },
-      // { Header: 'Total Amount', accessor: 'total_amount' },
-      // { Header: 'Stone', accessor: 'stone' },
-      // { Header: 'Stone Pcs', accessor: 'stone_pcs' },
-      // { Header: 'Stone CT', accessor: 'stone_ct' },
-      // { Header: 'CWP', accessor: 'cwp' },
-      // { Header: 'GMS', accessor: 'gms' },
-      // { Header: 'Stone Rate', accessor: 'stone_rate' },
-      // { Header: 'Clarity', accessor: 'clarity' },
-      // { Header: 'Rate', accessor: 'rate' },
-      // { Header: 'Clear', accessor: 'clear' },
-      // { Header: 'Class', accessor: 'class' },
-      // { Header: 'Cut', accessor: 'cut' },
-      // { Header: 'Action', accessor: 'action' },
+      { Header: 'Net Weight', accessor: 'net_weight' },
+      { Header: 'HM Charges', accessor: 'hm_charges' },
+      { Header: 'Other Charges', accessor: 'other_charges' },
+      { Header: 'Total Charges', accessor: 'charges' },
+      { Header: 'Purity', accessor: 'purity' },
+      { Header: 'Pure Weight', accessor: 'pure_weight' },
+      { Header: 'Rate', accessor: 'rate' },
+      { Header: 'Total Amount', accessor: 'total_amount' },
     ],
     []
   );
-  
+
+  // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${baseURL}/get/purchases`); // Fetch data from the endpoint
+        const response = await fetch(`${baseURL}/get/purchases`);
         const result = await response.json();
-        if (result?.purchases) {
-          setData(result.purchases); // Set fetched data
+        if (result) {
+          setData(result); // Assuming API returns an array of purchases
+        } else {
+          console.error('Unexpected data structure:', result);
         }
       } catch (error) {
-        console.error('Error fetching payments:', error);
+        console.error('Error fetching purchases:', error);
       }
     };
     fetchData();
   }, []);
 
+  // Handle navigation to the Create Purchase page
   const handleCreate = () => {
-    navigate('/purchase'); // Navigate to the /suppliers page
+    navigate('/purchase'); // Update with your correct route
   };
 
   return (
@@ -107,13 +78,17 @@ const PurchaseTable = () => {
       <div className="purchase-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Purchase</h3>
-            <Button  className='create_but' onClick={handleCreate} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+            <h3>Purchases</h3>
+            <Button
+              className="create_but"
+              onClick={handleCreate}
+              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+            >
               + Create
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={[...data].reverse()} />
       </div>
     </div>
   );
