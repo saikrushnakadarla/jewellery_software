@@ -27,6 +27,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         subcategory_id: "",
         // subcategory_id: "SB001",
         product_Name: "",
+        design_master: "",
         Pricing: "",
         Tag_ID: "",
         Prefix: "tag",
@@ -203,33 +204,34 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         const currentSuffix = parseInt(formData.suffix || "001", 10);
         const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
-    
+
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
             return;
         }
-    
+
         try {
             // If `prev` is available from the component state, props, or elsewhere:
             const prev = {
                 item_prefix: "", // Replace this with your actual logic for prev
             };
-    
+
             await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
-    
+
             alert('Data and updated values saved successfully!');
-    
+
             setFormData({
                 product_id: selectedProduct.product_id,
-              
+
                 sub_category: "",
                 subcategory_id: "",
                 product_Name: "",
+                design_master: "",
                 Pricing: "",
                 Tag_ID: "",
                 Prefix: "tag",
@@ -259,7 +261,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             alert('An error occurred. Please try again.');
         }
     };
-    
+
     useEffect(() => {
         const getLastPcode = async () => {
             try {
@@ -376,9 +378,29 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         fetchSubCategories();
     }, []);
 
+  const [designOptions, setdesignOptions] = useState([]);
 
-
- 
+ // Fetch design master options from the API
+ useEffect(() => {
+    const fetchDesignMaster = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/designmaster`);
+        const designMasters = response.data.map((item) => {
+          console.log('Design ID:', item.design_id); // Log design_id
+          return {
+            value: item.design_name, // Assuming the column name is "design_name"
+            label: item.design_name,
+            id: item.design_id, // Assuming the column name is "design_id"
+          };
+        });
+        setdesignOptions(designMasters);
+      } catch (error) {
+        console.error('Error fetching design masters:', error);
+      }
+    };
+  
+    fetchDesignMaster();
+  }, []);
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -432,7 +454,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     }}
                                                 />
                                             </Col>
-                                            <Col xs={12} md={3}>
+                                            <Col xs={12} md={2}>
                                                 <InputField
                                                     label="Product Name:"
                                                     name="product_Name"
@@ -440,8 +462,18 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     onChange={handleChange}  // Pass the event handler correctly
                                                 />
                                             </Col>
-
-                                            <Col xs={12} md={3}>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Design Master:"
+                                                    name="design_master"
+                                                    type="select"
+                                                    value={formData.design_master}
+                                                    onChange={handleChange}
+                                                    // options={designOptions}
+                                                    options={designOptions.map(option => ({ value: option.value, label: option.label }))}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
                                                 <InputField
                                                     label="Pricing:"
                                                     name="Pricing"
