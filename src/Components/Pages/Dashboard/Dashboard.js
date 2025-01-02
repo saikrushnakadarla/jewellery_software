@@ -2,6 +2,7 @@ import React from 'react';
 import './Dashboard.css';
 import Repairs from './Repairs';
 import Customers from './Customers';
+import CustomerDashboard from './CustomerDashboard'
 
 function Dashboard() {
   return (
@@ -23,6 +24,9 @@ function Dashboard() {
           </div>
         </div>
       </div>
+      {/* <div className="dashboard_main-container">
+      <CustomerDashboard />
+      </div> */}
       <div className="dashboard-customers-row">
         <div className="dashboard-customers-container">
           <h2 className="dashboard-section-title">TOP CUSTOMERS</h2>

@@ -13,7 +13,8 @@ const RepairForm = () => {
   const location = useLocation();
   const { id } = useParams();
   const [formData, setFormData] = useState({
-    name: "",
+    customer_id:"",
+    account_name: "",
     mobile: "",
     email: "",
     address1: "",

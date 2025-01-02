@@ -37,8 +37,8 @@ const RepairsTable = () => {
         accessor: 'repair_no',
       },
       {
-        Header: 'Name',
-        accessor: 'name',
+        Header: 'Customer Name',
+        accessor: 'account_name',
       },
       {
         Header: 'Mobile',
@@ -48,34 +48,6 @@ const RepairsTable = () => {
         Header: 'Email',
         accessor: 'email',
       },
-      // {
-      //   Header: 'Address 1',
-      //   accessor: 'address1',
-      // },
-      // {
-      //   Header: 'Address 2',
-      //   accessor: 'address2',
-      // },
-      // {
-      //   Header: 'Staff',
-      //   accessor: 'staff',
-      // },
-      // {
-      //   Header: 'Delivery Date',
-      //   accessor: 'delivery_date',
-      //   Cell: ({ value }) => {
-      //     const date = new Date(value);
-      //     return date.toLocaleDateString('en-GB'); // 'en-GB' formats as dd/mm/yyyy
-      //   },
-      // },
-      // {
-      //   Header: 'Place',
-      //   accessor: 'place',
-      // },
-      // {
-      //   Header: 'Counter',
-      //   accessor: 'counter',
-      // },
       {
         Header: 'Entry Type',
         accessor: 'entry_type',

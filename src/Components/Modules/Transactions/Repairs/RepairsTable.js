@@ -107,7 +107,7 @@ const handlePopoverToggle = (event, repairId) => {
   const columns = React.useMemo(
     () => [
       { Header: 'Repair No', accessor: 'repair_no' },
-      { Header: 'Customer Name', accessor: 'name' },
+      { Header: 'Customer Name', accessor: 'account_name' },
       { Header: 'Mobile', accessor: 'mobile' },
       { Header: 'Email', accessor: 'email' },
       { Header: 'Entry Type', accessor: 'entry_type' },
