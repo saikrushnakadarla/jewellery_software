@@ -31,8 +31,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         Pricing: "",
         Tag_ID: "",
         Prefix: "", // Default value
-        Category: selectedProduct.metal_type,
+        // Category: selectedProduct.metal_type,
         Purity: selectedProduct.purity,
+        metal_type: selectedProduct.metal_type,
         PCode_BarCode: "",
         Gross_Weight: "",
         Stones_Weight: "",
@@ -381,7 +382,8 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
     useEffect(() => {
         if (selectedProduct) {
-            console.log("Product ID:", selectedProduct.product_id); // Use product_id as needed
+            console.log("Product ID:", selectedProduct.product_id); 
+            console.log("Product ID:", selectedProduct.metal_type); // Use product_id as needed
         }
     }, [selectedProduct]);
 

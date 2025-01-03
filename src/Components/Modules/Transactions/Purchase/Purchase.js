@@ -38,6 +38,7 @@ const URDPurchase = () => {
       other_charges: "",
       charges: "",
       purity: "",
+      metal_type:"",
       pure_weight: "",
       rate: "",
       total_amount: "",
@@ -48,6 +49,7 @@ const URDPurchase = () => {
   const [showModal1, setShowModal] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   // useEffect(() => {
   //   const fetchPurityPercentage = async () => {
@@ -356,13 +358,10 @@ const URDPurchase = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [showModal1]);
 
-
-
   const handleCloseModal1 = () => {
     setShowModal(false);
     setSelectedProduct(null);
   };
-
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -421,9 +420,6 @@ const URDPurchase = () => {
     fetchLastInvoice();
   }, []);
 
-  const [categories, setCategories] = useState([]);
-  // Fetch categories from the API
-  // Fetch categories from the API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -549,11 +545,13 @@ const URDPurchase = () => {
             setProductIdAndRbarcode({
               product_id: matchingProduct.product_id,
               rbarcode: matchingProduct.rbarcode,
+              metal_type:matchingProduct.Category,
             });
             setFormData((prevFormData) => ({
               ...prevFormData,
               product_id: matchingProduct.product_id, // Add product_id here
               rbarcode: matchingProduct.rbarcode,    // Ensure rbarcode is also updated
+              metal_type:matchingProduct.Category,
             }));
 
             // Log success to console
@@ -830,6 +828,7 @@ const URDPurchase = () => {
                     <th>HM Charges</th>
                     <th>Other Charges</th>
                     <th>Charges</th>
+                    <th>Metal Type</th>
                     <th>Purity</th>
                     <th>Pure Wt</th>
                     <th>Rate</th>
@@ -850,6 +849,7 @@ const URDPurchase = () => {
                       <td>{data.hm_charges}</td>
                       <td>{data.other_charges}</td>
                       <td>{data.charges}</td>
+                      <td>{data.metal_type}</td>
                       <td>{data.purity}</td>
                       <td>{data.pure_weight}</td>
                       <td>{data.rate}</td>

@@ -32,9 +32,51 @@ const RepairForm = () => {
 
   const navigate = useNavigate();
   const [isQtyEditable, setIsQtyEditable] = useState(false);
+  const [uniqueProducts, setUniqueProducts] = useState([]); 
+  const [metalTypes, setMetalTypes] = useState([]);
+  const [designmaster, setDesignMaster] = useState([]);
+  const [purity, setPurity] = useState([]);
+
+  const fetchMetalTypes = async () => {
+    try {
+      const response = await fetch(`${baseURL}/metaltype`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const result = await response.json();
+      setMetalTypes(result);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const fetchDesignMaster = async () => {
+    try {
+      const response = await fetch(`${baseURL}/designmaster`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const result = await response.json();
+      setDesignMaster(result);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const fetchPurity = async () => {
+    try {
+      const response = await fetch(`${baseURL}/purity`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+      const result = await response.json();
+      setPurity(result);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
 
 
-  useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(`${baseURL}/get/products`);
@@ -52,12 +94,19 @@ const RepairForm = () => {
       try {
         const response = await fetch(`${baseURL}/get/opening-tags-entry`);
         if (!response.ok) {
-          throw new Error('Failed to fetch tags');
+          throw new Error("Failed to fetch tags");
         }
         const result = await response.json();
-        setData(result.result);
+    
+        // Remove duplicate product_Name entries
+        const uniqueProductNames = Array.from(
+          new Map(result.result.map((prod) => [prod.product_Name, prod])).values()
+        );
+    
+        setData(result.result); // Set the full data
+        setUniqueProducts(uniqueProductNames); // Set unique product_Name options
       } catch (error) {
-        console.error('Error fetching tags:', error);
+        console.error("Error fetching tags:", error);
       }
     };
 
@@ -76,10 +125,13 @@ const RepairForm = () => {
         console.error('Error fetching customers:', error);
       }
     };
-
+  useEffect(() => {
     fetchProducts();
     fetchTags();
     fetchCustomers();
+    fetchMetalTypes();
+    fetchDesignMaster();
+    fetchPurity();
   }, []);
 
   const handleChange = (e) => {
@@ -146,117 +198,111 @@ const RepairForm = () => {
   //   }
   // };
   
-  // const handleProductNameChange = (productName) => {
-  //   const product = products.find((prod) => String(prod.product_name) === String(productName));
+  const handleProductNameChange = (productName) => {
+    const product = data.find((prod) => String(prod.product_Name) === String(productName));
 
-  //   if (product) {
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-
-  //       code: product.rbarcode,
-
-  //       product_id: product.product_id || "",
-  //       product_name: product.product_name || "",
-  //       metal_type: product.Category || "",
-  //       design_name: product.design_master || "",
-  //       purity: product.purity || "",
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode,
+        product_id: product.product_id || "",
+        product_name: product.product_Name || "",        
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
         
-  //     }));
-  //   } else {
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       code: "",
-  //       product_id: "",
-  //       product_name: "",
-  //       metal_type: "",
-  //       design_name: "",
-  //       purity: "",
-        
-  //     }));
-  //   }
-  // };
+      }));
+    }
+  };
 
-  // const handleProductChange = (productId) => {
-  //   const product = products.find((prod) => String(prod.product_id) === String(productId));
+  const handleProductChange = (productId) => {
+    const product = products.find((prod) => String(prod.product_id) === String(productId));
   
-  //   if (product) {
-  //     // Find the corresponding tag entry from the open-tags-entry
-  //     const tag = data.find((tag) => String(tag.product_id) === String(productId));
+    if (product) {
+      // Find the corresponding tag entry from the open-tags-entry
+      const tag = data.find((tag) => String(tag.product_id) === String(productId));
       
-  //     // If tag is found, populate the form with the tag's details
-  //     if (tag) {
-  //       setFormData((prevData) => ({
-  //         ...prevData,
-  //         code: product.rbarcode, // Priority to tag code if available
-  //         product_id: product.product_id,
-  //         product_name: product.product_name,
-  //         metal_type: product.Category,
-  //         design_name: product.design_master,
-  //         purity: product.purity,
-  //         gross_weight: "", // Use tag's gross weight
-  //         stone_weight: "",
-  //         stone_price:"",
-  //         weight_bw: "",
-  //         va_on: "",
-  //         va_percent:  "",
-  //         wastage_weight: "",
-  //         total_weight_aw: "",
-  //         mc_on: "",
-  //         mc_per_gram: "",
-  //         making_charges: "",
-  //       }));
-  //     } else {
-  //       // If no tag is found, just fill product details
-  //       setFormData((prevData) => ({
-  //         ...prevData,
-  //         code: product.rbarcode,
-  //         product_id: product.product_id,
-  //         product_name: product.product_name,
-  //         metal_type: product.Category,
-  //         design_name: product.design_master,
-  //         purity: product.purity,
-  //         gross_weight: "",
-  //         stone_weight: "",
-  //         stone_price: "",
-  //         weight_bw: "",
-  //         va_on: "",
-  //         va_percent: "",
-  //         wastage_weight: "",
-  //         total_weight_aw: "",
-  //         mc_on: "",
-  //         mc_per_gram: "",
-  //         making_charges: "",
-  //       }));
-  //     }
-  //   } else {
-  //     // Reset form data if no product is selected
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       code: "",
-  //       product_id: "",
-  //       product_name: "",
-  //       metal_type: "",
-  //       design_name: "",
-  //       purity: "",
-  //       gross_weight: "",
-  //       stone_weight: "",
-  //       stone_price: "",
-  //       weight_bw: "",
-  //       va_on: "",
-  //       va_percent: "",
-  //       wastage_weight: "",
-  //       total_weight_aw: "",
-  //       mc_on: "",
-  //       mc_per_gram: "",
-  //       making_charges: "",
-  //       rate: "",
-  //       rate_amt: "",
-  //       tax_percent: "",
-  //       tax_amt: "",
-  //       total_price: "",
-  //     }));
-  //   }
-  // };
+      // If tag is found, populate the form with the tag's details
+      if (tag) {
+        setFormData((prevData) => ({
+          ...prevData,
+          code: product.rbarcode, // Priority to tag code if available
+          product_id: product.product_id,
+          product_name: product.product_name,
+          metal_type: product.Category,
+          design_name: product.design_master,
+          purity: product.purity,
+          gross_weight: "", // Use tag's gross weight
+          stone_weight: "",
+          stone_price:"",
+          weight_bw: "",
+          va_on: "",
+          va_percent:  "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gram: "",
+          making_charges: "",
+        }));
+      } else {
+        // If no tag is found, just fill product details
+        setFormData((prevData) => ({
+          ...prevData,
+          code: product.rbarcode,
+          product_id: product.product_id,
+          product_name: product.product_name,
+          metal_type: product.Category,
+          design_name: product.design_master,
+          purity: product.purity,
+          gross_weight: "",
+          stone_weight: "",
+          stone_price: "",
+          weight_bw: "",
+          va_on: "",
+          va_percent: "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gram: "",
+          making_charges: "",
+        }));
+      }
+    } else {
+      // Reset form data if no product is selected
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        gross_weight: "",
+        stone_weight: "",
+        stone_price: "",
+        weight_bw: "",
+        va_on: "",
+        va_percent: "",
+        wastage_weight: "",
+        total_weight_aw: "",
+        mc_on: "",
+        mc_per_gram: "",
+        making_charges: "",
+        rate: "",
+        rate_amt: "",
+        tax_percent: "",
+        tax_amt: "",
+        total_price: "",
+      }));
+    }
+  };
   
   const handleBarcodeChange = async (code) => {
     try {
@@ -390,7 +436,7 @@ const RepairForm = () => {
       console.error("Error handling code change:", error);
     }
   };
-  
+
   return (
     <div className="main-container">
       <Container className="sales-form-container">
@@ -453,30 +499,30 @@ const RepairForm = () => {
             label: product.product_id,
           }))}
         />
-      </Col>
+      </Col> */}
       <Col xs={12} md={3}>
-        <InputField
-          label="Product Name"
-          name="product_name"
-          value={formData.product_name}
-          onChange={(e) => handleProductNameChange(e.target.value)}
-          type="select"
-          options={products.map((product) => ({
-            value: product.product_name,
-            label: product.product_name,
-          }))}
-        />
+      <InputField
+        label="Product Name"
+        name="product_name"
+        value={formData.product_name}
+        onChange={(e) => handleProductNameChange(e.target.value)}
+        type="select"
+        options={uniqueProducts.map((prod) => ({
+          value: prod.product_Name,
+          label: prod.product_Name,
+        }))}
+      />
       </Col>
       <Col xs={12} md={2}>
         <InputField
           label="Metal Type"
           name="metal_type"
           value={formData.metal_type}
-          onChange={(e) => handleMetalTypeChange(e.target.value)}                    
+          onChange={handleChange}                    
           type="select"
-          options={products.map((product) => ({
-            value: product.Category,
-            label: product.Category,
+          options={metalTypes.map((metalType) => ({
+            value: metalType.metal_name,
+            label: metalType.metal_name,
           }))}                    
         />
       </Col>
@@ -485,24 +531,29 @@ const RepairForm = () => {
           label="Design Name"
           name="design_name"
           value={formData.design_name}
-          onChange={(e) => handleDesignNameChange(e.target.value)}
+          onChange={handleChange}
           type="select"
-          options={products.map((product) => ({
-            value: product.design_master,
-            label: product.design_master,
+          options={designmaster.map((designMaster) => ({
+            value: designMaster.design_name,
+            label: designMaster.design_name,
           }))}
         />
       </Col>
-      <Col xs={12} md={1}>
+      <Col xs={12} md={2}>
         <InputField
           label="Purity"
           name="purity"
           value={formData.purity}
           onChange={handleChange}
-          readOnly
+          type="select"
+          options={purity.map((purity) => ({
+            value: purity.name,
+            label: purity.name,
+          }))}
         />
-      </Col> */}
-      <Col xs={12} md={2}>
+      </Col>
+
+      {/* <Col xs={12} md={2}>
         <InputField
           label="P ID"
           name="product_id"
@@ -546,7 +597,7 @@ const RepairForm = () => {
           onChange={handleChange}
           readOnly
         />
-      </Col>
+      </Col> */}
       <Col xs={12} md={1}>
         <InputField
           label="Gross Wt"
