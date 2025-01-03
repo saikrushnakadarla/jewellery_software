@@ -320,7 +320,11 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     //         setShowModal(false);
     //     };
 
-    const [newSubCategory, setNewSubCategory] = useState({ name: "", prefix: "" });
+    const [newSubCategory, setNewSubCategory] = useState({
+        name: '',
+        prefix: '',
+        category: ''
+    });
     const [isSubCategoryAdded, setIsSubCategoryAdded] = useState(false);
     // Handle input field changes in modal
     const handleModalChange = (e) => {
@@ -342,37 +346,44 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const handleAddSubCategory = async () => {
         try {
             const data = {
-                category_id:selectedProduct.product_id,
+                category_id: selectedProduct.product_id,
                 subcategory_id: 1, // Assuming this is a static value or comes from somewhere else
                 sub_category_name: newSubCategory.name,
                 category: newSubCategory.category || formData.category,
                 prefix: newSubCategory.prefix
             };
-
+    
             // Make POST request to the API
             const response = await axios.post('http://localhost:5000/post/subcategory', data);
-
-            // Check the response status
+    
             if (response.status === 201) { // Use 201 instead of 200 for created status
-                // Successfully added the subcategory, close the modal and handle any additional logic (e.g., refresh list)
+                // Successfully added the subcategory
                 handleCloseModal();
                 console.log('Subcategory added successfully');
-                alert("Data saved successfully:")
-
+                alert("Data saved successfully");
+    
+                // Clear the form
+                setNewSubCategory({
+                    name: '',
+                    prefix: '',
+                    category: ''
+                });
+    
+                // Refresh the subcategory list
+                fetchSubCategories();
             } else {
-                // Handle error here (optional)
                 console.error('Error adding subcategory:', response);
             }
         } catch (error) {
-            // Handle any errors
             console.error('Error during API request:', error);
         }
     };
+    
 
 
 
     // Fetch the subcategories when the component mounts
-    useEffect(() => {
+
         const fetchSubCategories = async () => {
             try {
                 const response = await axios.get("http://localhost:5000/get/subcategories");
@@ -381,7 +392,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 console.error("Error fetching subcategories:", error);
             }
         };
-
+    useEffect(() => {
         fetchSubCategories();
     }, []);
 
@@ -638,9 +649,10 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     value={formData.Stock_Point}
                                                     onChange={handleChange}
                                                     options={[
-                                                        { value: "Main Store", label: "Main Store" },
-                                                        { value: "Secondary Store", label: "Secondary Store" },
-                                                    ]}
+                                                        { value: "Floor1", label: "Floor1" },
+                                                        { value: "Floor2", label: "Floor2" },
+                                                        { value: "Strong room", label: "Strong room" },
+                                                      ]}
                                                 />
                                             </Col>
                                         </Row>
