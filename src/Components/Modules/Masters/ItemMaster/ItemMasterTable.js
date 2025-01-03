@@ -193,7 +193,7 @@ const [taxOptions, setTaxOptions] = useState([]);
       // { Header: 'Sale Account Head', accessor: 'sale_account_head' },
       // { Header: 'Purchase Account Head:', accessor: 'purchase_account_head' },
       { Header: 'Tax Slab', accessor: 'tax_slab' },
-      // { Header: 'HSN Code', accessor: 'hsn_code' },
+      { Header: 'HSN Code', accessor: 'hsn_code' },
       // { Header: 'Maintain Tags', accessor: 'maintain_tags' },
       // { Header: 'OP. Qty', accessor: 'op_qty' },
       // { Header: 'OP. Value:', accessor: 'op_value' },
