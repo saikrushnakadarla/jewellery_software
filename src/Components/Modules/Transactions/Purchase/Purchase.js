@@ -14,6 +14,7 @@ const URDPurchase = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
+  const [productIdAndRbarcode, setProductIdAndRbarcode] = useState({});
   const [formData, setFormData] = useState(
     {
       mobile: "",
@@ -355,10 +356,7 @@ const URDPurchase = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [showModal1]);
 
-  const handleOpenModal = (data) => {
-    setSelectedProduct(data);
-    setShowModal(true);
-  };
+
 
   const handleCloseModal1 = () => {
     setShowModal(false);
@@ -389,21 +387,21 @@ const URDPurchase = () => {
     fetchCurrentRates();
   }, []);
 
-  useEffect(() => {
-    const fetchLastRbarcode = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/lastRbarcode`);
-        setFormData((prev) => ({
-          ...prev,
-          rbarcode: response.data.lastrbNumbers,
-        }));
-      } catch (error) {
-        console.error("Error fetching estimate number:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchLastRbarcode = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/lastRbarcode`);
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         rbarcode: response.data.lastrbNumbers,
+  //       }));
+  //     } catch (error) {
+  //       console.error("Error fetching estimate number:", error);
+  //     }
+  //   };
 
-    fetchLastRbarcode();
-  }, []);
+  //   fetchLastRbarcode();
+  // }, []);
 
 
   useEffect(() => {
@@ -491,6 +489,68 @@ const URDPurchase = () => {
     }
   }, [formData.category]);
 
+
+
+
+  useEffect(() => {
+    if (formData.category && formData.purity) {
+      // Fetch data from API
+      axios
+        .get("http://localhost:5000/get/products")
+        .then((response) => {
+          const products = response.data;
+
+          // Filter the products matching both category and purity
+          const matchingProduct = products.find(
+            (product) =>
+              product.product_name === formData.category &&
+              product.purity === formData.purity
+          );
+
+          // Update the product ID and rbarcode
+          if (matchingProduct) {
+            setProductIdAndRbarcode({
+              product_id: matchingProduct.product_id,
+              rbarcode: matchingProduct.rbarcode,
+            });
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              product_id: matchingProduct.product_id, // Add product_id here
+              rbarcode: matchingProduct.rbarcode,    // Ensure rbarcode is also updated
+            }));
+
+            // Log success to console
+            console.log(
+              `Fetched product details: Product ID = ${matchingProduct.product_id}, Rbarcode = ${matchingProduct.rbarcode}`
+            );
+          } else {
+            setProductIdAndRbarcode({});
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              product_id: '', // Reset product_id if no match
+              rbarcode: '',   // Reset rbarcode if no match
+            }));
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching product details:", error);
+        });
+    } else {
+      // Reset if category or purity is not selected
+      setProductIdAndRbarcode({});
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        product_id: '', // Reset product_id
+        rbarcode: '',   // Reset rbarcode
+      }));
+    }
+  }, [formData.category, formData.purity]);
+
+
+  const handleOpenModal = (data) => {
+    setSelectedProduct(data);
+    setShowModal(true);
+  };
 
   return (
     <div className="main-container">
@@ -609,7 +669,7 @@ const URDPurchase = () => {
                 <InputField
                   label="Rbarcode"
                   name="rbarcode"
-                  value={formData.rbarcode}
+                  value={productIdAndRbarcode.rbarcode}
                   onChange={(e) => handleChange("rbarcode", e.target.value)}
                 />
               </Col>
@@ -673,7 +733,6 @@ const URDPurchase = () => {
                   options={purityOptions}
                 />
               </Col>
-
               <Col xs={12} md={1}>
 
                 <InputField
@@ -723,6 +782,7 @@ const URDPurchase = () => {
               <Table striped bordered hover className="mt-4">
                 <thead>
                   <tr>
+                    <th>product_id</th>
                     <th>Rbarcode</th>
                     <th>Category</th>
                     <th>Pieces</th>
@@ -742,6 +802,7 @@ const URDPurchase = () => {
                 <tbody>
                   {tableData.map((data, index) => (
                     <tr key={index}>
+                      <td>{data.product_id}</td> {/* Display product_id */}
                       <td>{data.rbarcode}</td>
                       <td>{data.category}</td>
                       <td>{data.pcs}</td>
@@ -782,6 +843,7 @@ const URDPurchase = () => {
                     </tr>
                   ))}
                 </tbody>
+
               </Table>
             </div>
           </div>
