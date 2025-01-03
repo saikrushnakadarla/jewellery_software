@@ -387,6 +387,7 @@ const URDPurchase = () => {
     fetchCurrentRates();
   }, []);
 
+
   // useEffect(() => {
   //   const fetchLastRbarcode = async () => {
   //     try {
@@ -422,6 +423,7 @@ const URDPurchase = () => {
 
   const [categories, setCategories] = useState([]);
   // Fetch categories from the API
+  // Fetch categories from the API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -435,9 +437,10 @@ const URDPurchase = () => {
         const categorizedData = data.map((item) => ({
           value: item.product_name,
           label: item.product_name,
+          categoryType: item.Category, // Assuming "category" column indicates Gold/Silver
           purity: item.purity,
           hsn_code: item.hsn_code,
-          product_id: item.product_id
+          product_id: item.product_id,
         }));
 
         // Remove duplicates
@@ -453,41 +456,75 @@ const URDPurchase = () => {
 
     fetchCategories();
   }, []);
+
   // Fetch purity options and hsn_code based on the selected category
+  // Fetch purity options and rates based on the selected category
   useEffect(() => {
+    const fetchRateForSilver = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/get/current-rates");
+        setFormData((prev) => ({
+          ...prev,
+          purity: "24K", // Directly set purity to 24K for silver
+          rate: response.data.silver_rate || "",
+        }));
+      } catch (error) {
+        console.error("Error fetching silver rate:", error);
+      }
+    };
+
     if (formData.category) {
-      // Fetch data from API when category is selected
-      axios
-        .get("http://localhost:5000/get/products")
-        .then((response) => {
-          const products = response.data;
+      const selectedCategory = categories.find(
+        (cat) => cat.value === formData.category
+      );
 
-          // Filter products based on selected category name
-          const filteredProducts = products.filter(
-            (product) => product.product_name === formData.category
-          );
+      if (selectedCategory?.categoryType === "Silver") {
+        fetchRateForSilver();
+        setPurityOptions([{
+          value: "24K",
+          label: "24K",
+        }]); // Only show 24K for silver
+      } else if (selectedCategory?.categoryType === "Gold") {
+        axios
+          .get("http://localhost:5000/get/products")
+          .then((response) => {
+            const products = response.data;
 
-          // Extract unique purity values
-          const uniquePurityValues = [
-            ...new Set(filteredProducts.map((product) => product.purity)),
-          ].filter((purity) => purity); // Exclude null/undefined
+            // Filter products based on selected category name
+            const filteredProducts = products.filter(
+              (product) => product.product_name === formData.category
+            );
 
-          // Update purity options
-          setPurityOptions(
-            uniquePurityValues.map((purity) => ({
-              value: purity,
-              label: purity,
-            }))
-          );
-        })
-        .catch((error) => {
-          console.error("Error fetching products:", error);
-        });
+            // Extract unique purity values
+            const uniquePurityValues = [
+              ...new Set(filteredProducts.map((product) => product.purity)),
+            ].filter((purity) => purity); // Exclude null/undefined
+
+            // Update purity options
+            setPurityOptions(
+              uniquePurityValues.map((purity) => ({
+                value: purity,
+                label: purity,
+              }))
+            );
+
+            // Reset rate until purity is selected
+            setFormData((prev) => ({
+              ...prev,
+              rate: "",
+            }));
+          })
+          .catch((error) => {
+            console.error("Error fetching products:", error);
+          });
+      }
     } else {
-      // Reset purity options if no category is selected
+      // Reset purity options and rate if no category is selected
       setPurityOptions([]);
+      setFormData((prev) => ({ ...prev, rate: "" }));
     }
-  }, [formData.category]);
+  }, [formData.category, categories]);
+
 
 
 
@@ -732,6 +769,7 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("purity", e.target.value)}
                   options={purityOptions}
                 />
+
               </Col>
               <Col xs={12} md={1}>
 

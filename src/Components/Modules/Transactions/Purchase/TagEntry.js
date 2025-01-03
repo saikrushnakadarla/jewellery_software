@@ -25,12 +25,12 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         category: selectedProduct.category,
         sub_category: "",
         subcategory_id: "",
-        // subcategory_id: "SB001",
+        // subcategory_id: "SBI001",
         product_Name: "",
         design_master: "",
         Pricing: "",
         Tag_ID: "",
-        Prefix: "tag",
+        Prefix: "", // Default value
         Category: selectedProduct.metal_type,
         Purity: selectedProduct.purity,
         PCode_BarCode: "",
@@ -56,7 +56,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         if (selectedProduct) {
             setFormData((prevState) => ({
                 ...prevState,
-                category: selectedProduct.category || "", 
+                category: selectedProduct.category || "",
             }));
         }
     }, [selectedProduct]);
@@ -234,7 +234,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 design_master: "",
                 Pricing: "",
                 Tag_ID: "",
-                Prefix: "tag",
+                Prefix: "",
                 Category: selectedProduct.metal_type,
                 Purity: selectedProduct.purity,
                 PCode_BarCode: `${prev?.item_prefix || ""}${nextSuffix}`,
@@ -320,6 +320,11 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     //         setShowModal(false);
     //     };
 
+    // const [newSubCategory, setNewSubCategory] = useState({
+    //     name: '',
+    //     prefix: '',
+    //     category: ''
+    // });
     const [newSubCategory, setNewSubCategory] = useState({
         name: '',
         prefix: '',
@@ -329,6 +334,21 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     // Handle input field changes in modal
     const handleModalChange = (e) => {
         const { name, value } = e.target;
+        // Update newSubCategory values
+        setNewSubCategory((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+
+        // If the changed field is 'prefix', update the formData Prefix field
+        if (name === "prefix") {
+            setFormData((prev) => ({
+                ...prev,
+                Prefix: value,
+            }));
+        }
+
+
         setNewSubCategory((prevState) => ({
             ...prevState,
             [name]: value,
@@ -337,9 +357,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
     useEffect(() => {
         if (selectedProduct) {
-          console.log("Product ID:", selectedProduct.product_id); // Use product_id as needed
+            console.log("Product ID:", selectedProduct.product_id); // Use product_id as needed
         }
-      }, [selectedProduct]);
+    }, [selectedProduct]);
 
 
     // Handle form submission to add new subcategory
@@ -352,23 +372,23 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 category: newSubCategory.category || formData.category,
                 prefix: newSubCategory.prefix
             };
-    
+
             // Make POST request to the API
             const response = await axios.post('http://localhost:5000/post/subcategory', data);
-    
+
             if (response.status === 201) { // Use 201 instead of 200 for created status
                 // Successfully added the subcategory
                 handleCloseModal();
                 console.log('Subcategory added successfully');
                 alert("Data saved successfully");
-    
+
                 // Clear the form
                 setNewSubCategory({
                     name: '',
                     prefix: '',
                     category: ''
                 });
-    
+
                 // Refresh the subcategory list
                 fetchSubCategories();
             } else {
@@ -378,47 +398,47 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             console.error('Error during API request:', error);
         }
     };
-    
+
 
 
 
     // Fetch the subcategories when the component mounts
 
-        const fetchSubCategories = async () => {
-            try {
-                const response = await axios.get("http://localhost:5000/get/subcategories");
-                setSubCategories(response.data); // Assuming the response data is an array of subcategories
-            } catch (error) {
-                console.error("Error fetching subcategories:", error);
-            }
-        };
+    const fetchSubCategories = async () => {
+        try {
+            const response = await axios.get("http://localhost:5000/get/subcategories");
+            setSubCategories(response.data); // Assuming the response data is an array of subcategories
+        } catch (error) {
+            console.error("Error fetching subcategories:", error);
+        }
+    };
     useEffect(() => {
         fetchSubCategories();
     }, []);
 
-  const [designOptions, setdesignOptions] = useState([]);
+    const [designOptions, setdesignOptions] = useState([]);
 
- // Fetch design master options from the API
- useEffect(() => {
-    const fetchDesignMaster = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/designmaster`);
-        const designMasters = response.data.map((item) => {
-          console.log('Design ID:', item.design_id); // Log design_id
-          return {
-            value: item.design_name, // Assuming the column name is "design_name"
-            label: item.design_name,
-            id: item.design_id, // Assuming the column name is "design_id"
-          };
-        });
-        setdesignOptions(designMasters);
-      } catch (error) {
-        console.error('Error fetching design masters:', error);
-      }
-    };
-  
-    fetchDesignMaster();
-  }, []);
+    // Fetch design master options from the API
+    useEffect(() => {
+        const fetchDesignMaster = async () => {
+            try {
+                const response = await axios.get(`${baseURL}/designmaster`);
+                const designMasters = response.data.map((item) => {
+                    console.log('Design ID:', item.design_id); // Log design_id
+                    return {
+                        value: item.design_name, // Assuming the column name is "design_name"
+                        label: item.design_name,
+                        id: item.design_id, // Assuming the column name is "design_id"
+                    };
+                });
+                setdesignOptions(designMasters);
+            } catch (error) {
+                console.error('Error fetching design masters:', error);
+            }
+        };
+
+        fetchDesignMaster();
+    }, []);
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -652,7 +672,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                         { value: "Floor1", label: "Floor1" },
                                                         { value: "Floor2", label: "Floor2" },
                                                         { value: "Strong room", label: "Strong room" },
-                                                      ]}
+                                                    ]}
                                                 />
                                             </Col>
                                         </Row>
