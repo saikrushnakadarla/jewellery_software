@@ -439,6 +439,7 @@ const URDPurchase = () => {
           label: item.product_name,
           purity: item.purity,
           hsn_code: item.hsn_code,
+          product_id:item.product_id
         }));
 
         // Remove duplicates
