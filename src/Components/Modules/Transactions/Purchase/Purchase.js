@@ -439,7 +439,7 @@ const URDPurchase = () => {
           label: item.product_name,
           purity: item.purity,
           hsn_code: item.hsn_code,
-          product_id:item.product_id
+          product_id: item.product_id
         }));
 
         // Remove duplicates
@@ -664,15 +664,15 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("charges", e.target.value)} />
               </Col>
               <Col xs={12} md={2}>
-        <InputField
-          label="Purity"
-          type="select"
-          name="purity"
-          value={formData.purity}
-          onChange={(e) => handleChange("purity", e.target.value)}
-          options={purityOptions}
-        />
-      </Col>
+                <InputField
+                  label="Purity"
+                  type="select"
+                  name="purity"
+                  value={formData.purity}
+                  onChange={(e) => handleChange("purity", e.target.value)}
+                  options={purityOptions}
+                />
+              </Col>
 
               <Col xs={12} md={1}>
 
