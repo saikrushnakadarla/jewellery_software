@@ -56,7 +56,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         if (selectedProduct) {
             setFormData((prevState) => ({
                 ...prevState,
-                category: selectedProduct.category || "", // Set category from selectedProduct
+                category: selectedProduct.category || "", 
             }));
         }
     }, [selectedProduct]);
