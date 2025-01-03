@@ -24,9 +24,9 @@ function Dashboard() {
           </div>
         </div>
       </div>
-      {/* <div className="dashboard_main-container">
+      <div className="dashboard_main-container">
       <CustomerDashboard />
-      </div> */}
+      </div>
       <div className="dashboard-customers-row">
         <div className="dashboard-customers-container">
           <h2 className="dashboard-section-title">TOP CUSTOMERS</h2>
