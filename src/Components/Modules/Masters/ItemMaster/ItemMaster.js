@@ -96,6 +96,11 @@ const FormWithTable = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: value,
+    }));
+
     if (name === "design_master") {
       const selectedOption = designOptions.find(option => option.value === value);
       setFormData({
@@ -496,7 +501,7 @@ const FormWithTable = () => {
         console.error('Error fetching metal types:', error);
       }
     };
-
+  
     fetchMetalTypes();
   }, []);
 
@@ -527,14 +532,12 @@ useEffect(() => {
   const fetchPurity = async () => {
     try {
       const response = await axios.get(`${baseURL}/purity`);
-      const purityOptions = response.data.map((item) => {
-        console.log('Purity ID:', item.purity_id); // Log purity_id
-        return {
-          value: item.name, // Assuming the column name is "name"
-          label: item.name,
-          id: item.purity_id, // Assuming the column name is "purity_id"
-        };
-      });
+      const purityOptions = response.data.map(item => ({
+        value: item.name, // Assuming the column name is "name"
+        label: item.name,
+        id: item.purity_id, // Assuming the column name is "purity_id"
+        metal: item.metal, // Assuming "metal" is the column for related metal type
+      }));
       setDropdownOptions(purityOptions);
     } catch (error) {
       console.error('Error fetching purity options:', error);
@@ -543,6 +546,18 @@ useEffect(() => {
 
   fetchPurity();
 }, []);
+const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
+useEffect(() => {
+  // Filter purity options based on selected metal type
+  if (formData.Category) {
+    const filteredPurityOptions = dropdownOptions.filter(
+      option => option.metal === formData.Category
+    );
+    setFilteredPurityOptions(filteredPurityOptions); // Add a state for filtered purity options
+  } else {
+    setFilteredPurityOptions([]); // Reset if no metal type is selected
+  }
+}, [formData.Category, dropdownOptions]);
 
 
   useEffect(() => {
@@ -610,14 +625,14 @@ useEffect(() => {
                   onChange={handleChange}
 
                 />
-                <InputField
-                  label="Metal Type:"
-                  name="Category"
-                  type="select"
-                  value={formData.Category}
-                  onChange={handleChange}
-                  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
-                />
+               <InputField
+  label="Metal Type:"
+  name="Category"
+  type="select"
+  value={formData.Category}
+  onChange={handleChange}
+  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+/>
                 {/* <InputField
                   label="Design Master:"
                   name="design_master"
@@ -626,14 +641,16 @@ useEffect(() => {
                   onChange={handleChange}
                   options={designOptions.map(option => ({ value: option.value, label: option.label }))}
                 /> */}
-                <InputField
-                  label="Purity:"
-                  name="purity"
-                  type="select"
-                  value={formData.purity}
-                  onChange={handleChange}
-                  options={dropdownOptions.map(option => ({ value: option.value, label: option.label }))}
-                />
+             
+
+<InputField
+  label="Purity:"
+  name="purity"
+  type="select"
+  value={formData.purity}
+  onChange={handleChange}
+  options={filteredPurityOptions.map(option => ({ value: option.value, label: option.label }))}
+/>
                 {/* <InputField
                   label="Item Prefix:"
                   name="item_prefix"
