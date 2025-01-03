@@ -164,31 +164,55 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             .catch((error) => console.error("Error fetching products:", error));
     }, []);
 
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
         const { name, value } = e.target;
-
-        setFormData((prevData) => {
-            if (name === "sub_category") {
-                const selectedCategory = subCategories.find(
-                    (category) => category.subcategory_id === parseInt(value) // Ensure correct type match
-                );
-
-                const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-
-                return {
+    
+        if (name === "sub_category") {
+            const selectedCategory = subCategories.find(
+                (category) => category.subcategory_id === parseInt(value) // Ensure correct type match
+            );
+    
+            const newPrefix = selectedCategory ? selectedCategory.prefix : "";
+    
+            console.log("New Prefix:", newPrefix);
+    
+            if (newPrefix) {
+                try {
+                    // Fetch the next unique PCode_BarCode from the backend
+                    const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+                        params: { prefix: newPrefix },
+                    });
+    
+                    const nextPCodeBarCode = response.data.nextPCodeBarCode;
+    
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        [name]: selectedCategory ? selectedCategory.sub_category_name : "",
+                        subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
+                        item_prefix: newPrefix,
+                        Prefix: newPrefix,
+                        PCode_BarCode: nextPCodeBarCode, // Update with unique PCode_BarCode
+                    }));
+                } catch (error) {
+                    console.error("Error fetching PCode_BarCode:", error);
+                    // Optional: Show an error message to the user
+                }
+            } else {
+                setFormData((prevData) => ({
                     ...prevData,
                     [name]: selectedCategory ? selectedCategory.sub_category_name : "",
                     subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
-                    item_prefix: newPrefix,
-                    PCode_BarCode: `${newPrefix}${prevData.suffix || "001"}`,
-                };
+                    item_prefix: "",
+                    Prefix: "",
+                    PCode_BarCode: "", // Clear if no prefix
+                }));
             }
-
-            return {
+        } else {
+            setFormData((prevData) => ({
                 ...prevData,
                 [name]: value,
-            };
-        });
+            }));
+        }
     };
 
 
