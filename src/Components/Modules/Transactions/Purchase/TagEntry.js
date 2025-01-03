@@ -27,6 +27,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         subcategory_id: "",
         // subcategory_id: "SB001",
         product_Name: "",
+        design_master: "",
         Pricing: "",
         Tag_ID: "",
         Prefix: "tag",
@@ -193,38 +194,91 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
 
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
-        // Validate the required fields
+
+        const currentSuffix = parseInt(formData.suffix || "001", 10);
+        const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
+
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
             return;
         }
-    
-        // Log the selected sub_category and subcategory_id
-        console.log("Selected Sub Category:", formData.sub_category);
-        console.log("Selected Sub Category ID:", formData.subcategory_id);
-    
+
         try {
+            // If `prev` is available from the component state, props, or elsewhere:
+            const prev = {
+                item_prefix: "", // Replace this with your actual logic for prev
+            };
+
             await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
-    
+
             alert('Data and updated values saved successfully!');
+
+            setFormData({
+                product_id: selectedProduct.product_id,
+
+                sub_category: "",
+                subcategory_id: "",
+                product_Name: "",
+                design_master: "",
+                Pricing: "",
+                Tag_ID: "",
+                Prefix: "tag",
+                Category: selectedProduct.metal_type,
+                Purity: selectedProduct.purity,
+                PCode_BarCode: `${prev?.item_prefix || ""}${nextSuffix}`,
+                suffix: nextSuffix,
+                Gross_Weight: "",
+                Stones_Weight: "",
+                Stones_Price: "",
+                HUID_No: "",
+                Wastage_On: "",
+                Wastage_Percentage: "",
+                Status: "sold",
+                Source: "Purchase",
+                Stock_Point: "",
+                WastageWeight: "",
+                TotalWeight_AW: "",
+                MC_Per_Gram: "",
+                Making_Charges_On: "",
+                Making_Charges: "",
+                Design_Master: selectedProduct.design_name,
+                Weight_BW: "",
+            });
         } catch (error) {
-            if (error.response) {
-                alert(`Error: ${error.response.data.message || 'Invalid input data'}`);
-            } else if (error.request) {
-                alert('No response received from the server. Please try again.');
-            } else {
-                alert('An error occurred. Please check the console for details.');
-            }
             console.error(error);
+            alert('An error occurred. Please try again.');
         }
     };
-    
 
+    useEffect(() => {
+        const getLastPcode = async () => {
+            try {
+                const response = await axios.get(`${baseURL}/last-pbarcode`);
+                const suffix = response.data.lastPCode_BarCode || "001"; // Fallback to "001" if no value is fetched
+                setFormData((prev) => ({
+                    ...prev,
+                    suffix, // Store the fetched suffix
+                    PCode_BarCode: `${prev.item_prefix || ""}${suffix}`, // Combine prefix with fetched suffix
+                }));
+            } catch (error) {
+                console.error("Error fetching last PCode_BarCode:", error);
+            }
+        };
+
+        getLastPcode();
+    }, []);
 
 
     useEffect(() => {
@@ -324,26 +378,29 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         fetchSubCategories();
     }, []);
 
+  const [designOptions, setdesignOptions] = useState([]);
 
-
-    useEffect(() => {
-        const getLastPcode = async () => {
-            try {
-                const response = await axios.get(`${baseURL}/last-pbarcode`);
-                const suffix = response.data.lastPCode_BarCode || "001"; // Fallback to "001" if no value is fetched
-                setFormData((prev) => ({
-                    ...prev,
-                    suffix, // Store the fetched suffix
-                    PCode_BarCode: `${prev.item_prefix || ""}${suffix}`, // Combine prefix with fetched suffix
-                }));
-            } catch (error) {
-                console.error("Error fetching last PCode_BarCode:", error);
-            }
-        };
-
-        getLastPcode();
-    }, []);
-
+ // Fetch design master options from the API
+ useEffect(() => {
+    const fetchDesignMaster = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/designmaster`);
+        const designMasters = response.data.map((item) => {
+          console.log('Design ID:', item.design_id); // Log design_id
+          return {
+            value: item.design_name, // Assuming the column name is "design_name"
+            label: item.design_name,
+            id: item.design_id, // Assuming the column name is "design_id"
+          };
+        });
+        setdesignOptions(designMasters);
+      } catch (error) {
+        console.error('Error fetching design masters:', error);
+      }
+    };
+  
+    fetchDesignMaster();
+  }, []);
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -397,7 +454,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     }}
                                                 />
                                             </Col>
-                                            <Col xs={12} md={3}>
+                                            <Col xs={12} md={2}>
                                                 <InputField
                                                     label="Product Name:"
                                                     name="product_Name"
@@ -405,8 +462,18 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     onChange={handleChange}  // Pass the event handler correctly
                                                 />
                                             </Col>
-
-                                            <Col xs={12} md={3}>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Design Master:"
+                                                    name="design_master"
+                                                    type="select"
+                                                    value={formData.design_master}
+                                                    onChange={handleChange}
+                                                    // options={designOptions}
+                                                    options={designOptions.map(option => ({ value: option.value, label: option.label }))}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
                                                 <InputField
                                                     label="Pricing:"
                                                     name="Pricing"

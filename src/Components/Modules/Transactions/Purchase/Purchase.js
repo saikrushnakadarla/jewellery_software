@@ -455,30 +455,40 @@ const URDPurchase = () => {
     fetchCategories();
   }, []);
   // Fetch purity options and hsn_code based on the selected category
-  // Update purity options and hsn_code when the category is changed
   useEffect(() => {
-    const selectedCategory = categories.find(
-      (category) => category.value === formData.category
-    );
+    if (formData.category) {
+      // Fetch data from API when category is selected
+      axios
+        .get("http://localhost:5000/get/products")
+        .then((response) => {
+          const products = response.data;
 
-    if (selectedCategory) {
-      // Filter purity options based on the selected category
-      const filteredPurityOptions = selectedCategory.purity
-        ? [{ value: selectedCategory.purity, label: selectedCategory.purity }]
-        : [];
+          // Filter products based on selected category name
+          const filteredProducts = products.filter(
+            (product) => product.product_name === formData.category
+          );
 
-      setPurityOptions(filteredPurityOptions);
+          // Extract unique purity values
+          const uniquePurityValues = [
+            ...new Set(filteredProducts.map((product) => product.purity)),
+          ].filter((purity) => purity); // Exclude null/undefined
 
-      // Set hsn_code based on the selected category
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        hsn_code: selectedCategory.hsn_code,  // Set hsn_code automatically
-      }));
+          // Update purity options
+          setPurityOptions(
+            uniquePurityValues.map((purity) => ({
+              value: purity,
+              label: purity,
+            }))
+          );
+        })
+        .catch((error) => {
+          console.error("Error fetching products:", error);
+        });
     } else {
-      setPurityOptions([]); // If no category is selected, reset purity options
+      // Reset purity options if no category is selected
+      setPurityOptions([]);
     }
-  }, [formData.category, categories]);
-
+  }, [formData.category]);
 
 
   return (
@@ -653,15 +663,15 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("charges", e.target.value)} />
               </Col>
               <Col xs={12} md={2}>
-                <InputField
-                  label="Purity"
-                  type="select"
-                  name="purity"
-                  value={formData.purity}
-                  onChange={(e) => handleChange("purity", e.target.value)}
-                  options={purityOptions}
-                />
-              </Col>
+        <InputField
+          label="Purity"
+          type="select"
+          name="purity"
+          value={formData.purity}
+          onChange={(e) => handleChange("purity", e.target.value)}
+          options={purityOptions}
+        />
+      </Col>
 
               <Col xs={12} md={1}>
 
