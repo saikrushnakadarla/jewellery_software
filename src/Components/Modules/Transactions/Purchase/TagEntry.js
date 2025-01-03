@@ -431,14 +431,21 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const fetchSubCategories = async () => {
         try {
             const response = await axios.get("http://localhost:5000/get/subcategories");
-            setSubCategories(response.data); // Assuming the response data is an array of subcategories
+            const filteredSubCategories = response.data.filter(
+                (subCategory) => subCategory.category_id === selectedProduct.product_id
+            );
+            setSubCategories(filteredSubCategories); // Set the filtered subcategories
         } catch (error) {
             console.error("Error fetching subcategories:", error);
         }
     };
+    
     useEffect(() => {
-        fetchSubCategories();
-    }, []);
+        if (selectedProduct?.product_id) { // Ensure selectedProduct is defined
+            fetchSubCategories();
+        }
+    }, [selectedProduct]);
+    
 
     const [designOptions, setdesignOptions] = useState([]);
 
