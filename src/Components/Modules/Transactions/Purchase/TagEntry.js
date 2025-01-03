@@ -22,7 +22,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const [productOptions, setProductOptions] = useState([]);
     const [formData, setFormData] = useState({
         product_id: selectedProduct.product_id,
-        category: "",
+        category: selectedProduct.category,
         sub_category: "",
         subcategory_id: "",
         // subcategory_id: "SB001",
@@ -227,7 +227,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
             setFormData({
                 product_id: selectedProduct.product_id,
-
+                category: selectedProduct.category,
                 sub_category: "",
                 subcategory_id: "",
                 product_Name: "",
@@ -342,6 +342,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const handleAddSubCategory = async () => {
         try {
             const data = {
+                category_id:selectedProduct.product_id,
                 subcategory_id: 1, // Assuming this is a static value or comes from somewhere else
                 sub_category_name: newSubCategory.name,
                 category: newSubCategory.category || formData.category,

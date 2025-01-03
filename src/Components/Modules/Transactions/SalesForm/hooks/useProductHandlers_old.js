@@ -370,7 +370,7 @@ const useProductHandlers = () => {
   
       // Check for product by code
       const product = products.find((prod) => String(prod.rbarcode) === String(code));
-      console.log("productDetails:", product);
+  
       if (product) {
         // If product found by code, populate the form
         setFormData((prevData) => ({
@@ -403,7 +403,7 @@ const useProductHandlers = () => {
         if (tag) {
           const productId = tag.product_id;
           const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-          console.log("productDetails:", productDetails);
+  
           // Log opentag_id for debugging
           console.log("opentag_id:", tag.opentag_id);
   
@@ -412,10 +412,10 @@ const useProductHandlers = () => {
             code: tag.PCode_BarCode || "",
             product_id: tag.product_id || "",
             opentag_id: tag.opentag_id || "",
-            product_name: tag.product_Name || "",
+            product_name: productDetails?.product_name || "",
             metal_type: productDetails?.Category || "",
-            design_name: tag.design_master || "",
-            purity: tag.Purity || "",
+            design_name: productDetails?.design_master || "",
+            purity: productDetails?.purity || "",
             gross_weight: tag.Gross_Weight || "",
             stone_weight: tag.Stones_Weight || "",
             stone_price: tag.Stones_Price || "",

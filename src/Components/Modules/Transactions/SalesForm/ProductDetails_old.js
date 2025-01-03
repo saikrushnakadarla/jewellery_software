@@ -66,7 +66,7 @@ const ProductDetails = ({
             }
           />
         </Col>
-      {/* <Col xs={12} md={2}>
+      <Col xs={12} md={2}>
         <InputField
           label="P ID"
           name="product_id"
@@ -116,51 +116,6 @@ const ProductDetails = ({
             value: product.design_master,
             label: product.design_master,
           }))}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Purity"
-          name="purity"
-          value={formData.purity}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col> */}
-      <Col xs={12} md={2}>
-        <InputField
-          label="P ID"
-          name="product_id"
-          value={formData.product_id}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField
-          label="Product Name"
-          name="product_name"
-          value={formData.product_name}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Metal Type"
-          name="metal_type"
-          value={formData.metal_type}
-          onChange={handleChange}
-          readOnly                  
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Design Name"
-          name="design_name"
-          value={formData.design_name}
-          onChange={handleChange}
-          readOnly
         />
       </Col>
       <Col xs={12} md={1}>
