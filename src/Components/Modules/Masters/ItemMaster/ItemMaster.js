@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import InputField from "./Inputfield"; // Assuming you have this component
 import StoneDetailsModal from "../../Transactions/StockEntry/StoneDetailsModal";
 import "./ItemMaster.css";
@@ -440,7 +440,8 @@ const FormWithTable = () => {
 
         await Promise.all(saveEntriesPromises);
         alert("Category added successfully!");
-
+        const from = location.state?.from || "/itemmastertable";
+    navigate(from);
         // Reset the form fields
         setFormData({
             product_name: "",
@@ -473,14 +474,16 @@ const FormWithTable = () => {
     } catch (error) {
         console.error("Error saving data:", error);
         alert("Failed to save data. Please try again.");
+       
     }
 };
 
   
-
+const location = useLocation();
 
   const handleBack = () => {
-    navigate("/itemmastertable");
+    const from = location.state?.from || "/itemmastertable";
+    navigate(from);
   };
 
   const [metalOptions, setmetalOptions] = useState([]);
