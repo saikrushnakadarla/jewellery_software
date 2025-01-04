@@ -275,7 +275,13 @@ const URDPurchase = () => {
   const handleEdit = async (index) => {
     const selectedData = tableData[index]; // Get the data for the selected row
     const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
-
+  
+    // Ensure pcs and gross_weight are not undefined, and if so, default to 0
+    const pcsToSend = pcs || 0;
+    const grossWeightToSend = gross_weight || 0;
+  
+    console.log("Sending to server:", { pcs: pcsToSend, gross_weight: grossWeightToSend });
+  
     try {
       // Send a request to the backend to update the product_id entry
       const response = await fetch(`http://localhost:5000/delete-updated-values/${product_id}`, {
@@ -283,13 +289,13 @@ const URDPurchase = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ pcs, gross_weight }), // Pass pcs and gross_weight
+        body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to update entry in updated_values_table");
       }
-
+  
       console.log("Entry updated successfully");
       setFormData(selectedData); // Populate the form with selected row data
       setEditingIndex(index); // Track the index being edited
@@ -298,6 +304,8 @@ const URDPurchase = () => {
       alert("Failed to update the entry. Please try again.");
     }
   };
+  
+  
 
 
   const handleDelete = (index) => {
