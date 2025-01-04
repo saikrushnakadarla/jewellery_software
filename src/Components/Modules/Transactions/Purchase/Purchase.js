@@ -937,7 +937,7 @@ const URDPurchase = () => {
                           type="button"
                           className="action-button edit-button"
                           onClick={() => handleEdit(index)}
-                          // disabled={editingIndex !== null}
+                          disabled={editingIndex !== null}
                         >
                           <FaEdit />
                         </button>
