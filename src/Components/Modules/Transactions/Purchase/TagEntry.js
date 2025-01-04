@@ -307,33 +307,33 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     }, []);
 
 
-    useEffect(() => {
-        if (selectedProduct?.product_id) {
-            fetch(`${baseURL}/get/update-values?product_id=${selectedProduct.product_id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch product details');
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    const fetchedData = data?.data?.[0] || {};
-                    setProductDetails({
-                        pcs: fetchedData.pieces || selectedProduct.pcs,
-                        gross_weight: fetchedData.gross_weight || selectedProduct.gross_weight,
-                    });
-                })
-                .catch((error) => {
-                    console.error('Error fetching product details:', error);
-                    alert('Failed to fetch product details. Please try again later.');
-                });
-        }
-    }, [selectedProduct, baseURL]);
+    // useEffect(() => {
+    //     if (selectedProduct?.product_id) {
+    //         fetch(`${baseURL}/get/update-values?product_id=${selectedProduct.product_id}`, {
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //         })
+    //             .then((response) => {
+    //                 if (!response.ok) {
+    //                     throw new Error('Failed to fetch product details');
+    //                 }
+    //                 return response.json();
+    //             })
+    //             .then((data) => {
+    //                 const fetchedData = data?.data?.[0] || {};
+    //                 setProductDetails({
+    //                     pcs: fetchedData.pieces || selectedProduct.pcs,
+    //                     gross_weight: fetchedData.gross_weight || selectedProduct.gross_weight,
+    //                 });
+    //             })
+    //             .catch((error) => {
+    //                 console.error('Error fetching product details:', error);
+    //                 alert('Failed to fetch product details. Please try again later.');
+    //             });
+    //     }
+    // }, [selectedProduct, baseURL]);
 
 
     //    // Function to handle modal open
@@ -351,6 +351,8 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     //     prefix: '',
     //     category: ''
     // });
+
+
     const [newSubCategory, setNewSubCategory] = useState({
         name: '',
         prefix: '',
@@ -474,14 +476,36 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         fetchDesignMaster();
     }, []);
 
+    const [pcs, setPcs] = useState(null);
+  const [grossWeight, setGrossWeight] = useState(null);
+
+  // Function to fetch data from the API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/entry/${selectedProduct.product_id}`);
+        const data = await response.json();
+        setPcs(data.pcs);
+        setGrossWeight(data.gross_weight);
+
+        // Update formData with the fetched values
+        // setFormData((prev) => ({
+        //   ...prev,
+        //   Gross_Weight: data.gross_weight,
+        // }));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [selectedProduct.product_id]);
+
     return (
         <div style={{ paddingTop: "0px" }}>
             <div>
-                <h4>Pieces: {productDetails.pcs}</h4>
-                <h4>Gross Weight: {productDetails.gross_weight}</h4>
-
-                {/* <h4>Pieces: {displayPieces}</h4> 
-            <h4>Gross Weight: {displayGrossWeight}</h4>  */}
+            <h4>Pieces: {pcs !== null ? pcs : "0"}</h4>
+            <h4>Gross Weight: {grossWeight !== null ? grossWeight : "0"}</h4>
             </div>
             <div className="container mt-4">
                 <div className="row mt-3">
