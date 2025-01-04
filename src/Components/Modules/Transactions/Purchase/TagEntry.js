@@ -307,52 +307,6 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     }, []);
 
 
-    // useEffect(() => {
-    //     if (selectedProduct?.product_id) {
-    //         fetch(`${baseURL}/get/update-values?product_id=${selectedProduct.product_id}`, {
-    //             method: 'GET',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //         })
-    //             .then((response) => {
-    //                 if (!response.ok) {
-    //                     throw new Error('Failed to fetch product details');
-    //                 }
-    //                 return response.json();
-    //             })
-    //             .then((data) => {
-    //                 const fetchedData = data?.data?.[0] || {};
-    //                 setProductDetails({
-    //                     pcs: fetchedData.pieces || selectedProduct.pcs,
-    //                     gross_weight: fetchedData.gross_weight || selectedProduct.gross_weight,
-    //                 });
-    //             })
-    //             .catch((error) => {
-    //                 console.error('Error fetching product details:', error);
-    //                 alert('Failed to fetch product details. Please try again later.');
-    //             });
-    //     }
-    // }, [selectedProduct, baseURL]);
-
-
-    //    // Function to handle modal open
-    //    const handleOpenModal = () => {
-    //     setShowModal(true);
-    // };
-
-    //       // Function to handle modal close
-    //       const handleCloseModal = () => {
-    //         setShowModal(false);
-    //     };
-
-    // const [newSubCategory, setNewSubCategory] = useState({
-    //     name: '',
-    //     prefix: '',
-    //     category: ''
-    // });
-
-
     const [newSubCategory, setNewSubCategory] = useState({
         name: '',
         prefix: '',

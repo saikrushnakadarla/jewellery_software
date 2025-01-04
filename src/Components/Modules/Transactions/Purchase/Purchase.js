@@ -169,67 +169,68 @@ const URDPurchase = () => {
     });
   };
 
-  const handleAdd = async (e) => {
-    e.preventDefault();
-  
-    // Prepare data to be sent to the API
-    const apiData = {
-      product_id: formData.product_id, // Assuming rbarcode maps to product_id
-      pcs: formData.pcs,
-      gross_weight: formData.gross_weight,
-    };
-  
-    try {
-      // Make a POST request to the API
-      const response = await fetch("http://localhost:5000/add-entry", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(apiData),
-      });
-  
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Pcs and GrossWeight added to the database successfully:", result);
-  
-        if (editingIndex === null) {
-          // Add new entry to the table
-          setTableData([...tableData, formData]);
-        } else {
-          // Edit existing entry in the table
-          const updatedTableData = tableData.map((row, index) =>
-            index === editingIndex ? formData : row
-          );
-          setTableData(updatedTableData);
-          setEditingIndex(null); // Reset edit mode
-        }
-  
-        // Reset formData only when needed (optional for editing scenarios)
-        setFormData({
-          ...formData, // If necessary, keep persistent fields like mobile, etc.
-          category: "",
-          hsn_code: "",
-          rbarcode: "",
-          pcs: "",
-          gross_weight: "",
-          stone_weight: "",
-          net_weight: "",
-          hm_charges: "",
-          other_charges: "",
-          charges: "",
-          purity: "",
-          pure_weight: "",
-          rate: "",
-          total_amount: "",
-        });
-      } else {
-        console.error("Failed to add entry to the database:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error while adding entry to the database:", error);
-    }
+ const handleAdd = async (e) => {
+  e.preventDefault();
+
+  // Prepare data to be sent to the API
+  const apiData = {
+    product_id: formData.product_id, // Assuming rbarcode maps to product_id
+    pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
+    gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
   };
+
+  try {
+    // Make a POST request to the API
+    const response = await fetch("http://localhost:5000/add-entry", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(apiData),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log("Pcs and GrossWeight added to the database successfully:", result);
+
+      if (editingIndex === null) {
+        // Add new entry to the table
+        setTableData([...tableData, formData]);
+      } else {
+        // Edit existing entry in the table
+        const updatedTableData = tableData.map((row, index) =>
+          index === editingIndex ? formData : row
+        );
+        setTableData(updatedTableData);
+        setEditingIndex(null); // Reset edit mode
+      }
+
+      // Reset formData only when needed (optional for editing scenarios)
+      setFormData({
+        ...formData, // If necessary, keep persistent fields like mobile, etc.
+        category: "",
+        hsn_code: "",
+        rbarcode: "",
+        pcs: "",
+        gross_weight: "",
+        stone_weight: "",
+        net_weight: "",
+        hm_charges: "",
+        other_charges: "",
+        charges: "",
+        purity: "",
+        pure_weight: "",
+        rate: "",
+        total_amount: "",
+      });
+    } else {
+      console.error("Failed to add entry to the database:", response.statusText);
+    }
+  } catch (error) {
+    console.error("Error while adding entry to the database:", error);
+  }
+};
+
   
 
   const handleSave = async (e) => {
