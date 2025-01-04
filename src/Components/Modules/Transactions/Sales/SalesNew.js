@@ -8,7 +8,6 @@ import baseURL from "../../../../Url/NodeBaseURL";
 const RepairForm = () => {
   const [products, setProducts] = useState([]);
   const [data, setData] = useState([]);
-  const [customers, setCustomers] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
@@ -29,53 +28,14 @@ const RepairForm = () => {
     barcode: "",
     stones_price: "",
   });
-
-  const navigate = useNavigate();
   const [isQtyEditable, setIsQtyEditable] = useState(false);
   const [uniqueProducts, setUniqueProducts] = useState([]); 
   const [metalTypes, setMetalTypes] = useState([]);
-  const [designmaster, setDesignMaster] = useState([]);
   const [purity, setPurity] = useState([]);
-
-  const fetchMetalTypes = async () => {
-    try {
-      const response = await fetch(`${baseURL}/metaltype`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
-      }
-      const result = await response.json();
-      setMetalTypes(result);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
-
-  const fetchDesignMaster = async () => {
-    try {
-      const response = await fetch(`${baseURL}/designmaster`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
-      }
-      const result = await response.json();
-      setDesignMaster(result);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
-
-  const fetchPurity = async () => {
-    try {
-      const response = await fetch(`${baseURL}/purity`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
-      }
-      const result = await response.json();
-      setPurity(result);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
-
+  const [filteredMetalTypes, setFilteredMetalTypes] = useState(metalTypes);
+  const [designOptions, setDesignOptions] = useState([]); 
+  const [filteredDesignOptions, setFilteredDesignOptions] = useState(designOptions); 
+  const [filteredPurityOptions, setFilteredPurityOptions] = useState(purity);
 
     const fetchProducts = async () => {
       try {
@@ -103,207 +63,133 @@ const RepairForm = () => {
           new Map(result.result.map((prod) => [prod.product_Name, prod])).values()
         );
     
+        // Extract unique metal types
+        const uniqueMetalTypes = Array.from(
+          new Set(result.result.map((prod) => prod.metal_type))
+        ).map((metalType) => ({ metal_type: metalType }));
+    
+        // Extract unique design names
+        const uniqueDesigns = Array.from(
+          new Set(result.result.map((prod) => prod.design_master))
+        ).map((designMaster) => ({ design_master: designMaster }));
+
+        const uniquePurity = Array.from(
+          new Set(result.result.map((prod) => prod.Purity))
+        ).map((Purity) => ({ Purity: Purity }));
+    
         setData(result.result); // Set the full data
         setUniqueProducts(uniqueProductNames); // Set unique product_Name options
+        setMetalTypes(uniqueMetalTypes); // Set all unique metal types
+        setFilteredMetalTypes(uniqueMetalTypes); // Initially, show all metal types
+        setDesignOptions(uniqueDesigns); // Set all unique designs
+        setFilteredDesignOptions(uniqueDesigns); // Initially, show all designs
+        setPurity(uniquePurity); // Set all unique metal types
+        setFilteredPurityOptions(uniquePurity); // Initially, show all metal types
       } catch (error) {
         console.error("Error fetching tags:", error);
       }
     };
-
-    const fetchCustomers = async () => {
-      try {
-        const response = await fetch(`${baseURL}/get/account-details`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch customers');
-        }
-        const result = await response.json();
-        const customers = result.filter(
-          (item) => item.account_group === 'CUSTOMERS'
+    
+    const handleProductNameChange = (productName) => {
+      const product = data.find((prod) => String(prod.product_Name) === String(productName));
+    
+      if (product) {
+        setFormData((prevData) => ({
+          ...prevData,
+          code: product.rbarcode,
+          product_id: product.product_id || "",
+          product_name: product.product_Name || "",
+        }));
+    
+        // Filter metal types based on the selected product's metal type
+        const filteredMetalTypes = metalTypes.filter(
+          (metalType) => metalType.metal_type === product.metal_type
         );
-        setCustomers(customers);
-      } catch (error) {
-        console.error('Error fetching customers:', error);
+        setFilteredMetalTypes(filteredMetalTypes); // Update filtered metal types
+    
+        // Filter and deduplicate design_master options for the selected product
+        const filteredDesignOptions = Array.from(
+          new Set(
+            data
+              .filter((prod) => prod.product_Name === productName)
+              .map((prod) => prod.design_master)
+          )
+        ).map((designMaster) => ({ design_master: designMaster }));
+        setFilteredDesignOptions(filteredDesignOptions); // Update filtered design options
+    
+        // Filter and deduplicate purity options for the selected product
+        const filteredPurityOptions = Array.from(
+          new Set(
+            data
+              .filter((prod) => prod.product_Name === productName)
+              .map((prod) => prod.Purity)
+          )
+        ).map((Purity) => ({ Purity }));
+        setFilteredPurityOptions(filteredPurityOptions); // Update filtered purity options
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          code: "",
+          product_id: "",
+          product_name: "",
+          metal_type: "",
+          design_name: "",
+          purity: "",
+        }));
+    
+        setFilteredMetalTypes(metalTypes); // Reset to all metal types
+        setFilteredDesignOptions(designOptions); // Clear design_master options
+        setFilteredPurityOptions(purity); // Clear purity options
       }
     };
+      
   useEffect(() => {
     fetchProducts();
     fetchTags();
-    fetchCustomers();
-    fetchMetalTypes();
-    fetchDesignMaster();
-    fetchPurity();
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
-  };
-
-  // const handleMetalTypeChange = (metalType) => {
-  //   const product = products.find((prod) => String(prod.Category) === String(metalType));
-
-  //   if (product) {
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       code: product.rbarcode || "",
-  //       product_id: product.product_id || "",
-  //       product_name: product.product_name || "",
-  //       metal_type: product.Category || "",
-  //       design_name: product.design_master || "",
-  //       purity: product.purity || "",
-        
-  //     }));
-  //   } else {
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       code: "",
-  //       product_id: "",
-  //       product_name: "",
-  //       metal_type: "",
-  //       design_name: "",
-  //       purity: "",
-        
-  //     }));
-  //   }
-  // };
-
-  // const handleDesignNameChange = (designName) => {
-  //   const product = products.find((prod) => String(prod.design_master) === String(designName));
-
-  //   if (product) {
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       code: product.rbarcode || "",
-  //       product_id: product.product_id || "",
-  //       product_name: product.product_name || "",
-  //       metal_type: product.Category || "",
-  //       design_name: product.design_master || "",
-  //       purity: product.purity || "",
-        
-  //     }));
-  //   } else {
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       code: "",
-  //       product_id: "",
-  //       product_name: "",
-  //       metal_type: "",
-  //       design_name: "",
-  //       purity: "",
-        
-  //     }));
-  //   }
-  // };
+    const updatedFormData = { ...formData, [name]: value };
   
-  const handleProductNameChange = (productName) => {
-    const product = data.find((prod) => String(prod.product_Name) === String(productName));
-
-    if (product) {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: product.rbarcode,
-        product_id: product.product_id || "",
-        product_name: product.product_Name || "",        
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        
-      }));
-    }
-  };
-
-  const handleProductChange = (productId) => {
-    const product = products.find((prod) => String(prod.product_id) === String(productId));
+    setFormData(updatedFormData);
   
-    if (product) {
-      // Find the corresponding tag entry from the open-tags-entry
-      const tag = data.find((tag) => String(tag.product_id) === String(productId));
-      
-      // If tag is found, populate the form with the tag's details
-      if (tag) {
+    // Check if all required fields are selected
+    const { product_name, metal_type, design_name, purity } = updatedFormData;
+  
+    if (product_name && metal_type && design_name && purity) {
+      // Find the matching entry from the data
+      const matchingEntry = data.find(
+        (prod) =>
+          prod.product_Name === product_name &&
+          prod.metal_type === metal_type &&
+          prod.design_master === design_name &&
+          prod.Purity === purity
+      );
+  
+      if (matchingEntry) {
+        // Update the PCode_BarCode in the formData
         setFormData((prevData) => ({
           ...prevData,
-          code: product.rbarcode, // Priority to tag code if available
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          gross_weight: "", // Use tag's gross weight
-          stone_weight: "",
-          stone_price:"",
-          weight_bw: "",
-          va_on: "",
-          va_percent:  "",
-          wastage_weight: "",
-          total_weight_aw: "",
-          mc_on: "",
-          mc_per_gram: "",
-          making_charges: "",
+          code: matchingEntry.PCode_BarCode, // Set the matching PCode_BarCode
         }));
       } else {
-        // If no tag is found, just fill product details
+        // Reset the PCode_BarCode if no match is found
         setFormData((prevData) => ({
           ...prevData,
-          code: product.rbarcode,
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          gross_weight: "",
-          stone_weight: "",
-          stone_price: "",
-          weight_bw: "",
-          va_on: "",
-          va_percent: "",
-          wastage_weight: "",
-          total_weight_aw: "",
-          mc_on: "",
-          mc_per_gram: "",
-          making_charges: "",
+          code: "",
         }));
       }
     } else {
-      // Reset form data if no product is selected
+      // Reset the PCode_BarCode if all fields are not selected
       setFormData((prevData) => ({
         ...prevData,
         code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        mc_on: "",
-        mc_per_gram: "",
-        making_charges: "",
-        rate: "",
-        rate_amt: "",
-        tax_percent: "",
-        tax_amt: "",
-        total_price: "",
       }));
     }
   };
   
+
   const handleBarcodeChange = async (code) => {
     try {
       if (!code) {
@@ -487,55 +373,42 @@ const RepairForm = () => {
             }
           />
         </Col>
-      {/* <Col xs={12} md={2}>
+        <Col xs={12} md={3}>
         <InputField
-          label="P ID"
-          name="product_id"
-          value={formData.product_id}
-          onChange={(e) => handleProductChange(e.target.value)}
+          label="Product Name"
+          name="product_name"
+          value={formData.product_name}
+          onChange={(e) => handleProductNameChange(e.target.value)}
           type="select"
-          options={products.map((product) => ({
-            value: product.product_id,
-            label: product.product_id,
+          options={uniqueProducts.map((prod) => ({
+            value: prod.product_Name,
+            label: prod.product_Name,
           }))}
         />
-      </Col> */}
-      <Col xs={12} md={3}>
-      <InputField
-        label="Product Name"
-        name="product_name"
-        value={formData.product_name}
-        onChange={(e) => handleProductNameChange(e.target.value)}
-        type="select"
-        options={uniqueProducts.map((prod) => ({
-          value: prod.product_Name,
-          label: prod.product_Name,
-        }))}
-      />
       </Col>
       <Col xs={12} md={2}>
         <InputField
           label="Metal Type"
           name="metal_type"
           value={formData.metal_type}
-          onChange={handleChange}                    
+          onChange={handleChange}
           type="select"
-          options={metalTypes.map((metalType) => ({
-            value: metalType.metal_name,
-            label: metalType.metal_name,
-          }))}                    
+          options={filteredMetalTypes.map((metalType) => ({
+            value: metalType.metal_type,
+            label: metalType.metal_type,
+          }))}
         />
       </Col>
-      <Col xs={12} md={2}>
+      <Col xs={12} md={3}>
         <InputField
-          label="Design Name"
+          label="Design Master"
           name="design_name"
           value={formData.design_name}
           onChange={handleChange}
           type="select"
-          options={designmaster.map((designMaster) => ({
-            value: designMaster.design_name,
-            label: designMaster.design_name,
+          options={filteredDesignOptions.map((designOption) => ({
+            value: designOption.design_master,
+            label: designOption.design_master,
           }))}
         />
       </Col>
@@ -546,9 +419,9 @@ const RepairForm = () => {
           value={formData.purity}
           onChange={handleChange}
           type="select"
-          options={purity.map((purity) => ({
-            value: purity.name,
-            label: purity.name,
+          options={filteredPurityOptions.map((Purity) => ({
+            value: Purity.Purity,
+            label: Purity.Purity,
           }))}
         />
       </Col>

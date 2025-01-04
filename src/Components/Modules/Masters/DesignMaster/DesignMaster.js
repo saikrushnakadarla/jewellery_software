@@ -283,10 +283,10 @@ function DesignMaster() {
               required={true}
 
               options={[
-                { value: 'gold', label: 'Gold' },
-                { value: 'silver', label: 'Silver' },
-                { value: 'platinum', label: 'Platinum' },
-                { value: 'diamond', label: 'Diamond' },
+                { value: 'Gold', label: 'Gold' },
+                { value: 'Silver', label: 'Silver' },
+                { value: 'Platinum', label: 'Platinum' },
+                { value: 'Diamond', label: 'Diamond' },
               ]}
               error={errors.metal}
 
@@ -297,7 +297,7 @@ function DesignMaster() {
               name="short_id"
               value={formData.short_id}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.short_id}
 
             />
@@ -319,7 +319,7 @@ function DesignMaster() {
               name="design_item"
               value={formData.design_item}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.design_item}
 
             />
@@ -343,7 +343,7 @@ function DesignMaster() {
               name="wastage_percentage"
               value={formData.wastage_percentage}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.wastage_percentage}
 
             />
@@ -353,7 +353,7 @@ function DesignMaster() {
               name="making_charge"
               value={formData.making_charge}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.making_charge}
 
             />
@@ -363,7 +363,7 @@ function DesignMaster() {
               name="design_short_code"
               value={formData.design_short_code}
               onChange={handleChange}
-              required={true}
+              // required={true}
               error={errors.design_short_code}
 
             />
@@ -373,7 +373,7 @@ function DesignMaster() {
               name="brand_category"
               value={formData.brand_category}
               onChange={handleChange}
-              required={true}
+              // required={true}
             
               error={errors.brand_category}
 
@@ -385,7 +385,7 @@ function DesignMaster() {
               type="select"
               value={formData.mc_type}
               onChange={handleChange}
-              required={true}
+              // required={true}
               options={[
                 { value: 'fixed', label: 'By Fixed' },
                 { value: 'percentage', label: 'By Weight' },
