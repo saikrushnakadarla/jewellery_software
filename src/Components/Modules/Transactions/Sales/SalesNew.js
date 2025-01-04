@@ -32,10 +32,10 @@ const RepairForm = () => {
   const [uniqueProducts, setUniqueProducts] = useState([]); 
   const [metalTypes, setMetalTypes] = useState([]);
   const [purity, setPurity] = useState([]);
-  const [filteredMetalTypes, setFilteredMetalTypes] = useState(metalTypes);
+  const [filteredMetalTypes, setFilteredMetalTypes] = useState([]);
   const [designOptions, setDesignOptions] = useState([]); 
-  const [filteredDesignOptions, setFilteredDesignOptions] = useState(designOptions); 
-  const [filteredPurityOptions, setFilteredPurityOptions] = useState(purity);
+  const [filteredDesignOptions, setFilteredDesignOptions] = useState([]); 
+  const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
 
     const fetchProducts = async () => {
       try {
@@ -89,64 +89,82 @@ const RepairForm = () => {
         console.error("Error fetching tags:", error);
       }
     };
-    
-    const handleProductNameChange = (productName) => {
-      const product = data.find((prod) => String(prod.product_Name) === String(productName));
-    
-      if (product) {
-        setFormData((prevData) => ({
-          ...prevData,
-          code: product.rbarcode,
-          product_id: product.product_id || "",
-          product_name: product.product_Name || "",
-        }));
-    
-        // Filter metal types based on the selected product's metal type
-        const filteredMetalTypes = metalTypes.filter(
-          (metalType) => metalType.metal_type === product.metal_type
-        );
-        setFilteredMetalTypes(filteredMetalTypes); // Update filtered metal types
-    
-        // Filter and deduplicate design_master options for the selected product
-        const filteredDesignOptions = Array.from(
-          new Set(
-            data
-              .filter((prod) => prod.product_Name === productName)
-              .map((prod) => prod.design_master)
-          )
-        ).map((designMaster) => ({ design_master: designMaster }));
-        setFilteredDesignOptions(filteredDesignOptions); // Update filtered design options
-    
-        // Filter and deduplicate purity options for the selected product
-        const filteredPurityOptions = Array.from(
-          new Set(
-            data
-              .filter((prod) => prod.product_Name === productName)
-              .map((prod) => prod.Purity)
-          )
-        ).map((Purity) => ({ Purity }));
-        setFilteredPurityOptions(filteredPurityOptions); // Update filtered purity options
-      } else {
-        setFormData((prevData) => ({
-          ...prevData,
-          code: "",
-          product_id: "",
-          product_name: "",
-          metal_type: "",
-          design_name: "",
-          purity: "",
-        }));
-    
-        setFilteredMetalTypes(metalTypes); // Reset to all metal types
-        setFilteredDesignOptions(designOptions); // Clear design_master options
-        setFilteredPurityOptions(purity); // Clear purity options
-      }
-    };
       
   useEffect(() => {
     fetchProducts();
     fetchTags();
   }, []);
+
+  const handleProductNameChange = (productName) => {
+    const product = data.find((prod) => String(prod.product_Name) === String(productName));
+  
+    if (product) {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode,
+        product_id: product.product_id || "",
+        product_name: product.product_Name || "",
+        
+      }));
+  
+      // Filter metal types based on the selected product's metal type
+      const filteredMetalTypes = metalTypes.filter(
+        (metalType) => metalType.metal_type === product.metal_type
+      );
+      setFilteredMetalTypes(filteredMetalTypes); // Update filtered metal types
+  
+      // Filter and deduplicate design_master options for the selected product
+      const filteredDesignOptions = Array.from(
+        new Set(
+          data
+            .filter((prod) => prod.product_Name === productName)
+            .map((prod) => prod.design_master)
+        )
+      ).map((designMaster) => ({ design_master: designMaster }));
+      setFilteredDesignOptions(filteredDesignOptions); // Update filtered design options
+  
+      // Filter and deduplicate purity options for the selected product
+      const filteredPurityOptions = Array.from(
+        new Set(
+          data
+            .filter((prod) => prod.product_Name === productName)
+            .map((prod) => prod.Purity)
+        )
+      ).map((Purity) => ({ Purity }));
+      setFilteredPurityOptions(filteredPurityOptions); // Update filtered purity options
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        gross_weight: "",
+        stone_weight: "",
+        stone_price: "",
+        weight_bw: "",
+        va_on: "",
+        va_percent: "",
+        wastage_weight: "",
+        total_weight_aw: "",
+        mc_on: "",
+        mc_per_gram: "",
+        making_charges: "",
+        rate: "",
+        rate_amt: "",
+        tax_percent: "",
+        tax_amt: "",
+        total_price: "",
+        qty: "",
+      }));
+  
+      setFilteredMetalTypes(metalTypes); // Reset to all metal types
+      setFilteredDesignOptions(designOptions); // Clear design_master options
+      setFilteredPurityOptions(purity); // Clear purity options
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -169,15 +187,47 @@ const RepairForm = () => {
   
       if (matchingEntry) {
         // Update the PCode_BarCode in the formData
+        const productId = matchingEntry.product_id;
+        const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
         setFormData((prevData) => ({
           ...prevData,
-          code: matchingEntry.PCode_BarCode, // Set the matching PCode_BarCode
+          code: matchingEntry.PCode_BarCode,
+          gross_weight :matchingEntry.Gross_Weight,
+          stone_weight: matchingEntry.Stones_Weight || "",
+          stone_price: matchingEntry.Stones_Price || "",
+          weight_bw: matchingEntry.Weight_BW || "",
+          va_on: matchingEntry.Wastage_On || "",
+          va_percent: matchingEntry.Wastage_Percentage || "",
+          wastage_weight: matchingEntry.WastageWeight || "",
+          total_weight_aw: matchingEntry.TotalWeight_AW || "",
+          mc_on: matchingEntry.Making_Charges_On || "",
+          mc_per_gram: matchingEntry.MC_Per_Gram || "",
+          making_charges: matchingEntry.Making_Charges || "",
+          tax_percent: productDetails?.tax_slab || "",
+          qty: 1, // Allow qty to be editable for tag
         }));
       } else {
         // Reset the PCode_BarCode if no match is found
         setFormData((prevData) => ({
           ...prevData,
           code: "",
+          gross_weight: "",
+          stone_weight: "",
+          stone_price: "",
+          weight_bw: "",
+          va_on: "",
+          va_percent: "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "",
+          mc_per_gram: "",
+          making_charges: "",
+          rate: "",
+          rate_amt: "",
+          tax_percent: "",
+          tax_amt: "",
+          total_price: "",
+          qty: "",
         }));
       }
     } else {
@@ -189,7 +239,6 @@ const RepairForm = () => {
     }
   };
   
-
   const handleBarcodeChange = async (code) => {
     try {
       if (!code) {
@@ -331,146 +380,103 @@ const RepairForm = () => {
           <div className="sales-form-section">
             <Col>
             <Row>
-    <Col xs={12} md={2}>
-          <InputField
-            label="BarCode/Rbarcode"
-            name="code"
-            value={formData.code}
-            onChange={(e) => handleBarcodeChange(e.target.value)}
-            type="select"
-            options={
-              !formData.product_id
-                ? [
-                    ...products.map((product) => ({
-                      value: product.rbarcode,
-                      label: product.rbarcode,
-                    })),
-                    ...data.map((tag) => ({
-                      value: tag.PCode_BarCode,
-                      label: tag.PCode_BarCode,
-                    })),
-                  ]
-                : [
-                    ...products
-                      .filter(
-                        (product) =>
-                          String(product.product_id) === String(formData.product_id)
-                      )
-                      .map((product) => ({
-                        value: product.rbarcode,
-                        label: product.rbarcode,
-                      })),
-                    ...data
-                      .filter(
-                        (tag) =>
-                          String(tag.product_id) === String(formData.product_id)
-                      )
-                      .map((tag) => ({
-                        value: tag.PCode_BarCode,
-                        label: tag.PCode_BarCode,
-                      })),
-                  ]
-            }
-          />
-        </Col>
-        <Col xs={12} md={3}>
-        <InputField
-          label="Product Name"
-          name="product_name"
-          value={formData.product_name}
-          onChange={(e) => handleProductNameChange(e.target.value)}
-          type="select"
-          options={uniqueProducts.map((prod) => ({
-            value: prod.product_Name,
-            label: prod.product_Name,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Metal Type"
-          name="metal_type"
-          value={formData.metal_type}
-          onChange={handleChange}
-          type="select"
-          options={filteredMetalTypes.map((metalType) => ({
-            value: metalType.metal_type,
-            label: metalType.metal_type,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField
-          label="Design Master"
-          name="design_name"
-          value={formData.design_name}
-          onChange={handleChange}
-          type="select"
-          options={filteredDesignOptions.map((designOption) => ({
-            value: designOption.design_master,
-            label: designOption.design_master,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Purity"
-          name="purity"
-          value={formData.purity}
-          onChange={handleChange}
-          type="select"
-          options={filteredPurityOptions.map((Purity) => ({
-            value: Purity.Purity,
-            label: Purity.Purity,
-          }))}
-        />
-      </Col>
+            <Col xs={12} md={2}>
+                  <InputField
+                    label="BarCode/Rbarcode"
+                    name="code"
+                    value={formData.code}
+                    onChange={(e) => handleBarcodeChange(e.target.value)}
+                    type="select"
+                    options={
+                      !formData.product_id
+                        ? [
+                            ...products.map((product) => ({
+                              value: product.rbarcode,
+                              label: product.rbarcode,
+                            })),
+                            ...data.map((tag) => ({
+                              value: tag.PCode_BarCode,
+                              label: tag.PCode_BarCode,
+                            })),
+                          ]
+                        : [
+                            ...products
+                              .filter(
+                                (product) =>
+                                  String(product.product_id) === String(formData.product_id)
+                              )
+                              .map((product) => ({
+                                value: product.rbarcode,
+                                label: product.rbarcode,
+                              })),
+                            ...data
+                              .filter(
+                                (tag) =>
+                                  String(tag.product_id) === String(formData.product_id)
+                              )
+                              .map((tag) => ({
+                                value: tag.PCode_BarCode,
+                                label: tag.PCode_BarCode,
+                              })),
+                          ]
+                    }
+                  />
+              </Col>
+                <Col xs={12} md={3}>
+                <InputField
+                  label="Product Name"
+                  name="product_name"
+                  value={formData.product_name}
+                  onChange={(e) => handleProductNameChange(e.target.value)}
+                  type="select"
+                  options={uniqueProducts.map((prod) => ({
+                    value: prod.product_Name,
+                    label: prod.product_Name,
+                  }))}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Metal Type"
+                  name="metal_type"
+                  value={formData.metal_type}
+                  onChange={handleChange}
+                  type="select"
+                  options={filteredMetalTypes.map((metalType) => ({
+                    value: metalType.metal_type,
+                    label: metalType.metal_type,
+                  }))}
+                />
+              </Col>
+              <Col xs={12} md={3}>
+                <InputField
+                  label="Design Master"
+                  name="design_name"
+                  value={formData.design_name}
+                  onChange={handleChange}
+                  type="select"
+                  options={filteredDesignOptions.map((designOption) => ({
+                    value: designOption.design_master,
+                    label: designOption.design_master,
+                  }))}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Purity"
+                  name="purity"
+                  value={formData.purity}
+                  onChange={handleChange}
+                  type="select"
+                  options={filteredPurityOptions.map((Purity) => ({
+                    value: Purity.Purity,
+                    label: Purity.Purity,
+                  }))}
+                />
+              </Col>
 
-      {/* <Col xs={12} md={2}>
-        <InputField
-          label="P ID"
-          name="product_id"
-          value={formData.product_id}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField
-          label="Product Name"
-          name="product_name"
-          value={formData.product_name}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Metal Type"
-          name="metal_type"
-          value={formData.metal_type}
-          onChange={handleChange}
-          readOnly                  
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Design Name"
-          name="design_name"
-          value={formData.design_name}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Purity"
-          name="purity"
-          value={formData.purity}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col> */}
+
+
       <Col xs={12} md={1}>
         <InputField
           label="Gross Wt"
@@ -631,17 +637,6 @@ const RepairForm = () => {
           readOnly
         />
       </Col>
-      {/* <Col xs={12} md={1}>
-          <Button
-            onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
-            style={{
-              backgroundColor: isEditing ? "#a36e29" : "#a36e29",
-              borderColor: isEditing ? "#a36e29" : "#a36e29",
-            }}
-          >
-            {isEditing ? "Update" : "Add"}
-          </Button>
-        </Col> */}
       </Row>
             </Col>
           </div>

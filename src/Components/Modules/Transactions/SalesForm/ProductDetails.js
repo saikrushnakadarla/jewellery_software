@@ -5,128 +5,124 @@ import axios from 'axios';
 import baseURL from "../../../../Url/NodeBaseURL";
 
 const ProductDetails = ({ 
+  handleAdd,
+  handleUpdate,
+  isEditing, 
   formData, 
   data,
   handleChange, 
   handleBarcodeChange,
-  handleProductChange,
   handleProductNameChange,
-  handleMetalTypeChange,
-  handleDesignNameChange,
-  handleAdd,
-  handleUpdate,
-  isEditing, 
   products,
-
+  filteredDesignOptions,
+  filteredPurityOptions,
+  filteredMetalTypes,
+  uniqueProducts,
   isQtyEditable
 }) => {
+
+  console.log("Filtered Design Options:", filteredDesignOptions);
+  console.log("Filtered Purity Options:", filteredPurityOptions);
+  console.log("Filtered Metal Types:", filteredMetalTypes);
+  console.log("Unique Products:", uniqueProducts);
   
   return (
     <Col >
     <Row>
     <Col xs={12} md={2}>
-          <InputField
-            label="BarCode/Rbarcode"
-            name="code"
-            value={formData.code}
-            onChange={(e) => handleBarcodeChange(e.target.value)}
-            type="select"
-            options={
-              !formData.product_id
-                ? [
-                    ...products.map((product) => ({
-                      value: product.rbarcode,
-                      label: product.rbarcode,
-                    })),
-                    ...data.map((tag) => ({
-                      value: tag.PCode_BarCode,
-                      label: tag.PCode_BarCode,
-                    })),
-                  ]
-                : [
-                    ...products
-                      .filter(
-                        (product) =>
-                          String(product.product_id) === String(formData.product_id)
-                      )
-                      .map((product) => ({
-                        value: product.rbarcode,
-                        label: product.rbarcode,
-                      })),
-                    ...data
-                      .filter(
-                        (tag) =>
-                          String(tag.product_id) === String(formData.product_id)
-                      )
-                      .map((tag) => ({
-                        value: tag.PCode_BarCode,
-                        label: tag.PCode_BarCode,
-                      })),
-                  ]
-            }
-          />
-        </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="P ID"
-          name="product_id"
-          value={formData.product_id}
-          onChange={(e) => handleProductChange(e.target.value)}
-          type="select"
-          options={products.map((product) => ({
-            value: product.product_id,
-            label: product.product_id,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField
-          label="Product Name"
-          name="product_name"
-          value={formData.product_name}
-          onChange={(e) => handleProductNameChange(e.target.value)}
-          type="select"
-          options={products.map((product) => ({
-            value: product.product_name,
-            label: product.product_name,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Metal Type"
-          name="metal_type"
-          value={formData.metal_type}
-          onChange={(e) => handleMetalTypeChange(e.target.value)}                    
-          type="select"
-          options={products.map((product) => ({
-            value: product.Category,
-            label: product.Category,
-          }))}                    
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Design Name"
-          name="design_name"
-          value={formData.design_name}
-          onChange={(e) => handleDesignNameChange(e.target.value)}
-          type="select"
-          options={products.map((product) => ({
-            value: product.design_master,
-            label: product.design_master,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Purity"
-          name="purity"
-          value={formData.purity}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
+                  <InputField
+                    label="BarCode/Rbarcode"
+                    name="code"
+                    value={formData.code}
+                    onChange={(e) => handleBarcodeChange(e.target.value)}
+                    type="select"
+                    options={
+                      !formData.product_id
+                        ? [
+                            ...products.map((product) => ({
+                              value: product.rbarcode,
+                              label: product.rbarcode,
+                            })),
+                            ...data.map((tag) => ({
+                              value: tag.PCode_BarCode,
+                              label: tag.PCode_BarCode,
+                            })),
+                          ]
+                        : [
+                            ...products
+                              .filter(
+                                (product) =>
+                                  String(product.product_id) === String(formData.product_id)
+                              )
+                              .map((product) => ({
+                                value: product.rbarcode,
+                                label: product.rbarcode,
+                              })),
+                            ...data
+                              .filter(
+                                (tag) =>
+                                  String(tag.product_id) === String(formData.product_id)
+                              )
+                              .map((tag) => ({
+                                value: tag.PCode_BarCode,
+                                label: tag.PCode_BarCode,
+                              })),
+                          ]
+                    }
+                  />
+              </Col>
+                <Col xs={12} md={3}>
+                <InputField
+                  label="Product Name"
+                  name="product_name"
+                  value={formData.product_name}
+                  onChange={(e) => handleProductNameChange(e.target.value)}
+                  type="select"
+                  options={uniqueProducts.map((prod) => ({
+                    value: prod.product_Name,
+                    label: prod.product_Name,
+                  }))}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Metal Type"
+                  name="metal_type"
+                  value={formData.metal_type}
+                  onChange={handleChange}
+                  type="select"
+                  options={filteredMetalTypes.map((metalType) => ({
+                    value: metalType.metal_type,
+                    label: metalType.metal_type,
+                  }))}
+                />
+              </Col>
+              <Col xs={12} md={3}>
+                <InputField
+                  label="Design Master"
+                  name="design_name"
+                  value={formData.design_name}
+                  onChange={handleChange}
+                  type="select"
+                  options={filteredDesignOptions?.map((designOption) => ({
+                    value: designOption.design_master,
+                    label: designOption.design_master,
+                  }))}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Purity"
+                  name="purity"
+                  value={formData.purity}
+                  onChange={handleChange}
+                  type="select"
+                  options={filteredPurityOptions.map((Purity) => ({
+                    value: Purity.Purity,
+                    label: Purity.Purity,
+                  }))}
+                />
+              </Col>
       <Col xs={12} md={1}>
         <InputField
           label="Gross Wt"
