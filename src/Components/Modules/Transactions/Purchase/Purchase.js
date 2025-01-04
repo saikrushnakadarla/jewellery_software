@@ -43,7 +43,7 @@ const URDPurchase = () => {
       rate: "",
       total_amount: "",
     });
-  const [tableData, setTableData] = useState([]);
+  // const [tableData, setTableData] = useState([]);
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
   const [purityOptions, setPurityOptions] = useState([]);
   const [showModal1, setShowModal] = useState(false);
@@ -51,36 +51,7 @@ const URDPurchase = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [categories, setCategories] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchPurityPercentage = async () => {
-  //     try {
-  //       const response = await axios.get(`${baseURL}/purity`);
-  //       setPurityOptions(response.data);
-  //       const purityData = Array.isArray(response.data) ? response.data : [response.data]; // Ensure response is an array
 
-  //       console.log("API Data:", purityData); // Log the API data for debugging
-
-  //       // Find the matching purity
-  //       const matchedPurity = purityData.find(
-  //         (item) => item.name === formData.purity
-  //       );
-
-  //       if (matchedPurity) {
-  //         console.log("Matched Purity:", matchedPurity); // Log the matched purity
-  //         setFormData((prevData) => ({
-  //           ...prevData,
-  //           purityPercentage: matchedPurity.purity_percentage,
-  //         }));
-  //       } else {
-  //         console.warn("Purity not found in API data");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching purity data:", error);
-  //     }
-  //   };
-
-  //   fetchPurityPercentage();
-  // }, [formData.purity]);
 
   const handleChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
@@ -168,6 +139,19 @@ const URDPurchase = () => {
       return updatedDetails;
     });
   };
+
+  const [tableData, setTableData] = useState(() => {
+    const savedData = localStorage.getItem("tableData");
+    return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
+  });
+
+  // const [editingIndex, setEditingIndex] = useState(null);
+
+  // Save table data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("tableData", JSON.stringify(tableData));
+  }, [tableData]);
+
 
   const handleAdd = async (e) => {
     e.preventDefault();
