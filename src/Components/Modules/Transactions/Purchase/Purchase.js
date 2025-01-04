@@ -43,7 +43,7 @@ const URDPurchase = () => {
       rate: "",
       total_amount: "",
     });
-  const [tableData, setTableData] = useState([]);
+  // const [tableData, setTableData] = useState([]);
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
   const [purityOptions, setPurityOptions] = useState([]);
   const [showModal1, setShowModal] = useState(false);
@@ -169,18 +169,27 @@ const URDPurchase = () => {
     });
   };
 
- const handleAdd = async (e) => {
+// Initialize table data from localStorage
+const [tableData, setTableData] = React.useState(() => {
+  const savedData = localStorage.getItem("tableData");
+  return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
+});
+
+// Save table data to localStorage whenever it changes
+useEffect(() => {
+  localStorage.setItem("tableData", JSON.stringify(tableData));
+}, [tableData]);
+
+const handleAdd = async (e) => {
   e.preventDefault();
 
-  // Prepare data to be sent to the API
   const apiData = {
-    product_id: formData.product_id, // Assuming rbarcode maps to product_id
-    pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
-    gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
+    product_id: formData.product_id,
+    pcs: formData.pcs || "0",
+    gross_weight: formData.gross_weight || "0",
   };
 
   try {
-    // Make a POST request to the API
     const response = await fetch("http://localhost:5000/add-entry", {
       method: "POST",
       headers: {
@@ -194,20 +203,17 @@ const URDPurchase = () => {
       console.log("Pcs and GrossWeight added to the database successfully:", result);
 
       if (editingIndex === null) {
-        // Add new entry to the table
         setTableData([...tableData, formData]);
       } else {
-        // Edit existing entry in the table
         const updatedTableData = tableData.map((row, index) =>
           index === editingIndex ? formData : row
         );
         setTableData(updatedTableData);
-        setEditingIndex(null); // Reset edit mode
+        setEditingIndex(null);
       }
 
-      // Reset formData only when needed (optional for editing scenarios)
       setFormData({
-        ...formData, // If necessary, keep persistent fields like mobile, etc.
+        ...formData,
         category: "",
         hsn_code: "",
         rbarcode: "",
@@ -231,59 +237,56 @@ const URDPurchase = () => {
   }
 };
 
-  
+const handleSave = async (e) => {
+  e.preventDefault();
+  try {
+    const dataToSave = {
+      formData: { ...formData }, // Explicitly spread to ensure values are intact
+      table_data: tableData, // Include table data
+    };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    try {
-      const dataToSave = {
-        formData: { ...formData }, // Explicitly spread to ensure values are intact
-        table_data: tableData, // Include table data
-      };
+    // Send the data to your backend
+    const response = await axios.post("http://localhost:5000/post/purchase", dataToSave, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      // Send the data to your backend
-      const response = await axios.post("http://localhost:5000/post/purchase", dataToSave, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    console.log("Data saved successfully:", response.data);
+    alert("Data saved successfully:")
 
-      console.log("Data saved successfully:", response.data);
-      alert("Data saved successfully:")
+    // Optionally reset after successful save
+    setFormData({
+      mobile: "",
+      account_name: "",
+      gst_in: "",
+      terms: "Cash",
+      invoice: "",
+      bill_no: "",
+      rate_cut: "",
+      date: new Date().toISOString().split("T")[0],
+      bill_date: new Date().toISOString().split("T")[0],
+      due_date: "",
+      category: "",
+      rbarcode: "",
+      pcs: "",
+      gross_weight: "",
+      stone_weight: "",
+      net_weight: "",
+      hm_charges: "",
+      other_charges: "",
+      charges: "",
+      purity: "",
+      pure_weight: "",
+      rate: "",
+      total_amount: "",
+    });
 
-      // Optionally reset after successful save
-      setFormData({
-        mobile: "",
-        account_name: "",
-        gst_in: "",
-        terms: "Cash",
-        invoice: "",
-        bill_no: "",
-        rate_cut: "",
-        date: new Date().toISOString().split("T")[0],
-        bill_date: new Date().toISOString().split("T")[0],
-        due_date: "",
-        category: "",
-        rbarcode: "",
-        pcs: "",
-        gross_weight: "",
-        stone_weight: "",
-        net_weight: "",
-        hm_charges: "",
-        other_charges: "",
-        charges: "",
-        purity: "",
-        pure_weight: "",
-        rate: "",
-        total_amount: "",
-      });
-
-      setTableData([]); // Reset table data if needed
-    } catch (error) {
-      console.error("Error saving data:", error);
-    }
-  };
-
+    setTableData([]); // Reset table data if needed
+  } catch (error) {
+    console.error("Error saving data:", error);
+  }
+};
   const handleEdit = (index) => {
     setFormData(tableData[index]); // Populate the form with selected row data
     setEditingIndex(index); // Track the index being edited
