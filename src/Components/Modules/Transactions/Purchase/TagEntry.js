@@ -10,16 +10,13 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import { Form, Row, Col } from 'react-bootstrap';
 import { Modal, Button } from "react-bootstrap";  // Add this import
 
-
-
 const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const [productDetails, setProductDetails] = useState({
         pcs: selectedProduct?.pcs || 0,
         gross_weight: selectedProduct?.gross_weight || 0,
     });
-
+    const navigate = useNavigate();
     const [subCategories, setSubCategories] = useState([]);
-
     const [productOptions, setProductOptions] = useState([]);
     const [formData, setFormData] = useState({
         product_id: selectedProduct.product_id,
@@ -53,6 +50,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         Design_Master: selectedProduct.design_name,
         Weight_BW: "",
     });
+    const [showModal, setShowModal] = useState(false);
+    const handleOpenModal = () => setShowModal(true);
+    const handleCloseModal = () => setShowModal(false);
 
     useEffect(() => {
         if (selectedProduct) {
@@ -70,11 +70,6 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             Stones_Price: totalPrice.toFixed(2),
         });
     };
-
-    const [showModal, setShowModal] = useState(false);
-
-    const handleOpenModal = () => setShowModal(true);
-    const handleCloseModal = () => setShowModal(false);
 
     // const handleChange = (e) => {
     //     const { name, value } = e.target;
@@ -138,20 +133,13 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             }));
         }
     };
-
-
-
     useEffect(() => {
         handleMakingChargesCalculation();
     }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
 
-    const navigate = useNavigate();
-
     const handleBack = () => {
         navigate("/stockEntryTable");
     };
-
-
 
     // Fetch product options for P ID dropdown (product_id)
     useEffect(() => {
@@ -217,9 +205,6 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }
     };
 
-
-
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -254,13 +239,13 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             });
     
             // Update gross weight and pcs using the API
-            await axios.post(`${baseURL}/add-entry`, {
-                id: formData.id,
-                product_id: formData.product_id,
-                pcs: updatedPcs,
-                gross_weight: updatedGrossWeight,
-                added_at: new Date().toISOString(),
-            });
+            // await axios.post(`${baseURL}/add-entry`, {
+            //     id: formData.id,
+            //     product_id: formData.product_id,
+            //     pcs: updatedPcs,
+            //     gross_weight: updatedGrossWeight,
+            //     added_at: new Date().toISOString(),
+            // });
 
             alert('Data and updated values saved successfully!');
     
@@ -303,7 +288,6 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }
     };
     
-
     useEffect(() => {
         const getLastPcode = async () => {
             try {
@@ -359,7 +343,6 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             console.log("Product ID:", selectedProduct.metal_type); // Use product_id as needed
         }
     }, [selectedProduct]);
-
 
     // Handle form submission to add new subcategory
     const handleAddSubCategory = async () => {
@@ -417,7 +400,6 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }
     }, [selectedProduct]);
     
-
     const [designOptions, setdesignOptions] = useState([]);
 
     // Fetch design master options from the API
