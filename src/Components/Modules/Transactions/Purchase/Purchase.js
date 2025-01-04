@@ -284,10 +284,40 @@ const URDPurchase = () => {
     }
   };
 
-  const handleEdit = (index) => {
-    setFormData(tableData[index]); // Populate the form with selected row data
-    setEditingIndex(index); // Track the index being edited
+  // const handleEdit = (index) => {
+  //   setFormData(tableData[index]); // Populate the form with selected row data
+  //   setEditingIndex(index); // Track the index being edited
+  // };
+
+  const handleEdit = async (index) => {
+    const selectedData = tableData[index]; // Get the data for the selected row
+    const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
+  
+    try {
+      // Send a request to the backend to update the product_id entry
+      const response = await fetch(`http://localhost:5000/delete-updated-values/${product_id}`, {
+        method: "PUT", // Change to PUT since we're updating, not deleting
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pcs, gross_weight }), // Pass pcs and gross_weight
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to update entry in updated_values_table");
+      }
+  
+      console.log("Entry updated successfully");
+      setFormData(selectedData); // Populate the form with selected row data
+      setEditingIndex(index); // Track the index being edited
+    } catch (error) {
+      console.error("Error updating entry:", error);
+      alert("Failed to update the entry. Please try again.");
+    }
   };
+  
+  
+  
 
   const handleDelete = (index) => {
     const updatedTableData = tableData.filter((_, i) => i !== index);
