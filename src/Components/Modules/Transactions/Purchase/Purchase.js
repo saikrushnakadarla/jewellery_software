@@ -579,8 +579,6 @@ const URDPurchase = () => {
 
 
 
-
-
   useEffect(() => {
     if (formData.category && formData.purity) {
       // Fetch data from API
