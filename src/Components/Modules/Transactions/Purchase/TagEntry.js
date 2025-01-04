@@ -229,27 +229,41 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         const currentSuffix = parseInt(formData.suffix || "001", 10);
         const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
-
+    
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
             return;
         }
-
+    
         try {
+            const updatedGrossWeight = -parseFloat(formData.Gross_Weight || 0);
+            const updatedPcs = -1;
+    
             // If `prev` is available from the component state, props, or elsewhere:
             const prev = {
                 item_prefix: "", // Replace this with your actual logic for prev
             };
-
+    
+            // Save form data
             await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
+    
+            // Update gross weight and pcs using the API
+            await axios.post("http://localhost:5000/add-entry", {
+                id: formData.id,
+                product_id: formData.product_id,
+                pcs: updatedPcs,
+                gross_weight: updatedGrossWeight,
+                added_at: new Date().toISOString(),
+            });
 
             alert('Data and updated values saved successfully!');
-
+    
+            // Reset form data
             setFormData({
                 product_id: selectedProduct.product_id,
                 category: selectedProduct.category,
@@ -260,7 +274,6 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 Pricing: "",
                 Tag_ID: "",
                 Prefix: "",
-                // Category: selectedProduct.metal_type,
                 metal_type: selectedProduct.metal_type,
                 Purity: selectedProduct.purity,
                 PCode_BarCode: `${prev?.item_prefix || ""}${nextSuffix}`,
@@ -287,6 +300,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             alert('An error occurred. Please try again.');
         }
     };
+    
 
     useEffect(() => {
         const getLastPcode = async () => {
@@ -382,11 +396,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }
     };
 
-
-
-
     // Fetch the subcategories when the component mounts
-
     const fetchSubCategories = async () => {
         try {
             const response = await axios.get("http://localhost:5000/get/subcategories");
