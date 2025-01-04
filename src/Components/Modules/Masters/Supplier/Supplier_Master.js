@@ -145,7 +145,9 @@ function Supplier_Master() {
   
       if (saveResponse.ok) {
         alert(`Supplier ${id ? 'updated' : 'created'} successfully!`);
-        navigate('/suppliertable');
+        // navigate('/suppliertable');
+        const from = location.state?.from || "/suppliertable";
+        navigate(from);
       } else {
         console.error('Failed to save supplier');
         alert('Failed to save supplier.');

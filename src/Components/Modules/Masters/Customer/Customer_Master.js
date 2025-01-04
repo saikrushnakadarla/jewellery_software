@@ -165,7 +165,8 @@ function Customer_Master() {
 
       if (saveResponse.ok) {
         alert(`Customer ${id ? 'updated' : 'created'} successfully!`);
-        navigate('/customerstable');
+        const from = location.state?.from || "/customerstable";
+        navigate(from);
       } else {
         console.error('Failed to save supplier');
         alert('Failed to save supplier.');
