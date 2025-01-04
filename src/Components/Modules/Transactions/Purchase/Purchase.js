@@ -38,7 +38,7 @@ const URDPurchase = () => {
       other_charges: "",
       charges: "",
       purity: "",
-      metal_type:"",
+      metal_type: "",
       pure_weight: "",
       rate: "",
       total_amount: "",
@@ -169,69 +169,69 @@ const URDPurchase = () => {
     });
   };
 
- const handleAdd = async (e) => {
-  e.preventDefault();
+  const handleAdd = async (e) => {
+    e.preventDefault();
 
-  // Prepare data to be sent to the API
-  const apiData = {
-    product_id: formData.product_id, // Assuming rbarcode maps to product_id
-    pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
-    gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
+    // Prepare data to be sent to the API
+    const apiData = {
+      product_id: formData.product_id, // Assuming rbarcode maps to product_id
+      pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
+      gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
+    };
+
+    try {
+      // Make a POST request to the API
+      const response = await fetch("http://localhost:5000/add-entry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Pcs and GrossWeight added to the database successfully:", result);
+
+        if (editingIndex === null) {
+          // Add new entry to the table
+          setTableData([...tableData, formData]);
+        } else {
+          // Edit existing entry in the table
+          const updatedTableData = tableData.map((row, index) =>
+            index === editingIndex ? formData : row
+          );
+          setTableData(updatedTableData);
+          setEditingIndex(null); // Reset edit mode
+        }
+
+        // Reset formData only when needed (optional for editing scenarios)
+        setFormData({
+          ...formData, // If necessary, keep persistent fields like mobile, etc.
+          category: "",
+          hsn_code: "",
+          rbarcode: "",
+          pcs: "",
+          gross_weight: "",
+          stone_weight: "",
+          net_weight: "",
+          hm_charges: "",
+          other_charges: "",
+          charges: "",
+          purity: "",
+          pure_weight: "",
+          rate: "",
+          total_amount: "",
+        });
+      } else {
+        console.error("Failed to add entry to the database:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error while adding entry to the database:", error);
+    }
   };
 
-  try {
-    // Make a POST request to the API
-    const response = await fetch("http://localhost:5000/add-entry", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(apiData),
-    });
 
-    if (response.ok) {
-      const result = await response.json();
-      console.log("Pcs and GrossWeight added to the database successfully:", result);
-
-      if (editingIndex === null) {
-        // Add new entry to the table
-        setTableData([...tableData, formData]);
-      } else {
-        // Edit existing entry in the table
-        const updatedTableData = tableData.map((row, index) =>
-          index === editingIndex ? formData : row
-        );
-        setTableData(updatedTableData);
-        setEditingIndex(null); // Reset edit mode
-      }
-
-      // Reset formData only when needed (optional for editing scenarios)
-      setFormData({
-        ...formData, // If necessary, keep persistent fields like mobile, etc.
-        category: "",
-        hsn_code: "",
-        rbarcode: "",
-        pcs: "",
-        gross_weight: "",
-        stone_weight: "",
-        net_weight: "",
-        hm_charges: "",
-        other_charges: "",
-        charges: "",
-        purity: "",
-        pure_weight: "",
-        rate: "",
-        total_amount: "",
-      });
-    } else {
-      console.error("Failed to add entry to the database:", response.statusText);
-    }
-  } catch (error) {
-    console.error("Error while adding entry to the database:", error);
-  }
-};
-
-  
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -291,7 +291,7 @@ const URDPurchase = () => {
   const handleEdit = async (index) => {
     const selectedData = tableData[index]; // Get the data for the selected row
     const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
-  
+
     try {
       // Send a request to the backend to update the product_id entry
       const response = await fetch(`http://localhost:5000/delete-updated-values/${product_id}`, {
@@ -301,11 +301,11 @@ const URDPurchase = () => {
         },
         body: JSON.stringify({ pcs, gross_weight }), // Pass pcs and gross_weight
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to update entry in updated_values_table");
       }
-  
+
       console.log("Entry updated successfully");
       setFormData(selectedData); // Populate the form with selected row data
       setEditingIndex(index); // Track the index being edited
@@ -314,8 +314,8 @@ const URDPurchase = () => {
       alert("Failed to update the entry. Please try again.");
     }
   };
-  
-  
+
+
   const handleDelete = (index) => {
     const updatedTableData = tableData.filter((_, i) => i !== index);
     setTableData(updatedTableData); // Remove the selected row
@@ -460,21 +460,21 @@ const URDPurchase = () => {
   // }, []);
 
 
-  useEffect(() => {
-    const fetchLastInvoice = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/lastInvoice`);
-        setFormData((prev) => ({
-          ...prev,
-          invoice: response.data.lastInvoiceNumber,
-        }));
-      } catch (error) {
-        console.error("Error fetching estimate number:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchLastInvoice = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/lastInvoice`);
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         invoice: response.data.lastInvoiceNumber,
+  //       }));
+  //     } catch (error) {
+  //       console.error("Error fetching estimate number:", error);
+  //     }
+  //   };
 
-    fetchLastInvoice();
-  }, []);
+  //   fetchLastInvoice();
+  // }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -601,13 +601,13 @@ const URDPurchase = () => {
             setProductIdAndRbarcode({
               product_id: matchingProduct.product_id,
               rbarcode: matchingProduct.rbarcode,
-              metal_type:matchingProduct.Category,
+              metal_type: matchingProduct.Category,
             });
             setFormData((prevFormData) => ({
               ...prevFormData,
               product_id: matchingProduct.product_id, // Add product_id here
               rbarcode: matchingProduct.rbarcode,    // Ensure rbarcode is also updated
-              metal_type:matchingProduct.Category,
+              metal_type: matchingProduct.Category,
             }));
 
             // Log success to console
@@ -641,6 +641,13 @@ const URDPurchase = () => {
   const handleOpenModal = (data) => {
     setSelectedProduct(data);
     setShowModal(true);
+  };
+
+
+  // Handle category addition and navigate
+  const handleAddCategory = () => {
+    console.log("Add Category button clicked");
+    navigate("/itemmaster");
   };
 
   return (
@@ -715,14 +722,17 @@ const URDPurchase = () => {
                       ]}
                     />
                   </Col>
-                  <Col xs={12} md={3} >
-                    <InputField label="Invoice" value={formData.invoice}
-                      onChange={(e) => handleChange("indent", e.target.value)} />
+                  <Col xs={12} md={4}>
+                    <InputField
+                      label="Invoice"
+                      value={formData.invoice}
+                      onChange={(e) => handleChange("invoice", e.target.value)} // Corrected key
+                    />
                   </Col>
-                  <Col xs={12} md={3} >
+                  {/* <Col xs={12} md={3} >
                     <InputField label="Bill No" value={formData.bill_no}
                       onChange={(e) => handleChange("bill_no", e.target.value)} />
-                  </Col>
+                  </Col> */}
 
                   <Col xs={12} md={3} >
                     <InputField label="Rate-Cut" value={formData.rate_cut}
@@ -743,19 +753,31 @@ const URDPurchase = () => {
           </div>
           <div className="urd-form-section">
             <Row>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Category"
-                  name="category"
-                  type="select"
-                  value={formData.category}
-                  onChange={(e) => handleChange("category", e.target.value)}
-                  options={categories.map((category) => ({
-                    value: category.value,
-                    label: category.label,
-                  }))}
-                />
-              </Col>
+            <Col xs={12} md={2} className="d-flex align-items-center">
+        <div style={{ flex: 1 }}>
+          <InputField
+            label="Category"
+            name="category"
+            type="select"
+            value={formData.category}
+            onChange={(e) => handleChange("category", e.target.value)}
+            options={categories.map((category) => ({
+              value: category.value,
+              label: category.label,
+            }))}
+          />
+        </div>
+        <AiOutlinePlus
+          size={20}
+          color="black"
+          onClick={handleAddCategory}
+          style={{
+            marginLeft: "10px",
+            cursor: "pointer",
+            marginBottom: "20px",
+          }}
+        />
+      </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Rbarcode"
