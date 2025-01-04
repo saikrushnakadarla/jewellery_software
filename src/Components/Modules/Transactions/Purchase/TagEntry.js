@@ -11,6 +11,7 @@ import { Form, Row, Col } from 'react-bootstrap';
 import { Modal, Button } from "react-bootstrap";  // Add this import
 
 
+
 const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const [productDetails, setProductDetails] = useState({
         pcs: selectedProduct?.pcs || 0,
@@ -253,7 +254,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             });
     
             // Update gross weight and pcs using the API
-            await axios.post("http://localhost:5000/add-entry", {
+            await axios.post(`${baseURL}/add-entry`, {
                 id: formData.id,
                 product_id: formData.product_id,
                 pcs: updatedPcs,
@@ -263,6 +264,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
             alert('Data and updated values saved successfully!');
     
+            fetchData();
             // Reset form data
             setFormData({
                 product_id: selectedProduct.product_id,
@@ -371,7 +373,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             };
 
             // Make POST request to the API
-            const response = await axios.post('http://localhost:5000/post/subcategory', data);
+            const response = await axios.post(`${baseURL}/post/subcategory`, data);
 
             if (response.status === 201) { // Use 201 instead of 200 for created status
                 // Successfully added the subcategory
@@ -399,7 +401,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     // Fetch the subcategories when the component mounts
     const fetchSubCategories = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/get/subcategories");
+            const response = await axios.get(`${baseURL}/get/subcategories`);
             const filteredSubCategories = response.data.filter(
                 (subCategory) => subCategory.category_id === selectedProduct.product_id
             );
@@ -444,10 +446,10 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
   const [grossWeight, setGrossWeight] = useState(null);
 
   // Function to fetch data from the API
-  useEffect(() => {
+  
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/entry/${selectedProduct.product_id}`);
+        const response = await fetch(`${baseURL}/entry/${selectedProduct.product_id}`);
         const data = await response.json();
         setPcs(data.pcs);
         setGrossWeight(data.gross_weight);
@@ -461,7 +463,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         console.error("Error fetching data:", error);
       }
     };
-
+    useEffect(() => {
     fetchData();
   }, [selectedProduct.product_id]);
 
