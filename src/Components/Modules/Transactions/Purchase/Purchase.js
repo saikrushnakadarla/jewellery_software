@@ -645,7 +645,7 @@ const URDPurchase = () => {
   // Handle category addition and navigate
   const handleAddCategory = () => {
     console.log("Add Category button clicked");
-    navigate("/itemmaster");
+    navigate("/itemmaster" , { state: { from: "/purchase" } });
   };
 
   return (
@@ -943,6 +943,7 @@ const URDPurchase = () => {
                           type="button"
                           className="action-button edit-button"
                           onClick={() => handleEdit(index)}
+                          // disabled={editingIndex !== null}
                         >
                           <FaEdit />
                         </button>
