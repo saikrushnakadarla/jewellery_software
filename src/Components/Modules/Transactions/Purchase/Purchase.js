@@ -15,34 +15,40 @@ const URDPurchase = () => {
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
   const [productIdAndRbarcode, setProductIdAndRbarcode] = useState({});
-  const [formData, setFormData] = useState(
-    {
-      mobile: "",
-      account_name: "",
-      gst_in: "",
-      terms: "Cash",
-      invoice: "",
-      bill_no: "",
-      rate_cut: "",
-      date: new Date().toISOString().split("T")[0],
-      bill_date: new Date().toISOString().split("T")[0],
-      due_date: "",
-      category: "",
-      hsn_code: "",
-      rbarcode: "",
-      pcs: "",
-      gross_weight: "",
-      stone_weight: "",
-      net_weight: "",
-      hm_charges: "",
-      other_charges: "",
-      charges: "",
-      purity: "",
-      metal_type: "",
-      pure_weight: "",
-      rate: "",
-      total_amount: "",
-    });
+  const [formData, setFormData] = useState(() => {
+    // Load from local storage if available, otherwise use initial state
+    const savedData = localStorage.getItem("purchaseFormData");
+    return savedData
+      ? JSON.parse(savedData)
+      : {
+          mobile: "",
+          account_name: "",
+          gst_in: "",
+          terms: "Cash",
+          invoice: "",
+          bill_no: "",
+          rate_cut: "",
+          date: new Date().toISOString().split("T")[0],
+          bill_date: new Date().toISOString().split("T")[0],
+          due_date: "",
+          category: "",
+          hsn_code: "",
+          rbarcode: "",
+          pcs: "",
+          gross_weight: "",
+          stone_weight: "",
+          net_weight: "",
+          hm_charges: "",
+          other_charges: "",
+          charges: "",
+          purity: "",
+          metal_type: "",
+          pure_weight: "",
+          rate: "",
+          total_amount: "",
+        };
+  });
+
   // const [tableData, setTableData] = useState([]);
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
   const [purityOptions, setPurityOptions] = useState([]);
@@ -121,7 +127,6 @@ const URDPurchase = () => {
           updatedDetails.eqt_wt = netWeight.toFixed(2);
         }
       }
-
       // Other calculations for weights and amounts
       const grossWeight = parseFloat(updatedDetails.gross_weight) || 0;
       const stoneWeight = parseFloat(updatedDetails.stone_weight) || 0;
@@ -135,23 +140,18 @@ const URDPurchase = () => {
       const pureWeight = parseFloat(updatedDetails.pure_weight) || 0;
       const rate = parseFloat(updatedDetails.rate) || 0;
       updatedDetails.total_amount = (pureWeight * rate).toFixed(2);
-
       return updatedDetails;
     });
   };
-
   const [tableData, setTableData] = useState(() => {
     const savedData = localStorage.getItem("tableData");
     return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
   });
-
   // const [editingIndex, setEditingIndex] = useState(null);
-
   // Save table data to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("tableData", JSON.stringify(tableData));
   }, [tableData]);
-
 
   const handleAdd = async (e) => {
     e.preventDefault();
@@ -188,7 +188,6 @@ const URDPurchase = () => {
           setTableData(updatedTableData);
           setEditingIndex(null); // Reset edit mode
         }
-
         // Reset formData only when needed (optional for editing scenarios)
         setFormData({
           ...formData, // If necessary, keep persistent fields like mobile, etc.
@@ -214,8 +213,11 @@ const URDPurchase = () => {
       console.error("Error while adding entry to the database:", error);
     }
   };
-
-
+  // Save form data and table data to local storage whenever they change
+  useEffect(() => {
+    localStorage.setItem("purchaseFormData", JSON.stringify(formData));
+    localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
+  }, [formData, tableData]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -233,10 +235,10 @@ const URDPurchase = () => {
       });
 
       console.log("Data saved successfully:", response.data);
-      alert("Data saved successfully:")
+      alert("Data saved successfully");
 
-      // Optionally reset after successful save
-      setFormData({
+      // Reset form data and table data after successful save
+      const initialFormState = {
         mobile: "",
         account_name: "",
         gst_in: "",
@@ -248,6 +250,7 @@ const URDPurchase = () => {
         bill_date: new Date().toISOString().split("T")[0],
         due_date: "",
         category: "",
+        hsn_code: "",
         rbarcode: "",
         pcs: "",
         gross_weight: "",
@@ -257,17 +260,20 @@ const URDPurchase = () => {
         other_charges: "",
         charges: "",
         purity: "",
+        metal_type: "",
         pure_weight: "",
         rate: "",
         total_amount: "",
-      });
+      };
 
-      setTableData([]); // Reset table data if needed
+      setFormData(initialFormState);
+      setTableData([]);
+      localStorage.removeItem("purchaseFormData");
+      localStorage.removeItem("purchaseTableData");
     } catch (error) {
       console.error("Error saving data:", error);
     }
   };
-
   // const handleEdit = (index) => {
   //   setFormData(tableData[index]); // Populate the form with selected row data
   //   setEditingIndex(index); // Track the index being edited
@@ -295,7 +301,6 @@ const URDPurchase = () => {
       if (!response.ok) {
         throw new Error("Failed to update entry in updated_values_table");
       }
-  
       console.log("Entry updated successfully");
       setFormData(selectedData); // Populate the form with selected row data
       setEditingIndex(index); // Track the index being edited
@@ -305,9 +310,6 @@ const URDPurchase = () => {
     }
   };
   
-  
-
-
   const handleDelete = (index) => {
     const updatedTableData = tableData.filter((_, i) => i !== index);
     setTableData(updatedTableData); // Remove the selected row
