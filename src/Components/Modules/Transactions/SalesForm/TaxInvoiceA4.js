@@ -1,8 +1,9 @@
 import React from "react";
 
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
-import logo1 from './Logos/logo_dark.png'
-import logo2 from './Logos/logo_dark.png'
+import logo1 from './Images/logo_dark.png'
+
+
 
 // Define styles
 const styles = StyleSheet.create({
@@ -28,8 +29,9 @@ const styles = StyleSheet.create({
         },
         image1: {
                 // width: 100,
-                // height: 100,
+                height: 50,
                 marginTop: 0,
+
         },
         image2: {
                 // width: 50,
@@ -48,11 +50,11 @@ const styles = StyleSheet.create({
                 // justifyContent: 'center', 
                 alignItems: 'center',  // Centers the content horizontally
                 padding: 20,
-                marginTop: -50,
+                marginTop: -60,
         },
         heading: {
                 fontWeight: 'bold',
-                fontSize: 12,
+                fontSize: 10,
                 textAlign: 'center',
                 marginBottom: 5,
         },
@@ -69,13 +71,16 @@ const styles = StyleSheet.create({
                 // flex: 1,
                 // paddingLeft: 100,
                 marginLeft: 100,
+                fontSize:7,
         },
         rightColumn: {
                 flex: 1,
                 paddingLeft: 10,
+                fontSize:7,
         },
         flatNo: {
                 marginBottom: 2,
+
         },
         cin: {
                 marginBottom: 2,
@@ -133,46 +138,72 @@ const styles = StyleSheet.create({
         tableRow: {
                 display: 'flex',
                 flexDirection: 'row',
+                fontFamily:'Times-Roman'
         },
         tableCellHeader: {
-                width: '5%',
+                width: '4%',
+                textAlign: 'right',
+                marginTop:'-4'
         },
         tableCellDescription: {
-                width: '18%',
+                width: '24%',
+                textAlign: 'left',
+                marginTop:'-4'
         },
         tableCellHSN: {
-                width: '9%',
+                width: '8%',
+                textAlign: 'center',
+                marginTop:'-4'
         },
         tableCellQty: {
                 width: '5%',
+                textAlign: 'center',
+                marginTop:'-4'
         },
         tableCellPurity: {
                 width: '8%',
+                textAlign: 'left',
+                marginTop:'-4'
         },
         tableCellGrossWt: {
                 width: '11%',
+                textAlign: 'right',
+                marginTop:'-4'
         },
         tableCellStoneWt: {
                 width: '11%',
+                textAlign: 'right',
+                marginTop:'-4'
         },
         tableCellNetWt: {
                 width: '11%',
+                textAlign: 'right',
+                marginTop:'-4'
         },
         tableCellRate: {
                 width: '10%',
+                textAlign: 'right',
+                marginTop:'-4'
         },
         tableCellMC: {
                 width: '8%',
+                textAlign: 'right',
+                marginTop:'-4'
         },
         tableCellStAmt: {
                 width: '10%',
+                textAlign: 'right',
+                marginTop:'-4'
         },
         tableCellTotal: {
                 width: '10%',
+                textAlign: 'right',
+                marginTop:'-4'
         },
 
         lastheight: {
-                height: 30,
+                height: 28,
+                // marginTop:'10'
         },
 });
 
@@ -182,14 +213,15 @@ const TaxINVoiceReceipt = () => {
                         <Page size="A4" style={styles.page}>
                                 {/* First Row */}
                                 <View style={styles.row}>
-                                        <View style={[styles.column, { marginTop: 20, width: '20%', marginLeft: 20, fontFamily: 'Helvetica-Bold'  }]}>
-                                                <Text style={[styles.boldText, { marginBottom: 6 }]}>CUSTOMER DETAILS:</Text>
-                                                <Text style={{ marginBottom: 6 }}>SHUBHA,</Text>
+                                <View style={[styles.column, { marginTop: 20, width: '20%', marginLeft: 20, fontFamily: 'Times-Bold' }]}>
+                                                <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
+                                                <Text style={{ marginBottom: 5 }}>SHUBHA,</Text>
 
-                                                <Text style={{ marginBottom: 6 }}>BANGALORE</Text>
-                                                <Text style={{ marginBottom: 6 }}>MOBILE: 9901517112</Text>
-                                                <Text style={{ marginBottom: 6 }}>PAN NO: DRXPR9966P</Text>
+                                                <Text style={{ marginBottom: 5 }}>BANGALORE</Text>
+                                                <Text style={{ marginBottom: 5 }}>MOBILE: 9901517112</Text>
+                                                <Text style={{ marginBottom: 5 }}>PAN NO: DRXPR9966P</Text>
                                         </View>
+
                                         <View style={[styles.column, { width: '40%' }]}>
                                                 <Image
                                                         style={styles.image1}
@@ -204,32 +236,32 @@ const TaxINVoiceReceipt = () => {
                                                 /> */}
                                         </View>
 
-                                        <View style={[styles.column, { marginTop: 0, width: '20%', marginLeft: 20,fontFamily:'Helvetica-Bold' }]}>
-                                                <Text style={{ fontWeight: 'bold', fontSize: 14, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text>
+                                        <View style={[styles.column, { marginTop: 0, width: '20%', marginLeft: 20,fontFamily:'Times-Bold' }]}>
+                                                <Text style={{ fontWeight: 'bold', fontSize: 12, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text>
                                                 {/* <View style={{ alignItems: 'center', marginBottom: 10 }}>
                                                         <Barcode value="SV1224" format="CODE128" width={1.5} height={50} />
                                                 </View> */}
 
                                                 {/* BILL NO */}
-                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>BILL NO:</Text>
                                                         <Text style={{ textAlign: "right", flex: 1 }}>SV1224</Text>
                                                 </View>
 
                                                 {/* DATE */}
-                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>DATE:</Text>
                                                         <Text style={{ textAlign: "right", flex: 1 }}>29-12-2024</Text>
                                                 </View>
 
                                                 {/* STAFF */}
-                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>STAFF:</Text>
                                                         <Text style={{ textAlign: "right", flex: 1 }}>SGJ</Text>
                                                 </View>
 
                                                 {/* GSTIN */}
-                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6 }}>
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>GSTIN:</Text>
                                                         <Text style={{ textAlign: "right", flex: 1 }}>29ABMCS9253K1ZG</Text>
                                                 </View>
@@ -241,7 +273,7 @@ const TaxINVoiceReceipt = () => {
 
                                 <View style={styles.container}>
                                         {/* Centered Heading */}
-                                        <Text style={[styles.heading, {fontFamily:'Helvetica-Bold'}]}>SADASHRI VENTURES PRIVATE LIMITED</Text>
+                                        <Text style={[styles.heading, {fontFamily:'Times-Bold'}]}>SADASHRI VENTURES PRIVATE LIMITED</Text>
 
                                         {/* Flat No. and Branch section */}
                                         <View style={styles.contentContainer}>
@@ -260,7 +292,7 @@ const TaxINVoiceReceipt = () => {
 
                                                 {/* Branch Section */}
                                                 <View style={styles.rightColumn}>
-                                                        <Text style={[styles.branch, {fontFamily:'Helvetica-Bold'}]}>BRANCH:</Text>
+                                                        <Text style={[styles.branch, {fontFamily:'Times-Bold'}]}>BRANCH:</Text>
                                                         <Text style={styles.branchContent}>Shop no. 1 No.2063, Dairy Circle, </Text>
                                                         <Text style={styles.branchContent}> Asha Arcade, 16th B Cross Rd,</Text>
                                                         <Text style={styles.branchContent}>Yalahanka New Town, Bangalore - 064</Text>
@@ -279,7 +311,7 @@ const TaxINVoiceReceipt = () => {
 
                                         <View style={styles.boxContainer}>
                                                 <View style={styles.table}>
-                                                        <View style={[styles.tableRow, {fontFamily:'Helvetica-Bold'}]}>
+                                                        <View style={[styles.tableRow, {fontFamily:'Times-Bold'}]}>
                                                                 <Text style={[styles.tableCell, styles.tableCellHeader]}>SI</Text>
                                                                 <View style={styles.divider1} />
 
@@ -295,13 +327,19 @@ const TaxINVoiceReceipt = () => {
                                                                 <Text style={[styles.tableCell, styles.tableCellPurity]}>Purity</Text>
                                                                 <View style={styles.divider1} />
 
-                                                                <Text style={[styles.tableCell, styles.tableCellGrossWt]}>Gross.Wt(In Gms)</Text>
+                                                                <Text style={[styles.tableCell, styles.tableCellGrossWt]}>Gross.Wt 
+                                                                <Text style={{ fontFamily: 'Times-Roman', fontSize: 7 }}>  In Gms</Text>
+                                                                </Text>
                                                                 <View style={styles.divider1} />
 
-                                                                <Text style={[styles.tableCell, styles.tableCellStoneWt]}>Stone.Wt(In Gms)</Text>
+                                                                <Text style={[styles.tableCell, styles.tableCellStoneWt]}>Stone.Wt
+                                                                <Text style={{ fontFamily: 'Times-Roman', fontSize: 7 }}>   In Gms</Text>
+                                                                        </Text>
                                                                 <View style={styles.divider1} />
 
-                                                                <Text style={[styles.tableCell, styles.tableCellNetWt]}>Net.Wt(In Gms) </Text>
+                                                                <Text style={[styles.tableCell, styles.tableCellNetWt]}>Net.Wt
+                                                                <Text style={{ fontFamily: 'Times-Roman', fontSize: 7 }}>             In Gms</Text>
+                                                                </Text>
                                                                 <View style={styles.divider1} />
 
                                                                 <Text style={[styles.tableCell, styles.tableCellRate]}>Rate</Text>
@@ -318,14 +356,14 @@ const TaxINVoiceReceipt = () => {
                                                         <View style={styles.horizontalLine} />
 
                                                         {/* Add rows of data below */}
-                                                        <View style={styles.tableRow}>
-                                                                <Text style={[styles.tableCell, styles.tableCellHeader]}>1</Text>
+                                                        <View style={[styles.tableRow, {fontFamily:'Times-Roman'}]}>
+                                                                <Text style={[styles.tableCell, styles.tableCellHeader,]}>1</Text>
                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                <Text style={[styles.tableCell, styles.tableCellDescription]}>GOLD-NOSTPIN GOLD</Text>
+                                                                <Text style={[styles.tableCell, styles.tableCellDescription]}>GOLD-NOSEPIN GOLD</Text>
                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                <Text style={[styles.tableCell, styles.tableCellHSN]}>711311</Text>
+                                                                <Text style={[styles.tableCell, styles.tableCellHSN]}>HSN001</Text>
                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                 <Text style={[styles.tableCell, styles.tableCellQty]}>1</Text>
@@ -362,7 +400,7 @@ const TaxINVoiceReceipt = () => {
                                                                 <Text style={[styles.tableCell, styles.tableCellDescription]}>GOLD-NECKLACE</Text>
                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                <Text style={[styles.tableCell, styles.tableCellHSN]}>711311</Text>
+                                                                <Text style={[styles.tableCell, styles.tableCellHSN]}>HSN001</Text>
                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                 <Text style={[styles.tableCell, styles.tableCellQty]}>1</Text>
@@ -728,7 +766,7 @@ const TaxINVoiceReceipt = () => {
 
                                                 <View style={[styles.horizontalLine, { marginTop: -2 }]} />
 
-                                                <View style={[styles.tableRow, {fontFamily:'Helvetica-Bold'}]}>
+                                                <View style={[styles.tableRow, {fontFamily:'Times-Bold'}]}>
                                                         <Text style={[styles.tableCell, styles.tableCellHeader, styles.lastheight]}></Text>
                                                         <View style={[styles.divider1, { marginTop: -2 }]} />
 
@@ -769,7 +807,7 @@ const TaxINVoiceReceipt = () => {
                                                 <View style={[styles.horizontalLine, { marginTop: -2 }]} />
 
 
-                                                <View style={{ flexDirection: "row", justifyContent: "space-between", fontFamily:'Helvetica-Bold' }}>
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", fontFamily:'Times-Bold' }}>
                                                         {/* Left Side Content */}
                                                         <View style={{ paddingLeft: 10, marginTop: 20 }}>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>Cash Recd: 45000.00</Text>
@@ -808,13 +846,13 @@ const TaxINVoiceReceipt = () => {
                                                                 </View>
                                                         </View>
                                                 </View>
-                                                <View style={{ alignItems: "center", fontFamily:'Helvetica-Bold' }}>
+                                                <View style={{ alignItems: "center", fontFamily:'Times-Bold' }}>
                                                         <Text>
                                                                 (Rupees Four Lakh Four Thousand Five Hundred Only)
                                                         </Text>
                                                 </View>
 
-                                                <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "space-between", marginBottom: 3, fontFamily:'Helvetica-Bold'  }}>
+                                                <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "space-between", marginBottom: 3, fontFamily:'Times-Bold'  }}>
                                                         {/* Left Side */}
                                                         <View style={{ alignItems: "flex-start", paddingLeft: 10 }}>
                                                                 <Text style={[styles.bold]}>For Customer</Text>
