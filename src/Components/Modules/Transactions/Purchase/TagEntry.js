@@ -216,8 +216,11 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        const currentSuffix = parseInt(formData.suffix || "001", 10);
-        const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
+        // Validate pcs and grossWeight
+        if (pcs <= 0 || grossWeight <= 0) {
+            alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
+            return;
+        }
     
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
@@ -225,6 +228,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }
     
         try {
+            const currentSuffix = parseInt(formData.suffix || "001", 10);
+            const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
+    
             const updatedGrossWeight = -parseFloat(formData.Gross_Weight || 0);
             const updatedPcs = -1;
     
@@ -246,10 +252,11 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             //     gross_weight: updatedGrossWeight,
             //     added_at: new Date().toISOString(),
             // });
-
+    
             alert('Data and updated values saved successfully!');
     
             fetchData();
+    
             // Reset form data
             setFormData({
                 product_id: selectedProduct.product_id,

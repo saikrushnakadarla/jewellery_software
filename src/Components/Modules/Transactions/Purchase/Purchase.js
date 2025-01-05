@@ -21,32 +21,33 @@ const URDPurchase = () => {
     return savedData
       ? JSON.parse(savedData)
       : {
-          mobile: "",
-          account_name: "",
-          gst_in: "",
-          terms: "Cash",
-          invoice: "",
-          bill_no: "",
-          rate_cut: "",
-          date: new Date().toISOString().split("T")[0],
-          bill_date: new Date().toISOString().split("T")[0],
-          due_date: "",
-          category: "",
-          hsn_code: "",
-          rbarcode: "",
-          pcs: "",
-          gross_weight: "",
-          stone_weight: "",
-          net_weight: "",
-          hm_charges: "",
-          other_charges: "",
-          charges: "",
-          purity: "",
-          metal_type: "",
-          pure_weight: "",
-          rate: "",
-          total_amount: "",
-        };
+        mobile: "",
+        account_name: "",
+        gst_in: "",
+        terms: "Cash",
+        invoice: "",
+        bill_no: "",
+        rate_cut: "",
+        date: new Date().toISOString().split("T")[0],
+        bill_date: new Date().toISOString().split("T")[0],
+        due_date: "",
+        category: "",
+        hsn_code: "",
+        rbarcode: "",
+        pcs: "",
+        gross_weight: "",
+        stone_weight: "",
+        net_weight: "",
+        hm_charges: "",
+        other_charges: "",
+        charges: "",
+        purity: "",
+        product_id: "",
+        metal_type: "",
+        pure_weight: "",
+        rate: "",
+        total_amount: "",
+      };
   });
 
   // const [tableData, setTableData] = useState([]);
@@ -152,14 +153,14 @@ const URDPurchase = () => {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-
+  
     // Prepare data to be sent to the API
     const apiData = {
       product_id: formData.product_id, // Assuming rbarcode maps to product_id
       pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
       gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
     };
-
+  
     try {
       // Make a POST request to the API
       const response = await fetch(`${baseURL}/add-entry`, {
@@ -169,11 +170,11 @@ const URDPurchase = () => {
         },
         body: JSON.stringify(apiData),
       });
-
+  
       if (response.ok) {
         const result = await response.json();
         console.log("Pcs and GrossWeight added to the database successfully:", result);
-
+  
         if (editingIndex === null) {
           // Add new entry to the table
           setTableData([...tableData, formData]);
@@ -185,9 +186,10 @@ const URDPurchase = () => {
           setTableData(updatedTableData);
           setEditingIndex(null); // Reset edit mode
         }
+  
         // Reset formData only when needed (optional for editing scenarios)
         setFormData({
-          ...formData, // If necessary, keep persistent fields like mobile, etc.
+          ...formData, // Retain fields as necessary
           category: "",
           hsn_code: "",
           rbarcode: "",
@@ -210,32 +212,34 @@ const URDPurchase = () => {
       console.error("Error while adding entry to the database:", error);
     }
   };
-  // Save form data and table data to local storage whenever they change
-  useEffect(() => {
-    localStorage.setItem("purchaseFormData", JSON.stringify(formData));
-    localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
-  }, [formData, tableData]);
-
+  
   const handleSave = async (e) => {
     e.preventDefault();
+  
+    console.log("Product ID before submission:", formData.product_id);
+  
     try {
+      // Prepare data for saving
       const dataToSave = {
-        formData: { ...formData }, // Explicitly spread to ensure values are intact
-        table_data: tableData, // Include table data
+        formData: { ...formData }, // Include form data as it is
+        table_data: tableData.map((row) => ({
+          ...row, // Include all row data
+          product_id: row.product_id, // Ensure product_id is explicitly sent for each row
+        })),
       };
-
-      // Send the data to your backend
+  
+      console.log("Data to save:", dataToSave);
+  
+      // Send data to the backend
       const response = await axios.post(`${baseURL}/post/purchase`, dataToSave, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
-
+  
       console.log("Purchase saved successfully:", response.data);
       alert("Purchase saved successfully");
-
-      // Reset form data and table data after successful save
-      const initialFormState = {
+  
+      // Reset formData and tableData
+      setFormData({
         mobile: "",
         account_name: "",
         gst_in: "",
@@ -261,9 +265,8 @@ const URDPurchase = () => {
         pure_weight: "",
         rate: "",
         total_amount: "",
-      };
-
-      setFormData(initialFormState);
+        product_id: "",
+      });
       setTableData([]);
       localStorage.removeItem("purchaseFormData");
       localStorage.removeItem("purchaseTableData");
@@ -271,6 +274,19 @@ const URDPurchase = () => {
       console.error("Error saving data:", error);
     }
   };
+  
+  
+  
+  
+
+
+  // Save form data and table data to local storage whenever they change
+  useEffect(() => {
+    localStorage.setItem("purchaseFormData", JSON.stringify(formData));
+    localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
+  }, [formData, tableData]);
+
+
   // const handleEdit = (index) => {
   //   setFormData(tableData[index]); // Populate the form with selected row data
   //   setEditingIndex(index); // Track the index being edited
@@ -278,13 +294,13 @@ const URDPurchase = () => {
   const handleEdit = async (index) => {
     const selectedData = tableData[index]; // Get the data for the selected row
     const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
-  
+
     // Ensure pcs and gross_weight are not undefined, and if so, default to 0
     const pcsToSend = pcs || 0;
     const grossWeightToSend = gross_weight || 0;
-  
+
     console.log("Sending to server:", { pcs: pcsToSend, gross_weight: grossWeightToSend });
-  
+
     try {
       // Send a request to the backend to update the product_id entry
       const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
@@ -294,7 +310,7 @@ const URDPurchase = () => {
         },
         body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to update entry in updated_values_table");
       }
@@ -306,7 +322,7 @@ const URDPurchase = () => {
       alert("Failed to update the entry. Please try again.");
     }
   };
-  
+
   // const handleDelete = (index) => {
   //   const updatedTableData = tableData.filter((_, i) => i !== index);
   //   setTableData(updatedTableData); // Remove the selected row
@@ -314,13 +330,13 @@ const URDPurchase = () => {
   const handleDelete = async (index) => {
     const selectedData = tableData[index]; // Get the data for the selected row
     const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
-  
+
     // Ensure pcs and gross_weight are not undefined, and if so, default to 0
     const pcsToSend = pcs || 0;
     const grossWeightToSend = gross_weight || 0;
-  
+
     console.log("Sending to server for deletion:", { product_id, pcs: pcsToSend, gross_weight: grossWeightToSend });
-  
+
     try {
       // Send a request to the backend to delete the product_id entry
       const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
@@ -330,11 +346,11 @@ const URDPurchase = () => {
         },
         body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to delete entry in updated_values_table");
       }
-  
+
       console.log("Entry deleted successfully");
       // Remove the selected row from the table data
       const updatedTableData = tableData.filter((_, i) => i !== index);
@@ -344,7 +360,7 @@ const URDPurchase = () => {
       alert("Failed to delete the entry. Please try again.");
     }
   };
-  
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -583,43 +599,30 @@ const URDPurchase = () => {
 
   useEffect(() => {
     if (formData.category && formData.purity) {
-      // Fetch data from API
       axios
         .get(`${baseURL}/get/products`)
         .then((response) => {
           const products = response.data;
-
-          // Filter the products matching both category and purity
+  
           const matchingProduct = products.find(
             (product) =>
               product.product_name === formData.category &&
               product.purity === formData.purity
           );
-
-          // Update the product ID and rbarcode
+  
           if (matchingProduct) {
-            setProductIdAndRbarcode({
-              product_id: matchingProduct.product_id,
-              rbarcode: matchingProduct.rbarcode,
-              metal_type: matchingProduct.Category,
-            });
             setFormData((prevFormData) => ({
               ...prevFormData,
-              product_id: matchingProduct.product_id, // Add product_id here
-              rbarcode: matchingProduct.rbarcode,    // Ensure rbarcode is also updated
+              product_id: matchingProduct.product_id, // Update product_id
+              rbarcode: matchingProduct.rbarcode,    // Update rbarcode
               metal_type: matchingProduct.Category,
             }));
-
-            // Log success to console
-            console.log(
-              `Fetched product details: Product ID = ${matchingProduct.product_id}, Rbarcode = ${matchingProduct.rbarcode}`
-            );
           } else {
-            setProductIdAndRbarcode({});
+            // Reset product_id and rbarcode if no match
             setFormData((prevFormData) => ({
               ...prevFormData,
-              product_id: '', 
-              rbarcode: '',   // Reset rbarcode if no match
+              product_id: '',
+              rbarcode: '',
             }));
           }
         })
@@ -628,14 +631,14 @@ const URDPurchase = () => {
         });
     } else {
       // Reset if category or purity is not selected
-      setProductIdAndRbarcode({});
       setFormData((prevFormData) => ({
         ...prevFormData,
-        product_id: '', // Reset product_id
-        rbarcode: '',   // Reset rbarcode
+        product_id: '',
+        rbarcode: '',
       }));
     }
   }, [formData.category, formData.purity]);
+  
 
   const handleOpenModal = (data) => {
     setSelectedProduct(data);
@@ -643,7 +646,7 @@ const URDPurchase = () => {
   };
   const handleAddCategory = () => {
     console.log("Add Category button clicked");
-    navigate("/itemmaster" , { state: { from: "/purchase" } });
+    navigate("/itemmaster", { state: { from: "/purchase" } });
   };
 
   return (
@@ -749,31 +752,42 @@ const URDPurchase = () => {
           </div>
           <div className="urd-form-section">
             <Row>
-            <Col xs={12} md={2} className="d-flex align-items-center">
-        <div style={{ flex: 1 }}>
-          <InputField
-            label="Category"
-            name="category"
-            type="select"
-            value={formData.category}
-            onChange={(e) => handleChange("category", e.target.value)}
-            options={categories.map((category) => ({
-              value: category.value,
-              label: category.label,
-            }))}
-          />
-        </div>
-        <AiOutlinePlus
-          size={20}
-          color="black"
-          onClick={handleAddCategory}
-          style={{
-            marginLeft: "10px",
-            cursor: "pointer",
-            marginBottom: "20px",
-          }}
-        />
-      </Col>
+              <Col xs={12} md={2} className="d-flex align-items-center">
+                <div style={{ flex: 1 }}>
+                  <InputField
+                    label="Category"
+                    name="category"
+                    type="select"
+                    value={formData.category}
+                    onChange={(e) => handleChange("category", e.target.value)}
+                    options={categories.map((category) => ({
+                      value: category.value,
+                      label: category.label,
+                    }))}
+                  />
+                </div>
+                <AiOutlinePlus
+                  size={20}
+                  color="black"
+                  onClick={handleAddCategory}
+                  style={{
+                    marginLeft: "10px",
+                    cursor: "pointer",
+                    marginBottom: "20px",
+                  }}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Purity"
+                  type="select"
+                  name="purity"
+                  value={formData.purity}
+                  onChange={(e) => handleChange("purity", e.target.value)}
+                  options={purityOptions}
+                />
+
+              </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Rbarcode"
@@ -831,17 +845,6 @@ const URDPurchase = () => {
               <Col xs={12} md={2}>
                 <InputField label="Charges" type="number" value={formData.charges}
                   onChange={(e) => handleChange("charges", e.target.value)} />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Purity"
-                  type="select"
-                  name="purity"
-                  value={formData.purity}
-                  onChange={(e) => handleChange("purity", e.target.value)}
-                  options={purityOptions}
-                />
-
               </Col>
               <Col xs={12} md={1}>
 
