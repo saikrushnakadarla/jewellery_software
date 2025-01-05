@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const RepairDetails = () => {
   const { invoice_number } = useParams(); // Get the invoice_number from the URL
@@ -12,7 +13,7 @@ const RepairDetails = () => {
   useEffect(() => {
     const fetchRepairDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/get-repair-details/${invoice_number}`);
+        const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
         setRepair(response.data);
         setLoading(false);
       } catch (error) {

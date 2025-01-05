@@ -162,7 +162,7 @@ const URDPurchase = () => {
 
     try {
       // Make a POST request to the API
-      const response = await fetch("http://localhost:5000/add-entry", {
+      const response = await fetch(`${baseURL}/add-entry`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -225,7 +225,7 @@ const URDPurchase = () => {
       };
 
       // Send the data to your backend
-      const response = await axios.post("http://localhost:5000/post/purchase", dataToSave, {
+      const response = await axios.post(`${baseURL}/post/purchase`, dataToSave, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -287,7 +287,7 @@ const URDPurchase = () => {
   
     try {
       // Send a request to the backend to update the product_id entry
-      const response = await fetch(`http://localhost:5000/delete-updated-values/${product_id}`, {
+      const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
         method: "PUT", // Change to PUT since we're updating, not deleting
         headers: {
           "Content-Type": "application/json",
@@ -323,7 +323,7 @@ const URDPurchase = () => {
   
     try {
       // Send a request to the backend to delete the product_id entry
-      const response = await fetch(`http://localhost:5000/delete-updated-values/${product_id}`, {
+      const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
         method: "PUT", // Assuming your API is updating records
         headers: {
           "Content-Type": "application/json",
@@ -485,7 +485,7 @@ const URDPurchase = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5000/get/products");
+        const response = await fetch(`${baseURL}/get/products`);
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
@@ -518,7 +518,7 @@ const URDPurchase = () => {
   useEffect(() => {
     const fetchRateForSilver = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/get/current-rates");
+        const response = await axios.get(`${baseURL}/get/current-rates`);
         setFormData((prev) => ({
           ...prev,
           purity: "24K", // Directly set purity to 24K for silver
@@ -542,7 +542,7 @@ const URDPurchase = () => {
         }]); // Only show 24K for silver
       } else if (selectedCategory?.categoryType === "Gold") {
         axios
-          .get("http://localhost:5000/get/products")
+          .get(`${baseURL}/get/products`)
           .then((response) => {
             const products = response.data;
 
@@ -585,7 +585,7 @@ const URDPurchase = () => {
     if (formData.category && formData.purity) {
       // Fetch data from API
       axios
-        .get("http://localhost:5000/get/products")
+        .get(`${baseURL}/get/products`)
         .then((response) => {
           const products = response.data;
 

@@ -176,8 +176,8 @@ const RepairForm = () => {
     const { product_name, metal_type, design_name, purity } = updatedFormData;
   
     if (product_name && metal_type && design_name && purity) {
-      // Find the matching entry from the data
-      const matchingEntry = data.find(
+      // Find all matching entries from the data
+      const matchingEntries = data.filter(
         (prod) =>
           prod.product_Name === product_name &&
           prod.metal_type === metal_type &&
@@ -185,14 +185,26 @@ const RepairForm = () => {
           prod.Purity === purity
       );
   
-      if (matchingEntry) {
-        // Update the PCode_BarCode in the formData
+      if (matchingEntries.length > 1) {
+        // Multiple matches found, populate options but don't set any value
+        setFormData((prevData) => ({
+          ...prevData,
+          code: "", // Ensure no barcode is selected by default
+          barcodeOptions: matchingEntries.map((entry) => ({
+            value: entry.PCode_BarCode,
+            label: entry.PCode_BarCode,
+          })),
+        }));
+      } else if (matchingEntries.length === 1) {
+        // Single match found, set the corresponding values
+        const matchingEntry = matchingEntries[0];
         const productId = matchingEntry.product_id;
         const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
+  
         setFormData((prevData) => ({
           ...prevData,
           code: matchingEntry.PCode_BarCode,
-          gross_weight :matchingEntry.Gross_Weight,
+          gross_weight: matchingEntry.Gross_Weight,
           stone_weight: matchingEntry.Stones_Weight || "",
           stone_price: matchingEntry.Stones_Price || "",
           weight_bw: matchingEntry.Weight_BW || "",
@@ -204,13 +216,15 @@ const RepairForm = () => {
           mc_per_gram: matchingEntry.MC_Per_Gram || "",
           making_charges: matchingEntry.Making_Charges || "",
           tax_percent: productDetails?.tax_slab || "",
-          qty: 1, // Allow qty to be editable for tag
+          qty: 1,
+          barcodeOptions: [], // Clear previous options if any
         }));
       } else {
-        // Reset the PCode_BarCode if no match is found
+        // No match found, reset form fields
         setFormData((prevData) => ({
           ...prevData,
           code: "",
+          barcodeOptions: [],
           gross_weight: "",
           stone_weight: "",
           stone_price: "",
@@ -235,9 +249,11 @@ const RepairForm = () => {
       setFormData((prevData) => ({
         ...prevData,
         code: "",
+        barcodeOptions: [],
       }));
     }
   };
+  
   
   const handleBarcodeChange = async (code) => {
     try {
@@ -380,7 +396,7 @@ const RepairForm = () => {
           <div className="sales-form-section">
             <Col>
             <Row>
-            <Col xs={12} md={2}>
+            {/* <Col xs={12} md={2}>
                   <InputField
                     label="BarCode/Rbarcode"
                     name="code"
@@ -421,7 +437,31 @@ const RepairForm = () => {
                           ]
                     }
                   />
-              </Col>
+              </Col> */}
+              <Col xs={12} md={2}>
+  <InputField
+    label="BarCode/Rbarcode"
+    name="code"
+    value={formData.code}
+    onChange={(e) => handleBarcodeChange(e.target.value)}
+    type="select"
+    options={
+      formData.barcodeOptions?.length > 0
+        ? formData.barcodeOptions
+        : [
+            ...products.map((product) => ({
+              value: product.rbarcode,
+              label: product.rbarcode,
+            })),
+            ...data.map((tag) => ({
+              value: tag.PCode_BarCode,
+              label: tag.PCode_BarCode,
+            })),
+          ]
+    }
+  />
+</Col>
+
                 <Col xs={12} md={3}>
                 <InputField
                   label="Product Name"

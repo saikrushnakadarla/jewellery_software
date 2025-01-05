@@ -256,7 +256,7 @@ const RepairsTable = () => {
                       <td>
                         {product.product_image ? (
                           <img
-                            src={`http://localhost:5000/uploads/${product.product_image}`}
+                            src={`${baseURL}/uploads/${product.product_image}`}
                             alt={product.product_name}
                             style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                           />
