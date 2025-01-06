@@ -19,17 +19,11 @@ const RepairForm = () => {
     <div className="main-container">
     <Container className="barcode-form-container">
       <form className="barcode-form">
-        {/* Left Section */}
         <div className="barcode-form-left">
-          {/* Customer Details */}
-          <Col className="form-section">
-            
+          <Col className="form-section"> 
             <Row >
               <InputField label="Date" type="date"/>
             </Row>
-            {/* <Row >
-              <InputField label="P Code" />
-            </Row> */}
             <Row >
               <InputField label="Product Name" />
             </Row>
@@ -41,12 +35,8 @@ const RepairForm = () => {
                 <Button type="submit" variant="primary">ADD</Button>
             </div>
             </Row>
-            </Col>
-             {/* Buttons */}
-        
-         
+            </Col>        
         </div>
-        {/* Right Section */}
         <div className="barcode-form-right">
           <Col className="form-section">
           <Table bordered hover responsive>
@@ -70,9 +60,6 @@ const RepairForm = () => {
           </Col>
         </div>
       </form>
-
-          
-       
       </Container>
       </div>
   );

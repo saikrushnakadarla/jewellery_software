@@ -28,7 +28,7 @@ const PurchaseTable = () => {
       { Header: 'GST IN', accessor: 'gst_in' },
       { Header: 'Terms', accessor: 'terms' },
       { Header: 'Invoice', accessor: 'invoice' },
-      { Header: 'Bill No', accessor: 'bill_no' },
+      // { Header: 'Bill No', accessor: 'bill_no' },
       { Header: 'Rate Cut', accessor: 'rate_cut' },
       { Header: 'Date', accessor: 'date', Cell: ({ value }) => <span>{formatDate(value)}</span> },
       { Header: 'Bill Date', accessor: 'bill_date', Cell: ({ value }) => <span>{formatDate(value)}</span> },

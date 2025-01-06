@@ -275,17 +275,10 @@ const URDPurchase = () => {
     }
   };
   
-  
-  
-  
-
-
-  // Save form data and table data to local storage whenever they change
   useEffect(() => {
     localStorage.setItem("purchaseFormData", JSON.stringify(formData));
     localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
   }, [formData, tableData]);
-
 
   // const handleEdit = (index) => {
   //   setFormData(tableData[index]); // Populate the form with selected row data
@@ -360,7 +353,6 @@ const URDPurchase = () => {
       alert("Failed to delete the entry. Please try again.");
     }
   };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -584,6 +576,7 @@ const URDPurchase = () => {
             setFormData((prev) => ({
               ...prev,
               rate: "",
+              
             }));
           })
           .catch((error) => {
@@ -593,7 +586,7 @@ const URDPurchase = () => {
     } else {
       // Reset purity options and rate if no category is selected
       setPurityOptions([]);
-      setFormData((prev) => ({ ...prev, rate: "" }));
+      setFormData((prev) => ({ ...prev, rate: "",hsn_code:'', }));
     }
   }, [formData.category, categories]);
 
@@ -623,6 +616,7 @@ const URDPurchase = () => {
               ...prevFormData,
               product_id: '',
               rbarcode: '',
+              
             }));
           }
         })
@@ -752,7 +746,7 @@ const URDPurchase = () => {
           </div>
           <div className="urd-form-section">
             <Row>
-              <Col xs={12} md={2} className="d-flex align-items-center">
+              <Col xs={12} md={3} className="d-flex align-items-center">
                 <div style={{ flex: 1 }}>
                   <InputField
                     label="Category"
@@ -792,7 +786,7 @@ const URDPurchase = () => {
                 <InputField
                   label="Rbarcode"
                   name="rbarcode"
-                  value={productIdAndRbarcode.rbarcode}
+                  value={formData.rbarcode}
                   onChange={(e) => handleChange("rbarcode", e.target.value)}
                 />
               </Col>
@@ -855,7 +849,7 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("pure_weight", e.target.value)}
                 />
               </Col>
-              <Col xs={12} md={2}>
+              <Col xs={12} md={1}>
                 <InputField
                   label="Rate"
                   type="number"

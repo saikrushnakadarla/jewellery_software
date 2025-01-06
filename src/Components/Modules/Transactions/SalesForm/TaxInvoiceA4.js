@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
-import logo1 from './Images/logo_dark.png'
+import logo1 from '../../../../logo_dark.png'
 
 
 
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
         },
 });
 
-const TaxINVoiceReceipt = () => {
+const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails }) => {
         return (
                 <Document>
                         <Page size="A4" style={styles.page}>
@@ -218,7 +218,7 @@ const TaxINVoiceReceipt = () => {
                                                 <Text style={{ marginBottom: 5 }}>SHUBHA,</Text>
 
                                                 <Text style={{ marginBottom: 5 }}>BANGALORE</Text>
-                                                <Text style={{ marginBottom: 5 }}>MOBILE: 9901517112</Text>
+                                                <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
                                                 <Text style={{ marginBottom: 5 }}>PAN NO: DRXPR9966P</Text>
                                         </View>
 
