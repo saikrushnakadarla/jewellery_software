@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
 
         },
         image1: {
-                // width: 100,
+                // width: 100,F
                 height: 50,
                 marginTop: 0,
 
@@ -257,7 +257,7 @@ const TaxINVoiceReceipt = () => {
                                                 {/* STAFF */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>STAFF:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>SGJ</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>Sadashri Jewels</Text>
                                                 </View>
 
                                                 {/* GSTIN */}
