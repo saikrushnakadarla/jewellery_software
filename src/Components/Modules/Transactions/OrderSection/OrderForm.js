@@ -46,6 +46,10 @@ const SalesForm = () => {
     handleProductNameChange,
     handleMetalTypeChange,
     handleDesignNameChange,
+    filteredDesignOptions,
+    filteredPurityOptions,
+    filteredMetalTypes,
+    uniqueProducts,
   } = useProductHandlers();
 
   // Apply calculations
@@ -337,6 +341,10 @@ const SalesForm = () => {
               handleAdd={handleAdd}
               products={products}
               data={data}
+              uniqueProducts={uniqueProducts}
+              filteredMetalTypes={filteredMetalTypes}
+              filteredPurityOptions={filteredPurityOptions}
+              filteredDesignOptions={filteredDesignOptions}
               isQtyEditable={isQtyEditable}             
             />
           </div>
