@@ -389,10 +389,43 @@ const handleBarcodeChange = async (code) => {
       const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
 
       if (tag) {
+        // Check if the tag is marked as "Sold"
+        if (tag.Status === "Sold") {
+          alert("The product is already sold out!");
+          // Reset form fields
+          setFormData((prevData) => ({
+            ...prevData,
+            code: "",
+            product_id: "",
+            product_name: "",
+            metal_type: "",
+            design_name: "",
+            purity: "",
+            gross_weight: "",
+            stone_weight: "",
+            stone_price: "",
+            weight_bw: "",
+            va_on: "",
+            va_percent: "",
+            wastage_weight: "",
+            total_weight_aw: "",
+            mc_on: "",
+            mc_per_gram: "",
+            making_charges: "",
+            rate: "",
+            rate_amt: "",
+            tax_percent: "",
+            tax_amt: "",
+            total_price: "",
+            qty: "", // Reset qty
+          }));
+          setIsQtyEditable(true); // Allow editing of qty
+          return; // Exit early
+        }
+
         const productId = tag.product_id;
         const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
         console.log("productDetails:", productDetails);
-        // Log opentag_id for debugging
         console.log("opentag_id:", tag.opentag_id);
 
         setFormData((prevData) => ({
@@ -454,6 +487,7 @@ const handleBarcodeChange = async (code) => {
     console.error("Error handling code change:", error);
   }
 };
+
   
 
 return {
