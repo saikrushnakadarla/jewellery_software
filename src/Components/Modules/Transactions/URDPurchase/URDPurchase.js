@@ -288,19 +288,6 @@ const URDPurchase = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const fetchPurity = async () => {
-  //     try {
-  //       const response = await axios.get(`${baseURL}/purity`);
-  //       setPurity(response.data); // Populate table with fetched data
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-
-  //   fetchPurity();
-  // }, []);
-
   useEffect(() => {
     const fetchPurity = async () => {
       try {
@@ -316,8 +303,6 @@ const URDPurchase = () => {
 
   const [metalOptions, setMetalOptions] = useState([]);
 
-  // Fetch data from the backend API when the component mounts
-  // Fetch metal types on component mount
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
@@ -544,14 +529,6 @@ const URDPurchase = () => {
           <div className="urd-form-section">
             <h4>Purchase Details</h4>
             <Row>
-              {/* <Col xs={12} md={2}>
-                <InputField
-                  label="P ID"
-                  name="product_id"
-                  value={productDetails.product_id}
-                  onChange={handleInputChange}
-                />
-              </Col> */}
               <Col xs={12} md={2}>
                 <InputField
                   label="Product"
