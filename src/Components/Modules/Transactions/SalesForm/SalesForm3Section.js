@@ -34,9 +34,9 @@ const SalesFormSection = () => {
     pending_amount: ''
   });
 
- 
+
   const [isEditing, setIsEditing] = useState(false); // To track if we're in edit mode
-  const [editIndex, setEditIndex] = useState(null); 
+  const [editIndex, setEditIndex] = useState(null);
 
 
 
@@ -241,14 +241,14 @@ const SalesFormSection = () => {
   //   setSchemeDetails(data);
   //   setEditingRow(data.member_number); // Set the editing row
   // };
-  
+
   // const handleDelete = (memberNumber) => {
   //   // Filter out the deleted record based on member_number
   //   setSchemeTableData((prevData) =>
   //     prevData.filter((data) => data.member_number !== memberNumber)
   //   );
   // };
-  
+
   const handleAddButtonClick = (isOldForm) => {
     if (editingRow) {
       // If we're in edit mode, update the row
@@ -260,6 +260,7 @@ const SalesFormSection = () => {
         );
         // Reset after update
         setOldDetails({
+          product: "",
           metal: "",
           purity: "",
           hsn_code: "",
@@ -299,16 +300,18 @@ const SalesFormSection = () => {
         if (oldDetails.metal && oldDetails.purity && oldDetails.hsn_code) {
           setOldTableData((prevData) => [...prevData, oldDetails]);
           setOldDetails({
+            product: "",
             metal: "",
             purity: "",
             hsn_code: "",
-            gross: 0,
-            dust: 0,
+            gross: "",
+            dust: "",
             ml_percent: 0,
             net_wt: 0,
             remarks: "",
-            rate: 0,
+            rate: "",
             total_amount: 0,
+            total_old_amount:""
           });
         } else {
           alert("Please fill in all required fields.");
@@ -327,6 +330,7 @@ const SalesFormSection = () => {
             pending_months: "",
             paid_amount: "",
             pending_amount: "",
+            schemes_total_amount: "",
           });
         } else {
           alert("Please fill in all required fields.");
@@ -334,24 +338,24 @@ const SalesFormSection = () => {
       }
     }
   };
-  
+
   // Handle Edit for Old Table
   const handleEditOld = (data) => {
     setOldDetails(data);
     setEditingRow(data.hsn_code); // Set the row to edit
   };
-  
+
   // Handle Edit for Scheme Table
   const handleEditScheme = (data) => {
     setSchemeDetails(data);
     setEditingRow(data.member_number); // Set the row to edit
   };
-  
+
   // Handle Delete for Old Table
   const handleDeleteOld = (hsnCode) => {
     setOldTableData((prevData) => prevData.filter((data) => data.hsn_code !== hsnCode));
   };
-  
+
   // Handle Delete for Scheme Table
   const handleDeleteScheme = (memberNumber) => {
     setSchemeTableData((prevData) => prevData.filter((data) => data.member_number !== memberNumber));
@@ -365,8 +369,69 @@ const SalesFormSection = () => {
     return schemeTableData.reduce((sum, item) => sum + parseFloat(item.paid_amount || 0), 0).toFixed(2);
   };
 
-
+  const handleSubmitOldData = async () => {
+    try {
+      // Calculate the total amount once
+      const totalOldAmount = calculateOldTotalSum();
   
+      // Iterate over oldTableData and send POST request for each entry
+      for (const data of oldTableData) {
+        const payload = {
+          ...data,
+          total_old_amount: totalOldAmount, // Add the total amount to each request
+        };
+  
+        const response = await fetch('http://localhost:5000/olditems', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Failed to save data for HSN Code ${data.hsn_code}`);
+        }
+      }
+      alert('Data submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      alert('Error occurred while submitting data. Please try again.');
+    }
+  };
+  
+  const handleSubmitSchemeData = async () => {
+    try {
+      // Calculate the total amount once
+      const schemesTotalAmount = calculateSchemeTotalSum();
+  
+      // Iterate over schemeTableData and send POST request for each entry
+      for (const data of schemeTableData) {
+        const payload = {
+          ...data,
+          schemes_total_amount: schemesTotalAmount, // Add the total amount to each request
+        };
+  
+        const response = await fetch('http://localhost:5000/member-schemes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`Failed to save data for Member Number ${data.member_number}`);
+        }
+      }
+      alert('Data submitted successfully!');
+    } catch (error) {
+      console.error('Error submitting data:', error);
+      alert('Error occurred while submitting data. Please try again.');
+    }
+  };
+  
+
   return (
     <Col className="sales-form-section">
       <Row>
@@ -388,11 +453,12 @@ const SalesFormSection = () => {
       </Row>
 
       {activeForm === "old" && (
-        <>
-         <Row>
+  <>
+    <Row>
       <h4 className="mb-3">Old</h4>
+      {/* Input Fields */}
       <Col xs={12} md={4}>
-        <InputField label="Product" />
+        <InputField label="Product" name="product" value={oldDetails.product} onChange={(e) => handleInputChange(e, true)}/>
       </Col>
       <Col xs={12} md={3}>
         <InputField
@@ -451,9 +517,11 @@ const SalesFormSection = () => {
       </Col>
     </Row>
 
+    {/* Table */}
     <Table striped bordered hover className="mt-4">
       <thead>
         <tr>
+          <th>Product</th>
           <th>Metal</th>
           <th>Purity</th>
           <th>Gross</th>
@@ -470,6 +538,7 @@ const SalesFormSection = () => {
       <tbody>
         {oldTableData.map((data, index) => (
           <tr key={index}>
+            <td>{data.product}</td>
             <td>{data.metal}</td>
             <td>{data.purity}</td>
             <td>{data.gross}</td>
@@ -493,16 +562,25 @@ const SalesFormSection = () => {
       </tbody>
     </Table>
 
-          <div className="d-flex justify-content-between px-2 mt-2">
-            <h5>Total Amount for Old:</h5>
-            <h5>₹ {calculateOldTotalSum()}</h5>
-          </div>
-        </>
-      )}
+    {/* Total Amount Section */}
+    <div className="d-flex justify-content-between px-2 mt-2">
+      <h5>Total Amount for Old:</h5>
+      <h5>₹ {calculateOldTotalSum()}</h5>
+    </div>
 
-      {activeForm === "schemes" && (
-        <>
-        <Row>
+    {/* Submit Button */}
+    <div className="text-right mt-3">
+      <Button variant="primary" onClick={handleSubmitOldData}>
+        Submit
+      </Button>
+    </div>
+  </>
+)}
+
+
+{activeForm === "schemes" && (
+  <>
+    <Row>
       <h4 className="mb-3">Schemes</h4>
       <Col xs={12} md={3}>
         <InputField label="Scheme" name="scheme" value={schemeDetails.scheme} onChange={(e) => handleInputChange(e, false)} />
@@ -541,10 +619,10 @@ const SalesFormSection = () => {
       </Col>
     </Row>
 
+    {/* Table */}
     <Table striped bordered hover className="mt-4">
       <thead>
         <tr>
-          <th>Scheme</th>
           <th>Member Name</th>
           <th>Member Number</th>
           <th>Scheme Name</th>
@@ -560,7 +638,6 @@ const SalesFormSection = () => {
       <tbody>
         {schemeTableData.map((data, index) => (
           <tr key={index}>
-            <td>{data.scheme}</td>
             <td>{data.member_name}</td>
             <td>{data.member_number}</td>
             <td>{data.scheme_name}</td>
@@ -582,12 +659,22 @@ const SalesFormSection = () => {
         ))}
       </tbody>
     </Table>
-          <div className="d-flex justify-content-between px-2 mt-2">
-            <h5>Total Amount for Schemes:</h5>
-            <h5>₹ {calculateSchemeTotalSum()}</h5>
-          </div>
-        </>
-      )}
+
+    {/* Total Amount Section */}
+    <div className="d-flex justify-content-between px-2 mt-2">
+      <h5>Total Amount for Schemes:</h5>
+      <h5>₹ {calculateSchemeTotalSum()}</h5>
+    </div>
+
+    {/* Submit Button */}
+    <div className="text-right mt-3">
+      <Button variant="primary" onClick={handleSubmitSchemeData}>
+        Submit
+      </Button>
+    </div>
+  </>
+)}
+
     </Col>
   );
 };

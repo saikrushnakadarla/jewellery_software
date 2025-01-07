@@ -14,7 +14,7 @@ import baseURL from './../../../../Url/NodeBaseURL';
 import SalesFormSection from "./SalesForm3Section";
 import { pdf } from '@react-pdf/renderer';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import PDFLayout from './PDFLayout';
+import PDFLayout from './TaxInvoiceA4';
 
 const SalesForm = () => {
   const navigate = useNavigate();
