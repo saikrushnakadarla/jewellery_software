@@ -1,10 +1,8 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
-import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
-import { Button, Row, Col, Modal } from 'react-bootstrap';
+import { FaEdit, FaTrash } from 'react-icons/fa';
+import { Button, Row, Col } from 'react-bootstrap';
 import './Customers_Table.css';
 
 import baseURL from '../../../../Url/NodeBaseURL';
@@ -13,8 +11,6 @@ const RepairsTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store table data
   const [loading, setLoading] = useState(true); // State for loading indicator
-  const [modalData, setModalData] = useState(null); // State to store data for the modal
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
 
   const columns = React.useMemo(
     () => [
@@ -31,6 +27,26 @@ const RepairsTable = () => {
         accessor: 'print_name',
       },
       {
+        Header: 'Account Group',
+        accessor: 'account_group',
+      },
+      {
+        Header: 'Pincode',
+        accessor: 'pincode',
+      },
+      {
+        Header: 'State',
+        accessor: 'state',
+      },
+      {
+        Header: 'State Code',
+        accessor: 'state_code',
+      },
+      {
+        Header: 'Phone',
+        accessor: 'phone',
+      },
+      {
         Header: 'Mobile',
         accessor: 'mobile',
       },
@@ -39,15 +55,45 @@ const RepairsTable = () => {
         accessor: 'email',
       },
       {
+        Header: 'Birthday',
+        accessor: 'birthday',
+      },
+      {
+        Header: 'Anniversary',
+        accessor: 'anniversary',
+      },
+      {
+        Header: 'Bank Account No',
+        accessor: 'bank_account_no',
+      },
+      {
+        Header: 'Bank Name',
+        accessor: 'bank_name',
+      },
+      {
+        Header: 'IFSC Code',
+        accessor: 'ifsc_code',
+      },
+      {
+        Header: 'Branch',
+        accessor: 'branch',
+      },
+      {
+        Header: 'GSTIN',
+        accessor: 'gst_in',
+      },
+      {
+        Header: 'Aadhar Card',
+        accessor: 'aadhar_card',
+      },
+      {
+        Header: 'PAN Card',
+        accessor: 'pan_card',
+      },
+      {
         Header: 'Action',
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
-            <button
-              className="action-button view-button"
-              onClick={() => handleView(row.original)}
-            >
-              <FaEye />
-            </button>
             <button
               className="action-button edit-button"
               onClick={() => handleEdit(row.original.account_id)}
@@ -138,11 +184,6 @@ const RepairsTable = () => {
     navigate('/customermaster'); // Navigate to the /customermaster page
   };
 
-  const handleView = (rowData) => {
-    setModalData(rowData);
-    setShowModal(true);
-  };
-
   return (
     <div className="main-container">
       <div className="customers-table-container">
@@ -161,63 +202,9 @@ const RepairsTable = () => {
         {loading ? (
           <div>Loading...</div>
         ) : (
-          <DataTable columns={columns} data={[...data].reverse()} />
+          <DataTable columns={columns}  data={[...data].reverse()} />
         )}
       </div>
-
-      {/* Modal for displaying full data */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Customer Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {modalData && (
-            <div className="modal-content-grid">
-              <Row>
-                <Col md={6}><strong>Trade Name:</strong> {modalData.account_name}</Col>
-                <Col md={6}><strong>Print Name:</strong> {modalData.print_name}</Col>
-              </Row>
-              <Row>
-                <Col md={6}><strong>Account Group:</strong> {modalData.account_group}</Col>
-                <Col md={6}><strong>Pincode:</strong> {modalData.pincode}</Col>
-              </Row>
-              <Row>
-                <Col md={6}><strong>State:</strong> {modalData.state}</Col>
-                <Col md={6}><strong>State Code:</strong> {modalData.state_code}</Col>
-              </Row>
-              <Row>
-                <Col md={6}><strong>Phone:</strong> {modalData.phone}</Col>
-                <Col md={6}><strong>Mobile:</strong> {modalData.mobile}</Col>
-              </Row>
-              <Row>
-                <Col md={6}><strong>Email:</strong> {modalData.email}</Col>
-                <Col md={6}><strong>Birthday:</strong> {modalData.birthday}</Col>
-              </Row>
-              <Row>
-                <Col md={6}><strong>Anniversary:</strong> {modalData.anniversary}</Col>
-                <Col md={6}><strong>Bank Account No:</strong> {modalData.bank_account_no}</Col>
-              </Row>
-              <Row>
-                <Col md={6}><strong>Bank Name:</strong> {modalData.bank_name}</Col>
-                <Col md={6}><strong>IFSC Code:</strong> {modalData.ifsc_code}</Col>
-              </Row>
-              <Row>
-                <Col md={6}><strong>Branch:</strong> {modalData.branch}</Col>
-                <Col md={6}><strong>GSTIN:</strong> {modalData.gst_in}</Col>
-              </Row>
-              <Row>
-                <Col md={6}><strong>Aadhar Card:</strong> {modalData.aadhar_card}</Col>
-                <Col md={6}><strong>PAN Card:</strong> {modalData.pan_card}</Col>
-              </Row>
-            </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </div>
   );
 };
