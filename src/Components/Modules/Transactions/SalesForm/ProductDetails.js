@@ -18,6 +18,7 @@ const ProductDetails = ({
   filteredPurityOptions,
   filteredMetalTypes,
   uniqueProducts,
+  isBarcodeSelected,
   isQtyEditable
 }) => {
 
@@ -71,97 +72,145 @@ const ProductDetails = ({
                     }
                   />
               </Col> */}
-                            <Col xs={12} md={2}>
-  <InputField
-    label="BarCode/Rbarcode"
-    name="code"
-    value={formData.code}
-    onChange={(e) => handleBarcodeChange(e.target.value)}
-    type="select"
-    options={
-      formData.barcodeOptions?.length > 0
-        ? formData.barcodeOptions
-        : [
-            ...products.map((product) => ({
-              value: product.rbarcode,
-              label: product.rbarcode,
-            })),
-            ...data.map((tag) => ({
-              value: tag.PCode_BarCode,
-              label: tag.PCode_BarCode,
-            })),
-          ]
-    }
-  />
-</Col>
-                <Col xs={12} md={3}>
-                <InputField
-                  label="Product Name"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={(e) => handleProductNameChange(e.target.value)}
-                  type="select"
-                  options={uniqueProducts.map((prod) => ({
-                    value: prod.product_Name,
-                    label: prod.product_Name,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Metal Type"
-                  name="metal_type"
-                  value={formData.metal_type}
-                  onChange={handleChange}
-                  type="select"
-                  options={filteredMetalTypes.map((metalType) => ({
-                    value: metalType.metal_type,
-                    label: metalType.metal_type,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={3}>
-                <InputField
-                  label="Design Master"
-                  name="design_name"
-                  value={formData.design_name}
-                  onChange={handleChange}
-                  type="select"
-                  options={filteredDesignOptions?.map((designOption) => ({
-                    value: designOption.design_master,
-                    label: designOption.design_master,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Purity"
-                  name="purity"
-                  value={formData.purity}
-                  onChange={handleChange}
-                  type="select"
-                  options={filteredPurityOptions.map((Purity) => ({
-                    value: Purity.Purity,
-                    label: Purity.Purity,
-                  }))}
-                />
-              </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Gross Wt"
-          name="gross_weight"
-          value={formData.gross_weight || ""} // Default to "0" if undefined
-          onChange={handleChange}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Stone Wt"
-          name="stone_weight"
-          value={formData.stone_weight || ""}
-          onChange={handleChange}
-        />
-      </Col>
+                             <Col xs={12} md={2}>
+    <InputField
+      label="BarCode/Rbarcode"
+      name="code"
+      value={formData.code}
+      onChange={(e) => handleBarcodeChange(e.target.value)}
+      type="select"
+      options={
+        formData.barcodeOptions?.length > 0
+          ? formData.barcodeOptions
+          : [
+              ...products.map((product) => ({
+                value: product.rbarcode,
+                label: product.rbarcode,
+              })),
+              ...data.map((tag) => ({
+                value: tag.PCode_BarCode,
+                label: tag.PCode_BarCode,
+              })),
+            ]
+      }
+    />
+  </Col>
+
+  {/* Product Name Field */}
+  <Col xs={12} md={2}>
+    {isBarcodeSelected ? (
+      <InputField
+        label="Product Name"
+        name="product_name"
+        value={formData.product_name}
+        onChange={handleChange}
+        type="text"
+      />
+    ) : (
+      <InputField
+        label="Product Name"
+        name="product_name"
+        value={formData.product_name}
+        onChange={(e) => handleProductNameChange(e.target.value)}
+        type="select"
+        options={uniqueProducts.map((prod) => ({
+          value: prod.product_Name,
+          label: prod.product_Name,
+        }))}
+      />
+    )}
+  </Col>
+
+  {/* Metal Type Field */}
+  <Col xs={12} md={2}>
+    <InputField
+      label="Metal Type"
+      name="metal_type"
+      value={formData.metal_type}
+      onChange={handleChange}
+      type="select"
+      options={filteredMetalTypes.map((metalType) => ({
+        value: metalType.metal_type,
+        label: metalType.metal_type,
+      }))}
+    />
+  </Col>
+
+  {/* Design Master Field */}
+  <Col xs={12} md={2}>
+    {isBarcodeSelected ? (
+      <InputField
+        label="Design Master"
+        name="design_name"
+        value={formData.design_name}
+        onChange={handleChange}
+        type="text"
+      />
+    ) : (
+      <InputField
+        label="Design Master"
+        name="design_name"
+        value={formData.design_name}
+        onChange={handleChange}
+        type="select"
+        options={filteredDesignOptions.map((designOption) => ({
+          value: designOption.design_master,
+          label: designOption.design_master,
+        }))}
+      />
+    )}
+  </Col>
+
+  {/* Purity Field */}
+  <Col xs={12} md={2}>
+    <InputField
+      label="Purity"
+      name="purity"
+      value={formData.purity}
+      onChange={handleChange}
+      type="select"
+      options={filteredPurityOptions.map((Purity) => ({
+        value: Purity.Purity,
+        label: Purity.Purity,
+      }))}
+    />
+  </Col>
+
+  {/* Other Fields */}
+  <Col xs={12} md={2}>
+    <InputField
+      label="Category"
+      name="category"
+      value={formData.category || ""}
+      onChange={handleChange}
+      readOnly
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField
+      label="Sub Category"
+      name="sub_category"
+      value={formData.sub_category || ""}
+      onChange={handleChange}
+      readOnly={!isBarcodeSelected}
+    />
+  </Col>
+  <Col xs={12} md={1}>
+    <InputField
+      label="Gross Wt"
+      name="gross_weight"
+      value={formData.gross_weight || ""}
+      onChange={handleChange}
+    />
+  </Col>
+  <Col xs={12} md={1}>
+    <InputField
+      label="Stone Wt"
+      name="stone_weight"
+      value={formData.stone_weight || ""}
+      onChange={handleChange}
+    />
+  </Col>
       <Col xs={12} md={1}>
         <InputField
           label="St Price"
@@ -247,9 +296,9 @@ const ProductDetails = ({
           onChange={handleChange}
         />
       </Col>
-      <Col xs={12} md={2}>
+      <Col xs={12} md={1}>
         <InputField
-          label="Making Charges"
+          label="Total MC"
           name="making_charges"
           value={formData.making_charges || ""}
           onChange={handleChange}
@@ -272,7 +321,7 @@ const ProductDetails = ({
         readOnly={!isQtyEditable} // Make it editable when isQtyEditable is true
       />
     </Col>
-      <Col xs={12} md={2}>
+      <Col xs={12} md={1}>
       <InputField
         label="Amount"
         name="rate_amt"

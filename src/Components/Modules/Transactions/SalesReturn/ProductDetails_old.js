@@ -1,96 +1,132 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Row, Button } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
+import axios from 'axios';
+import baseURL from "../../../../Url/NodeBaseURL";
 
 const ProductDetails = ({ 
   formData, 
   data,
   handleChange, 
   handleBarcodeChange,
+  handleProductChange,
   handleProductNameChange,
-  handleImageUpload,
+  handleMetalTypeChange,
+  handleDesignNameChange,
   handleAdd,
+  handleUpdate,
+  isEditing, 
   products,
-  filteredDesignOptions,
-  filteredPurityOptions,
-  filteredMetalTypes,
-  uniqueProducts,
-  designMaster,
-  purity,
-  metalTypes,
+
   isQtyEditable
 }) => {
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Check file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file');
-        return;
-      }
-      
-      // Check file size (e.g., 5MB limit)
-      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-      if (file.size > maxSize) {
-        alert('File size should be less than 5MB');
-        return;
-      }
-
-      // Create a preview URL and pass the file to parent
-      handleImageUpload(file);
-    }
-  };
-
+  
   return (
     <Col >
     <Row>
-            <Col xs={12} md={3}>
-                <InputField
-                  label="Product Name"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={handleChange}
-                />
-            </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Metal Type"
-                  name="metal_type"
-                  value={formData.metal_type}
-                  onChange={handleChange}
-                  type="select"
-                  options={metalTypes.map((metalType) => ({
-                    value: metalType.metal_name,
-                    label: metalType.metal_name,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={3}>
-                <InputField
-                  label="Design Master"
-                  name="design_name"
-                  value={formData.design_name}
-                  onChange={handleChange}
-                  type="select"
-                  options={designMaster.map((designOption) => ({
-                    value: designOption.design_name,
-                    label: designOption.design_name,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Purity"
-                  name="purity"
-                  value={formData.purity}
-                  onChange={handleChange}
-                  type="select"
-                  options={purity.map((Purity) => ({
-                    value: Purity.name,
-                    label: Purity.name,
-                  }))}
-                />
-              </Col>
+    <Col xs={12} md={2}>
+          <InputField
+            label="BarCode/Rbarcode"
+            name="code"
+            value={formData.code}
+            onChange={(e) => handleBarcodeChange(e.target.value)}
+            type="select"
+            options={
+              !formData.product_id
+                ? [
+                    ...products.map((product) => ({
+                      value: product.rbarcode,
+                      label: product.rbarcode,
+                    })),
+                    ...data.map((tag) => ({
+                      value: tag.PCode_BarCode,
+                      label: tag.PCode_BarCode,
+                    })),
+                  ]
+                : [
+                    ...products
+                      .filter(
+                        (product) =>
+                          String(product.product_id) === String(formData.product_id)
+                      )
+                      .map((product) => ({
+                        value: product.rbarcode,
+                        label: product.rbarcode,
+                      })),
+                    ...data
+                      .filter(
+                        (tag) =>
+                          String(tag.product_id) === String(formData.product_id)
+                      )
+                      .map((tag) => ({
+                        value: tag.PCode_BarCode,
+                        label: tag.PCode_BarCode,
+                      })),
+                  ]
+            }
+          />
+        </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="P ID"
+          name="product_id"
+          value={formData.product_id}
+          onChange={(e) => handleProductChange(e.target.value)}
+          type="select"
+          options={products.map((product) => ({
+            value: product.product_id,
+            label: product.product_id,
+          }))}
+        />
+      </Col>
+      <Col xs={12} md={3}>
+        <InputField
+          label="Product Name"
+          name="product_name"
+          value={formData.product_name}
+          onChange={(e) => handleProductNameChange(e.target.value)}
+          type="select"
+          options={products.map((product) => ({
+            value: product.product_name,
+            label: product.product_name,
+          }))}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Metal Type"
+          name="metal_type"
+          value={formData.metal_type}
+          onChange={(e) => handleMetalTypeChange(e.target.value)}                    
+          type="select"
+          options={products.map((product) => ({
+            value: product.Category,
+            label: product.Category,
+          }))}                    
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Design Name"
+          name="design_name"
+          value={formData.design_name}
+          onChange={(e) => handleDesignNameChange(e.target.value)}
+          type="select"
+          options={products.map((product) => ({
+            value: product.design_master,
+            label: product.design_master,
+          }))}
+        />
+      </Col>
+      <Col xs={12} md={1}>
+        <InputField
+          label="Purity"
+          name="purity"
+          value={formData.purity}
+          onChange={handleChange}
+          readOnly
+        />
+      </Col>
       <Col xs={12} md={1}>
         <InputField
           label="Gross Wt"
@@ -141,7 +177,6 @@ const ProductDetails = ({
         ]}
       />
     </Col>
-
       <Col xs={12} md={1}>
         <InputField
           label="VA%"
@@ -202,11 +237,13 @@ const ProductDetails = ({
         />
       </Col>
       <Col xs={12} md={1}>
-        <InputField label="Rate" name="rate"
-          value={formData.rate}
-          onChange={handleChange} 
-        />
-      </Col>
+          <InputField
+            label="Rate"
+            name="rate"
+            value={formData.rate }
+            onChange={handleChange}
+          />
+        </Col>
       <Col xs={12} md={1}>
       <InputField
         label="Qty"
@@ -250,28 +287,16 @@ const ProductDetails = ({
           readOnly
         />
       </Col>
-      <Col xs={12} md={3}>
-          <div className="mb-3">
-            <label className="form-label">Product Image</label>
-            <input
-              type="file"
-              className="form-control"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-            {formData.product_image && (
-              <div className="mt-2">
-                <img
-                  src={URL.createObjectURL(formData.product_image)}
-                  alt="Preview"
-                  style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                />
-              </div>
-            )}
-          </div>
-        </Col>
-        <Col xs={12} md={1}>
-          <Button onClick={handleAdd} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
+      <Col xs={12} md={1}>
+          <Button
+            onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
+            style={{
+              backgroundColor: isEditing ? "#a36e29" : "#a36e29",
+              borderColor: isEditing ? "#a36e29" : "#a36e29",
+            }}
+          >
+            {isEditing ? "Update" : "Add"}
+          </Button>
         </Col>
       </Row>
       </Col> 

@@ -24,6 +24,8 @@ const RepairForm = () => {
     metal_type:"",
     design_master:"",
     purity:"",
+    category: "",
+    sub_category: "",
     gross_weight: "",
     stones_weight: "",
     stones_price: "",
@@ -205,6 +207,8 @@ const handleProductNameChange = (productName) => {
       metal_type: "",
       design_name: "",
       purity: "",
+      category: "",
+      sub_category: "",
       gross_weight: "",
       stones_weight: "",
       stones_price: "",
@@ -212,15 +216,15 @@ const handleProductNameChange = (productName) => {
       wastage_on: "",
       wastage_percent: "",
       wastage_weight: "",
-      total_weight_aw: "",
+      total_weight: "",
       making_charges_on: "",
       mc_per_gram: "",
-      making_charges: "",
+      total_mc: "",
       rate: "",
       rate_amt: "",
       tax_percent: "",
       tax_amt: "",
-      total_price: "",
+      total_rs: "",
       qty: "",
     }));
 
@@ -232,16 +236,21 @@ const handleProductNameChange = (productName) => {
 
 const handleInputChange = (e) => {
   const { name, value } = e.target;
+
+  // Preserve the current barcode
+  const currentBarcode = formData.code;
+
+  // Update the specific field in formData
   const updatedFormData = { ...formData, [name]: value };
 
   setFormData(updatedFormData);
 
-  // Check if all required fields are selected
+  // Destructure relevant fields
   const { product_name, metal_type, design_name, purity } = updatedFormData;
 
   if (product_name && metal_type && design_name && purity) {
-    // Find the matching entry from the data
-    const matchingEntry = data.find(
+    // Filter matching entries
+    const matchingEntries = data.filter(
       (prod) =>
         prod.product_Name === product_name &&
         prod.metal_type === metal_type &&
@@ -249,72 +258,80 @@ const handleInputChange = (e) => {
         prod.Purity === purity
     );
 
-    if (matchingEntry) {
-      // Update the PCode_BarCode in the formData
-      const productId = matchingEntry.product_id;
-      const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-      setFormData((prevData) => ({
-        ...prevData,
-        code: matchingEntry.PCode_BarCode,
-        gross_weight :matchingEntry.Gross_Weight,
-        stones_weight: matchingEntry.Stones_Weight || "",
-        stones_price: matchingEntry.Stones_Price || "",
-        weight_bw: matchingEntry.Weight_BW || "",
-        wastage_on: matchingEntry.Wastage_On || "",
-        wastage_percent: matchingEntry.Wastage_Percentage || "",
-        wastage_weight: matchingEntry.WastageWeight || "",
-        total_weight_aw: matchingEntry.TotalWeight_AW || "",
-        making_charges_on: matchingEntry.Making_Charges_On || "",
-        mc_per_gram: matchingEntry.MC_Per_Gram || "",
-        making_charges: matchingEntry.Making_Charges || "",
-        tax_percent: productDetails?.tax_slab || "",
-        qty: 1, // Allow qty to be editable for tag
-      }));
+    console.log("Matching Entries:", matchingEntries);
+
+    if (matchingEntries.length > 0) {
+      if (matchingEntries.length > 1) {
+        // Handle multiple matching entries
+        setFormData((prevData) => ({
+          ...prevData,
+          code: currentBarcode, // Preserve the selected barcode
+          barcodeOptions: matchingEntries.map((entry) => ({
+            value: entry.PCode_BarCode,
+            label: entry.PCode_BarCode,
+          })),
+        }));
+      } else if (matchingEntries.length === 1) {
+        const matchingEntry = matchingEntries[0];
+
+
+        const productId = matchingEntry.product_id;
+
+        const productDetails = products.find(
+          (prod) => String(prod.product_id) === String(productId)
+        );
+
+        // Set the selected form data based on the matching entry
+        setFormData((prevData) => ({
+          ...prevData,
+          code: currentBarcode || matchingEntry.PCode_BarCode, // Use existing barcode or set the new one
+          category: matchingEntry.category,
+          sub_category: matchingEntry.sub_category,
+          gross_weight: matchingEntry.Gross_Weight,
+          stones_weight: matchingEntry.Stones_Weight || "",
+          stones_price: matchingEntry.Stones_Price || "",
+          weight_bw: matchingEntry.Weight_BW || "",
+          wastage_on: matchingEntry.Wastage_On || "",
+          wastage_percent: matchingEntry.Wastage_Percentage || "",
+          wastage_weight: matchingEntry.WastageWeight || "",
+          total_weight: matchingEntry.TotalWeight_AW || "",
+          making_charges_on: matchingEntry.Making_Charges_On || "",
+          mc_per_gram: matchingEntry.MC_Per_Gram || "",
+          total_mc: matchingEntry.Making_Charges || "",
+          tax_percent: productDetails?.tax_slab || "",
+          qty: 1,
+          barcodeOptions: [], // Clear barcode options after setting the data
+        }));
+      }
     } else {
-      // Reset the PCode_BarCode if no match is found
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        gross_weight: "",
-        stones_weight: "",
-        stones_price: "",
-        weight_bw: "",
-        wastage_on: "",
-        wastage_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        making_charges_on: "",
-        mc_per_gram: "",
-        making_charges: "",
-        rate: "",
-        rate_amt: "",
-        tax_percent: "",
-        tax_amt: "",
-        total_price: "",
-        qty: "",
-      }));
+      console.log("No matching entries found. No updates made.");
     }
   } else {
-    // Reset the PCode_BarCode if all fields are not selected
-    setFormData((prevData) => ({
-      ...prevData,
-      code: "",
-    }));
+    console.log("Required fields are missing or incomplete. No updates made.");
   }
 };
+
+
+
+
+
+const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
 
 const handleBarcodeChange = async (code) => {
   try {
     if (!code) {
-      // If barcode is cleared, reset all related fields
+      // If barcode is cleared, reset all related fields and set code to ""
+      setIsBarcodeSelected(false);  // Reset the barcode selection flag
       setFormData((prevData) => ({
         ...prevData,
-        code: "",
+        code: "",  // Reset code when barcode is cleared
         product_id: "",
         product_name: "",
         metal_type: "",
         design_name: "",
         purity: "",
+        category: "",
+        sub_category: "",
         gross_weight: "",
         stones_weight: "",
         stones_price: "",
@@ -322,15 +339,15 @@ const handleBarcodeChange = async (code) => {
         wastage_on: "",
         wastage_percent: "",
         wastage_weight: "",
-        total_weight_aw: "",
+        total_weight: "",
         making_charges_on: "",
         mc_per_gram: "",
-        making_charges: "",
+        total_mc: "",
         rate: "",
         rate_amt: "",
         tax_percent: "",
         tax_amt: "",
-        total_price: "",
+        total_rs: "",
         qty: "", // Reset qty
       }));
       setIsQtyEditable(true); // Default to editable if barcode is cleared
@@ -339,17 +356,19 @@ const handleBarcodeChange = async (code) => {
 
     // Check for product by code
     const product = products.find((prod) => String(prod.rbarcode) === String(code));
-    console.log("productDetails:", product);
     if (product) {
-      // If product found by code, populate the form
+      // If product found by code, populate the form and make fields editable
+      setIsBarcodeSelected(true);  // Set the barcode as selected
       setFormData((prevData) => ({
         ...prevData,
-        code: product.rbarcode,
+        code: product.rbarcode,  // Retain the selected barcode
         product_id: product.product_id,
-        product_name: product.product_name,
+        product_name: "", // Make editable
         metal_type: product.Category,
-        design_name: product.design_master,
+        design_name: "", // Make editable
         purity: product.purity,
+        category: product.product_name,
+        sub_category: "",
         gross_weight: "",
         stones_weight: "",
         stones_price: "",
@@ -357,34 +376,34 @@ const handleBarcodeChange = async (code) => {
         wastage_on: "",
         wastage_percent: "",
         wastage_weight: "",
-        total_weight_aw: "",
+        total_weight: "",
         making_charges_on: "",
         mc_per_gram: "",
-        making_charges: "",
+        total_mc: "",
         tax_percent: product.tax_slab,
+        total_rs: "",
         qty: 1, // Set qty to 1 for product
       }));
       setIsQtyEditable(false); // Set qty as read-only
     } else {
       // Check if tag exists by code
       const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
-
       if (tag) {
+        setIsBarcodeSelected(true);  // Set the barcode as selected
         const productId = tag.product_id;
         const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-        console.log("productDetails:", productDetails);
-        // Log opentag_id for debugging
-        console.log("opentag_id:", tag.opentag_id);
 
         setFormData((prevData) => ({
           ...prevData,
-          code: tag.PCode_BarCode || "",
+          code: tag.PCode_BarCode || "", // Retain the barcode
           product_id: tag.product_id || "",
           opentag_id: tag.opentag_id || "",
-          product_name: tag.product_Name || "",
-          metal_type: productDetails?.Category || "",
-          design_name: tag.design_master || "",
+          product_name: tag.product_Name || "", // Make editable
+          metal_type: tag.metal_type || "",
+          design_name: tag.design_master || "", // Make editable
           purity: tag.Purity || "",
+          category: tag.category || "",
+          sub_category: tag.sub_category || "",
           gross_weight: tag.Gross_Weight || "",
           stones_weight: tag.Stones_Weight || "",
           stones_price: tag.Stones_Price || "",
@@ -392,10 +411,10 @@ const handleBarcodeChange = async (code) => {
           wastage_on: tag.Wastage_On || "",
           wastage_percent: tag.Wastage_Percentage || "",
           wastage_weight: tag.WastageWeight || "",
-          total_weight_aw: tag.TotalWeight_AW || "",
+          total_weight: tag.TotalWeight_AW || "",
           making_charges_on: tag.Making_Charges_On || "",
           mc_per_gram: tag.MC_Per_Gram || "",
-          making_charges: tag.Making_Charges || "",
+          total_mc: tag.Making_Charges || "",
           tax_percent: productDetails?.tax_slab || "",
           qty: 1, // Allow qty to be editable for tag
         }));
@@ -404,12 +423,14 @@ const handleBarcodeChange = async (code) => {
         // Reset form if no tag is found
         setFormData((prevData) => ({
           ...prevData,
-          code: "",
+          code: "", // Reset code
           product_id: "",
           product_name: "",
           metal_type: "",
           design_name: "",
           purity: "",
+          category: "",
+          sub_category: "",
           gross_weight: "",
           stones_weight: "",
           stones_price: "",
@@ -417,15 +438,15 @@ const handleBarcodeChange = async (code) => {
           wastage_on: "",
           wastage_percent: "",
           wastage_weight: "",
-          total_weight_aw: "",
+          total_weight: "",
           making_charges_on: "",
           mc_per_gram: "",
-          making_charges: "",
+          total_mc: "",
           rate: "",
           rate_amt: "",
           tax_percent: "",
           tax_amt: "",
-          total_price: "",
+          total_rs: "",
           qty: "", // Reset qty
         }));
         setIsQtyEditable(true); // Default to editable
@@ -658,99 +679,126 @@ const handleBarcodeChange = async (code) => {
           </Col>
 
           <Col xs={12} md={2}>
-                  <InputField
-                    label="BarCode/Rbarcode"
-                    name="code"
-                    value={formData.code}
-                    onChange={(e) => handleBarcodeChange(e.target.value)}
-                    type="select"
-                    options={
-                      !formData.product_id
-                        ? [
-                            ...products.map((product) => ({
-                              value: product.rbarcode,
-                              label: product.rbarcode,
-                            })),
-                            ...data.map((tag) => ({
-                              value: tag.PCode_BarCode,
-                              label: tag.PCode_BarCode,
-                            })),
-                          ]
-                        : [
-                            ...products
-                              .filter(
-                                (product) =>
-                                  String(product.product_id) === String(formData.product_id)
-                              )
-                              .map((product) => ({
-                                value: product.rbarcode,
-                                label: product.rbarcode,
-                              })),
-                            ...data
-                              .filter(
-                                (tag) =>
-                                  String(tag.product_id) === String(formData.product_id)
-                              )
-                              .map((tag) => ({
-                                value: tag.PCode_BarCode,
-                                label: tag.PCode_BarCode,
-                              })),
-                          ]
-                    }
-                  />
-              </Col>
-                <Col xs={12} md={2}>
-                <InputField
-                  label="Product Name"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={(e) => handleProductNameChange(e.target.value)}
-                  type="select"
-                  options={uniqueProducts.map((prod) => ({
-                    value: prod.product_Name,
-                    label: prod.product_Name,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Metal Type"
-                  name="metal_type"
-                  value={formData.metal_type}
-                  onChange={handleInputChange}
-                  type="select"
-                  options={filteredMetalTypes.map((metalType) => ({
-                    value: metalType.metal_type,
-                    label: metalType.metal_type,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Design Master"
-                  name="design_name"
-                  value={formData.design_name}
-                  onChange={handleInputChange}
-                  type="select"
-                  options={filteredDesignOptions.map((designOption) => ({
-                    value: designOption.design_master,
-                    label: designOption.design_master,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Purity"
-                  name="purity"
-                  value={formData.purity}
-                  onChange={handleInputChange}
-                  type="select"
-                  options={filteredPurityOptions.map((Purity) => ({
-                    value: Purity.Purity,
-                    label: Purity.Purity,
-                  }))}
-                />
-              </Col>
+    <InputField
+      label="BarCode/Rbarcode"
+      name="code"
+      value={formData.code}
+      onChange={(e) => handleBarcodeChange(e.target.value)}
+      type="select"
+      options={
+        formData.barcodeOptions?.length > 0
+          ? formData.barcodeOptions
+          : [
+              ...products.map((product) => ({
+                value: product.rbarcode,
+                label: product.rbarcode,
+              })),
+              ...data.map((tag) => ({
+                value: tag.PCode_BarCode,
+                label: tag.PCode_BarCode,
+              })),
+            ]
+      }
+    />
+  </Col>
+
+  {/* Product Name Field */}
+  <Col xs={12} md={2}>
+    {isBarcodeSelected ? (
+      <InputField
+        label="Product Name"
+        name="product_name"
+        value={formData.product_name}
+        onChange={handleInputChange}
+        type="text"
+      />
+    ) : (
+      <InputField
+        label="Product Name"
+        name="product_name"
+        value={formData.product_name}
+        onChange={(e) => handleProductNameChange(e.target.value)}
+        type="select"
+        options={uniqueProducts.map((prod) => ({
+          value: prod.product_Name,
+          label: prod.product_Name,
+        }))}
+      />
+    )}
+  </Col>
+
+  {/* Metal Type Field */}
+  <Col xs={12} md={2}>
+    <InputField
+      label="Metal Type"
+      name="metal_type"
+      value={formData.metal_type}
+      onChange={handleInputChange}
+      type="select"
+      options={filteredMetalTypes.map((metalType) => ({
+        value: metalType.metal_type,
+        label: metalType.metal_type,
+      }))}
+    />
+  </Col>
+
+  {/* Design Master Field */}
+  <Col xs={12} md={2}>
+    {isBarcodeSelected ? (
+      <InputField
+        label="Design Master"
+        name="design_name"
+        value={formData.design_name}
+        onChange={handleInputChange}
+        type="text"
+      />
+    ) : (
+      <InputField
+        label="Design Master"
+        name="design_name"
+        value={formData.design_name}
+        onChange={handleInputChange}
+        type="select"
+        options={filteredDesignOptions.map((designOption) => ({
+          value: designOption.design_master,
+          label: designOption.design_master,
+        }))}
+      />
+    )}
+  </Col>
+
+  {/* Purity Field */}
+  <Col xs={12} md={2}>
+    <InputField
+      label="Purity"
+      name="purity"
+      value={formData.purity}
+      onChange={handleInputChange}
+      type="select"
+      options={filteredPurityOptions.map((Purity) => ({
+        value: Purity.Purity,
+        label: Purity.Purity,
+      }))}
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField
+      label="Category"
+      name="category"
+      value={formData.category || ""}
+      onChange={handleInputChange}
+      readOnly
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField
+      label="Sub Category"
+      name="sub_category"
+      value={formData.sub_category || ""}
+      onChange={handleInputChange}
+      readOnly={!isBarcodeSelected}
+    />
+  </Col>
           <Col xs={12} md={2}>
             <InputField label="Gross Weight:" name="gross_weight" value={formData.gross_weight} onChange={handleInputChange} />
           </Col>

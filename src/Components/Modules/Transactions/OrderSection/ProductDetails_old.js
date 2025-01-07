@@ -15,9 +15,6 @@ const ProductDetails = ({
   filteredPurityOptions,
   filteredMetalTypes,
   uniqueProducts,
-  designMaster,
-  purity,
-  metalTypes,
   isQtyEditable
 }) => {
   const handleFileChange = (e) => {
@@ -44,14 +41,84 @@ const ProductDetails = ({
   return (
     <Col >
     <Row>
-            <Col xs={12} md={3}>
+    {/* <Col xs={12} md={2}>
+                  <InputField
+                    label="BarCode/Rbarcode"
+                    name="code"
+                    value={formData.code}
+                    onChange={(e) => handleBarcodeChange(e.target.value)}
+                    type="select"
+                    options={
+                      !formData.product_id
+                        ? [
+                            ...products.map((product) => ({
+                              value: product.rbarcode,
+                              label: product.rbarcode,
+                            })),
+                            ...data.map((tag) => ({
+                              value: tag.PCode_BarCode,
+                              label: tag.PCode_BarCode,
+                            })),
+                          ]
+                        : [
+                            ...products
+                              .filter(
+                                (product) =>
+                                  String(product.product_id) === String(formData.product_id)
+                              )
+                              .map((product) => ({
+                                value: product.rbarcode,
+                                label: product.rbarcode,
+                              })),
+                            ...data
+                              .filter(
+                                (tag) =>
+                                  String(tag.product_id) === String(formData.product_id)
+                              )
+                              .map((tag) => ({
+                                value: tag.PCode_BarCode,
+                                label: tag.PCode_BarCode,
+                              })),
+                          ]
+                    }
+                  />
+              </Col> */}
+                            <Col xs={12} md={2}>
+  <InputField
+    label="BarCode/Rbarcode"
+    name="code"
+    value={formData.code}
+    onChange={(e) => handleBarcodeChange(e.target.value)}
+    type="select"
+    options={
+      formData.barcodeOptions?.length > 0
+        ? formData.barcodeOptions
+        : [
+            ...products.map((product) => ({
+              value: product.rbarcode,
+              label: product.rbarcode,
+            })),
+            ...data.map((tag) => ({
+              value: tag.PCode_BarCode,
+              label: tag.PCode_BarCode,
+            })),
+          ]
+    }
+  />
+</Col>
+<Col xs={12} md={3}>
                 <InputField
                   label="Product Name"
                   name="product_name"
                   value={formData.product_name}
-                  onChange={handleChange}
+                  onChange={(e) => handleProductNameChange(e.target.value)}
+                  type="select"
+                  options={uniqueProducts.map((prod) => ({
+                    value: prod.product_Name,
+                    label: prod.product_Name,
+                  }))}
                 />
-            </Col>
+              </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Metal Type"
@@ -59,9 +126,9 @@ const ProductDetails = ({
                   value={formData.metal_type}
                   onChange={handleChange}
                   type="select"
-                  options={metalTypes.map((metalType) => ({
-                    value: metalType.metal_name,
-                    label: metalType.metal_name,
+                  options={filteredMetalTypes.map((metalType) => ({
+                    value: metalType.metal_type,
+                    label: metalType.metal_type,
                   }))}
                 />
               </Col>
@@ -72,9 +139,9 @@ const ProductDetails = ({
                   value={formData.design_name}
                   onChange={handleChange}
                   type="select"
-                  options={designMaster.map((designOption) => ({
-                    value: designOption.design_name,
-                    label: designOption.design_name,
+                  options={filteredDesignOptions?.map((designOption) => ({
+                    value: designOption.design_master,
+                    label: designOption.design_master,
                   }))}
                 />
               </Col>
@@ -85,9 +152,9 @@ const ProductDetails = ({
                   value={formData.purity}
                   onChange={handleChange}
                   type="select"
-                  options={purity.map((Purity) => ({
-                    value: Purity.name,
-                    label: Purity.name,
+                  options={filteredPurityOptions.map((Purity) => ({
+                    value: Purity.Purity,
+                    label: Purity.Purity,
                   }))}
                 />
               </Col>

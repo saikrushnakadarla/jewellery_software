@@ -35,6 +35,10 @@
   gap: 20px;
 }
 
+.sales-form-third {
+  flex: 0 0 60%;
+}
+
 .sales-form-third,
 .sales-form-fourth {
   flex: 1;

@@ -62,7 +62,6 @@ const useProductHandlers = () => {
   const [uniqueProducts, setUniqueProducts] = useState([]); 
   const [metalTypes, setMetalTypes] = useState([]);
   const [purity, setPurity] = useState([]);
-  const [designMaster, setDesignMaster] = useState([]);
   const [filteredMetalTypes, setFilteredMetalTypes] = useState([]);
   const [designOptions, setDesignOptions] = useState([]); 
   const [filteredDesignOptions, setFilteredDesignOptions] = useState([]); 
@@ -116,46 +115,6 @@ const useProductHandlers = () => {
         console.error('Error fetching products:', error);
       }
     };
-
-    const fetchMetalTypes = async () => {
-      try {
-        const response = await fetch(`${baseURL}/metaltype`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        const result = await response.json();
-        setMetalTypes(result);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-
-
-    const fetchDesignMaster = async () => {
-      try {
-        const response = await fetch(`${baseURL}/designmaster`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        const result = await response.json();
-        setDesignMaster(result);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-
-    const fetchPurity = async () => {
-      try {
-        const response = await fetch(`${baseURL}/purity`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        const result = await response.json();
-        setPurity(result);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
   
     const fetchTags = async () => {
       try {
@@ -200,9 +159,6 @@ const useProductHandlers = () => {
   useEffect(() => {
     fetchProducts();
     fetchTags();
-    fetchMetalTypes();
-    fetchDesignMaster();
-    fetchPurity();
   }, []);
   
   const handleProductNameChange = (productName) => {
@@ -497,6 +453,8 @@ const useProductHandlers = () => {
     }
   };
 
+
+
   return {
     formData,
     data,
@@ -510,9 +468,6 @@ const useProductHandlers = () => {
     filteredPurityOptions,
     filteredMetalTypes,
     uniqueProducts,
-    designMaster,
-    purity,
-    metalTypes,
   };
 };
 

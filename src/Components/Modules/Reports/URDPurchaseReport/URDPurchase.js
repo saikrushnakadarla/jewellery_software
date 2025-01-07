@@ -53,7 +53,7 @@ const RepairsTable = () => {
       },
       {
         Header: 'Purchase No',
-        accessor: 'purchase_number',
+        accessor: 'urdpurchase_number',
       },
       {
         Header: 'Product Name',

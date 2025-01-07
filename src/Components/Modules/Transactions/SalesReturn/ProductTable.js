@@ -1,7 +1,8 @@
 import React from 'react';
 import { Table, Button } from 'react-bootstrap';
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
-const ProductTable = ({ repairDetails, onDelete }) => {
+const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
@@ -45,7 +46,7 @@ const ProductTable = ({ repairDetails, onDelete }) => {
         </tr>
       </thead>
       <tbody>
-        {repairDetails.length > 0 ? (
+      {repairDetails.length > 0 ? (
           repairDetails.map((detail, index) => (
             <tr key={index}>
               <td>{detail.date}</td>
@@ -72,8 +73,14 @@ const ProductTable = ({ repairDetails, onDelete }) => {
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>
               <td>
-                {/* Add delete button */}
-                <Button variant="danger" onClick={() => onDelete(index)}>Delete</Button>
+              <Button
+              variant="primary"
+              onClick={() => onEdit(index)}
+              style={{ marginRight: "8px" }}
+            >
+             <FaEdit style={{ marginRight: "4px" }} />
+            </Button>
+                <Button variant="danger" onClick={() => onDelete(index)}>  <FaTrashAlt style={{ marginRight: "4px" }} /></Button>
               </td>
             </tr>
           ))
@@ -85,20 +92,7 @@ const ProductTable = ({ repairDetails, onDelete }) => {
           </tr>
         )}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan="20" className="text-right">Taxable Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{taxableAmount.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colSpan="20" className="text-right">Tax Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{taxAmount.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colSpan="20" className="text-right">Net Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{netAmount.toFixed(2)}</td>
-        </tr>
-      </tfoot>
+      
     </Table>
   );
 };

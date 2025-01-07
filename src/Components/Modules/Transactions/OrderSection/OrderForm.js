@@ -50,6 +50,9 @@ const SalesForm = () => {
     filteredPurityOptions,
     filteredMetalTypes,
     uniqueProducts,
+    designMaster,
+    purity,
+    metalTypes,
   } = useProductHandlers();
 
   // Apply calculations
@@ -340,6 +343,9 @@ const SalesForm = () => {
               handleImageUpload={handleImageUpload} 
               handleAdd={handleAdd}
               products={products}
+              metalTypes={metalTypes}
+              purity={purity}
+              designMaster={designMaster}
               data={data}
               uniqueProducts={uniqueProducts}
               filteredMetalTypes={filteredMetalTypes}

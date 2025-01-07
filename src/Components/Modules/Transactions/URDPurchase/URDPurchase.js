@@ -7,7 +7,6 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
 
-
 const URDPurchase = () => {
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
@@ -259,6 +258,13 @@ const URDPurchase = () => {
         total_amount: 0,
       });
     }
+  };
+
+  const handleDeleteItem = (index) => {
+    // Remove the item at the specified index from the items array
+    const updatedItems = items.filter((_, i) => i !== index);
+    setItems(updatedItems); // Update the state
+    localStorage.setItem('purchaseItems', JSON.stringify(updatedItems)); // Update localStorage
   };
 
 
@@ -681,6 +687,7 @@ const URDPurchase = () => {
                   <th>Remark</th>
                   <th>Rate</th>
                   <th>Total Value</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -700,6 +707,14 @@ const URDPurchase = () => {
                     <td>{item.remarks}</td>
                     <td>{item.rate}</td>
                     <td>{item.total_amount}</td>
+                    <td>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDeleteItem(index)}
+                    >
+                      Delete
+                    </Button>
+                  </td>
                   </tr>
                 ))}
               </tbody>

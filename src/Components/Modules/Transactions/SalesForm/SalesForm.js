@@ -14,7 +14,7 @@ import baseURL from './../../../../Url/NodeBaseURL';
 import SalesFormSection from "./SalesForm3Section";
 import { pdf } from '@react-pdf/renderer';
 import { PDFDownloadLink } from '@react-pdf/renderer';
-import PDFLayout from './TaxInvoiceA4';
+import PDFLayout from './PDFLayout';
 
 const SalesForm = () => {
   const navigate = useNavigate();
@@ -48,9 +48,10 @@ const SalesForm = () => {
     handleMetalTypeChange,
     handleDesignNameChange,
     filteredDesignOptions,
-  filteredPurityOptions,
-  filteredMetalTypes,
-  uniqueProducts,
+    filteredPurityOptions,
+    filteredMetalTypes,
+    uniqueProducts,
+    isBarcodeSelected,
   } = useProductHandlers();
 
   // Apply calculations
@@ -332,6 +333,7 @@ const SalesForm = () => {
               filteredMetalTypes={filteredMetalTypes}
               filteredPurityOptions={filteredPurityOptions}
               filteredDesignOptions={filteredDesignOptions}
+              isBarcodeSelected={isBarcodeSelected}
               isQtyEditable={isQtyEditable}  
               handleUpdate={handleUpdate}
               isEditing={editIndex !== null}           

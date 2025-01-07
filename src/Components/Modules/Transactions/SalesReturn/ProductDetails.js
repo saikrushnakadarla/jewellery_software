@@ -5,172 +5,212 @@ import axios from 'axios';
 import baseURL from "../../../../Url/NodeBaseURL";
 
 const ProductDetails = ({ 
+  handleAdd,
+  handleUpdate,
+  isEditing, 
   formData, 
   data,
   handleChange, 
   handleBarcodeChange,
-  handleProductChange,
   handleProductNameChange,
-  handleMetalTypeChange,
-  handleDesignNameChange,
-  handleAdd,
   products,
-
+  filteredDesignOptions,
+  filteredPurityOptions,
+  filteredMetalTypes,
+  uniqueProducts,
+  isBarcodeSelected,
   isQtyEditable
 }) => {
-  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt:"" });
 
-  useEffect(() => {
-    const fetchCurrentRates = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get/current-rates`);
-        console.log('API Response:', response.data); 
+  console.log("Filtered Design Options:", filteredDesignOptions);
+  console.log("Filtered Purity Options:", filteredPurityOptions);
+  console.log("Filtered Metal Types:", filteredMetalTypes);
+  console.log("Unique Products:", uniqueProducts);
   
-        // Dynamically set the rates based on response
-        setRates({
-          rate_24crt: response.data.rate_24crt || "",
-          rate_22crt: response.data.rate_22crt || "",
-          rate_18crt: response.data.rate_18crt || "",
-          rate_16crt: response.data.rate_16crt || "",
-        });
-      } catch (error) {
-        console.error('Error fetching current rates:', error);
-      }
-    };
-    fetchCurrentRates();
-  }, []);
-  
-  const currentRate =
-    formData.purity === "24K" ? rates.rate_24crt :
-    formData.purity === "22K" ? rates.rate_22crt :
-    formData.purity === "18K" ? rates.rate_18crt :
-    formData.purity === "16K" ? rates.rate_16crt :
-    "";
-  
-
-
   return (
     <Col >
     <Row>
-    <Col xs={12} md={2}>
-          <InputField
-            label="BarCode/Rbarcode"
-            name="code"
-            value={formData.code}
-            onChange={(e) => handleBarcodeChange(e.target.value)}
-            type="select"
-            options={
-              !formData.product_id
-                ? [
-                    ...products.map((product) => ({
-                      value: product.rbarcode,
-                      label: product.rbarcode,
-                    })),
-                    ...data.map((tag) => ({
-                      value: tag.PCode_BarCode,
-                      label: tag.PCode_BarCode,
-                    })),
-                  ]
-                : [
-                    ...products
-                      .filter(
-                        (product) =>
-                          String(product.product_id) === String(formData.product_id)
-                      )
-                      .map((product) => ({
-                        value: product.rbarcode,
-                        label: product.rbarcode,
-                      })),
-                    ...data
-                      .filter(
-                        (tag) =>
-                          String(tag.product_id) === String(formData.product_id)
-                      )
-                      .map((tag) => ({
-                        value: tag.PCode_BarCode,
-                        label: tag.PCode_BarCode,
-                      })),
-                  ]
-            }
-          />
-        </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="P ID"
-          name="product_id"
-          value={formData.product_id}
-          onChange={(e) => handleProductChange(e.target.value)}
-          type="select"
-          options={products.map((product) => ({
-            value: product.product_id,
-            label: product.product_id,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField
-          label="Product Name"
-          name="product_name"
-          value={formData.product_name}
-          onChange={(e) => handleProductNameChange(e.target.value)}
-          type="select"
-          options={products.map((product) => ({
-            value: product.product_name,
-            label: product.product_name,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Metal Type"
-          name="metal_type"
-          value={formData.metal_type}
-          onChange={(e) => handleMetalTypeChange(e.target.value)}                    
-          type="select"
-          options={products.map((product) => ({
-            value: product.Category,
-            label: product.Category,
-          }))}                    
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Design Name"
-          name="design_name"
-          value={formData.design_name}
-          onChange={(e) => handleDesignNameChange(e.target.value)}
-          type="select"
-          options={products.map((product) => ({
-            value: product.design_master,
-            label: product.design_master,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Purity"
-          name="purity"
-          value={formData.purity}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Gross Wt"
-          name="gross_weight"
-          value={formData.gross_weight || ""} // Default to "0" if undefined
-          onChange={handleChange}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Stone Wt"
-          name="stone_weight"
-          value={formData.stone_weight || ""}
-          onChange={handleChange}
-        />
-      </Col>
+    {/* <Col xs={12} md={2}>
+                  <InputField
+                    label="BarCode/Rbarcode"
+                    name="code"
+                    value={formData.code}
+                    onChange={(e) => handleBarcodeChange(e.target.value)}
+                    type="select"
+                    options={
+                      !formData.product_id
+                        ? [
+                            ...products.map((product) => ({
+                              value: product.rbarcode,
+                              label: product.rbarcode,
+                            })),
+                            ...data.map((tag) => ({
+                              value: tag.PCode_BarCode,
+                              label: tag.PCode_BarCode,
+                            })),
+                          ]
+                        : [
+                            ...products
+                              .filter(
+                                (product) =>
+                                  String(product.product_id) === String(formData.product_id)
+                              )
+                              .map((product) => ({
+                                value: product.rbarcode,
+                                label: product.rbarcode,
+                              })),
+                            ...data
+                              .filter(
+                                (tag) =>
+                                  String(tag.product_id) === String(formData.product_id)
+                              )
+                              .map((tag) => ({
+                                value: tag.PCode_BarCode,
+                                label: tag.PCode_BarCode,
+                              })),
+                          ]
+                    }
+                  />
+              </Col> */}
+                             <Col xs={12} md={2}>
+    <InputField
+      label="BarCode/Rbarcode"
+      name="code"
+      value={formData.code}
+      onChange={(e) => handleBarcodeChange(e.target.value)}
+      type="select"
+      options={
+        formData.barcodeOptions?.length > 0
+          ? formData.barcodeOptions
+          : [
+              ...products.map((product) => ({
+                value: product.rbarcode,
+                label: product.rbarcode,
+              })),
+              ...data.map((tag) => ({
+                value: tag.PCode_BarCode,
+                label: tag.PCode_BarCode,
+              })),
+            ]
+      }
+    />
+  </Col>
+
+  {/* Product Name Field */}
+  <Col xs={12} md={2}>
+    {isBarcodeSelected ? (
+      <InputField
+        label="Product Name"
+        name="product_name"
+        value={formData.product_name}
+        onChange={handleChange}
+        type="text"
+      />
+    ) : (
+      <InputField
+        label="Product Name"
+        name="product_name"
+        value={formData.product_name}
+        onChange={(e) => handleProductNameChange(e.target.value)}
+        type="select"
+        options={uniqueProducts.map((prod) => ({
+          value: prod.product_Name,
+          label: prod.product_Name,
+        }))}
+      />
+    )}
+  </Col>
+
+  {/* Metal Type Field */}
+  <Col xs={12} md={2}>
+    <InputField
+      label="Metal Type"
+      name="metal_type"
+      value={formData.metal_type}
+      onChange={handleChange}
+      type="select"
+      options={filteredMetalTypes.map((metalType) => ({
+        value: metalType.metal_type,
+        label: metalType.metal_type,
+      }))}
+    />
+  </Col>
+
+  {/* Design Master Field */}
+  <Col xs={12} md={2}>
+    {isBarcodeSelected ? (
+      <InputField
+        label="Design Master"
+        name="design_name"
+        value={formData.design_name}
+        onChange={handleChange}
+        type="text"
+      />
+    ) : (
+      <InputField
+        label="Design Master"
+        name="design_name"
+        value={formData.design_name}
+        onChange={handleChange}
+        type="select"
+        options={filteredDesignOptions.map((designOption) => ({
+          value: designOption.design_master,
+          label: designOption.design_master,
+        }))}
+      />
+    )}
+  </Col>
+
+  {/* Purity Field */}
+  <Col xs={12} md={2}>
+    <InputField
+      label="Purity"
+      name="purity"
+      value={formData.purity}
+      onChange={handleChange}
+      type="select"
+      options={filteredPurityOptions.map((Purity) => ({
+        value: Purity.Purity,
+        label: Purity.Purity,
+      }))}
+    />
+  </Col>
+
+  {/* Other Fields */}
+  <Col xs={12} md={2}>
+    <InputField
+      label="Category"
+      name="category"
+      value={formData.category || ""}
+      onChange={handleChange}
+      readOnly
+    />
+  </Col>
+  <Col xs={12} md={2}>
+    <InputField
+      label="Sub Category"
+      name="sub_category"
+      value={formData.sub_category || ""}
+      onChange={handleChange}
+      readOnly={!isBarcodeSelected}
+    />
+  </Col>
+  <Col xs={12} md={1}>
+    <InputField
+      label="Gross Wt"
+      name="gross_weight"
+      value={formData.gross_weight || ""}
+      onChange={handleChange}
+    />
+  </Col>
+  <Col xs={12} md={1}>
+    <InputField
+      label="Stone Wt"
+      name="stone_weight"
+      value={formData.stone_weight || ""}
+      onChange={handleChange}
+    />
+  </Col>
       <Col xs={12} md={1}>
         <InputField
           label="St Price"
@@ -256,9 +296,9 @@ const ProductDetails = ({
           onChange={handleChange}
         />
       </Col>
-      <Col xs={12} md={2}>
+      <Col xs={12} md={1}>
         <InputField
-          label="Making Charges"
+          label="Total MC"
           name="making_charges"
           value={formData.making_charges || ""}
           onChange={handleChange}
@@ -268,7 +308,7 @@ const ProductDetails = ({
           <InputField
             label="Rate"
             name="rate"
-            value={formData.rate || currentRate}
+            value={formData.rate }
             onChange={handleChange}
           />
         </Col>
@@ -281,7 +321,7 @@ const ProductDetails = ({
         readOnly={!isQtyEditable} // Make it editable when isQtyEditable is true
       />
     </Col>
-      <Col xs={12} md={2}>
+      <Col xs={12} md={1}>
       <InputField
         label="Amount"
         name="rate_amt"
@@ -315,8 +355,16 @@ const ProductDetails = ({
           readOnly
         />
       </Col>
-        <Col xs={12} md={1}>
-          <Button onClick={handleAdd} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
+      <Col xs={12} md={1}>
+          <Button
+            onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
+            style={{
+              backgroundColor: isEditing ? "#a36e29" : "#a36e29",
+              borderColor: isEditing ? "#a36e29" : "#a36e29",
+            }}
+          >
+            {isEditing ? "Update" : "Add"}
+          </Button>
         </Col>
       </Row>
       </Col> 

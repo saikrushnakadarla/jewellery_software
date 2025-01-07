@@ -209,6 +209,8 @@ const handleProductNameChange = (productName) => {
       metal_type: "",
       design_name: "",
       purity: "",
+      category:"",
+      sub_category:"",
       gross_weight: "",
       stone_weight: "",
       stone_price: "",
@@ -236,15 +238,20 @@ const handleProductNameChange = (productName) => {
 
 const handleChange = (e) => {
   const { name, value } = e.target;
+
+  // Preserve the current barcode
+  const currentBarcode = formData.code;
+
+  // Update the specific field in formData
   const updatedFormData = { ...formData, [name]: value };
 
   setFormData(updatedFormData);
 
-  // Check if all required fields are selected
+  // Destructure relevant fields
   const { product_name, metal_type, design_name, purity } = updatedFormData;
 
   if (product_name && metal_type && design_name && purity) {
-    // Find all matching entries from the data
+    // Filter matching entries
     const matchingEntries = data.filter(
       (prod) =>
         prod.product_Name === product_name &&
@@ -253,87 +260,111 @@ const handleChange = (e) => {
         prod.Purity === purity
     );
 
-    if (matchingEntries.length > 1) {
-      // Multiple matches found, populate options but don't set any value
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "", // Ensure no barcode is selected by default
-        barcodeOptions: matchingEntries.map((entry) => ({
-          value: entry.PCode_BarCode,
-          label: entry.PCode_BarCode,
-        })),
-      }));
-    } else if (matchingEntries.length === 1) {
-      // Single match found, set the corresponding values
-      const matchingEntry = matchingEntries[0];
-      const productId = matchingEntry.product_id;
-      const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
+    console.log("Matching Entries:", matchingEntries);
 
-      setFormData((prevData) => ({
-        ...prevData,
-        code: matchingEntry.PCode_BarCode,
-        gross_weight: matchingEntry.Gross_Weight,
-        stone_weight: matchingEntry.Stones_Weight || "",
-        stone_price: matchingEntry.Stones_Price || "",
-        weight_bw: matchingEntry.Weight_BW || "",
-        va_on: matchingEntry.Wastage_On || "",
-        va_percent: matchingEntry.Wastage_Percentage || "",
-        wastage_weight: matchingEntry.WastageWeight || "",
-        total_weight_aw: matchingEntry.TotalWeight_AW || "",
-        mc_on: matchingEntry.Making_Charges_On || "",
-        mc_per_gram: matchingEntry.MC_Per_Gram || "",
-        making_charges: matchingEntry.Making_Charges || "",
-        tax_percent: productDetails?.tax_slab || "",
-        qty: 1,
-        barcodeOptions: [], // Clear previous options if any
-      }));
+    if (matchingEntries.length > 0) {
+      if (matchingEntries.length > 1) {
+        // Handle multiple matching entries
+        setFormData((prevData) => ({
+          ...prevData,
+          code: currentBarcode, // Preserve the selected barcode
+          barcodeOptions: matchingEntries.map((entry) => ({
+            value: entry.PCode_BarCode,
+            label: entry.PCode_BarCode,
+          })),
+        }));
+      } else if (matchingEntries.length === 1) {
+        const matchingEntry = matchingEntries[0];
+
+        // Check if the product is already sold
+        if (matchingEntry.Status === "Sold") {
+          alert("The product is already sold out.");
+          
+          // Clear the form details after the alert, except for the barcode
+          setFormData((prevData) => ({
+            ...prevData,
+            barcodeOptions: [], // Clear barcode options
+            category: "",
+            sub_category: "",
+            gross_weight: "",
+            stone_weight: "",
+            stone_price: "",
+            weight_bw: "",
+            va_on: "",
+            va_percent: "",
+            wastage_weight: "",
+            total_weight_aw: "",
+            mc_on: "",
+            mc_per_gram: "",
+            making_charges: "",
+            rate: "",
+            rate_amt: "",
+            tax_percent: "",
+            tax_amt: "",
+            total_price: "",
+            qty: "",
+          }));
+
+          return; // Stop further execution
+        }
+
+        const productId = matchingEntry.product_id;
+
+        const productDetails = products.find(
+          (prod) => String(prod.product_id) === String(productId)
+        );
+
+        // Set the selected form data based on the matching entry
+        setFormData((prevData) => ({
+          ...prevData,
+          code: currentBarcode || matchingEntry.PCode_BarCode, // Use existing barcode or set the new one
+          category: matchingEntry.category,
+          sub_category: matchingEntry.sub_category,
+          gross_weight: matchingEntry.Gross_Weight,
+          stone_weight: matchingEntry.Stones_Weight || "",
+          stone_price: matchingEntry.Stones_Price || "",
+          weight_bw: matchingEntry.Weight_BW || "",
+          va_on: matchingEntry.Wastage_On || "",
+          va_percent: matchingEntry.Wastage_Percentage || "",
+          wastage_weight: matchingEntry.WastageWeight || "",
+          total_weight_aw: matchingEntry.TotalWeight_AW || "",
+          mc_on: matchingEntry.Making_Charges_On || "",
+          mc_per_gram: matchingEntry.MC_Per_Gram || "",
+          making_charges: matchingEntry.Making_Charges || "",
+          tax_percent: productDetails?.tax_slab || "",
+          qty: 1,
+          barcodeOptions: [], // Clear barcode options after setting the data
+        }));
+      }
     } else {
-      // No match found, reset form fields
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        barcodeOptions: [],
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        mc_on: "",
-        mc_per_gram: "",
-        making_charges: "",
-        rate: "",
-        rate_amt: "",
-        tax_percent: "",
-        tax_amt: "",
-        total_price: "",
-        qty: "",
-      }));
+      console.log("No matching entries found. No updates made.");
     }
   } else {
-    // Reset the PCode_BarCode if all fields are not selected
-    setFormData((prevData) => ({
-      ...prevData,
-      code: "",
-      barcodeOptions: [],
-    }));
+    console.log("Required fields are missing or incomplete. No updates made.");
   }
 };
+
+
+
+
+
+const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
 
 const handleBarcodeChange = async (code) => {
   try {
     if (!code) {
-      // If barcode is cleared, reset all related fields
+      // If barcode is cleared, reset all related fields and set code to ""
+      setIsBarcodeSelected(false);  // Reset the barcode selection flag
       setFormData((prevData) => ({
         ...prevData,
-        code: "",
+        code: "",  // Reset code when barcode is cleared
         product_id: "",
         product_name: "",
         metal_type: "",
         design_name: "",
         purity: "",
+        category: "",
+        sub_category: "",
         gross_weight: "",
         stone_weight: "",
         stone_price: "",
@@ -358,17 +389,19 @@ const handleBarcodeChange = async (code) => {
 
     // Check for product by code
     const product = products.find((prod) => String(prod.rbarcode) === String(code));
-    console.log("productDetails:", product);
     if (product) {
-      // If product found by code, populate the form
+      // If product found by code, populate the form and make fields editable
+      setIsBarcodeSelected(true);  // Set the barcode as selected
       setFormData((prevData) => ({
         ...prevData,
-        code: product.rbarcode,
+        code: product.rbarcode,  // Retain the selected barcode
         product_id: product.product_id,
-        product_name: product.product_name,
+        product_name: "", // Make editable
         metal_type: product.Category,
-        design_name: product.design_master,
+        design_name: "", // Make editable
         purity: product.purity,
+        category: product.product_name,
+        sub_category: "",
         gross_weight: "",
         stone_weight: "",
         stone_price: "",
@@ -387,56 +420,32 @@ const handleBarcodeChange = async (code) => {
     } else {
       // Check if tag exists by code
       const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
-
       if (tag) {
-        // Check if the tag is marked as "Sold"
+        setIsBarcodeSelected(true);  // Set the barcode as selected
+        // If the tag is marked as "Sold"
         if (tag.Status === "Sold") {
           alert("The product is already sold out!");
-          // Reset form fields
           setFormData((prevData) => ({
             ...prevData,
-            code: "",
-            product_id: "",
-            product_name: "",
-            metal_type: "",
-            design_name: "",
-            purity: "",
-            gross_weight: "",
-            stone_weight: "",
-            stone_price: "",
-            weight_bw: "",
-            va_on: "",
-            va_percent: "",
-            wastage_weight: "",
-            total_weight_aw: "",
-            mc_on: "",
-            mc_per_gram: "",
-            making_charges: "",
-            rate: "",
-            rate_amt: "",
-            tax_percent: "",
-            tax_amt: "",
-            total_price: "",
-            qty: "", // Reset qty
           }));
           setIsQtyEditable(true); // Allow editing of qty
-          return; // Exit early
+          return;
         }
 
         const productId = tag.product_id;
         const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-        console.log("productDetails:", productDetails);
-        console.log("opentag_id:", tag.opentag_id);
 
         setFormData((prevData) => ({
           ...prevData,
-          code: tag.PCode_BarCode || "",
+          code: tag.PCode_BarCode || "", // Retain the barcode
           product_id: tag.product_id || "",
           opentag_id: tag.opentag_id || "",
-          product_name: tag.product_Name || "",
-          metal_type: productDetails?.Category || "",
-          design_name: tag.design_master || "",
+          product_name: tag.product_Name || "", // Make editable
+          metal_type: tag.metal_type || "",
+          design_name: tag.design_master || "", // Make editable
           purity: tag.Purity || "",
+          category: tag.category || "",
+          sub_category: tag.sub_category || "",
           gross_weight: tag.Gross_Weight || "",
           stone_weight: tag.Stones_Weight || "",
           stone_price: tag.Stones_Price || "",
@@ -456,12 +465,14 @@ const handleBarcodeChange = async (code) => {
         // Reset form if no tag is found
         setFormData((prevData) => ({
           ...prevData,
-          code: "",
+          code: "", // Reset code
           product_id: "",
           product_name: "",
           metal_type: "",
           design_name: "",
           purity: "",
+          category: "",
+          sub_category: "",
           gross_weight: "",
           stone_weight: "",
           stone_price: "",
@@ -503,6 +514,7 @@ return {
   filteredPurityOptions,
   filteredMetalTypes,
   uniqueProducts,
+  isBarcodeSelected,
 };
 
 };

@@ -113,7 +113,7 @@ function Navbar() {
             <div className="navbar-dropdown-content">
 
               <Link to="/salestable" onClick={handleItemClick} className={isActive('/salestable')}>Sales</Link>
-              {/* <Link to="/salesreturn" onClick={handleItemClick} className={isActive('/salesreturn')}>Sales Return</Link> */}
+              <Link to="/salesreturn" onClick={handleItemClick} className={isActive('/salesreturn')}>Sales Return</Link>
               <Link to="/estimatetable" onClick={handleItemClick} className={isActive('/estimatetable')}>Estimate</Link>
               <Link to="/stockEntryTable" onClick={handleItemClick} className={isActive('/stockEntryTable')}>Stock Entry</Link>
               <Link to="/paymentstable" onClick={handleItemClick} className={isActive('/paymentstable')}>Payments</Link>

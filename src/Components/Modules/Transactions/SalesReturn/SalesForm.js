@@ -12,9 +12,13 @@ import useCalculations from './hooks/useCalculations';
 import './../Sales/SalesForm.css';
 import baseURL from './../../../../Url/NodeBaseURL';
 import SalesFormSection from "./SalesForm3Section";
+import { pdf } from '@react-pdf/renderer';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import PDFLayout from './PDFLayout';
 
 const SalesForm = () => {
   const navigate = useNavigate();
+  const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [metal, setMetal] = useState("");
   const [repairDetails, setRepairDetails] = useState(
@@ -43,6 +47,11 @@ const SalesForm = () => {
     handleProductNameChange,
     handleMetalTypeChange,
     handleDesignNameChange,
+    filteredDesignOptions,
+    filteredPurityOptions,
+    filteredMetalTypes,
+    uniqueProducts,
+    isBarcodeSelected,
   } = useProductHandlers();
 
   // Apply calculations
@@ -139,11 +148,29 @@ const SalesForm = () => {
   };
 
   // Add product to repair details
+  const [isEditing, setIsEditing] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+  
+  // Function to handle editing a product
   const handleAdd = () => {
     setRepairDetails([...repairDetails, { ...formData }]);
     resetProductFields();
-    alert("Product added successfully");
   };
+
+  const handleEdit = (index) => {
+    setEditIndex(index);
+    setFormData(repairDetails[index]); // Populate form with selected item
+  };
+
+  const handleUpdate = () => {
+    const updatedDetails = repairDetails.map((item, index) =>
+      index === editIndex ? { ...formData } : item
+    );
+    setRepairDetails(updatedDetails);
+    setEditIndex(null);
+    resetProductFields();
+  };
+
 
   // Handle product delete
   const handleDelete = (indexToDelete) => {
@@ -198,10 +225,29 @@ const SalesForm = () => {
       online: paymentDetails.online || "",
       online_amt: paymentDetails.online_amt || 0,
     }));
-
+  
     try {
       await axios.post(`${baseURL}/save-repair-details`, { repairDetails: dataToSave });
       alert("Data saved successfully");
+  
+      // Generate PDF Blob
+      const pdfDoc = (
+        <PDFLayout
+          formData={formData}
+          repairDetails={repairDetails}
+          paymentDetails={paymentDetails}
+        />
+      );
+      const pdfBlob = await pdf(pdfDoc).toBlob();
+  
+      // Create a download link and trigger it
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(pdfBlob);
+      link.download = `invoice-${formData.invoice_number}.pdf`;
+      link.click();
+  
+      // Clean up
+      URL.revokeObjectURL(link.href);
       setRepairDetails([]);
       resetForm();
     } catch (error) {
@@ -209,6 +255,7 @@ const SalesForm = () => {
       alert("Error saving data");
     }
   };
+  
 
   const resetForm = () => {
     setFormData({
@@ -282,12 +329,19 @@ const SalesForm = () => {
               handleAdd={handleAdd}
               products={products}
               data={data}
-              isQtyEditable={isQtyEditable}             
+              uniqueProducts={uniqueProducts}
+              filteredMetalTypes={filteredMetalTypes}
+              filteredPurityOptions={filteredPurityOptions}
+              filteredDesignOptions={filteredDesignOptions}
+              isBarcodeSelected={isBarcodeSelected}
+              isQtyEditable={isQtyEditable}  
+              handleUpdate={handleUpdate}
+              isEditing={editIndex !== null}           
             />
           </div>
 
           <div className="sales-form-section">
-            <ProductTable repairDetails={repairDetails}  onDelete={handleDelete}/>
+            <ProductTable repairDetails={repairDetails} onEdit={handleEdit}  onDelete={handleDelete}/>
           </div>
 
           {/* <div className="sales-form2">
@@ -314,10 +368,27 @@ const SalesForm = () => {
                 setPaymentDetails={setPaymentDetails}
                 handleSave={handleSave}
                 handleBack={handleBack}
-                totalPrice={totalPrice} // Pass totalPrice as a prop
+                totalPrice={totalPrice} 
+                repairDetails={repairDetails} // Pass totalPrice as a prop
               />
             </div>
           </div>
+          {showPDFDownload && (
+        <PDFDownloadLink
+          document={
+            <PDFLayout
+              formData={formData}
+              repairDetails={repairDetails}
+              paymentDetails={paymentDetails}
+            />
+          }
+          fileName={`invoice-${formData.invoice_number}.pdf`}
+        >
+          {({ blob, url, loading, error }) =>
+            loading ? "Generating PDF..." : "Download Invoice PDF"
+          }
+        </PDFDownloadLink>
+      )}
         </Form>
       </Container>
     </div>
