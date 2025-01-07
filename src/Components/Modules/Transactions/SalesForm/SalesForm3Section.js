@@ -115,23 +115,23 @@ const SalesFormSection = () => {
   };
 
 
-  useEffect(() => {
-    const fetchCurrentRates = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get/current-rates`);
-        setRates({
-          rate_24crt: response.data.rate_24crt || "",
-          rate_22crt: response.data.rate_22crt || "",
-          rate_18crt: response.data.rate_18crt || "",
-          rate_16crt: response.data.rate_16crt || "",
-        });
-      } catch (error) {
-        console.error("Error fetching current rates:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCurrentRates = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/get/current-rates`);
+  //       setRates({
+  //         rate_24crt: response.data.rate_24crt || "",
+  //         rate_22crt: response.data.rate_22crt || "",
+  //         rate_18crt: response.data.rate_18crt || "",
+  //         rate_16crt: response.data.rate_16crt || "",
+  //       });
+  //     } catch (error) {
+  //       console.error("Error fetching current rates:", error);
+  //     }
+  //   };
 
-    fetchCurrentRates();
-  }, []);
+  //   fetchCurrentRates();
+  // }, []);
 
 
   const parsePurityToPercentage = (purity) => {
@@ -313,7 +313,7 @@ const SalesFormSection = () => {
               <InputField
                 label="ml_percent"
                 name="ml_percent"
-                value={oldDetails.gross}
+                value={oldDetails.ml_percent}
                 onChange={(e) => handleInputChange(e, true)}
               />
             </Col>
