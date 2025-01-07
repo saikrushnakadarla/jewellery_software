@@ -28,7 +28,7 @@ const useProductHandlers = () => {
     aadhar_card: "",
     gst_in: "",
     pan_card: "",
-    terms: "Cash",
+    terms: "",
     date: "",
     invoice_number: "",
     code: "",

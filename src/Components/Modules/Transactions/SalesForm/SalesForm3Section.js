@@ -165,15 +165,19 @@ const SalesFormSection = () => {
     const grossWeight = parseFloat(gross) || 0;
     const dustWeight = parseFloat(dust) || 0;
     const mlPercentValue = parseFloat(ml_percent) || 0;
-
-    return ((grossWeight - dustWeight) * (purityPercentage - mlPercentValue)) / 100;
+  
+    const netWeight = ((grossWeight - dustWeight) * (purityPercentage - mlPercentValue)) / 100;
+    return parseFloat(netWeight.toFixed(2)); // Fix to 2 decimals
   };
-
+  
   const calculateTotalAmount = ({ net_wt, rate }) => {
     const netWeight = parseFloat(net_wt) || 0;
     const rateAmount = parseFloat(rate) || 0;
-    return ((netWeight) * (rateAmount));
+  
+    const totalAmount = netWeight * rateAmount;
+    return parseFloat(totalAmount.toFixed(2)); // Fix to 2 decimals
   };
+  
 
   const currentRate =
     oldDetails.purity === "24K" ? rates.rate_24crt :
