@@ -222,6 +222,14 @@ const SalesFormSection = () => {
     }
   };
 
+  const calculateOldTotalSum = () => {
+    return oldTableData.reduce((sum, item) => sum + parseFloat(item.total_amount || 0), 0).toFixed(2);
+  };
+
+  const calculateSchemeTotalSum = () => {
+    return schemeTableData.reduce((sum, item) => sum + parseFloat(item.paid_amount || 0), 0).toFixed(2);
+  };
+
   return (
     <Col className="sales-form-section">
       <Row>
@@ -343,7 +351,7 @@ const SalesFormSection = () => {
             </Col>
             <Col xs={12} md={2}>
               <Button
-                
+
                 onClick={() => handleAddButtonClick(true)}
               >
                 Add
@@ -383,6 +391,10 @@ const SalesFormSection = () => {
               ))}
             </tbody>
           </Table>
+          <div className="d-flex justify-content-between px-2 mt-2">
+  <h5>Total Amount for Old:</h5>
+  <h5>₹ {calculateOldTotalSum()}</h5>
+</div>
         </>
       )}
 
@@ -513,6 +525,10 @@ const SalesFormSection = () => {
               ))}
             </tbody>
           </Table>
+          <div className="d-flex justify-content-between px-2 mt-2">
+  <h5>Total Amount for Schemes:</h5>
+  <h5>₹ {calculateSchemeTotalSum()}</h5>
+</div>
         </>
       )}
     </Col>
