@@ -384,8 +384,8 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item }) =>
 
                                                         {/* Add rows of data below */}
                                                         {repairDetails.map((item, index) => (
-                                                                <View style={[styles.tableRow, { fontFamily: 'Times-Roman' }]}>
-                                                                        <Text style={[styles.tableCell, styles.tableCellHeader]}>1</Text>
+                                                                <View style={[styles.tableRow, { fontFamily: 'Times-Roman' }]} key={index}>
+                                                                        <Text style={[styles.tableCell, styles.tableCellHeader]}>{index + 1}</Text>
                                                                         <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                         <Text style={[styles.tableCell, styles.tableCellDescription]}>
@@ -436,14 +436,12 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item }) =>
                                                                         </Text>
                                                                         <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        {/* <Text style={[styles.tableCell, styles.tableCellTotal]}>
-                                                                                {item.rate_amt || "0.00"}
-                                                                        </Text> */}
                                                                         <Text style={[styles.tableCell, styles.tableCellTotal]}>
                                                                                 {(parseFloat(item.rate_amt || 0) + parseFloat(item.stone_price || 0) + parseFloat(item.making_charges || 0)).toFixed(2) || "0.00"}
                                                                         </Text>
                                                                 </View>
                                                         ))}
+
 
                                                 </View>
 
@@ -454,7 +452,7 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item }) =>
                                                         <Text style={[styles.tableCell, styles.tableCellDescription, styles.lastheight]}></Text>
                                                         <Text style={[styles.tableCell, styles.tableCellHSN, styles.lastheight]}></Text>
                                                         <Text style={[styles.tableCell, styles.tableCellQty, styles.lastheight]}>
-                                                                {totalValues.qty.toFixed(2)}
+                                                                {Math.round(totalValues.qty)}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellPurity, styles.lastheight]}></Text>
                                                         <Text style={[styles.tableCell, styles.tableCellGrossWt, styles.lastheight]}>
@@ -490,15 +488,15 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item }) =>
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", fontFamily: 'Times-Bold' }}>
                                                         {/* Left Side Content */}
                                                         <View style={{ paddingLeft: 10, marginTop: 20 }}>
-                                                                <Text style={[styles.bold, { marginBottom: 3 }]}>Cash Recd: 45000.00</Text>
+                                                                {/* <Text style={[styles.bold, { marginBottom: 3 }]}>Cash Recd: 45000.00</Text>
 
-                                                                <Text style={[styles.bold]}>NEFT Recd: 14000.00 #: Bank:</Text>
+                                                                <Text style={[styles.bold]}>NEFT Recd: 14000.00 #: Bank:</Text> */}
                                                         </View>
                                                         {/* {repairDetails.map((item, index) => ( */}
                                                         <View style={{ paddingRight: 10, marginTop: 5 }}>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>Discount:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>3.20</Text>
+                                                                        <Text style={{ textAlign: "right" }}>0</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>GST Value:</Text>
@@ -509,13 +507,13 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item }) =>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>CGST @1.50%:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {(item?.tax_amt ?? 0) / 2}
+                                                                                {item?.tax_amt ? item.tax_amt / 2 : 0}
                                                                         </Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>SGST @1.50%:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {(item?.tax_amt ?? 0) / 2}
+                                                                                {item?.tax_amt ? item.tax_amt / 2 : 0}
                                                                         </Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
