@@ -126,37 +126,42 @@ const useProductHandlers = () => {
       }
       const result = await response.json();
   
+      // Filter tags where Status === 'Sold'
+      const soldTags = result.result.filter((prod) => prod.Status === 'Sold');
+  
       // Remove duplicate product_Name entries
       const uniqueProductNames = Array.from(
-        new Map(result.result.map((prod) => [prod.product_Name, prod])).values()
+        new Map(soldTags.map((prod) => [prod.product_Name, prod])).values()
       );
   
       // Extract unique metal types
       const uniqueMetalTypes = Array.from(
-        new Set(result.result.map((prod) => prod.metal_type))
+        new Set(soldTags.map((prod) => prod.metal_type))
       ).map((metalType) => ({ metal_type: metalType }));
   
       // Extract unique design names
       const uniqueDesigns = Array.from(
-        new Set(result.result.map((prod) => prod.design_master))
+        new Set(soldTags.map((prod) => prod.design_master))
       ).map((designMaster) => ({ design_master: designMaster }));
-
+  
+      // Extract unique purity options
       const uniquePurity = Array.from(
-        new Set(result.result.map((prod) => prod.Purity))
+        new Set(soldTags.map((prod) => prod.Purity))
       ).map((Purity) => ({ Purity: Purity }));
   
-      setData(result.result); // Set the full data
+      setData(soldTags); // Set the filtered data
       setUniqueProducts(uniqueProductNames); // Set unique product_Name options
       setMetalTypes(uniqueMetalTypes); // Set all unique metal types
       setFilteredMetalTypes(uniqueMetalTypes); // Initially, show all metal types
       setDesignOptions(uniqueDesigns); // Set all unique designs
       setFilteredDesignOptions(uniqueDesigns); // Initially, show all designs
-      setPurity(uniquePurity); // Set all unique metal types
-      setFilteredPurityOptions(uniquePurity); // Initially, show all metal types
+      setPurity(uniquePurity); // Set all unique purity options
+      setFilteredPurityOptions(uniquePurity); // Initially, show all purity options
     } catch (error) {
       console.error("Error fetching tags:", error);
     }
   };
+  
     
 useEffect(() => {
   fetchProducts();
@@ -275,39 +280,6 @@ const handleChange = (e) => {
         }));
       } else if (matchingEntries.length === 1) {
         const matchingEntry = matchingEntries[0];
-
-        // Check if the product is already sold
-        if (matchingEntry.Status === "Sold") {
-          alert("The product is already sold out.");
-          
-          // Clear the form details after the alert, except for the barcode
-          setFormData((prevData) => ({
-            ...prevData,
-            barcodeOptions: [], // Clear barcode options
-            category: "",
-            sub_category: "",
-            gross_weight: "",
-            stone_weight: "",
-            stone_price: "",
-            weight_bw: "",
-            va_on: "",
-            va_percent: "",
-            wastage_weight: "",
-            total_weight_aw: "",
-            mc_on: "",
-            mc_per_gram: "",
-            making_charges: "",
-            rate: "",
-            rate_amt: "",
-            tax_percent: "",
-            tax_amt: "",
-            total_price: "",
-            qty: "",
-          }));
-
-          return; // Stop further execution
-        }
-
         const productId = matchingEntry.product_id;
 
         const productDetails = products.find(
@@ -343,10 +315,6 @@ const handleChange = (e) => {
     console.log("Required fields are missing or incomplete. No updates made.");
   }
 };
-
-
-
-
 
 const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
 
@@ -422,16 +390,6 @@ const handleBarcodeChange = async (code) => {
       const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
       if (tag) {
         setIsBarcodeSelected(true);  // Set the barcode as selected
-        // If the tag is marked as "Sold"
-        if (tag.Status === "Sold") {
-          alert("The product is already sold out!");
-          setFormData((prevData) => ({
-            ...prevData,
-          }));
-          setIsQtyEditable(true); // Allow editing of qty
-          return;
-        }
-
         const productId = tag.product_id;
         const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
 
@@ -498,8 +456,6 @@ const handleBarcodeChange = async (code) => {
     console.error("Error handling code change:", error);
   }
 };
-
-  
 
 return {
   formData,

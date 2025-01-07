@@ -56,6 +56,7 @@ const SalesForm = () => {
 
   // Apply calculations
   useCalculations(formData, setFormData);
+  const [uniqueInvoice, setUniqueInvoice] = useState([]);
 
   // Fetch customers
   useEffect(() => {
@@ -76,21 +77,30 @@ const SalesForm = () => {
     fetchCustomers();
   }, []);
 
-  // Fetch last invoice number
   useEffect(() => {
-    const fetchLastInvoiceNumber = async () => {
+    const fetchRepairs = async () => {
       try {
-        const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
-        setFormData(prev => ({ ...prev, invoice_number: response.data.lastInvoiceNumber }));
+        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+        
+        // Filter the data based on the 'transaction_status' column
+        const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
+        
+        setUniqueInvoice(filteredData); // Set the filtered data
+        
+        console.log("Unique Invoice =", filteredData);
+  
+        // Set the first unique invoice number to the form
+        if (filteredData.length > 0) {
+          setFormData(prev => ({ ...prev, invoice_number: filteredData[0].invoice_number }));
+        }
       } catch (error) {
-        console.error("Error fetching invoice number:", error);
+        console.error('Error fetching repair details:', error);
       }
     };
-
-    fetchLastInvoiceNumber();
+  
+    fetchRepairs();
   }, []);
 
-  // Save data to localStorage whenever repairDetails or paymentDetails change
   useEffect(() => {
     localStorage.setItem('repairDetails', JSON.stringify(repairDetails));
   }, [repairDetails]);
@@ -99,7 +109,6 @@ const SalesForm = () => {
     localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
   }, [paymentDetails]);
 
-  // Handle customer change
   const handleCustomerChange = (customerId) => {
     setFormData((prevData) => ({
       ...prevData,
@@ -147,11 +156,8 @@ const SalesForm = () => {
     }
   };
 
-  // Add product to repair details
-  const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-  
-  // Function to handle editing a product
+
   const handleAdd = () => {
     setRepairDetails([...repairDetails, { ...formData }]);
     resetProductFields();
@@ -170,9 +176,6 @@ const SalesForm = () => {
     setEditIndex(null);
     resetProductFields();
   };
-
-
-  // Handle product delete
   const handleDelete = (indexToDelete) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       setRepairDetails(repairDetails.filter((_, index) => index !== indexToDelete));
@@ -180,7 +183,6 @@ const SalesForm = () => {
     }
   };
 
-  // Reset product fields
   const resetProductFields = () => {
     setFormData(prev => ({
       ...prev,
@@ -210,8 +212,6 @@ const SalesForm = () => {
       qty: "",
     }));
   };
-
-  // Calculate totalPrice (sum of total_price from all repairDetails)
   const totalPrice = repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
   const handleSave = async () => {
@@ -313,6 +313,7 @@ const SalesForm = () => {
               <InvoiceDetails 
                 formData={formData}
                 setFormData={setFormData}
+                uniqueInvoice={uniqueInvoice}
               />
             </div>
           </div>
@@ -344,22 +345,10 @@ const SalesForm = () => {
             <ProductTable repairDetails={repairDetails} onEdit={handleEdit}  onDelete={handleDelete}/>
           </div>
 
-          {/* <div className="sales-form2">
-            <div className="sales-form-fourth">
-              <PaymentDetails 
-                paymentDetails={paymentDetails}
-                setPaymentDetails={setPaymentDetails}
-                handleSave={handleSave}
-                handleBack={handleBack}
-                totalPrice={totalPrice} // Pass totalPrice as a prop
-              />
-            </div>
-          </div> */}
-
 
           <div className="sales-form2">
             <div className="sales-form-third">
-              <SalesFormSection metal={metal} setMetal={setMetal} />
+              
             </div>
 
             <div className="sales-form-fourth">

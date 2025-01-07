@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 
-const InvoiceDetails = ({ formData, setFormData }) => {
+const InvoiceDetails = ({ formData, setFormData,uniqueInvoice }) => {
   useEffect(() => {
     // Set the default date value to the current date if it's not already set
     if (!formData.date) {
@@ -29,13 +29,20 @@ const InvoiceDetails = ({ formData, setFormData }) => {
       </Col>
       </Row>
       <Row>
-        <InputField
-          label="Invoice Number"
-          name="invoice_number"
-          value={formData.invoice_number}
-          onChange={(e) => setFormData({ ...formData, invoice_number: e.target.value })}
-        />
+      <InputField
+        label="Invoice Number"
+        name="invoice_number"
+        value={formData.invoice_number}
+        onChange={(e) => setFormData({ ...formData, invoice_number: e.target.value })}
+        type="select"
+        options={uniqueInvoice.map((invoice) => ({
+          value: invoice.invoice_number,
+          label: invoice.invoice_number,
+        }))}
+      />
+
       </Row>
+
     </Col>
   );
 };
