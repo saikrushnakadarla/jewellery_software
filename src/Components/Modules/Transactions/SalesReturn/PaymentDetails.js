@@ -13,6 +13,7 @@ const PaymentDetails = ({
   invoiceDetails,
   selectedRows,
   totalPrice,
+  resetForm
 }) => {
 
 
@@ -46,30 +47,37 @@ const PaymentDetails = ({
   
       // Prepare data for updating `open_tags_entry`
       const openTagsUpdates = selectedInvoices.map((invoice) => ({
-        PCode_BarCode: invoice.code, // Send the exact invoice.code (PCode_BarCode)
+        PCode_BarCode: invoice.code,
         Status: "Sale Returned",
       }));
   
-      // Prepare data for inserting new open_tags_entry
-      const newOpenTagsEntries = selectedInvoices.map((invoice) => ({
-        PCode_BarCode: invoice.code, // Send the exact invoice.code (PCode_BarCode)
-        status: "Available",
+      // Prepare data for updating `product` table
+      const productUpdates = selectedInvoices.map((invoice) => ({
+        product_id: invoice.product_id,
+        qty: invoice.qty,
+        gross_weight: invoice.gross_weight,
       }));
+  
+      // Extract codes for adding 'Available' entries
+      const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
   
       // API Calls
       await axios.post("http://localhost:5000/updateRepairDetails", { updates: repairDetailsUpdates });
       await axios.post("http://localhost:5000/updateOpenTags", { updates: openTagsUpdates });
-      await axios.post("http://localhost:5000/addOpenTags", { entries: newOpenTagsEntries });
+      await axios.post("http://localhost:5000/updateProduct", { updates: productUpdates });
+      await axios.post("http://localhost:5000/addAvailableEntry", { codes: codesForAvailableEntries });
   
       alert("Checkout successful and records updated!");
+      resetForm();
+  
+      // Refresh the window
+      window.location.reload();
     } catch (error) {
       console.error("Error during checkout:", error);
       alert("An error occurred during checkout. Please try again.");
     }
   };
   
-  
-
   return (
     <div>
       <Col className="sales-form-section">

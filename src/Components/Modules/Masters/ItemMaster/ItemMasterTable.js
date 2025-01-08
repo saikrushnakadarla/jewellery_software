@@ -200,6 +200,8 @@ const [taxOptions, setTaxOptions] = useState([]);
       { Header: 'Purchase Weight', accessor: 'pur_weight' },
       { Header: 'Sale Qty', accessor: 'sale_qty' },
       { Header: 'Sale Weight', accessor: 'sale_weight' },
+      { Header: 'Sale Return Qty', accessor: 'salereturn_qty' },
+      { Header: 'Sale Return Weight', accessor: 'salereturn_weight' },
       { Header: 'Bal Qty', accessor: 'bal_qty' },
       { Header: 'Bal Weight', accessor: 'bal_weight' },
       // { Header: 'HUID No:', accessor: 'huid_no' },

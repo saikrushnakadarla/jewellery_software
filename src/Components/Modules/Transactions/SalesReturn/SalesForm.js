@@ -100,18 +100,23 @@ const SalesForm = () => {
         setInvoiceDetails(null); // Clear details if no invoice is selected
         return;
       }
-
+  
       try {
         const response = await axios.get(`${baseURL}/getsales/${formData.invoice_number}`);
-        setInvoiceDetails(response.data); // Update state with fetched details
-        console.log("Fetched Invoice Details:", response.data);
+        
+        // Filter the results to exclude those with status 'Sale Returned'
+        const filteredData = response.data.filter((invoice) => invoice.status !== 'Sale Returned');
+        
+        setInvoiceDetails(filteredData); // Update state with filtered details
+        console.log("Fetched Invoice Details:", filteredData);
       } catch (error) {
         console.error(`Error fetching details for invoice ${formData.invoice_number}:`, error);
       }
     };
-
+  
     fetchInvoiceDetails();
   }, [formData.invoice_number]);
+  
   
   
 
@@ -416,6 +421,7 @@ const SalesForm = () => {
                 selectedRows={selectedRows}
                 handleSelectAllChange={handleSelectAllChange}
                 handleCheckboxChange={handleCheckboxChange}
+                resetForm={resetForm}
               />
             </div>
           </div>
