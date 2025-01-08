@@ -11,7 +11,7 @@ const SalesData = () => {
 
   const fetchSalesData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/get-unique-repair-details');
+      const response = await axios.get('http://localhost:5000/get/repair-details');
       const data = response.data;
 
       // Filter data where transaction_status is "Sales"
@@ -61,9 +61,9 @@ const SalesData = () => {
   return (
     <div>
       <h2>Sales Details</h2>
-      <p>Total Sales: {salesCounts.totalSalesCount}</p>
-      <p>Today's Sales: {salesCounts.todaysSalesCount}</p>
-      <p>This Month's Sales: {salesCounts.monthSalesCount}</p>
+      <p>Total : {salesCounts.totalSalesCount}</p>
+      <p>Today: {salesCounts.todaysSalesCount}</p>
+      <p>This Month: {salesCounts.monthSalesCount}</p>
     </div>
   );
 };
