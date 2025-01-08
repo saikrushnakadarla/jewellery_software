@@ -11,7 +11,7 @@ const SalesData = () => {
 
   const fetchSalesData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/get-unique-repair-details');
+      const response = await axios.get('http://localhost:5000/get/repair-details');
       const data = response.data;
 
       // Filter data where transaction_status is "Sales"
