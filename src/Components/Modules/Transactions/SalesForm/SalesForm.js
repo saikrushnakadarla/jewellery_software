@@ -18,6 +18,25 @@ import PDFLayout from './TaxInvoiceA4';
 
 const SalesForm = () => {
   const navigate = useNavigate();
+  const [oldSalesData, setOldSalesData] = useState(() => {
+    const savedData = localStorage.getItem('oldSalesData');
+    return savedData ? JSON.parse(savedData) : [];
+  });
+  
+  const [schemeSalesData, setSchemeSalesData] = useState(() => {
+    const savedData = localStorage.getItem('schemeSalesData');
+    return savedData ? JSON.parse(savedData) : [];
+  });
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    localStorage.setItem('oldSalesData', JSON.stringify(oldSalesData));
+  }, [oldSalesData]);
+
+  useEffect(() => {
+    localStorage.setItem('schemeSalesData', JSON.stringify(schemeSalesData));
+  }, [schemeSalesData]);
+
   const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [metal, setMetal] = useState("");
@@ -215,19 +234,25 @@ const SalesForm = () => {
   const totalPrice = repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
   const handleSave = async () => {
-    const dataToSave = repairDetails.map(item => ({
-      ...item,
-      cash_amount: paymentDetails.cash_amount || 0,
-      card_amount: paymentDetails.card || 0,
-      card_amt: paymentDetails.card_amt || 0,
-      chq: paymentDetails.chq || "",
-      chq_amt: paymentDetails.chq_amt || 0,
-      online: paymentDetails.online || "",
-      online_amt: paymentDetails.online_amt || 0,
-    }));
-  
+    const dataToSave = {
+      repairDetails: repairDetails.map(item => ({
+        ...item,
+        cash_amount: paymentDetails.cash_amount || 0,
+        card_amount: paymentDetails.card || 0,
+        card_amt: paymentDetails.card_amt || 0,
+        chq: paymentDetails.chq || "",
+        chq_amt: paymentDetails.chq_amt || 0,
+        online: paymentDetails.online || "",
+        online_amt: paymentDetails.online_amt || 0,
+      })),
+      oldItems: oldSalesData,
+      memberSchemes: schemeSalesData,
+      
+     
+    };
+    console.log("text",oldSalesData);
     try {
-      await axios.post(`${baseURL}/save-repair-details`, { repairDetails: dataToSave });
+      await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Data saved successfully");
   
       // Generate PDF Blob
@@ -249,6 +274,12 @@ const SalesForm = () => {
       // Clean up
       URL.revokeObjectURL(link.href);
       setRepairDetails([]);
+      
+      setSchemeSalesData([]);
+    
+      localStorage.removeItem('schemeSalesData');
+      setOldSalesData([]); // Clear old sales data
+      localStorage.removeItem('oldSalesData');
       resetForm();
     } catch (error) {
       console.error("Error saving data:", error);
@@ -359,7 +390,7 @@ const SalesForm = () => {
 
           <div className="sales-form2">
             <div className="sales-form-third">
-              <SalesFormSection metal={metal} setMetal={setMetal} />
+              <SalesFormSection metal={metal} setMetal={setMetal} setOldSalesData={setOldSalesData} setSchemeSalesData={setSchemeSalesData} />
             </div>
 
             <div className="sales-form-fourth">

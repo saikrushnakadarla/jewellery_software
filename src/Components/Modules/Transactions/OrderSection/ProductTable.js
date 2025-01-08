@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table, Button } from 'react-bootstrap';
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 const ProductTable = ({ repairDetails, onDelete }) => {
   const taxableAmount = repairDetails.reduce((sum, item) => {
@@ -84,10 +85,16 @@ const ProductTable = ({ repairDetails, onDelete }) => {
                   'No Image'
                 )}
               </td>
-              <td>
-                {/* Add delete button */}
-                <Button variant="danger" onClick={() => onDelete(index)}>Delete</Button>
-              </td>
+               <td>
+                            <Button
+                            variant="primary"
+                            onClick={() => onEdit(index)}
+                            style={{ marginRight: "8px" }}
+                          >
+                           <FaEdit style={{ marginRight: "4px" }} />
+                          </Button>
+                              <Button variant="danger" onClick={() => onDelete(index)}>  <FaTrashAlt style={{ marginRight: "4px" }} /></Button>
+                            </td>
             </tr>
           ))
         ) : (
