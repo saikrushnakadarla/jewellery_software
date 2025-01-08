@@ -1,6 +1,9 @@
 import React from 'react';
 import './Dashboard.css';
 import Repairs from './Repairs';
+import Sales from './Sales';
+import Orders from './Orders';
+import URDPurchase from './URDPurchase';
 import Customers from './Customers';
 import CustomerDashboard from './CustomerDashboard'
 
@@ -21,6 +24,17 @@ function Dashboard() {
           <div className="dashboard_card bg-dash3">
             <h2>Receivables</h2>
             <p>100000</p>
+          </div>
+        </div>
+        <div className="dashboard_card-row" style={{marginTop:'15px'}}> 
+          <div className="dashboard_card bg-dash2">         
+            <Sales />
+          </div>
+          <div className="dashboard_card bg-dash1">
+          <Orders />
+          </div>
+          <div className="dashboard_card bg-dash3">
+          <URDPurchase />
           </div>
         </div>
       </div>
