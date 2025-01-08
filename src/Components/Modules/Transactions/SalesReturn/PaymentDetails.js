@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Col, Row, Button } from 'react-bootstrap';
-import InputField from './../../../Pages/InputField/InputField';
-import { Table } from 'react-bootstrap';
+import React, { useEffect, useState } from "react";
+import { Col, Row, Button } from "react-bootstrap";
+import InputField from "./../../../Pages/InputField/InputField";
+import { Table } from "react-bootstrap";
+import axios from "axios"; // Assuming you are using axios for API calls
 
 const PaymentDetails = ({
   paymentDetails,
@@ -11,9 +12,9 @@ const PaymentDetails = ({
   repairDetails,
   invoiceDetails,
   selectedRows,
-  totalPrice, 
+  totalPrice,
 }) => {
-  const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
+
 
   // Calculate taxable amount based on selected rows
   const taxableAmount = selectedRows.reduce((sum, rowIndex) => {
@@ -24,27 +25,50 @@ const PaymentDetails = ({
     return sum + stonePrice + makingCharges + rateAmt;
   }, 0);
 
-  console.log("Taxable Amount from Selected Entries:", taxableAmount);
-
   const taxAmount = selectedRows.reduce((sum, rowIndex) => {
     const detail = invoiceDetails[rowIndex];
     return sum + parseFloat(detail.tax_amt || 0);
   }, 0);
 
   const netAmount = taxableAmount + taxAmount;
-  console.log("Net Amount from Selected Entries:", netAmount);
 
-  // Calculate total entered amount
-  useEffect(() => {
-    const totalEnteredAmount =
-      parseFloat(paymentDetails.cash_amount || 0) +
-      parseFloat(paymentDetails.card_amt || 0) +
-      parseFloat(paymentDetails.chq_amt || 0) +
-      parseFloat(paymentDetails.online_amt || 0);
 
-    const tolerance = 0.01;
-    setIsSubmitEnabled(Math.abs(totalEnteredAmount - parseFloat(totalPrice || 0)) < tolerance);
-  }, [paymentDetails, totalPrice]);
+
+  const handleCheckout = async () => {
+    try {
+      const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
+  
+      // Prepare data for updating `repair_details`
+      const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
+        id: invoice.id,
+        status: "Sale Returned",
+      }));
+  
+      // Prepare data for updating `open_tags_entry`
+      const openTagsUpdates = selectedInvoices.map((invoice) => ({
+        PCode_BarCode: invoice.code, // Send the exact invoice.code (PCode_BarCode)
+        Status: "Sale Returned",
+      }));
+  
+      // Prepare data for inserting new open_tags_entry
+      const newOpenTagsEntries = selectedInvoices.map((invoice) => ({
+        PCode_BarCode: invoice.code, // Send the exact invoice.code (PCode_BarCode)
+        status: "Available",
+      }));
+  
+      // API Calls
+      await axios.post("http://localhost:5000/updateRepairDetails", { updates: repairDetailsUpdates });
+      await axios.post("http://localhost:5000/updateOpenTags", { updates: openTagsUpdates });
+      await axios.post("http://localhost:5000/addOpenTags", { entries: newOpenTagsEntries });
+  
+      alert("Checkout successful and records updated!");
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      alert("An error occurred during checkout. Please try again.");
+    }
+  };
+  
+  
 
   return (
     <div>
@@ -55,30 +79,42 @@ const PaymentDetails = ({
             {Array.isArray(invoiceDetails) && invoiceDetails.length > 0 ? (
               <>
                 <tr>
-                  <td colSpan="20" className="text-right">Taxable Amount</td>
+                  <td colSpan="20" className="text-right">
+                    Taxable Amount
+                  </td>
                   <td colSpan="4">{taxableAmount}</td>
                 </tr>
                 <tr>
-                  <td colSpan="20" className="text-right">Tax Amount</td>
+                  <td colSpan="20" className="text-right">
+                    Tax Amount
+                  </td>
                   <td colSpan="4">{taxAmount}</td>
                 </tr>
                 <tr>
-                  <td colSpan="20" className="text-right">Net Amount</td>
+                  <td colSpan="20" className="text-right">
+                    Net Amount
+                  </td>
                   <td colSpan="4">{netAmount}</td>
                 </tr>
               </>
             ) : (
               <>
                 <tr>
-                  <td colSpan="20" className="text-right">Taxable Amount</td>
+                  <td colSpan="20" className="text-right">
+                    Taxable Amount
+                  </td>
                   <td colSpan="4">0.00</td>
                 </tr>
                 <tr>
-                  <td colSpan="20" className="text-right">Tax Amount</td>
+                  <td colSpan="20" className="text-right">
+                    Tax Amount
+                  </td>
                   <td colSpan="4">0.00</td>
                 </tr>
                 <tr>
-                  <td colSpan="20" className="text-right">Net Amount</td>
+                  <td colSpan="20" className="text-right">
+                    Net Amount
+                  </td>
                   <td colSpan="4">0.00</td>
                 </tr>
               </>
@@ -88,9 +124,9 @@ const PaymentDetails = ({
         <Row>
           <Col xs={12} md={3}>
             <Button
-              onClick={handleSave}
-              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-              disabled={!isSubmitEnabled} 
+              onClick={handleCheckout}
+              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+              // disabled={!isSubmitEnabled}
             >
               Check Out
             </Button>
@@ -101,14 +137,13 @@ const PaymentDetails = ({
               className="cus-back-btn"
               variant="secondary"
               onClick={handleBack}
-              style={{ backgroundColor: 'gray', marginRight: '10px' }}
+              style={{ backgroundColor: "gray", marginRight: "10px" }}
             >
               Cancel
             </Button>
           </Col>
         </Row>
       </Col>
-
     </div>
   );
 };

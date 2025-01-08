@@ -232,47 +232,47 @@ const SalesForm = () => {
   };
   const totalPrice = repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
-  const handleSave = async () => {
-    const dataToSave = repairDetails.map(item => ({
-      ...item,
-      cash_amount: paymentDetails.cash_amount || 0,
-      card_amount: paymentDetails.card || 0,
-      card_amt: paymentDetails.card_amt || 0,
-      chq: paymentDetails.chq || "",
-      chq_amt: paymentDetails.chq_amt || 0,
-      online: paymentDetails.online || "",
-      online_amt: paymentDetails.online_amt || 0,
-    }));
+  // const handleSave = async () => {
+  //   const dataToSave = repairDetails.map(item => ({
+  //     ...item,
+  //     cash_amount: paymentDetails.cash_amount || 0,
+  //     card_amount: paymentDetails.card || 0,
+  //     card_amt: paymentDetails.card_amt || 0,
+  //     chq: paymentDetails.chq || "",
+  //     chq_amt: paymentDetails.chq_amt || 0,
+  //     online: paymentDetails.online || "",
+  //     online_amt: paymentDetails.online_amt || 0,
+  //   }));
   
-    try {
-      await axios.post(`${baseURL}/save-repair-details`, { repairDetails: dataToSave });
-      alert("Data saved successfully");
+  //   try {
+  //     await axios.post(`${baseURL}/save-repair-details`, { repairDetails: dataToSave });
+  //     alert("Data saved successfully");
   
-      // Generate PDF Blob
-      const pdfDoc = (
-        <PDFLayout
-          formData={formData}
-          repairDetails={repairDetails}
-          paymentDetails={paymentDetails}
-        />
-      );
-      const pdfBlob = await pdf(pdfDoc).toBlob();
+  //     // Generate PDF Blob
+  //     const pdfDoc = (
+  //       <PDFLayout
+  //         formData={formData}
+  //         repairDetails={repairDetails}
+  //         paymentDetails={paymentDetails}
+  //       />
+  //     );
+  //     const pdfBlob = await pdf(pdfDoc).toBlob();
   
-      // Create a download link and trigger it
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(pdfBlob);
-      link.download = `invoice-${formData.invoice_number}.pdf`;
-      link.click();
+  //     // Create a download link and trigger it
+  //     const link = document.createElement('a');
+  //     link.href = URL.createObjectURL(pdfBlob);
+  //     link.download = `invoice-${formData.invoice_number}.pdf`;
+  //     link.click();
   
-      // Clean up
-      URL.revokeObjectURL(link.href);
-      setRepairDetails([]);
-      resetForm();
-    } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Error saving data");
-    }
-  };
+  //     // Clean up
+  //     URL.revokeObjectURL(link.href);
+  //     setRepairDetails([]);
+  //     resetForm();
+  //   } catch (error) {
+  //     console.error("Error saving data:", error);
+  //     alert("Error saving data");
+  //   }
+  // };
   
 
   const resetForm = () => {
@@ -407,7 +407,7 @@ const SalesForm = () => {
               <PaymentDetails 
                 paymentDetails={paymentDetails}
                 setPaymentDetails={setPaymentDetails}
-                handleSave={handleSave}
+                // handleSave={handleSave}
                 handleBack={handleBack}
                 totalPrice={totalPrice} 
                 repairDetails={repairDetails} 
