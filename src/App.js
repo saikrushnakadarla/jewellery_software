@@ -53,6 +53,7 @@ import Worker_Table from './Components/Modules/Masters/Worker/WorkerTable';
 import Login from './Components/Pages/Login/Login';
 import SalesReturn from './Components/Modules/Transactions/SalesReturn/SalesForm';
 import EstimateReceipt from './Components/Modules/Transactions/Estimate/EstimateReceipt';
+import AccountDetails from './Components/Pages/Dashboard/AccountDetails'
 
 function App() {
   const location = useLocation();
@@ -121,6 +122,8 @@ function App() {
 
         <Route path="/salesreturn" element={<SalesReturn />} />
         <Route path="/estimatereceipt" element={<EstimateReceipt />} />
+
+        <Route path="/accountdetails" element={<AccountDetails />} />
       </Routes>
     </>
   );

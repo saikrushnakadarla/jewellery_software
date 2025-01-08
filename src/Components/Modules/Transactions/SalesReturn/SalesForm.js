@@ -57,6 +57,8 @@ const SalesForm = () => {
   // Apply calculations
   useCalculations(formData, setFormData);
   const [uniqueInvoice, setUniqueInvoice] = useState([]);
+  const [filteredInvoices, setFilteredInvoices] = useState([]);
+  const [invoiceDetails, setInvoiceDetails] = useState(null);
 
   // Fetch customers
   useEffect(() => {
@@ -73,26 +75,17 @@ const SalesForm = () => {
         console.error('Error fetching customers:', error);
       }
     };
-
+  
     fetchCustomers();
   }, []);
-
+  
   useEffect(() => {
     const fetchRepairs = async () => {
       try {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
-        
-        // Filter the data based on the 'transaction_status' column
         const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
-        
-        setUniqueInvoice(filteredData); // Set the filtered data
-        
-        console.log("Unique Invoice =", filteredData);
-  
-        // Set the first unique invoice number to the form
-        if (filteredData.length > 0) {
-          setFormData(prev => ({ ...prev, invoice_number: filteredData[0].invoice_number }));
-        }
+        setUniqueInvoice(filteredData);
+        setFilteredInvoices(filteredData); // Initially, show all invoices
       } catch (error) {
         console.error('Error fetching repair details:', error);
       }
@@ -100,6 +93,27 @@ const SalesForm = () => {
   
     fetchRepairs();
   }, []);
+
+  useEffect(() => {
+    const fetchInvoiceDetails = async () => {
+      if (!formData.invoice_number) {
+        setInvoiceDetails(null); // Clear details if no invoice is selected
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${baseURL}/getsales/${formData.invoice_number}`);
+        setInvoiceDetails(response.data); // Update state with fetched details
+        console.log("Fetched Invoice Details:", response.data);
+      } catch (error) {
+        console.error(`Error fetching details for invoice ${formData.invoice_number}:`, error);
+      }
+    };
+
+    fetchInvoiceDetails();
+  }, [formData.invoice_number]);
+  
+  
 
   useEffect(() => {
     localStorage.setItem('repairDetails', JSON.stringify(repairDetails));
@@ -110,19 +124,14 @@ const SalesForm = () => {
   }, [paymentDetails]);
 
   const handleCustomerChange = (customerId) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      customer_id: customerId, // Ensure customer_id is correctly updated
-    }));
-
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
-    console.log("Customer Id=", customer)
-
+    
     if (customer) {
+      // Update customer details in formData
       setFormData({
         ...formData,
-        customer_id: customerId, // Ensure this is correctly set
-        account_name: customer.account_name, // Set the name field to the selected customer
+        customer_id: customerId,
+        account_name: customer.account_name,
         mobile: customer.mobile || "",
         email: customer.email || "",
         address1: customer.address1 || "",
@@ -134,9 +143,16 @@ const SalesForm = () => {
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
-
       });
+  
+      // Filter invoices by customer account_name or mobile
+      const filtered = uniqueInvoice.filter(
+        (invoice) =>
+          invoice.customer_name === customer.account_name || invoice.mobile === customer.mobile
+      );
+      setFilteredInvoices(filtered);
     } else {
+      // Reset formData and invoices if no customer is selected
       setFormData({
         ...formData,
         customer_id: "",
@@ -153,8 +169,10 @@ const SalesForm = () => {
         gst_in: "",
         pan_card: "",
       });
+      setFilteredInvoices(uniqueInvoice);
     }
   };
+  
 
   const [editIndex, setEditIndex] = useState(null);
 
@@ -214,47 +232,47 @@ const SalesForm = () => {
   };
   const totalPrice = repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
-  const handleSave = async () => {
-    const dataToSave = repairDetails.map(item => ({
-      ...item,
-      cash_amount: paymentDetails.cash_amount || 0,
-      card_amount: paymentDetails.card || 0,
-      card_amt: paymentDetails.card_amt || 0,
-      chq: paymentDetails.chq || "",
-      chq_amt: paymentDetails.chq_amt || 0,
-      online: paymentDetails.online || "",
-      online_amt: paymentDetails.online_amt || 0,
-    }));
+  // const handleSave = async () => {
+  //   const dataToSave = repairDetails.map(item => ({
+  //     ...item,
+  //     cash_amount: paymentDetails.cash_amount || 0,
+  //     card_amount: paymentDetails.card || 0,
+  //     card_amt: paymentDetails.card_amt || 0,
+  //     chq: paymentDetails.chq || "",
+  //     chq_amt: paymentDetails.chq_amt || 0,
+  //     online: paymentDetails.online || "",
+  //     online_amt: paymentDetails.online_amt || 0,
+  //   }));
   
-    try {
-      await axios.post(`${baseURL}/save-repair-details`, { repairDetails: dataToSave });
-      alert("Data saved successfully");
+  //   try {
+  //     await axios.post(`${baseURL}/save-repair-details`, { repairDetails: dataToSave });
+  //     alert("Data saved successfully");
   
-      // Generate PDF Blob
-      const pdfDoc = (
-        <PDFLayout
-          formData={formData}
-          repairDetails={repairDetails}
-          paymentDetails={paymentDetails}
-        />
-      );
-      const pdfBlob = await pdf(pdfDoc).toBlob();
+  //     // Generate PDF Blob
+  //     const pdfDoc = (
+  //       <PDFLayout
+  //         formData={formData}
+  //         repairDetails={repairDetails}
+  //         paymentDetails={paymentDetails}
+  //       />
+  //     );
+  //     const pdfBlob = await pdf(pdfDoc).toBlob();
   
-      // Create a download link and trigger it
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(pdfBlob);
-      link.download = `invoice-${formData.invoice_number}.pdf`;
-      link.click();
+  //     // Create a download link and trigger it
+  //     const link = document.createElement('a');
+  //     link.href = URL.createObjectURL(pdfBlob);
+  //     link.download = `invoice-${formData.invoice_number}.pdf`;
+  //     link.click();
   
-      // Clean up
-      URL.revokeObjectURL(link.href);
-      setRepairDetails([]);
-      resetForm();
-    } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Error saving data");
-    }
-  };
+  //     // Clean up
+  //     URL.revokeObjectURL(link.href);
+  //     setRepairDetails([]);
+  //     resetForm();
+  //   } catch (error) {
+  //     console.error("Error saving data:", error);
+  //     alert("Error saving data");
+  //   }
+  // };
   
 
   const resetForm = () => {
@@ -293,6 +311,30 @@ const SalesForm = () => {
     navigate("/customermaster", { state: { from: "/sales" } });
   };
 
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
+  
+    const handleCheckboxChange = (event, index) => {
+      const isChecked = event.target.checked;
+      if (isChecked) {
+        setSelectedRows([...selectedRows, index]); // Add index to selectedRows
+      } else {
+        setSelectedRows(selectedRows.filter(i => i !== index)); // Remove index from selectedRows
+      }
+    };
+  
+    const handleSelectAllChange = (event) => {
+      const isChecked = event.target.checked;
+      if (isChecked) {
+        // Select all rows
+        setSelectedRows(invoiceDetails.map((_, index) => index));
+      } else {
+        // Deselect all rows
+        setSelectedRows([]);
+      }
+      setIsAllSelected(isChecked); // Update "Check All" checkbox state
+    };
+
   return (
     <div className="main-container">
       <Container className="sales-form-container">
@@ -314,6 +356,8 @@ const SalesForm = () => {
                 formData={formData}
                 setFormData={setFormData}
                 uniqueInvoice={uniqueInvoice}
+                filteredInvoices={filteredInvoices}
+                invoiceDetails={invoiceDetails}
               />
             </div>
           </div>
@@ -342,7 +386,15 @@ const SalesForm = () => {
           </div>
 
           <div className="sales-form-section">
-            <ProductTable repairDetails={repairDetails} onEdit={handleEdit}  onDelete={handleDelete}/>
+            <ProductTable 
+              repairDetails={repairDetails} 
+              invoiceDetails={invoiceDetails}
+              isAllSelected={isAllSelected}
+              selectedRows={selectedRows}
+              handleSelectAllChange={handleSelectAllChange}
+              handleCheckboxChange={handleCheckboxChange}
+              onEdit={handleEdit} 
+              onDelete={handleDelete}/>
           </div>
 
 
@@ -355,10 +407,15 @@ const SalesForm = () => {
               <PaymentDetails 
                 paymentDetails={paymentDetails}
                 setPaymentDetails={setPaymentDetails}
-                handleSave={handleSave}
+                // handleSave={handleSave}
                 handleBack={handleBack}
                 totalPrice={totalPrice} 
-                repairDetails={repairDetails} // Pass totalPrice as a prop
+                repairDetails={repairDetails} 
+                invoiceDetails={invoiceDetails}
+                isAllSelected={isAllSelected}
+                selectedRows={selectedRows}
+                handleSelectAllChange={handleSelectAllChange}
+                handleCheckboxChange={handleCheckboxChange}
               />
             </div>
           </div>
