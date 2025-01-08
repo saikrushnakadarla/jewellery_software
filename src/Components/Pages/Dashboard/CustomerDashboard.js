@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import baseURL from "../../../Url/NodeBaseURL";
-import InputField from "../../Pages/InputField/InputField"; // Adjust the path as necessary
+import InputField from "../../Pages/InputField/InputField";
 
-function Customers() {
-  const [customers, setCustomers] = useState([]); // State for customer data
-  const [formData, setFormData] = useState({ customer_id: "" }); // Form data
+function Customers({ onSelectCustomer }) {
+  const [customers, setCustomers] = useState([]);
+  const [formData, setFormData] = useState({ customer_id: "" });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,7 +18,6 @@ function Customers() {
           (item) => item.account_group === "CUSTOMERS"
         );
         setCustomers(filteredCustomers);
-        console.log("Customers=", filteredCustomers);
       } catch (error) {
         console.error("Error fetching customers:", error);
       }
@@ -28,7 +27,8 @@ function Customers() {
   }, []);
 
   const handleCustomerChange = (selectedCustomerId) => {
-    setFormData({ ...formData, customer_id: selectedCustomerId });
+    setFormData({ customer_id: selectedCustomerId });
+    onSelectCustomer(selectedCustomerId); // Notify parent component
   };
 
   const selectedCustomer = customers.find(
@@ -44,23 +44,19 @@ function Customers() {
             label="Mobile"
             name="mobile"
             type="select"
-            value={formData.customer_id || ""} // Use customer_id to match selected value
+            value={formData.customer_id || ""}
             onChange={(e) => handleCustomerChange(e.target.value)}
-            options={[
-              // { value: "", label: "Select Mobile" }, // Default option
-              ...customers.map((customer) => ({
-                value: customer.account_id, // Use account_id as the value
-                label: customer.mobile, // Display mobile as the label
-              })),
-            ]}
+            options={customers.map((customer) => ({
+              value: customer.account_id,
+              label: customer.mobile,
+            }))}
           />
         </div>
       </div>
-      {formData.customer_id && selectedCustomer && (
-        <div className="row ">
+      {selectedCustomer && (
+        <div className="row">
           <div className="col-4">
             <h4>Selected Customer Details:</h4>
-           
             <p>
               <strong>Name:</strong> {selectedCustomer.account_name}
             </p>

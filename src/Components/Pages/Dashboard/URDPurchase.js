@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const URDPurchases = () => {
-  const [purchases, setPurchases] = useState([]);
+const URDPurchases = ({ selectedCustomerId }) => {
   const [purchaseCounts, setPurchaseCounts] = useState({
     total: 0,
     today: 0,
@@ -11,62 +10,49 @@ const URDPurchases = () => {
 
   const fetchPurchases = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/get-purchases');
+      const response = await axios.get("http://localhost:5000/get-purchases");
       const data = response.data;
 
-      // Set the fetched data
-      setPurchases(data);
+      // Filter purchases by customer if `selectedCustomerId` is provided
+      const filteredPurchases = selectedCustomerId
+        ? data.filter((purchase) => purchase.customer_id === selectedCustomerId)
+        : data;
 
-      const today = new Date();
-      const currentMonth = today.getMonth();
-      const currentYear = today.getFullYear();
+      const todayDate = new Date().toISOString().slice(0, 10);
+      const todayCount = filteredPurchases.filter(
+        (purchase) => purchase.date.slice(0, 10) === todayDate
+      ).length;
 
-      const counts = data.reduce(
-        (acc, purchase) => {
-          const purchaseDate = new Date(purchase.date);
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const monthCount = filteredPurchases.filter((purchase) => {
+        const purchaseDate = new Date(purchase.date);
+        return (
+          purchaseDate.getMonth() === currentMonth &&
+          purchaseDate.getFullYear() === currentYear
+        );
+      }).length;
 
-          // Total count
-          acc.total += 1;
-
-          // Today's count
-          if (
-            purchaseDate.getDate() === today.getDate() &&
-            purchaseDate.getMonth() === today.getMonth() &&
-            purchaseDate.getFullYear() === today.getFullYear()
-          ) {
-            acc.today += 1;
-          }
-
-          // This month's count
-          if (
-            purchaseDate.getMonth() === currentMonth &&
-            purchaseDate.getFullYear() === currentYear
-          ) {
-            acc.thisMonth += 1;
-          }
-
-          return acc;
-        },
-        { total: 0, today: 0, thisMonth: 0 }
-      );
-
-      // Update the counts state
-      setPurchaseCounts(counts);
+      setPurchaseCounts({
+        total: filteredPurchases.length,
+        today: todayCount,
+        thisMonth: monthCount,
+      });
     } catch (error) {
-      console.error('Error fetching URD purchases:', error);
+      console.error("Error fetching URD purchases:", error);
     }
   };
 
   useEffect(() => {
     fetchPurchases();
-  }, []);
+  }, [selectedCustomerId]);
 
   return (
     <div>
       <h2>URD Purchases</h2>
-      <p>Total URD Purchases: {purchaseCounts.total}</p>
-      <p>Today's URD Purchases: {purchaseCounts.today}</p>
-      <p>This Month's URD Purchases: {purchaseCounts.thisMonth}</p>
+      <p>Total URD Purchases: {purchaseCounts.total }</p>
+      <p>Today's URD Purchases: {purchaseCounts.today }</p>
+      <p>This Month's URD Purchases: {purchaseCounts.thisMonth }</p>
     </div>
   );
 };

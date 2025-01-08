@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const SalesData = () => {
-  const [salesData, setSalesData] = useState([]);
+const Sales = ({ selectedCustomerId }) => {
   const [salesCounts, setSalesCounts] = useState({
     totalSalesCount: 0,
     todaysSalesCount: 0,
@@ -11,22 +10,21 @@ const SalesData = () => {
 
   const fetchSalesData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/get/repair-details');
+      const response = await axios.get("http://localhost:5000/get/repair-details");
       const data = response.data;
 
-      // Filter data where transaction_status is "Sales"
-      const filteredSales = data.filter(item => item.transaction_status === "Sales");
-      setSalesData(filteredSales);
+      // Filter for all sales or specific customer sales
+      const filteredSales = selectedCustomerId
+        ? data.filter((item) => item.transaction_status === "Sales" && item.customer_id === selectedCustomerId)
+        : data.filter((item) => item.transaction_status === "Sales");
 
       const today = new Date();
       const counts = filteredSales.reduce(
         (acc, sale) => {
           const saleDate = new Date(sale.date);
 
-          // Total sales count
           acc.totalSalesCount += 1;
 
-          // Today's sales count
           if (
             saleDate.getDate() === today.getDate() &&
             saleDate.getMonth() === today.getMonth() &&
@@ -35,7 +33,6 @@ const SalesData = () => {
             acc.todaysSalesCount += 1;
           }
 
-          // This month's sales count
           if (
             saleDate.getMonth() === today.getMonth() &&
             saleDate.getFullYear() === today.getFullYear()
@@ -50,22 +47,22 @@ const SalesData = () => {
 
       setSalesCounts(counts);
     } catch (error) {
-      console.error('Error fetching sales data:', error);
+      console.error("Error fetching sales data:", error);
     }
   };
 
   useEffect(() => {
     fetchSalesData();
-  }, []);
+  }, [selectedCustomerId]);
 
   return (
     <div>
       <h2>Sales Details</h2>
-      <p>Total : {salesCounts.totalSalesCount}</p>
-      <p>Today: {salesCounts.todaysSalesCount}</p>
+      <p>Total: {salesCounts.totalSalesCount }</p>
+      <p>Today: {salesCounts.todaysSalesCount }</p>
       <p>This Month: {salesCounts.monthSalesCount}</p>
     </div>
   );
 };
 
-export default SalesData;
+export default Sales;

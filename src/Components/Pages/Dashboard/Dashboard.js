@@ -1,21 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import Repairs from './Repairs';
 import Sales from './Sales';
 import Orders from './Orders';
 import URDPurchase from './URDPurchase';
 import Customers from './Customers';
-import CustomerDashboard from './CustomerDashboard'
+import CustomerDashboard from './CustomerDashboard';
 
 function Dashboard() {
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const navigate = useNavigate();
+
   return (
     <div className="main-container">
       <div className="dashboard_main-container">
-        {/* <h1 className='dashboard_heading'>Dashboard</h1> */}
-
         <div className="dashboard_card-row"> 
           <div className="dashboard_card bg-dash2">         
-            <Repairs />
+            <Repairs selectedCustomerId={selectedCustomerId} />
+            <a 
+              href="#" 
+              className="details-link" 
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/repairstable');
+              }}
+            >
+              Details
+            </a>
+            <a style={{marginLeft:'300px'}}
+                href="#" 
+                className="new-link" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/repairs');
+                }}
+              >
+                New
+              </a>
           </div>
           <div className="dashboard_card bg-dash1">
             <h2>Payables</h2>
@@ -28,57 +50,83 @@ function Dashboard() {
         </div>
         <div className="dashboard_card-row" style={{marginTop:'15px'}}> 
           <div className="dashboard_card bg-dash2">         
-            <Sales />
+            <Sales selectedCustomerId={selectedCustomerId} />
+            <a 
+              href="#" 
+              className="details-link" 
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/salestable');
+              }}
+            >
+              Details
+            </a>
+            <a style={{marginLeft:'300px'}}
+                href="#" 
+                className="new-link" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/sales');
+                }}
+              >
+                New
+              </a>
           </div>
           <div className="dashboard_card bg-dash1">
-          <Orders />
+            <Orders selectedCustomerId={selectedCustomerId} />
+            <a 
+              href="#" 
+              className="details-link" 
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/orderstable');
+              }}
+            >
+              Details
+            </a>
+            <a style={{marginLeft:'300px'}}
+                href="#" 
+                className="new-link" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/orders');
+                }}
+              >
+                New
+              </a>
           </div>
           <div className="dashboard_card bg-dash3">
-          <URDPurchase />
+            <URDPurchase selectedCustomerId={selectedCustomerId} />
+            <a 
+              href="#" 
+              className="details-link" 
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/urdpurchasetable');
+              }}
+            >
+              Details
+            </a>
+            <a style={{marginLeft:'300px'}}
+                href="#" 
+                className="new-link" 
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate('/urd_purchase');
+                }}
+              >
+                New
+              </a>
           </div>
         </div>
       </div>
       <div className="dashboard_main-container">
-      <CustomerDashboard />
+        <CustomerDashboard onSelectCustomer={setSelectedCustomerId} />
       </div>
       <div className="dashboard-customers-row">
         <div className="dashboard-customers-container">
           <h2 className="dashboard-section-title">TOP CUSTOMERS</h2>
           <div className="dashboard-table-wrapper">
-            {/* <table className="dashboard-responsive-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Product</th>
-                  <th>Amount</th>
-                  <th>Contact</th>
-                  <th>Email</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>John Doe</td>
-                  <td>Gold Necklace</td>
-                  <td>₹50,000</td>
-                  <td>+91 9876543210</td>
-                  <td>johndoe@example.com</td>
-                </tr>
-                <tr>
-                  <td>Jane Smith</td>
-                  <td>Diamond Ring</td>
-                  <td>₹45,000</td>
-                  <td>+91 8765432109</td>
-                  <td>janesmith@example.com</td>
-                </tr>
-                <tr>
-                  <td>David Brown</td>
-                  <td>Silver Bracelet</td>
-                  <td>₹40,000</td>
-                  <td>+91 7654321098</td>
-                  <td>davidbrown@example.com</td>
-                </tr>
-              </tbody>
-            </table> */}
             <Customers />
           </div>
         </div>

@@ -1,69 +1,70 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
-const OrdersData = () => {
-  const [salesData, setSalesData] = useState([]);
-  const [salesCounts, setSalesCounts] = useState({
-    totalSalesCount: 0,
-    todaysSalesCount: 0,
-    monthSalesCount: 0,
+const OrdersData = ({ selectedCustomerId }) => {
+  const [orderCounts, setOrderCounts] = useState({
+    totalOrderCount: 0,
+    todaysOrderCount: 0,
+    monthOrderCount: 0,
   });
 
-  const fetchSalesData = async () => {
+  const fetchOrderData = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/get/repair-details');
+      const response = await axios.get("http://localhost:5000/get/repair-details");
       const data = response.data;
 
-      // Filter data where transaction_status is "Sales"
-      const filteredSales = data.filter(item => item.transaction_status === "Orders");
-      setSalesData(filteredSales);
+      // Filter for all orders or specific customer orders
+      const filteredOrders = selectedCustomerId
+        ? data.filter(
+            (item) =>
+              item.transaction_status === "Orders" &&
+              item.customer_id === selectedCustomerId
+          )
+        : data.filter((item) => item.transaction_status === "Orders");
 
       const today = new Date();
-      const counts = filteredSales.reduce(
-        (acc, sale) => {
-          const saleDate = new Date(sale.date);
+      const counts = filteredOrders.reduce(
+        (acc, order) => {
+          const orderDate = new Date(order.date);
 
-          // Total sales count
-          acc.totalSalesCount += 1;
+          acc.totalOrderCount += 1;
 
-          // Today's sales count
           if (
-            saleDate.getDate() === today.getDate() &&
-            saleDate.getMonth() === today.getMonth() &&
-            saleDate.getFullYear() === today.getFullYear()
+            orderDate.getDate() === today.getDate() &&
+            orderDate.getMonth() === today.getMonth() &&
+            orderDate.getFullYear() === today.getFullYear()
           ) {
-            acc.todaysSalesCount += 1;
+            acc.todaysOrderCount += 1;
           }
 
-          // This month's sales count
           if (
-            saleDate.getMonth() === today.getMonth() &&
-            saleDate.getFullYear() === today.getFullYear()
+            orderDate.getMonth() === today.getMonth() &&
+            orderDate.getFullYear() === today.getFullYear()
           ) {
-            acc.monthSalesCount += 1;
+            acc.monthOrderCount += 1;
           }
 
           return acc;
         },
-        { totalSalesCount: 0, todaysSalesCount: 0, monthSalesCount: 0 }
+        { totalOrderCount: 0, todaysOrderCount: 0, monthOrderCount: 0 }
       );
 
-      setSalesCounts(counts);
+      setOrderCounts(counts);
     } catch (error) {
-      console.error('Error fetching sales data:', error);
+      console.error("Error fetching order data:", error);
     }
   };
 
   useEffect(() => {
-    fetchSalesData();
-  }, []);
+    fetchOrderData();
+  }, [selectedCustomerId]);
 
   return (
     <div>
       <h2>Orders Details</h2>
-      <p>Total: {salesCounts.totalSalesCount}</p>
-      <p>Today: {salesCounts.todaysSalesCount}</p>
-      <p>This Month: {salesCounts.monthSalesCount}</p>
+      <p>Total: {orderCounts.totalOrderCount }</p>
+      <p>Today: {orderCounts.todaysOrderCount }</p>
+      <p>This Month: {orderCounts.monthOrderCount }</p>
     </div>
   );
 };
