@@ -61,9 +61,9 @@ const SalesData = () => {
   return (
     <div>
       <h2>Sales Details</h2>
-      <p>Total Sales: {salesCounts.totalSalesCount}</p>
-      <p>Today's Sales: {salesCounts.todaysSalesCount}</p>
-      <p>This Month's Sales: {salesCounts.monthSalesCount}</p>
+      <p>Total : {salesCounts.totalSalesCount}</p>
+      <p>Today: {salesCounts.todaysSalesCount}</p>
+      <p>This Month: {salesCounts.monthSalesCount}</p>
     </div>
   );
 };
