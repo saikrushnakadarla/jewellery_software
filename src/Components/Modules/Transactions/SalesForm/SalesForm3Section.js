@@ -12,12 +12,12 @@ const SalesFormSection = () => {
     metal: "",
     purity: "",
     hsn_code: "",
-    gross: 0,
-    dust: 0,
+    gross: "",
+    dust: "",
     ml_percent: 0,
     net_wt: 0,
     remarks: "",
-    rate: 0,
+    rate: "",
     total_amount: 0,
   });
 
@@ -165,19 +165,19 @@ const SalesFormSection = () => {
     const grossWeight = parseFloat(gross) || 0;
     const dustWeight = parseFloat(dust) || 0;
     const mlPercentValue = parseFloat(ml_percent) || 0;
-  
+
     const netWeight = ((grossWeight - dustWeight) * (purityPercentage - mlPercentValue)) / 100;
     return parseFloat(netWeight.toFixed(2)); // Fix to 2 decimals
   };
-  
+
   const calculateTotalAmount = ({ net_wt, rate }) => {
     const netWeight = parseFloat(net_wt) || 0;
     const rateAmount = parseFloat(rate) || 0;
-  
+
     const totalAmount = netWeight * rateAmount;
     return parseFloat(totalAmount.toFixed(2)); // Fix to 2 decimals
   };
-  
+
 
   const currentRate =
     oldDetails.purity === "24K" ? rates.rate_24crt :
@@ -268,12 +268,12 @@ const SalesFormSection = () => {
           metal: "",
           purity: "",
           hsn_code: "",
-          gross: 0,
-          dust: 0,
+          gross: "",
+          dust: "",
           ml_percent: 0,
           net_wt: 0,
           remarks: "",
-          rate: 0,
+          rate: "",
           total_amount: 0,
         });
       } else {
@@ -315,7 +315,7 @@ const SalesFormSection = () => {
             remarks: "",
             rate: "",
             total_amount: 0,
-            total_old_amount:""
+            total_old_amount: ""
           });
         } else {
           alert("Please fill in all required fields.");
@@ -377,14 +377,14 @@ const SalesFormSection = () => {
     try {
       // Calculate the total amount once
       const totalOldAmount = calculateOldTotalSum();
-  
+
       // Iterate over oldTableData and send POST request for each entry
       for (const data of oldTableData) {
         const payload = {
           ...data,
           total_old_amount: totalOldAmount, // Add the total amount to each request
         };
-  
+
         const response = await fetch('http://localhost:5000/olditems', {
           method: 'POST',
           headers: {
@@ -392,7 +392,7 @@ const SalesFormSection = () => {
           },
           body: JSON.stringify(payload),
         });
-  
+
         if (!response.ok) {
           throw new Error(`Failed to save data for HSN Code ${data.hsn_code}`);
         }
@@ -403,19 +403,19 @@ const SalesFormSection = () => {
       alert('Error occurred while submitting data. Please try again.');
     }
   };
-  
+
   const handleSubmitSchemeData = async () => {
     try {
       // Calculate the total amount once
       const schemesTotalAmount = calculateSchemeTotalSum();
-  
+
       // Iterate over schemeTableData and send POST request for each entry
       for (const data of schemeTableData) {
         const payload = {
           ...data,
           schemes_total_amount: schemesTotalAmount, // Add the total amount to each request
         };
-  
+
         const response = await fetch('http://localhost:5000/member-schemes', {
           method: 'POST',
           headers: {
@@ -423,7 +423,7 @@ const SalesFormSection = () => {
           },
           body: JSON.stringify(payload),
         });
-  
+
         if (!response.ok) {
           throw new Error(`Failed to save data for Member Number ${data.member_number}`);
         }
@@ -434,13 +434,14 @@ const SalesFormSection = () => {
       alert('Error occurred while submitting data. Please try again.');
     }
   };
-  
+
 
   return (
     <Col className="sales-form-section">
       <Row>
         <Col xs={12} className="mb-3">
           <Button
+
             variant={activeForm === "old" ? "primary" : "secondary"}
             onClick={() => setActiveForm("old")}
           >
@@ -457,227 +458,227 @@ const SalesFormSection = () => {
       </Row>
 
       {activeForm === "old" && (
-  <>
-    <Row>
-      <h4 className="mb-3">Old</h4>
-      {/* Input Fields */}
-      <Col xs={12} md={4}>
-        <InputField label="Product" name="product" value={oldDetails.product} onChange={(e) => handleInputChange(e, true)}/>
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField
-          label="Metal"
-          name="metal"
-          type="select"
-          value={oldDetails.metal}
-          onChange={handleInputChange}
-          options={metalOptions.map((option) => ({
-            value: option.value,
-            label: option.label,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField
-          label="Purity"
-          type="select"
-          name="purity"
-          value={oldDetails.purity}
-          onChange={handleInputChange}
-          options={purityOptions.map((purity) => ({
-            value: purity.name,
-            label: purity.name,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} readOnly />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Gross" name="gross" value={oldDetails.gross} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Dust" name="dust" value={oldDetails.dust} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="ML Percent" name="ml_percent" value={oldDetails.ml_percent} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Net Weight" name="net_wt" value={Number.isNaN(oldDetails.net_wt) ? "" : oldDetails.net_wt.toFixed(2)} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Rate" name="rate" value={oldDetails.rate || currentRate} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Total Amount" name="total_amount" value={oldDetails.total_amount.toFixed(2)} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={2}>
-        <Button onClick={() => handleAddButtonClick(true)}>
-          {editingRow ? "Update" : "Add"}
-        </Button>
-      </Col>
-    </Row>
-
-    {/* Table */}
-    <Table striped bordered hover className="mt-4">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Metal</th>
-          <th>Purity</th>
-          <th>Gross</th>
-          <th>Dust</th>
-          <th>HSN Code</th>
-          <th>ML Percent</th>
-          <th>Net Weight</th>
-          <th>Remarks</th>
-          <th>Rate</th>
-          <th>Total Amount</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {oldTableData.map((data, index) => (
-          <tr key={index}>
-            <td>{data.product}</td>
-            <td>{data.metal}</td>
-            <td>{data.purity}</td>
-            <td>{data.gross}</td>
-            <td>{data.dust}</td>
-            <td>{data.hsn_code}</td>
-            <td>{data.ml_percent}</td>
-            <td>{data.net_wt}</td>
-            <td>{data.remarks}</td>
-            <td>{data.rate}</td>
-            <td>{data.total_amount}</td>
-            <td>
-              <Button variant="warning" size="sm" className="mr-2" onClick={() => handleEditOld(data)}>
-                Edit
+        <>
+          <Row>
+            <h4 className="mb-3">Old</h4>
+            {/* Input Fields */}
+            <Col xs={12} md={4}>
+              <InputField label="Product" name="product" value={oldDetails.product} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField
+                label="Metal"
+                name="metal"
+                type="select"
+                value={oldDetails.metal}
+                onChange={handleInputChange}
+                options={metalOptions.map((option) => ({
+                  value: option.value,
+                  label: option.label,
+                }))}
+              />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField
+                label="Purity"
+                type="select"
+                name="purity"
+                value={oldDetails.purity}
+                onChange={handleInputChange}
+                options={purityOptions.map((purity) => ({
+                  value: purity.name,
+                  label: purity.name,
+                }))}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} readOnly />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Gross" name="gross" value={oldDetails.gross} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Dust" name="dust" value={oldDetails.dust} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="ML Percent" name="ml_percent" value={oldDetails.ml_percent} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Net Weight" name="net_wt" value={Number.isNaN(oldDetails.net_wt) ? "" : oldDetails.net_wt.toFixed(2)} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Rate" name="rate" value={oldDetails.rate || currentRate} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Total Amount" name="total_amount" value={oldDetails.total_amount.toFixed(2)} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={2}>
+              <Button style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={() => handleAddButtonClick(true)}>
+                {editingRow ? "Update" : "Add"}
               </Button>
-              <Button variant="danger" size="sm" onClick={() => handleDeleteOld(data.hsn_code)}>
-                Delete
+            </Col>
+          </Row>
+
+          {/* Table */}
+          <Table striped bordered hover className="mt-4">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Metal</th>
+                <th>Purity</th>
+                <th>Gross</th>
+                <th>Dust</th>
+                <th>HSN Code</th>
+                <th>ML %</th>
+                <th>Net Wt</th>
+                <th>Remarks</th>
+                <th>Rate</th>
+                <th>Total Amt</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {oldTableData.map((data, index) => (
+                <tr key={index}>
+                  <td>{data.product}</td>
+                  <td>{data.metal}</td>
+                  <td>{data.purity.toFixed(2)}</td>
+                  <td>{data.gross.toFixed(2)}</td>
+                  <td>{data.dust.toFixed(2)}</td>
+                  <td>{data.hsn_code}</td>
+                  <td>{data.ml_percent.toFixed(2)}</td>
+                  <td>{data.net_wt.toFixed(2)}</td>
+                  <td>{data.remarks}</td>
+                  <td>{data.rate.toFixed(2)}</td>
+                  <td>{data.total_amount.toFixed(2)}</td>
+                  <td>
+                    <Button variant="warning" size="sm" className="mr-2" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={() => handleEditOld(data)}>
+                      Edit
+                    </Button>
+                    <Button variant="danger" size="sm" onClick={() => handleDeleteOld(data.hsn_code)}>
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+
+          {/* Total Amount Section */}
+          <div className="d-flex justify-content-between px-2 mt-2">
+            <h5>Total Amount for Old:</h5>
+            <h5>₹ {calculateOldTotalSum()}</h5>
+          </div>
+
+          {/* Submit Button */}
+          <div className="text-right mt-3">
+            <Button style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} variant="primary" onClick={handleSubmitOldData}>
+              Submit
+            </Button>
+          </div>
+        </>
+      )}
+
+
+      {activeForm === "schemes" && (
+        <>
+          <Row>
+            <h4 className="mb-3">Schemes</h4>
+            <Col xs={12} md={3}>
+              <InputField label="Scheme" name="scheme" value={schemeDetails.scheme} onChange={(e) => handleInputChange(e, false)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Member Name" name="member_name" value={schemeDetails.member_name} onChange={(e) => handleInputChange(e, false)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Member Number" name="member_number" value={schemeDetails.member_number} onChange={(e) => handleInputChange(e, false)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Scheme Name" name="scheme_name" value={schemeDetails.scheme_name} onChange={(e) => handleInputChange(e, false)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Installments Paid" name="installments_paid" value={schemeDetails.installments_paid} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Duration (Months)" name="duration_months" value={schemeDetails.duration_months} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Paid Months" name="paid_months" value={schemeDetails.paid_months} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Pending Months" name="pending_months" value={schemeDetails.pending_months} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Paid Amount" name="paid_amount" value={schemeDetails.paid_amount} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={3}>
+              <InputField label="Pending Amount" name="pending_amount" value={schemeDetails.pending_amount} onChange={(e) => handleInputChange(e, true)} />
+            </Col>
+            <Col xs={12} md={2}>
+              <Button style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={() => handleAddButtonClick(false)}>
+                {editingRow ? "Update" : "Add"}
               </Button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+            </Col>
+          </Row>
 
-    {/* Total Amount Section */}
-    <div className="d-flex justify-content-between px-2 mt-2">
-      <h5>Total Amount for Old:</h5>
-      <h5>₹ {calculateOldTotalSum()}</h5>
-    </div>
+          {/* Table */}
+          <Table striped bordered hover className="mt-4">
+            <thead>
+              <tr>
+                <th>Member Name</th>
+                <th>Member Number</th>
+                <th>Scheme Name</th>
+                <th>EMI Paid</th>
+                <th>Duration Months</th>
+                <th>Paid Months</th>
+                <th>Pending Months</th>
+                <th>Paid Amt</th>
+                <th>Pending Amt</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {schemeTableData.map((data, index) => (
+                <tr key={index}>
+                  <td>{data.member_name}</td>
+                  <td>{data.member_number.toFixed(2)}</td>
+                  <td>{data.scheme_name.toFixed(2)}</td>
+                  <td>{data.installments_paid.toFixed(2)}</td>
+                  <td>{data.duration_months}</td>
+                  <td>{data.paid_months}</td>
+                  <td>{data.pending_months}</td>
+                  <td>{data.paid_amount.toFixed(2)}</td>
+                  <td>{data.pending_amount.toFixed(2)}</td>
+                  <td>
+                    <Button style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} variant="warning" size="sm" className="mr-2" onClick={() => handleEditScheme(data)}>
+                      Edit
+                    </Button>
+                    <Button variant="danger" size="sm" onClick={() => handleDeleteScheme(data.member_number)}>
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
 
-    {/* Submit Button */}
-    <div className="text-right mt-3">
-      <Button variant="primary" onClick={handleSubmitOldData}>
-        Submit
-      </Button>
-    </div>
-  </>
-)}
+          {/* Total Amount Section */}
+          <div className="d-flex justify-content-between px-2 mt-2">
+            <h5>Total Amount for Schemes:</h5>
+            <h5>₹ {calculateSchemeTotalSum()}</h5>
+          </div>
 
-
-{activeForm === "schemes" && (
-  <>
-    <Row>
-      <h4 className="mb-3">Schemes</h4>
-      <Col xs={12} md={3}>
-        <InputField label="Scheme" name="scheme" value={schemeDetails.scheme} onChange={(e) => handleInputChange(e, false)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Member Name" name="member_name" value={schemeDetails.member_name} onChange={(e) => handleInputChange(e, false)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Member Number" name="member_number" value={schemeDetails.member_number} onChange={(e) => handleInputChange(e, false)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Scheme Name" name="scheme_name" value={schemeDetails.scheme_name} onChange={(e) => handleInputChange(e, false)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Installments Paid" name="installments_paid" value={schemeDetails.installments_paid} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Duration (Months)" name="duration_months" value={schemeDetails.duration_months} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Paid Months" name="paid_months" value={schemeDetails.paid_months} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Pending Months" name="pending_months" value={schemeDetails.pending_months} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Paid Amount" name="paid_amount" value={schemeDetails.paid_amount} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={3}>
-        <InputField label="Pending Amount" name="pending_amount" value={schemeDetails.pending_amount} onChange={(e) => handleInputChange(e, true)} />
-      </Col>
-      <Col xs={12} md={2}>
-        <Button onClick={() => handleAddButtonClick(false)}>
-          {editingRow ? "Update" : "Add"}
-        </Button>
-      </Col>
-    </Row>
-
-    {/* Table */}
-    <Table striped bordered hover className="mt-4">
-      <thead>
-        <tr>
-          <th>Member Name</th>
-          <th>Member Number</th>
-          <th>Scheme Name</th>
-          <th>Installments Paid</th>
-          <th>Duration Months</th>
-          <th>Paid Months</th>
-          <th>Pending Months</th>
-          <th>Paid Amount</th>
-          <th>Pending Amount</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {schemeTableData.map((data, index) => (
-          <tr key={index}>
-            <td>{data.member_name}</td>
-            <td>{data.member_number}</td>
-            <td>{data.scheme_name}</td>
-            <td>{data.installments_paid}</td>
-            <td>{data.duration_months}</td>
-            <td>{data.paid_months}</td>
-            <td>{data.pending_months}</td>
-            <td>{data.paid_amount}</td>
-            <td>{data.pending_amount}</td>
-            <td>
-              <Button variant="warning" size="sm" className="mr-2" onClick={() => handleEditScheme(data)}>
-                Edit
-              </Button>
-              <Button variant="danger" size="sm" onClick={() => handleDeleteScheme(data.member_number)}>
-                Delete
-              </Button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
-
-    {/* Total Amount Section */}
-    <div className="d-flex justify-content-between px-2 mt-2">
-      <h5>Total Amount for Schemes:</h5>
-      <h5>₹ {calculateSchemeTotalSum()}</h5>
-    </div>
-
-    {/* Submit Button */}
-    <div className="text-right mt-3">
-      <Button variant="primary" onClick={handleSubmitSchemeData}>
-        Submit
-      </Button>
-    </div>
-  </>
-)}
+          {/* Submit Button */}
+          <div className="text-right mt-3">
+            <Button style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} variant="primary" onClick={handleSubmitSchemeData}>
+              Submit
+            </Button>
+          </div>
+        </>
+      )}
 
     </Col>
   );
