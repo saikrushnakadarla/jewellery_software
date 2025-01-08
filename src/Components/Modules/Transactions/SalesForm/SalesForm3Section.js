@@ -518,7 +518,7 @@ const SalesFormSection = () => {
     </Row>
 
     {/* Table */}
-    <Table striped bordered hover className="mt-4">
+    <Table bordered hover responsive>
       <thead>
         <tr>
           <th>Product</th>
@@ -560,7 +560,7 @@ const SalesFormSection = () => {
           </tr>
         ))}
       </tbody>
-    </Table>
+     </Table>
 
     {/* Total Amount Section */}
     <div className="d-flex justify-content-between px-2 mt-2">
@@ -620,7 +620,7 @@ const SalesFormSection = () => {
     </Row>
 
     {/* Table */}
-    <Table striped bordered hover className="mt-4">
+    <Table bordered hover responsive>
       <thead>
         <tr>
           <th>Member Name</th>
@@ -658,7 +658,7 @@ const SalesFormSection = () => {
           </tr>
         ))}
       </tbody>
-    </Table>
+     </Table>
 
     {/* Total Amount Section */}
     <div className="d-flex justify-content-between px-2 mt-2">
