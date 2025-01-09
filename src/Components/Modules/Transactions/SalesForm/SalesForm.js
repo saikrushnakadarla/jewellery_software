@@ -280,7 +280,9 @@ const SalesForm = () => {
       localStorage.removeItem('schemeSalesData');
       setOldSalesData([]); // Clear old sales data
       localStorage.removeItem('oldSalesData');
+
       resetForm();
+      window.location.reload();
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Error saving data");
