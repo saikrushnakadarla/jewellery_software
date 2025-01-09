@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTable, usePagination, useGlobalFilter, useSortBy } from 'react-table';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 
 // Global Search Filter Component
 function GlobalFilter({ globalFilter, setGlobalFilter }) {
@@ -19,7 +18,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter }) {
 }
 
 // Reusable DataTable Component
-export default function DataTable({ columns, data }) {
+export default function DataTable({ columns, data, initialSearchValue }) {
   const {
     getTableProps,
     getTableBodyProps,
@@ -38,12 +37,19 @@ export default function DataTable({ columns, data }) {
     {
       columns,
       data,
-      initialState: { pageIndex: 0 },
+      initialState: { pageIndex: 0, globalFilter: initialSearchValue }, // Set initial global filter
     },
     useGlobalFilter,
     useSortBy,
     usePagination
   );
+
+  // Set the global filter to the initial value when the component mounts
+  useEffect(() => {
+    if (initialSearchValue) {
+      setGlobalFilter(initialSearchValue);
+    }
+  }, [initialSearchValue, setGlobalFilter]);
 
   return (
     <div className="dataTable_wrapper container-fluid">
@@ -52,7 +58,7 @@ export default function DataTable({ columns, data }) {
 
       {/* Table */}
       <div className="table-responsive">
-        <table {...getTableProps()} className="table table-striped ">
+        <table {...getTableProps()} className="table table-striped">
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()} className="dataTable_headerRow">
@@ -95,7 +101,7 @@ export default function DataTable({ columns, data }) {
             {pageIndex + 1} of {pageOptions.length}
           </strong>
         </div>
-        <div className='pagebuttons'>
+        <div className="pagebuttons">
           <button
             className="btn btn-primary me-2 btn1"
             onClick={() => previousPage()}
