@@ -120,7 +120,7 @@ const RepairForm = () => {
     if (customer) {
       setFormData({
         ...formData,
-        customer_id: customerId, // Ensure this is correctly set
+        customer_id: customer.account_id, // Ensure this is correctly set
         account_name: customer.account_name, // Set the name field to the selected customer
         mobile: customer.mobile || "",
         email: customer.email || "",
@@ -204,9 +204,6 @@ const RepairForm = () => {
     }
   }, [id]);
   
-  
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const updatedFormData = {

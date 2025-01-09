@@ -46,7 +46,7 @@ import OrdersTable from './Components/Modules/Transactions/Orders/OrdersTable';
 // import Orders from './Components/Modules/Transactions/Orders/Orders';
 import Orders from './Components/Modules/Transactions/OrderSection/OrderForm';
 import BarCodePrinting from './Components/Modules/Reports/BarcodePrinting/BarCodePrinting';
-import SalesNew from './Components/Modules/Transactions/Sales/SalesNew';
+import SalesNew from './Components/Modules/Transactions/SalesReturn/SalesReturnNew';
 import RepairDetails from "./Components/Modules/Transactions/Sales/SalesDetailsModules";
 import Worker_Master from './Components/Modules/Masters/Worker/Worker';
 import Worker_Table from './Components/Modules/Masters/Worker/WorkerTable';

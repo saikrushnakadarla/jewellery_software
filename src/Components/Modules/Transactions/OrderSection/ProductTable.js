@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
-const ProductTable = ({ repairDetails, onDelete }) => {
+const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;

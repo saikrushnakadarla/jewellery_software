@@ -64,7 +64,21 @@ function Navbar() {
       </div>
 
       <nav className={`navbar-links ${isOpen ? 'open' : ''}`}>
-        {/* Masters Dropdown */}
+      <div>
+      <span>
+        <Link
+          to="/dashboard"
+          onClick={handleItemClick}
+          style={{
+            color: window.location.pathname === '/dashboard' ? '#a36e29' : 'black',
+            backgroundColor: 'transparent',
+            textDecoration: 'none',
+          }}
+        >
+          DASHBOARD
+        </Link>
+      </span>
+    </div>
         <div
           className="navbar-dropdown"
           onMouseEnter={() => toggleDropdown('masters')}

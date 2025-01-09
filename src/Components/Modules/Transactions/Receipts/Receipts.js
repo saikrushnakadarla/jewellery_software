@@ -18,6 +18,7 @@ const RepairForm = () => {
     cheque_number: "",
     receipt_no: "",
     account_name: "",
+    invoice_number:"",
     total_amt: "",
     discount_amt: "",
     cash_amt: "",
@@ -25,8 +26,9 @@ const RepairForm = () => {
   });
 
   const [accountOptions, setAccountOptions] = useState([]);
+  const [repairDetails, setRepairDetails] = useState(null);
+  const [invoiceNumberOptions, setInvoiceNumberOptions] = useState([]);
 
-  // Fetch last receipt number for new entries
   useEffect(() => {
     const fetchLastReceiptNumber = async () => {
       try {
@@ -43,7 +45,6 @@ const RepairForm = () => {
     fetchLastReceiptNumber();
   }, [repairData]);
 
-  // Initialize formData with repairData if editing
   useEffect(() => {
     if (repairData) {
       setFormData((prev) => ({
@@ -74,20 +75,47 @@ const RepairForm = () => {
     fetchAccountNames();
   }, []);
 
-  // Handle input changes
+  useEffect(() => {
+    const fetchRepairs = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+        
+        // Filter the data based on the 'transaction_status' column
+        const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
+        
+        setRepairDetails(filteredData);
+        console.log("filteredData=",filteredData)
+        
+      } catch (error) {
+        console.error('Error fetching repair details:', error);
+        
+      }
+    };
+  
+    fetchRepairs();
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     setFormData((prevData) => {
       const updatedData = {
         ...prevData,
         [name]: value,
       };
-
+  
+      // Check if 'account_name' is being cleared
+      if (name === "account_name" && value === "") {
+        // Clear the invoice_number if account_name is cleared
+        updatedData.invoice_number = "";
+        // Optionally, you can also clear the invoiceNumberOptions
+        setInvoiceNumberOptions([]);
+      }
+  
       if (name === "total_amt" || name === "discount_amt") {
         const totalAmt = parseFloat(updatedData.total_amt) || 0;
         const discountAmt = parseFloat(updatedData.discount_amt) || 0;
-
+  
         // Ensure discount amount is not greater than total amount
         if (discountAmt > totalAmt) {
           alert("Discount amount cannot be greater than total amount.");
@@ -96,10 +124,22 @@ const RepairForm = () => {
           updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
         }
       }
-
+  
+      if (name === "account_name") {
+        // Filter `repairDetails` to find matching `invoice_number`
+        const filteredInvoices = repairDetails
+          .filter((item) => item.account_name === value)
+          .map((item) => ({
+            value: item.invoice_number,
+            label: item.invoice_number,
+          }));
+        setInvoiceNumberOptions(filteredInvoices);
+      }
+  
       return updatedData;
     });
   };
+  
 
   // Submit form data
   const handleSubmit = async (e) => {
@@ -177,6 +217,17 @@ const RepairForm = () => {
               options={accountOptions}
             />
           </Col>
+          <Col xs={12} md={2}>
+          <InputField
+            label="Invoice Number"
+            type="select"
+            name="invoice_number"
+            value={formData.invoice_number}
+            onChange={handleInputChange}
+            options={invoiceNumberOptions}
+          />
+        </Col>
+
           <Col xs={12} md={2}>
             <InputField
               label="Total Amt"
