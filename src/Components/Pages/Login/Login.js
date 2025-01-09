@@ -16,68 +16,61 @@ function Login() {
     setShowPassword(!showPassword);
   };
 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  console.log('Submitting credentials:', { email, password }); // Debug log
-  setErrorMessage(''); // Clear any previous error message
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    console.log('Submitting credentials:', { email, password }); // Debug log
+    setErrorMessage(''); // Clear any previous error message
 
-  if (!email || !password) {
-    setErrorMessage('Please provide both email and password.');
-    return;
-  }
-
-  try {
-    // Send login request
-    const response = await axios.post(`${baseURL}/login`, {
-      email,
-      password,
-    });
-
-    console.log('Login response:', response.data); // Debug log
-
-    // Handle success response from backend
-    if (response.data.success) {
-      navigate('/dashboard');
-    } else {
-      setErrorMessage(response.data.message || 'You do not have admin access.');
+    if (!email || !password) {
+      setErrorMessage('Please provide both email and password.');
+      return;
     }
-  } catch (error) {
-    // Improved error handling
-    console.error('Login error:', error); // Debug log for the entire error object
 
-    const errorMessage = 
-      error.response?.data?.message || // Server-provided error message
-      (error.response ? 'An error occurred. Please try again.' : 'Network error. Please check your connection.');
+    try {
+      // Send login request
+      const response = await axios.post(`${baseURL}/login`, {
+        email,
+        password,
+      });
 
-    setErrorMessage(errorMessage);
-  }
-};
+      console.log('Login response:', response.data); // Debug log
 
-  
+      // Handle success response from backend
+      if (response.data.success) {
+        // Prompt user for next action
+        const wantsToUpdateRate = window.confirm('Do you want to update rates?');
+        if (wantsToUpdateRate) {
+          navigate('/rates'); // Navigate to rates page
+        } else {
+          navigate('/dashboard'); // Navigate to dashboard
+        }
+      } else {
+        setErrorMessage(response.data.message || 'You do not have admin access.');
+      }
+    } catch (error) {
+      // Improved error handling
+      console.error('Login error:', error); // Debug log for the entire error object
+
+      const errorMessage =
+        error.response?.data?.message || // Server-provided error message
+        (error.response ? 'An error occurred. Please try again.' : 'Network error. Please check your connection.');
+
+      setErrorMessage(errorMessage);
+    }
+  };
+
   return (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
       <div className="card" style={{ width: '36rem', marginTop: '100px' }}>
-        <div className="card-body"   style={{
-    backgroundColor: 'rgba(163, 110, 41, 0.08)',
-   
-  }}>
+        <div className="card-body" style={{
+          backgroundColor: 'rgba(163, 110, 41, 0.08)',
+        }}>
           <div className="text-center mb-4">
             <img src={logo} alt="Logo" className="mb-3" style={{ width: "350px", height: "80px" }} />
             <h3>Login</h3>
           </div>
           <form onSubmit={handleLogin}>
             <div className="mb-3">
-              {/* <label htmlFor="email" style={{ fontWeight: 'bold' }}>Email</label>
-              <input
-                type="email"
-                className="form-control mt-1"
-                id="email"
-                name="email"
-                placeholder="Enter Your Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              /> */}
               <InputField
                 label="Email:"
                 name="email"
@@ -85,20 +78,8 @@ const handleLogin = async (e) => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
-
             </div>
             <div className="mb-3 position-relative">
-              {/* <label htmlFor="password" style={{ fontWeight: 'bold' }}>Password</label> */}
-              {/* <input
-                type={showPassword ? 'text' : 'password'}
-                className="form-control mt-1"
-                id="password"
-                name="password"
-                placeholder="Enter Your Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              /> */}
               <InputField
                 type={showPassword ? 'text' : 'password'}
                 label="Password:"
@@ -133,7 +114,8 @@ const handleLogin = async (e) => {
                   borderRadius: '5px',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease-in-out',
-                }}              >
+                }}
+              >
                 Login
               </button>
             </div>

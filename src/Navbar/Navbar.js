@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import logo from '../../src/Components/Pages/Login/Logo/logo_dark.png';
 import './Navbar.css';
 
 function Navbar() {
@@ -12,6 +13,7 @@ function Navbar() {
   const [utilityDropdownOpen, setUtilityDropdownOpen] = useState(false);
 
   const location = useLocation();  // Get the current location from React Router
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -45,6 +47,10 @@ function Navbar() {
     setIsOpen(false);
   };
 
+  const handleLogout = () => {
+    navigate('/'); // Navigate to the homepage or login page
+  };
+
   // Function to check if the link is active based on the current location
   const isActive = (path) => {
     return location.pathname === path ? 'active' : '';  // Return 'active' if the path matches the current location
@@ -52,7 +58,9 @@ function Navbar() {
 
   return (
     <header className="navbar-header">
-      <div className="navbar-brand">Jewellery App</div>
+      <div className="navbar-brand">
+      <img src={logo} alt="Logo" className="" style={{ width: "250px", height: "50px" }} />
+      </div>
 
       <div
         className={`navbar-hamburger ${isOpen ? 'open' : ''}`}
@@ -190,6 +198,11 @@ function Navbar() {
           )}
         </div>
       </nav>
+      <div className="navbar-logout">
+        <button className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
     </header>
   );
 }

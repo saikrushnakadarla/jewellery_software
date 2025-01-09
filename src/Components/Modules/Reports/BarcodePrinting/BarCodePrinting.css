@@ -12,11 +12,18 @@
     background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
+
+  .qr-button-container {
+    position: absolute;
+    top: 86px;
+    left: 87%;
+    z-index: 10;
+  }
   
   .barcode-form {
     display: flex;
     gap: 10px;
-    margin-top: -40px;
+    margin-top: 15px;
   }
   
   .barcode-form-left {

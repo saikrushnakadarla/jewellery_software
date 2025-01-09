@@ -17,6 +17,27 @@
   color: #fff;
 }
 
+.navbar-logout {
+  position: absolute;
+  top: 25px;
+  right: 20px;
+}
+
+.logout-button {
+  background-color: #a36e29;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.logout-button:hover {
+  background-color: #864c1a;
+}
+
+
 
 .navbar-brand {
     font-size: 1.5rem;
