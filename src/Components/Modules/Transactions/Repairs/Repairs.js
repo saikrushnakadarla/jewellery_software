@@ -12,8 +12,18 @@ const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
+  const { state } = useLocation();
+  // const { mobile } = state || {};  // Extract mobile from location state
+  const { mobile } = location.state || {};
+  const initialSearchValue = location.state?.mobile || '';
+
+
+  // Set the mobile value in formData if passed via location state
+  // Set the mobile value in formData if passed via location state
+
+
   const [formData, setFormData] = useState({
-    customer_id:"",
+    customer_id: "",
     account_name: "",
     mobile: "",
     email: "",
@@ -42,7 +52,6 @@ const RepairForm = () => {
     total: "",
     status: "Pending",
   });
-
   const [customers, setCustomers] = useState([]);
   const [metalTypes, setMetalTypes] = useState([]);
   const [purityData, setPurityData] = useState([]);
@@ -155,6 +164,40 @@ const RepairForm = () => {
     }
   };
 
+  useEffect(() => {
+    if (mobile) {
+      console.log("Selected Mobile from New Link:", mobile);
+
+      // Find the customer matching the passed mobile
+      const matchedCustomer = customers.find((cust) => cust.mobile === mobile);
+
+      if (matchedCustomer) {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          customer_id: matchedCustomer.account_id,
+          account_name: matchedCustomer.account_name,
+          mobile: matchedCustomer.mobile, // Set the mobile field in formData
+          email: matchedCustomer.email || "",
+          address1: matchedCustomer.address1 || "",
+          address2: matchedCustomer.address2 || "",
+          city: matchedCustomer.city || "",
+          pincode: matchedCustomer.pincode || "",
+          state: matchedCustomer.state || "",
+          state_code: matchedCustomer.state_code || "",
+          aadhar_card: matchedCustomer.aadhar_card || "",
+          gst_in: matchedCustomer.gst_in || "",
+          pan_card: matchedCustomer.pan_card || "",
+        }));
+      } else {
+        // If no matching customer, only set mobile
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          mobile: mobile,
+        }));
+      }
+    }
+  }, [mobile, customers]);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -173,7 +216,7 @@ const RepairForm = () => {
           const response = await axios.get(`${baseURL}/get/repairs/${id}`);
           if (response.status === 200) {
             const repairData = response.data;
-  
+
             const parseDate = (dateString) => {
               if (!dateString) return '';
               const date = new Date(dateString);
@@ -182,7 +225,7 @@ const RepairForm = () => {
               const day = String(date.getDate()).padStart(2, '0');
               return `${year}-${month}-${day}`;
             };
-  
+
             setFormData((prev) => ({
               ...prev,
               ...repairData,
@@ -190,7 +233,7 @@ const RepairForm = () => {
               delivery_date: parseDate(repairData.delivery_date),
               repair_no: repairData.repair_no, // Ensure repair_no is set correctly
             }));
-  
+
             if (repairData.customer_id) {
               handleCustomerChange(repairData.customer_id);
             }
@@ -199,11 +242,11 @@ const RepairForm = () => {
           console.error("Error fetching repair details:", error);
         }
       };
-  
+
       fetchRepairDetails();
     }
   }, [id]);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const updatedFormData = {
@@ -254,11 +297,11 @@ const RepairForm = () => {
           console.error('Error fetching RPN number:', error);
         }
       };
-  
+
       fetchLastRPNNumber();
     }
   }, [id]);
-  
+
 
   return (
     <div className="main-container">
@@ -270,13 +313,13 @@ const RepairForm = () => {
               <Col className="form-section">
                 <h4 className="mb-4">Customer Details</h4>
                 <Row>
-                <Col xs={12} md={3} className="d-flex align-items-center">
+                  <Col xs={12} md={3} className="d-flex align-items-center">
                     <div style={{ flex: 1 }}>
                       <InputField
                         label="Mobile"
                         name="mobile"
                         type="select"
-                        value={formData.customer_id || ""} // Use customer_id to match selected value
+                        value={formData.customer_id || ""} // Use customer_id to match selected option
                         onChange={(e) => handleCustomerChange(e.target.value)}
                         options={[
                           ...customers.map((customer) => ({
@@ -285,6 +328,16 @@ const RepairForm = () => {
                           })),
                         ]}
                       />
+                      {/* <InputField
+        label="Mobile"
+        name="mobile"
+        type="text"  // 'select' is not correct for a simple mobile input, it should be 'text' or 'number'
+        value={formData.mobile || ""}  // Ensure the value comes from formData.mobile
+        onChange={(e) => setFormData({
+          ...formData,
+          mobile: e.target.value // Update mobile when the user types in the field
+        })}
+      /> */}
                     </div>
                     <AiOutlinePlus
                       size={20}
@@ -302,14 +355,14 @@ const RepairForm = () => {
                       label="Customer Name:"
                       name="account_name"
                       type="select"
-                        value={formData.customer_id || ""} // Use customer_id to match selected value
-                        onChange={(e) => handleCustomerChange(e.target.value)}
-                        options={[
-                          ...customers.map((customer) => ({
-                            value: customer.account_id, // Use account_id as the value
-                            label: customer.account_name, // Display mobile as the label
-                          })),
-                        ]}
+                      value={formData.customer_id || ""} // Use customer_id to match selected value
+                      onChange={(e) => handleCustomerChange(e.target.value)}
+                      options={[
+                        ...customers.map((customer) => ({
+                          value: customer.account_id, // Use account_id as the value
+                          label: customer.account_name, // Display mobile as the label
+                        })),
+                      ]}
 
                     />
                   </Col>
@@ -370,13 +423,13 @@ const RepairForm = () => {
                   />
                 </Row>
                 <Row>
-                <InputField
-  label="Repair No:"
-  name="repair_no"
-  value={formData.repair_no}
-  onChange={handleChange}
-  readOnly
-/>
+                  <InputField
+                    label="Repair No:"
+                    name="repair_no"
+                    value={formData.repair_no}
+                    onChange={handleChange}
+                    readOnly
+                  />
 
                 </Row>
                 <Row>
@@ -430,19 +483,19 @@ const RepairForm = () => {
                     <InputField label="Description:" name="description" value={formData.description} onChange={handleChange} />
                   </Col>
                   <Col xs={12} md={2}>
-                  <InputField
-                    label="Purity:"
-                    name="purity"
-                    type="select"
-                    value={formData.purity}
-                    onChange={handleChange}
-                    options={
-                      purityData.map((item) => ({
-                        value: item.name,
-                        label: item.name,
-                      }))
-                    }
-                  />
+                    <InputField
+                      label="Purity:"
+                      name="purity"
+                      type="select"
+                      value={formData.purity}
+                      onChange={handleChange}
+                      options={
+                        purityData.map((item) => ({
+                          value: item.name,
+                          label: item.name,
+                        }))
+                      }
+                    />
                   </Col>
                 </Row>
               </Col>
