@@ -39,11 +39,11 @@ const ReceiptsTable = () => {
         accessor: 'total_amt',
       },
       {
-        Header: 'Discount Amt',
+        Header: 'Paid Amt',
         accessor: 'discount_amt',
       },
       {
-        Header: 'Cash Amt',
+        Header: 'Bal Amt',
         accessor: 'cash_amt',
       },
       {

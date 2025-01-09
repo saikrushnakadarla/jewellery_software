@@ -9,8 +9,7 @@ import axios from "axios";
 const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const repairData = location.state?.repairData; // Passed from the previous screen
-
+  const repairData = location.state?.repairData; 
   const [formData, setFormData] = useState({
     transaction_type: "Receipt",
     date: "",
@@ -24,6 +23,12 @@ const RepairForm = () => {
     cash_amt: "",
     remarks: "",
   });
+  const { invoiceData } = location.state || {};
+  useEffect(() => {
+    if (invoiceData) {
+      console.log('Received Invoice Data:', invoiceData);
+    }
+  }, [invoiceData]);
 
   const [accountOptions, setAccountOptions] = useState([]);
   const [repairDetails, setRepairDetails] = useState(null);
@@ -51,13 +56,38 @@ const RepairForm = () => {
         ...prev,
         ...repairData, // Override with existing repair data
       }));
+  
+      if (repairData.account_name) {
+        // Populate invoiceNumberOptions for the account
+        const filteredInvoices = repairDetails
+          ?.filter((item) => item.account_name === repairData.account_name)
+          .map((item) => ({
+            value: item.invoice_number,
+            label: item.invoice_number,
+          }));
+  
+        setInvoiceNumberOptions(filteredInvoices);
+  
+        // Set total_amt based on the selected invoice_number
+        const selectedRepair = repairDetails?.find(
+          (item) => item.invoice_number === repairData.invoice_number
+        );
+  
+        if (selectedRepair) {
+          // Use bal_after_receipts if it exists, otherwise fall back to bal_amt
+          const totalAmt = selectedRepair.bal_after_receipts || selectedRepair.bal_amt || "";
+          setFormData((prev) => ({
+            ...prev,
+            total_amt: totalAmt,
+          }));
+        }
+      }
     } else {
       const today = new Date().toISOString().split("T")[0];
       setFormData((prev) => ({ ...prev, date: today }));
     }
-  }, [repairData]);
+  }, [repairData, repairDetails]);
 
-  // Fetch account names
   useEffect(() => {
     const fetchAccountNames = async () => {
       try {
@@ -104,20 +134,24 @@ const RepairForm = () => {
         [name]: value,
       };
   
-      // Check if 'account_name' is being cleared
+      // Clear `invoice_number` and related fields when `account_name` is cleared
       if (name === "account_name" && value === "") {
-        // Clear the invoice_number if account_name is cleared
         updatedData.invoice_number = "";
-        // Optionally, you can also clear the invoiceNumberOptions
+        updatedData.total_amt = "";
+        updatedData.cash_amt = "";
         setInvoiceNumberOptions([]);
       }
   
+      // Handle changes to `total_amt` or `discount_amt`
       if (name === "total_amt" || name === "discount_amt") {
         const totalAmt = parseFloat(updatedData.total_amt) || 0;
         const discountAmt = parseFloat(updatedData.discount_amt) || 0;
   
-        // Ensure discount amount is not greater than total amount
-        if (discountAmt > totalAmt) {
+        // If `total_amt` is cleared, clear `cash_amt`
+        if (name === "total_amt" && value === "") {
+          updatedData.cash_amt = "";
+        } else if (discountAmt > totalAmt) {
+          // Ensure discount amount is not greater than total amount
           alert("Discount amount cannot be greater than total amount.");
           updatedData.discount_amt = "";
         } else {
@@ -125,8 +159,8 @@ const RepairForm = () => {
         }
       }
   
+      // Update `invoiceNumberOptions` when `account_name` changes
       if (name === "account_name") {
-        // Filter `repairDetails` to find matching `invoice_number`
         const filteredInvoices = repairDetails
           .filter((item) => item.account_name === value)
           .map((item) => ({
@@ -136,12 +170,29 @@ const RepairForm = () => {
         setInvoiceNumberOptions(filteredInvoices);
       }
   
+      // Update `total_amt` when `invoice_number` changes
+      if (name === "invoice_number") {
+        if (value === "") {
+          // Clear `total_amt` when `invoice_number` is cleared
+          updatedData.total_amt = "";
+          updatedData.cash_amt = ""; // Also clear cash_amt when invoice is cleared
+        } else {
+          // Set `total_amt` to the `bal_amt` of the selected invoice
+          const selectedRepair = repairDetails.find(
+            (item) => item.invoice_number === value
+          );
+  
+          if (selectedRepair) {
+            updatedData.total_amt = selectedRepair.bal_after_receipts || selectedRepair.bal_amt || "";
+            updatedData.cash_amt = ""; // Reset cash_amt when new total_amt is populated
+          }
+        }
+      }
+  
       return updatedData;
     });
   };
-  
 
-  // Submit form data
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -159,6 +210,46 @@ const RepairForm = () => {
       window.alert(`Error: ${error.message}`);
     }
   };
+
+  useEffect(() => {
+    if (invoiceData) {
+      setFormData((prevData) => ({
+        ...prevData,
+        account_name: invoiceData.account_name || "", // Set account name
+        invoice_number: invoiceData.invoice_number || "", // Set invoice number
+      }));
+  
+      // Populate invoice number options based on account_name
+      const filteredInvoices = repairDetails
+        ?.filter((item) => item.account_name === invoiceData.account_name)
+        .map((item) => ({
+          value: item.invoice_number,
+          label: item.invoice_number,
+        }));
+  
+      setInvoiceNumberOptions(filteredInvoices);
+  
+      // Automatically set total amount based on selected invoice
+      const selectedInvoice = repairDetails?.find(
+        (item) => item.invoice_number === invoiceData.invoice_number
+      );
+  
+      if (selectedInvoice) {
+        const totalAmt = selectedInvoice.bal_after_receipts || selectedInvoice.bal_amt || "";
+        setFormData((prevData) => ({
+          ...prevData,
+          total_amt: totalAmt,
+        }));
+      }
+    }
+  }, [invoiceData, repairDetails]);
+
+  const handleBack = () => {
+    const from = location.state?.from || "/receiptstable"; // Default to /receiptstable if no from location provided
+    navigate(from);
+  };
+  
+  
 
   return (
     <div className="main-container">
@@ -239,7 +330,7 @@ const RepairForm = () => {
           </Col>
           <Col xs={12} md={2}>
             <InputField
-              label="Discount Amt"
+              label="Paying Amt"
               type="number"
               name="discount_amt"
               value={formData.discount_amt}
@@ -248,7 +339,7 @@ const RepairForm = () => {
           </Col>
           <Col xs={12} md={2}>
             <InputField
-              label="Cash Amt"
+              label="Balance Amt"
               type="number"
               name="cash_amt"
               value={formData.cash_amt}
@@ -270,7 +361,8 @@ const RepairForm = () => {
             variant="secondary"
             className="cus-back-btn"
             type="button"
-            onClick={() => navigate("/receiptstable")}
+            // onClick={() => navigate("/receiptstable")}
+            onClick={handleBack}
           >
             Cancel
           </Button>

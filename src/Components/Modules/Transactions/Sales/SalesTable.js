@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout';
-import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import { FaEye } from 'react-icons/fa';
 import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from '../../../../Url/NodeBaseURL';
@@ -14,17 +14,16 @@ const RepairsTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [repairDetails, setRepairDetails] = useState(null);
 
-   // Extract mobile from location state
-   const { mobile } = location.state || {};
-   const initialSearchValue = location.state?.mobile || '';
+  // Extract mobile from location state
+  const { mobile } = location.state || {};
+  const initialSearchValue = location.state?.mobile || '';
 
-   useEffect(() => {
-     if (mobile) {
-       console.log("Selected Mobile from Dashboard:", mobile);
-     }
-   }, [mobile]);
+  useEffect(() => {
+    if (mobile) {
+      console.log('Selected Mobile from Dashboard:', mobile);
+    }
+  }, [mobile]);
 
-  // Columns for the DataTable
   const columns = React.useMemo(
     () => [
       {
@@ -39,7 +38,6 @@ const RepairsTable = () => {
       {
         Header: 'Mobile Number',
         accessor: 'mobile',
-        // Cell: ({ value }) => formatDate(value), // Format date value
       },
       {
         Header: 'Invoice Number',
@@ -64,14 +62,6 @@ const RepairsTable = () => {
         accessor: 'actions',
         Cell: ({ row }) => (
           <div>
-            {/* <FaEdit
-              style={{ cursor: 'pointer', marginRight: '10px', color: 'blue' }}
-              onClick={() => handleEdit(row.original.id)}
-            />
-            <FaTrash
-              style={{ cursor: 'pointer', color: 'red' }}
-              onClick={() => handleDelete(row.original.id)}
-            /> */}
             <FaEye
               style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
               onClick={() => handleViewDetails(row.original.invoice_number)} // Pass invoice_number
@@ -79,11 +69,22 @@ const RepairsTable = () => {
           </div>
         ),
       },
+      {
+        Header: 'Receipts',
+        accessor: 'receipts',
+        Cell: ({ row }) => (
+          <Button
+            style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+            onClick={() => handleAddReceipt(row.original)} // Pass the row data to handle the receipt creation
+          >
+            Add Receipt
+          </Button>
+        ),
+      },
     ],
     []
   );
 
-  // Function to format date in Indian format (DD-MM-YYYY)
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -92,7 +93,6 @@ const RepairsTable = () => {
     ).padStart(2, '0')}-${date.getFullYear()}`;
   };
 
-  // Fetch unique repair details from the API
   useEffect(() => {
     const fetchRepairs = async () => {
       try {
@@ -108,23 +108,14 @@ const RepairsTable = () => {
         setLoading(false);
       }
     };
-  
+
     fetchRepairs();
   }, []);
-  
-  const handleEdit = (id) => {
-    navigate(`/repairs/edit/${id}`);
-  };
-
-  const handleDelete = (id) => {
-    console.log('Delete record with id:', id);
-  };
 
   const handleCreate = () => {
     navigate('/sales');
   };
 
-  // Fetch and show repair details in modal
   const handleViewDetails = async (invoice_number) => {
     try {
       const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
@@ -135,11 +126,16 @@ const RepairsTable = () => {
     }
   };
 
-  // Close the modal
+  const handleAddReceipt = (invoiceData) => {
+    navigate("/receipts", { state: { from: "/salestable", invoiceData } });
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setRepairDetails(null); // Clear repair details on modal close
   };
+
+
 
   return (
     <div className="main-container">
@@ -159,12 +155,12 @@ const RepairsTable = () => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue}/>
+          <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
         )}
       </div>
 
       {/* Modal to display repair details */}
-      <Modal show={showModal} onHide={handleCloseModal} size="xl" className='m-auto'>
+      <Modal show={showModal} onHide={handleCloseModal} size="xl" className="m-auto">
         <Modal.Header closeButton>
           <Modal.Title>Sales Details</Modal.Title>
         </Modal.Header>
@@ -174,10 +170,6 @@ const RepairsTable = () => {
               <h5>Customer Info</h5>
               <Table bordered>
                 <tbody>
-                  {/* <tr>
-                    <td>Customer ID</td>
-                    <td>{repairDetails.uniqueData.customer_id}</td>
-                  </tr> */}
                   <tr>
                     <td>Mobile</td>
                     <td>{repairDetails.uniqueData.mobile}</td>
@@ -208,28 +200,26 @@ const RepairsTable = () => {
               <h5>Products</h5>
               <Table bordered>
                 <thead>
-                <tr>
-              <th>Bar Code</th>
-              <th>Product Name</th>
-              {/* <th>Metal</th> */}
-              <th>Metal Type</th>
-              <th>Purity</th>
-              <th>Gross Weight</th>
-              <th>Stone Weight</th>
-              <th>Wastage Weight</th>
-              <th>Total Weight</th>
-              <th>Making Charges</th>
-              <th>Rate</th>
-              <th>Tax Amount</th>
-              <th>Total Price</th>
-            </tr>
+                  <tr>
+                    <th>Bar Code</th>
+                    <th>Product Name</th>
+                    <th>Metal Type</th>
+                    <th>Purity</th>
+                    <th>Gross Weight</th>
+                    <th>Stone Weight</th>
+                    <th>Wastage Weight</th>
+                    <th>Total Weight</th>
+                    <th>Making Charges</th>
+                    <th>Rate</th>
+                    <th>Tax Amount</th>
+                    <th>Total Price</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {repairDetails.repeatedData.map((product, index) => (
                     <tr key={index}>
                       <td>{product.code}</td>
                       <td>{product.product_name}</td>
-                      {/* <td>{product.metal || 'N/A'}</td> */}
                       <td>{product.metal_type}</td>
                       <td>{product.purity}</td>
                       <td>{product.gross_weight}</td>
@@ -242,10 +232,12 @@ const RepairsTable = () => {
                       <td>{product.total_price}</td>
                     </tr>
                   ))}
-                  <tr style={{fontWeight:'bold'}}>
-                  <td colSpan="11" className="text-end">Total Amount</td>
-                  <td>{repairDetails.uniqueData.net_amount}</td>
-                </tr> 
+                  <tr style={{ fontWeight: 'bold' }}>
+                    <td colSpan="11" className="text-end">
+                      Total Amount
+                    </td>
+                    <td>{repairDetails.uniqueData.net_amount}</td>
+                  </tr>
                 </tbody>
               </Table>
             </>
