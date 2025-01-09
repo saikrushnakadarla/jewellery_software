@@ -26,6 +26,11 @@ const RepairsTable = () => {
         Cell: ({ value }) => formatDate(value), // Format date value
       },
       {
+        Header: 'Mobile Number',
+        accessor: 'mobile',
+        // Cell: ({ value }) => formatDate(value), // Format date value
+      },
+      {
         Header: 'Invoice Number',
         accessor: 'invoice_number',
       },

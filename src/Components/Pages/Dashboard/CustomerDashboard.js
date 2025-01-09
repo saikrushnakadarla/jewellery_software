@@ -27,8 +27,11 @@ function Customers({ onSelectCustomer }) {
   }, []);
 
   const handleCustomerChange = (selectedCustomerId) => {
+    const selectedCustomer = customers.find(
+      (customer) => customer.account_id === selectedCustomerId
+    );
     setFormData({ customer_id: selectedCustomerId });
-    onSelectCustomer(selectedCustomerId); // Notify parent component
+    onSelectCustomer(selectedCustomer?.mobile); // Pass selected mobile to parent
   };
 
   const selectedCustomer = customers.find(
