@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const OrdersData = ({ selectedCustomerId }) => {
+const OrdersData = ({ selectedCustomerMobile }) => {
   const [orderCounts, setOrderCounts] = useState({
     totalOrderCount: 0,
     todaysOrderCount: 0,
@@ -14,11 +14,11 @@ const OrdersData = ({ selectedCustomerId }) => {
       const data = response.data;
 
       // Filter for all orders or specific customer orders
-      const filteredOrders = selectedCustomerId
+      const filteredOrders = selectedCustomerMobile
         ? data.filter(
             (item) =>
               item.transaction_status === "Orders" &&
-              item.customer_id === selectedCustomerId
+              item.mobile === selectedCustomerMobile
           )
         : data.filter((item) => item.transaction_status === "Orders");
 
@@ -57,7 +57,7 @@ const OrdersData = ({ selectedCustomerId }) => {
 
   useEffect(() => {
     fetchOrderData();
-  }, [selectedCustomerId]);
+  }, [selectedCustomerMobile]);
 
   return (
     <div>

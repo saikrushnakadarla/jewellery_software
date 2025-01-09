@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout';
 import { FaEye } from 'react-icons/fa';
 import { Button, Row, Col, Modal, Table, Form } from 'react-bootstrap';
@@ -8,11 +8,24 @@ import baseURL from '../../../../Url/NodeBaseURL';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [repairDetails, setRepairDetails] = useState(null);
   const [accounts, setAccounts] = useState([]);
+
+
+  // Extract mobile from location state
+   const { mobile } = location.state || {};
+   const initialSearchValue = location.state?.mobile || '';
+
+   useEffect(() => {
+     if (mobile) {
+       console.log("Selected Mobile from Dashboard:", mobile);
+     }
+   }, [mobile]);
+
   const columns = React.useMemo(
     () => [
       {
@@ -23,6 +36,10 @@ const RepairsTable = () => {
         Header: 'Date',
         accessor: 'date',
         Cell: ({ value }) => formatDate(value),
+      },
+      {
+        Header: 'Mobile Number',
+        accessor: 'mobile',
       },
       {
         Header: 'Invoice Number',
@@ -180,7 +197,7 @@ const RepairsTable = () => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <DataTable columns={columns} data={data} />
+          <DataTable columns={columns} data={data} initialSearchValue={initialSearchValue} />
         )}
       </div>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate } from 'react-router-dom';
 import { Button, Row, Col, Modal, Form, Overlay, Popover, Table } from 'react-bootstrap';
 import { FaEye, FaTrash,FaEdit} from 'react-icons/fa';
 import { FiAlignJustify } from 'react-icons/fi';
@@ -11,6 +11,7 @@ import baseURL from '../../../../Url/NodeBaseURL';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [repairs, setRepairs] = useState([]);
   const [showPopover, setShowPopover] = useState(false);
   const [popoverData, setPopoverData] = useState({ repairId: null, target: null });
@@ -26,6 +27,16 @@ const RepairsTable = () => {
   const [localDetails, setLocalDetails] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
 
+   // Extract mobile from location state
+     const { mobile } = location.state || {};
+     const initialSearchValue = location.state?.mobile || '';
+  
+     useEffect(() => {
+       if (mobile) {
+         console.log("Selected Mobile from Dashboard:", mobile);
+       }
+     }, [mobile]);
+  
   // Fetch repairs
 
     const fetchRepairs = async () => {
@@ -266,7 +277,7 @@ const handlePopoverToggle = (event, repairId) => {
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={[...repairs].reverse()} />
+        <DataTable columns={columns} data={[...repairs].reverse()} initialSearchValue={initialSearchValue} />
         {/* Popover */}
         <Overlay
           show={showPopover}

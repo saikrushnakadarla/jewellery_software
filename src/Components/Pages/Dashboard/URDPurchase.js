@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const URDPurchases = ({ selectedCustomerId }) => {
+const URDPurchases = ({ selectedCustomerMobile }) => {
   const [purchaseCounts, setPurchaseCounts] = useState({
     total: 0,
     today: 0,
@@ -14,8 +14,8 @@ const URDPurchases = ({ selectedCustomerId }) => {
       const data = response.data;
 
       // Filter purchases by customer if `selectedCustomerId` is provided
-      const filteredPurchases = selectedCustomerId
-        ? data.filter((purchase) => purchase.customer_id === selectedCustomerId)
+      const filteredPurchases = selectedCustomerMobile
+        ? data.filter((purchase) => purchase.mobile === selectedCustomerMobile)
         : data;
 
       const todayDate = new Date().toISOString().slice(0, 10);
@@ -45,7 +45,7 @@ const URDPurchases = ({ selectedCustomerId }) => {
 
   useEffect(() => {
     fetchPurchases();
-  }, [selectedCustomerId]);
+  }, [selectedCustomerMobile]);
 
   return (
     <div>

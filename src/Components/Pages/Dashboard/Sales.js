@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const Sales = ({ selectedCustomerId }) => {
+const Sales = ({ selectedCustomerMobile }) => {
   const [salesCounts, setSalesCounts] = useState({
     totalSalesCount: 0,
     todaysSalesCount: 0,
@@ -14,8 +14,8 @@ const Sales = ({ selectedCustomerId }) => {
       const data = response.data;
 
       // Filter for all sales or specific customer sales
-      const filteredSales = selectedCustomerId
-        ? data.filter((item) => item.transaction_status === "Sales" && item.customer_id === selectedCustomerId)
+      const filteredSales = selectedCustomerMobile
+        ? data.filter((item) => item.transaction_status === "Sales" && item.mobile === selectedCustomerMobile)
         : data.filter((item) => item.transaction_status === "Sales");
 
       const today = new Date();
@@ -53,7 +53,7 @@ const Sales = ({ selectedCustomerId }) => {
 
   useEffect(() => {
     fetchSalesData();
-  }, [selectedCustomerId]);
+  }, [selectedCustomerMobile]);
 
   return (
     <div>

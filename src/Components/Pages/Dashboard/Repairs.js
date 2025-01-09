@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import baseURL from "../../../Url/NodeBaseURL";
 
-function Repairs({ selectedCustomerId }) {
+function Repairs({ selectedCustomerMobile }) {
   const [statusCounts, setStatusCounts] = useState({
     pending: 0,
     assignToWorkshop: 0,
@@ -16,8 +16,8 @@ function Repairs({ selectedCustomerId }) {
       const data = response.data;
 
       // Filter repairs by customer if `selectedCustomerId` is provided
-      const filteredRepairs = selectedCustomerId
-        ? data.filter((repair) => repair.customer_id === selectedCustomerId)
+      const filteredRepairs = selectedCustomerMobile
+        ? data.filter((repair) => repair.mobile === selectedCustomerMobile)
         : data;
 
       // Calculate counts for each status
@@ -40,7 +40,7 @@ function Repairs({ selectedCustomerId }) {
 
   useEffect(() => {
     fetchRepairs();
-  }, [selectedCustomerId]);
+  }, [selectedCustomerMobile]);
 
   return (
     <div>

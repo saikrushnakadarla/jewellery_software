@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { Button, Row, Col } from 'react-bootstrap';
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -7,6 +7,16 @@ import baseURL from "../../../../Url/NodeBaseURL";
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
   const [data, setData] = useState([]); // State to store fetched data
+ const location = useLocation();
+   // Extract mobile from location state
+     const { mobile } = location.state || {};
+     const initialSearchValue = location.state?.mobile || '';
+  
+     useEffect(() => {
+       if (mobile) {
+         console.log("Selected Mobile from Dashboard:", mobile);
+       }
+     }, [mobile]);
 
   const formatDate = (isoDate) => {
     const date = new Date(isoDate);
@@ -156,7 +166,7 @@ const RepairsTable = () => {
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} /> {/* Pass the fetched data */}
+        <DataTable columns={columns} data={data} initialSearchValue={initialSearchValue} /> {/* Pass the fetched data */}
       </div>
     </div>
   );
