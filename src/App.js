@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import Repairs from "./Components/Modules/Transactions/Repairs/Repairs"; 
 import RepairsView from "./Components/Modules/Transactions/Repairs/RepairsView"; 
 import URDPurchase from "./Components/Modules/Transactions/URDPurchase/URDPurchase";

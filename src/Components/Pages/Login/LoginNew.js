@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import baseURL from "../../../Url/NodeBaseURL";
-import backgroundImage from './sadashribg-2.jpg';
-import googleImage from './Logo/google.png';
-
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -44,18 +41,15 @@ function Login() {
 
   return (
     <div
-    style={{
-      minHeight: '100vh',
-      display: 'flex',
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-      backgroundImage: `url(${backgroundImage})`, // Replace with your image path
-      backgroundSize: 'cover', // Ensures the image covers the entire div
-      backgroundRepeat: 'no-repeat', // Prevents repeating the image
-      backgroundPosition: 'center', // Centers the image
-      paddingRight: '150px',
-    }}
-  >
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        background: "url('./Logo/sadashribg-2.jpg') no-repeat center center/cover",
+        paddingRight: '150px',
+      }}
+    >
       <div
         className="login-card"
         style={{
@@ -63,7 +57,7 @@ function Login() {
           borderRadius: '15px',
           padding: '40px',
           width: '100%',
-          maxWidth: '500px',
+          maxWidth: '400px',
           boxShadow: '0 8px 15px rgba(0, 0, 0, 0.2)',
         }}
       >
@@ -145,7 +139,7 @@ function Login() {
           )}
 
           {/* Remember Me and Forgot Password */}
-          {/* <div className="mb-3 d-flex justify-content-between align-items-center">
+          <div className="mb-3 d-flex justify-content-between align-items-center">
             <div className="form-check">
               <input
                 type="checkbox"
@@ -163,7 +157,7 @@ function Login() {
             <a href="#" className="btn btn-link p-0" style={{ color: '#b77318' }}>
               Forgot Password?
             </a>
-          </div> */}
+          </div>
 
           {/* Login Button */}
           <button
@@ -201,7 +195,7 @@ function Login() {
             }}
           >
             <img
-              src={googleImage}
+              src="/path-to-google-logo.png"
               alt="Google Logo"
               style={{
                 width: '20px',

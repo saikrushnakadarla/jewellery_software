@@ -29,17 +29,17 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Account Name',
+        Header: 'Customer Name',
         accessor: 'account_name',
       },
       {
         Header: 'Mobile',
         accessor: 'mobile',
       },
-      {
-        Header: 'Email',
-        accessor: 'email',
-      },
+      // {
+      //   Header: 'Email',
+      //   accessor: 'email',
+      // },
       {
         Header: 'Date',
         accessor: 'date',
@@ -48,18 +48,18 @@ const RepairsTable = () => {
         Header: 'Purchase No',
         accessor: 'urdpurchase_number',
       },
-      {
-        Header: 'Product Name',
-        accessor: 'product_name',
-      },
-      {
-        Header: 'Metal',
-        accessor: 'metal',
-      },
-      {
-        Header: 'Purity',
-        accessor: 'purity',
-      },
+      // {
+      //   Header: 'Product Name',
+      //   accessor: 'product_name',
+      // },
+      // {
+      //   Header: 'Metal',
+      //   accessor: 'metal',
+      // },
+      // {
+      //   Header: 'Purity',
+      //   accessor: 'purity',
+      // },
       {
         Header: 'Gross Weight',
         accessor: 'gross',

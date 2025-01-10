@@ -39,6 +39,7 @@ const RepairsTable = () => {
   
      const [showDetailModal, setShowDetailModal] = useState(false);
      const [selectedRepair, setSelectedRepair] =useState(null);
+     const [repairDetails, setRepairDetails] = useState([]);
 
     const fetchRepairs = async () => {
       try {
@@ -48,8 +49,19 @@ const RepairsTable = () => {
         console.error('Error fetching repairs:', error);
       }
     };
+
+    const fetchRepairDetails = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/repair-details`);
+        setRepairDetails(response.data); // Store repair details for the table
+      } catch (error) {
+        console.error("Error fetching repair details:", error);
+      }
+    };
+
   useEffect(() => {
     fetchRepairs();
+    fetchRepairDetails();
   }, []);
 
   useEffect(() => {
@@ -124,8 +136,8 @@ const handlePopoverToggle = (event, repairId) => {
       { Header: 'Email', accessor: 'email' },
       { Header: 'Entry Type', accessor: 'entry_type' },
       { Header: 'Item Name', accessor: 'item' },
-      { Header: 'Metal Type', accessor: 'metal_type' },
-      { Header: 'Purity', accessor: 'purity' },
+      // { Header: 'Metal Type', accessor: 'metal_type' },
+      // { Header: 'Purity', accessor: 'purity' },
       { Header: 'Total', accessor: 'total' },
       {
         Header: 'Date',
@@ -137,7 +149,7 @@ const handlePopoverToggle = (event, repairId) => {
         accessor: 'delivery_date',
         Cell: ({ value }) => <span>{formatDate(value)}</span>, // Format birthday date
       },
-      { Header: 'Counter', accessor: 'counter' },
+      // { Header: 'Counter', accessor: 'counter' },
       { Header: 'Status', accessor: 'status' },
       {
         Header: 'ACTION',
@@ -498,15 +510,15 @@ const handlePopoverToggle = (event, repairId) => {
               <p><strong>Repair No:</strong> {selectedRepair.repair_no}</p>
               <p><strong>Customer Name:</strong> {selectedRepair.account_name}</p>
               <p><strong>Mobile:</strong> {selectedRepair.mobile}</p>
-              <p><strong>Email:</strong> {selectedRepair.email}</p>
-              <p><strong>Entry Type:</strong> {selectedRepair.entry_type}</p>
+              {/* <p><strong>Email:</strong> {selectedRepair.email}</p>
+              <p><strong>Entry Type:</strong> {selectedRepair.entry_type}</p> */}
               <p><strong>Item Name:</strong> {selectedRepair.item}</p>
-              <p><strong>Metal Type:</strong> {selectedRepair.metal_type}</p>
-              <p><strong>Purity:</strong> {selectedRepair.purity}</p>
+              {/* <p><strong>Metal Type:</strong> {selectedRepair.metal_type}</p>
+              <p><strong>Purity:</strong> {selectedRepair.purity}</p> */}
               <p><strong>Total:</strong> {selectedRepair.total}</p>
               <p><strong>Date:</strong> {formatDate(selectedRepair.date)}</p>
               <p><strong>Delivery Date:</strong> {formatDate(selectedRepair.delivery_date)}</p>
-              <p><strong>Counter:</strong> {selectedRepair.counter}</p>
+              {/* <p><strong>Counter:</strong> {selectedRepair.counter}</p> */}
               <p><strong>Status:</strong> {selectedRepair.status}</p>
             </div>
           ) : (
