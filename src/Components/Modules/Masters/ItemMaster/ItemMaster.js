@@ -600,7 +600,7 @@ useEffect(() => {
 
 
   return (
-    <div style={{ paddingTop: "90px" }}>
+    <div style={{ paddingTop: "100px" }}>
       <div className="container mt-4">
         <div className="row">
           <div className="col-12">

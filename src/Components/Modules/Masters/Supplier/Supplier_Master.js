@@ -109,6 +109,10 @@ function Supplier_Master() {
       alert('Mobile number is required.');
       return;
     }
+    if (formData.mobile.length !== 10) {
+      alert('Mobile number must be exactly 10 digits.');
+      return;
+    }
   
     try {
       // Only check for duplicates if this is a new record (POST request)

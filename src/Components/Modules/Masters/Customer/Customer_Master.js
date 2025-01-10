@@ -119,7 +119,7 @@ function Customer_Master() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Validation
     if (!formData.account_name.trim()) {
       alert('Customer Name is required.');
@@ -129,7 +129,11 @@ function Customer_Master() {
       alert('Mobile number is required.');
       return;
     }
-
+    if (formData.mobile.length !== 10) {
+      alert('Mobile number must be exactly 10 digits.');
+      return;
+    }
+  
     try {
       // Only check for duplicates if this is a new record (POST request)
       if (!id) {
@@ -139,22 +143,22 @@ function Customer_Master() {
           throw new Error('Failed to fetch data for duplicate check.');
         }
         const result = await response.json();
-
+  
         // Check if the mobile number already exists
         const isDuplicateMobile = result.some((item) => item.mobile === formData.mobile);
-
+  
         if (isDuplicateMobile) {
           alert('This mobile number is already associated with another entry.');
           return;
         }
       }
-
+  
       // Proceed with saving the record (POST or PUT based on id)
       const method = id ? 'PUT' : 'POST';
       const endpoint = id
         ? `${baseURL}/edit/account-details/${id}`
         : `${baseURL}/account-details`;
-
+  
       const saveResponse = await fetch(endpoint, {
         method,
         headers: {
@@ -162,7 +166,7 @@ function Customer_Master() {
         },
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
-
+  
       if (saveResponse.ok) {
         alert(`Customer ${id ? 'updated' : 'created'} successfully!`);
         const from = location.state?.from || "/customerstable";
@@ -176,6 +180,7 @@ function Customer_Master() {
       alert('An error occurred while processing the request.');
     }
   };
+  
 
 
   const handleBack = () => {

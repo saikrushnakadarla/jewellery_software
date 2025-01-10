@@ -114,39 +114,13 @@ const RepairForm = () => {
     }
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const method = id ? "PUT" : "POST";
-  //     const url = id
-  //       ? `${baseURL}/edit/account-details/${id}`
-  //       : `${baseURL}/account-details`;
-  //     const response = await fetch(url, {
-  //       method: method,
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(formData),
-  //     });
-
-  //     if (!response.ok) {
-  //       const errorText = await response.text();
-  //       throw new Error(`Server error: ${errorText}`);
-  //     }
-
-  //     const result = await response.json();
-  //     alert(id ? "Account updated successfully!" : "Account created successfully!");
-  //     navigate("/accountstable");
-  //   } catch (err) {
-  //     console.error("Error submitting form:", err.message);
-  //     alert(`Error: ${err.message}`);
-  //   }
-  // };
-
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.mobile.length !== 10) {
+      alert('Mobile number must be exactly 10 digits.');
+      return;
+    }
 
     try {
       // Step 1: Check for duplicate mobile number only when creating a new account (POST request)

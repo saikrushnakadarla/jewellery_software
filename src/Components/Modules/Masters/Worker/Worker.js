@@ -92,22 +92,6 @@ function Customer_Master() {
     fetchCustomer();
   }, [id]);
 
-
-  // useEffect(() => {
-  //   if (id) {
-  //     const fetchCustomer = async () => {
-  //       try {
-  //         const response = await fetch(`${baseURL}/get/account-details/${id}`);
-  //         const result = await response.json();
-  //         setFormData(result);
-  //       } catch (error) {
-  //         console.error('Error fetching customer:', error);
-  //       }
-  //     };
-  //     fetchCustomer();
-  //   }
-  // }, [id]);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -133,48 +117,6 @@ function Customer_Master() {
     setTcsApplicable(!tcsApplicable);
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   if (!formData.account_name.trim()) {
-  //     alert('Worker Name is required.');
-  //     return;
-  //   }
-  //   if (!formData.mobile.trim()) {
-  //     alert('Mobile number is required.');
-  //     return;
-  //   }
-  //   try {
-  //     const method = id ? "PUT" : "POST";
-  //     const endpoint = id
-  //       ? `${baseURL}/edit/account-details/${id}`
-  //       : `${baseURL}/account-details`;
-
-  //     const response = await fetch(endpoint, {
-  //       method,
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ ...formData, tcsApplicable }),
-  //     });
-
-  //     if (response.ok) {
-  //       alert(`Worker ${id ? "updated" : "created"} successfully!`);
-
-  //       // Check where to navigate back
-  //       const from = location.state?.from || "/customerstable";
-  //       navigate(from); // Redirect to the origin page or default to the customers table
-  //     } else {
-  //       alert("Failed to save customer.");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     alert("An error occurred.");
-  //   }
-  // };
-
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -185,6 +127,10 @@ function Customer_Master() {
     }
     if (!formData.mobile.trim()) {
       alert('Mobile number is required.');
+      return;
+    }
+    if (formData.mobile.length !== 10) {
+      alert('Mobile number must be exactly 10 digits.');
       return;
     }
 
