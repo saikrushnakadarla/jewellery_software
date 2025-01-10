@@ -16,7 +16,6 @@ const URDPurchase = () => {
   const [customers, setCustomers] = useState([]);
   const [productIdAndRbarcode, setProductIdAndRbarcode] = useState({});
   const [formData, setFormData] = useState(() => {
-    // Load from local storage if available, otherwise use initial state
     const savedData = localStorage.getItem("purchaseFormData");
     return savedData
       ? JSON.parse(savedData)
@@ -49,6 +48,7 @@ const URDPurchase = () => {
         total_amount: "",
         paid_amount: "",
         balance_amount: "",
+        balance_after_receipt:"0",
       };
   });
 
@@ -219,6 +219,7 @@ const URDPurchase = () => {
           total_amount: "",
           paid_amount: "",
           balance_amount: "",
+          balance_after_receipt:"0",
         });
       } else {
         console.error("Failed to add entry to the database:", response.statusText);
@@ -236,10 +237,11 @@ const URDPurchase = () => {
     try {
       // Prepare data for saving
       const dataToSave = {
-        formData: { ...formData }, // Include form data as it is
+        formData: { ...formData,  }, // Include form data as it is
         table_data: tableData.map((row) => ({
           ...row, // Include all row data
           product_id: row.product_id, // Ensure product_id is explicitly sent for each row
+          balance_after_receipt: "0" 
         })),
       };
   

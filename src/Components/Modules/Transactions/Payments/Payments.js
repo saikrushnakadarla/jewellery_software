@@ -18,28 +18,29 @@ const RepairForm = () => {
     cheque_number: "",
     receipt_no: "",
     account_name: "",
+    invoice:"",
     total_amt: "",
     discount_amt: "",
     cash_amt: "",
     remarks: "",
   });
 
-  useEffect(() => {
-    const fetchLastPaymentNumber = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/lastPaymentNumber`);
-        // setFormData(prev => ({ ...prev, receipt_no: response.data.lastPaymentNumber }));
-        setFormData((prev) => ({
-          ...prev,
-          receipt_no: repairData ? repairData.receipt_no : response.data.lastPaymentNumber,
-        }));
-      } catch (error) {
-        console.error("Error fetching invoice number:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchLastPaymentNumber = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/lastPaymentNumber`);
+  //       // setFormData(prev => ({ ...prev, receipt_no: response.data.lastPaymentNumber }));
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         receipt_no: repairData ? repairData.receipt_no : response.data.lastPaymentNumber,
+  //       }));
+  //     } catch (error) {
+  //       console.error("Error fetching invoice number:", error);
+  //     }
+  //   };
 
-    fetchLastPaymentNumber();
-  }, []);
+  //   fetchLastPaymentNumber();
+  // }, []);
 
   useEffect(() => {
     if (repairData) {
@@ -51,11 +52,47 @@ const RepairForm = () => {
   }, [repairData]);
   const [accountOptions, setAccountOptions] = useState([]);
 
+  const [purchases, setPurchases] = useState([]);
+
+
+  useEffect(() => {
+    // Fetch purchases data when component mounts
+    axios.get("http://localhost:5000/get/purchases")
+      .then((response) => {
+        setPurchases(response.data);
+        
+        // Extract account names for options
+        const accounts = response.data.map((purchase) => purchase.account_name);
+        setAccountOptions([...new Set(accounts)]); // Remove duplicates
+      })
+      .catch((error) => {
+        console.error("Error fetching purchases:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    // Filter and set invoice when account_name is selected
+    const selectedPurchase = purchases.find(
+      (purchase) => purchase.account_name === formData.account_name
+    );
+    
+    if (selectedPurchase) {
+      setFormData((prevData) => ({
+        ...prevData,
+        invoice: selectedPurchase.invoice || "", // Assuming invoice can be an empty string
+        total_amt: selectedPurchase.balance_after_receipt > 0 
+                    ? selectedPurchase.balance_after_receipt 
+                    : selectedPurchase.balance_amount || 0,
+      }));
+    }
+  }, [formData.account_name, purchases]);
+  
+
   // Fetch account names on component mount
   useEffect(() => {
-     // Set default date to today
-     const today = new Date().toISOString().split("T")[0];
-     setFormData((prevData) => ({ ...prevData, date: today }));
+    // Set default date to today
+    const today = new Date().toISOString().split("T")[0];
+    setFormData((prevData) => ({ ...prevData, date: today }));
     const fetchAccountNames = async () => {
       try {
         const response = await fetch(`${baseURL}/payment-account-names`);
@@ -63,21 +100,24 @@ const RepairForm = () => {
           throw new Error("Failed to fetch account names");
         }
         const data = await response.json();
-  
+        console.error(' account name:', data);
+
         // Map API response to match the options structure
         const formattedOptions = data.map((item) => ({
           value: item.account_name,
           label: item.account_name,
         }));
-  
+
         setAccountOptions(formattedOptions);
       } catch (error) {
         console.error("Error fetching account names:", error);
       }
     };
-  
+
     fetchAccountNames();
   }, []);
+
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -103,6 +143,8 @@ const RepairForm = () => {
       return updatedData;
     });
   };
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -168,7 +210,7 @@ const RepairForm = () => {
               onChange={handleInputChange}
             />
           </Col>
-         
+
           <Col xs={12} md={3}>
             <InputField
               label="Account Name"
@@ -176,7 +218,17 @@ const RepairForm = () => {
               name="account_name"
               value={formData.account_name}
               onChange={handleInputChange}
-              options={accountOptions}
+              options={accountOptions} // Ensure options are populated if needed
+            />
+          </Col>
+          <Col xs={12} md={3}>
+            <InputField
+              label="Invoice"
+              type="text"
+              name="invoice"
+              value={formData.invoice}
+              onChange={handleInputChange}
+             
             />
           </Col>
           <Col xs={12} md={2}>
@@ -190,7 +242,7 @@ const RepairForm = () => {
           </Col>
           <Col xs={12} md={2}>
             <InputField
-              label="Discount Amt"
+              label="Paid Amt"
               type="number"
               name="discount_amt"
               value={formData.discount_amt}
