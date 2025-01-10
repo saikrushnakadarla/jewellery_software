@@ -15,8 +15,9 @@ const StockEntryTable = () => {
   const [data, setData] = useState([]); // State to store fetched table data
   const [isEditMode, setIsEditMode] = useState(false); // State to toggle form visibility
   const [formData, setFormData] = useState({}); // State to store the form data
-
+  const [subCategories, setSubCategories] = useState([]);
   const handleCloseModal = () => setShowModal(false);
+  const [designOptions, setdesignOptions] = useState([]);
   // Fetch data from the API
   useEffect(() => {
     fetch(`${baseURL}/get/opening-tags-entry`) // Correct URL
@@ -71,63 +72,63 @@ const StockEntryTable = () => {
 
   // Handle form submission
 
- // Automatically calculate Weight_BW when Gross_Weight or Stones_Weight changes
-    useEffect(() => {
-        const grossWeight = parseFloat(formData.Gross_Weight) || 0;
-        const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
-        const weightBW = grossWeight - stonesWeight;
-
-        setFormData((prev) => ({
-            ...prev,
-            Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
-        }));
-    }, [formData.Gross_Weight, formData.Stones_Weight]);
-    // Automatically calculate WastageWeight and TotalWeight_AW
-    useEffect(() => {
-        const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
-        const grossWeight = parseFloat(formData.Gross_Weight) || 0;
-        const weightBW = parseFloat(formData.Weight_BW) || 0;
-
-        let wastageWeight = 0;
-        let totalWeight = 0;
-
-        if (formData.Wastage_On === "Gross Weight") {
-            wastageWeight = (grossWeight * wastagePercentage) / 100;
-            totalWeight = weightBW + wastageWeight;
-        } else if (formData.Wastage_On === "Weight BW") {
-            wastageWeight = (weightBW * wastagePercentage) / 100;
-            totalWeight = weightBW + wastageWeight;
-        }
-
-        setFormData((prev) => ({
-            ...prev,
-            WastageWeight: wastageWeight.toFixed(2),
-            TotalWeight_AW: totalWeight.toFixed(2),
-        }));
-    }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
-
-    const handleMakingChargesCalculation = () => {
-        const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
-        const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
-        const makingCharges = parseFloat(formData.Making_Charges) || 0;
-
-        if (formData.Making_Charges_On === "By Weight") {
-            const calculatedMakingCharges = totalWeight * mcPerGram;
-            setFormData((prev) => ({
-                ...prev,
-                Making_Charges: calculatedMakingCharges.toFixed(2),
-            }));
-        } else if (formData.Making_Charges_On === "Fixed") {
-            const calculatedMcPerGram = makingCharges / totalWeight;
-            setFormData((prev) => ({
-                ...prev,
-                MC_Per_Gram: calculatedMcPerGram.toFixed(2),
-            }));
-        }
-    };
+  // Automatically calculate Weight_BW when Gross_Weight or Stones_Weight changes
   useEffect(() => {
-        handleMakingChargesCalculation();
-    }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
+    const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+    const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
+    const weightBW = grossWeight - stonesWeight;
+
+    setFormData((prev) => ({
+      ...prev,
+      Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
+    }));
+  }, [formData.Gross_Weight, formData.Stones_Weight]);
+  // Automatically calculate WastageWeight and TotalWeight_AW
+  useEffect(() => {
+    const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
+    const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+    const weightBW = parseFloat(formData.Weight_BW) || 0;
+
+    let wastageWeight = 0;
+    let totalWeight = 0;
+
+    if (formData.Wastage_On === "Gross Weight") {
+      wastageWeight = (grossWeight * wastagePercentage) / 100;
+      totalWeight = weightBW + wastageWeight;
+    } else if (formData.Wastage_On === "Weight BW") {
+      wastageWeight = (weightBW * wastagePercentage) / 100;
+      totalWeight = weightBW + wastageWeight;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      WastageWeight: wastageWeight.toFixed(2),
+      TotalWeight_AW: totalWeight.toFixed(2),
+    }));
+  }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
+
+  const handleMakingChargesCalculation = () => {
+    const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
+    const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
+    const makingCharges = parseFloat(formData.Making_Charges) || 0;
+
+    if (formData.Making_Charges_On === "By Weight") {
+      const calculatedMakingCharges = totalWeight * mcPerGram;
+      setFormData((prev) => ({
+        ...prev,
+        Making_Charges: calculatedMakingCharges.toFixed(2),
+      }));
+    } else if (formData.Making_Charges_On === "Fixed") {
+      const calculatedMcPerGram = makingCharges / totalWeight;
+      setFormData((prev) => ({
+        ...prev,
+        MC_Per_Gram: calculatedMcPerGram.toFixed(2),
+      }));
+    }
+  };
+  useEffect(() => {
+    handleMakingChargesCalculation();
+  }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -160,22 +161,28 @@ const StockEntryTable = () => {
   // Define the columns for the table
   const columns = React.useMemo(
     () => [
-      { Header: 'Pricing', accessor: 'Pricing' },
+
       // { Header: 'Product ID', accessor: 'product_id' },
+      { Header: 'Category', accessor: 'category' },
+      { Header: 'Sub Category', accessor: 'sub_category' },
       { Header: 'Product Name', accessor: 'product_Name' },
-      { Header: 'Metal Type', accessor: 'metal_type' },
+      // { Header: 'Metal Type', accessor: 'metal_type' },
       { Header: 'Design Master', accessor: 'design_master' },
-      { Header: 'Purity', accessor: 'Purity' },
+      { Header: 'Pricing', accessor: 'Pricing' },
+      { Header: 'Pcode/Barcode', accessor: 'PCode_BarCode' },
+      // { Header: 'Purity', accessor: 'Purity' },
       // { Header: 'Prefix', accessor: 'Prefix' },
-      { Header: 'BarCode', accessor: 'PCode_BarCode' },
+      // { Header: 'BarCode', accessor: 'PCode_BarCode' },
       { Header: 'Gross Weight', accessor: 'Gross_Weight' },
       { Header: 'Stones Weight', accessor: 'Stones_Weight' },
       { Header: 'Stones Price', accessor: 'Stones_Price' },
       { Header: 'Weight (WW)', accessor: 'Weight_BW' },
       { Header: 'Wastage On', accessor: 'Wastage_On' },
-      // { Header: 'Wastage', accessor: 'WastageWeight' },
+
       { Header: 'Wasatage%', accessor: 'Wastage_Percentage' },
+      { Header: 'Wastage', accessor: 'WastageWeight' },
       { Header: 'Weight', accessor: 'TotalWeight_AW' },
+      { Header: 'Making Charges On', accessor: 'Making_Charges_On' },
       { Header: 'Making Charges', accessor: 'Making_Charges' },
       { Header: 'Stock Point', accessor: 'Stock_Point' },
       { Header: 'Status', accessor: 'Status' },
@@ -276,6 +283,87 @@ const StockEntryTable = () => {
 
             {/* Section 1 */}
             <div className="row g-3">
+              {/* <div className="col-md-2">
+                <InputField
+                  label="Pricing:"
+                  name="Pricing"
+                  type="select"
+                  value={formData.Pricing || ''}
+                  onChange={handleChange}
+                  options={[
+                    { value: "By Weight", label: "By Weight" },
+                    { value: "By fixed", label: "By fixed" },
+                  ]}
+                />
+              </div> */}
+              <div className="col-md-3">
+                <InputField
+                  label="Category:"
+                  name="category"
+                  value={formData.category}
+                  onChange={(e) => handleChange(e)}
+                  readOnly
+                />
+              </div>
+              <div className="col-md-3">
+                <InputField
+                  label="Sub Category:"
+                  name="sub_category"
+                  type="select"
+                  value={formData.sub_category}
+                  onChange={handleChange}
+                  options={subCategories.map((category) => ({
+                    value: category.subcategory_id, // Use subcategory_id as the value
+                    label: category.sub_category_name, // Use sub_category_name as the label
+                  }))}
+                />
+              </div>
+              <div className="col-md-2">
+                <InputField
+                  label="Product Name:"
+                  name="product_Name"
+                  value={formData.product_Name}
+                  onChange={handleChange}  // Pass the event handler correctly
+                />
+              </div>
+              {/* <div className="col-md-2">
+                <InputField
+                  label="P ID:"
+                  name="product_id"
+                  type="select"
+                  value={formData.product_id || ''}
+                  onChange={handleChange}
+                  options={productOptions}
+                />
+              </div> */}
+              {/* <div className="col-md-2">
+                <InputField
+                  label="Tag ID:"
+                  name="Tag_ID"
+                  value={formData.Tag_ID || ''}
+                  onChange={handleChange}
+                />
+              </div> */}
+
+              <div className="col-md-2">
+                <InputField
+                  label="Design Master:"
+                  name="design_master"
+                  type="select"
+                  value={formData.design_master}
+                  onChange={handleChange}
+                  // options={designOptions}
+                  options={designOptions.map(option => ({ value: option.value, label: option.label }))}
+                />
+              </div>
+              {/* <div className="col-md-3">
+                <InputField
+                  label="Category:"
+                  name="Category"
+                  value={formData.Category || ''}
+                  readOnly
+                />
+              </div> */}
               <div className="col-md-2">
                 <InputField
                   label="Pricing:"
@@ -289,56 +377,24 @@ const StockEntryTable = () => {
                   ]}
                 />
               </div>
-              <div className="col-md-2">
+              <div className="col-md-3">
                 <InputField
-                  label="P ID:"
-                  name="product_id"
-                  type="select"
-                  value={formData.product_id || ''}
+                  label="PCode/BarCode:"
+                  name="PCode_BarCode"
+                  type="text"
+                  value={formData.PCode_BarCode}
                   onChange={handleChange}
-                  options={productOptions}
-                />
-              </div>
-              <div className="col-md-2">
-                <InputField
-                  label="Tag ID:"
-                  name="Tag_ID"
-                  value={formData.Tag_ID || ''}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="col-md-3">
-                <InputField
-                  label="Product Name:"
-                  name="product_Name"
-                  value={formData.product_Name || ''}
                   readOnly
                 />
               </div>
-              <div className="col-md-3">
-                <InputField
-                  label="Design Master:"
-                  name="Design_Master"
-                  value={formData.Design_Master || ''}
-                  readOnly
-                />
-              </div>
-              <div className="col-md-3">
-                <InputField
-                  label="Category:"
-                  name="Category"
-                  value={formData.Category || ''}
-                  readOnly
-                />
-              </div>
-              <div className="col-md-3">
+              {/* <div className="col-md-3">
                 <InputField
                   label="Prefix:"
                   value="tag"
                   readOnly
                 />
-              </div>
-              <div className="col-md-3">
+              </div> */}
+              {/* <div className="col-md-3">
                 <InputField
                   label="Purity:"
                   name="Purity"
@@ -353,29 +409,24 @@ const StockEntryTable = () => {
                   value={formData.PCode_BarCode || ''}
                   onChange={handleChange}
                 />
+              </div> */}
+              <div className="col-md-3">
+                <InputField
+                  label="Gross Weight:"
+                  name="Gross_Weight"
+                  value={formData.Gross_Weight || ''}
+                  onChange={handleChange}
+                />
               </div>
-            </div>
-
-            {/* Section 2 */}
-            <div className="mb-4">
-              <div className="row g-3">
-                <div className="col-md-3">
-                  <InputField
-                    label="Gross Weight:"
-                    name="Gross_Weight"
-                    value={formData.Gross_Weight || ''}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="col-md-3">
-                  <InputField
-                    label="Stones Weight:"
-                    name="Stones_Weight"
-                    value={formData.Stones_Weight || ''}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="col-md-2">
+              <div className="col-md-2">
+                <InputField
+                  label="Stones Weight:"
+                  name="Stones_Weight"
+                  value={formData.Stones_Weight || ''}
+                  onChange={handleChange}
+                />
+              </div>
+              {/* <div className="col-md-2">
                   <button
                     type="button"
                     className="btn btn-primary w-100"
@@ -384,23 +435,29 @@ const StockEntryTable = () => {
                   >
                     Stone Details
                   </button>
-                </div>
-                <div className="col-md-2">
-                  <InputField
-                    label="Stones Price:"
-                    name="Stones_Price"
-                    value={formData.Stones_Price || ''}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="col-md-2">
-                  <InputField
-                    label="Weight BW:"
-                    name="Weight_BW"
-                    value={formData.Weight_BW || ''}
-                    onChange={handleChange}
-                  />
-                </div>
+                </div> */}
+              <div className="col-md-2">
+                <InputField
+                  label="Stones Price:"
+                  name="Stones_Price"
+                  value={formData.Stones_Price || ''}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="col-md-2">
+                <InputField
+                  label="Weight BW:"
+                  name="Weight_BW"
+                  value={formData.Weight_BW || ''}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            {/* Section 2 */}
+            <div className="mb-4">
+              <div className="row g-3">
+
               </div>
             </div>
 
@@ -497,18 +554,23 @@ const StockEntryTable = () => {
               </div>
             </div>
 
-            <button type="submit" className="btn btn-primary">
+            {/* <button type="" className="create_but" variant="success"
+                          style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
               Update
-            </button>
+            </button> */}
+            <Button className="create_but" type="" variant="success"
+              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+              update
+            </Button>
           </form>
 
         </div>
       )}
-       <StoneDetailsModal
-              showModal={showModal}
-              handleCloseModal={handleCloseModal}
-              handleUpdateStoneDetails={handleUpdateStoneDetails}
-            />
+      <StoneDetailsModal
+        showModal={showModal}
+        handleCloseModal={handleCloseModal}
+        handleUpdateStoneDetails={handleUpdateStoneDetails}
+      />
     </div>
   );
 };

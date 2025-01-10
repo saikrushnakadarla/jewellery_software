@@ -147,9 +147,9 @@ const ItemMasterTable = () => {
         body: JSON.stringify(formData),
       });
       if (!response.ok) {
-        throw new Error('Failed to update product');
+        throw new Error('Failed to update Category');
       }
-      alert('Product updated successfully');
+      alert('Category updated successfully');
       setShowUpdateModal(false);
       fetchProducts(); // Refresh the product list after update
     } catch (error) {
@@ -182,7 +182,7 @@ const [taxOptions, setTaxOptions] = useState([]);
 
   const columns = React.useMemo(
     () => [
-      { Header: 'Category ID:', accessor: 'product_id' },
+      // { Header: 'Category ID:', accessor: 'product_id' },
       { Header: 'Category Name:', accessor: 'product_name' },
       { Header: 'Barcode', accessor: 'rbarcode' },
       { Header: 'Metal Type', accessor: 'Category' },
@@ -271,17 +271,18 @@ const [taxOptions, setTaxOptions] = useState([]);
       dialogClassName="custom-modal-width"
     >
       <Modal.Header closeButton>
-        <Modal.Title>Update Product</Modal.Title>
+        <Modal.Title>Update Category</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleUpdateSubmit} className="form-container">
-          <h4 style={{ marginBottom: "15px" }}>Product Details</h4>
+          <h4 style={{ marginBottom: "15px" }}>Category Details</h4>
           <div className="form-row">
             <InputField
-              label="Product Name:"
+              label="Category:"
               name="product_name"
               value={formData.product_name}
               onChange={handleChange}
+              readOnly
             />
             <InputField
               label="Rbarcode:"
@@ -298,14 +299,14 @@ const [taxOptions, setTaxOptions] = useState([]);
               onChange={handleChange}
               options={metalOptions}
             />
-            <InputField
+            {/* <InputField
               label="Design Master:"
               name="design_master"
               type="select"
               value={formData.design_master}
               onChange={handleChange}
               options={designOptions}
-            />
+            /> */}
             <InputField
               label="Purity:"
               name="purity"
@@ -314,12 +315,12 @@ const [taxOptions, setTaxOptions] = useState([]);
               onChange={handleChange}
               options={dropdownOptions}
             />
-            <InputField
+            {/* <InputField
               label="Item Prefix:"
               name="item_prefix"
               value={formData.item_prefix}
               onChange={handleChange}
-            />
+            /> */}
           </div>
           <div className="form-row">
             <InputField
@@ -344,7 +345,7 @@ const [taxOptions, setTaxOptions] = useState([]);
             />
           </div>
     
-          <div className="form-container" style={{ marginTop: "15px" }}>
+          {/* <div className="form-container" style={{ marginTop: "15px" }}>
             <div className="main-tags-row" style={{ display: "flex" }}>
               <input
                 type="checkbox"
@@ -393,11 +394,13 @@ const [taxOptions, setTaxOptions] = useState([]);
                 style={maintainTagsStyle}
               />
             </div>
-          </div>
+          </div> */}
     
-          <Button  type="submit" style={{backgroundColor:'rgb(163, 110, 41)'}}>
+          <Button  className="create_but"  type="" variant="success"
+              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
             update
           </Button>
+         
         </Form>
       </Modal.Body>
     </Modal>
