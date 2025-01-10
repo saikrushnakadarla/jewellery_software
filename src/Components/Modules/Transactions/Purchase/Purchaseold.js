@@ -11,292 +11,347 @@ import { Modal } from "react-bootstrap";
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const URDPurchase = () => {
-  const [metal, setMetal] = useState("");
-  const [purity, setPurity] = useState("");
-  const [product, setProduct] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
-  const [formData, setFormData] = useState(
-    {
-      account_name: "",
-      mobile: "",
-      account_name: "",
-      email: "",
-      address1: "",
-      address2: "",
-      city: "",
-      pincode: "",
-      state: "",
-      state_code: "",
-      aadhar_card: "",
-      gst_in: "",
-      pan_card: "",
-      terms: "Cash",
-      indent: "",
-      bill_no: "",
-      type: "",
-      rate_cut: "",
-      date: new Date().toISOString().split("T")[0],
-      bill_date: "",
-      due_date: "",
-      Purchase_rate: "",
-      product_id: "",
-      product_name: "",
-      metal_type: "",
-      design_name: "",
-      purity: "",
-      purityPercentage: "",
-      hsn: "",
-      product_type: "",
-      stock_type: "",
-      pcs: "",
-      gross_weight: "",
-      stone_weight: "",
-      net_weight: "",
-      unit_weight: "",
-      waste_percentage: "",
-      waste_amount: "",
-      pure_weight: "",
-      alloy: "",
-      cost: "",
-      total_weight: "",
-      wt_rate_amount: "",
-      mc_per_gram: "",
-      mc: "",
-      stone_amount: "",
-      total_amount: "",
-      stone: "",
-      stone_pcs: "",
-      stone_ct: "",
-      cwp: "",
-      gms: "",
-      stone_rate: "",
-      clarity: "",
-      rate: "",
-      clear: "",
-      class: "",
-      cut: "",
-    });
+  const [productIdAndRbarcode, setProductIdAndRbarcode] = useState({});
+  const [formData, setFormData] = useState(() => {
+    // Load from local storage if available, otherwise use initial state
+    const savedData = localStorage.getItem("purchaseFormData");
+    return savedData
+      ? JSON.parse(savedData)
+      : {
+        mobile: "",
+        account_name: "",
+        gst_in: "",
+        terms: "Cash",
+        invoice: "",
+        bill_no: "",
+        rate_cut: "",
+        date: new Date().toISOString().split("T")[0],
+        bill_date: new Date().toISOString().split("T")[0],
+        due_date: "",
+        category: "",
+        hsn_code: "",
+        rbarcode: "",
+        pcs: "",
+        gross_weight: "",
+        stone_weight: "",
+        net_weight: "",
+        hm_charges: "",
+        other_charges: "",
+        charges: "",
+        purity: "",
+        product_id: "",
+        metal_type: "",
+        pure_weight: "",
+        rate: "",
+        total_amount: "",
+      };
+  });
 
-  // Fetch purity percentage when purity changes
-  useEffect(() => {
-    const fetchPurityPercentage = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        const purityData = Array.isArray(response.data) ? response.data : [response.data]; // Ensure response is an array
-
-        console.log("API Data:", purityData); // Log the API data for debugging
-
-        // Find the matching purity
-        const matchedPurity = purityData.find(
-          (item) => item.name === formData.purity
-        );
-
-        if (matchedPurity) {
-          console.log("Matched Purity:", matchedPurity); // Log the matched purity
-          setFormData((prevData) => ({
-            ...prevData,
-            purityPercentage: matchedPurity.purity_percentage,
-          }));
-        } else {
-          console.warn("Purity not found in API data");
-        }
-      } catch (error) {
-        console.error("Error fetching purity data:", error);
-      }
-    };
-
-    fetchPurityPercentage();
-  }, [formData.purity]); // Re-run when `purity` changes
-
-  const [tableData, setTableData] = useState([]);
-  const [isQtyEditable, setIsQtyEditable] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [data, setData] = useState([]);
+  // const [tableData, setTableData] = useState([]);
+  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
+  const [purityOptions, setPurityOptions] = useState([]);
+  const [showModal1, setShowModal] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [categories, setCategories] = useState([]);
 
   const handleChange = (field, value) => {
-    setFormData((prev) => {
-      const updatedFormData = { ...prev, [field]: value };
+    setFormData({ ...formData, [field]: value });
 
-      // Automatically calculate net_weight
-      if (field === "gross_weight" || field === "stone_weight") {
-        const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
-        const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
-        updatedFormData.net_weight = grossWeight - stoneWeight;
+    setFormData((prevFormData) => {
+      const updatedFormData = { ...prevFormData, [field]: value };
+
+      // If the category changes, update the hsn_code automatically
+      if (field === "category") {
+        const selectedCategory = categories.find(
+          (category) => category.value === value
+        );
+        if (selectedCategory) {
+          updatedFormData.hsn_code = selectedCategory.hsn_code;  // Set the hsn_code based on the selected category
+        }
       }
-
-      // Always calculate pure_weight when net_weight or purityPercentage changes
-      const netWeight = parseFloat(updatedFormData.net_weight) || 0;
-      const purityPercentage = parseFloat(updatedFormData.purityPercentage) || 0;
-      updatedFormData.pure_weight = (netWeight * purityPercentage) / 100;
-
-      // Automatically calculate waste_amount
-      const pureWeight = parseFloat(updatedFormData.pure_weight) || 0;
-      const wastePercentage = parseFloat(updatedFormData.waste_percentage) || 0;
-      updatedFormData.waste_amount = (pureWeight * wastePercentage) / 100;
-
-      // Automatically calculate total_weight
-      const wasteAmount = parseFloat(updatedFormData.waste_amount) || 0;
-      updatedFormData.total_weight = pureWeight + wasteAmount;
-
-      // Automatically calculate wt_rate_amount
-      const totalWeight = parseFloat(updatedFormData.total_weight) || 0;
-      const stoneRate = parseFloat(updatedFormData.stone_rate) || 0;
-      updatedFormData.wt_rate_amount = totalWeight * stoneRate;
-
-      // Automatically calculate mc
-      const mcPerGram = parseFloat(updatedFormData.mc_per_gram) || 0;
-      updatedFormData.mc = totalWeight * mcPerGram;
-
-      // Automatically calculate total_amount (before adding stone_amount)
-      const wtRateAmount = parseFloat(updatedFormData.wt_rate_amount) || 0;
-      const mc = parseFloat(updatedFormData.mc) || 0;
-      updatedFormData.total_amount = wtRateAmount + mc;
-
-      // Case 1: If "ct" is selected in CWP, calculate stone_amount = stone_ct * rate
-      if (updatedFormData.cwp === "ct") {
-        const stoneCt = parseFloat(updatedFormData.stone_ct) || 0;
-        const rate = parseFloat(updatedFormData.rate) || 0;
-        updatedFormData.stone_amount = stoneCt * rate;
-      }
-
-      // Case 2: If "weight" is selected in CWP, calculate stone_amount = gms * rate
-      if (updatedFormData.cwp === "weight") {
-        const gms = parseFloat(updatedFormData.gms) || 0;
-        const rate = parseFloat(updatedFormData.rate) || 0;
-        updatedFormData.stone_amount = gms * rate;
-      }
-
-      // Case 3: If "piece" is selected in CWP, calculate stone_amount = stone_pcs * rate
-      if (updatedFormData.cwp === "piece") {
-        const stonePcs = parseFloat(updatedFormData.stone_pcs) || 0;
-        const rate = parseFloat(updatedFormData.rate) || 0;
-        updatedFormData.stone_amount = stonePcs * rate;
-      }
-
-      // Automatically add stone_amount to total_amount
-      const stoneAmount = parseFloat(updatedFormData.stone_amount) || 0;
-      updatedFormData.total_amount += stoneAmount;
 
       return updatedFormData;
     });
-  };
 
+    setFormData((prev) => {
+      const updatedFormData = { ...prev, [field]: value };
 
-  const [editingIndex, setEditingIndex] = useState(null);
+      let updatedDetails = { ...updatedFormData };
 
-  const handleAdd = () => {
-    if (editingIndex !== null) {
-      // Update the existing row
-      const updatedTableData = [...tableData];
-      updatedTableData[editingIndex] = formData;
-      setTableData(updatedTableData);
-      setEditingIndex(null); // Reset editing state
-    } else {
-      // Add new row
-      setTableData((prev) => [...prev, formData]);
-    }
-
-    setFormData({
-      code: "",
-      product_id: "",
-      product_name: "",
-      metal_type: "",
-      design_name: "",
-      purity: "",
-      purityPercentage: "",
-      hsn: "",
-      product_type: "",
-      stock_type: "",
-      pcs: "",
-      gross_weight: "",
-      stone_weight: "",
-      net_weight: "",
-      unit_weight: "",
-      waste_percentage: "",
-      waste_amount: "",
-      pure_weight: "",
-      alloy: "",
-      cost: "",
-      total_weight: "",
-      wt_rate_amount: "",
-      mc_per_gram: "",
-      mc: "",
-      stone_amount: "",
-      total_amount: "",
-      stone: "",
-      stone_pcs: "",
-      stone_ct: "",
-      cwp: "",
-      gms: "",
-      stone_rate: "",
-      clarity: "",
-      rate: "",
-      clear: "",
-      class: "",
-      cut: "",
-    });
-  };
-
-
-  const handleSave = async () => {
-    try {
-      const dataToSave = {
-        formData,
-        tableData,
+      // Parse purity to percentage from carats (e.g., "24K" -> 100%)
+      const parsePurityToPercentage = (purity) => {
+        const caratValue = parseFloat(purity.replace("K", "")); // Extract number from "24K", "22K", etc.
+        return (caratValue / 24) * 100; // Convert carats to percentage
       };
 
-      const response = await axios.post(`${baseURL}/post/purchase`, dataToSave);
+      // Update rate based on purity
+      if (field === "purity") {
+        const rate =
+          value === "24K" ? rates.rate_24crt :
+            value === "22K" ? rates.rate_22crt :
+              value === "18K" ? rates.rate_18crt :
+                value === "16K" ? rates.rate_16crt :
+                  "";
 
-      if (response.status === 201) {
-        alert(response.data.message);
+        updatedDetails.rate = rate;
+      }
 
-        // Reset formData and tableData
+      // Update pure weight when net weight or purity changes
+      if (field === "net_weight" || field === "purity") {
+        const netWeight = parseFloat(updatedDetails.net_weight) || 0;
+        const purityPercentage = parsePurityToPercentage(updatedDetails.purity) || 0;
+
+        updatedDetails.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
+      }
+
+      // Additional calculations for other fields
+      if (
+        updatedDetails.gross &&
+        updatedDetails.dust &&
+        updatedDetails.ml_percent &&
+        updatedDetails.purity
+      ) {
+        const purityValue = parsePurityToPercentage(updatedDetails.purity);
+
+        if (purityValue) {
+          const gross = parseFloat(updatedDetails.gross) || 0;
+          const dust = parseFloat(updatedDetails.dust) || 0;
+          const mlPercent = parseFloat(updatedDetails.ml_percent) || 0;
+
+          const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
+          updatedDetails.eqt_wt = netWeight.toFixed(2);
+        }
+      }
+      // Other calculations for weights and amounts
+      const grossWeight = parseFloat(updatedDetails.gross_weight) || 0;
+      const stoneWeight = parseFloat(updatedDetails.stone_weight) || 0;
+      updatedDetails.net_weight = grossWeight - stoneWeight;
+
+      const netWeight = parseFloat(updatedDetails.net_weight) || 0;
+      const purityPercentage = parsePurityToPercentage(updatedDetails.purity) || 0;
+      updatedDetails.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
+
+      // Calculate total amount based on pure weight and rate
+      const pureWeight = parseFloat(updatedDetails.pure_weight) || 0;
+      const rate = parseFloat(updatedDetails.rate) || 0;
+      updatedDetails.total_amount = (pureWeight * rate).toFixed(2);
+      return updatedDetails;
+    });
+  };
+  const [tableData, setTableData] = useState(() => {
+    const savedData = localStorage.getItem("tableData");
+    return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
+  });
+  // Save table data to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("tableData", JSON.stringify(tableData));
+  }, [tableData]);
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+  
+    // Prepare data to be sent to the API
+    const apiData = {
+      product_id: formData.product_id, // Assuming rbarcode maps to product_id
+      pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
+      gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
+    };
+  
+    try {
+      // Make a POST request to the API
+      const response = await fetch(`${baseURL}/add-entry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(apiData),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Pcs and GrossWeight added to the database successfully:", result);
+  
+        if (editingIndex === null) {
+          // Add new entry to the table
+          setTableData([...tableData, formData]);
+        } else {
+          // Edit existing entry in the table
+          const updatedTableData = tableData.map((row, index) =>
+            index === editingIndex ? formData : row
+          );
+          setTableData(updatedTableData);
+          setEditingIndex(null); // Reset edit mode
+        }
+  
+        // Reset formData only when needed (optional for editing scenarios)
         setFormData({
-          account_name: "",
-          mobile: "",
-          email: "",
-          address1: "",
-          address2: "",
-          city: "",
-          pincode: "",
-          state: "",
-          state_code: "",
-          aadhar_card: "",
-          gst_in: "",
-          pan_card: "",
-          terms: "Cash",
-          indent: "",
-          bill_no: "",
-          type: "",
-          rate_cut: "",
-          date: "",
-          bill_date: "",
-          due_date: "",
-          Purchase_rate: "",
+          ...formData, // Retain fields as necessary
+          category: "",
+          hsn_code: "",
+          rbarcode: "",
+          pcs: "",
+          gross_weight: "",
+          stone_weight: "",
+          net_weight: "",
+          hm_charges: "",
+          other_charges: "",
+          charges: "",
+          purity: "",
+          pure_weight: "",
+          rate: "",
+          total_amount: "",
         });
-
-        setTableData([]);
       } else {
-        alert("Unexpected response from server.");
+        console.error("Failed to add entry to the database:", response.statusText);
       }
     } catch (error) {
-      console.error("Error saving data:", error.response?.data || error);
-      alert("Failed to save data.");
+      console.error("Error while adding entry to the database:", error);
+    }
+  };
+  
+  const handleSave = async (e) => {
+    e.preventDefault();
+  
+    console.log("Product ID before submission:", formData.product_id);
+  
+    try {
+      // Prepare data for saving
+      const dataToSave = {
+        formData: { ...formData }, // Include form data as it is
+        table_data: tableData.map((row) => ({
+          ...row, // Include all row data
+          product_id: row.product_id, // Ensure product_id is explicitly sent for each row
+        })),
+      };
+  
+      console.log("Data to save:", dataToSave);
+  
+      // Send data to the backend
+      const response = await axios.post(`${baseURL}/post/purchase`, dataToSave, {
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      console.log("Purchase saved successfully:", response.data);
+      alert("Purchase saved successfully");
+  
+      // Reset formData and tableData
+      setFormData({
+        mobile: "",
+        account_name: "",
+        gst_in: "",
+        terms: "Cash",
+        invoice: "",
+        bill_no: "",
+        rate_cut: "",
+        date: new Date().toISOString().split("T")[0],
+        bill_date: new Date().toISOString().split("T")[0],
+        due_date: "",
+        category: "",
+        hsn_code: "",
+        rbarcode: "",
+        pcs: "",
+        gross_weight: "",
+        stone_weight: "",
+        net_weight: "",
+        hm_charges: "",
+        other_charges: "",
+        charges: "",
+        purity: "",
+        metal_type: "",
+        pure_weight: "",
+        rate: "",
+        total_amount: "",
+        product_id: "",
+      });
+      setTableData([]);
+      localStorage.removeItem("purchaseFormData");
+      localStorage.removeItem("purchaseTableData");
+    } catch (error) {
+      console.error("Error saving data:", error);
+    }
+  };
+  
+  useEffect(() => {
+    localStorage.setItem("purchaseFormData", JSON.stringify(formData));
+    localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
+  }, [formData, tableData]);
+
+  // const handleEdit = (index) => {
+  //   setFormData(tableData[index]); // Populate the form with selected row data
+  //   setEditingIndex(index); // Track the index being edited
+  // };
+  const handleEdit = async (index) => {
+    const selectedData = tableData[index]; // Get the data for the selected row
+    const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
+
+    // Ensure pcs and gross_weight are not undefined, and if so, default to 0
+    const pcsToSend = pcs || 0;
+    const grossWeightToSend = gross_weight || 0;
+
+    console.log("Sending to server:", { pcs: pcsToSend, gross_weight: grossWeightToSend });
+
+    try {
+      // Send a request to the backend to update the product_id entry
+      const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
+        method: "PUT", // Change to PUT since we're updating, not deleting
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update entry in updated_values_table");
+      }
+      console.log("Entry updated successfully");
+      setFormData(selectedData); // Populate the form with selected row data
+      setEditingIndex(index); // Track the index being edited
+    } catch (error) {
+      console.error("Error updating entry:", error);
+      alert("Failed to update the entry. Please try again.");
     }
   };
 
+  // const handleDelete = (index) => {
+  //   const updatedTableData = tableData.filter((_, i) => i !== index);
+  //   setTableData(updatedTableData); // Remove the selected row
+  // };
+  const handleDelete = async (index) => {
+    const selectedData = tableData[index]; // Get the data for the selected row
+    const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
 
+    // Ensure pcs and gross_weight are not undefined, and if so, default to 0
+    const pcsToSend = pcs || 0;
+    const grossWeightToSend = gross_weight || 0;
 
-  const handleEdit = (index) => {
-    setFormData(tableData[index]); // Populate the form with selected row data
-    setEditingIndex(index); // Track the index being edited
-  };
+    console.log("Sending to server for deletion:", { product_id, pcs: pcsToSend, gross_weight: grossWeightToSend });
 
-  const handleDelete = (index) => {
-    const updatedTableData = tableData.filter((_, i) => i !== index);
-    setTableData(updatedTableData); // Remove the selected row
+    try {
+      // Send a request to the backend to delete the product_id entry
+      const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
+        method: "PUT", // Assuming your API is updating records
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete entry in updated_values_table");
+      }
+
+      console.log("Entry deleted successfully");
+      // Remove the selected row from the table data
+      const updatedTableData = tableData.filter((_, i) => i !== index);
+      setTableData(updatedTableData);
+    } catch (error) {
+      console.error("Error deleting entry:", error);
+      alert("Failed to delete the entry. Please try again.");
+    }
   };
 
   useEffect(() => {
@@ -372,286 +427,14 @@ const URDPurchase = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch(`${baseURL}/get/products`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        const result = await response.json();
-        setProducts(result);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-    fetchProducts();
-  }, []);
-
-  const handleMetalTypeChange = (metalType) => {
-    const product = products.find((prod) => String(prod.Category) === String(metalType));
-
-    if (product) {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: product.rbarcode || "",
-        product_id: product.product_id || "",
-        product_name: product.product_name || "",
-        metal_type: product.Category || "",
-        design_name: product.design_master || "",
-        purity: product.purity || "",
-        hsn: product.hsn_code || "",
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        hsn: "",
-      }));
-    }
-  };
-
-  const handleDesignNameChange = (designName) => {
-    const product = products.find((prod) => String(prod.design_master) === String(designName));
-
-    if (product) {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: product.rbarcode || "",
-        product_id: product.product_id || "",
-        product_name: product.product_name || "",
-        metal_type: product.Category || "",
-        design_name: product.design_master || "",
-        purity: product.purity || "",
-        hsn: product.hsn_code || "",
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        hsn: "",
-      }));
-    }
-  };
-
-  const handleProductNameChange = (productName) => {
-    const product = products.find((prod) => String(prod.product_name) === String(productName));
-
-    if (product) {
-      setFormData((prevData) => ({
-        ...prevData,
-
-        code: product.rbarcode,
-
-        product_id: product.product_id || "",
-        product_name: product.product_name || "",
-        metal_type: product.Category || "",
-        design_name: product.design_master || "",
-        purity: product.purity || "",
-        hsn: product.hsn_code || "",
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        hsn: "",
-      }));
-    }
-  };
-
-  const handleProductChange = (productId) => {
-    const product = products.find((prod) => String(prod.product_id) === String(productId));
-
-    if (product) {
-      // Find the corresponding tag entry from the open-tags-entry
-      const tag = data.find((tag) => String(tag.product_id) === String(productId));
-
-      // If tag is found, populate the form with the tag's details
-      if (tag) {
-        setFormData((prevData) => ({
-          ...prevData,
-          code: '', // Priority to tag code if available
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          gross_weight: "", // Use tag's gross weight
-          stone_weight: "",
-          stone_price: "",
-          weight_bw: "",
-          va_on: "",
-          va_percent: "",
-          wastage_weight: "",
-          total_weight_aw: "",
-          mc_on: "",
-          mc_per_gram: "",
-          making_charges: "",
-        }));
-      } else {
-        // If no tag is found, just fill product details
-        setFormData((prevData) => ({
-          ...prevData,
-          code: product.rbarcode,
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          hsn: product.hsn_code || "",
-          gross_weight: "",
-          stone_weight: "",
-          stone_price: "",
-          weight_bw: "",
-          va_on: "",
-          va_percent: "",
-          wastage_weight: "",
-          total_weight_aw: "",
-          mc_on: "",
-          mc_per_gram: "",
-          making_charges: "",
-        }));
-      }
-    } else {
-      // Reset form data if no product is selected
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        hsn: "",
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        mc_on: "",
-        mc_per_gram: "",
-        making_charges: "",
-        rate: "",
-        rate_amt: "",
-        tax_percent: "",
-        tax_amt: "",
-        total_price: "",
-      }));
-    }
-  };
-
-  const [selectedProduct, setSelectedProduct] = useState(null);
-
-
-  const handleBarcodeChange = async (code) => {
-    try {
-      const product = products.find((prod) => String(prod.rbarcode) === String(code));
-
-      if (product) {
-        // Set form data as before
-        setFormData((prevData) => ({
-          ...prevData,
-          code: product.rbarcode,
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          hsn: product.hsn_code || "",
-          qty: 1, // Set qty to 1 for product
-        }));
-        setIsQtyEditable(false);
-
-        // Update selected product data
-        setSelectedProduct({
-          product_id: product.product_id,
-          product_name: product.product_name,
-          metal_type: product.Category,
-          design_name: product.design_master,
-          purity: product.purity,
-          hsn: product.hsn_code || "",
-        });
-      } else {
-        const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
-        if (tag) {
-          const productId = tag.product_id;
-          const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-
-          setFormData((prevData) => ({
-            ...prevData,
-            code: tag.PCode_BarCode || "",
-            product_id: tag.product_id || "",
-            product_name: productDetails?.product_name || "",
-            metal_type: productDetails?.Category || "",
-            design_name: productDetails?.design_master || "",
-            purity: productDetails?.purity || "",
-            qty: 1,
-          }));
-          setIsQtyEditable(true);
-
-          // Update selected product data
-          setSelectedProduct({
-            product_id: tag.product_id || "",
-            product_name: productDetails?.product_name || "",
-            metal_type: productDetails?.Category || "",
-            design_name: productDetails?.design_master || "",
-            purity: productDetails?.purity || "",
-            hsn: productDetails?.hsn_code || "",
-            
-            
-          });
-        } else {
-          // Reset the form and state if no product or tag is found
-          setFormData((prevData) => ({
-            ...prevData,
-            code: "",
-            product_id: "",
-            product_name: "",
-            metal_type: "",
-            design_name: "",
-            purity: "",
-            hsn: "",
-            qty: "",
-          }));
-          setIsQtyEditable(true);
-          setSelectedProduct(null); // Reset selected product
-        }
-      }
-    } catch (error) {
-      console.error("Error handling code change:", error);
-    }
-  };
-
-
   const handleBack = () => {
     navigate('/purchasetable');
   };
 
   const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/purchase" } });
+    navigate("/suppliermaster", { state: { from: "/purchase" } });
   };
 
-  const [showModal1, setShowModal] = useState(false);
-
-  // Prevent modal from closing unintentionally
   useEffect(() => {
     const handleBeforeUnload = (e) => {
       if (showModal1) {
@@ -664,26 +447,200 @@ const URDPurchase = () => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [showModal1]);
 
-  const handleOpenModal = (data) => {
-    setSelectedProduct({
-        product_id: data.product_id,
-        product_name: data.product_name,
-        metal_type: data.metal_type,
-        design_name: data.design_name,
-        purity: data.purity,
-        hsn: data.hsn,
-        pcs: data.pcs,
-        gross_weight: data.gross_weight,
-    });
-    setShowModal(true); // This shows the modal
-};
+  const handleCloseModal1 = () => {
+    setShowModal(false);
+    setSelectedProduct(null);
+  };
+
+  useEffect(() => {
+    const fetchCurrentRates = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/current-rates`);
+        console.log('API Response:', response.data);
+
+        // Log the 24crt rate separately
+        console.log('24crt Rate:', response.data.rate_24crt);
+
+        // Dynamically set the rates based on response
+        setRates({
+          rate_24crt: response.data.rate_24crt || "",
+          rate_22crt: response.data.rate_22crt || "",
+          rate_18crt: response.data.rate_18crt || "",
+          rate_16crt: response.data.rate_16crt || "",
+        });
+      } catch (error) {
+        console.error('Error fetching current rates:', error);
+      }
+    };
+    fetchCurrentRates();
+  }, []);
+  // useEffect(() => {
+  //   const fetchLastInvoice = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/lastInvoice`);
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         invoice: response.data.lastInvoiceNumber,
+  //       }));
+  //     } catch (error) {
+  //       console.error("Error fetching estimate number:", error);
+  //     }
+  //   };
+
+  //   fetchLastInvoice();
+  // }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/products`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+
+        // Extract unique categories and map them into the required format with purity and hsn_code
+        const categorizedData = data.map((item) => ({
+          value: item.product_name,
+          label: item.product_name,
+          categoryType: item.Category, // Assuming "category" column indicates Gold/Silver
+          purity: item.purity,
+          hsn_code: item.hsn_code,
+          product_id: item.product_id,
+        }));
+
+        // Remove duplicates
+        const uniqueCategories = [
+          ...new Map(categorizedData.map((item) => [item.value, item])).values(),
+        ];
+
+        setCategories(uniqueCategories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchRateForSilver = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/current-rates`);
+        setFormData((prev) => ({
+          ...prev,
+          purity: "24K", // Directly set purity to 24K for silver
+          rate: response.data.silver_rate || "",
+        }));
+      } catch (error) {
+        console.error("Error fetching silver rate:", error);
+      }
+    };
+
+    if (formData.category) {
+      const selectedCategory = categories.find(
+        (cat) => cat.value === formData.category
+      );
+
+      if (selectedCategory?.categoryType === "Silver") {
+        fetchRateForSilver();
+        setPurityOptions([{
+          value: "24K",
+          label: "24K",
+        }]); // Only show 24K for silver
+      } else if (selectedCategory?.categoryType === "Gold") {
+        axios
+          .get(`${baseURL}/get/products`)
+          .then((response) => {
+            const products = response.data;
+
+            // Filter products based on selected category name
+            const filteredProducts = products.filter(
+              (product) => product.product_name === formData.category
+            );
+
+            // Extract unique purity values
+            const uniquePurityValues = [
+              ...new Set(filteredProducts.map((product) => product.purity)),
+            ].filter((purity) => purity); // Exclude null/undefined
+
+            // Update purity options
+            setPurityOptions(
+              uniquePurityValues.map((purity) => ({
+                value: purity,
+                label: purity,
+              }))
+            );
+
+            // Reset rate until purity is selected
+            setFormData((prev) => ({
+              ...prev,
+              rate: "",
+              
+            }));
+          })
+          .catch((error) => {
+            console.error("Error fetching products:", error);
+          });
+      }
+    } else {
+      // Reset purity options and rate if no category is selected
+      setPurityOptions([]);
+      setFormData((prev) => ({ ...prev, rate: "",hsn_code:'', }));
+    }
+  }, [formData.category, categories]);
+
+  useEffect(() => {
+    if (formData.category && formData.purity) {
+      axios
+        .get(`${baseURL}/get/products`)
+        .then((response) => {
+          const products = response.data;
+  
+          const matchingProduct = products.find(
+            (product) =>
+              product.product_name === formData.category &&
+              product.purity === formData.purity
+          );
+  
+          if (matchingProduct) {
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              product_id: matchingProduct.product_id, // Update product_id
+              rbarcode: matchingProduct.rbarcode,    // Update rbarcode
+              metal_type: matchingProduct.Category,
+            }));
+          } else {
+            // Reset product_id and rbarcode if no match
+            setFormData((prevFormData) => ({
+              ...prevFormData,
+              product_id: '',
+              rbarcode: '',
+              
+            }));
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching product details:", error);
+        });
+    } else {
+      // Reset if category or purity is not selected
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        product_id: '',
+        rbarcode: '',
+      }));
+    }
+  }, [formData.category, formData.purity]);
   
 
-
-
-
-  const handleCloseModal1 = () => {
-    setShowModal(false); // Close the modal
+  const handleOpenModal = (data) => {
+    setSelectedProduct(data);
+    setShowModal(true);
+  };
+  const handleAddCategory = () => {
+    console.log("Add Category button clicked");
+    navigate("/itemmaster", { state: { from: "/purchase" } });
   };
 
   return (
@@ -692,7 +649,6 @@ const URDPurchase = () => {
         <Form>
           <div className="purchase-form">
             <div className="purchase-form-left">
-              {/* Customer Details */}
               <Col className="urd-form1-section">
                 <h4 className="mb-4">Supplier Details</h4>
                 <Row>
@@ -739,72 +695,12 @@ const URDPurchase = () => {
 
                     />
                   </Col>
-                  {/* <Col xs={12} md={3}>
-                    <InputField
-                      label="Email:"
-
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="Address1:"
-                      value={formData.address1}
-                      onChange={(e) => handleChange("address1", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="Address2:"
-                      value={formData.address2}
-                      onChange={(e) => handleChange("address2", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="City"
-                      value={formData.city}
-                      onChange={(e) => handleChange("city", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="PinCode"
-                      value={formData.pincode}
-                      onChange={(e) => handleChange("pincode", e.target.value)}
-
-                    />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField label="State:" value={formData.state}
-                      onChange={(e) => handleChange("state", e.target.value)} />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField label="State Code:" value={formData.state_code}
-                      onChange={(e) => handleChange("state_code", e.target.value)} />
-                  </Col>
-                  <Col xs={12} md={3}>
-                    <InputField label="Aadhar" value={formData.aadhar_card}
-                      onChange={(e) => handleChange("aadhar_card", e.target.value)} />
-                  </Col> */}
 
                   <Col xs={12} md={4}>
                     <InputField label="GSTIN" value={formData.gst_in}
                       onChange={(e) => handleChange("gst_in", e.target.value)} />
                   </Col>
-                  {/* <Col xs={12} md={3}>
-                    <InputField label="PAN" value={formData.pan_card}
-                      onChange={(e) => handleChange("pan_card", e.target.value)} />
-                  </Col> */}
-
                 </Row>
-
               </Col>
             </div>
             <div className="purchase-form-right">
@@ -819,30 +715,23 @@ const URDPurchase = () => {
                       ]}
                     />
                   </Col>
-                  <Col xs={12} md={3} >
-                    <InputField label="Invoice" value={formData.indent}
-                      onChange={(e) => handleChange("indent", e.target.value)} />
+                  <Col xs={12} md={4}>
+                    <InputField
+                      label="Invoice"
+                      value={formData.invoice}
+                      onChange={(e) => handleChange("invoice", e.target.value)} // Corrected key
+                    />
                   </Col>
-                  <Col xs={12} md={2} >
+                  {/* <Col xs={12} md={3} >
                     <InputField label="Bill No" value={formData.bill_no}
                       onChange={(e) => handleChange("bill_no", e.target.value)} />
-                  </Col>
-                  <Col xs={12} md={2} >
-                    <InputField label="Type" value={formData.type}
-                      onChange={(e) => handleChange("type", e.target.value)} />
-                  </Col>
-                  <Col xs={12} md={2} >
+                  </Col> */}
+
+                  <Col xs={12} md={3} >
                     <InputField label="Rate-Cut" value={formData.rate_cut}
                       onChange={(e) => handleChange("rate_cut", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={3}>
-                    <InputField
-                      label="Date"
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) => handleChange("date", e.target.value)}
-                    />
-                  </Col>
+
                   <Col xs={12} md={3} >
                     <InputField label="Bill Date" type="date" value={formData.bill_date}
                       onChange={(e) => handleChange("bill_date", e.target.value)} />
@@ -851,138 +740,64 @@ const URDPurchase = () => {
                     <InputField label="Due Date" type="date" value={formData.due_date}
                       onChange={(e) => handleChange("due_date", e.target.value)} />
                   </Col>
-                  <Col xs={12} md={3} >
-                    <InputField label="Rate" value={formData.Purchase_rate}
-                      onChange={(e) => handleChange("Purchase_rate", e.target.value)} />
-                  </Col>
-
                 </Row>
-
-
               </Col>
             </div>
           </div>
-
           <div className="urd-form-section">
-            {/* <h4>Purchase Details</h4> */}
             <Row>
+              <Col xs={12} md={3} className="d-flex align-items-center">
+                <div style={{ flex: 1 }}>
+                  <InputField
+                    label="Category"
+                    name="category"
+                    type="select"
+                    value={formData.category}
+                    onChange={(e) => handleChange("category", e.target.value)}
+                    options={categories.map((category) => ({
+                      value: category.value,
+                      label: category.label,
+                    }))}
+                  />
+                </div>
+                <AiOutlinePlus
+                  size={20}
+                  color="black"
+                  onClick={handleAddCategory}
+                  style={{
+                    marginLeft: "10px",
+                    cursor: "pointer",
+                    marginBottom: "20px",
+                  }}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Purity"
+                  type="select"
+                  name="purity"
+                  value={formData.purity}
+                  onChange={(e) => handleChange("purity", e.target.value)}
+                  options={purityOptions}
+                />
+
+              </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Rbarcode"
-                  name="code"
-                  value={formData.code}
-                  onChange={(e) => handleBarcodeChange(e.target.value)}
-                  type="select"
-                  options={
-                    !formData.product_id
-                      ? [
-                        ...products.map((product) => ({
-                          value: product.rbarcode,
-                          label: product.rbarcode,
-                        })),
-                        ...data.map((tag) => ({
-                          value: tag.PCode_BarCode,
-                          label: tag.PCode_BarCode,
-                        })),
-                      ]
-                      : [
-                        ...products
-                          .filter((product) => String(product.product_id) === String(formData.product_id))
-                          .map((product) => ({
-                            value: product.rbarcode,
-                            label: product.rbarcode,
-                          })),
-                        ...data
-                          .filter((tag) => String(tag.product_id) === String(formData.product_id))
-                          .map((tag) => ({
-                            value: tag.PCode_BarCode,
-                            label: tag.PCode_BarCode,
-                          })),
-                      ]
-                  }
-                />
-              </Col>
-              {/* <Col xs={12} md={2}>
-                  <InputField
-                    label="P ID"
-                    name="product_id"
-                    value={formData.product_id}
-                    onChange={(e) => handleProductChange(e.target.value)}
-                    type="select"
-                    options={products.map((product) => ({
-                      value: product.product_id,
-                      label: product.product_id,
-                    }))}
-                  />
-                </Col> */}
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Product Name"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={(e) => handleProductNameChange(e.target.value)}
-                  type="select"
-                  options={products.map((product) => ({
-                    value: product.product_name,
-                    label: product.product_name,
-                  }))}
+                  name="rbarcode"
+                  value={formData.rbarcode}
+                  onChange={(e) => handleChange("rbarcode", e.target.value)}
                 />
               </Col>
               <Col xs={12} md={2}>
                 <InputField
-                  label="Metal Type"
-                  name="metal_type"
-                  value={formData.metal_type}
-                  onChange={(e) => handleMetalTypeChange(e.target.value)}
-                  type="select"
-                  options={products.map((product) => ({
-                    value: product.Category,
-                    label: product.Category,
-                  }))}
+                  label="HSN Code"
+                  name="hsn_code"
+                  value={formData.hsn_code}
+                  onChange={handleChange}
+                  readOnly
                 />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Design Name"
-                  name="design_name"
-                  value={formData.design_name}
-                  onChange={(e) => handleDesignNameChange(e.target.value)}
-                  type="select"
-                  options={products.map((product) => ({
-                    value: product.design_master,
-                    label: product.design_master,
-                  }))}
-                />
-              </Col>
-              {/* <Col xs={12} md={2}>
-                <InputField
-                  label="Purity:"
-                  type="select"
-                  value={formData.purity}
-                  onChange={(e) => handleChange('purity', e.target.value)}
-                  options={[
-                    { value: "24K", label: "24K" },
-                    { value: "22K", label: "22K (916)" },
-                    { value: "22KHM", label: "22K (916HM)" },
-                    { value: "18K", label: "18K (750)" },
-                    { value: "14K", label: "14K (585)" },
-                    { value: "10K", label: "10K (417)" },
-                    { value: "9K", label: "9K (375)" },
-                  ]}
-                />
-              </Col> */}
-
-              <Col xs={12} md={1}>
-                <InputField label="HSN" type="text" value={formData.hsn}
-                  onChange={(e) => handleChange("hsn", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Type" type="text" value={formData.product_type}
-                  onChange={(e) => handleChange("product_type", e.target.value)} />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField label="Stock Type" type="text" value={formData.stock_type}
-                  onChange={(e) => handleChange("stock_type", e.target.value)} />
               </Col>
               <Col xs={12} md={1}>
                 <InputField label="PCs" type="text" value={formData.pcs}
@@ -997,229 +812,133 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("stone_weight", e.target.value)} />
               </Col>
               <Col xs={12} md={1}>
-                <InputField label="Net" type="number" value={formData.net_weight}
-                  onChange={(e) => handleChange("net_weight", e.target.value)} />
-              </Col>
-              <Col xs={12} md={2}>
                 <InputField
-                  label="Purity"
-                  name="purity"
-                  value={formData.purity}
-                  onChange={handleChange}
-                  readOnly
+                  label="Net"
+                  type="number"
+                  value={formData.net_weight}
+                  onChange={(e) => handleChange("net_weight", e.target.value)}
                 />
               </Col>
               <Col xs={12} md={2}>
+                <InputField label="HM Charges" type="number" value={formData.hm_charges}
+                  onChange={(e) => handleChange("hm_charges", e.target.value)} />
+              </Col>
+
+              <Col xs={12} md={2}>
                 <InputField
-                  label="Purity Percentage"
-                  name="purityPercentage"
-                  value={formData.purityPercentage}
-                  readOnly
-                />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Pure Wt" type="number" value={formData.pure_weight}
-                  onChange={(e) => handleChange("pure_weight", e.target.value)} />
-              </Col>
-
-              <Col xs={12} md={1}>
-                <InputField label="Unit" type="number" value={formData.unit_weight}
-                  onChange={(e) => handleChange("unit_weight", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="W%" type="number" value={formData.waste_percentage}
-                  onChange={(e) => handleChange("waste_percentage", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Waste" type="number" value={formData.waste_amount}
-                  onChange={(e) => handleChange("waste_amount", e.target.value)} />
-              </Col>
-
-              <Col xs={12} md={1}>
-                <InputField label="Alloy" value={formData.alloy}
-                  onChange={(e) => handleChange("alloy", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Cost" type="number" value={formData.cost}
-                  onChange={(e) => handleChange("cost", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Total Wt" type="number" value={formData.total_weight}
-                  onChange={(e) => handleChange("total_weight", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Rate" type="number" value={formData.stone_rate}
-                  onChange={(e) => handleChange("stone_rate", e.target.value)} />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField label="WT*Rate Amt" type="number" value={formData.wt_rate_amount}
-                  onChange={(e) => handleChange("wt_rate_amount", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="MC/Gm" type="number" value={formData.mc_per_gram}
-                  onChange={(e) => handleChange("mc_per_gram", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="MC" type="number" value={formData.mc}
-                  onChange={(e) => handleChange("mc", e.target.value)} />
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={12} md={2}>
-                <InputField label="Stone" value={formData.stone}
-                  onChange={(e) => handleChange("stone", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="PCs" type="number" value={formData.stone_pcs}
-                  onChange={(e) => handleChange("stone_pcs", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="CT" type="number" value={formData.stone_ct}
-                  onChange={(e) => handleChange("stone_ct", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Gms" type="number" value={formData.gms}
-                  onChange={(e) => handleChange("gms", e.target.value)} />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField label="CWP" type="select" value={formData.cwp}
-                  onChange={(e) => handleChange("cwp", e.target.value)}
+                  label="Other Charges:"
+                  type="select"
+                  value={formData.other_charges}
+                  onChange={(e) => handleChange("other_charges", e.target.value)}
                   options={[
-                    { value: "ct", label: "ct" },
-                    { value: "weight", label: "weight" },
-                    { value: "piece", label: "piece" },
+                    { value: "Cargo", label: "Cargo" },
+                    { value: "Transport", label: "Transport" },
                   ]}
                 />
               </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Rate" type="number" value={formData.rate}
-                  onChange={(e) => handleChange("rate", e.target.value)} />
+              <Col xs={12} md={2}>
+                <InputField label="Charges" type="number" value={formData.charges}
+                  onChange={(e) => handleChange("charges", e.target.value)} />
               </Col>
               <Col xs={12} md={1}>
-                <InputField label="Stn.Amt" type="number" value={formData.stone_amount}
-                  onChange={(e) => handleChange("stone_amount", e.target.value)} />
-              </Col>
-              {/* <Col xs={12} md={1}>
-                <InputField label="Clear" value={formData.clear}
-                  onChange={(e) => handleChange("clear", e.target.value)} />
-              </Col> */}
-              <Col xs={12} md={1}>
-                <InputField label="Clarity" value={formData.clarity}
-                  onChange={(e) => handleChange("clarity", e.target.value)} />
+
+                <InputField
+                  label="Pure Wt"
+                  type="number"
+                  value={formData.pure_weight}
+                  onChange={(e) => handleChange("pure_weight", e.target.value)}
+                />
               </Col>
               <Col xs={12} md={1}>
-                <InputField label="Colour" value={formData.class}
-                  onChange={(e) => handleChange("class", e.target.value)} />
+                <InputField
+                  label="Rate"
+                  type="number"
+                  value={formData.rate}
+                  onChange={(e) => handleChange("rate", e.target.value)}
+                />
+
               </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Cut" value={formData.cut}
-                  onChange={(e) => handleChange("cut", e.target.value)} />
-              </Col>
-              {/* <Col xs={12} md={1}>
-                <InputField label="CT" type="number" value={formData.stone_ct}
-                  onChange={(e) => handleChange("stone_ct", e.target.value)} />
-              </Col> */}
-              <Col xs={12} md={1}>
-                <InputField label="Total" type="number" value={formData.total_amount}
-                  onChange={(e) => handleChange("total_amount", e.target.value)} />
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Total Amount"
+                  type="number"
+                  value={formData.total_amount}
+                  readOnly // Prevent editing by the user
+                />
               </Col>
 
+
+              {/* <Col xs={12} md={1}>
+                <InputField label="Actions" type="number" value={formData.total_amount}
+                  onChange={(e) => handleChange("total_amount", e.target.value)} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Pure Bal" type="number" value={formData.total_amount}
+                  onChange={(e) => handleChange("total_amount", e.target.value)} />
+              </Col> */}
               <Col xs={12} md={1}>
                 <Button onClick={handleAdd}>
+
                   {editingIndex !== null ? "Update" : "Add"}
                 </Button>
               </Col>
+            </Row>
+            <Row>
             </Row>
             <div style={{ overflowX: "scroll", marginTop: '-27px' }}>
               <Table striped bordered hover className="mt-4">
                 <thead>
                   <tr>
-                    <th>BarCode/Rbarcode</th>
-                    <th>Product ID</th>
-                    <th>Product Name</th>
-                    <th>Metal Type</th>
-                    <th>Design Name</th>
-                    <th>Purity</th>
-                    <th>purityPercentage</th>
-                    <th>HSN</th>
-                    <th>Product Type</th>
-                    <th>Stock Type</th>
+                    <th>product_id</th>
+                    <th>Rbarcode</th>
+                    <th>Category</th>
                     <th>Pieces</th>
-                    <th>Gross Weight</th>
-                    <th>Stone Weight</th>
-                    <th>Net Weight</th>
-                    <th>Unit Weight</th>
-                    <th>Waste Percentage</th>
-                    <th>Waste Amount</th>
-                    <th>Pure Weight</th>
-                    <th>Alloy</th>
-                    <th>Cost</th>
-                    <th>Total Weight</th>
-                    <th>Weight Rate Amount</th>
-                    <th>MC Per Gram</th>
-                    <th>Making Charges</th>
-                    <th>Stone Amount</th>
-                    <th>Total Amount</th>
+                    <th>Gross</th>
                     <th>Stone</th>
-                    <th>Stone Pieces</th>
-                    <th>Stone Carat</th>
-                    <th>CWP</th>
-                    <th>GMS</th>
-                    <th>Stone Rate</th>
-                    <th>Clarity</th>
+                    <th>Net</th>
+                    <th>HM Charges</th>
+                    <th>Other Charges</th>
+                    <th>Charges</th>
+                    <th>Metal Type</th>
+                    <th>Purity</th>
+                    <th>Pure Wt</th>
                     <th>Rate</th>
-                    <th>Clear</th>
-                    <th>Class</th>
-                    <th>Cut</th>
+                    <th>Total Amount</th>
                     <th>Actions</th> {/* New Action column */}
                   </tr>
                 </thead>
                 <tbody>
                   {tableData.map((data, index) => (
                     <tr key={index}>
-                      <td>{data.code}</td>
-                      <td>{data.product_id}</td>
-                      <td>{data.product_name}</td>
-                      <td>{data.metal_type}</td>
-                      <td>{data.design_name}</td>
-                      <td>{data.purity}</td>
-                      <td>{data.purityPercentage}</td>
-                      <td>{data.hsn}</td>
-                      <td>{data.product_type}</td>
-                      <td>{data.stock_type}</td>
+                      <td>{data.product_id}</td> {/* Display product_id */}
+                      <td>{data.rbarcode}</td>
+                      <td>{data.category}</td>
                       <td>{data.pcs}</td>
                       <td>{data.gross_weight}</td>
                       <td>{data.stone_weight}</td>
                       <td>{data.net_weight}</td>
-                      <td>{data.unit_weight}</td>
-                      <td>{data.waste_percentage}</td>
-                      <td>{data.waste_amount}</td>
+                      <td>{data.hm_charges}</td>
+                      <td>{data.other_charges}</td>
+                      <td>{data.charges}</td>
+                      <td>{data.metal_type}</td>
+                      <td>{data.purity}</td>
                       <td>{data.pure_weight}</td>
-                      <td>{data.alloy}</td>
-                      <td>{data.cost}</td>
-                      <td>{data.total_weight}</td>
-                      <td>{data.wt_rate_amount}</td>
-                      <td>{data.mc_per_gram}</td>
-                      <td>{data.mc}</td>
-                      <td>{data.stone_amount}</td>
-                      <td>{data.total_amount}</td>
-                      <td>{data.stone}</td>
-                      <td>{data.stone_pcs}</td>
-                      <td>{data.stone_ct}</td>
-                      <td>{data.cwp}</td>
-                      <td>{data.gms}</td>
-                      <td>{data.stone_rate}</td>
-                      <td>{data.clarity}</td>
                       <td>{data.rate}</td>
-                      <td>{data.clear}</td>
-                      <td>{data.class}</td>
-                      <td>{data.cut}</td>
+                      <td>{data.total_amount}</td>
                       <td style={{ display: 'flex' }}>
-                        <button type="button" className="btn btn-primary" style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }} onClick={() => handleOpenModal(data)}>Tag Entry</button> {/* New Action button */}
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }}
+                          onClick={() => handleOpenModal(data)} // Pass entire row data
+                        >
+                          Tag Entry
+                        </button>
                         <button
                           type="button"
                           className="action-button edit-button"
                           onClick={() => handleEdit(index)}
+                          disabled={editingIndex !== null}
                         >
                           <FaEdit />
                         </button>
@@ -1227,34 +946,30 @@ const URDPurchase = () => {
                           type="button"
                           className="action-button delete-button"
                           onClick={() => handleDelete(index)}
+                          disabled={editingIndex !== null}
                         >
                           <FaTrash />
                         </button>
                       </td>
-
                     </tr>
                   ))}
                 </tbody>
-              </Table>
 
+              </Table>
             </div>
           </div>
-
           <div className="form-buttons">
             <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSave}>Save</Button>
-
             <Button
               variant="secondary"
               onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
             >
               cancel
             </Button>
-
           </div>
         </Form>
       </div>
 
-      {/* Modal containing the TagEntry component */}
       <Modal
         show={showModal1}
         onHide={handleCloseModal1}
@@ -1267,7 +982,12 @@ const URDPurchase = () => {
           <Modal.Title>Tag Entry</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <TagEntry handleCloseModal={handleCloseModal1} selectedProduct={selectedProduct} />
+          {selectedProduct && (
+            <TagEntry
+              handleCloseModal={handleCloseModal1}
+              selectedProduct={selectedProduct}
+            />
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal1}>
@@ -1275,6 +995,7 @@ const URDPurchase = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
 
     </div>
   );

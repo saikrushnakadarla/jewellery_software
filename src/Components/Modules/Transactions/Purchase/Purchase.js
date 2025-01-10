@@ -47,6 +47,8 @@ const URDPurchase = () => {
         pure_weight: "",
         rate: "",
         total_amount: "",
+        paid_amount: "",
+        balance_amount: "",
       };
   });
 
@@ -59,89 +61,100 @@ const URDPurchase = () => {
   const [categories, setCategories] = useState([]);
 
   const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
-
+  
       // If the category changes, update the hsn_code automatically
       if (field === "category") {
         const selectedCategory = categories.find(
           (category) => category.value === value
         );
         if (selectedCategory) {
-          updatedFormData.hsn_code = selectedCategory.hsn_code;  // Set the hsn_code based on the selected category
+          updatedFormData.hsn_code = selectedCategory.hsn_code;
         }
       }
-
-      return updatedFormData;
-    });
-
-    setFormData((prev) => {
-      const updatedFormData = { ...prev, [field]: value };
-
-      let updatedDetails = { ...updatedFormData };
-
+  
       // Parse purity to percentage from carats (e.g., "24K" -> 100%)
       const parsePurityToPercentage = (purity) => {
         const caratValue = parseFloat(purity.replace("K", "")); // Extract number from "24K", "22K", etc.
         return (caratValue / 24) * 100; // Convert carats to percentage
       };
-
+  
       // Update rate based on purity
       if (field === "purity") {
         const rate =
-          value === "24K" ? rates.rate_24crt :
-            value === "22K" ? rates.rate_22crt :
-              value === "18K" ? rates.rate_18crt :
-                value === "16K" ? rates.rate_16crt :
-                  "";
-
-        updatedDetails.rate = rate;
+          value === "24K"
+            ? rates.rate_24crt
+            : value === "22K"
+            ? rates.rate_22crt
+            : value === "18K"
+            ? rates.rate_18crt
+            : value === "16K"
+            ? rates.rate_16crt
+            : "";
+  
+        updatedFormData.rate = rate;
       }
-
+  
       // Update pure weight when net weight or purity changes
       if (field === "net_weight" || field === "purity") {
-        const netWeight = parseFloat(updatedDetails.net_weight) || 0;
-        const purityPercentage = parsePurityToPercentage(updatedDetails.purity) || 0;
-
-        updatedDetails.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
+        const netWeight = parseFloat(updatedFormData.net_weight) || 0;
+        const purityPercentage = parsePurityToPercentage(
+          updatedFormData.purity
+        ) || 0;
+  
+        updatedFormData.pure_weight = (
+          (netWeight * purityPercentage) / 100
+        ).toFixed(2);
       }
-
+  
       // Additional calculations for other fields
       if (
-        updatedDetails.gross &&
-        updatedDetails.dust &&
-        updatedDetails.ml_percent &&
-        updatedDetails.purity
+        updatedFormData.gross &&
+        updatedFormData.dust &&
+        updatedFormData.ml_percent &&
+        updatedFormData.purity
       ) {
-        const purityValue = parsePurityToPercentage(updatedDetails.purity);
-
+        const purityValue = parsePurityToPercentage(updatedFormData.purity);
+  
         if (purityValue) {
-          const gross = parseFloat(updatedDetails.gross) || 0;
-          const dust = parseFloat(updatedDetails.dust) || 0;
-          const mlPercent = parseFloat(updatedDetails.ml_percent) || 0;
-
+          const gross = parseFloat(updatedFormData.gross) || 0;
+          const dust = parseFloat(updatedFormData.dust) || 0;
+          const mlPercent = parseFloat(updatedFormData.ml_percent) || 0;
+  
           const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
-          updatedDetails.eqt_wt = netWeight.toFixed(2);
+          updatedFormData.eqt_wt = netWeight.toFixed(2);
         }
       }
-      // Other calculations for weights and amounts
-      const grossWeight = parseFloat(updatedDetails.gross_weight) || 0;
-      const stoneWeight = parseFloat(updatedDetails.stone_weight) || 0;
-      updatedDetails.net_weight = grossWeight - stoneWeight;
-
-      const netWeight = parseFloat(updatedDetails.net_weight) || 0;
-      const purityPercentage = parsePurityToPercentage(updatedDetails.purity) || 0;
-      updatedDetails.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
-
-      // Calculate total amount based on pure weight and rate
-      const pureWeight = parseFloat(updatedDetails.pure_weight) || 0;
-      const rate = parseFloat(updatedDetails.rate) || 0;
-      updatedDetails.total_amount = (pureWeight * rate).toFixed(2);
-      return updatedDetails;
+  
+      // Update net weight and pure weight
+      const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
+      const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
+      updatedFormData.net_weight = grossWeight - stoneWeight;
+  
+      const netWeight = parseFloat(updatedFormData.net_weight) || 0;
+      const purityPercentage = parsePurityToPercentage(
+        updatedFormData.purity
+      ) || 0;
+      updatedFormData.pure_weight = (
+        (netWeight * purityPercentage) / 100
+      ).toFixed(2);
+  
+      // Calculate total amount
+      const pureWeight = parseFloat(updatedFormData.pure_weight) || 0;
+      const rate = parseFloat(updatedFormData.rate) || 0;
+      updatedFormData.total_amount = (pureWeight * rate).toFixed(2);
+  
+      // Calculate balance amount
+      const paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
+      updatedFormData.balance_amount = (
+        parseFloat(updatedFormData.total_amount || 0) - paidAmount
+      ).toFixed(2);
+  
+      return updatedFormData;
     });
   };
+  
   const [tableData, setTableData] = useState(() => {
     const savedData = localStorage.getItem("tableData");
     return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
@@ -204,6 +217,8 @@ const URDPurchase = () => {
           pure_weight: "",
           rate: "",
           total_amount: "",
+          paid_amount: "",
+          balance_amount: "",
         });
       } else {
         console.error("Failed to add entry to the database:", response.statusText);
@@ -840,7 +855,7 @@ const URDPurchase = () => {
                 <InputField label="Charges" type="number" value={formData.charges}
                   onChange={(e) => handleChange("charges", e.target.value)} />
               </Col>
-              <Col xs={12} md={1}>
+              <Col xs={12} md={2}>
 
                 <InputField
                   label="Pure Wt"
@@ -849,7 +864,7 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("pure_weight", e.target.value)}
                 />
               </Col>
-              <Col xs={12} md={1}>
+              <Col xs={12} md={2}>
                 <InputField
                   label="Rate"
                   type="number"
@@ -864,6 +879,22 @@ const URDPurchase = () => {
                   type="number"
                   value={formData.total_amount}
                   readOnly // Prevent editing by the user
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label=" Paid Amount"
+                  type="number"
+                  value={formData.paid_amount}
+                  onChange={(e) => handleChange("paid_amount", e.target.value)}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Balance Amount"
+                  type="number"
+                  value={formData.balance_amount}
+                  onChange={(e) => handleChange("balance_amount", e.target.value)}
                 />
               </Col>
 
@@ -904,13 +935,15 @@ const URDPurchase = () => {
                     <th>Pure Wt</th>
                     <th>Rate</th>
                     <th>Total Amount</th>
+                    <th>Paid Amount</th>
+                    <th>Balance Amount</th>
                     <th>Actions</th> {/* New Action column */}
                   </tr>
                 </thead>
                 <tbody>
                   {tableData.map((data, index) => (
                     <tr key={index}>
-                      <td>{data.product_id}</td> {/* Display product_id */}
+                      <td>{data.product_id}</td>
                       <td>{data.rbarcode}</td>
                       <td>{data.category}</td>
                       <td>{data.pcs}</td>
@@ -925,6 +958,8 @@ const URDPurchase = () => {
                       <td>{data.pure_weight}</td>
                       <td>{data.rate}</td>
                       <td>{data.total_amount}</td>
+                      <td>{data.paid_amount}</td>
+                      <td>{data.balance_amount}</td>
                       <td style={{ display: 'flex' }}>
                         <button
                           type="button"
