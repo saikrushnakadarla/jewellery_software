@@ -272,29 +272,36 @@ const SalesForm = () => {
     navigate("/customermaster", { state: { from: "/sales" } });
   };
 
-    const [selectedRows, setSelectedRows] = useState([]);
-    const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
   
-    const handleCheckboxChange = (event, index) => {
-      const isChecked = event.target.checked;
-      if (isChecked) {
-        setSelectedRows([...selectedRows, index]); // Add index to selectedRows
-      } else {
-        setSelectedRows(selectedRows.filter(i => i !== index)); // Remove index from selectedRows
-      }
-    };
+  const handleCheckboxChange = (event, index) => {
+    const isChecked = event.target.checked;
+    let updatedSelectedRows;
   
-    const handleSelectAllChange = (event) => {
-      const isChecked = event.target.checked;
-      if (isChecked) {
-        // Select all rows
-        setSelectedRows(invoiceDetails.map((_, index) => index));
-      } else {
-        // Deselect all rows
-        setSelectedRows([]);
-      }
-      setIsAllSelected(isChecked); // Update "Check All" checkbox state
-    };
+    if (isChecked) {
+      updatedSelectedRows = [...selectedRows, index]; // Add index to selectedRows
+    } else {
+      updatedSelectedRows = selectedRows.filter((i) => i !== index); // Remove index from selectedRows
+    }
+  
+    setSelectedRows(updatedSelectedRows);
+  
+    // Update "Select All" checkbox state
+    setIsAllSelected(updatedSelectedRows.length === invoiceDetails.length);
+  };
+  
+  const handleSelectAllChange = (event) => {
+    const isChecked = event.target.checked;
+    if (isChecked) {
+      // Select all rows
+      setSelectedRows(invoiceDetails.map((_, index) => index));
+    } else {
+      // Deselect all rows
+      setSelectedRows([]);
+    }
+    setIsAllSelected(isChecked); // Update "Check All" checkbox state
+  };
 
   return (
     <div style={{paddingTop:'75px'}}>
