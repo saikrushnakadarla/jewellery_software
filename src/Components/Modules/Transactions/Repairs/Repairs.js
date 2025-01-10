@@ -328,16 +328,6 @@ const RepairForm = () => {
                           })),
                         ]}
                       />
-                      {/* <InputField
-        label="Mobile"
-        name="mobile"
-        type="text"  // 'select' is not correct for a simple mobile input, it should be 'text' or 'number'
-        value={formData.mobile || ""}  // Ensure the value comes from formData.mobile
-        onChange={(e) => setFormData({
-          ...formData,
-          mobile: e.target.value // Update mobile when the user types in the field
-        })}
-      /> */}
                     </div>
                     <AiOutlinePlus
                       size={20}

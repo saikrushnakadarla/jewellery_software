@@ -4,8 +4,6 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 const ProductTable = ({ repairDetails, onDelete, onEdit, 
   invoiceDetails,selectedRows,isAllSelected,handleCheckboxChange,handleSelectAllChange }) => {
-
-
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
@@ -25,10 +23,10 @@ const ProductTable = ({ repairDetails, onDelete, onEdit,
           <th>
             <input
               type="checkbox"
-              checked={isAllSelected} // If all rows are selected, "Check All" will be checked
-              onChange={handleSelectAllChange} // Handle "Check All" toggle
+              checked={isAllSelected} 
+              onChange={handleSelectAllChange} 
             />
-          </th> {/* Check All column */}
+          </th> 
           <th>Invoice Number</th>
           <th>Code</th>
           <th>Product Name</th>
@@ -49,8 +47,8 @@ const ProductTable = ({ repairDetails, onDelete, onEdit,
               <td>
                 <input
                   type="checkbox"
-                  checked={selectedRows.includes(index)} // Check if this row is selected
-                  onChange={(event) => handleCheckboxChange(event, index)} // Handle checkbox change
+                  checked={selectedRows.includes(index)} 
+                  onChange={(event) => handleCheckboxChange(event, index)}
                 />
               </td>
               <td>{detail.invoice_number}</td>

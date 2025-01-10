@@ -297,11 +297,11 @@ const SalesForm = () => {
     };
 
   return (
-    <div className="main-container">
+    <div style={{paddingTop:'75px'}}>
       <Container className="sales-form-container">
         <Form>
           <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>
-            Sales
+            Sales Return
           </h3>
           <div className="sales-form">
             <div className="sales-form-left">

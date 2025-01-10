@@ -187,14 +187,23 @@ const handlePopoverToggle = (event, repairId) => {
     ],
     [popoverData.repairId]
   );
+  const [repairDetailsForModal, setRepairDetailsForModal] = useState(null);
 
   const handleViewClick = (repairData) => {
     setSelectedRepair(repairData);
+    const matchingDetail = repairDetails.find(
+      (detail) => detail.repair_id === repairData.repair_id
+    );
+    console.log("matchingDetail=",matchingDetail)
+  
+    setRepairDetailsForModal(matchingDetail || null); // Set details if found
     setShowDetailModal(true);
   };
   
   const handleCloseModal = () => {
     setShowDetailModal(false);
+    setSelectedRepair(null);
+    setRepairDetailsForModal(null); // Clear additional details
   };
 
   const handleRepairEdit = (id) => {
@@ -510,16 +519,40 @@ const handlePopoverToggle = (event, repairId) => {
               <p><strong>Repair No:</strong> {selectedRepair.repair_no}</p>
               <p><strong>Customer Name:</strong> {selectedRepair.account_name}</p>
               <p><strong>Mobile:</strong> {selectedRepair.mobile}</p>
-              {/* <p><strong>Email:</strong> {selectedRepair.email}</p>
-              <p><strong>Entry Type:</strong> {selectedRepair.entry_type}</p> */}
               <p><strong>Item Name:</strong> {selectedRepair.item}</p>
-              {/* <p><strong>Metal Type:</strong> {selectedRepair.metal_type}</p>
-              <p><strong>Purity:</strong> {selectedRepair.purity}</p> */}
               <p><strong>Total:</strong> {selectedRepair.total}</p>
               <p><strong>Date:</strong> {formatDate(selectedRepair.date)}</p>
               <p><strong>Delivery Date:</strong> {formatDate(selectedRepair.delivery_date)}</p>
-              {/* <p><strong>Counter:</strong> {selectedRepair.counter}</p> */}
               <p><strong>Status:</strong> {selectedRepair.status}</p>
+
+              {/* Tabular format for additional repair details */}
+              {repairDetailsForModal ? (
+                <div>
+                  <h5>Additional Repair Details</h5>
+                  <table className="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Metal Type</th>
+                        <th>Weight</th>
+                        <th>Quantity</th>
+                        <th>Rate Type</th>
+                        <th>Rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{repairDetailsForModal.metal_type || "N/A"}</td>
+                        <td>{repairDetailsForModal.weight || "N/A"}</td>
+                        <td>{repairDetailsForModal.qty || "N/A"}</td>
+                        <td>{repairDetailsForModal.rate_type || "N/A"}</td>
+                        <td>{repairDetailsForModal.rate || "N/A"}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>Loading additional details...</p>
+              )}
             </div>
           ) : (
             <p>No details available.</p>
@@ -531,6 +564,8 @@ const handlePopoverToggle = (event, repairId) => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+
 
       </div>
     </div>
