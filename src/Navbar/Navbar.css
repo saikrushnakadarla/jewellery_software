@@ -10,6 +10,7 @@
  z-index: 1001;
     width: 100%;
     margin-top: -10px;
+    height: 82px;
 }
 
 .active {
@@ -43,7 +44,7 @@
     font-size: 1.5rem;
     font-weight: bold;
     color: #a36e29;
-    margin-bottom: 5px;
+    margin-bottom: -6px;
     margin-right: 5%;
   }
 

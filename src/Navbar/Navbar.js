@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FaSignOutAlt } from "react-icons/fa";
-import logo from '../../src/Components/Pages/Login/Logo/logo_dark.png';
+import logo from '../../src/Components/Pages/Login/Logo/sadashri_logo.png';
 import './Navbar.css';
 
 function Navbar() {
@@ -60,7 +60,7 @@ function Navbar() {
   return (
     <header className="navbar-header">
       <div className="navbar-brand">
-      <img src={logo} alt="Logo" className="" style={{ width: "250px", height: "50px" }} />
+      <img src={logo} alt="Logo" className="" style={{ width: "200px" }} />
       </div>
 
       <div
