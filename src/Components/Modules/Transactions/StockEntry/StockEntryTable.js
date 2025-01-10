@@ -227,6 +227,10 @@ const StockEntryTable = () => {
   // Handle field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      sub_category: data.sub_category, // Assuming `sub_category` is the existing value
+    });
     setFormData({ ...formData, [name]: value });
 
     if (name === "product_id" && value) {
@@ -255,6 +259,9 @@ const StockEntryTable = () => {
       Stones_Weight: totalWeight.toFixed(2),
       Stones_Price: totalPrice.toFixed(2),
     });
+  };
+  const handleCancel = () => {
+    navigate('/stockEntryTable');
   };
 
   return (
@@ -310,7 +317,7 @@ const StockEntryTable = () => {
                   label="Sub Category:"
                   name="sub_category"
                   type="select"
-                  value={formData.sub_category}
+                  value={formData.sub_category || ''}
                   onChange={handleChange}
                   options={subCategories.map((category) => ({
                     value: category.subcategory_id, // Use subcategory_id as the value
@@ -350,7 +357,7 @@ const StockEntryTable = () => {
                   label="Design Master:"
                   name="design_master"
                   type="select"
-                  value={formData.design_master}
+                  value={formData.design_master || ''}
                   onChange={handleChange}
                   // options={designOptions}
                   options={designOptions.map(option => ({ value: option.value, label: option.label }))}
@@ -562,6 +569,14 @@ const StockEntryTable = () => {
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
               update
             </Button>
+            <Button
+                      variant="secondary"
+                      className="cus-back-btn"
+                      type="button"
+                      onClick={() => navigate("/stockEntryTable")}
+                    >
+                      Cancel
+                    </Button>
           </form>
 
         </div>

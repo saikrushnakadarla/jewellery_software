@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
-import { Button, Row, Col } from 'react-bootstrap';
-import baseURL from "../../../../Url/NodeBaseURL";
-import { FaTrash } from 'react-icons/fa'; // Import delete icon
+import DataTable from '../../../Pages/InputField/TableLayout';
+import { Button, Row, Col, Modal } from 'react-bootstrap';
+import baseURL from '../../../../Url/NodeBaseURL';
+import InputField from "../../../Pages/InputField/InputField";
+import { FaTrash, FaEdit } from 'react-icons/fa'; // Import icons
 
 const RepairsTable = () => {
-  const navigate = useNavigate(); // Initialize navigate function
-  const [data, setData] = useState([]); // State to store fetched data
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [formData, setFormData] = useState({}); // State for editing form data
   const location = useLocation();
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
@@ -28,7 +31,7 @@ const RepairsTable = () => {
 
   const fetchUrdPurchases = async () => {
     try {
-      const response = await fetch(`${baseURL}/get-purchases`); // Replace with your actual API endpoint
+      const response = await fetch(`${baseURL}/get-purchases`);
       const result = await response.json();
 
       if (response.ok) {
@@ -72,11 +75,49 @@ const RepairsTable = () => {
   };
 
   useEffect(() => {
-    fetchUrdPurchases(); // Call the function to fetch data
+    fetchUrdPurchases();
   }, []);
+
+  const handleEdit = (row) => {
+    setFormData(row);
+    setShowEditModal(true);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/urd-purchase/${formData.urdpurchase_number}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+  
+      if (response.ok) {
+        setShowEditModal(false);
+        alert('Record updated successfully.');
+        fetchUrdPurchases(); // Refresh the table data
+      } else {
+        console.error('Failed to update:', await response.json());
+      }
+    } catch (error) {
+      console.error('Error updating record:', error);
+    }
+  };
+  
 
   const handleDelete = async (urdpurchase_number) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+    if (!confirmDelete) return;
+
     try {
       const response = await fetch(`${baseURL}/delete/${urdpurchase_number}`, {
         method: 'DELETE',
@@ -87,8 +128,7 @@ const RepairsTable = () => {
 
       if (response.ok) {
         setData((prevData) => prevData.filter((item) => item.urdpurchase_number !== urdpurchase_number));
-        console.log(`Deleted purchase with number: ${urdpurchase_number}`);
-         alert("Record deleted successfully.");
+        alert("Record deleted successfully.");
       } else {
         console.error('Failed to delete:', await response.json());
       }
@@ -99,57 +139,35 @@ const RepairsTable = () => {
 
   const columns = React.useMemo(
     () => [
-      {
-        Header: 'Customer Name',
-        accessor: 'account_name',
-      },
-      {
-        Header: 'Mobile',
-        accessor: 'mobile',
-      },
-      {
-        Header: 'Date',
-        accessor: 'date',
-      },
-      {
-        Header: 'Purchase No',
-        accessor: 'urdpurchase_number',
-      },
-      {
-        Header: 'Gross Weight',
-        accessor: 'gross',
-      },
-      {
-        Header: 'Dust Weight',
-        accessor: 'dust',
-      },
-      {
-        Header: 'ML%',
-        accessor: 'ml_percent',
-      },
-      {
-        Header: 'Net Weight',
-        accessor: 'eqt_wt',
-      },
-      {
-        Header: 'Rate',
-        accessor: 'rate',
-      },
-      {
-        Header: 'Total Amount',
-        accessor: 'total_amount',
-      },
+      { Header: 'Customer Name', accessor: 'account_name' },
+      { Header: 'Mobile', accessor: 'mobile' },
+      { Header: 'Date', accessor: 'date' },
+      { Header: 'Purchase No', accessor: 'urdpurchase_number' },
+      { Header: 'Gross Weight', accessor: 'gross' },
+      { Header: 'Dust Weight', accessor: 'dust' },
+      { Header: 'ML%', accessor: 'ml_percent' },
+      { Header: 'Net Weight', accessor: 'eqt_wt' },
+      { Header: 'Rate', accessor: 'rate' },
+      { Header: 'Total Amount', accessor: 'total_amount' },
       {
         Header: 'Actions',
         Cell: ({ row }) => (
           <>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => handleDelete(row.original.urdpurchase_number)}
-          >
-            <FaTrash />
-          </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              className="me-2"
+              onClick={() => handleEdit(row.original)}
+            >
+              <FaEdit />
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => handleDelete(row.original.urdpurchase_number)}
+            >
+              <FaTrash />
+            </Button>
           </>
         ),
       },
@@ -157,9 +175,7 @@ const RepairsTable = () => {
     []
   );
 
-  const handleCreate = () => {
-    navigate('/urd_purchase'); // Navigate to the create page
-  };
+  
 
   return (
     <div className="main-container">
@@ -170,14 +186,138 @@ const RepairsTable = () => {
             <Button
               className="create_but"
               variant="success"
-              onClick={handleCreate}
+              onClick={() => navigate('/urd_purchase')}
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
             >
               + Create
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} initialSearchValue={initialSearchValue} /> {/* Pass the fetched data */}
+        <DataTable columns={columns} data={data} initialSearchValue={initialSearchValue} />
+
+        {/* Edit Modal */}
+        <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+  <Modal.Header closeButton>
+    <Modal.Title>Edit Record</Modal.Title>
+  </Modal.Header>
+  <Modal.Body >
+    <Row>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Product"
+          name="product_name"
+          value={formData.product_name || ''}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Metal"
+          name="metal"
+          type="select"
+          value={formData.metal || ''}
+          onChange={handleInputChange}
+          // options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Purity"
+          type="select"
+          name="purity"
+          value={formData.purity || ''}
+          onChange={handleInputChange}
+          // options={purityOptions.map(purity => ({
+          //   value: purity.name,
+          //   label: purity.name,
+          // }))}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="HSN Code"
+          name="hsn_code"
+          type="text"
+          value={formData.hsn_code || ''}
+          onChange={handleInputChange}
+          readOnly
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Gross"
+          type="number"
+          name="gross"
+          value={formData.gross || ''}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Dust"
+          type="number"
+          name="dust"
+          value={formData.dust || ''}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={1}>
+        <InputField
+          label="ML %"
+          type="number"
+          name="ml_percent"
+          value={formData.ml_percent || ''}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Net WT"
+          type="number"
+          name="eqt_wt"
+          value={formData.eqt_wt || ''}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Rate"
+          name="rate"
+          value={formData.rate  }
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Amount"
+          type="number"
+          name="total_amount"
+          value={formData.total_amount || ''}
+          onChange={handleInputChange}
+          readOnly
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Remarks"
+          type="text"
+          name="remarks"
+          value={formData.remarks || ''}
+          onChange={handleInputChange}
+        />
+      </Col>
+    </Row>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+      Cancel
+    </Button>
+    <Button variant="primary" onClick={handleSaveEdit}>
+      Save Changes
+    </Button>
+  </Modal.Footer>
+</Modal>
+
       </div>
     </div>
   );
