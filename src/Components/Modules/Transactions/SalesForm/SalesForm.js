@@ -402,7 +402,8 @@ const SalesForm = () => {
                 handleSave={handleSave}
                 handleBack={handleBack}
                 totalPrice={totalPrice} 
-                repairDetails={repairDetails} // Pass totalPrice as a prop
+                repairDetails={repairDetails}
+                oldSalesData={oldSalesData} schemeSalesData={schemeSalesData} // Pass totalPrice as a prop
               />
             </div>
           </div>

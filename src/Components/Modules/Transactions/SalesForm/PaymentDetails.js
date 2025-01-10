@@ -9,7 +9,9 @@ const PaymentDetails = ({
   handleSave,
   handleBack,
   repairDetails,
-  totalPrice, // Assuming total price is passed as a prop
+  totalPrice,
+  schemeSalesData, 
+  oldSalesData,
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const taxableAmount = repairDetails.reduce((sum, item) => {
@@ -24,7 +26,19 @@ const PaymentDetails = ({
   const netAmount = taxableAmount + taxAmount;
   console.log("Net Amount=",netAmount)
 
+  const oldItemsAmount = oldSalesData.reduce(
+    (sum, item) => sum + parseFloat(item.total_amount || 0),
+    0
+  );
 
+  // Calculate Scheme Amount (sum of paid_amount from schemeSalesData)
+  const schemeAmount = schemeSalesData.reduce(
+    (sum, item) => sum + parseFloat(item.paid_amount || 0),
+    0
+  );
+
+  // Calculate Net Payable Amount
+  const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);
   // Calculate total entered amount
   useEffect(() => {
     // Sum of all payment details
@@ -59,7 +73,20 @@ const PaymentDetails = ({
           <td colSpan="20" className="text-right">Net Amount</td> {/* Adjusted colspan to 20 */}
           <td colSpan="4">{netAmount.toFixed(2)}</td>
         </tr>
-        </Table>
+
+        <tr>
+              <td colSpan="20" className="text-right">Old Items Amount</td>
+              <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Scheme Amount</td>
+              <td colSpan="4">{schemeAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Net Payable Amount</td>
+              <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
+            </tr>
+          </Table>
       </Row>
     </Col>
         <Col className="sales-form-section">
@@ -109,7 +136,7 @@ const PaymentDetails = ({
             <Button
               onClick={handleSave}
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-              disabled={!isSubmitEnabled} // Disable if not enabled
+              disabled={!isSubmitEnabled} 
             >
               Check Out
             </Button>
