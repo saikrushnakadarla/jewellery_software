@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { FaSignOutAlt } from "react-icons/fa";
 import logo from '../../src/Components/Pages/Login/Logo/logo_dark.png';
 import './Navbar.css';
 
@@ -199,10 +200,10 @@ function Navbar() {
         </div>
       </nav>
       <div className="navbar-logout">
-        <button className="logout-button" onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
+      <button className="logout-button" onClick={handleLogout}>
+        <FaSignOutAlt size={20} /> {/* Render the logout icon */}
+      </button>
+    </div>
     </header>
   );
 }
