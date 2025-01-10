@@ -1,20 +1,29 @@
-import React, { useState } from 'react';
-import { Table, Button } from 'react-bootstrap';
+import React, { useState } from "react";
+import { Table, Button } from "react-bootstrap";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
-const ProductTable = ({ repairDetails, onDelete, onEdit, 
-  invoiceDetails,selectedRows,isAllSelected,handleCheckboxChange,handleSelectAllChange }) => {
+const ProductTable = ({
+  repairDetails,
+  onDelete,
+  onEdit,
+  invoiceDetails,
+  selectedRows,
+  isAllSelected,
+  handleCheckboxChange,
+  handleSelectAllChange,
+}) => {
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
     return sum + stonePrice + makingCharges + rateAmt;
   }, 0);
-  console.log("Total Price=", taxableAmount);
 
-  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  const taxAmount = repairDetails.reduce(
+    (sum, item) => sum + parseFloat(item.tax_amt || 0),
+    0
+  );
   const netAmount = taxableAmount + taxAmount;
-  console.log("Net Amount=", netAmount);
 
   return (
     <Table bordered hover responsive>
@@ -23,10 +32,10 @@ const ProductTable = ({ repairDetails, onDelete, onEdit,
           <th>
             <input
               type="checkbox"
-              checked={isAllSelected} 
-              onChange={handleSelectAllChange} 
+              checked={isAllSelected} // If all rows are selected, "Check All" will be checked
+              onChange={handleSelectAllChange} // Handle "Check All" toggle
             />
-          </th> 
+          </th>
           <th>Invoice Number</th>
           <th>Code</th>
           <th>Product Name</th>
@@ -47,8 +56,8 @@ const ProductTable = ({ repairDetails, onDelete, onEdit,
               <td>
                 <input
                   type="checkbox"
-                  checked={selectedRows.includes(index)} 
-                  onChange={(event) => handleCheckboxChange(event, index)}
+                  checked={selectedRows.includes(index)} // Check if this row is selected
+                  onChange={(event) => handleCheckboxChange(event, index)} // Handle checkbox change
                 />
               </td>
               <td>{detail.invoice_number}</td>
