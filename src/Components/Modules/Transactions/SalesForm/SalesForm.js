@@ -307,17 +307,21 @@ const SalesForm = () => {
         <PDFLayout
           formData={formData}
           repairDetails={repairDetails}
-          paymentDetails={paymentDetails}
+          cash_amount={paymentDetails.cash_amount || 0}
+          card_amt={paymentDetails.card_amt || 0}
+          chq_amt={paymentDetails.chq_amt || 0}
+          online_amt={paymentDetails.online_amt || 0}
           taxAmount={taxAmount}
           oldItemsAmount={oldItemsAmount}
           schemeAmount={schemeAmount}
           netPayableAmount={netPayableAmount}
         />
       );
+  
       const pdfBlob = await pdf(pdfDoc).toBlob();
   
       // Create a download link and trigger it
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
       link.download = `invoice-${formData.invoice_number}.pdf`;
       link.click();
@@ -336,6 +340,7 @@ const SalesForm = () => {
       alert("Error saving data");
     }
   };
+  
   
   
   
