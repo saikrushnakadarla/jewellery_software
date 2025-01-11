@@ -4,6 +4,7 @@ import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button, Table } from "react-bootstrap";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
+import baseURL from '../../../../Url/NodeBaseURL';
 
 const RepairForm = () => {
   const [staticEntries, setStaticEntries] = useState([]);
@@ -16,7 +17,7 @@ const RepairForm = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/get/opening-tags-entry");
+        const response = await fetch(`${baseURL}/get/opening-tags-entry`);
         const data = await response.json();
         console.log("API Response:", data);
 
@@ -100,7 +101,7 @@ const RepairForm = () => {
       try {
         // Update qr_status to "yes"
         const response = await fetch(
-          `http://localhost:5000/update/opening-tags-entry/${entry.opentag_id}`,
+          `${baseURL}/update/opening-tags-entry/${entry.opentag_id}`,
           {
             method: "PUT",
             headers: {

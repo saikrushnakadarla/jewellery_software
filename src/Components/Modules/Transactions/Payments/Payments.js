@@ -93,7 +93,7 @@ const RepairForm = () => {
 
   useEffect(() => {
     // Fetch purchases data when component mounts
-    axios.get("http://localhost:5000/get/purchases")
+    axios.get(`${baseURL}/get/purchases`)
       .then((response) => {
         setPurchases(response.data);
         

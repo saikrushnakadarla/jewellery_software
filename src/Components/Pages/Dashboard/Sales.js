@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import baseURL from '../../../Url/NodeBaseURL';
 
 const Sales = ({ selectedCustomerMobile }) => {
   const [salesCounts, setSalesCounts] = useState({
@@ -10,7 +11,7 @@ const Sales = ({ selectedCustomerMobile }) => {
 
   const fetchSalesData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/get/repair-details");
+      const response = await axios.get(`${baseURL}/get/repair-details`);
       const data = response.data;
 
       // Filter for all sales or specific customer sales

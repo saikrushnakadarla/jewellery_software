@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import baseURL from '../../../Url/NodeBaseURL';
+
 
 const AccountDetailsTable = () => {
   const [data, setData] = useState([]);
@@ -9,7 +11,7 @@ const AccountDetailsTable = () => {
   useEffect(() => {
     // Fetch data from the backend API
     axios
-      .get('http://localhost:5000/api/data') // Replace with your actual API URL
+      .get(`${baseURL}/api/data`) // Replace with your actual API URL
       .then((response) => {
         setData(response.data);
         setLoading(false);

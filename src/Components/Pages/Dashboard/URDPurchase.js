@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import baseURL from '../../../Url/NodeBaseURL';
 
 const URDPurchases = ({ selectedCustomerMobile }) => {
   const [purchaseCounts, setPurchaseCounts] = useState({
@@ -10,7 +11,7 @@ const URDPurchases = ({ selectedCustomerMobile }) => {
 
   const fetchPurchases = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/get-purchases");
+      const response = await axios.get(`${baseURL}/get-purchases`);
       const data = response.data;
 
       // Filter purchases by customer if `selectedCustomerId` is provided
