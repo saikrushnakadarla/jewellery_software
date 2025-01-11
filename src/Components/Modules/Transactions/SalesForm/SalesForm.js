@@ -18,15 +18,27 @@ import PDFLayout from './TaxInvoiceA4';
 
 const SalesForm = () => {
   const navigate = useNavigate();
-  const [oldSalesData, setOldSalesData] = useState(() => {
-    const savedData = localStorage.getItem('oldSalesData');
-    return savedData ? JSON.parse(savedData) : [];
-  });
   
-  const [schemeSalesData, setSchemeSalesData] = useState(() => {
-    const savedData = localStorage.getItem('schemeSalesData');
-    return savedData ? JSON.parse(savedData) : [];
-  });
+  const [showPDFDownload, setShowPDFDownload] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [metal, setMetal] = useState("");
+  // const [oldSalesData, setOldSalesData] = useState(() => {
+  //   const savedData = localStorage.getItem('oldSalesData');
+  //   return savedData ? JSON.parse(savedData) : [];
+  // });
+  
+  // const [schemeSalesData, setSchemeSalesData] = useState(() => {
+  //   const savedData = localStorage.getItem('schemeSalesData');
+  //   return savedData ? JSON.parse(savedData) : [];
+  // });
+
+  const [oldSalesData, setOldSalesData] = useState(
+    JSON.parse(localStorage.getItem('oldSalesData')) || []
+  );
+
+  const [schemeSalesData, setSchemeSalesData] = useState(
+    JSON.parse(localStorage.getItem('schemeSalesData')) || []
+  );
 
   // Save to localStorage whenever data changes
   useEffect(() => {
@@ -37,9 +49,6 @@ const SalesForm = () => {
     localStorage.setItem('schemeSalesData', JSON.stringify(schemeSalesData));
   }, [schemeSalesData]);
 
-  const [showPDFDownload, setShowPDFDownload] = useState(false);
-  const [customers, setCustomers] = useState([]);
-  const [metal, setMetal] = useState("");
   const [repairDetails, setRepairDetails] = useState(
     JSON.parse(localStorage.getItem('repairDetails')) || []
   );
@@ -235,6 +244,42 @@ const SalesForm = () => {
   // Calculate totalPrice (sum of total_price from all repairDetails)
   const totalPrice = repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
+  const [oldTableData, setOldTableData] = useState(() => {
+    const savedData = localStorage.getItem('oldTableData');
+    return savedData ? JSON.parse(savedData) : [];
+  });
+
+  const [schemeTableData, setSchemeTableData] = useState(() => {
+    const savedData = localStorage.getItem('schemeTableData');
+    return savedData ? JSON.parse(savedData) : [];
+  });
+
+  const clearData = () => {
+    setOldSalesData([]);
+    setSchemeSalesData([]);
+    setRepairDetails([]);
+    setPaymentDetails({
+      cash_amount: 0,
+      card_amt: 0,
+      chq: "",
+      chq_amt: 0,
+      online: "",
+      online_amt: 0,
+    });
+    setOldTableData([]); // Clear the oldTableData state
+    setSchemeTableData([])
+    localStorage.removeItem('oldSalesData');
+    localStorage.removeItem('schemeSalesData');
+    localStorage.removeItem('repairDetails');
+    localStorage.removeItem('paymentDetails');
+    localStorage.removeItem('oldTableData'); // Explicitly remove oldTableData from local storage
+    localStorage.removeItem('schemeTableData'); // Explicitly remove oldTableData from local storage
+  
+    console.log("Data cleared successfully");
+  };
+  
+  
+
   const handleSave = async () => {
     const dataToSave = {
       repairDetails: repairDetails.map(item => ({
@@ -249,10 +294,10 @@ const SalesForm = () => {
       })),
       oldItems: oldSalesData,
       memberSchemes: schemeSalesData,
-      
-     
     };
-    console.log("text",oldSalesData);
+  
+    console.log("Saving data:", dataToSave);
+  
     try {
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Data saved successfully");
@@ -279,14 +324,11 @@ const SalesForm = () => {
   
       // Clean up
       URL.revokeObjectURL(link.href);
-      setRepairDetails([]);
-      
-      setSchemeSalesData([]);
-    
-      localStorage.removeItem('schemeSalesData');
-      setOldSalesData([]); // Clear old sales data
-      localStorage.removeItem('oldSalesData');
-
+  
+      // Clear all data after saving
+      clearData();
+  
+      // Reset the form and reload the page if necessary
       resetForm();
       window.location.reload();
     } catch (error) {
@@ -294,6 +336,9 @@ const SalesForm = () => {
       alert("Error saving data");
     }
   };
+  
+  
+  
   
 
   const resetForm = () => {
@@ -424,7 +469,13 @@ const SalesForm = () => {
 
           <div className="sales-form2">
             <div className="sales-form-third">
-              <SalesFormSection metal={metal} setMetal={setMetal} setOldSalesData={setOldSalesData} setSchemeSalesData={setSchemeSalesData} />
+              <SalesFormSection metal={metal} 
+                setMetal={setMetal} 
+                setOldSalesData={setOldSalesData} 
+                oldTableData={oldTableData} 
+                setSchemeSalesData={setSchemeSalesData}
+                schemeTableData={schemeTableData}
+               />
             </div>
 
             <div className="sales-form-fourth">

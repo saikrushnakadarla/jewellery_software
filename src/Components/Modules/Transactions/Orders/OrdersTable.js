@@ -202,7 +202,7 @@ const RepairsTable = () => {
       </div>
 
       {/* Modal to display repair details */}
-      <Modal show={showModal} onHide={handleCloseModal} size="xl" className="m-auto">
+      <Modal show={showModal} onHide={handleCloseModal} >
         <Modal.Header closeButton>
           <Modal.Title>Orders Details</Modal.Title>
         </Modal.Header>
