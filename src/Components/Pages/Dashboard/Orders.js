@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import baseURL from '../../../Url/NodeBaseURL';
 
 const OrdersData = ({ selectedCustomerMobile }) => {
   const [orderCounts, setOrderCounts] = useState({
@@ -10,7 +11,7 @@ const OrdersData = ({ selectedCustomerMobile }) => {
 
   const fetchOrderData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/get/repair-details");
+      const response = await axios.get(`${baseURL}/get/repair-details`);
       const data = response.data;
 
       // Filter for all orders or specific customer orders

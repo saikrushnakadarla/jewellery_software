@@ -25,32 +25,45 @@ const RepairForm = () => {
     remarks: "",
   });
 
+  const [accountOptions, setAccountOptions] = useState([]);
+
+  const [purchases, setPurchases] = useState([]);
+  const [invoiceOptions, setInvoiceOptions] = useState([]);
+
  const { invoiceData } = location.state || {};
 
- useEffect(() => {
-  if (invoiceData) {
-    console.log('Received Invoice Data:', invoiceData);
-    setFormData({
-      account_name: invoiceData.account_name || '',
-      invoice_number: invoiceData.invoice || '', // Ensure this matches the invoice option value
-      total_amt: invoiceData.balance_after_receipt || '',
-    });
-
-    // Update options dynamically
-    setAccountOptions([
-      { value: invoiceData.account_name, label: invoiceData.account_name },
-    ]);
-
-    setInvoiceOptions([
-      { value: invoiceData.invoice, label: `Invoice #${invoiceData.invoice}` },
-    ]);
-  }
-}, [invoiceData]);
-
-
-    
-
-
+  useEffect(() => {
+    if (invoiceData) {
+      setFormData((prevData) => ({
+        ...prevData,
+        account_name: invoiceData.account_name || "", // Set account name
+        invoice_number: invoiceData.invoice || "", // Set invoice number
+      }));
+  
+      // Populate invoice number options based on account_name
+      const filteredInvoices = purchases
+        ?.filter((item) => item.account_name === invoiceData.account_name)
+        .map((item) => ({
+          value: item.invoice_number,
+          label: item.invoice_number,
+        }));
+  
+        setInvoiceOptions(filteredInvoices);
+  
+      // Automatically set total amount based on selected invoice
+      const selectedInvoice = purchases?.find(
+        (item) => item.invoice_number === invoiceData.invoice
+      );
+  
+      if (selectedInvoice) {
+        const totalAmt = selectedInvoice.balance_after_receipt || selectedInvoice.balance_amount || "";
+        setFormData((prevData) => ({
+          ...prevData,
+          total_amt: totalAmt,
+        }));
+      }
+    }
+  }, [invoiceData, purchases]);
 
   useEffect(() => {
     const fetchLastPaymentNumber = async () => {
@@ -77,15 +90,10 @@ const RepairForm = () => {
       setFormData(prev => ({ ...prev, date: today }));
     }
   }, [repairData]);
-  const [accountOptions, setAccountOptions] = useState([]);
-
-  const [purchases, setPurchases] = useState([]);
-  const [invoiceOptions, setInvoiceOptions] = useState([]);
-
 
   useEffect(() => {
     // Fetch purchases data when component mounts
-    axios.get("http://localhost:5000/get/purchases")
+    axios.get(`${baseURL}/get/purchases`)
       .then((response) => {
         setPurchases(response.data);
         
@@ -120,8 +128,6 @@ const RepairForm = () => {
     }
   }, [formData.account_name, purchases]);
   
-  
-
 useEffect(() => {
   if (formData.invoice_number) {
     const selectedInvoice = purchases.find(
@@ -283,19 +289,20 @@ useEffect(() => {
               name="account_name"
               value={formData.account_name}
               onChange={handleInputChange}
-              options={accountOptions} // Ensure options are populated if needed
+              options={accountOptions} // Dynamically populated
             />
           </Col>
           <Col xs={12} md={3}>
-          <InputField
-            label="Invoice"
-            type="select" // Change to dropdown
-            name="invoice_number"
-            value={formData.invoice_number}
-            onChange={handleInputChange}
-            options={invoiceOptions} // Use dynamically filtered invoice options
-          />
-        </Col>
+            <InputField
+              label="Invoice"
+              type="select"
+              name="invoice_number"
+              value={formData.invoice_number}
+              onChange={handleInputChange}
+              options={invoiceOptions} // Dynamically populated with invoiceData
+            />
+          </Col>
+
 
           <Col xs={12} md={2}>
             <InputField

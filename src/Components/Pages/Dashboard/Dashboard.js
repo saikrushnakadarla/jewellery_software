@@ -131,53 +131,6 @@ function Dashboard() {
       <div className="dashboard_main-container">
         <CustomerDashboard onSelectCustomer={setSelectedMobile} />
       </div>
-      <div className="dashboard-customers-row">
-        <div className="dashboard-customers-container">
-          <h2 className="dashboard-section-title">TOP CUSTOMERS</h2>
-          <div className="dashboard-table-wrapper">
-            <Customers />
-          </div>
-        </div>
-        <div className="dashboard-customers-container">
-          <h2 className="dashboard-section-title">TOP SELLING PRODUCTS</h2>
-          <div className="dashboard-table-wrapper">
-            <table className="dashboard-responsive-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Price</th>
-                  <th>Category</th>
-                  <th>Units Sold</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Gold Necklace</td>
-                  <td>₹1,00,000</td>
-                  <td>Gold</td>
-                  <td>30</td>
-                  <td>Elegant design with pure gold</td>
-                </tr>
-                <tr>
-                  <td>Diamond Ring</td>
-                  <td>₹75,000</td>
-                  <td>Diamond</td>
-                  <td>25</td>
-                  <td>Exquisite ring with high-grade diamonds</td>
-                </tr>
-                <tr>
-                  <td>Silver Bracelet</td>
-                  <td>₹20,000</td>
-                  <td>Silver</td>
-                  <td>20</td>
-                  <td>Stylish bracelet suitable for all occasions</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

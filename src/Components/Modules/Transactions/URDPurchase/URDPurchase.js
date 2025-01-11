@@ -53,8 +53,6 @@ const URDPurchase = () => {
     rate: 0,
     total_amount: 0,
   });
-  const [purity, setPurity] = useState([]);
-  const [metalType, setMetalType] = useState([]);
 
   const [purityOptions, setPurityOptions] = useState([]);
 
@@ -77,7 +75,7 @@ const URDPurchase = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData(prevState => {
+    setProductDetails(prevState => {
       const updatedData = { ...prevState, [name]: value };
 
       if (name === "purity") {
@@ -95,7 +93,7 @@ const URDPurchase = () => {
       // Update HSN Code based on selected metal
       if (name === 'metal') {
         const selectedMetal = metalOptions.find(option => option.value === value);
-        updatedData.hsn_code = selectedMetal ? selectedMetal.hsn_code : '';
+        updatedDetails.hsn_code = selectedMetal ? selectedMetal.hsn_code : '';
       }
 
       return updatedData;
@@ -589,7 +587,7 @@ useEffect(() => {
                   label="Metal"
                   name="metal"
                   type="select"
-                  value={formData.metal}
+                  value={productDetails.metal}
                   onChange={handleInputChange}
                   options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
@@ -612,7 +610,7 @@ useEffect(() => {
                   label="HSN Code"
                   name="hsn_code"
                   type="text"
-                  value={formData.hsn_code}
+                  value={productDetails.hsn_code}
                   onChange={handleInputChange}
                   readOnly // Make it read-only
                 />
@@ -770,6 +768,14 @@ useEffect(() => {
             </div>
           </div>
           <div className="form-buttons">
+            
+            {/* <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button> */}
+            <Button
+              variant="secondary"
+              onClick={handleBack} style={{ backgroundColor: 'gray', }}
+            >
+              cancel
+            </Button>
             <Button
               type="submit"
               variant="success"
@@ -778,14 +784,6 @@ useEffect(() => {
             >
               Save
             </Button>
-            <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button>
-            <Button
-              variant="secondary"
-              onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
-            >
-              cancel
-            </Button>
-
           </div>
         </Form>
       </div>

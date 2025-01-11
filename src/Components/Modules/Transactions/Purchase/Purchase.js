@@ -491,21 +491,21 @@ const URDPurchase = () => {
     };
     fetchCurrentRates();
   }, []);
-  // useEffect(() => {
-  //   const fetchLastInvoice = async () => {
-  //     try {
-  //       const response = await axios.get(`${baseURL}/lastInvoice`);
-  //       setFormData((prev) => ({
-  //         ...prev,
-  //         invoice: response.data.lastInvoiceNumber,
-  //       }));
-  //     } catch (error) {
-  //       console.error("Error fetching estimate number:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchLastInvoice = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastInvoice`);
+        setFormData((prev) => ({
+          ...prev,
+          invoice: response.data.lastInvoiceNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
 
-  //   fetchLastInvoice();
-  // }, []);
+    fetchLastInvoice();
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {

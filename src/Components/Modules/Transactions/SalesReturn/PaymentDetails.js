@@ -3,6 +3,7 @@ import { Col, Row, Button } from "react-bootstrap";
 import InputField from "./../../../Pages/InputField/InputField";
 import { Table } from "react-bootstrap";
 import axios from "axios"; // Assuming you are using axios for API calls
+import baseURL from '../../../../Url/NodeBaseURL';
 
 const PaymentDetails = ({
   paymentDetails,
@@ -62,10 +63,10 @@ const PaymentDetails = ({
       const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
   
       // API Calls
-      await axios.post("http://localhost:5000/updateRepairDetails", { updates: repairDetailsUpdates });
-      await axios.post("http://localhost:5000/updateOpenTags", { updates: openTagsUpdates });
-      await axios.post("http://localhost:5000/updateProduct", { updates: productUpdates });
-      await axios.post("http://localhost:5000/addAvailableEntry", { codes: codesForAvailableEntries });
+      await axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates });
+      await axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates });
+      await axios.post(`${baseURL}/updateProduct`, { updates: productUpdates });
+      await axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries });
   
       alert("Checkout successful and records updated!");
       resetForm();

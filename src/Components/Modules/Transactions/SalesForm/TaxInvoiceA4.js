@@ -2,6 +2,7 @@ import React from "react";
 
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
 import logo1 from '../../../../logo_dark.png'
+import { toWords } from "number-to-words";
 
 
 
@@ -208,7 +209,18 @@ const styles = StyleSheet.create({
 });
 
 
-const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item,taxAmount,oldItemsAmount,schemeAmount,netPayableAmount }) => {
+const TaxINVoiceReceipt = ({
+        formData,
+        repairDetails,
+        cash_amount,
+        card_amt,
+        chq_amt,
+        online_amt,
+        taxAmount,
+        oldItemsAmount,
+        schemeAmount,
+        netPayableAmount,
+      }) => {
         // Calculate total values
         const totalValues = repairDetails.reduce(
                 (totals, item) => {
@@ -234,6 +246,10 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item,taxAm
                         rateAmount: 0,
                 }
         );
+        const netBillValue = totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount;
+
+    // Convert the value into words
+    const netBillValueInWords = toWords(netBillValue).replace(/(^\w|\s\w)/g, m => m.toUpperCase()); // Capitalize words
 
         return (
                 <Document>
@@ -272,7 +288,7 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item,taxAm
                                                 {/* BILL NO */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>BILL NO:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>SV1224</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.invoice_number}</Text>
                                                 </View>
 
                                                 {/* DATE */}
@@ -487,11 +503,23 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item,taxAm
 
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", fontFamily: 'Times-Bold' }}>
                                                         {/* Left Side Content */}
+                                                        
                                                         <View style={{ paddingLeft: 10, marginTop: 20 }}>
-                                                                {/* <Text style={[styles.bold, { marginBottom: 3 }]}>Cash Recd: 45000.00</Text>
-
-                                                                <Text style={[styles.bold]}>NEFT Recd: 14000.00 #: Bank:</Text> */}
+                                                                <Text style={[styles.bold, { marginBottom: 3 }]}>
+                                                                Cash Recd: {cash_amount ?? "0.00"}
+                                                                </Text>
+                                                                <Text style={[styles.bold, { marginBottom: 3 }]}>
+                                                                Card Recd: {card_amt ?? "0.00"}
+                                                                </Text>
+                                                                <Text style={[styles.bold, { marginBottom: 3 }]}>
+                                                                Cheque Recd: {chq_amt ?? "0.00"}
+                                                                </Text>
+                                                                <Text style={[styles.bold]}>
+                                                                NEFT Recd: {online_amt ?? "0.00"} #: Bank:
+                                                                </Text>
                                                         </View>
+
+                                                        
                                                         {/* {repairDetails.map((item, index) => ( */}
                                                         <View style={{ paddingRight: 10, marginTop: 5 }}>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
@@ -520,7 +548,8 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item,taxAm
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text style={[styles.bold]}>Net Bill Value: </Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                        {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)}
+                                                                        {/* {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)} */}
+                                                                        {netBillValue.toFixed(2)}
                                                                         </Text>
 
                                                                 </View>
@@ -543,9 +572,9 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item,taxAm
 
                                                 </View>
                                                 <View style={{ alignItems: "center", fontFamily: 'Times-Bold' }}>
-                                                        <Text>
-                                                                (Rupees Four Lakh Four Thousand Five Hundred Only)
-                                                        </Text>
+                                                <Text>
+                                                        (Rupees {netBillValueInWords} Only)
+                                                </Text>
                                                 </View>
 
                                                 <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "space-between", marginBottom: 3, fontFamily: 'Times-Bold' }}>
