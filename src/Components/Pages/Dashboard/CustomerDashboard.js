@@ -41,8 +41,11 @@ function Customers({ onSelectCustomer }) {
   return (
     <div className="container mt-3">
       <div className="row">
-        <div className="col-4">
-          <h3>Select Customer</h3>
+      <div className="col-3"></div>
+      <div className="col-3"></div>
+      <div className="col-3"></div>
+        <div className="col-3">
+          
           <InputField
             label="Mobile"
             name="mobile"
@@ -56,7 +59,7 @@ function Customers({ onSelectCustomer }) {
           />
         </div>
       </div>
-      {selectedCustomer && (
+      {/* {selectedCustomer && (
         <div className="row">
           <div className="col-4">
             <h4>Selected Customer Details:</h4>
@@ -68,7 +71,7 @@ function Customers({ onSelectCustomer }) {
             </p>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

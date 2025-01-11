@@ -18,6 +18,10 @@ function Dashboard() {
 
   return (
     <div className="main-container">
+
+      <div className="dashboard_main-container">
+        <CustomerDashboard onSelectCustomer={setSelectedMobile} />
+      </div>
       <div className="dashboard_main-container">
         <div className="dashboard_card-row">
           <div className="dashboard_card bg-dash2">
@@ -127,9 +131,6 @@ function Dashboard() {
             </a>
           </div>
         </div>
-      </div>
-      <div className="dashboard_main-container">
-        <CustomerDashboard onSelectCustomer={setSelectedMobile} />
       </div>
     </div>
   );

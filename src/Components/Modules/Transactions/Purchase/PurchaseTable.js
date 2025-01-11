@@ -81,7 +81,7 @@ const handleDelete = async (id) => {
         Cell: ({ row }) => {
           const { balance_amount, balance_after_receipt, paid_amt } = row.original;
           if (balance_amount === paid_amt) {
-            return balance_after_receipt || '-';
+            return balance_after_receipt ;
           }
           return balance_after_receipt ? balance_after_receipt : balance_amount || '-';
         },
