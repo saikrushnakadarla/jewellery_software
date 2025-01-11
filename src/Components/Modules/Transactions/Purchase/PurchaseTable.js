@@ -47,9 +47,26 @@ const PurchaseTable = () => {
       // { Header: 'Rate', accessor: 'rate' },
       { Header: 'Total Amount', accessor: 'total_amount' },
       { Header: 'Bal Amount', accessor: 'balance_amount' },
+      {
+              Header: 'Receipts',
+              accessor: 'receipts',
+              Cell: ({ row }) => (
+                <Button
+                  style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+                  onClick={() => handleAddReceipt(row.original)} // Pass the row data to handle the receipt creation
+                >
+                  Add Receipt
+                </Button>
+              ),
+            },
     ],
     []
   );
+
+  const handleAddReceipt = (invoiceData) => {
+    console.log("Invoice Data:", invoiceData); // Log the invoice data to the console
+    navigate("/payments", { state: { from: "/purchasetable", invoiceData } });
+  };
 
   // Fetch data from API
   useEffect(() => {

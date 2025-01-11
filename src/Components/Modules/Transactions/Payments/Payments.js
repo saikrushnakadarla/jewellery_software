@@ -25,6 +25,33 @@ const RepairForm = () => {
     remarks: "",
   });
 
+ const { invoiceData } = location.state || {};
+
+ useEffect(() => {
+  if (invoiceData) {
+    console.log('Received Invoice Data:', invoiceData);
+    setFormData({
+      account_name: invoiceData.account_name || '',
+      invoice_number: invoiceData.invoice || '', // Ensure this matches the invoice option value
+      total_amt: invoiceData.balance_after_receipt || '',
+    });
+
+    // Update options dynamically
+    setAccountOptions([
+      { value: invoiceData.account_name, label: invoiceData.account_name },
+    ]);
+
+    setInvoiceOptions([
+      { value: invoiceData.invoice, label: `Invoice #${invoiceData.invoice}` },
+    ]);
+  }
+}, [invoiceData]);
+
+
+    
+
+
+
   useEffect(() => {
     const fetchLastPaymentNumber = async () => {
       try {
@@ -197,6 +224,11 @@ useEffect(() => {
     }
   };
 
+  const handleBack = () => {
+    const from = location.state?.from || "/paymentstable"; // Default to /receiptstable if no from location provided
+    navigate(from);
+  }; 
+
   return (
     <div className="main-container">
       <Container className="payments-form-container">
@@ -308,7 +340,8 @@ useEffect(() => {
             variant="secondary"
             className="cus-back-btn"
             type="button"
-            onClick={() => navigate("/paymentstable")}
+            // onClick={() => navigate("/paymentstable")}
+            onClick={handleBack}
           >
             Cancel
           </Button>
