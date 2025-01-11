@@ -472,9 +472,11 @@ const SalesForm = () => {
               <SalesFormSection metal={metal} 
                 setMetal={setMetal} 
                 setOldSalesData={setOldSalesData} 
-                oldTableData={oldTableData} 
+                oldTableData={oldTableData}
+                setOldTableData={setOldTableData} 
                 setSchemeSalesData={setSchemeSalesData}
                 schemeTableData={schemeTableData}
+                setSchemeTableData={setSchemeTableData}
                />
             </div>
 
