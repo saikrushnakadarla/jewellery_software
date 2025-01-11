@@ -17,6 +17,25 @@ import { pdf } from '@react-pdf/renderer';
 import PDFLayout from './PDFLayout';
 
 const SalesForm = () => {
+  const [oldSalesData, setOldSalesData] = useState(() => {
+      const savedData = localStorage.getItem('oldSalesData');
+      return savedData ? JSON.parse(savedData) : [];
+    });
+    
+    const [schemeSalesData, setSchemeSalesData] = useState(() => {
+      const savedData = localStorage.getItem('schemeSalesData');
+      return savedData ? JSON.parse(savedData) : [];
+    });
+  
+    // Save to localStorage whenever data changes
+    useEffect(() => {
+      localStorage.setItem('oldSalesData', JSON.stringify(oldSalesData));
+    }, [oldSalesData]);
+  
+    useEffect(() => {
+      localStorage.setItem('schemeSalesData', JSON.stringify(schemeSalesData));
+    }, [schemeSalesData]);
+
   const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
   const [metal, setMetal] = useState("");
@@ -225,9 +244,11 @@ const SalesForm = () => {
       chq_amt: paymentDetails.chq_amt || 0,
       online: paymentDetails.online || "",
       online_amt: paymentDetails.online_amt || 0,
+      oldItems: oldSalesData,
+      memberSchemes: schemeSalesData,
     }));
-  
-    // Append the JSON data
+    
+    console.log("data",oldSalesData);
     formData.append("repairDetails", JSON.stringify(dataToSave));
   
     // Append files for each repair item if they exist
@@ -374,7 +395,7 @@ const SalesForm = () => {
 
           <div className="sales-form2">
             <div className="sales-form-third">
-              <SalesFormSection metal={metal} setMetal={setMetal} />
+              <SalesFormSection metal={metal} setMetal={setMetal} setOldSalesData={setOldSalesData} setSchemeSalesData={setSchemeSalesData}/>
             </div>
 
             <div className="sales-form-fourth">

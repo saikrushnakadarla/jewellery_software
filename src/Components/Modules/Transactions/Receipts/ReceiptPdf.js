@@ -102,9 +102,9 @@ const PDFContent = () => (
       <View style={styles.tableHeader}>
         <Text style={[styles.tableCell, styles.sno]}>S.No.</Text>
         <Text style={[styles.tableCell, styles.inv]}>Invoice ID</Text>
-        <Text style={[styles.tableCell, styles.totalAmt]}>Total Amt</Text>
-        <Text style={[styles.tableCell, styles.balanceAmt]}>Bal Amt</Text>
+        <Text style={[styles.tableCell, styles.totalAmt]}>Total Amt</Text> 
         <Text style={[styles.tableCell, styles.paidAmt]}>Paid Amt</Text>
+        <Text style={[styles.tableCell, styles.balanceAmt]}>Bal Amt</Text>
       </View>
 
       {/* Table Rows */}
@@ -113,8 +113,8 @@ const PDFContent = () => (
           <Text style={[styles.tableCell, styles.sno]}>{item}</Text>
           <Text style={[styles.tableCell, styles.inv]}>INV{item}</Text>
           <Text style={[styles.tableCell, styles.totalAmt]}>100.00</Text>
-          <Text style={[styles.tableCell, styles.balanceAmt]}>50.00</Text>
           <Text style={[styles.tableCell, styles.paidAmt]}>50.00</Text>
+          <Text style={[styles.tableCell, styles.balanceAmt]}>50.00</Text>
         </View>
       ))}
 

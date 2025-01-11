@@ -21,39 +21,38 @@ const PurchaseTable = () => {
     return `${day}/${month}/${year}`;
   };
 
-  // Function to handle delete request
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this purchase?');
-    if (!confirmDelete) return;
+// Function to handle delete request
+const handleDelete = async (id) => {
+  const confirmDelete = window.confirm('Are you sure you want to delete this purchase?');
+  if (!confirmDelete) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const response = await fetch(`${baseURL}/delete-purchases`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ purchaseIds: [id] }),
-      });
+  try {
+    const response = await fetch(`${baseURL}/delete-purchases`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ purchaseIds: [id] }),
+    });
 
-      const result = await response.json();
+    const result = await response.json();
 
-      if (response.ok) {
-        alert(result.message || 'Purchase deleted successfully');
-        // Remove the deleted item from the state
-        setData((prevData) => prevData.filter((item) => item.id !== id));
-      } else {
-        console.error('Error deleting purchase:', result.error);
-        alert(result.message || 'Failed to delete purchase');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Something went wrong while deleting the purchase');
-    } finally {
-      setLoading(false);
+    if (response.ok) {
+      alert(result.message || 'Purchase deleted successfully');
+      // Remove the deleted item from the state
+      setData((prevData) => prevData.filter((item) => item.id !== id));
+    } else {
+      console.error('Error deleting purchase:', result.error);
+      alert(result.message || 'Failed to delete purchase');
     }
-  };
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Something went wrong while deleting the purchase');
+  } finally {
+    setLoading(false);
+  }
+};
 
-  // Define columns for the DataTable
   const columns = React.useMemo(
     () => [
       { Header: 'Sr.No', accessor: 'id' },
@@ -67,19 +66,38 @@ const PurchaseTable = () => {
       { Header: 'Purity', accessor: 'purity' },
       { Header: 'Pure Weight', accessor: 'pure_weight' },
       { Header: 'Total Amount', accessor: 'total_amount' },
-      { Header: 'Bal Amount', accessor: 'balance_amount' },
-      {
-        Header: 'Receipts',
-        accessor: 'receipts',
-        Cell: ({ row }) => (
-          <Button
-            style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
-            onClick={() => handleAddReceipt(row.original)}
-          >
-            Add Receipt
-          </Button>
-        ),
+      { 
+        Header: 'Paid Amount', 
+        accessor: 'paid_amount',
+        Cell: ({ row }) => {
+          const { paid_amount, paid_amt } = row.original;
+          const totalPaid = (paid_amount || 0) + (paid_amt || 0);
+          return totalPaid;
+        },
       },
+      { 
+        Header: 'Bal Amount', 
+        accessor: 'balance_amount',
+        Cell: ({ row }) => {
+          const { balance_amount, balance_after_receipt, paid_amt } = row.original;
+          if (balance_amount === paid_amt) {
+            return balance_after_receipt || '-';
+          }
+          return balance_after_receipt ? balance_after_receipt : balance_amount || '-';
+        },
+      },
+      // {
+      //   Header: 'Receipts',
+      //   accessor: 'receipts',
+      //   Cell: ({ row }) => (
+      //     <Button
+      //       style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+      //       onClick={() => handleAddReceipt(row.original)}
+      //     >
+      //       Add Receipt
+      //     </Button>
+      //   ),
+      // },
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -87,15 +105,34 @@ const PurchaseTable = () => {
           <Button
             variant="danger"
             onClick={() => handleDelete(row.original.id)}
-            disabled={loading} // Disable button while loading
+            disabled={loading}
           >
             <FaTrash />
           </Button>
         ),
       },
+      {
+        Header: 'Payments',
+        accessor: 'payment',
+        Cell: ({ row }) => {
+          const { total_amount, paid_amount, paid_amt } = row.original;
+          const totalPaid = (paid_amount || 0) + (paid_amt || 0);
+  
+          return (
+            <Button
+              style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+              onClick={() => handleAddReceipt(row.original)}
+              disabled={total_amount === totalPaid} // Disable button if total_amount equals totalPaid
+            >
+              Add Payment
+            </Button>
+          );
+        },
+      },
     ],
-    [loading] // Add `loading` as a dependency to re-render correctly
+    [loading]
   );
+  
 
   const handleAddReceipt = (invoiceData) => {
     console.log("Invoice Data:", invoiceData);

@@ -2,6 +2,7 @@ import React from "react";
 
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
 import logo1 from '../../../../logo_dark.png'
+import { toWords } from "number-to-words";
 
 
 
@@ -245,6 +246,10 @@ const TaxINVoiceReceipt = ({
                         rateAmount: 0,
                 }
         );
+        const netBillValue = totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount;
+
+    // Convert the value into words
+    const netBillValueInWords = toWords(netBillValue).replace(/(^\w|\s\w)/g, m => m.toUpperCase()); // Capitalize words
 
         return (
                 <Document>
@@ -543,7 +548,8 @@ const TaxINVoiceReceipt = ({
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text style={[styles.bold]}>Net Bill Value: </Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                        {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)}
+                                                                        {/* {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)} */}
+                                                                        {netBillValue.toFixed(2)}
                                                                         </Text>
 
                                                                 </View>
@@ -566,9 +572,9 @@ const TaxINVoiceReceipt = ({
 
                                                 </View>
                                                 <View style={{ alignItems: "center", fontFamily: 'Times-Bold' }}>
-                                                        <Text>
-                                                                (Rupees Four Lakh Four Thousand Five Hundred Only)
-                                                        </Text>
+                                                <Text>
+                                                        (Rupees {netBillValueInWords} Only)
+                                                </Text>
                                                 </View>
 
                                                 <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "space-between", marginBottom: 3, fontFamily: 'Times-Bold' }}>
