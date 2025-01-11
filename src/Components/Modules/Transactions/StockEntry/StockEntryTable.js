@@ -336,13 +336,9 @@ const StockEntryTable = (selectedProduct) => {
                 <InputField
                   label="Sub Category:"
                   name="sub_category"
-                  type="select"
                   value={formData.sub_category || ''}
-                  onChange={handleChange}
-                  options={subCategories.map((category) => ({
-                    value: category.subcategory_id, // Use subcategory_id as the value
-                    label: category.sub_category_name, // Use sub_category_name as the label
-                  }))}
+                  onChange={(e) => handleChange(e)}
+                 readOnly
                 />
               </div>
               <div className="col-md-2">
