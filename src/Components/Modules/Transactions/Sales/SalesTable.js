@@ -82,7 +82,7 @@ const RepairsTable = () => {
         ),
       },
     ],
-    []
+    [] 
   );
 
   const formatDate = (dateString) => {
