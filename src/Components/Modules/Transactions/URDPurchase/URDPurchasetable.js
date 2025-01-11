@@ -445,7 +445,7 @@ const RepairsTable = () => {
   <Modal.Header closeButton>
     <Modal.Title>Edit Record</Modal.Title>
   </Modal.Header>
-  <Modal.Body >
+  <Modal.Body style={{    backgroundColor:" rgba(163, 110, 41, 0.08)"}}>
     <Row>
     <Col xs={12} md={2}>
                 <InputField
