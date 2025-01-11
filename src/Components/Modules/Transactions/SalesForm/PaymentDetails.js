@@ -12,33 +12,40 @@ const PaymentDetails = ({
   totalPrice,
   schemeSalesData, 
   oldSalesData,
+  taxableAmount,
+  taxAmount,
+  oldItemsAmount,
+  schemeAmount,
+  netPayableAmount,
+  netAmount
+
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
-  const taxableAmount = repairDetails.reduce((sum, item) => {
-    const stonePrice = parseFloat(item.stone_price) || 0;
-    const makingCharges = parseFloat(item.making_charges) || 0;
-    const rateAmt = parseFloat(item.rate_amt) || 0;
-    return sum + stonePrice + makingCharges + rateAmt;
-  }, 0);
-  console.log("Total Price=",taxableAmount)
+  // const taxableAmount = repairDetails.reduce((sum, item) => {
+  //   const stonePrice = parseFloat(item.stone_price) || 0;
+  //   const makingCharges = parseFloat(item.making_charges) || 0;
+  //   const rateAmt = parseFloat(item.rate_amt) || 0;
+  //   return sum + stonePrice + makingCharges + rateAmt;
+  // }, 0);
+  // console.log("Total Price=",taxableAmount)
   
-  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
-  const netAmount = taxableAmount + taxAmount;
-  console.log("Net Amount=",netAmount)
+  // const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  // const netAmount = taxableAmount + taxAmount;
+  // console.log("Net Amount=",netAmount)
 
-  const oldItemsAmount = oldSalesData.reduce(
-    (sum, item) => sum + parseFloat(item.total_amount || 0),
-    0
-  );
+  // const oldItemsAmount = oldSalesData.reduce(
+  //   (sum, item) => sum + parseFloat(item.total_amount || 0),
+  //   0
+  // );
 
-  // Calculate Scheme Amount (sum of paid_amount from schemeSalesData)
-  const schemeAmount = schemeSalesData.reduce(
-    (sum, item) => sum + parseFloat(item.paid_amount || 0),
-    0
-  );
+  // // Calculate Scheme Amount (sum of paid_amount from schemeSalesData)
+  // const schemeAmount = schemeSalesData.reduce(
+  //   (sum, item) => sum + parseFloat(item.paid_amount || 0),
+  //   0
+  // );
 
-  // Calculate Net Payable Amount
-  const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);
+  // // Calculate Net Payable Amount
+  // const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);
   // Calculate total entered amount
   useEffect(() => {
     // Sum of all payment details
@@ -136,7 +143,7 @@ const PaymentDetails = ({
             <Button
               onClick={handleSave}
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-              disabled={!isSubmitEnabled} 
+              // disabled={!isSubmitEnabled} 
             >
               Check Out
             </Button>

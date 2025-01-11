@@ -242,7 +242,7 @@ const RepairForm = () => {
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={12} md={1}>
+            <Col xs={12} md={2}>
               <InputField
                 label="Dr/Cr"
                 name="dr_cr"
@@ -263,7 +263,7 @@ const RepairForm = () => {
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={12} md={4}>
+            <Col xs={12} md={3}>
               <InputField
                 label="Address2"
                 name="address2"

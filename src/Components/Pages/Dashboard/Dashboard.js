@@ -8,6 +8,7 @@ import Orders from './Orders';
 import URDPurchase from './URDPurchase';
 import Customers from './Customers';
 import CustomerDashboard from './CustomerDashboard';
+import Receivables from './Receivables';
 
 function Dashboard() {
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -48,8 +49,7 @@ function Dashboard() {
             <p>100000</p>
           </div>
           <div className="dashboard_card bg-dash3">
-            <h2>Receivables</h2>
-            <p>100000</p>
+            <Receivables selectedCustomerMobile={selectedMobile} />
           </div>
         </div>
         <div className="dashboard_card-row" style={{ marginTop: '15px' }}>

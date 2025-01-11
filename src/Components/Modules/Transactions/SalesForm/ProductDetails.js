@@ -13,6 +13,8 @@ const ProductDetails = ({
   handleChange, 
   handleBarcodeChange,
   handleProductNameChange,
+  handleMetalTypeChange,
+  handleDesignNameChange,
   products,
   filteredDesignOptions,
   filteredPurityOptions,
@@ -30,49 +32,7 @@ const ProductDetails = ({
   return (
     <Col >
     <Row>
-    {/* <Col xs={12} md={2}>
-                  <InputField
-                    label="BarCode/Rbarcode"
-                    name="code"
-                    value={formData.code}
-                    onChange={(e) => handleBarcodeChange(e.target.value)}
-                    type="select"
-                    options={
-                      !formData.product_id
-                        ? [
-                            ...products.map((product) => ({
-                              value: product.rbarcode,
-                              label: product.rbarcode,
-                            })),
-                            ...data.map((tag) => ({
-                              value: tag.PCode_BarCode,
-                              label: tag.PCode_BarCode,
-                            })),
-                          ]
-                        : [
-                            ...products
-                              .filter(
-                                (product) =>
-                                  String(product.product_id) === String(formData.product_id)
-                              )
-                              .map((product) => ({
-                                value: product.rbarcode,
-                                label: product.rbarcode,
-                              })),
-                            ...data
-                              .filter(
-                                (tag) =>
-                                  String(tag.product_id) === String(formData.product_id)
-                              )
-                              .map((tag) => ({
-                                value: tag.PCode_BarCode,
-                                label: tag.PCode_BarCode,
-                              })),
-                          ]
-                    }
-                  />
-              </Col> */}
-                             <Col xs={12} md={2}>
+    <Col xs={12} md={2}>
     <InputField
       label="BarCode/Rbarcode"
       name="code"
@@ -127,7 +87,7 @@ const ProductDetails = ({
       label="Metal Type"
       name="metal_type"
       value={formData.metal_type}
-      onChange={handleChange}
+      onChange={(e) => handleMetalTypeChange(e.target.value)}
       type="select"
       options={filteredMetalTypes.map((metalType) => ({
         value: metalType.metal_type,
@@ -151,7 +111,7 @@ const ProductDetails = ({
         label="Design Master"
         name="design_name"
         value={formData.design_name}
-        onChange={handleChange}
+        onChange={(e) => handleDesignNameChange(e.target.value)}
         type="select"
         options={filteredDesignOptions.map((designOption) => ({
           value: designOption.design_master,

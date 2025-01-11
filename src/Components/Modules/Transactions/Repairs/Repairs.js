@@ -6,6 +6,9 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import PDFContent from "./RepairInvoice";
 
 const RepairForm = () => {
   const today = new Date().toISOString().split("T")[0];
@@ -269,6 +272,17 @@ const RepairForm = () => {
         }
       }
       navigate("/repairstable");
+
+      // // Generate PDF
+      // const pdfDoc = pdf(
+      //   <PDFContent
+      //     formData={formData}
+      //     image={image}
+      //   />
+      // );
+  
+      // const blob = await pdfDoc.toBlob();
+      // saveAs(blob, `repair-${formData.repair_no}.pdf`);
     } catch (error) {
       console.error("Error submitting the form:", error);
       alert("Failed to submit the repair entry");

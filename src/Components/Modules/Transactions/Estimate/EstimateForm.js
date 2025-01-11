@@ -523,7 +523,7 @@ const handleBarcodeChange = async (code) => {
       const blob = await pdfDoc.toBlob();
       saveAs(blob, `estimate_${Date.now()}.pdf`);
   
-      alert("Estimates saved and PDF generated successfully!");
+      alert("Estimates saved successfully!");
       setEntries([]);
       setFormData(initialFormData);
       navigate("/estimatetable"); // Redirect to another page if needed

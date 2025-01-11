@@ -47,14 +47,15 @@ import OrdersTable from './Components/Modules/Transactions/Orders/OrdersTable';
 // import Orders from './Components/Modules/Transactions/Orders/Orders';
 import Orders from './Components/Modules/Transactions/OrderSection/OrderForm';
 import BarCodePrinting from './Components/Modules/Reports/BarcodePrinting/BarCodePrinting';
-import SalesNew from './Components/Modules/Transactions/SalesReturn/SalesReturnNew';
+import SalesNew from './Components/Modules/Transactions/Sales/SalesNew';
 import RepairDetails from "./Components/Modules/Transactions/Sales/SalesDetailsModules";
 import Worker_Master from './Components/Modules/Masters/Worker/Worker';
 import Worker_Table from './Components/Modules/Masters/Worker/WorkerTable';
 import Login from './Components/Pages/Login/Login';
 import SalesReturn from './Components/Modules/Transactions/SalesReturn/SalesForm';
 import EstimateReceipt from './Components/Modules/Transactions/Estimate/EstimateReceipt';
-import AccountDetails from './Components/Pages/Dashboard/AccountDetails'
+import AccountDetails from './Components/Pages/Dashboard/AccountDetails';
+import Receivables from "./Components/Pages/Dashboard/Receivables";
 
 function App() {
   const location = useLocation();
@@ -125,6 +126,7 @@ function App() {
         <Route path="/estimatereceipt" element={<EstimateReceipt />} />
 
         <Route path="/accountdetails" element={<AccountDetails />} />
+        <Route path="/receivables" element={<Receivables />} />
       </Routes>
     </>
   );

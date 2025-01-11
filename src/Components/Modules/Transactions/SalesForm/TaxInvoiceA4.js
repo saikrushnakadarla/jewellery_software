@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
 });
 
 
-const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item }) => {
+const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item,taxAmount,oldItemsAmount,schemeAmount,netPayableAmount }) => {
         // Calculate total values
         const totalValues = repairDetails.reduce(
                 (totals, item) => {
@@ -242,9 +242,9 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item }) =>
                                 <View style={styles.row}>
                                         <View style={[styles.column, { marginTop: 20, width: '20%', marginLeft: 20, fontFamily: 'Times-Bold' }]}>
                                                 <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
-                                                <Text style={{ marginBottom: 5 }}>Name:{formData.account_name}</Text>
+                                                <Text style={{ marginBottom: 5 }}>{formData.account_name}</Text>
 
-                                                <Text style={{ marginBottom: 5 }}>City:{formData.city}</Text>
+                                                <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
                                                 <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
                                                 <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text>
                                         </View>
@@ -507,29 +507,35 @@ const TaxINVoiceReceipt = ({ formData, repairDetails, paymentDetails, item }) =>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>CGST @1.50%:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {item?.tax_amt ? item.tax_amt / 2 : 0}
+                                                                                {(taxAmount / 2).toFixed(2)}
                                                                         </Text>
-                                                                </View>
-                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                        </View>
+                                                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>SGST @1.50%:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {item?.tax_amt ? item.tax_amt / 2 : 0}
+                                                                                {(taxAmount / 2).toFixed(2)}
                                                                         </Text>
                                                                 </View>
+
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={[styles.bold]}>Net Bill Value:</Text>
+                                                                        <Text style={[styles.bold]}>Net Bill Value: </Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + (item?.tax_amt ?? 0)).toFixed(2)}
+                                                                        {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)}
                                                                         </Text>
+
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>(-) OLD:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>0</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{oldItemsAmount.toFixed(2)}</Text>
+                                                                </View>
+                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                        <Text>(-) SCHEME:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{schemeAmount.toFixed(2)}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text style={[styles.bold]}>Net Amount:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + (item?.tax_amt ?? 0)).toFixed(2)}
+                                                                        {netPayableAmount.toFixed(2)}
                                                                         </Text>
                                                                 </View>
                                                         </View>

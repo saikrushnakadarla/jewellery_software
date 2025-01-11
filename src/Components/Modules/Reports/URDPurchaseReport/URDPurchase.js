@@ -32,17 +32,17 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Account Name',
+        Header: 'Name',
         accessor: 'account_name',
       },
       {
         Header: 'Mobile',
         accessor: 'mobile',
       },
-      {
-        Header: 'Email',
-        accessor: 'email',
-      },
+      // {
+      //   Header: 'Email',
+      //   accessor: 'email',
+      // },
       {
         Header: 'Date',
         accessor: 'date',
@@ -63,10 +63,10 @@ const RepairsTable = () => {
         Header: 'Metal',
         accessor: 'metal',
       },
-      {
-        Header: 'Purity',
-        accessor: 'purity',
-      },
+      // {
+      //   Header: 'Purity',
+      //   accessor: 'purity',
+      // },
       {
         Header: 'Gross Weight',
         accessor: 'gross',
@@ -75,16 +75,16 @@ const RepairsTable = () => {
         Header: 'Dust Weight',
         accessor: 'dust',
       },
-      {
-        Header: 'Touch Percent',
-        accessor: 'touch_percent',
-      },
+      // {
+      //   Header: 'Touch Percent',
+      //   accessor: 'touch_percent',
+      // },
       {
         Header: 'ML Percent',
         accessor: 'ml_percent',
       },
       {
-        Header: 'EQT Weight',
+        Header: 'Net Weight',
         accessor: 'eqt_wt',
       },
       {

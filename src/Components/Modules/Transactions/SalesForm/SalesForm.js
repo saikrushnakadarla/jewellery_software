@@ -261,6 +261,10 @@ const SalesForm = () => {
           formData={formData}
           repairDetails={repairDetails}
           paymentDetails={paymentDetails}
+          taxAmount={taxAmount}
+          oldItemsAmount={oldItemsAmount}
+          schemeAmount={schemeAmount}
+          netPayableAmount={netPayableAmount}
         />
       );
       const pdfBlob = await pdf(pdfDoc).toBlob();
@@ -325,6 +329,32 @@ const SalesForm = () => {
   const handleAddCustomer = () => {
     navigate("/customermaster", { state: { from: "/sales" } });
   };
+
+  const taxableAmount = repairDetails.reduce((sum, item) => {
+    const stonePrice = parseFloat(item.stone_price) || 0;
+    const makingCharges = parseFloat(item.making_charges) || 0;
+    const rateAmt = parseFloat(item.rate_amt) || 0;
+    return sum + stonePrice + makingCharges + rateAmt;
+  }, 0);
+  console.log("Total Price=",taxableAmount)
+  
+  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  const netAmount = taxableAmount + taxAmount;
+  console.log("Net Amount=",netAmount)
+
+  const oldItemsAmount = oldSalesData.reduce(
+    (sum, item) => sum + parseFloat(item.total_amount || 0),
+    0
+  );
+
+  // Calculate Scheme Amount (sum of paid_amount from schemeSalesData)
+  const schemeAmount = schemeSalesData.reduce(
+    (sum, item) => sum + parseFloat(item.paid_amount || 0),
+    0
+  );
+
+  // Calculate Net Payable Amount
+  const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);
 
   return (
     <div className="main-container">
@@ -403,6 +433,12 @@ const SalesForm = () => {
                 handleBack={handleBack}
                 totalPrice={totalPrice} 
                 repairDetails={repairDetails}
+                taxableAmount={taxableAmount}
+                taxAmount={taxAmount}
+                netAmount={netAmount}
+                oldItemsAmount={oldItemsAmount}
+                schemeAmount={schemeAmount}
+                netPayableAmount={netPayableAmount}
                 oldSalesData={oldSalesData} schemeSalesData={schemeSalesData} // Pass totalPrice as a prop
               />
             </div>

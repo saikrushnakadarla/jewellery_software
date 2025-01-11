@@ -95,76 +95,67 @@ const RepairForm = () => {
     fetchTags();
   }, []);
 
-  const handleProductNameChange = (productName) => {
-    const product = data.find((prod) => String(prod.product_Name) === String(productName));
+  // const handleProductNameChange = (productName) => {
+  //   const productEntries = data.filter((prod) => prod.product_Name === productName);
   
-    if (product) {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: product.rbarcode,
-        product_id: product.product_id || "",
-        product_name: product.product_Name || "",
-        
-      }));
+  //   if (productEntries.length > 0) {
+  //     const uniqueMetalTypes = Array.from(
+  //       new Set(productEntries.map((prod) => prod.metal_type))
+  //     ).map((metalType) => ({ metal_type: metalType }));
   
-      // Filter metal types based on the selected product's metal type
-      const filteredMetalTypes = metalTypes.filter(
-        (metalType) => metalType.metal_type === product.metal_type
-      );
-      setFilteredMetalTypes(filteredMetalTypes); // Update filtered metal types
+  //     const uniqueDesignOptions = Array.from(
+  //       new Set(productEntries.map((prod) => prod.design_master))
+  //     ).map((designMaster) => ({ design_master: designMaster }));
   
-      // Filter and deduplicate design_master options for the selected product
-      const filteredDesignOptions = Array.from(
-        new Set(
-          data
-            .filter((prod) => prod.product_Name === productName)
-            .map((prod) => prod.design_master)
-        )
-      ).map((designMaster) => ({ design_master: designMaster }));
-      setFilteredDesignOptions(filteredDesignOptions); // Update filtered design options
+  //     const uniquePurityOptions = Array.from(
+  //       new Set(productEntries.map((prod) => prod.Purity))
+  //     ).map((Purity) => ({ Purity }));
   
-      // Filter and deduplicate purity options for the selected product
-      const filteredPurityOptions = Array.from(
-        new Set(
-          data
-            .filter((prod) => prod.product_Name === productName)
-            .map((prod) => prod.Purity)
-        )
-      ).map((Purity) => ({ Purity }));
-      setFilteredPurityOptions(filteredPurityOptions); // Update filtered purity options
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        mc_on: "",
-        mc_per_gram: "",
-        making_charges: "",
-        rate: "",
-        rate_amt: "",
-        tax_percent: "",
-        tax_amt: "",
-        total_price: "",
-        qty: "",
-      }));
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       code: productEntries[0]?.rbarcode || "",
+  //       product_id: productEntries[0]?.product_id || "",
+  //       product_name: productName,
+  //     }));
   
-      setFilteredMetalTypes(metalTypes); // Reset to all metal types
-      setFilteredDesignOptions(designOptions); // Clear design_master options
-      setFilteredPurityOptions(purity); // Clear purity options
-    }
-  };
+  //     setFilteredMetalTypes(uniqueMetalTypes);
+  //     setFilteredDesignOptions(uniqueDesignOptions);
+  //     setFilteredPurityOptions(uniquePurityOptions);
+  //   } else {
+  //     // Reset if no matching product entries found
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       code: "",
+  //       product_id: "",
+  //       product_name: "",
+  //       metal_type: "",
+  //       design_name: "",
+  //       purity: "",
+  //       gross_weight: "",
+  //       stone_weight: "",
+  //       stone_price: "",
+  //       weight_bw: "",
+  //       va_on: "",
+  //       va_percent: "",
+  //       wastage_weight: "",
+  //       total_weight_aw: "",
+  //       mc_on: "",
+  //       mc_per_gram: "",
+  //       making_charges: "",
+  //       rate: "",
+  //       rate_amt: "",
+  //       tax_percent: "",
+  //       tax_amt: "",
+  //       total_price: "",
+  //       qty: "",
+  //     }));
+  
+  //     setFilteredMetalTypes(metalTypes);
+  //     setFilteredDesignOptions(designOptions);
+  //     setFilteredPurityOptions(purity);
+  //   }
+  // };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -253,6 +244,121 @@ const RepairForm = () => {
       }));
     }
   };
+
+  const handleProductNameChange = (productName) => {
+    const productEntries = data.filter((prod) => prod.product_Name === productName);
+  
+    if (productEntries.length > 0) {
+      const uniqueMetalTypes = Array.from(
+        new Set(productEntries.map((prod) => prod.metal_type))
+      ).map((metalType) => ({ metal_type: metalType }));
+  
+      setFormData((prevData) => ({
+        ...prevData,
+        product_name: productName,
+        metal_type: "",
+        design_name: "",
+      }));
+  
+      setFilteredMetalTypes(uniqueMetalTypes); // Update metal types based on selected product
+      setFilteredDesignOptions([]); // Clear design options initially
+    } else {
+      // Reset fields if no matching product entries found
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        gross_weight: "",
+        stone_weight: "",
+        stone_price: "",
+        weight_bw: "",
+        va_on: "",
+        va_percent: "",
+        wastage_weight: "",
+        total_weight_aw: "",
+        mc_on: "",
+        mc_per_gram: "",
+        making_charges: "",
+        rate: "",
+        rate_amt: "",
+        tax_percent: "",
+        tax_amt: "",
+        total_price: "",
+        qty: "",
+      }));
+  
+      setFilteredMetalTypes(metalTypes);
+      setFilteredDesignOptions(designOptions);
+    }
+  };
+
+  
+  const handleMetalTypeChange = (metalType) => {
+    const productEntries = data.filter(
+      (prod) => prod.product_Name === formData.product_name && prod.metal_type === metalType
+    );
+  
+    if (productEntries.length > 0) {
+      const uniqueDesignOptions = Array.from(
+        new Set(productEntries.map((prod) => prod.design_master))
+      ).map((designMaster) => ({ design_master: designMaster }));
+  
+      setFormData((prevData) => ({
+        ...prevData,
+        metal_type: metalType,
+        design_name: "",
+      }));
+  
+      setFilteredDesignOptions(uniqueDesignOptions); // Update design options based on metal type
+    } else {
+      // Reset if no matching entries found
+      setFormData((prevData) => ({
+        ...prevData,
+        metal_type: "",
+        design_name: "",
+      }));
+  
+      setFilteredDesignOptions([]);
+    }
+  };
+
+  const handleDesignNameChange = (designName) => {
+    const productEntries = data.filter(
+      (prod) =>
+        prod.product_Name === formData.product_name &&
+        prod.metal_type === formData.metal_type &&
+        prod.design_master === designName
+    );
+  
+    if (productEntries.length > 0) {
+      const uniquePurityOptions = Array.from(
+        new Set(productEntries.map((prod) => prod.Purity))
+      ).map((Purity) => ({ Purity }));
+  
+      setFormData((prevData) => ({
+        ...prevData,
+        design_name: designName,
+        purity: "",
+      }));
+  
+      setFilteredPurityOptions(uniquePurityOptions); // Update purity options based on design
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        design_name: "",
+        purity: "",
+        
+      }));
+  
+      setFilteredPurityOptions([]);
+    }
+  };
+  
+  
   
   
   const handleBarcodeChange = async (code) => {
@@ -462,45 +568,48 @@ const RepairForm = () => {
   />
 </Col>
 
-                <Col xs={12} md={3}>
-                <InputField
-                  label="Product Name"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={(e) => handleProductNameChange(e.target.value)}
-                  type="select"
-                  options={uniqueProducts.map((prod) => ({
-                    value: prod.product_Name,
-                    label: prod.product_Name,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Metal Type"
-                  name="metal_type"
-                  value={formData.metal_type}
-                  onChange={handleChange}
-                  type="select"
-                  options={filteredMetalTypes.map((metalType) => ({
-                    value: metalType.metal_type,
-                    label: metalType.metal_type,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={3}>
-                <InputField
-                  label="Design Master"
-                  name="design_name"
-                  value={formData.design_name}
-                  onChange={handleChange}
-                  type="select"
-                  options={filteredDesignOptions.map((designOption) => ({
-                    value: designOption.design_master,
-                    label: designOption.design_master,
-                  }))}
-                />
-              </Col>
+<Col xs={12} md={3}>
+  <InputField
+    label="Product Name"
+    name="product_name"
+    value={formData.product_name}
+    onChange={(e) => handleProductNameChange(e.target.value)}
+    type="select"
+    options={uniqueProducts.map((prod) => ({
+      value: prod.product_Name,
+      label: prod.product_Name,
+    }))}
+  />
+</Col>
+
+<Col xs={12} md={2}>
+  <InputField
+    label="Metal Type"
+    name="metal_type"
+    value={formData.metal_type}
+    onChange={(e) => handleMetalTypeChange(e.target.value)}
+    type="select"
+    options={filteredMetalTypes.map((metalType) => ({
+      value: metalType.metal_type,
+      label: metalType.metal_type,
+    }))}
+  />
+</Col>
+
+<Col xs={12} md={3}>
+  <InputField
+    label="Design Name"
+    name="design_name"
+    value={formData.design_name}
+    onChange={(e) => handleDesignNameChange(e.target.value)}
+    type="select"
+    options={filteredDesignOptions.map((design) => ({
+      value: design.design_master,
+      label: design.design_master,
+    }))}
+  />
+</Col>
+
               <Col xs={12} md={2}>
                 <InputField
                   label="Purity"

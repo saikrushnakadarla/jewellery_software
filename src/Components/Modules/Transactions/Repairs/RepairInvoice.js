@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
-import logo1 from './Images/logo_dark.png'
+import logo1 from '../../../../logo_dark.png'
 
 
 
@@ -207,19 +207,18 @@ const styles = StyleSheet.create({
         },
 });
 
-const TaxINVoiceReceipt = () => {
+const TaxINVoiceReceipt = ({ formData, image }) => {
         return (
                 <Document>
                         <Page size="A4" style={styles.page}>
                                 {/* First Row */}
                                 <View style={styles.row}>
                                 <View style={[styles.column, { marginTop: 20, width: '20%', marginLeft: 20, fontFamily: 'Times-Bold' }]}>
-                                                <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
-                                                <Text style={{ marginBottom: 5 }}>SHUBHA,</Text>
-
-                                                <Text style={{ marginBottom: 5 }}>BANGALORE</Text>
-                                                <Text style={{ marginBottom: 5 }}>MOBILE: 9901517112</Text>
-                                                <Text style={{ marginBottom: 5 }}>PAN NO: DRXPR9966P</Text>
+                                       <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
+                                        <Text style={{ marginBottom: 5 }}>{formData.account_name}</Text>
+                                        <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
+                                        <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
+                                        {/* <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text> */}
                                         </View>
 
                                         <View style={[styles.column, { width: '40%' }]}>
@@ -245,13 +244,13 @@ const TaxINVoiceReceipt = () => {
                                                 {/* BILL NO */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>BILL NO:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>SV1224</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.repair_no}</Text>
                                                 </View>
 
                                                 {/* DATE */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>DATE:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>29-12-2024</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.date}</Text>
                                                 </View>
 
                                                 {/* STAFF */}

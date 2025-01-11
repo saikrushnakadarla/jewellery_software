@@ -65,7 +65,7 @@ const SupplierTable = () => {
     []
   );
 
-  useEffect(() => {
+
     const fetchData = async () => {
       try {
         const response = await fetch(`${baseURL}/get/account-details`);
@@ -87,7 +87,7 @@ const SupplierTable = () => {
         setLoading(false);
       }
     };
-
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -109,6 +109,7 @@ const SupplierTable = () => {
         } else {
           alert('Failed to delete supplier.');
         }
+        fetchData();
       } catch (error) {
         console.error('Error:', error);
         alert('An error occurred while deleting.');
