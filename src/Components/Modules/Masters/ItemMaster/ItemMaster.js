@@ -469,7 +469,7 @@ const FormWithTable = () => {
         // Clear the tag entries
         setOpenTagsEntries([]);
         // Refresh the window
-        window.location.reload();
+        // window.location.reload();
         setIsMaintainTagsChecked(false); // Reset checkbox
     } catch (error) {
         console.error("Error saving data:", error);

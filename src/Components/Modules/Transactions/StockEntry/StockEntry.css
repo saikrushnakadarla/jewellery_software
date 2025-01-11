@@ -16,8 +16,8 @@
 
   .modal-content {
     padding: 0px; /* Optional: Adjust padding for better layout */
-    width: 250%;
-    margin-left: -389px;
+    /* width: 250%;
+    margin-left: -389px; */
   }
   
   @media (max-width: 767px)  {

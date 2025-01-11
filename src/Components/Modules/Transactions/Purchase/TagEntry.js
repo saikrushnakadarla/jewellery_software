@@ -709,7 +709,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             </div>
 
             {/* Modal for adding a new sub category */}
-            <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal show={showModal} onHide={handleCloseModal} >
                 <Modal.Header closeButton>
                     <Modal.Title>Add New Sub Category</Modal.Title>
                 </Modal.Header>
