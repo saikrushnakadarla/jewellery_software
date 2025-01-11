@@ -46,6 +46,7 @@ const PurchaseTable = () => {
       { Header: 'Pure Weight', accessor: 'pure_weight' },
       // { Header: 'Rate', accessor: 'rate' },
       { Header: 'Total Amount', accessor: 'total_amount' },
+      { Header: 'Bal Amount', accessor: 'balance_amount' },
     ],
     []
   );

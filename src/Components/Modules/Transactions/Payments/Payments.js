@@ -18,29 +18,29 @@ const RepairForm = () => {
     cheque_number: "",
     receipt_no: "",
     account_name: "",
-    invoice:"",
+    invoice_number:"",
     total_amt: "",
     discount_amt: "",
     cash_amt: "",
     remarks: "",
   });
 
-  // useEffect(() => {
-  //   const fetchLastPaymentNumber = async () => {
-  //     try {
-  //       const response = await axios.get(`${baseURL}/lastPaymentNumber`);
-  //       // setFormData(prev => ({ ...prev, receipt_no: response.data.lastPaymentNumber }));
-  //       setFormData((prev) => ({
-  //         ...prev,
-  //         receipt_no: repairData ? repairData.receipt_no : response.data.lastPaymentNumber,
-  //       }));
-  //     } catch (error) {
-  //       console.error("Error fetching invoice number:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchLastPaymentNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastPaymentNumber`);
+        // setFormData(prev => ({ ...prev, receipt_no: response.data.lastPaymentNumber }));
+        setFormData((prev) => ({
+          ...prev,
+          receipt_no: repairData ? repairData.receipt_no : response.data.lastPaymentNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching invoice_number number:", error);
+      }
+    };
 
-  //   fetchLastPaymentNumber();
-  // }, []);
+    fetchLastPaymentNumber();
+  }, []);
 
   useEffect(() => {
     if (repairData) {
@@ -71,7 +71,7 @@ const RepairForm = () => {
   }, []);
 
   useEffect(() => {
-    // Filter and set invoice when account_name is selected
+    // Filter and set invoice_number when account_name is selected
     const selectedPurchase = purchases.find(
       (purchase) => purchase.account_name === formData.account_name
     );
@@ -79,7 +79,7 @@ const RepairForm = () => {
     if (selectedPurchase) {
       setFormData((prevData) => ({
         ...prevData,
-        invoice: selectedPurchase.invoice || "", // Assuming invoice can be an empty string
+        invoice_number: selectedPurchase.invoice || "", // Assuming invoice_number can be an empty string
         total_amt: selectedPurchase.balance_after_receipt > 0 
                     ? selectedPurchase.balance_after_receipt 
                     : selectedPurchase.balance_amount || 0,
@@ -225,8 +225,8 @@ const RepairForm = () => {
             <InputField
               label="Invoice"
               type="text"
-              name="invoice"
-              value={formData.invoice}
+              name="invoice_number"
+              value={formData.invoice_number}
               onChange={handleInputChange}
              
             />
