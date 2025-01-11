@@ -367,9 +367,9 @@ const SalesForm = () => {
 
 
           <div className="sales-form2">
-            <div className="sales-form-third">
+            {/* <div className="sales-form-third">
               
-            </div>
+            </div> */}
 
             <div className="sales-form-fourth">
               <PaymentDetails 

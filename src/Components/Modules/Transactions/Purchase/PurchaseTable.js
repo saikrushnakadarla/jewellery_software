@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Reusable DataTable component
 import { Button, Row, Col } from 'react-bootstrap';
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import './PurchaseTable.css';
 import baseURL from '../../../../Url/NodeBaseURL'; // Update with your base URL setup
 
 const PurchaseTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store fetched table data
+  const [loading, setLoading] = useState(false); // Loading state for delete actions
 
   // Function to format date to DD/MM/YYYY
   const formatDate = (date) => {
@@ -19,52 +21,84 @@ const PurchaseTable = () => {
     return `${day}/${month}/${year}`;
   };
 
+  // Function to handle delete request
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this purchase?');
+    if (!confirmDelete) return;
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${baseURL}/delete-purchases`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ purchaseIds: [id] }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(result.message || 'Purchase deleted successfully');
+        // Remove the deleted item from the state
+        setData((prevData) => prevData.filter((item) => item.id !== id));
+      } else {
+        console.error('Error deleting purchase:', result.error);
+        alert(result.message || 'Failed to delete purchase');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Something went wrong while deleting the purchase');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Define columns for the DataTable
   const columns = React.useMemo(
     () => [
+      { Header: 'Sr.No', accessor: 'id' },
       { Header: 'Name', accessor: 'account_name' },
-      // { Header: 'Customer Id', accessor: 'customer_id' },
       { Header: 'Mobile', accessor: 'mobile' },
-      // { Header: 'GST IN', accessor: 'gst_in' },
-      // { Header: 'Terms', accessor: 'terms' },
       { Header: 'Invoice', accessor: 'invoice' },
-      // { Header: 'Bill No', accessor: 'bill_no' },
-      // { Header: 'Rate Cut', accessor: 'rate_cut' },
       { Header: 'Date', accessor: 'date', Cell: ({ value }) => <span>{formatDate(value)}</span> },
-      // { Header: 'Bill Date', accessor: 'bill_date', Cell: ({ value }) => <span>{formatDate(value)}</span> },
-      // { Header: 'Due Date', accessor: 'due_date', Cell: ({ value }) => <span>{formatDate(value)}</span> },
       { Header: 'Category', accessor: 'category' },
-      // { Header: 'Barcode', accessor: 'rbarcode' },
       { Header: 'Pcs', accessor: 'pcs' },
       { Header: 'Gross Weight', accessor: 'gross_weight' },
-      // { Header: 'Stone Weight', accessor: 'stone_weight' },
-      // { Header: 'Net Weight', accessor: 'net_weight' },
-      // { Header: 'HM Charges', accessor: 'hm_charges' },
-      // { Header: 'Other Charges', accessor: 'other_charges' },
-      // { Header: 'Total Charges', accessor: 'charges' },
       { Header: 'Purity', accessor: 'purity' },
       { Header: 'Pure Weight', accessor: 'pure_weight' },
-      // { Header: 'Rate', accessor: 'rate' },
       { Header: 'Total Amount', accessor: 'total_amount' },
       { Header: 'Bal Amount', accessor: 'balance_amount' },
       {
-              Header: 'Receipts',
-              accessor: 'receipts',
-              Cell: ({ row }) => (
-                <Button
-                  style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
-                  onClick={() => handleAddReceipt(row.original)} // Pass the row data to handle the receipt creation
-                >
-                  Add Receipt
-                </Button>
-              ),
-            },
+        Header: 'Receipts',
+        accessor: 'receipts',
+        Cell: ({ row }) => (
+          <Button
+            style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+            onClick={() => handleAddReceipt(row.original)}
+          >
+            Add Receipt
+          </Button>
+        ),
+      },
+      {
+        Header: 'Actions',
+        accessor: 'actions',
+        Cell: ({ row }) => (
+          <Button
+            variant="danger"
+            onClick={() => handleDelete(row.original.id)}
+            disabled={loading} // Disable button while loading
+          >
+            <FaTrash />
+          </Button>
+        ),
+      },
     ],
-    []
+    [loading] // Add `loading` as a dependency to re-render correctly
   );
 
   const handleAddReceipt = (invoiceData) => {
-    console.log("Invoice Data:", invoiceData); // Log the invoice data to the console
+    console.log("Invoice Data:", invoiceData);
     navigate("/payments", { state: { from: "/purchasetable", invoiceData } });
   };
 
