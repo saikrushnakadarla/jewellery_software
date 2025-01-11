@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation,useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout';
-import { FaEye } from 'react-icons/fa';
+import { FaEye ,FaTrash} from 'react-icons/fa';
 import { Button, Row, Col, Modal, Table, Form } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from '../../../../Url/NodeBaseURL';
-
+import Swal from 'sweetalert2';
 const RepairsTable = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -68,6 +68,14 @@ const RepairsTable = () => {
               style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
               onClick={() => handleViewDetails(row.original.invoice_number)}
             />
+             <FaTrash
+                          style={{
+                            cursor: 'pointer',
+                            marginLeft: '10px',
+                            color: 'red',
+                          }}
+                          onClick={() => handleDelete(row.original.invoice_number)}
+                        />
           </div>
         ),
       },
@@ -164,7 +172,31 @@ const RepairsTable = () => {
     }
   };
   
-  
+  const handleDelete = async (invoiceNumber) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you really want to delete invoice ${invoiceNumber}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.delete(`${baseURL}/repair-details/${invoiceNumber}`);
+          if (response.status === 200) {
+            Swal.fire('Deleted!', response.data.message, 'success');
+            // Update the table data by removing the deleted record
+            setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
+          }
+        } catch (error) {
+          console.error('Error deleting repair details:', error);
+          Swal.fire('Error!', 'Failed to delete repair details. Please try again.', 'error');
+        }
+      }
+    });
+  };
   
   const handleCloseModal = () => {
     setShowModal(false);
