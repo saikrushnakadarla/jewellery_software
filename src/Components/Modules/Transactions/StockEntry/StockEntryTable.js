@@ -260,9 +260,7 @@ const StockEntryTable = (selectedProduct) => {
       Stones_Price: totalPrice.toFixed(2),
     });
   };
-  const handleCancel = () => {
-    navigate('/stockEntryTable');
-  };
+  const [isFormVisible, setFormVisible] = useState(true);
   const updateField = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -294,7 +292,11 @@ const StockEntryTable = (selectedProduct) => {
     console.log("Navigating to /stockEntryTable");
     navigate("/stockEntryTable");
   };
-
+  const handleCancel = () => {
+    setFormVisible(false); // Hide the form when the cancel button is clicked
+    // navigate("/stockEntryTable");
+    window.location.reload();
+  };
 
   return (
     <div className="main-container">
@@ -317,6 +319,7 @@ const StockEntryTable = (selectedProduct) => {
         </div>
       ) : (
         <div className="container mt-4">
+          {isFormVisible && (
           <form className="p-4 border rounded form-container-stockentry" onSubmit={handleSubmit}>
             <h4>Stock Entry</h4>
 
@@ -524,20 +527,20 @@ const StockEntryTable = (selectedProduct) => {
 
 
             <Button
-              type="button"
-              className="cus-back-btn"
-              // onClick={handleBack}
-              style={{ backgroundColor: "gray", marginRight: "10px" }}
-            >
-              Cancel
-            </Button>
+            type="button"
+            className="cus-back-btn"
+            onClick={handleCancel}
+            style={{ backgroundColor: "gray", marginRight: "10px" }}
+          >
+            Cancel
+          </Button>
             <Button className="create_but" type="" variant="success"
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
               update
             </Button>
 
           </form>
-
+          )}
         </div>
       )}
       <StoneDetailsModal
