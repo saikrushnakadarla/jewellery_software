@@ -10,7 +10,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
 
 
-const StockEntryTable = () => {
+const StockEntryTable = (selectedProduct) => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store fetched table data
   const [isEditMode, setIsEditMode] = useState(false); // State to toggle form visibility
@@ -263,6 +263,38 @@ const StockEntryTable = () => {
   const handleCancel = () => {
     navigate('/stockEntryTable');
   };
+  const updateField = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+
+  // Fetch design master options from the API
+  useEffect(() => {
+    const fetchDesignMaster = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/designmaster`);
+        const designMasters = response.data.map((item) => {
+          console.log('Design ID:', item.design_id); // Log design_id
+          return {
+            value: item.design_name, // Assuming the column name is "design_name"
+            label: item.design_name,
+            id: item.design_id, // Assuming the column name is "design_id"
+          };
+        });
+        setdesignOptions(designMasters);
+      } catch (error) {
+        console.error('Error fetching design masters:', error);
+      }
+    };
+
+    fetchDesignMaster();
+  }, []);
+
+  const handleBack = () => {
+    console.log("Navigating to /stockEntryTable");
+    navigate("/stockEntryTable");
+  };
+
 
   return (
     <div className="main-container">
@@ -290,19 +322,7 @@ const StockEntryTable = () => {
 
             {/* Section 1 */}
             <div className="row g-3">
-              {/* <div className="col-md-2">
-                <InputField
-                  label="Pricing:"
-                  name="Pricing"
-                  type="select"
-                  value={formData.Pricing || ''}
-                  onChange={handleChange}
-                  options={[
-                    { value: "By Weight", label: "By Weight" },
-                    { value: "By fixed", label: "By fixed" },
-                  ]}
-                />
-              </div> */}
+
               <div className="col-md-3">
                 <InputField
                   label="Category:"
@@ -333,24 +353,7 @@ const StockEntryTable = () => {
                   onChange={handleChange}  // Pass the event handler correctly
                 />
               </div>
-              {/* <div className="col-md-2">
-                <InputField
-                  label="P ID:"
-                  name="product_id"
-                  type="select"
-                  value={formData.product_id || ''}
-                  onChange={handleChange}
-                  options={productOptions}
-                />
-              </div> */}
-              {/* <div className="col-md-2">
-                <InputField
-                  label="Tag ID:"
-                  name="Tag_ID"
-                  value={formData.Tag_ID || ''}
-                  onChange={handleChange}
-                />
-              </div> */}
+
 
               <div className="col-md-2">
                 <InputField
@@ -363,14 +366,7 @@ const StockEntryTable = () => {
                   options={designOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
               </div>
-              {/* <div className="col-md-3">
-                <InputField
-                  label="Category:"
-                  name="Category"
-                  value={formData.Category || ''}
-                  readOnly
-                />
-              </div> */}
+
               <div className="col-md-2">
                 <InputField
                   label="Pricing:"
@@ -394,29 +390,7 @@ const StockEntryTable = () => {
                   readOnly
                 />
               </div>
-              {/* <div className="col-md-3">
-                <InputField
-                  label="Prefix:"
-                  value="tag"
-                  readOnly
-                />
-              </div> */}
-              {/* <div className="col-md-3">
-                <InputField
-                  label="Purity:"
-                  name="Purity"
-                  value={formData.Purity || ''}
-                  readOnly
-                />
-              </div>
-              <div className="col-md-3">
-                <InputField
-                  label="PCode/BarCode:"
-                  name="PCode_BarCode"
-                  value={formData.PCode_BarCode || ''}
-                  onChange={handleChange}
-                />
-              </div> */}
+
               <div className="col-md-3">
                 <InputField
                   label="Gross Weight:"
@@ -433,16 +407,7 @@ const StockEntryTable = () => {
                   onChange={handleChange}
                 />
               </div>
-              {/* <div className="col-md-2">
-                  <button
-                    type="button"
-                    className="btn btn-primary w-100"
-                    onClick={handleOpenModal}
-                    style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-                  >
-                    Stone Details
-                  </button>
-                </div> */}
+
               <div className="col-md-2">
                 <InputField
                   label="Stones Price:"
@@ -561,22 +526,20 @@ const StockEntryTable = () => {
               </div>
             </div>
 
-            {/* <button type="" className="create_but" variant="success"
-                          style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
-              Update
-            </button> */}
+
+            <Button
+              type="button"
+              className="cus-back-btn"
+              // onClick={handleBack}
+              style={{ backgroundColor: "gray", marginRight: "10px" }}
+            >
+              Cancel
+            </Button>
             <Button className="create_but" type="" variant="success"
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
               update
             </Button>
-            <Button
-                      variant="secondary"
-                      className="cus-back-btn"
-                      type="button"
-                      onClick={() => navigate("/stockEntryTable")}
-                    >
-                      Cancel
-                    </Button>
+
           </form>
 
         </div>
