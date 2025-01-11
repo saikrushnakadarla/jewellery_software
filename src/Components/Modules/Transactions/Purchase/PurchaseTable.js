@@ -46,18 +46,47 @@ const PurchaseTable = () => {
       { Header: 'Pure Weight', accessor: 'pure_weight' },
       // { Header: 'Rate', accessor: 'rate' },
       { Header: 'Total Amount', accessor: 'total_amount' },
-      { Header: 'Bal Amount', accessor: 'balance_amount' },
+      { 
+        Header: 'Paid Amount', 
+        accessor: 'paid_amount',
+        Cell: ({ row }) => {
+          const { paid_amount, paid_amt } = row.original;
+          const totalPaid = (paid_amount || 0) + (paid_amt || 0);
+          return totalPaid;
+        },
+       },
+      { 
+        Header: 'Bal Amount', 
+        accessor: 'balance_amount',
+        Cell: ({ row }) => {
+          const { balance_amount, balance_after_receipt, paid_amt } = row.original;
+          
+          // If bal_amt equals receipts_amt, show bal_after_receipts
+          if (balance_amount === paid_amt) {
+            return balance_after_receipt || '-';
+          }
+      
+          // Default logic: Show bal_after_receipts if it exists, otherwise bal_amt
+          return balance_after_receipt ? balance_after_receipt : balance_amount || '-';
+        },
+       },
       {
-              Header: 'Receipts',
-              accessor: 'receipts',
-              Cell: ({ row }) => (
-                <Button
-                  style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
-                  onClick={() => handleAddReceipt(row.original)} // Pass the row data to handle the receipt creation
-                >
-                  Add Receipt
-                </Button>
-              ),
+              Header: 'Payments',
+              accessor: 'payment',
+              Cell: ({ row }) => {
+                const { total_amount, paid_amount, paid_amt } = row.original;
+                const totalPaid = (paid_amount || 0) + (paid_amt || 0);
+            
+                return (
+                  <Button
+                    style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+                    onClick={() => handleAddReceipt(row.original)} // Pass the row data to handle the receipt creation
+                    disabled={total_amount === totalPaid} // Disable button if net_bill_amount equals totalPaid
+                  >
+                    Add Payment
+                  </Button>
+                );
+              },
             },
     ],
     []
