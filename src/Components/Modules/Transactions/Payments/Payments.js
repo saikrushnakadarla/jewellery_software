@@ -53,6 +53,7 @@ const RepairForm = () => {
   const [accountOptions, setAccountOptions] = useState([]);
 
   const [purchases, setPurchases] = useState([]);
+  const [invoiceOptions, setInvoiceOptions] = useState([]);
 
 
   useEffect(() => {
@@ -71,21 +72,53 @@ const RepairForm = () => {
   }, []);
 
   useEffect(() => {
-    // Filter and set invoice_number when account_name is selected
-    const selectedPurchase = purchases.find(
-      (purchase) => purchase.account_name === formData.account_name
-    );
-    
-    if (selectedPurchase) {
+    if (formData.account_name) {
+      // Filter purchases to get invoice options for the selected account name
+      const filteredInvoices = purchases
+        .filter((purchase) => purchase.account_name === formData.account_name)
+        .map((purchase) => ({
+          value: purchase.invoice, // Assuming `invoice` is the key for invoice number
+          label: purchase.invoice,
+        }));
+  
+      setInvoiceOptions(filteredInvoices); // Update invoice dropdown options
+    } else {
+      // Reset invoice options, invoice_number, and total_amt when account_name is cleared
+      setInvoiceOptions([]);
       setFormData((prevData) => ({
         ...prevData,
-        invoice_number: selectedPurchase.invoice || "", // Assuming invoice_number can be an empty string
-        total_amt: selectedPurchase.balance_after_receipt > 0 
-                    ? selectedPurchase.balance_after_receipt 
-                    : selectedPurchase.balance_amount || 0,
+        invoice_number: "",
+        total_amt: "",
       }));
     }
   }, [formData.account_name, purchases]);
+  
+  
+
+useEffect(() => {
+  if (formData.invoice_number) {
+    const selectedInvoice = purchases.find(
+      (purchase) => purchase.invoice === formData.invoice_number
+    );
+
+    if (selectedInvoice) {
+      setFormData((prevData) => ({
+        ...prevData,
+        total_amt:
+          selectedInvoice.balance_after_receipt > 0
+            ? selectedInvoice.balance_after_receipt
+            : selectedInvoice.balance_amount || 0,
+      }));
+    }
+  } else {
+    // Clear total_amt when invoice_number is cleared
+    setFormData((prevData) => ({
+      ...prevData,
+      total_amt: "",
+    }));
+  }
+}, [formData.invoice_number, purchases]);
+
   
 
   // Fetch account names on component mount
@@ -222,15 +255,16 @@ const RepairForm = () => {
             />
           </Col>
           <Col xs={12} md={3}>
-            <InputField
-              label="Invoice"
-              type="text"
-              name="invoice_number"
-              value={formData.invoice_number}
-              onChange={handleInputChange}
-             
-            />
-          </Col>
+          <InputField
+            label="Invoice"
+            type="select" // Change to dropdown
+            name="invoice_number"
+            value={formData.invoice_number}
+            onChange={handleInputChange}
+            options={invoiceOptions} // Use dynamically filtered invoice options
+          />
+        </Col>
+
           <Col xs={12} md={2}>
             <InputField
               label="Total Amt"
@@ -238,6 +272,7 @@ const RepairForm = () => {
               name="total_amt"
               value={formData.total_amt}
               onChange={handleInputChange}
+              readOnly
             />
           </Col>
           <Col xs={12} md={2}>
