@@ -4,7 +4,7 @@ import InputField from "./../../Masters/ItemMaster/Inputfield";
 import baseURL from "../../../../Url/NodeBaseURL";
 
 
-const SchemeSalesForm = ({ setSchemeSalesData,schemeTableData,setSchemeTableData }) => {
+const SchemeSalesForm = ({ setSchemeSalesData }) => {
 
    
   const [schemeDetails, setSchemeDetails] = useState({
@@ -21,7 +21,10 @@ const SchemeSalesForm = ({ setSchemeSalesData,schemeTableData,setSchemeTableData
     schemes_total_amount: "",
   });
 
-
+  const [schemeTableData, setSchemeTableData] = useState(() => {
+    const savedData = localStorage.getItem('schemeTableData');
+    return savedData ? JSON.parse(savedData) : [];
+  });
 
   // Save to localStorage whenever table data changes
   useEffect(() => {

@@ -4,7 +4,7 @@ import { Col, Row, Button, Table } from "react-bootstrap";
 import InputField from "./../../Masters/ItemMaster/Inputfield";
 import baseURL from "../../../../Url/NodeBaseURL";
 
-const OldSalesForm = ({ setOldSalesData, oldTableData,setOldTableData }) => {
+const OldSalesForm = ({ setOldSalesData }) => {
 
     
   const [metalOptions, setMetalOptions] = useState([]);
@@ -24,7 +24,10 @@ const OldSalesForm = ({ setOldSalesData, oldTableData,setOldTableData }) => {
     total_old_amount: "",
   });
 
- 
+  const [oldTableData, setOldTableData] = useState(() => {
+    const savedData = localStorage.getItem('oldTableData');
+    return savedData ? JSON.parse(savedData) : [];
+  });
 
   // Save to localStorage whenever table data changes
   useEffect(() => {
