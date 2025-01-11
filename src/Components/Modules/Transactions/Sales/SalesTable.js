@@ -51,22 +51,22 @@ const RepairsTable = () => {
       {
         Header: 'Total Amt',
         accessor: 'net_amount',
-        Cell: ({ value }) => value || '-', 
+        Cell: ({ value }) => value || 0 
       },
       {
         Header: 'Old Amt',
         accessor: 'old_exchange_amt',
-        Cell: ({ value }) => value || '-', 
+        Cell: ({ value }) => value || 0 
       },
       {
         Header: 'Scheme Amt',
         accessor: 'scheme_amt',
-        Cell: ({ value }) => value || '-', 
+        Cell: ({ value }) => value || 0 
       },
       {
         Header: 'Net Amt',
         accessor: 'net_bill_amount',
-        Cell: ({ value }) => value || '-', 
+        Cell: ({ value }) => value || 0 
       },
       {
         Header: 'Paid Amt',
@@ -86,11 +86,11 @@ const RepairsTable = () => {
           
           // If bal_amt equals receipts_amt, show bal_after_receipts
           if (bal_amt === receipts_amt) {
-            return bal_after_receipts || '-';
+            return bal_after_receipts || 0
           }
       
           // Default logic: Show bal_after_receipts if it exists, otherwise bal_amt
-          return bal_after_receipts ? bal_after_receipts : bal_amt || '-';
+          return bal_after_receipts ? bal_after_receipts : bal_amt || 0
         },
       },
       
