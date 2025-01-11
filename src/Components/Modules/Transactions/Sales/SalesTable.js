@@ -50,13 +50,50 @@ const RepairsTable = () => {
       {
         Header: 'Total Amt',
         accessor: 'net_amount',
-        Cell: ({ value }) => value || '-', // Handle cases with missing values
+        Cell: ({ value }) => value || '-', 
       },
       {
-        Header: 'Paid Amount',
-        accessor: 'paid_amount',
-        Cell: ({ row }) => row.original.net_amount || '-', // Use `net_amount` for now
+        Header: 'Old Amt',
+        accessor: 'old_exchange_amt',
+        Cell: ({ value }) => value || '-', 
       },
+      {
+        Header: 'Scheme Amt',
+        accessor: 'scheme_amt',
+        Cell: ({ value }) => value || '-', 
+      },
+      {
+        Header: 'Net Amt',
+        accessor: 'net_bill_amount',
+        Cell: ({ value }) => value || '-', 
+      },
+      {
+        Header: 'Paid Amt',
+        accessor: 'paid_amt',
+        Cell: ({ row }) => {
+          const { paid_amt, receipts_amt } = row.original;
+          const totalPaid = (paid_amt || 0) + (receipts_amt || 0);
+          return totalPaid;
+        },
+      },
+      
+      {
+        Header: 'Bal Amt',
+        accessor: 'bal_amt', 
+        Cell: ({ row }) => {
+          const { bal_amt, bal_after_receipts, receipts_amt } = row.original;
+          
+          // If bal_amt equals receipts_amt, show bal_after_receipts
+          if (bal_amt === receipts_amt) {
+            return bal_after_receipts || '-';
+          }
+      
+          // Default logic: Show bal_after_receipts if it exists, otherwise bal_amt
+          return bal_after_receipts ? bal_after_receipts : bal_amt || '-';
+        },
+      },
+      
+      
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -72,15 +109,22 @@ const RepairsTable = () => {
       {
         Header: 'Receipts',
         accessor: 'receipts',
-        Cell: ({ row }) => (
-          <Button
-            style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
-            onClick={() => handleAddReceipt(row.original)} // Pass the row data to handle the receipt creation
-          >
-            Add Receipt
-          </Button>
-        ),
+        Cell: ({ row }) => {
+          const { net_bill_amount, paid_amt, receipts_amt } = row.original;
+          const totalPaid = (paid_amt || 0) + (receipts_amt || 0);
+      
+          return (
+            <Button
+              style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+              onClick={() => handleAddReceipt(row.original)} // Pass the row data to handle the receipt creation
+              disabled={net_bill_amount === totalPaid} // Disable button if net_bill_amount equals totalPaid
+            >
+              Add Receipt
+            </Button>
+          );
+        },
       },
+      
     ],
     []
   );

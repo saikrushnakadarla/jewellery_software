@@ -551,7 +551,7 @@ const handlePopoverToggle = (event, repairId) => {
                   </table>
                 </div>
               ) : (
-                <p>Loading additional details...</p>
+                <p>No additional details</p>
               )}
             </div>
           ) : (

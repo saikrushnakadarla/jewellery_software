@@ -210,6 +210,8 @@ const SalesForm = () => {
       metal_type: "",
       design_name: "",
       purity: "",
+      category:"",
+      sub_category:"",
       gross_weight: "",
       stone_weight: "",
       weight_bw: "",

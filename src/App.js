@@ -55,7 +55,7 @@ import Login from './Components/Pages/Login/Login';
 import SalesReturn from './Components/Modules/Transactions/SalesReturn/SalesForm';
 import EstimateReceipt from './Components/Modules/Transactions/Estimate/EstimateReceipt';
 import AccountDetails from './Components/Pages/Dashboard/AccountDetails';
-import Receivables from "./Components/Pages/Dashboard/Receivables";
+import Receivables from "./Components/Pages/Dashboard/Payables";
 
 function App() {
   const location = useLocation();

@@ -80,7 +80,7 @@ const useProductHandlers = () => {
         formData.purity === "18K" ? rates.rate_18crt :
         formData.purity === "16K" ? rates.rate_16crt :
         "";
-    } else if (formData.metal_type === "Silver") {
+    } else if (formData.metal_type === "Silver" && formData.purity) {
       currentRate = rates.silver_rate;
     }
   
@@ -361,16 +361,36 @@ const handleProductNameChange = (productName) => {
     // Reset fields if no matching product entries found
     setFormData((prevData) => ({
       ...prevData,
+      code: "",  
       product_name: "",
       metal_type: "",
       design_name: "",
+      purity: "",
+      category: "",
+      sub_category: "",
+      gross_weight: "",
+      stone_weight: "",
+      stone_price: "",
+      weight_bw: "",
+      va_on: "",
+      va_percent: "",
+      wastage_weight: "",
+      total_weight_aw: "",
+      mc_on: "",
+      mc_per_gram: "",
+      making_charges: "",
+      rate: "",
+      rate_amt: "",
+      tax_percent: "",
+      tax_amt: "",
+      total_price: "",
+      qty: "", // Rese
     }));
 
     setFilteredMetalTypes(metalTypes);
     setFilteredDesignOptions(designOptions);
   }
 };
-
 
 const handleMetalTypeChange = (metalType) => {
   const productEntries = data.filter(
@@ -432,8 +452,6 @@ const handleDesignNameChange = (designName) => {
     setFilteredPurityOptions([]);
   }
 };
-
-
 
 const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
 

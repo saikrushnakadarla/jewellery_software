@@ -9,6 +9,7 @@ import URDPurchase from './URDPurchase';
 import Customers from './Customers';
 import CustomerDashboard from './CustomerDashboard';
 import Receivables from './Receivables';
+import Payables from './Payables'
 
 function Dashboard() {
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -45,8 +46,7 @@ function Dashboard() {
             </a>
           </div>
           <div className="dashboard_card bg-dash1">
-            <h2>Payables</h2>
-            <p>100000</p>
+          <Payables selectedCustomerMobile={selectedMobile} />
           </div>
           <div className="dashboard_card bg-dash3">
             <Receivables selectedCustomerMobile={selectedMobile} />
