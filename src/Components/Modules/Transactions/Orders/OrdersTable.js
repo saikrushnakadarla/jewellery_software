@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout';
-import { FaEye ,FaTrash} from 'react-icons/fa';
+import { FaEye, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col, Modal, Table, Form } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from '../../../../Url/NodeBaseURL';
@@ -17,14 +17,14 @@ const RepairsTable = () => {
 
 
   // Extract mobile from location state
-   const { mobile } = location.state || {};
-   const initialSearchValue = location.state?.mobile || '';
+  const { mobile } = location.state || {};
+  const initialSearchValue = location.state?.mobile || '';
 
-   useEffect(() => {
-     if (mobile) {
-       console.log("Selected Mobile from Dashboard:", mobile);
-     }
-   }, [mobile]);
+  useEffect(() => {
+    if (mobile) {
+      console.log("Selected Mobile from Dashboard:", mobile);
+    }
+  }, [mobile]);
 
   const columns = React.useMemo(
     () => [
@@ -60,6 +60,30 @@ const RepairsTable = () => {
         Cell: ({ row }) => row.original.net_amount || '-',
       },
       {
+        Header: 'Status',
+        accessor: 'status',
+        Cell: ({ row }) => (
+          <select
+            value={row.original.order_status}
+            onChange={(e) => handleStatusChange(row.original.invoice_number, e.target.value)}
+            style={{
+              padding: '5px',
+              border: '1px solid #ccc',
+              borderRadius: '4px',
+            }}
+          >
+            <option value="Pending">Pending</option>
+            <option value="In Transit">In Transit</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+        ),
+      },
+      {
+        Header: 'Order Status',
+        accessor: 'order_status',
+        Cell: ({ row }) => row.original.order_status || '-',
+      },
+      {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => (
@@ -68,14 +92,14 @@ const RepairsTable = () => {
               style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
               onClick={() => handleViewDetails(row.original.invoice_number)}
             />
-             <FaTrash
-                          style={{
-                            cursor: 'pointer',
-                            marginLeft: '10px',
-                            color: 'red',
-                          }}
-                          onClick={() => handleDelete(row.original.invoice_number)}
-                        />
+            <FaTrash
+              style={{
+                cursor: 'pointer',
+                marginLeft: '10px',
+                color: 'red',
+              }}
+              onClick={() => handleDelete(row.original.invoice_number)}
+            />
           </div>
         ),
       },
@@ -83,6 +107,36 @@ const RepairsTable = () => {
     []
   );
 
+
+  const handleStatusChange = async (invoiceNumber, newStatus) => {
+    try {
+      // Make the PUT request to update the status in the backend
+      const response = await axios.put(`${baseURL}/update-order-status`, {
+        invoice_number: invoiceNumber,
+        order_status: newStatus,
+      });
+  
+      if (response.status === 200) {
+        // Update the local state with the new status
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.invoice_number === invoiceNumber
+              ? { ...item, order_status: newStatus }
+              : item
+          )
+        );
+  
+        Swal.fire('Success', 'Order status updated successfully.', 'success');
+      } else {
+        Swal.fire('Error', 'Failed to update the order status.', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      Swal.fire('Error', 'An error occurred while updating the order status.', 'error');
+    }
+  };
+  
+  
 
   useEffect(() => {
     const fetchRepairs = async () => {
@@ -134,19 +188,19 @@ const RepairsTable = () => {
       // Find the selected account and get its account_id
       const selectedAccount = accounts.find(account => account.account_name === worker_name);
       const account_id = selectedAccount?.account_id;
-  
+
       if (!account_id) {
         alert('Account ID is not found for the selected worker.');
         return;
       }
-  
+
       const response = await axios.post(`${baseURL}/assign-worker`, {
         invoice_number,
         code,
         worker_name,
         account_id, // Pass the account_id to the backend
       });
-  
+
       if (response.data.success) {
         setRepairDetails(prev => ({
           ...prev,
@@ -162,7 +216,7 @@ const RepairsTable = () => {
             return product;
           })
         }));
-  
+
         // Show success message
         alert('Worker assigned successfully!');
       }
@@ -171,7 +225,7 @@ const RepairsTable = () => {
       alert('Failed to assign worker. Please try again.');
     }
   };
-  
+
   const handleDelete = async (invoiceNumber) => {
     Swal.fire({
       title: 'Are you sure?',
@@ -197,7 +251,7 @@ const RepairsTable = () => {
       }
     });
   };
-  
+
   const handleCloseModal = () => {
     setShowModal(false);
     setRepairDetails(null);
@@ -277,80 +331,80 @@ const RepairsTable = () => {
 
               <h5>Products</h5>
               <div className="table-responsive">
-              <Table bordered>
-                <thead>
-                  <tr>
-                    <th>Code</th>
-                    <th>Product Image</th>
-                    <th>Product Name</th>
-                    <th>Metal</th>
-                    <th>Metal Type</th>
-                    <th>Purity</th>
-                    <th>Gross Weight</th>
-                    <th>Stone Weight</th>
-                    <th>Wastage Weight</th>
-                    <th>Total Weight</th>
-                    <th>Making Charges</th>
-                    <th>Rate</th>
-                    <th>Tax Amount</th>
-                    <th>Total Price</th>
-                    <th>Assigning</th>
-                    <th>Worker Name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {repairDetails.repeatedData.map((product, index) => (
-                    <tr key={index}>
-                      <td>{product.code}</td>
-                      <td>
-                        {product.product_image ? (
-                          <img
-                            src={`${baseURL}/uploads/${product.product_image}`}
-                            alt={product.product_name}
-                            style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                          />
-                        ) : (
-                          'No Image'
-                        )}
-                      </td>
-                      <td>{product.product_name}</td>
-                      <td>{product.metal || 'N/A'}</td>
-                      <td>{product.metal_type}</td>
-                      <td>{product.purity}</td>
-                      <td>{product.gross_weight}</td>
-                      <td>{product.stone_weight}</td>
-                      <td>{product.wastage_weight}</td>
-                      <td>{product.total_weight_av}</td>
-                      <td>{product.making_charges}</td>
-                      <td>{product.rate}</td>
-                      <td>{product.tax_amt}</td>
-                      <td>{product.total_price}</td>
-                      <td>
-        {product.assigning === 'pending' ? (
-          <Form.Select
-            onChange={(e) => handleWorkerAssignment(
-              repairDetails.uniqueData.invoice_number,
-              product.code,
-              e.target.value
-            )}
-          >
-            <option value="">Select Worker</option>
-            {Array.isArray(accounts) && accounts.map((account, idx) => (
-              <option key={idx} value={account.account_name}>
-                {account.account_name}
-              </option>
-            ))}
-          </Form.Select>
-        ) : (
-          <span>{product.account_name} (Assigned)</span>
-        )}
-      </td>
-      <td>{product.worker_name || "not Assigned"}</td>
+                <Table bordered>
+                  <thead>
+                    <tr>
+                      <th>Code</th>
+                      <th>Product Image</th>
+                      <th>Product Name</th>
+                      <th>Metal</th>
+                      <th>Metal Type</th>
+                      <th>Purity</th>
+                      <th>Gross Weight</th>
+                      <th>Stone Weight</th>
+                      <th>Wastage Weight</th>
+                      <th>Total Weight</th>
+                      <th>Making Charges</th>
+                      <th>Rate</th>
+                      <th>Tax Amount</th>
+                      <th>Total Price</th>
+                      <th>Assigning</th>
+                      <th>Worker Name</th>
                     </tr>
-                  ))}
-                </tbody>
+                  </thead>
+                  <tbody>
+                    {repairDetails.repeatedData.map((product, index) => (
+                      <tr key={index}>
+                        <td>{product.code}</td>
+                        <td>
+                          {product.product_image ? (
+                            <img
+                              src={`${baseURL}/uploads/${product.product_image}`}
+                              alt={product.product_name}
+                              style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                            />
+                          ) : (
+                            'No Image'
+                          )}
+                        </td>
+                        <td>{product.product_name}</td>
+                        <td>{product.metal || 'N/A'}</td>
+                        <td>{product.metal_type}</td>
+                        <td>{product.purity}</td>
+                        <td>{product.gross_weight}</td>
+                        <td>{product.stone_weight}</td>
+                        <td>{product.wastage_weight}</td>
+                        <td>{product.total_weight_av}</td>
+                        <td>{product.making_charges}</td>
+                        <td>{product.rate}</td>
+                        <td>{product.tax_amt}</td>
+                        <td>{product.total_price}</td>
+                        <td>
+                          {product.assigning === 'pending' ? (
+                            <Form.Select
+                              onChange={(e) => handleWorkerAssignment(
+                                repairDetails.uniqueData.invoice_number,
+                                product.code,
+                                e.target.value
+                              )}
+                            >
+                              <option value="">Select Worker</option>
+                              {Array.isArray(accounts) && accounts.map((account, idx) => (
+                                <option key={idx} value={account.account_name}>
+                                  {account.account_name}
+                                </option>
+                              ))}
+                            </Form.Select>
+                          ) : (
+                            <span>{product.account_name} (Assigned)</span>
+                          )}
+                        </td>
+                        <td>{product.worker_name || "not Assigned"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
                 </Table>
-                </div>
+              </div>
             </>
           )}
         </Modal.Body>
