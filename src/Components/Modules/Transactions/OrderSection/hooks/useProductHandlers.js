@@ -31,6 +31,7 @@ const useProductHandlers = () => {
     terms:"Cash",
     date: "",
     invoice_number: "",
+    delivery_date:"",
     code: "",
     product_id: "",
     metal: "",
@@ -55,9 +56,10 @@ const useProductHandlers = () => {
     tax_amt: "",
     total_price: "",
     transaction_status: "Orders",
-    qty: "",
+    qty: "1",
     opentag_id:"",
     product_image: null,
+    order_status:'In Progress'
   });
   const [uniqueProducts, setUniqueProducts] = useState([]); 
   const [metalTypes, setMetalTypes] = useState([]);

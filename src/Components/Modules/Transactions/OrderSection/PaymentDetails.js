@@ -101,7 +101,7 @@ const PaymentDetails = ({
           <Button
             onClick={handleSave}
             style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-            disabled={!isSubmitEnabled} // Disable if not enabled
+            // disabled={!isSubmitEnabled} 
           >
             Check Out
           </Button>
