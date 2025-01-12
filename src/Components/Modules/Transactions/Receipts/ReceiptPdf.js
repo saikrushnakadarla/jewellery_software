@@ -78,54 +78,66 @@ const styles = StyleSheet.create({
   },
 });
 
-const PDFContent = () => (
-  <Document>
-    <Page size={[250, 500]} style={styles.page}>
-      {/* Heading */}
-      <Text style={styles.heading}>Receipt</Text>
+const PDFContent = ({ formData }) => {
+  const currentTime = new Date().toLocaleTimeString(); // Fetch current time dynamically
 
-      {/* Details */}
-      <View>
-        <View style={styles.row}>
-          <Text style={styles.leftText}>Receipt No: </Text>
-          <Text style={styles.rightText}>Account Name:</Text>
+  return (
+    <Document>
+      <Page size={[250, 500]} style={styles.page}>
+        {/* Heading */}
+        <Text style={styles.heading}>Receipt</Text>
+
+        {/* Details */}
+        <View>
+          <View style={styles.row}>
+            <Text style={styles.leftText}>Receipt No: {formData.receipt_no}</Text>
+            <Text style={styles.rightText}>Account Name: {formData.account_name}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.leftText}>Date: {formData.date}</Text>
+            <Text style={styles.rightText}>Time: </Text>
+          </View>
         </View>
-        <View style={styles.row}>
-          <Text style={styles.leftText}>Date:</Text>
-          <Text style={styles.rightText}>Time:</Text>
+
+        {/* Table Header */}
+        <View style={styles.tableHeader}>
+          <Text style={[styles.tableCell, styles.sno]}>S.No.</Text>
+          <Text style={[styles.tableCell, styles.invoice_number]}>Invoice ID</Text>
+          <Text style={[styles.tableCell, styles.total_amt]}>Total Amt</Text> 
+          <Text style={[styles.tableCell, styles.discount_amt]}>Paid Amt</Text>
+          <Text style={[styles.tableCell, styles.balanceAmt]}>Bal Amt</Text>
         </View>
-      </View>
 
-      {/* Table Header */}
-      <View style={styles.tableHeader}>
-        <Text style={[styles.tableCell, styles.sno]}>S.No.</Text>
-        <Text style={[styles.tableCell, styles.inv]}>Invoice ID</Text>
-        <Text style={[styles.tableCell, styles.totalAmt]}>Total Amt</Text> 
-        <Text style={[styles.tableCell, styles.paidAmt]}>Paid Amt</Text>
-        <Text style={[styles.tableCell, styles.balanceAmt]}>Bal Amt</Text>
-      </View>
+        {/* Table Rows */}
+        {formData.invoice_number && formData.total_amt && formData.discount_amt && formData.balanceAmt &&
+          formData.invoice_number.map((invoice, index) => (
+            <View style={styles.tableRow} key={index}>
+              <Text style={[styles.tableCell, styles.sno]}>{index + 1}</Text>
+              <Text style={[styles.tableCell, styles.invoice_number]}>{invoice}</Text>
+              <Text style={[styles.tableCell, styles.total_amt]}>{formData.total_amt[index]}</Text>
+              <Text style={[styles.tableCell, styles.discount_amt]}>{formData.discount_amt[index]}</Text>
+              <Text style={[styles.tableCell, styles.balanceAmt]}>{formData.balanceAmt[index]}</Text>
+            </View>
+          ))}
 
-      {/* Table Rows */}
-      {[1, 2, 3].map((item, index) => (
-        <View style={styles.tableRow} key={index}>
-          <Text style={[styles.tableCell, styles.sno]}>{item}</Text>
-          <Text style={[styles.tableCell, styles.inv]}>INV{item}</Text>
-          <Text style={[styles.tableCell, styles.totalAmt]}>100.00</Text>
-          <Text style={[styles.tableCell, styles.paidAmt]}>50.00</Text>
-          <Text style={[styles.tableCell, styles.balanceAmt]}>50.00</Text>
+        {/* Footer Row */}
+        <View style={styles.footerRow}>
+          <Text style={[styles.tableCell, styles.sno]}></Text>
+          <Text style={[styles.tableCell, styles.invoice_number]}>Total</Text>
+          <Text style={[styles.tableCell, styles.total_amt]}>
+            {formData.total_amt.reduce((acc, curr) => acc + parseFloat(curr), 0).toFixed(2)}
+          </Text>
+          <Text style={[styles.tableCell, styles.discount_amt]}>
+            {formData.discount_amt.reduce((acc, curr) => acc + parseFloat(curr), 0).toFixed(2)}
+          </Text>
+          <Text style={[styles.tableCell, styles.balanceAmt]}>
+            {formData.balanceAmt.reduce((acc, curr) => acc + parseFloat(curr), 0).toFixed(2)}
+          </Text>
         </View>
-      ))}
+      </Page>
+    </Document>
+  );
+};
 
-      {/* Footer Row */}
-      <View style={styles.footerRow}>
-        <Text style={[styles.tableCell, styles.sno]}></Text>
-        <Text style={[styles.tableCell, styles.inv]}>Total</Text>
-        <Text style={[styles.tableCell, styles.totalAmt]}>300.00</Text>
-        <Text style={[styles.tableCell, styles.balanceAmt]}>150.00</Text>
-        <Text style={[styles.tableCell, styles.paidAmt]}>150.00</Text>
-      </View>
-    </Page>
-  </Document>
-);
 
 export default PDFContent;

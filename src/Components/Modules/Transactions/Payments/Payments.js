@@ -5,6 +5,9 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
+import { pdf } from "@react-pdf/renderer";
+
+import PDFContent from "../Receipts/ReceiptPdf"; 
 
 const RepairForm = () => {
   const navigate = useNavigate();
@@ -215,15 +218,37 @@ useEffect(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const endpoint = repairData ? `${baseURL}/edit/payments/${repairData.id}` : `${baseURL}/post/payments`;
+      const endpoint = repairData
+        ? `${baseURL}/edit/payments/${repairData.id}`
+        : `${baseURL}/post/payments`;
       const method = repairData ? "PUT" : "POST";
+  
+      // Save payment details to the server
       const response = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+  
       if (!response.ok) throw new Error("Failed to save data");
+  
+      // Notify user about successful save
       window.alert("Payment saved successfully!");
+  
+      // Generate the PDF
+      const pdfDoc = <PDFContent formData={formData} />;
+      const pdfBlob = await pdf(pdfDoc).toBlob();
+  
+      // Create a download link and trigger it
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(pdfBlob);
+      link.download = `payment-receipt-${formData.id || "new"}.pdf`;
+      link.click();
+  
+      // Clean up the download link
+      URL.revokeObjectURL(link.href);
+  
+      // Navigate to the payments table after saving
       navigate("/paymentstable");
     } catch (error) {
       window.alert(`Error: ${error.message}`);

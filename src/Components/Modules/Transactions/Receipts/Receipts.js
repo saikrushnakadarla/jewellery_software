@@ -5,6 +5,8 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
+import { pdf } from "@react-pdf/renderer";
+import PDFContent from "./ReceiptPdf";
 
 const RepairForm = () => {
   const navigate = useNavigate();
@@ -196,20 +198,48 @@ const RepairForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const endpoint = repairData ? `${baseURL}/edit/payments/${repairData.id}` : `${baseURL}/post/payments`;
+      // Determine the endpoint and HTTP method
+      const endpoint = repairData
+        ? `${baseURL}/edit/payments/${repairData.id}`
+        : `${baseURL}/post/payments`;
       const method = repairData ? "PUT" : "POST";
+  
+      // Save data to the backend
       const response = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+  
       if (!response.ok) throw new Error("Failed to save data");
-      window.alert("Receipt saved successfully!");
+  
+      alert("Receipt saved successfully!");
+  
+      // Log formData before generating the PDF
+      console.log("FormData being passed to PDF generation:", formData);
+  
+      // Generate PDF
+      const pdfBlob = await pdf(
+        <PDFContent formData={formData} repairDetails={repairDetails} />
+        
+      ).toBlob();
+  
+      // Create a download link and trigger the download
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(pdfBlob);
+      link.download = `receipt-${formData.id || "new"}.pdf`;
+      link.click();
+  
+      // Clean up
+      URL.revokeObjectURL(link.href);
+  
+      // Navigate to receipts table
       navigate("/receiptstable");
     } catch (error) {
-      window.alert(`Error: ${error.message}`);
+      alert(`Error: ${error.message}`);
     }
   };
+  
 
   useEffect(() => {
     if (invoiceData) {
