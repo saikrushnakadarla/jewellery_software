@@ -52,7 +52,7 @@ const useProductHandlers = () => {
     making_charges: "",
     rate: "",
     rate_amt: "",
-    tax_percent: "",
+    tax_percent: "03% GST",
     tax_amt: "",
     total_price: "",
     transaction_status: "Orders",
