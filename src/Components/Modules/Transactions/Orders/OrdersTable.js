@@ -245,8 +245,8 @@ const RepairsTable = () => {
             setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
           }
         } catch (error) {
-          console.error('Error deleting repair details:', error);
-          Swal.fire('Error!', 'Failed to delete repair details. Please try again.', 'error');
+          console.error('Error deleting order details:', error);
+          Swal.fire('Error!', 'Failed to delete order details. Please try again.', 'error');
         }
       }
     });
@@ -283,7 +283,7 @@ const RepairsTable = () => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <DataTable columns={columns} data={data} initialSearchValue={initialSearchValue} />
+          <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
         )}
       </div>
 
