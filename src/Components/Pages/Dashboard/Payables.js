@@ -37,11 +37,18 @@ function Receivables({ selectedCustomerMobile }) {
 
   // Calculate the total balance amount
   const totalBalance = customerData.reduce((sum, item) => {
-    const balance = item.balance_after_receipt
-      ? parseFloat(item.balance_after_receipt) || 0
-      : parseFloat(item.balance_amount) || 0;
+    const { balance_amount, balance_after_receipt, paid_amt } = item;
+  
+    // If balance_amount equals paid_amt, use balance_after_receipt
+    const balance = balance_amount === paid_amt
+      ? parseFloat(balance_after_receipt) || 0
+      : balance_after_receipt
+      ? parseFloat(balance_after_receipt) || 0
+      : parseFloat(balance_amount) || 0;
+  
     return sum + balance;
   }, 0);
+  
 
   if (loading) {
     return <div>Loading...</div>;
@@ -49,10 +56,10 @@ function Receivables({ selectedCustomerMobile }) {
 
   return (
     <div>
-      <h2>Payables</h2>
-      <p>
+      <h3>Payables</h3>
+      <p style={{fontSize:'35px', color:'green', marginTop:'20px'}}>
         <strong>
-          {totalBalance}
+        $ {totalBalance}
         </strong>
       </p>
     </div>

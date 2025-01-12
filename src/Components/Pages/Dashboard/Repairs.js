@@ -44,8 +44,8 @@ function Repairs({ selectedCustomerMobile }) {
 
   return (
     <div>
-      <h2>Repairs</h2>
-      <p>Pending: {statusCounts.pending }</p>
+      <h3>Repairs</h3>
+      {/* <p>Pending: {statusCounts.pending }</p> */}
       <p>Assign to Workshop: {statusCounts.assignToWorkshop }</p>
       <p>Receive from Workshop: {statusCounts.receiveFromWorkshop }</p>
       {/* <p>Delivery to Customer: {statusCounts.deliverToCustomer }</p> */}

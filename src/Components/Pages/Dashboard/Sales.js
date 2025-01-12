@@ -58,10 +58,10 @@ const Sales = ({ selectedCustomerMobile }) => {
 
   return (
     <div>
-      <h2>Sales Details</h2>
-      <p>Total: {salesCounts.totalSalesCount }</p>
+      <h3>Sales</h3>
+      {/* <p>Total: {salesCounts.totalSalesCount }</p> */}
       <p>Today: {salesCounts.todaysSalesCount }</p>
-      <p>This Month: {salesCounts.monthSalesCount}</p>
+      <p>Month: {salesCounts.monthSalesCount}</p>
     </div>
   );
 };

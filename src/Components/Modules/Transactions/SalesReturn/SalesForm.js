@@ -364,6 +364,21 @@ const SalesForm = () => {
               onEdit={handleEdit} 
               onDelete={handleDelete}/>
           </div>
+          <div className="sales-form-section">
+          <PaymentDetails 
+                paymentDetails={paymentDetails}
+                setPaymentDetails={setPaymentDetails}
+                handleBack={handleBack}
+                totalPrice={totalPrice} 
+                repairDetails={repairDetails} 
+                invoiceDetails={invoiceDetails}
+                isAllSelected={isAllSelected}
+                selectedRows={selectedRows}
+                handleSelectAllChange={handleSelectAllChange}
+                handleCheckboxChange={handleCheckboxChange}
+                resetForm={resetForm}
+              />
+          </div>
 
 
           <div className="sales-form2">
@@ -371,7 +386,7 @@ const SalesForm = () => {
               
             </div> */}
 
-            <div className="sales-form-fourth">
+            {/* <div className="sales-form-fourth">
               <PaymentDetails 
                 paymentDetails={paymentDetails}
                 setPaymentDetails={setPaymentDetails}
@@ -385,7 +400,7 @@ const SalesForm = () => {
                 handleCheckboxChange={handleCheckboxChange}
                 resetForm={resetForm}
               />
-            </div>
+            </div> */}
           </div>
           {showPDFDownload && (
         <PDFDownloadLink

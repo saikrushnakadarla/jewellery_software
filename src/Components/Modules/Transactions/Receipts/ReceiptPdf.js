@@ -1,7 +1,6 @@
 import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 
-// Styles optimized for thermal receipt printers
 const styles = StyleSheet.create({
   page: {
     padding: 10,
@@ -79,7 +78,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// PDF Document Component optimized for receipt printers
 const PDFContent = () => (
   <Document>
     <Page size={[250, 500]} style={styles.page}>

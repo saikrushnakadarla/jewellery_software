@@ -30,11 +30,18 @@ function Receivables({ selectedCustomerMobile }) {
 
   // Calculate the total balance amount
   const totalBalance = customerData.reduce((sum, item) => {
-    const balance = item.bal_after_receipts
-      ? parseFloat(item.bal_after_receipts) || 0
-      : parseFloat(item.bal_amt) || 0;
+    const { bal_amt, bal_after_receipts, receipts_amt } = item;
+  
+    // If bal_amt equals receipts_amt, use bal_after_receipts
+    const balance = bal_amt === receipts_amt
+      ? parseFloat(bal_after_receipts) || 0
+      : bal_after_receipts
+      ? parseFloat(bal_after_receipts) || 0
+      : parseFloat(bal_amt) || 0;
+  
     return sum + balance;
   }, 0);
+  
 
   if (loading) {
     return <div>Loading...</div>;
@@ -42,10 +49,10 @@ function Receivables({ selectedCustomerMobile }) {
 
   return (
     <div>
-      <h2>Receivables</h2>
-      <p>
+      <h3>Receivables</h3>
+      <p style={{fontSize:'35px', color:'red', marginTop:'20px'}}>
         <strong>
-          {totalBalance}
+        $ {totalBalance}
         </strong>
       </p>
     </div>

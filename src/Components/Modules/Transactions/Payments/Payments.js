@@ -325,7 +325,7 @@ useEffect(() => {
           </Col>
           <Col xs={12} md={2}>
             <InputField
-              label="Cash Amt"
+              label="Bal Amt"
               type="number"
               name="cash_amt"
               value={formData.cash_amt}

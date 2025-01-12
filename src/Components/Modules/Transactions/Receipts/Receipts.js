@@ -330,7 +330,7 @@ const RepairForm = () => {
           </Col>
           <Col xs={12} md={2}>
             <InputField
-              label="Paying Amt"
+              label="Paid Amt"
               type="number"
               name="discount_amt"
               value={formData.discount_amt}

@@ -81,7 +81,7 @@ const PaymentDetails = ({
   
   return (
     <div>
-      <Col className="sales-form-section">
+      <Col >
         <Row>
           <h4 className="mb-3">Summary</h4>
           <Table bordered hover responsive>
@@ -146,7 +146,7 @@ const PaymentDetails = ({
               className="cus-back-btn"
               variant="secondary"
               onClick={handleBack}
-              style={{ backgroundColor: "gray", marginRight: "10px" }}
+              style={{ backgroundColor: "gray", marginLeft: "-240px" }}
             >
               Cancel
             </Button>

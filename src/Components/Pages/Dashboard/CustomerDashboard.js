@@ -39,13 +39,12 @@ function Customers({ onSelectCustomer }) {
   );
 
   return (
-    <div className="container mt-3">
+    <div className="container mt-4">
       <div className="row">
-      <div className="col-3"></div>
-      <div className="col-3"></div>
-      <div className="col-3"></div>
-        <div className="col-3">
-          
+        <div className="col-3" style={{ marginLeft: '-80px' }}>Dashboard</div>
+        <div className="col-3"></div>
+        <div className="col-3"></div>
+        <div className="col-3" style={{ marginLeft: '80px' }}>
           <InputField
             label="Mobile"
             name="mobile"
@@ -59,20 +58,8 @@ function Customers({ onSelectCustomer }) {
           />
         </div>
       </div>
-      {/* {selectedCustomer && (
-        <div className="row">
-          <div className="col-4">
-            <h4>Selected Customer Details:</h4>
-            <p>
-              <strong>Name:</strong> {selectedCustomer.account_name}
-            </p>
-            <p>
-              <strong>Mobile:</strong> {selectedCustomer.mobile}
-            </p>
-          </div>
-        </div>
-      )} */}
     </div>
+
   );
 }
 

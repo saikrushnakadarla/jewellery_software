@@ -5,63 +5,149 @@ import './Dashboard.css';
 import Repairs from './Repairs';
 import Sales from './Sales';
 import Orders from './Orders';
+import Purchases from './Purchases';
 import URDPurchase from './URDPurchase';
 import Customers from './Customers';
 import CustomerDashboard from './CustomerDashboard';
 import Receivables from './Receivables';
-import Payables from './Payables'
+import Payables from './Payables';
+import AmountBilledToday from './AmountBilledToday';
+import { Bar, Pie, Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  PointElement,
+  LineElement,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  PointElement,
+  LineElement
+);
 
 function Dashboard() {
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [selectedMobile, setSelectedMobile] = useState(null);
   const navigate = useNavigate();
 
-  return (
-    <div className="main-container">
+  const barData = {
+    labels: ['Sales', 'Repairs', 'Orders'],
+    datasets: [
+      {
+        label: 'Amount',
+        data: [3000, 2500, 2000],
+        backgroundColor: ['#cd853f', '#8b4513', '#ffa500'],
+      },
+    ],
+  };
 
-      <div className="dashboard_main-container">
+  const pieDataReceivablesPayables = {
+    labels: ['Receivables', 'Payables'],
+    datasets: [
+      {
+        data: [60, 40],
+        backgroundColor: ['#cd853f', '#8b4513'],
+      },
+    ],
+  };
+
+  const lineDataRevenue = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+    datasets: [
+      {
+        label: 'Revenue',
+        data: [10000, 15000, 12000, 20000],
+        borderColor: '#cd853f',
+        borderWidth: 2,
+        fill: false,
+      },
+    ],
+  };
+
+  const pieDataOrderStatus = {
+    labels: ['Completed', 'Pending', 'Cancelled'],
+    datasets: [
+      {
+        data: [50, 30, 20],
+        backgroundColor: ['#cd853f', '#8b4513', '#ffa500'],
+      },
+    ],
+  };
+
+
+  return (
+    <div className="main-container" style={{backgroundColor:'#b7721834'}}>
+      <div className="dashboard-header">
         <CustomerDashboard onSelectCustomer={setSelectedMobile} />
       </div>
-      <div className="dashboard_main-container">
-        <div className="dashboard_card-row">
-          <div className="dashboard_card bg-dash2">
-            <Repairs selectedCustomerMobile={selectedMobile} />
-            <a
+      <div className="dashboard-container">
+        <div className="row-cards" style={{ marginTop: '15px' }}>
+          <div className="metric-card">
+            <Sales selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
               href="#"
-              className="details-link"
+              className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
                 console.log("Selected Customer Mobile:", selectedMobile);
-                navigate("/repairstable", { state: { mobile: selectedMobile } });
+                navigate("/salestable", { state: { mobile: selectedMobile } });
               }}
             >
               Details
             </a>
-            <a
-              style={{ marginLeft: '300px' }}
+            <a 
               href="#"
-              className="new-link"
+              className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
-                navigate('/repairs', { state: { mobile: selectedMobile } });
+                navigate("/sales", { state: { mobile: selectedMobile } });
               }}
             >
               New
             </a>
           </div>
-          <div className="dashboard_card bg-dash1">
-          <Payables selectedCustomerMobile={selectedMobile} />
-          </div>
-          <div className="dashboard_card bg-dash3">
-            <Receivables selectedCustomerMobile={selectedMobile} />
-          </div>
-        </div>
-        <div className="dashboard_card-row" style={{ marginTop: '15px' }}>
-          <div className="dashboard_card bg-dash2">
-            <Sales selectedCustomerMobile={selectedMobile} />
-            <a
+          <div className="metric-card">
+            <Orders selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
               href="#"
-              className="details-link"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/orderstable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/orders', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+          <div className="metric-card">
+            <Sales selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
                 console.log("Selected Customer Mobile:", selectedMobile);
@@ -71,9 +157,9 @@ function Dashboard() {
               Details
             </a>
             <a
-              style={{ marginLeft: "300px" }}
+              
               href="#"
-              className="new-link"
+              className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
                 navigate("/sales", { state: { mobile: selectedMobile } });
@@ -82,11 +168,11 @@ function Dashboard() {
               New
             </a>
           </div>
-          <div className="dashboard_card bg-dash1">
+          <div className="metric-card">
             <Orders selectedCustomerMobile={selectedMobile} />
-            <a
+            <a style={{marginRight:'100px'}}
               href="#"
-              className="details-link"
+              className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
                 console.log("Selected Customer Mobile:", selectedMobile);
@@ -95,9 +181,9 @@ function Dashboard() {
             >
               Details
             </a>
-            <a style={{ marginLeft: '300px' }}
+            <a 
               href="#"
-              className="new-link"
+              className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
                 navigate('/orders', { state: { mobile: selectedMobile } });
@@ -106,11 +192,38 @@ function Dashboard() {
               New
             </a>
           </div>
-          <div className="dashboard_card bg-dash3">
-            <URDPurchase selectedCustomerMobile={selectedMobile} />
-            <a
+          <div className="metric-card" >
+            <Repairs selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
               href="#"
-              className="details-link"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/repairstable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a
+              
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/repairs', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+        </div>
+        <div className="row-cards" style={{ marginTop: '15px' }}>
+          <div className="metric-card">
+            <URDPurchase selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
                 console.log("Selected Customer Mobile:", selectedMobile);
@@ -119,9 +232,9 @@ function Dashboard() {
             >
               Details
             </a>
-            <a style={{ marginLeft: '300px' }}
+            <a 
               href="#"
-              className="new-link"
+              className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
                 navigate('/urd_purchase', { state: { mobile: selectedMobile } });
@@ -130,7 +243,54 @@ function Dashboard() {
               New
             </a>
           </div>
+          <div className="metric-card">
+            <Purchases selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/urdpurchasetable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/urd_purchase', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+          <div className="metric-card">
+          <Payables selectedCustomerMobile={selectedMobile} />
+          </div>
+          <div className="metric-card">
+            <Receivables selectedCustomerMobile={selectedMobile} />
+          </div>
+          <div className="metric-card">
+            <AmountBilledToday selectedCustomerMobile={selectedMobile} />
+          </div>
         </div>
+        <div className="row-cards" style={{ marginTop: '15px',marginBottom:'15px' }}>
+        <div className="metric-card">
+            <Bar data={barData} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+          <div className="metric-card">
+            <Pie data={pieDataReceivablesPayables} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+          <div className="metric-card">
+            <Line data={lineDataRevenue} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+          <div className="metric-card">
+            <Pie data={pieDataOrderStatus} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+          </div>
       </div>
     </div>
   );

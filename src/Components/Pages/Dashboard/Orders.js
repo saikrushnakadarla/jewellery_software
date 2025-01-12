@@ -62,10 +62,10 @@ const OrdersData = ({ selectedCustomerMobile }) => {
 
   return (
     <div>
-      <h2>Orders Details</h2>
-      <p>Total: {orderCounts.totalOrderCount }</p>
+      <h3>Orders</h3>
+      {/* <p>Total: {orderCounts.totalOrderCount }</p> */}
       <p>Today: {orderCounts.todaysOrderCount }</p>
-      <p>This Month: {orderCounts.monthOrderCount }</p>
+      <p>Month: {orderCounts.monthOrderCount }</p>
     </div>
   );
 };

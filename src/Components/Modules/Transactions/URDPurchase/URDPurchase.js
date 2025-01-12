@@ -447,21 +447,21 @@ useEffect(() => {
               <Col className="urd-form-section">
                 <h4 className="mb-3">Customer Details</h4>
                 <Row>
-                  <Col xs={12} md={2} className="d-flex align-items-center">
+                  <Col xs={12} md={3} className="d-flex align-items-center">
                     <div style={{ flex: 1 }}>
                     <InputField
-    label="Mobile"
-    name="mobile"
-    type="select"
-    value={formData.customer_id || ""} // Use customer_id to match the selected value
-    onChange={(e) => handleCustomerChange(e.target.value)}
-    options={[
-      ...customers.map((customer) => ({
-        value: customer.account_id, // Use account_id as the value
-        label: customer.mobile, // Display mobile as the label
-      })),
-    ]}
-  />
+                      label="Mobile"
+                      name="mobile"
+                      type="select"
+                      value={formData.customer_id || ""} // Use customer_id to match the selected value
+                      onChange={(e) => handleCustomerChange(e.target.value)}
+                      options={[
+                        ...customers.map((customer) => ({
+                          value: customer.account_id, // Use account_id as the value
+                          label: customer.mobile, // Display mobile as the label
+                        })),
+                      ]}
+                    />
                     </div>
                     <AiOutlinePlus
                       size={20}
@@ -474,7 +474,7 @@ useEffect(() => {
                       }}
                     />
                   </Col>
-                  <Col xs={12} md={2}>
+                  <Col xs={12} md={3}>
                     <InputField
                       label="Customer Name:"
                       name="account_name"
@@ -518,7 +518,7 @@ useEffect(() => {
                       readOnly
                     />
                   </Col>
-                  <Col xs={12} md={2}>
+                  <Col xs={12} md={1}>
                     <InputField
                       label="City"
                       name="city"
@@ -527,9 +527,9 @@ useEffect(() => {
                       readOnly
                     />
                   </Col>
-                  <Col xs={12} md={2}>
+                  <Col xs={12} md={1}>
                     <InputField
-                      label="PinCode"
+                      label="PIN"
                       name="pincode"
                       value={formData.pincode}
                       onChange={handleChange}
@@ -570,7 +570,7 @@ useEffect(() => {
             </div>
           </div>
 
-          <div className="urd-form-section">
+          <div className="urd-form-section mt-1">
             <h4>Purchase Details</h4>
             <Row>
               <Col xs={12} md={2}>
@@ -705,7 +705,7 @@ useEffect(() => {
               </Col>
             </Row>
           </div>
-          <div className="urd-form-section">
+          <div className="urd-form-section mt-1">
             <h4>Item Details</h4>
 
             <Table bordered hover responsive>

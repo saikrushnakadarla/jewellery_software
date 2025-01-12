@@ -13,6 +13,7 @@ const URDPurchases = ({ selectedCustomerMobile }) => {
     try {
       const response = await axios.get(`${baseURL}/get-purchases`);
       const data = response.data;
+      console.log("URD=",data)
 
       // Filter purchases by customer if `selectedCustomerId` is provided
       const filteredPurchases = selectedCustomerMobile
@@ -50,10 +51,10 @@ const URDPurchases = ({ selectedCustomerMobile }) => {
 
   return (
     <div>
-      <h2>URD Purchases</h2>
-      <p>Total URD Purchases: {purchaseCounts.total }</p>
-      <p>Today's URD Purchases: {purchaseCounts.today }</p>
-      <p>This Month's URD Purchases: {purchaseCounts.thisMonth }</p>
+      <h3>URD Purchases</h3>
+      {/* <p>Total URD Purchases: {purchaseCounts.total }</p> */}
+      <p>Today: {purchaseCounts.today }</p>
+      <p>Month: {purchaseCounts.thisMonth }</p>
     </div>
   );
 };
