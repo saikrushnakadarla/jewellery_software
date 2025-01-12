@@ -13,32 +13,34 @@ import './../Sales/SalesForm.css';
 import baseURL from './../../../../Url/NodeBaseURL';
 import SalesFormSection from "./SalesForm3Section";
 import { pdf } from '@react-pdf/renderer';
-
-import PDFLayout from './PDFLayout';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import PDFLayout from './TaxInvoiceA4';
 
 const SalesForm = () => {
-  const [oldSalesData, setOldSalesData] = useState(() => {
-      const savedData = localStorage.getItem('oldSalesData');
-      return savedData ? JSON.parse(savedData) : [];
-    });
-    
-    const [schemeSalesData, setSchemeSalesData] = useState(() => {
-      const savedData = localStorage.getItem('schemeSalesData');
-      return savedData ? JSON.parse(savedData) : [];
-    });
   
-    // Save to localStorage whenever data changes
-    useEffect(() => {
-      localStorage.setItem('oldSalesData', JSON.stringify(oldSalesData));
-    }, [oldSalesData]);
-  
-    useEffect(() => {
-      localStorage.setItem('schemeSalesData', JSON.stringify(schemeSalesData));
-    }, [schemeSalesData]);
-
   const navigate = useNavigate();
+    const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [metal, setMetal] = useState("");
+
+  const [oldSalesData, setOldSalesData] = useState(
+    JSON.parse(localStorage.getItem('oldSalesData')) || []
+  );
+
+  const [schemeSalesData, setSchemeSalesData] = useState(
+    JSON.parse(localStorage.getItem('schemeSalesData')) || []
+  );
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    localStorage.setItem('oldSalesData', JSON.stringify(oldSalesData));
+  }, [oldSalesData]);
+
+  useEffect(() => {
+    localStorage.setItem('schemeSalesData', JSON.stringify(schemeSalesData));
+  }, [schemeSalesData]);
+
+
   const [repairDetails, setRepairDetails] = useState(
     JSON.parse(localStorage.getItem('repairDetails')) || []
   );
@@ -167,6 +169,9 @@ const SalesForm = () => {
     }
   };
 
+  
+    const [editIndex, setEditIndex] = useState(null);
+
 
   
   const handleImageUpload = (file) => {
@@ -185,6 +190,20 @@ const SalesForm = () => {
     });
     resetProductFields();
     alert("Product added successfully");
+  };
+
+  const handleEdit = (index) => {
+    setEditIndex(index);
+    setFormData(repairDetails[index]); // Populate form with selected item
+  };
+
+  const handleUpdate = () => {
+    const updatedDetails = repairDetails.map((item, index) =>
+      index === editIndex ? { ...formData } : item
+    );
+    setRepairDetails(updatedDetails);
+    setEditIndex(null);
+    resetProductFields();
   };
   
   // Handle product delete
@@ -230,28 +249,134 @@ const SalesForm = () => {
   // Calculate totalPrice (sum of total_price from all repairDetails)
   const totalPrice = repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
-  const handleSave = async () => {
-    // Create a FormData object
-    const formData = new FormData();
+    const [oldTableData, setOldTableData] = useState(() => {
+      const savedData = localStorage.getItem('oldTableData');
+      return savedData ? JSON.parse(savedData) : [];
+    });
   
-    // Map `repairDetails` to include payment details and append them as JSON
-    const dataToSave = repairDetails.map((item) => ({
-      ...item,
-      cash_amount: paymentDetails.cash_amount || 0,
-      card_amount: paymentDetails.card || 0,
-      card_amt: paymentDetails.card_amt || 0,
-      chq: paymentDetails.chq || "",
-      chq_amt: paymentDetails.chq_amt || 0,
-      online: paymentDetails.online || "",
-      online_amt: paymentDetails.online_amt || 0,
+    const [schemeTableData, setSchemeTableData] = useState(() => {
+      const savedData = localStorage.getItem('schemeTableData');
+      return savedData ? JSON.parse(savedData) : [];
+    });
+
+    const clearData = () => {
+      setOldSalesData([]);
+      setSchemeSalesData([]);
+      setRepairDetails([]);
+      setPaymentDetails({
+        cash_amount: 0,
+        card_amt: 0,
+        chq: "",
+        chq_amt: 0,
+        online: "",
+        online_amt: 0,
+      });
+      setOldTableData([]); // Clear the oldTableData state
+      setSchemeTableData([])
+      localStorage.removeItem('oldSalesData');
+      localStorage.removeItem('schemeSalesData');
+      localStorage.removeItem('repairDetails');
+      localStorage.removeItem('paymentDetails');
+      localStorage.removeItem('oldTableData'); // Explicitly remove oldTableData from local storage
+      localStorage.removeItem('schemeTableData'); // Explicitly remove oldTableData from local storage
+    
+      console.log("Data cleared successfully");
+    };
+
+  // const handleSave = async () => {
+  //   // Create a FormData object
+  //   const formData = new FormData();
+  
+  //  const dataToSave = {
+  //     repairDetails: repairDetails.map(item => ({
+  //       ...item,
+  //       cash_amount: paymentDetails.cash_amount || 0,
+  //       card_amount: paymentDetails.card || 0,
+  //       card_amt: paymentDetails.card_amt || 0,
+  //       chq: paymentDetails.chq || "",
+  //       chq_amt: paymentDetails.chq_amt || 0,
+  //       online: paymentDetails.online || "",
+  //       online_amt: paymentDetails.online_amt || 0,
+  //     })),
+  //     oldItems: oldSalesData,
+  //     memberSchemes: schemeSalesData,
+  //   };
+    
+  //   console.log("data",oldSalesData);
+  //   formData.append("repairDetails", JSON.stringify(dataToSave));
+  
+  //   // Append files for each repair item if they exist
+  //   repairDetails.forEach((item, index) => {
+  //     if (item.product_image) {
+  //       formData.append(`product_image`, item.product_image); // Multer will handle multiple files
+  //     }
+  //   });
+  
+  //   try {
+  //     // Make POST request with FormData
+  //     await axios.post(`${baseURL}/save-repair-details`, formData, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     });
+  //     alert("Data saved successfully");
+  //     const pdfDoc = (
+  //       <PDFLayout
+  //         formData={formData}
+  //         repairDetails={repairDetails}
+  //         cash_amount={paymentDetails.cash_amount || 0}
+  //         card_amt={paymentDetails.card_amt || 0}
+  //         chq_amt={paymentDetails.chq_amt || 0}
+  //         online_amt={paymentDetails.online_amt || 0}
+  //         taxAmount={taxAmount}
+  //         oldItemsAmount={oldItemsAmount}
+  //         schemeAmount={schemeAmount}
+  //         netPayableAmount={netPayableAmount}
+  //       />
+  //     );
+  //       const pdfBlob = await pdf(pdfDoc).toBlob();
+    
+  //       // Create a download link and trigger it
+  //       const link = document.createElement('a');
+  //       link.href = URL.createObjectURL(pdfBlob);
+  //       link.download = `invoice-${formData.invoice_number}.pdf`;
+  //       link.click();
+    
+  //       // Clean up
+  //       URL.revokeObjectURL(link.href);
+      
+  //     // Clear all data after saving
+  //     clearData();
+  
+  //     // Reset the form and reload the page if necessary
+  //     resetForm();
+  //     window.location.reload();
+  //   } catch (error) {
+  //     console.error("Error saving data:", error);
+  //     alert("Error saving data");
+  //   }
+  // };
+
+  const handleSave = async () => {
+    const formData = new FormData();
+
+    const dataToSave = {
+      repairDetails: repairDetails.map(item => ({
+        ...item,
+        cash_amount: paymentDetails.cash_amount || 0,
+        card_amount: paymentDetails.card || 0,
+        card_amt: paymentDetails.card_amt || 0,
+        chq: paymentDetails.chq || "",
+        chq_amt: paymentDetails.chq_amt || 0,
+        online: paymentDetails.online || "",
+        online_amt: paymentDetails.online_amt || 0,
+      })),
       oldItems: oldSalesData,
       memberSchemes: schemeSalesData,
-    }));
-    
-    console.log("data",oldSalesData);
-    formData.append("repairDetails", JSON.stringify(dataToSave));
+    };
   
-    // Append files for each repair item if they exist
+    console.log("Saving data:", dataToSave);
+
     repairDetails.forEach((item, index) => {
       if (item.product_image) {
         formData.append(`product_image`, item.product_image); // Multer will handle multiple files
@@ -259,33 +384,42 @@ const SalesForm = () => {
     });
   
     try {
-      // Make POST request with FormData
-      await axios.post(`${baseURL}/save-order-details`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axios.post(`${baseURL}/save-order-details`, dataToSave);
       alert("Data saved successfully");
-   const pdfDoc = (
-          <PDFLayout
-            formData={formData}
-            repairDetails={repairDetails}
-            paymentDetails={paymentDetails}
-          />
-        );
-        const pdfBlob = await pdf(pdfDoc).toBlob();
-    
-        // Create a download link and trigger it
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(pdfBlob);
-        link.download = `invoice-${formData.invoice_number}.pdf`;
-        link.click();
-    
-        // Clean up
-        URL.revokeObjectURL(link.href);
-      // Clear form data and reset state
-      setRepairDetails([]);
+  
+      // Generate PDF Blob
+      const pdfDoc = (
+        <PDFLayout
+          formData={formData}
+          repairDetails={repairDetails}
+          cash_amount={paymentDetails.cash_amount || 0}
+          card_amt={paymentDetails.card_amt || 0}
+          chq_amt={paymentDetails.chq_amt || 0}
+          online_amt={paymentDetails.online_amt || 0}
+          taxAmount={taxAmount}
+          oldItemsAmount={oldItemsAmount}
+          schemeAmount={schemeAmount}
+          netPayableAmount={netPayableAmount}
+        />
+      );
+  
+      const pdfBlob = await pdf(pdfDoc).toBlob();
+  
+      // Create a download link and trigger it
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(pdfBlob);
+      link.download = `invoice-${formData.invoice_number}.pdf`;
+      link.click();
+  
+      // Clean up
+      URL.revokeObjectURL(link.href);
+  
+      // Clear all data after saving
+      clearData();
+  
+      // Reset the form and reload the page if necessary
       resetForm();
+      window.location.reload();
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Error saving data");
@@ -327,6 +461,32 @@ const SalesForm = () => {
   const handleAddCustomer = () => {
     navigate("/customermaster", { state: { from: "/sales" } });
   };
+
+  const taxableAmount = repairDetails.reduce((sum, item) => {
+    const stonePrice = parseFloat(item.stone_price) || 0;
+    const makingCharges = parseFloat(item.making_charges) || 0;
+    const rateAmt = parseFloat(item.rate_amt) || 0;
+    return sum + stonePrice + makingCharges + rateAmt;
+  }, 0);
+  console.log("Total Price=",taxableAmount)
+  
+  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  const netAmount = taxableAmount + taxAmount;
+  console.log("Net Amount=",netAmount)
+
+  const oldItemsAmount = oldSalesData.reduce(
+    (sum, item) => sum + parseFloat(item.total_amount || 0),
+    0
+  );
+
+  // Calculate Scheme Amount (sum of paid_amount from schemeSalesData)
+  const schemeAmount = schemeSalesData.reduce(
+    (sum, item) => sum + parseFloat(item.paid_amount || 0),
+    0
+  );
+
+  // Calculate Net Payable Amount
+  const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);
 
   return (
     <div className="main-container">
@@ -372,12 +532,14 @@ const SalesForm = () => {
               filteredMetalTypes={filteredMetalTypes}
               filteredPurityOptions={filteredPurityOptions}
               filteredDesignOptions={filteredDesignOptions}
-              isQtyEditable={isQtyEditable}             
+              isQtyEditable={isQtyEditable}   
+              handleUpdate={handleUpdate}
+              isEditing={editIndex !== null}           
             />
           </div>
 
           <div className="sales-form-section">
-            <ProductTable repairDetails={repairDetails}  onDelete={handleDelete}/>
+            <ProductTable repairDetails={repairDetails} onEdit={handleEdit}  onDelete={handleDelete}/>
           </div>
 
           {/* <div className="sales-form2">
@@ -395,20 +557,51 @@ const SalesForm = () => {
 
           <div className="sales-form2">
             <div className="sales-form-third">
-              <SalesFormSection metal={metal} setMetal={setMetal} setOldSalesData={setOldSalesData} setSchemeSalesData={setSchemeSalesData}/>
+            <SalesFormSection metal={metal} 
+                setMetal={setMetal} 
+                setOldSalesData={setOldSalesData} 
+                oldTableData={oldTableData}
+                setOldTableData={setOldTableData} 
+                setSchemeSalesData={setSchemeSalesData}
+                schemeTableData={schemeTableData}
+                setSchemeTableData={setSchemeTableData}
+               />
             </div>
 
             <div className="sales-form-fourth">
-              <PaymentDetails 
+            <PaymentDetails 
                 paymentDetails={paymentDetails}
                 setPaymentDetails={setPaymentDetails}
                 handleSave={handleSave}
-                repairDetails={repairDetails}
                 handleBack={handleBack}
-                totalPrice={totalPrice} // Pass totalPrice as a prop
+                totalPrice={totalPrice} 
+                repairDetails={repairDetails}
+                taxableAmount={taxableAmount}
+                taxAmount={taxAmount}
+                netAmount={netAmount}
+                oldItemsAmount={oldItemsAmount}
+                schemeAmount={schemeAmount}
+                netPayableAmount={netPayableAmount}
+                oldSalesData={oldSalesData} schemeSalesData={schemeSalesData} 
               />
             </div>
           </div>
+          {showPDFDownload && (
+        <PDFDownloadLink
+          document={
+            <PDFLayout
+              formData={formData}
+              repairDetails={repairDetails}
+              paymentDetails={paymentDetails}
+            />
+          }
+          fileName={`invoice-${formData.invoice_number}.pdf`}
+        >
+          {({ blob, url, loading, error }) =>
+            loading ? "Generating PDF..." : "Download Invoice PDF"
+          }
+        </PDFDownloadLink>
+      )}
         </Form>
       </Container>
     </div>

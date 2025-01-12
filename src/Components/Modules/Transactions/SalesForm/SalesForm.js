@@ -22,15 +22,6 @@ const SalesForm = () => {
   const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [metal, setMetal] = useState("");
-  // const [oldSalesData, setOldSalesData] = useState(() => {
-  //   const savedData = localStorage.getItem('oldSalesData');
-  //   return savedData ? JSON.parse(savedData) : [];
-  // });
-  
-  // const [schemeSalesData, setSchemeSalesData] = useState(() => {
-  //   const savedData = localStorage.getItem('schemeSalesData');
-  //   return savedData ? JSON.parse(savedData) : [];
-  // });
 
   const [oldSalesData, setOldSalesData] = useState(
     JSON.parse(localStorage.getItem('oldSalesData')) || []
@@ -175,8 +166,6 @@ const SalesForm = () => {
     }
   };
 
-  // Add product to repair details
-  const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
   
   // Function to handle editing a product
@@ -281,6 +270,8 @@ const SalesForm = () => {
   
 
   const handleSave = async () => {
+    const formData = new FormData();
+
     const dataToSave = {
       repairDetails: repairDetails.map(item => ({
         ...item,
@@ -499,7 +490,7 @@ const SalesForm = () => {
                 oldItemsAmount={oldItemsAmount}
                 schemeAmount={schemeAmount}
                 netPayableAmount={netPayableAmount}
-                oldSalesData={oldSalesData} schemeSalesData={schemeSalesData} // Pass totalPrice as a prop
+                oldSalesData={oldSalesData} schemeSalesData={schemeSalesData} 
               />
             </div>
           </div>

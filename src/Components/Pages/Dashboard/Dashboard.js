@@ -94,7 +94,7 @@ function Dashboard() {
         <CustomerDashboard onSelectCustomer={setSelectedMobile} />
       </div>
       <div className="dashboard-container">
-        <div className="row-cards" style={{ marginTop: '15px' }}>
+        <div className="row-cards" >
           <div className="metric-card">
             <Sales selectedCustomerMobile={selectedMobile} />
             <a style={{marginRight:'100px'}}

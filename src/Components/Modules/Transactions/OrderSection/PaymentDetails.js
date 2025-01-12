@@ -8,20 +8,28 @@ const PaymentDetails = ({
   handleSave,
   handleBack,
   repairDetails,
-  totalPrice, // Assuming total price is passed as a prop
+  totalPrice,
+  schemeSalesData, 
+  oldSalesData,
+  taxableAmount,
+  taxAmount,
+  oldItemsAmount,
+  schemeAmount,
+  netPayableAmount,
+  netAmount // Assuming total price is passed as a prop
 }) => {
     const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
-    const taxableAmount = repairDetails.reduce((sum, item) => {
-      const stonePrice = parseFloat(item.stone_price) || 0;
-      const makingCharges = parseFloat(item.making_charges) || 0;
-      const rateAmt = parseFloat(item.rate_amt) || 0;
-      return sum + stonePrice + makingCharges + rateAmt;
-    }, 0);
-    console.log("Total Price=",taxableAmount)
+    // const taxableAmount = repairDetails.reduce((sum, item) => {
+    //   const stonePrice = parseFloat(item.stone_price) || 0;
+    //   const makingCharges = parseFloat(item.making_charges) || 0;
+    //   const rateAmt = parseFloat(item.rate_amt) || 0;
+    //   return sum + stonePrice + makingCharges + rateAmt;
+    // }, 0);
+    // console.log("Total Price=",taxableAmount)
     
-    const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
-    const netAmount = taxableAmount + taxAmount;
-    console.log("Net Amount=",netAmount)
+    // const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+    // const netAmount = taxableAmount + taxAmount;
+    // console.log("Net Amount=",netAmount)
 
   // Calculate total entered amount
   useEffect(() => {
@@ -56,6 +64,18 @@ const PaymentDetails = ({
           <td colSpan="20" className="text-right">Net Amount</td> {/* Adjusted colspan to 20 */}
           <td colSpan="4">{netAmount.toFixed(2)}</td>
         </tr>
+        <tr>
+              <td colSpan="20" className="text-right">Old Items Amount</td>
+              <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Scheme Amount</td>
+              <td colSpan="4">{schemeAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Net Payable Amount</td>
+              <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
+            </tr>
         </Table>
         <Col xs={12} md={4}>
           <InputField
