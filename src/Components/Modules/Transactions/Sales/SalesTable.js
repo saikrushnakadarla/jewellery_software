@@ -26,18 +26,18 @@ const RepairsTable = () => {
   }, [mobile]);
 
 
-  const handleEdit = async (invoice_number) => {
-    try {
-      const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
-      setRepairDetails(response.data); // Store the fetched repair details
-      const details=response.data
-      console.log('fetching repair details:', details.repeatedData);
-      navigate('/sales', { state: { repairDetails: response.data } });
-      await handleDelete(invoice_number);
-    } catch (error) {
-      console.error('Error fetching repair details:', error);
-    }
-  };
+  // const handleEdit = async (invoice_number) => {
+  //   try {
+  //     const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
+  //     setRepairDetails(response.data); // Store the fetched repair details
+  //     const details=response.data
+  //     console.log('fetching repair details:', details.repeatedData);
+  //     navigate('/sales', { state: { repairDetails: response.data } });
+  //     await handleDelete(invoice_number);
+  //   } catch (error) {
+  //     console.error('Error fetching repair details:', error);
+  //   }
+  // };
 
   // const handleEdit = (details) => {
   //   setRepairDetails(details); // Set the repair details to state
@@ -166,31 +166,76 @@ const RepairsTable = () => {
     []
   );
 
-  const handleDelete = async (invoiceNumber) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: `Do you really want to delete invoice ${invoiceNumber}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const response = await axios.delete(`${baseURL}/repair-details/${invoiceNumber}`);
-          if (response.status === 200) {
-            Swal.fire('Deleted!', response.data.message, 'success');
-            // Update the table data by removing the deleted record
-            setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
-          }
-        } catch (error) {
-          console.error('Error deleting repair details:', error);
-          Swal.fire('Error!', 'Failed to delete repair details. Please try again.', 'error');
-        }
-      }
-    });
+  const handleEdit = async (invoice_number) => {
+    try {
+      const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
+      const details = response.data;
+      
+      // Retrieve existing repair details from localStorage or set to an empty array if not available
+      const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
+      
+      // Add the new repair details (flatten the repeatedData if it's an array)
+      const updatedDetails = [...existingDetails, ...details.repeatedData]; // Merge repeatedData directly
+      
+      // Save the updated array back to localStorage
+      localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
+    
+      console.log('fetching repair details:', details.repeatedData);
+      
+      // Pass the fetched data to the next route
+      navigate('/sales');
+    
+      // Call handleDelete without confirmation
+      await handleDelete(invoice_number, true); 
+    } catch (error) {
+      console.error('Error fetching repair details:', error);
+    }
   };
+  
+  
+  
+  const handleDelete = async (invoiceNumber, skipConfirmation = false) => {
+    if (skipConfirmation) {
+      // Skip the confirmation and directly proceed with the deletion
+      try {
+        const response = await axios.delete(`${baseURL}/repair-details/${invoiceNumber}`);
+        if (response.status === 200) {
+          Swal.fire('Deleted!', response.data.message, 'success');
+          // Update the table data by removing the deleted record
+          setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
+        }
+      } catch (error) {
+        console.error('Error deleting repair details:', error);
+        Swal.fire('Error!', 'Failed to delete repair details. Please try again.', 'error');
+      }
+    } else {
+      // Show the confirmation alert
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you really want to delete invoice ${invoiceNumber}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const response = await axios.delete(`${baseURL}/repair-details/${invoiceNumber}`);
+            if (response.status === 200) {
+              Swal.fire('Deleted!', response.data.message, 'success');
+              // Update the table data by removing the deleted record
+              setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
+            }
+          } catch (error) {
+            console.error('Error deleting repair details:', error);
+            Swal.fire('Error!', 'Failed to delete repair details. Please try again.', 'error');
+          }
+        }
+      });
+    }
+  };
+  
 
 
   const formatDate = (dateString) => {

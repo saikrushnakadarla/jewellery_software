@@ -334,7 +334,6 @@ const RepairsTable = () => {
                 <Table bordered>
                   <thead>
                     <tr>
-                      
                       <th>Product Image</th>
                       <th>Product Name</th>
                       <th>Metal</th>

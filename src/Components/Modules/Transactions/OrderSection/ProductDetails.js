@@ -10,6 +10,8 @@ const ProductDetails = ({
   handleProductNameChange,
   handleImageUpload,
   handleAdd,
+  handleUpdate,
+  isEditing, 
   products,
   filteredDesignOptions,
   filteredPurityOptions,
@@ -271,7 +273,15 @@ const ProductDetails = ({
           </div>
         </Col>
         <Col xs={12} md={1}>
-          <Button onClick={handleAdd} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Add</Button>
+          <Button
+                      onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
+                      style={{
+                        backgroundColor: isEditing ? "#a36e29" : "#a36e29",
+                        borderColor: isEditing ? "#a36e29" : "#a36e29",
+                      }}
+                    >
+                      {isEditing ? "Update" : "Add"}
+                    </Button>
         </Col>
       </Row>
       </Col> 

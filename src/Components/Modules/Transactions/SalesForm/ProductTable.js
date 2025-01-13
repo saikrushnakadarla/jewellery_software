@@ -1,18 +1,16 @@
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React from 'react';
 import { Table, Button } from 'react-bootstrap';
-import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
-const RepairDetailsTable = ({ repairDetails, onEdit, onDelete }) => {
-  const location = useLocation(); // Access location object
-  const repairDetail = location.state?.repairDetails.repeatedData || []; // Retrieve the repairDetails from state
-
-  // Determine the data to display based on navigation
-  const dataToDisplay = repairDetail.length > 0 ? repairDetail : repairDetails;
-
-  useEffect(() => {
-    console.log('Data passed to /sales:', repairDetail); // Log the repairDetails
-  }, [repairDetail]);
+const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
+  const taxableAmount = repairDetails.reduce((sum, item) => {
+    const stonePrice = parseFloat(item.stone_price) || 0;
+    const makingCharges = parseFloat(item.making_charges) || 0;
+    const rateAmt = parseFloat(item.rate_amt) || 0;
+    return sum + stonePrice + makingCharges + rateAmt;
+  }, 0);
+  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  const netAmount = taxableAmount + taxAmount;
 
   return (
     <Table bordered hover responsive>
@@ -41,12 +39,13 @@ const RepairDetailsTable = ({ repairDetails, onEdit, onDelete }) => {
           <th>Tax %</th>
           <th>Tax Amount</th>
           <th>Total Price</th>
-          <th>Action</th>
+         
+          <th>Action</th> {/* Add Action column for delete */}
         </tr>
       </thead>
       <tbody>
-        {dataToDisplay.length > 0 ? (
-          dataToDisplay.map((detail, index) => (
+        {repairDetails.length > 0 ? (
+          repairDetails.map((detail, index) => (
             <tr key={index}>
               <td>{detail.date}</td>
               <td>{detail.invoice_number}</td>
@@ -71,30 +70,43 @@ const RepairDetailsTable = ({ repairDetails, onEdit, onDelete }) => {
               <td>{detail.tax_percent}</td>
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>
-              <td>
-                <Button
-                  variant="primary"
-                  onClick={() => onEdit(index)}
-                  style={{ marginRight: '8px' }}
-                >
-                  <FaEdit style={{ marginRight: '4px' }} />
-                </Button>
-                <Button variant="danger" onClick={() => onDelete(index)}>
-                  <FaTrashAlt style={{ marginRight: '4px' }} />
-                </Button>
-              </td>
+              
+               <td>
+                            <Button
+                            variant="primary"
+                            onClick={() => onEdit(index)}
+                            style={{ marginRight: "8px" }}
+                          >
+                           <FaEdit style={{ marginRight: "4px" }} />
+                          </Button>
+                              <Button variant="danger" onClick={() => onDelete(index)}>  <FaTrashAlt style={{ marginRight: "4px" }} /></Button>
+                            </td>
             </tr>
           ))
         ) : (
           <tr>
-            <td colSpan="24" className="text-center">
+            <td colSpan="25" className="text-center">
               No data available
             </td>
           </tr>
         )}
       </tbody>
+      {/* <tfoot>
+        <tr>
+          <td colSpan="20" className="text-right">Taxable Amount</td> 
+          <td colSpan="5">{taxableAmount.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td colSpan="20" className="text-right">Tax Amount</td> 
+          <td colSpan="5">{taxAmount.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td colSpan="20" className="text-right">Net Amount</td> 
+          <td colSpan="5">{netAmount.toFixed(2)}</td>
+        </tr>
+      </tfoot> */}
     </Table>
   );
 };
 
-export default RepairDetailsTable;
+export default ProductTable;
