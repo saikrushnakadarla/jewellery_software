@@ -1,19 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Table, Button } from 'react-bootstrap';
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 
-const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
-  const taxableAmount = repairDetails.reduce((sum, item) => {
-    const stonePrice = parseFloat(item.stone_price) || 0;
-    const makingCharges = parseFloat(item.making_charges) || 0;
-    const rateAmt = parseFloat(item.rate_amt) || 0;
-    return sum + stonePrice + makingCharges + rateAmt;
-  }, 0);
-  console.log("Total Price=",taxableAmount)
-  
-  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
-  const netAmount = taxableAmount + taxAmount;
-  console.log("Net Amount=",netAmount)
+const RepairDetailsTable = ({ repairDetails, onEdit, onDelete }) => {
+  const location = useLocation(); // Access location object
+  const repairDetail = location.state?.repairDetails.repeatedData || []; // Retrieve the repairDetails from state
+
+  // Determine the data to display based on navigation
+  const dataToDisplay = repairDetail.length > 0 ? repairDetail : repairDetails;
+
+  useEffect(() => {
+    console.log('Data passed to /sales:', repairDetail); // Log the repairDetails
+  }, [repairDetail]);
 
   return (
     <Table bordered hover responsive>
@@ -42,12 +41,12 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
           <th>Tax %</th>
           <th>Tax Amount</th>
           <th>Total Price</th>
-          <th>Action</th> {/* Add Action column for delete */}
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
-      {repairDetails.length > 0 ? (
-          repairDetails.map((detail, index) => (
+        {dataToDisplay.length > 0 ? (
+          dataToDisplay.map((detail, index) => (
             <tr key={index}>
               <td>{detail.date}</td>
               <td>{detail.invoice_number}</td>
@@ -73,14 +72,16 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>
               <td>
-              <Button
-              variant="primary"
-              onClick={() => onEdit(index)}
-              style={{ marginRight: "8px" }}
-            >
-             <FaEdit style={{ marginRight: "4px" }} />
-            </Button>
-                <Button variant="danger" onClick={() => onDelete(index)}>  <FaTrashAlt style={{ marginRight: "4px" }} /></Button>
+                <Button
+                  variant="primary"
+                  onClick={() => onEdit(index)}
+                  style={{ marginRight: '8px' }}
+                >
+                  <FaEdit style={{ marginRight: '4px' }} />
+                </Button>
+                <Button variant="danger" onClick={() => onDelete(index)}>
+                  <FaTrashAlt style={{ marginRight: '4px' }} />
+                </Button>
               </td>
             </tr>
           ))
@@ -92,9 +93,8 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
           </tr>
         )}
       </tbody>
-      
     </Table>
   );
 };
 
-export default ProductTable;
+export default RepairDetailsTable;

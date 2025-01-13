@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout';
-import { FaEye, FaTrash } from 'react-icons/fa';
+import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from '../../../../Url/NodeBaseURL';
@@ -24,6 +24,25 @@ const RepairsTable = () => {
       console.log('Selected Mobile from Dashboard:', mobile);
     }
   }, [mobile]);
+
+
+  const handleEdit = async (invoice_number) => {
+    try {
+      const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
+      setRepairDetails(response.data); // Store the fetched repair details
+      const details=response.data
+      console.log('fetching repair details:', details.repeatedData);
+      navigate('/sales', { state: { repairDetails: response.data } });
+      await handleDelete(invoice_number);
+    } catch (error) {
+      console.error('Error fetching repair details:', error);
+    }
+  };
+
+  // const handleEdit = (details) => {
+  //   setRepairDetails(details); // Set the repair details to state
+  //   navigate('/sales', { state: { repairDetails: details } }); // Navigate with state
+  // };
 
   const columns = React.useMemo(
     () => [
@@ -51,22 +70,22 @@ const RepairsTable = () => {
       {
         Header: 'Total Amt',
         accessor: 'net_amount',
-        Cell: ({ value }) => value || 0 
+        Cell: ({ value }) => value || 0
       },
       {
         Header: 'Old Amt',
         accessor: 'old_exchange_amt',
-        Cell: ({ value }) => value || 0 
+        Cell: ({ value }) => value || 0
       },
       {
         Header: 'Scheme Amt',
         accessor: 'scheme_amt',
-        Cell: ({ value }) => value || 0 
+        Cell: ({ value }) => value || 0
       },
       {
         Header: 'Net Amt',
         accessor: 'net_bill_amount',
-        Cell: ({ value }) => value || 0 
+        Cell: ({ value }) => value || 0
       },
       {
         Header: 'Paid Amt',
@@ -77,24 +96,24 @@ const RepairsTable = () => {
           return totalPaid;
         },
       },
-      
+
       {
         Header: 'Bal Amt',
-        accessor: 'bal_amt', 
+        accessor: 'bal_amt',
         Cell: ({ row }) => {
           const { bal_amt, bal_after_receipts, receipts_amt } = row.original;
-          
+
           // If bal_amt equals receipts_amt, show bal_after_receipts
           if (bal_amt === receipts_amt) {
             return bal_after_receipts || 0
           }
-      
+
           // Default logic: Show bal_after_receipts if it exists, otherwise bal_amt
           return bal_after_receipts ? bal_after_receipts : bal_amt || 0
         },
       },
-      
-      
+
+
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -104,7 +123,16 @@ const RepairsTable = () => {
               style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
               onClick={() => handleViewDetails(row.original.invoice_number)} // Pass invoice_number
             />
-             <FaTrash
+            {/* Edit Icon */}
+            <FaEdit
+              style={{
+                cursor: 'pointer',
+                marginLeft: '10px',
+                color: 'blue',
+              }}
+              onClick={() => handleEdit(row.original.invoice_number)}
+            />
+            <FaTrash
               style={{
                 cursor: 'pointer',
                 marginLeft: '10px',
@@ -121,7 +149,7 @@ const RepairsTable = () => {
         Cell: ({ row }) => {
           const { net_bill_amount, paid_amt, receipts_amt } = row.original;
           const totalPaid = (paid_amt || 0) + (receipts_amt || 0);
-      
+
           return (
             <Button
               style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
@@ -133,9 +161,9 @@ const RepairsTable = () => {
           );
         },
       },
-      
+
     ],
-    [] 
+    []
   );
 
   const handleDelete = async (invoiceNumber) => {
@@ -163,7 +191,7 @@ const RepairsTable = () => {
       }
     });
   };
-  
+
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -177,10 +205,10 @@ const RepairsTable = () => {
     const fetchRepairs = async () => {
       try {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
-        
+
         // Filter the data based on the 'transaction_status' column
         const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
-        
+
         setData(filteredData); // Set the filtered data
         setLoading(false);
       } catch (error) {
