@@ -123,20 +123,14 @@ const SalesForm = () => {
 
   // Handle customer change
   const handleCustomerChange = (customerId) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      customer_id: customerId,
-    }));
-
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
-    console.log("Customer Id=", customer)
-
+  
     if (customer) {
-      setFormData({
-        ...formData,
-        customer_id: customerId, // Ensure this is correctly set
-        account_name: customer.account_name, // Set the name field to the selected customer
-        mobile: customer.mobile || "",
+      setFormData((prevData) => ({
+        ...prevData,
+        customer_id: customerId, // Update selected customer ID
+        account_name: customer.account_name || "", // Update customer name
+        mobile: customer.mobile || "", // Update mobile
         email: customer.email || "",
         address1: customer.address1 || "",
         address2: customer.address2 || "",
@@ -147,11 +141,11 @@ const SalesForm = () => {
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
-
-      });
+      }));
     } else {
-      setFormData({
-        ...formData,
+      // Reset the form if no customer matches
+      setFormData((prevData) => ({
+        ...prevData,
         customer_id: "",
         account_name: "",
         mobile: "",
@@ -165,10 +159,10 @@ const SalesForm = () => {
         aadhar_card: "",
         gst_in: "",
         pan_card: "",
-      });
+      }));
     }
   };
-
+  
   
     const [editIndex, setEditIndex] = useState(null);
 

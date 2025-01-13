@@ -188,6 +188,7 @@ function Dashboard() {
               className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
                 navigate('/orders', { state: { mobile: selectedMobile } });
               }}
             >
