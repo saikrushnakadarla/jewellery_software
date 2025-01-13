@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import baseURL from './../../../../../Url/NodeBaseURL';
+import { useLocation } from "react-router-dom";
 
 const useProductHandlers = () => {
   const [products, setProducts] = useState([]);
   const [data, setData] = useState([]);
   const [isQtyEditable, setIsQtyEditable] = useState(false);
+  const location = useLocation();
+  
+  // Access the passed state (default to an empty object if undefined)
+  const { invoice_number = "", mobile = "" } = location.state || {};
 
   const [rates, setRates] = useState({
     rate_24crt: "",
@@ -16,7 +21,7 @@ const useProductHandlers = () => {
 
   const [formData, setFormData] = useState({
     customer_id: "value001",
-    mobile: "",
+    mobile: mobile,
     account_name: "",
     email: "",
     address1: "",
@@ -30,7 +35,7 @@ const useProductHandlers = () => {
     pan_card: "",
     terms: "Cash",
     date: "",
-    invoice_number: "",
+    invoice_number: invoice_number,
     code: "",
     product_id: "",
     metal: "",
