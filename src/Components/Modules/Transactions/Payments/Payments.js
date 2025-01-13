@@ -7,7 +7,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
 import { pdf } from "@react-pdf/renderer";
 
-import PDFContent from "../Receipts/ReceiptPdf"; 
+import PDFContent from "./ReceiptPdf"; 
 
 const RepairForm = () => {
   const navigate = useNavigate();

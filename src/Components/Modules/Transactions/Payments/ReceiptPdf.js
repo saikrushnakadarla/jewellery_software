@@ -91,7 +91,7 @@ const PDFContent = ({ formData }) => {
     <Document>
       <Page size={[250, 500]} style={styles.page}>
         {/* Heading */}
-        <Text style={styles.heading}>Receipt</Text>
+        <Text style={styles.heading}>Payment</Text>
 
         {/* Details */}
         <View>
