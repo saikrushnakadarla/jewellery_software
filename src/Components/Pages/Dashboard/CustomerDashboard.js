@@ -67,7 +67,7 @@
 
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import baseURL from "../../../Url/NodeBaseURL";
 
 function Customers({ onSelectCustomer }) {
@@ -75,6 +75,7 @@ function Customers({ onSelectCustomer }) {
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const containerRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,13 +101,20 @@ function Customers({ onSelectCustomer }) {
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-    const filtered = customers.filter(
-      (customer) =>
-        customer.mobile.toLowerCase().includes(query) ||
-        (customer.account_name && customer.account_name.toLowerCase().includes(query))
-    );
-    setFilteredCustomers(filtered);
-    setIsDropdownVisible(true);
+
+    if (query === "") {
+      // Reset to all customers if the query is empty
+      setFilteredCustomers(customers);
+      setIsDropdownVisible(false);
+    } else {
+      const filtered = customers.filter(
+        (customer) =>
+          customer.mobile.toLowerCase().includes(query) ||
+          (customer.account_name && customer.account_name.toLowerCase().includes(query))
+      );
+      setFilteredCustomers(filtered);
+      setIsDropdownVisible(true);
+    }
   };
 
   const handleCustomerSelect = (customer) => {
@@ -117,12 +125,34 @@ function Customers({ onSelectCustomer }) {
 
   const clearSearch = () => {
     setSearchQuery("");
-    setFilteredCustomers(customers);
+    setFilteredCustomers(customers); // Reset the filtered list
     setIsDropdownVisible(false);
   };
 
+  const handleClickOutside = (event) => {
+    if (containerRef.current && !containerRef.current.contains(event.target)) {
+      setIsDropdownVisible(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && filteredCustomers.length > 0) {
+      handleCustomerSelect(filteredCustomers[0]); // Automatically select the first customer
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", marginRight:"100px" }}>
+    <div
+      ref={containerRef}
+      style={{ padding: "20px", fontFamily: "Arial, sans-serif", marginRight: "100px" }}
+    >
       <div style={{ position: "relative", width: "100%" }}>
         {/* Search Bar */}
         <div style={{ position: "relative" }}>
@@ -130,6 +160,7 @@ function Customers({ onSelectCustomer }) {
             type="text"
             value={searchQuery}
             onChange={handleSearchChange}
+            onKeyDown={handleKeyPress}
             onFocus={() => setIsDropdownVisible(true)}
             placeholder="Search customers by mobile or name"
             style={{
@@ -245,3 +276,5 @@ function Customers({ onSelectCustomer }) {
 }
 
 export default Customers;
+
+

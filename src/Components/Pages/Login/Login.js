@@ -4,6 +4,7 @@ import axios from 'axios';
 import baseURL from "../../../Url/NodeBaseURL";
 import backgroundImage from './sadashribg-2.jpg';
 import googleImage from './Logo/google.png';
+import Swal from 'sweetalert2';
 
 
 function Login() {
@@ -20,18 +21,30 @@ function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-
+  
     if (!email || !password) {
       setErrorMessage('Please provide both email and password.');
       return;
     }
-
+  
     try {
       const response = await axios.post(`${baseURL}/login`, { email, password });
-
+  
       if (response.data.success) {
-        const wantsToUpdateRate = window.confirm('Do you want to update rates?');
-        navigate(wantsToUpdateRate ? '/rates' : '/dashboard');
+        Swal.fire({
+          title: 'Update Rates?',
+          text: 'Do you want to update rates?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, update rates',
+          cancelButtonText: 'No, go to dashboard',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            navigate('/rates');
+          } else {
+            navigate('/dashboard');
+          }
+        });
       } else {
         setErrorMessage(response.data.message || 'You do not have admin access.');
       }
@@ -41,6 +54,7 @@ function Login() {
       setErrorMessage(errorMessage);
     }
   };
+  
 
   return (
     <div
