@@ -238,7 +238,7 @@ const RepairsTable = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`${baseURL}/repair-details/${invoiceNumber}`);
+          const response = await axios.delete(`${baseURL}/order-details/${invoiceNumber}`);
           if (response.status === 200) {
             Swal.fire('Deleted!', response.data.message, 'success');
             // Update the table data by removing the deleted record
