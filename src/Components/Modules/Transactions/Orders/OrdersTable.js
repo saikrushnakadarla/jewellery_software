@@ -334,7 +334,7 @@ const RepairsTable = () => {
                 <Table bordered>
                   <thead>
                     <tr>
-                      <th>Code</th>
+                      
                       <th>Product Image</th>
                       <th>Product Name</th>
                       <th>Metal</th>
@@ -355,7 +355,6 @@ const RepairsTable = () => {
                   <tbody>
                     {repairDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
-                        <td>{product.code}</td>
                         <td>
                           {product.product_image ? (
                             <img
