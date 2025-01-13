@@ -140,12 +140,15 @@ useEffect(() => {
     if (selectedInvoice) {
       setFormData((prevData) => ({
         ...prevData,
-        total_amt:
-          selectedInvoice.balance_after_receipt > 0
-            ? selectedInvoice.balance_after_receipt
-            : selectedInvoice.balance_amount || 0,
+        total_amt: 
+          selectedInvoice.paid_amt + selectedInvoice.paid_amount === selectedInvoice.total_amount
+            ? parseFloat(selectedInvoice.balance_after_receipt) || 0
+            : selectedInvoice.balance_after_receipt > 0
+            ? parseFloat(selectedInvoice.balance_after_receipt) || 0
+            : parseFloat(selectedInvoice.balance_amount) || 0,
       }));
     }
+    
   } else {
     // Clear total_amt when invoice_number is cleared
     setFormData((prevData) => ({

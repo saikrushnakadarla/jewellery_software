@@ -185,9 +185,16 @@ const RepairForm = () => {
           );
   
           if (selectedRepair) {
-            updatedData.total_amt = selectedRepair.bal_after_receipts || selectedRepair.bal_amt || "";
+            updatedData.total_amt = 
+              selectedRepair.paid_amt + selectedRepair.receipts_amt === selectedRepair.net_bill_amount
+                ? parseFloat(selectedRepair.bal_after_receipts) || 0
+                : selectedRepair.bal_after_receipts
+                ? parseFloat(selectedRepair.bal_after_receipts) || 0
+                : parseFloat(selectedRepair.bal_amt) || 0;
+          
             updatedData.cash_amt = ""; // Reset cash_amt when new total_amt is populated
           }
+          
         }
       }
   
