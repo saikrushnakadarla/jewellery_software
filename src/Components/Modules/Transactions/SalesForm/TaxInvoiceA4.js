@@ -221,6 +221,7 @@ const TaxINVoiceReceipt = ({
         schemeAmount,
         netPayableAmount,
       }) => {
+        
         // Calculate total values
         const totalValues = repairDetails.reduce(
                 (totals, item) => {
