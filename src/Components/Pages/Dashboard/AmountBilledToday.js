@@ -7,7 +7,7 @@ function AmountBilledToday() {
       <h3>Amount Billed</h3>
       <p style={{fontSize:'35px', marginTop:'20px'}}>
         <strong>
-        $ 100000
+        ₹ 100000
         </strong>
       </p>
     </div>
