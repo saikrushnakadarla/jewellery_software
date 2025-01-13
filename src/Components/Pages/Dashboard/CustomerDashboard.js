@@ -122,7 +122,7 @@ function Customers({ onSelectCustomer }) {
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", marginRight:"100px" }}>
       <div style={{ position: "relative", width: "100%" }}>
         {/* Search Bar */}
         <div style={{ position: "relative" }}>
