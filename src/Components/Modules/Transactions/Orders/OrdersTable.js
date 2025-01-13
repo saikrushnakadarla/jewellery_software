@@ -238,7 +238,7 @@ const RepairsTable = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`${baseURL}/repair-details/${invoiceNumber}`);
+          const response = await axios.delete(`${baseURL}/order-details/${invoiceNumber}`);
           if (response.status === 200) {
             Swal.fire('Deleted!', response.data.message, 'success');
             // Update the table data by removing the deleted record
@@ -334,7 +334,7 @@ const RepairsTable = () => {
                 <Table bordered>
                   <thead>
                     <tr>
-                      <th>Code</th>
+                      
                       <th>Product Image</th>
                       <th>Product Name</th>
                       <th>Metal</th>
@@ -355,7 +355,6 @@ const RepairsTable = () => {
                   <tbody>
                     {repairDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
-                        <td>{product.code}</td>
                         <td>
                           {product.product_image ? (
                             <img
