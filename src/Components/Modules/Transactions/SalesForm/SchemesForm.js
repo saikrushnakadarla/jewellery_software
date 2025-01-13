@@ -91,9 +91,9 @@ const SchemeSalesForm = ({ setSchemeSalesData }) => {
     <>
       <Row>
         <h4 className="mb-3">Schemes</h4>
-        <Col xs={12} md={3}>
+        {/* <Col xs={12} md={3}>
           <InputField label="Scheme" name="scheme" value={schemeDetails.scheme} onChange={handleInputChange} />
-        </Col>
+        </Col> */}
         <Col xs={12} md={3}>
           <InputField label="Member Name" name="member_name" value={schemeDetails.member_name} onChange={handleInputChange} />
         </Col>

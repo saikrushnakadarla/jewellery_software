@@ -227,6 +227,12 @@ const RepairsTable = () => {
                 <td>{product.total_price}</td>
                     </tr>
                   ))}
+                  <tr style={{ fontWeight: 'bold' }}>
+                    <td colSpan="12" className="text-end">
+                      Total Amount
+                    </td>
+                    <td>{repairDetails.uniqueData.net_amount}</td>
+                  </tr>
                 </tbody>
               </Table>
             </>

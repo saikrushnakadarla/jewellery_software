@@ -123,20 +123,14 @@ const SalesForm = () => {
 
   // Handle customer change
   const handleCustomerChange = (customerId) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      customer_id: customerId,
-    }));
-
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
-    console.log("Customer Id=", customer)
-
+  
     if (customer) {
-      setFormData({
-        ...formData,
-        customer_id: customerId, // Ensure this is correctly set
-        account_name: customer.account_name, // Set the name field to the selected customer
-        mobile: customer.mobile || "",
+      setFormData((prevData) => ({
+        ...prevData,
+        customer_id: customerId, // Update selected customer ID
+        account_name: customer.account_name || "", // Update customer name
+        mobile: customer.mobile || "", // Update mobile
         email: customer.email || "",
         address1: customer.address1 || "",
         address2: customer.address2 || "",
@@ -147,11 +141,11 @@ const SalesForm = () => {
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
-
-      });
+      }));
     } else {
-      setFormData({
-        ...formData,
+      // Reset the form if no customer matches
+      setFormData((prevData) => ({
+        ...prevData,
         customer_id: "",
         account_name: "",
         mobile: "",
@@ -165,10 +159,10 @@ const SalesForm = () => {
         aadhar_card: "",
         gst_in: "",
         pan_card: "",
-      });
+      }));
     }
   };
-
+  
   
     const [editIndex, setEditIndex] = useState(null);
 
@@ -357,37 +351,47 @@ const SalesForm = () => {
   //   }
   // };
 
-  const handleSave = async () => {
+const handleSave = async () => {
+    console.log("Preparing to save data...");
     const formData = new FormData();
+    
+    // First, append all the repair details as JSON string
+    const repairDetailsWithPayment = repairDetails.map(item => ({
+      ...item,
+      cash_amount: paymentDetails.cash_amount || 0,
+      card_amount: paymentDetails.card || 0,
+      card_amt: paymentDetails.card_amt || 0,
+      chq: paymentDetails.chq || "",
+      chq_amt: paymentDetails.chq_amt || 0,
+      online: paymentDetails.online || "",
+      online_amt: paymentDetails.online_amt || 0,
+    }));
 
-    const dataToSave = {
-      repairDetails: repairDetails.map(item => ({
-        ...item,
-        cash_amount: paymentDetails.cash_amount || 0,
-        card_amount: paymentDetails.card || 0,
-        card_amt: paymentDetails.card_amt || 0,
-        chq: paymentDetails.chq || "",
-        chq_amt: paymentDetails.chq_amt || 0,
-        online: paymentDetails.online || "",
-        online_amt: paymentDetails.online_amt || 0,
-      })),
-      oldItems: oldSalesData,
-      memberSchemes: schemeSalesData,
-    };
-  
-    console.log("Saving data:", dataToSave);
+    // Append the JSON data as strings
+    formData.append('repairDetails', JSON.stringify(repairDetailsWithPayment));
+    formData.append('oldItems', JSON.stringify(oldSalesData));
+    formData.append('memberSchemes', JSON.stringify(schemeSalesData));
 
+    // Append each product image
     repairDetails.forEach((item, index) => {
-      if (item.product_image) {
-        formData.append(`product_image`, item.product_image); // Multer will handle multiple files
+      if (item.product_image instanceof File) {
+        formData.append('product_image', item.product_image);
       }
     });
-  
+
     try {
-      await axios.post(`${baseURL}/save-repair-details`, dataToSave);
+      console.log("Sending data to API...");
+      const response = await axios.post(`${baseURL}/save-order-details`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+
+      console.log("Data saved successfully.");
       alert("Data saved successfully");
   
       // Generate PDF Blob
+      console.log("Generating PDF document...");
       const pdfDoc = (
         <PDFLayout
           formData={formData}
@@ -404,20 +408,25 @@ const SalesForm = () => {
       );
   
       const pdfBlob = await pdf(pdfDoc).toBlob();
+      console.log("PDF blob created:", pdfBlob);
   
       // Create a download link and trigger it
+      console.log("Triggering download for PDF...");
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
       link.download = `invoice-${formData.invoice_number}.pdf`;
       link.click();
   
       // Clean up
+      console.log("Cleaning up after download...");
       URL.revokeObjectURL(link.href);
   
       // Clear all data after saving
+      console.log("Clearing data...");
       clearData();
   
       // Reset the form and reload the page if necessary
+      console.log("Resetting form and reloading page...");
       resetForm();
       window.location.reload();
     } catch (error) {
@@ -425,6 +434,7 @@ const SalesForm = () => {
       alert("Error saving data");
     }
   };
+  
   
   const resetForm = () => {
     setFormData({
