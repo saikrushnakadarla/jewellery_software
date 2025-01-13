@@ -24,7 +24,7 @@ function Customers() {
 
         // Filter only customers and format dates
         const customers = result
-          .filter((item) => item.account_group === 'CUSTOMERS')
+          .filter((item) => item.account_group === 'SUPPLIERS')
           .map((item) => ({
             ...item,
             birthday: formatDate(item.birthday),
@@ -43,7 +43,7 @@ function Customers() {
 
   return (
      <div>
-     <h3>Customers</h3>
+     <h3>SUPPLIERS</h3>
      <p style={{fontSize:'35px', marginTop:'20px'}}>
        <strong>
        {data.length}
