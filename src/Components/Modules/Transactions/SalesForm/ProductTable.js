@@ -2,18 +2,15 @@ import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
-const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
+const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
     return sum + stonePrice + makingCharges + rateAmt;
   }, 0);
-  console.log("Total Price=",taxableAmount)
-  
   const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
-  console.log("Net Amount=",netAmount)
 
   return (
     <Table bordered hover responsive>
@@ -42,11 +39,12 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
           <th>Tax %</th>
           <th>Tax Amount</th>
           <th>Total Price</th>
+         
           <th>Action</th> {/* Add Action column for delete */}
         </tr>
       </thead>
       <tbody>
-      {repairDetails.length > 0 ? (
+        {repairDetails.length > 0 ? (
           repairDetails.map((detail, index) => (
             <tr key={index}>
               <td>{detail.date}</td>
@@ -72,27 +70,41 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
               <td>{detail.tax_percent}</td>
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>
-              <td>
-              <Button
-              variant="primary"
-              onClick={() => onEdit(index)}
-              style={{ marginRight: "8px" }}
-            >
-             <FaEdit style={{ marginRight: "4px" }} />
-            </Button>
-                <Button variant="danger" onClick={() => onDelete(index)}>  <FaTrashAlt style={{ marginRight: "4px" }} /></Button>
-              </td>
+              
+               <td>
+                            <Button
+                            variant="primary"
+                            onClick={() => onEdit(index)}
+                            style={{ marginRight: "8px" }}
+                          >
+                           <FaEdit style={{ marginRight: "4px" }} />
+                          </Button>
+                              <Button variant="danger" onClick={() => onDelete(index)}>  <FaTrashAlt style={{ marginRight: "4px" }} /></Button>
+                            </td>
             </tr>
           ))
         ) : (
           <tr>
-            <td colSpan="24" className="text-center">
+            <td colSpan="25" className="text-center">
               No data available
             </td>
           </tr>
         )}
       </tbody>
-      
+      {/* <tfoot>
+        <tr>
+          <td colSpan="20" className="text-right">Taxable Amount</td> 
+          <td colSpan="5">{taxableAmount.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td colSpan="20" className="text-right">Tax Amount</td> 
+          <td colSpan="5">{taxAmount.toFixed(2)}</td>
+        </tr>
+        <tr>
+          <td colSpan="20" className="text-right">Net Amount</td> 
+          <td colSpan="5">{netAmount.toFixed(2)}</td>
+        </tr>
+      </tfoot> */}
     </Table>
   );
 };

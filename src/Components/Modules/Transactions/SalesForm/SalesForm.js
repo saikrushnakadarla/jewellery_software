@@ -289,7 +289,7 @@ const SalesForm = () => {
   
     try {
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
-      alert("Data saved successfully");
+      alert("Sales added successfully");
   
       // Generate PDF Blob
       const pdfDoc = (
