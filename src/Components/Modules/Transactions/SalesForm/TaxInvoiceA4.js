@@ -221,98 +221,94 @@ const TaxINVoiceReceipt = ({
         schemeAmount,
         netPayableAmount,
       }) => {
-        
+        // Log customer details to verify they are dynamically fetched
+        console.log("Customer Details:");
+        console.log("Account Name:", formData.account_name);
+        console.log("City:", formData.city);
+        console.log("Mobile:", formData.mobile);
+        console.log("PAN No:", formData.pan_card);
+        console.log("GSTIN:", formData.gst_in);
+        console.log("Invoice Number:", formData.invoice_number);
+        console.log("Date:", formData.date);
+      
         // Calculate total values
         const totalValues = repairDetails.reduce(
-                (totals, item) => {
-                        return {
-                                qty: totals.qty + Number(item.qty || 0),
-                                grossWeight: totals.grossWeight + Number(item.gross_weight || 0),
-                                stoneWeight: totals.stoneWeight + Number(item.stone_weight || 0),
-                                netWeight: totals.netWeight + Number(item.weight_bw || 0),
-                                rate: totals.rate + Number(item.rate || 0),
-                                makingCharges: totals.makingCharges + Number(item.making_charges || 0),
-                                stonePrice: totals.stonePrice + Number(item.stone_price || 0),
-                                rateAmount: totals.rateAmount + Number(item.rate_amt || 0),
-                        };
-                },
-                {
-                        qty: 0,
-                        grossWeight: 0,
-                        stoneWeight: 0,
-                        netWeight: 0,
-                        rate: 0,
-                        makingCharges: 0,
-                        stonePrice: 0,
-                        rateAmount: 0,
-                }
+          (totals, item) => {
+            return {
+              qty: totals.qty + Number(item.qty || 0),
+              grossWeight: totals.grossWeight + Number(item.gross_weight || 0),
+              stoneWeight: totals.stoneWeight + Number(item.stone_weight || 0),
+              netWeight: totals.netWeight + Number(item.weight_bw || 0),
+              rate: totals.rate + Number(item.rate || 0),
+              makingCharges: totals.makingCharges + Number(item.making_charges || 0),
+              stonePrice: totals.stonePrice + Number(item.stone_price || 0),
+              rateAmount: totals.rateAmount + Number(item.rate_amt || 0),
+            };
+          },
+          {
+            qty: 0,
+            grossWeight: 0,
+            stoneWeight: 0,
+            netWeight: 0,
+            rate: 0,
+            makingCharges: 0,
+            stonePrice: 0,
+            rateAmount: 0,
+          }
         );
+      
         const netBillValue = totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount;
-
-    // Convert the value into words
-    const netBillValueInWords = toWords(netBillValue).replace(/(^\w|\s\w)/g, m => m.toUpperCase()); // Capitalize words
-
+      
+        // Convert the value into words
+        const netBillValueInWords = toWords(netBillValue).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase()); // Capitalize words
+      
         return (
-                <Document>
-                        <Page size="A4" style={styles.page}>
-                                {/* First Row */}
-                                <View style={styles.row}>
-                                        <View style={[styles.column, { marginTop: 20, width: '20%', marginLeft: 20, fontFamily: 'Times-Bold' }]}>
-                                                <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
-                                                <Text style={{ marginBottom: 5 }}>Account Name: {formData.account_name}</Text>
-
-                                                <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
-                                                <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
-                                                <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text>
-                                        </View>
-
-                                        <View style={[styles.column, { width: '40%' }]}>
-                                                <Image
-                                                        style={styles.image1}
-                                                        src={logo1}
-                                                />
-                                        </View>
-                                        <View style={[styles.column, { width: '10%' }]}>
-
-                                                {/* <Image
-                                                        style={styles.image2}
-                                                        src={logo2}
-                                                /> */}
-                                        </View>
-
-                                        <View style={[styles.column, { marginTop: 0, width: '20%', marginLeft: 20, fontFamily: 'Times-Bold' }]}>
-                                                <Text style={{ fontWeight: 'bold', fontSize: 12, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text>
-                                                {/* <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                                                        <Barcode value="SV1224" format="CODE128" width={1.5} height={50} />
-                                                </View> */}
-
-                                                {/* BILL NO */}
-                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
-                                                        <Text>BILL NO:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.invoice_number}</Text>
-                                                </View>
-
-                                                {/* DATE */}
-                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
-                                                        <Text>DATE:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.date}</Text>
-                                                </View>
-
-                                                {/* STAFF */}
-                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
-                                                        <Text>STAFF:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>Sadashri Jewels</Text>
-                                                </View>
-
-                                                {/* GSTIN */}
-                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
-                                                        <Text>GSTIN:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.gst_in}</Text>
-                                                </View>
-                                        </View>
-
-                                </View>
-
+          <Document>
+            <Page size="A4" style={styles.page}>
+              {/* First Row */}
+              <View style={styles.row}>
+                <View style={[styles.column, { marginTop: 20, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
+                  <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
+                  <Text style={{ marginBottom: 5 }}>Account Name:{formData.customer_id || ""}</Text>
+                  <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
+                  <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
+                  <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text>
+                </View>
+      
+                <View style={[styles.column, { width: "40%" }]}>
+                  <Image style={styles.image1} src={logo1} />
+                </View>
+      
+                <View style={[styles.column, { width: "10%" }]}></View>
+      
+                <View style={[styles.column, { marginTop: 0, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
+                  <Text style={{ fontWeight: "bold", fontSize: 12, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text>
+      
+                  {/* BILL NO */}
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                    <Text>BILL NO:</Text>
+                    <Text style={{ textAlign: "right", flex: 1 }}>{formData.invoice_number}</Text>
+                  </View>
+      
+                  {/* DATE */}
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                    <Text>DATE:</Text>
+                    <Text style={{ textAlign: "right", flex: 1 }}>{formData.date}</Text>
+                  </View>
+      
+                  {/* STAFF */}
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                    <Text>STAFF:</Text>
+                    <Text style={{ textAlign: "right", flex: 1 }}>Sadashri Jewels</Text>
+                  </View>
+      
+                  {/* GSTIN */}
+                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                    <Text>GSTIN:</Text>
+                    <Text style={{ textAlign: "right", flex: 1 }}>{formData.gst_in}</Text>
+                  </View>
+                </View>
+              </View>
 
 
                                 <View style={styles.container}>

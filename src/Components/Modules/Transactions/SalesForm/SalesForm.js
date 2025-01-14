@@ -268,7 +268,7 @@ const SalesForm = () => {
   
 
   const handleSave = async () => {
-    const formData = new FormData();
+    // const formData = new FormData();
 
     const dataToSave = {
       repairDetails: repairDetails.map(item => ({
