@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Col, Row, Button } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 import { Table } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
 
 const PaymentDetails = ({
   paymentDetails,
@@ -18,35 +19,23 @@ const PaymentDetails = ({
   schemeAmount,
   netPayableAmount,
   netAmount
-
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
-  // const taxableAmount = repairDetails.reduce((sum, item) => {
-  //   const stonePrice = parseFloat(item.stone_price) || 0;
-  //   const makingCharges = parseFloat(item.making_charges) || 0;
-  //   const rateAmt = parseFloat(item.rate_amt) || 0;
-  //   return sum + stonePrice + makingCharges + rateAmt;
-  // }, 0);
-  // console.log("Total Price=",taxableAmount)
-  
-  // const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
-  // const netAmount = taxableAmount + taxAmount;
-  // console.log("Net Amount=",netAmount)
+  const location = useLocation();
 
-  // const oldItemsAmount = oldSalesData.reduce(
-  //   (sum, item) => sum + parseFloat(item.total_amount || 0),
-  //   0
-  // );
+  useEffect(() => {
+    // Set the default payment details from location.state if available
+    if (location.state?.cash_amount || location.state?.card_amt || location.state?.chq_amt || location.state?.online_amt) {
+      setPaymentDetails((prev) => ({
+        ...prev,
+        cash_amount: location.state.cash_amount || prev.cash_amount,
+        card_amt: location.state.card_amt || prev.card_amt,
+        chq_amt: location.state.chq_amt || prev.chq_amt,
+        online_amt: location.state.online_amt || prev.online_amt,
+      }));
+    }
+  }, [location.state, setPaymentDetails]);
 
-  // // Calculate Scheme Amount (sum of paid_amount from schemeSalesData)
-  // const schemeAmount = schemeSalesData.reduce(
-  //   (sum, item) => sum + parseFloat(item.paid_amount || 0),
-  //   0
-  // );
-
-  // // Calculate Net Payable Amount
-  // const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);
-  // Calculate total entered amount
   useEffect(() => {
     // Sum of all payment details
     const totalEnteredAmount =
@@ -64,24 +53,23 @@ const PaymentDetails = ({
 
   return (
     <div>
-    <Col className="sales-form-section">
-      <Row>
-        <h4 className="mb-3">Summary</h4>
-        <Table bordered hover responsive>
-        <tr>
-          <td colSpan="20" className="text-right">Taxable Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{taxableAmount.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colSpan="20" className="text-right">Tax Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{taxAmount.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colSpan="20" className="text-right">Net Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{netAmount.toFixed(2)}</td>
-        </tr>
-
-        <tr>
+      <Col className="sales-form-section">
+        <Row>
+          <h4 className="mb-3">Summary</h4>
+          <Table bordered hover responsive>
+            <tr>
+              <td colSpan="20" className="text-right">Taxable Amount</td>
+              <td colSpan="4">{taxableAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Tax Amount</td>
+              <td colSpan="4">{taxAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Net Amount</td>
+              <td colSpan="4">{netAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
               <td colSpan="20" className="text-right">Old Items Amount</td>
               <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
             </tr>
@@ -94,9 +82,10 @@ const PaymentDetails = ({
               <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
             </tr>
           </Table>
-      </Row>
-    </Col>
-        <Col className="sales-form-section">
+        </Row>
+      </Col>
+
+      <Col className="sales-form-section">
         <Row>
           <h4 className="mb-3">Payment Details</h4>
           <Col xs={12} md={4}>
@@ -170,7 +159,7 @@ const PaymentDetails = ({
           </Col>
         </Row>
       </Col>
-      </div>
+    </div>
   );
 };
 

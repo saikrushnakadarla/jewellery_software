@@ -161,30 +161,32 @@ const StockEntryTable = (selectedProduct) => {
   // Define the columns for the table
   const columns = React.useMemo(
     () => [
-
-      // { Header: 'Product ID', accessor: 'product_id' },
+      {
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+      },
       { Header: 'Category', accessor: 'category' },
       { Header: 'Sub Category', accessor: 'sub_category' },
       { Header: 'Product Name', accessor: 'product_Name' },
       // { Header: 'Metal Type', accessor: 'metal_type' },
       { Header: 'Design Master', accessor: 'design_master' },
-      { Header: 'Pricing', accessor: 'Pricing' },
-      { Header: 'Pcode/Barcode', accessor: 'PCode_BarCode' },
+      // { Header: 'Pricing', accessor: 'Pricing' },
+      { Header: 'Barcode', accessor: 'PCode_BarCode' },
       // { Header: 'Purity', accessor: 'Purity' },
       // { Header: 'Prefix', accessor: 'Prefix' },
       // { Header: 'BarCode', accessor: 'PCode_BarCode' },
       { Header: 'Gross Weight', accessor: 'Gross_Weight' },
       { Header: 'Stones Weight', accessor: 'Stones_Weight' },
-      { Header: 'Stones Price', accessor: 'Stones_Price' },
-      { Header: 'Weight (WW)', accessor: 'Weight_BW' },
-      { Header: 'Wastage On', accessor: 'Wastage_On' },
+      // { Header: 'Stones Price', accessor: 'Stones_Price' },
+      // { Header: 'Weight (WW)', accessor: 'Weight_BW' },
+      // { Header: 'Wastage On', accessor: 'Wastage_On' },
 
       { Header: 'Wasatage%', accessor: 'Wastage_Percentage' },
-      { Header: 'Wastage', accessor: 'WastageWeight' },
-      { Header: 'Weight', accessor: 'TotalWeight_AW' },
-      { Header: 'Making Charges On', accessor: 'Making_Charges_On' },
+      // { Header: 'Wastage', accessor: 'WastageWeight' },
+      { Header: 'Total Weight', accessor: 'TotalWeight_AW' },
+      // { Header: 'Making Charges On', accessor: 'Making_Charges_On' },
       { Header: 'Making Charges', accessor: 'Making_Charges' },
-      { Header: 'Stock Point', accessor: 'Stock_Point' },
+      // { Header: 'Stock Point', accessor: 'Stock_Point' },
       { Header: 'Status', accessor: 'Status' },
       {
         Header: 'Action',

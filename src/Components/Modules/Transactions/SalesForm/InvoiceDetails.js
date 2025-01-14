@@ -18,14 +18,14 @@ const InvoiceDetails = ({ formData, setFormData }) => {
 
   // Update formData.invoice_number from location.state
   useEffect(() => {
-    if (location.state?.invoice_number) {
+    if (location.state?.invoice_number && formData.invoice_number !== location.state.invoice_number) {
       console.log("Received Invoice Number from navigation:", location.state.invoice_number);
       setFormData((prev) => ({
         ...prev,
         invoice_number: location.state.invoice_number,
       }));
     }
-  }, [location.state, setFormData]);
+  }, [location.state, formData.invoice_number, setFormData]);
 
   return (
     <Col className="sales-form-section">

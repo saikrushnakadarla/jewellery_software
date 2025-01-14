@@ -50,7 +50,7 @@ const SchemeSalesForm = ({ setSchemeSalesData }) => {
       );
       setEditingRow(null);
     } else {
-      if (schemeDetails.scheme && schemeDetails.member_name && schemeDetails.member_number) {
+      if (schemeDetails.member_name && schemeDetails.member_number) {
         const newData = [...schemeTableData, schemeDetails];
         setSchemeTableData(newData);
         setSchemeDetails({

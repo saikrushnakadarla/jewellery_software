@@ -165,8 +165,7 @@ const SalesForm = () => {
   
 
   const [editIndex, setEditIndex] = useState(null);
-  
-  // Function to handle editing a product
+
   const handleAdd = () => {
     setRepairDetails([...repairDetails, { ...formData }]);
     resetProductFields();
@@ -186,8 +185,6 @@ const SalesForm = () => {
     resetProductFields();
   };
 
-
-  // Handle product delete
   const handleDelete = (indexToDelete) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       setRepairDetails(repairDetails.filter((_, index) => index !== indexToDelete));
@@ -195,7 +192,6 @@ const SalesForm = () => {
     }
   };
 
-  // Reset product fields
   const resetProductFields = () => {
     setFormData(prev => ({
       ...prev,
@@ -241,6 +237,74 @@ const SalesForm = () => {
     return savedData ? JSON.parse(savedData) : [];
   });
 
+
+  
+  const resetForm = () => {
+    setFormData({
+      customer_id: "",
+      mobile: "",
+      account_name: "",
+      email: "",
+      address1: "",
+      address2: "",
+      city: "",
+      pincode: "",
+      state: "",
+      state_code: "",
+      aadhar_card: "",
+      gst_in: "",
+      pan_card: "",
+      date: "",
+      invoice_number: "",
+    });
+    setPaymentDetails({
+      cash_amount: 0,
+      card_amt: 0,
+      chq: "",
+      chq_amt: 0,
+      online: "",
+      online_amt: 0,
+    });
+  };
+
+  const handleBack = () => {
+    navigate("/salestable");
+  };
+
+  const handleAddCustomer = () => {
+    navigate("/customermaster", { state: { from: "/sales" } });
+  };
+
+  const taxableAmount = repairDetails.reduce((sum, item) => {
+    const stonePrice = parseFloat(item.stone_price) || 0;
+    const makingCharges = parseFloat(item.making_charges) || 0;
+    const rateAmt = parseFloat(item.rate_amt) || 0;
+    return sum + stonePrice + makingCharges + rateAmt;
+  }, 0);
+  console.log("Total Price=",taxableAmount)
+  
+  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  const netAmount = taxableAmount + taxAmount;
+  console.log("Net Amount=",netAmount)
+
+  const oldItemsAmount = location.state?.old_exchange_amt
+  ? parseFloat(location.state.old_exchange_amt)
+  : oldSalesData.reduce(
+      (sum, item) => sum + parseFloat(item.total_amount || 0),
+      0
+    );
+
+const schemeAmount = location.state?.scheme_amt
+  ? parseFloat(location.state.scheme_amt)
+  : schemeSalesData.reduce(
+      (sum, item) => sum + parseFloat(item.paid_amount || 0),
+      0
+    );
+
+  // Calculate Net Payable Amount
+  const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);
+
+
   const clearData = () => {
     setOldSalesData([]);
     setSchemeSalesData([]);
@@ -268,11 +332,24 @@ const SalesForm = () => {
   
 
   const handleSave = async () => {
-    // const formData = new FormData();
-
+    // Include customer details in the data being saved
     const dataToSave = {
       repairDetails: repairDetails.map(item => ({
         ...item,
+        customer_id: formData.customer_id,
+        mobile: formData.mobile,
+        account_name: formData.account_name,
+        email: formData.email,
+        address1: formData.address1,
+        address2: formData.address2,
+        city: formData.city,
+        pincode: formData.pincode,
+        state: formData.state,
+        state_code: formData.state_code,
+        aadhar_card: formData.aadhar_card,
+        gst_in: formData.gst_in,
+        pan_card: formData.pan_card,
+        terms: formData.terms,
         cash_amount: paymentDetails.cash_amount || 0,
         card_amount: paymentDetails.card || 0,
         card_amt: paymentDetails.card_amt || 0,
@@ -329,73 +406,6 @@ const SalesForm = () => {
       alert("Error saving data");
     }
   };
-  
-  
-  
-  
-  
-
-  const resetForm = () => {
-    setFormData({
-      customer_id: "",
-      mobile: "",
-      account_name: "",
-      email: "",
-      address1: "",
-      address2: "",
-      city: "",
-      pincode: "",
-      state: "",
-      state_code: "",
-      aadhar_card: "",
-      gst_in: "",
-      pan_card: "",
-      date: "",
-      invoice_number: "",
-    });
-    setPaymentDetails({
-      cash_amount: 0,
-      card_amt: 0,
-      chq: "",
-      chq_amt: 0,
-      online: "",
-      online_amt: 0,
-    });
-  };
-
-  const handleBack = () => {
-    navigate("/salestable");
-  };
-
-  const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/sales" } });
-  };
-
-  const taxableAmount = repairDetails.reduce((sum, item) => {
-    const stonePrice = parseFloat(item.stone_price) || 0;
-    const makingCharges = parseFloat(item.making_charges) || 0;
-    const rateAmt = parseFloat(item.rate_amt) || 0;
-    return sum + stonePrice + makingCharges + rateAmt;
-  }, 0);
-  console.log("Total Price=",taxableAmount)
-  
-  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
-  const netAmount = taxableAmount + taxAmount;
-  console.log("Net Amount=",netAmount)
-
-  const oldItemsAmount = oldSalesData.reduce(
-    (sum, item) => sum + parseFloat(item.total_amount || 0),
-    0
-  );
-
-  // Calculate Scheme Amount (sum of paid_amount from schemeSalesData)
-  const schemeAmount = schemeSalesData.reduce(
-    (sum, item) => sum + parseFloat(item.paid_amount || 0),
-    0
-  );
-
-  // Calculate Net Payable Amount
-  const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);
 
   return (
     <div className="main-container">

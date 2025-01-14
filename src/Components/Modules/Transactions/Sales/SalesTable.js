@@ -93,6 +93,12 @@ const RepairsTable = () => {
           return bal_after_receipts ? bal_after_receipts : bal_amt || 0
         },
       },
+      // {
+      //   Header: 'Scheme Amt',
+      //   accessor: 'cash_amount',
+      //   Cell: ({ value }) => value || 0
+      // },
+     
 
 
       {
@@ -106,13 +112,21 @@ const RepairsTable = () => {
             />
             {/* Edit Icon */}
             <FaEdit
-        style={{
-          cursor: 'pointer',
-          marginLeft: '10px',
-          color: 'blue',
-        }}
-        onClick={() => handleEdit(row.original.invoice_number, row.original.mobile)} // Pass mobile
-      />
+            style={{
+              cursor: 'pointer',
+              marginLeft: '10px',
+              color: 'blue',
+            }}
+            onClick={() => handleEdit(row.original.invoice_number,
+              row.original.mobile,
+              row.original.old_exchange_amt,
+              row.original.scheme_amt,
+              row.original.cash_amount,
+              row.original.card_amt,
+              row.original.chq_amt,
+              row.original.online_amt,
+            )} 
+          />
             <FaTrash
               style={{
                 cursor: 'pointer',
@@ -147,7 +161,7 @@ const RepairsTable = () => {
     []
   );
 
-  const handleEdit = async (invoice_number, mobile) => {
+  const handleEdit = async (invoice_number, mobile,scheme_amt,old_exchange_amt,cash_amount,card_amt,chq_amt,online_amt) => {
     try {
       const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
       const details = response.data;
@@ -162,31 +176,34 @@ const RepairsTable = () => {
       localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
     
       console.log('fetching repair details:', details.repeatedData);
-      navigate('/sales', { state: {invoice_number, mobile, repairDetails: details } });
+      navigate('/sales', { state: {invoice_number, mobile,old_exchange_amt,scheme_amt,cash_amount,card_amt,chq_amt,online_amt, repairDetails: details } });
     
       // Call handleDelete without confirmation
-      // await handleDelete(invoice_number, true); 
+      await handleDelete(invoice_number, true, true);
       
     } catch (error) {
       console.error('Error fetching repair details:', error);
     }
   };
   
-  const handleDelete = async (invoiceNumber, skipConfirmation = false) => {
+  const handleDelete = async (invoiceNumber, skipConfirmation = false, skipMessage = false) => {
     if (skipConfirmation) {
-      // Skip the confirmation and directly proceed with the deletion
       try {
-        const response = await axios.delete(`${baseURL}/repair-details/${invoiceNumber}`);
-        if (response.status === 200) {
-          Swal.fire('Deleted!', response.data.message, 'success');
-          // Update the table data by removing the deleted record
+        const response = await axios.delete(
+          `${baseURL}/repair-details/${invoiceNumber}`,
+          { params: { skipMessage } } // Pass skipMessage as a query parameter
+        );
+        if (response.status === 200 || response.status === 204) {
+          if (!skipMessage) {
+            Swal.fire('Deleted!', response.data.message, 'success');
+          }
           setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
         }
       } catch (error) {
         console.error('Error deleting repair details:', error);
         Swal.fire('Error!', 'Failed to delete repair details. Please try again.', 'error');
       }
-    } else {
+    }  else {
       // Show the confirmation alert
       Swal.fire({
         title: 'Are you sure?',
