@@ -528,14 +528,14 @@ const handleBarcodeChange = async (code) => {
       if (tag) {
         setIsBarcodeSelected(true);  // Set the barcode as selected
         // If the tag is marked as "Sold"
-        if (tag.Status === "Sold") {
-          alert("The product is already sold out!");
-          setFormData((prevData) => ({
-            ...prevData,
-          }));
-          setIsQtyEditable(true); // Allow editing of qty
-          return;
-        }
+        // if (tag.Status === "Sold") {
+        //   alert("The product is already sold out!");
+        //   setFormData((prevData) => ({
+        //     ...prevData,
+        //   }));
+        //   setIsQtyEditable(true); // Allow editing of qty
+        //   return;
+        // }
 
         const productId = tag.product_id;
         const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
