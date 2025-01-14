@@ -117,7 +117,7 @@ const ProductDetails = ({
           onChange={handleChange}
         />
       </Col>
-      <Col xs={12} md={1}>
+      <Col xs={12} md={2}>
         <InputField
           label="Weight BW"
           name="weight_bw"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Form } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import CustomerDetails from './CustomerDetails';
 import InvoiceDetails from './InvoiceDetails';
@@ -17,7 +17,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import PDFLayout from './TaxInvoiceA4';
 
 const SalesForm = () => {
-  
+  const location = useLocation();
   const navigate = useNavigate();
     const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
@@ -358,27 +358,13 @@ const handleSave = async () => {
     // First, append all the repair details as JSON string
     const repairDetailsWithPayment = repairDetails.map(item => ({
       ...item,
-      customer_id: formData.customer_id,
-        mobile: formData.mobile,
-        account_name: formData.account_name,
-        email: formData.email,
-        address1: formData.address1,
-        address2: formData.address2,
-        city: formData.city,
-        pincode: formData.pincode,
-        state: formData.state,
-        state_code: formData.state_code,
-        aadhar_card: formData.aadhar_card,
-        gst_in: formData.gst_in,
-        pan_card: formData.pan_card,
-        terms: formData.terms,
-        cash_amount: paymentDetails.cash_amount || 0,
-        card_amount: paymentDetails.card || 0,
-        card_amt: paymentDetails.card_amt || 0,
-        chq: paymentDetails.chq || "",
-        chq_amt: paymentDetails.chq_amt || 0,
-        online: paymentDetails.online || "",
-        online_amt: paymentDetails.online_amt || 0,
+      cash_amount: paymentDetails.cash_amount || 0,
+      card_amount: paymentDetails.card || 0,
+      card_amt: paymentDetails.card_amt || 0,
+      chq: paymentDetails.chq || "",
+      chq_amt: paymentDetails.chq_amt || 0,
+      online: paymentDetails.online || "",
+      online_amt: paymentDetails.online_amt || 0,
     }));
 
     // Append the JSON data as strings
@@ -498,16 +484,19 @@ const handleSave = async () => {
   const netAmount = taxableAmount + taxAmount;
   console.log("Net Amount=",netAmount)
 
-  const oldItemsAmount = oldSalesData.reduce(
-    (sum, item) => sum + parseFloat(item.total_amount || 0),
-    0
-  );
+  const oldItemsAmount = location.state?.old_exchange_amt
+  ? parseFloat(location.state.old_exchange_amt)
+  : oldSalesData.reduce(
+      (sum, item) => sum + parseFloat(item.total_amount || 0),
+      0
+    );
 
-  // Calculate Scheme Amount (sum of paid_amount from schemeSalesData)
-  const schemeAmount = schemeSalesData.reduce(
-    (sum, item) => sum + parseFloat(item.paid_amount || 0),
-    0
-  );
+const schemeAmount = location.state?.scheme_amt
+  ? parseFloat(location.state.scheme_amt)
+  : schemeSalesData.reduce(
+      (sum, item) => sum + parseFloat(item.paid_amount || 0),
+      0
+    );
 
   // Calculate Net Payable Amount
   const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);

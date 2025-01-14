@@ -18,7 +18,6 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
         <tr>
           <th>Date</th>
           <th>Invoice Number</th>
-          <th>Code</th>
           <th>Product Name</th>
           <th>Metal Type</th>
           <th>Design Name</th>
@@ -49,7 +48,6 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
             <tr key={index}>
               <td>{detail.date}</td>
               <td>{detail.invoice_number}</td>
-              <td>{detail.code}</td>
               <td>{detail.product_name}</td>
               <td>{detail.metal_type}</td>
               <td>{detail.design_name}</td>

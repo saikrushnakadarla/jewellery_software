@@ -161,30 +161,40 @@ const RepairsTable = () => {
     []
   );
 
-  const handleEdit = async (invoice_number, mobile,scheme_amt,old_exchange_amt,cash_amount,card_amt,chq_amt,online_amt) => {
+  const handleEdit = async (invoice_number, mobile, scheme_amt, old_exchange_amt, cash_amount, card_amt, chq_amt, online_amt) => {
     try {
       const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
       const details = response.data;
-      
+  
       // Retrieve existing repair details from localStorage or set to an empty array if not available
       const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
-      
+  
+      // Get today's date in yyyy-mm-dd format
+      const today = new Date().toISOString().split('T')[0];
+  
+      // Set the date for repeatedData items to today's date
+      const formattedDetails = details.repeatedData.map((item) => {
+        item.date = today; // Override the date with today's date
+        return item;
+      });
+  
       // Add the new repair details (flatten the repeatedData if it's an array)
-      const updatedDetails = [...existingDetails, ...details.repeatedData]; // Merge repeatedData directly
-      
+      const updatedDetails = [...existingDetails, ...formattedDetails];
+  
       // Save the updated array back to localStorage
       localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
-    
-      console.log('fetching repair details:', details.repeatedData);
-      navigate('/sales', { state: {invoice_number, mobile,old_exchange_amt,scheme_amt,cash_amount,card_amt,chq_amt,online_amt, repairDetails: details } });
-    
+  
+      console.log('fetching repair details:', formattedDetails);
+      navigate('/sales', { state: { invoice_number, mobile, old_exchange_amt, scheme_amt, cash_amount, card_amt, chq_amt, online_amt, repairDetails: details } });
+  
       // Call handleDelete without confirmation
       await handleDelete(invoice_number, true, true);
-      
+  
     } catch (error) {
       console.error('Error fetching repair details:', error);
     }
   };
+  
   
   const handleDelete = async (invoiceNumber, skipConfirmation = false, skipMessage = false) => {
     if (skipConfirmation) {
@@ -231,8 +241,6 @@ const RepairsTable = () => {
     }
   };
   
-
-
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
