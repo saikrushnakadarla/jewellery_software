@@ -360,7 +360,11 @@ const schemeAmount = location.state?.scheme_amt
       })),
       oldItems: oldSalesData,
       memberSchemes: schemeSalesData,
+      oldItemsAmount: oldItemsAmount || 0, // Explicitly include value
+      schemeAmount: schemeAmount || 0,    // Explicitly include value
     };
+  
+    console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
   
     console.log("Saving data:", dataToSave);
   
@@ -406,6 +410,7 @@ const schemeAmount = location.state?.scheme_amt
       alert("Error saving data");
     }
   };
+  
 
   return (
     <div className="main-container">
