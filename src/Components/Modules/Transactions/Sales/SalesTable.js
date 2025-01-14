@@ -192,8 +192,6 @@ const RepairsTable = () => {
     }
   };
   
-  
-  
   const handleDelete = async (invoiceNumber, skipConfirmation = false) => {
     if (skipConfirmation) {
       // Skip the confirmation and directly proceed with the deletion

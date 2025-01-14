@@ -72,15 +72,15 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
               <td>{detail.total_price}</td>
               
                <td>
-                            <Button
-                            variant="primary"
-                            onClick={() => onEdit(index)}
-                            style={{ marginRight: "8px" }}
-                          >
-                           <FaEdit style={{ marginRight: "4px" }} />
-                          </Button>
-                              <Button variant="danger" onClick={() => onDelete(index)}>  <FaTrashAlt style={{ marginRight: "4px" }} /></Button>
-                            </td>
+                <Button
+                  variant="primary"
+                  onClick={() => onEdit(index)}
+                  style={{ marginRight: "8px" }}
+                >
+                <FaEdit style={{ marginRight: "4px" }} />
+                </Button>
+                <Button variant="danger" onClick={() => onDelete(index)}>  <FaTrashAlt style={{ marginRight: "4px" }} /></Button>
+                </td>
             </tr>
           ))
         ) : (
