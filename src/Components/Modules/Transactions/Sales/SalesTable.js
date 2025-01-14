@@ -25,25 +25,6 @@ const RepairsTable = () => {
     }
   }, [mobile]);
 
-
-  // const handleEdit = async (invoice_number) => {
-  //   try {
-  //     const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
-  //     setRepairDetails(response.data); // Store the fetched repair details
-  //     const details=response.data
-  //     console.log('fetching repair details:', details.repeatedData);
-  //     navigate('/sales', { state: { repairDetails: response.data } });
-  //     await handleDelete(invoice_number);
-  //   } catch (error) {
-  //     console.error('Error fetching repair details:', error);
-  //   }
-  // };
-
-  // const handleEdit = (details) => {
-  //   setRepairDetails(details); // Set the repair details to state
-  //   navigate('/sales', { state: { repairDetails: details } }); // Navigate with state
-  // };
-
   const columns = React.useMemo(
     () => [
       {
@@ -181,14 +162,10 @@ const RepairsTable = () => {
       localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
     
       console.log('fetching repair details:', details.repeatedData);
-
-      
-
-      // Pass the fetched data to the next route
       navigate('/sales', { state: {invoice_number, mobile, repairDetails: details } });
     
       // Call handleDelete without confirmation
-      await handleDelete(invoice_number, true); 
+      // await handleDelete(invoice_number, true); 
       
     } catch (error) {
       console.error('Error fetching repair details:', error);

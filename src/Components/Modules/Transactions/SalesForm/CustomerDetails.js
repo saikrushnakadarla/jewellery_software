@@ -5,9 +5,6 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { useLocation } from "react-router-dom";
 const CustomerDetails = ({ formData, handleCustomerChange, handleAddCustomer, customers }) => {
   const location = useLocation();
-    
-    
-
   // Update formData.mobile if mobile is passed via location.state
   useEffect(() => {
     if (location.state?.mobile) {
