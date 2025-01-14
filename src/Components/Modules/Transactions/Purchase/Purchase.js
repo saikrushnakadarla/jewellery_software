@@ -962,31 +962,25 @@ const URDPurchase = () => {
                       <td>{data.total_amount}</td>
                       <td>{data.paid_amount}</td>
                       <td>{data.balance_amount}</td>
-                      <td style={{ display: 'flex' }}>
+                      <td style={{ display: 'flex', alignItems: 'center' }}>
                         <button
                           type="button"
                           className="btn btn-primary"
-                          style={{ backgroundColor: 'rgb(163, 110, 41)', width: '102px' }}
+                          style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', width: '102px',fontSize: '0.875rem', }}
                           onClick={() => handleOpenModal(data)} // Pass entire row data
                         >
                           Tag Entry
                         </button>
-                        <button
-                          type="button"
-                          className="action-button edit-button"
+                        <FaEdit
+                          style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue' }}
                           onClick={() => handleEdit(index)}
                           disabled={editingIndex !== null}
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          type="button"
-                          className="action-button delete-button"
+                        />
+                        <FaTrash
+                          style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
                           onClick={() => handleDelete(index)}
                           disabled={editingIndex !== null}
-                        >
-                          <FaTrash />
-                        </button>
+                        />
                       </td>
                     </tr>
                   ))}

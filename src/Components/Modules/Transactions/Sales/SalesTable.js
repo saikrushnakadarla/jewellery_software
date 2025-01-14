@@ -112,27 +112,19 @@ const RepairsTable = () => {
             />
             {/* Edit Icon */}
             <FaEdit
-            style={{
-              cursor: 'pointer',
-              marginLeft: '10px',
-              color: 'blue',
-            }}
-            onClick={() => handleEdit(row.original.invoice_number,
-              row.original.mobile,
-              row.original.old_exchange_amt,
-              row.original.scheme_amt,
-              row.original.cash_amount,
-              row.original.card_amt,
-              row.original.chq_amt,
-              row.original.online_amt,
-            )} 
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
+              onClick={() => handleEdit(row.original.invoice_number,
+                row.original.mobile,
+                row.original.old_exchange_amt,
+                row.original.scheme_amt,
+                row.original.cash_amount,
+                row.original.card_amt,
+                row.original.chq_amt,
+                row.original.online_amt,
+              )} 
           />
             <FaTrash
-              style={{
-                cursor: 'pointer',
-                marginLeft: '10px',
-                color: 'red',
-              }}
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
               onClick={() => handleDelete(row.original.invoice_number)}
             />
           </div>
@@ -147,13 +139,20 @@ const RepairsTable = () => {
 
           return (
             <Button
-              style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+              style={{
+                backgroundColor: '#28a745',
+                borderColor: '#28a745',
+                fontSize: '0.875rem', // Smaller font size
+                padding: '0.25rem 0.5rem', // Reduced padding
+              }}
               onClick={() => handleAddReceipt(row.original)} // Pass the row data to handle the receipt creation
               disabled={net_bill_amount === totalPaid} // Disable button if net_bill_amount equals totalPaid
             >
               Add Receipt
             </Button>
           );
+          
+          
         },
       },
 

@@ -188,18 +188,15 @@ function CompanyInfo() {
       {
         Header: "Action",
         Cell: ({ row }) => (
-          <div className="d-flex align-items-center">
-            <button className="action-button edit-button"
+          <div>
+            <FaEdit 
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
               onClick={() => handleEdit(row.original)}
-            >
-              <FaEdit />
-            </button>
-            <button
-              className="action-button delete-button"
+            />
+            <FaTrash
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
               onClick={() => handleDelete(row.original.id)}
-            >
-              <FaTrash />
-            </button>
+            />
           </div>
         ),
       },

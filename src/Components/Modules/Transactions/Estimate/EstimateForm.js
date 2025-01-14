@@ -922,12 +922,12 @@ const handleBarcodeChange = async (code) => {
           <td>
             <div className="d-flex align-items-center">
               <FaEdit
-                className="action-icon edit-icon"
+                style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue' }}
                 onClick={() => handleEdit(index)}
-                style={{ cursor: 'pointer', marginRight: 10 }}
+                
               />
               <FaTrash
-                className="action-icon delete-icon"
+                style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
                 onClick={() => handleDelete(index)}
               />
             </div>

@@ -155,31 +155,23 @@ const handlePopoverToggle = (event, repairId) => {
         Header: 'ACTION',
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
-            <button
-              className="action-button view-button"
+            <FaEye
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
               // onClick={() => navigate(`/repairsview/${row.original.repair_id}`)}
               onClick={() => handleViewClick(row.original)}
-            >
-              <FaEye />
-            </button>
-            <button
-              className="action-button edit-button"
+            />
+            <FaEdit
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
               onClick={() => handleRepairEdit(row.original.repair_id)}
-            >
-              <FaEdit />
-            </button>
-            <button
-              className="action-button delete-button"
+            />
+            <FaTrash
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
               onClick={() => handleDeleteRepair(row.original.repair_id)}
-            >
-              <FaTrash />
-            </button>
-            <button
-              className="action-button sticky-note-button"
+            />
+            <FiAlignJustify
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'grey', }}
               onClick={(e) => handlePopoverToggle(e, row.original.repair_id)}
-            >
-              <FiAlignJustify />
-            </button>
+            />
           </div>
         ),
       },

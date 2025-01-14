@@ -398,21 +398,24 @@ const RepairsTable = () => {
         Header: 'Actions',
         Cell: ({ row }) => (
           <>
-            <Button
-              variant="primary"
-              size="sm"
-              className="me-2"
+            <FaEdit
+              style={{
+                cursor: 'pointer',
+                marginLeft: '10px',
+                color: 'blue',
+              }}
               onClick={() => handleEdit(row.original)}
-            >
-              <FaEdit />
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
+            />
+              
+            <FaTrash
+               style={{
+                cursor: 'pointer',
+                marginLeft: '10px',
+                color: 'red',
+              }}
               onClick={() => handleDelete(row.original.urdpurchase_number)}
-            >
-              <FaTrash />
-            </Button>
+            />
+              
           </>
         ),
       },

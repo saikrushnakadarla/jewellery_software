@@ -183,7 +183,7 @@ const [taxOptions, setTaxOptions] = useState([]);
   const columns = React.useMemo(
     () => [
       // { Header: 'Category ID:', accessor: 'product_id' },
-      { Header: 'Category Name:', accessor: 'product_name' },
+      { Header: 'Category Name', accessor: 'product_name' },
       { Header: 'Barcode', accessor: 'rbarcode' },
       { Header: 'Metal Type', accessor: 'Category' },
       // { Header: 'Design Master', accessor: 'design_master' },
@@ -192,16 +192,16 @@ const [taxOptions, setTaxOptions] = useState([]);
       // { Header: 'Short Name:', accessor: 'short_name' },
       // { Header: 'Sale Account Head', accessor: 'sale_account_head' },
       // { Header: 'Purchase Account Head:', accessor: 'purchase_account_head' },
-      { Header: 'Tax Slab', accessor: 'tax_slab' },
+      { Header: 'Tax', accessor: 'tax_slab' },
       { Header: 'HSN Code', accessor: 'hsn_code' },
       // { Header: 'Maintain Tags', accessor: 'maintain_tags' },
-      { Header: 'Purchase Qty', accessor: 'pur_qty' },
+      { Header: 'Pur Qty', accessor: 'pur_qty' },
       // { Header: 'OP. Value:', accessor: 'op_value' },
-      { Header: 'Purchase Weight', accessor: 'pur_weight' },
+      { Header: 'Pur Weight', accessor: 'pur_weight' },
       { Header: 'Sale Qty', accessor: 'sale_qty' },
       { Header: 'Sale Weight', accessor: 'sale_weight' },
-      { Header: 'Sale Return Qty', accessor: 'salereturn_qty' },
-      { Header: 'Sale Return Weight', accessor: 'salereturn_weight' },
+      // { Header: 'Sale Return Qty', accessor: 'salereturn_qty' },
+      // { Header: 'Sale Return Weight', accessor: 'salereturn_weight' },
       { Header: 'Bal Qty', accessor: 'bal_qty' },
       { Header: 'Bal Weight', accessor: 'bal_weight' },
       // { Header: 'HUID No:', accessor: 'huid_no' },
@@ -209,26 +209,16 @@ const [taxOptions, setTaxOptions] = useState([]);
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => (
-          <>
-             <div className="d-flex align-items-center">
-                       <button
-                         className="action-button edit-button"
-                         onClick={() => handleUpdate(row.original)}
-                       >
-                         <FaEdit />
-                       </button>
-                       <button
-                         className="action-button delete-button"
-                         onClick={() => handleDelete(row.original.product_id)}
-                       >
-                         <FaTrash />
-                       </button>
-                     </div>
-
-                     <>
-           
-          </>
-          </>
+          <div >
+            <FaEdit
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
+              onClick={() => handleUpdate(row.original)}
+            />
+            <FaTrash
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
+              onClick={() => handleDelete(row.original.product_id)}
+            />
+          </div> 
         ),
       },
     ],

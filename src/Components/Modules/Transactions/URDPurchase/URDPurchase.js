@@ -6,6 +6,7 @@ import { renderMatches, useNavigate, useLocation } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 
 const URDPurchase = () => {
   const navigate = useNavigate();
@@ -746,12 +747,10 @@ useEffect(() => {
                     <td>{item.rate}</td>
                     <td>{item.total_amount}</td>
                     <td>
-                    <Button
-                      variant="danger"
+                    <FaTrash
+                      style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
                       onClick={() => handleDeleteItem(index)}
-                    >
-                      Delete
-                    </Button>
+                    />
                   </td>
                   </tr>
                 ))}

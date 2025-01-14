@@ -102,13 +102,15 @@ const handleDelete = async (id) => {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => (
-          <Button
-            variant="danger"
-            onClick={() => handleDelete(row.original.id)}
-            disabled={loading}
-          >
-            <FaTrash />
-          </Button>
+          <FaTrash
+            style={{
+              cursor: 'pointer',
+              marginLeft: '10px',
+              color: 'red',
+            }}
+          onClick={() => handleDelete(row.original.id)}
+          disabled={loading}
+          />
         ),
       },
       {
@@ -120,7 +122,12 @@ const handleDelete = async (id) => {
   
           return (
             <Button
-              style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
+            style={{
+              backgroundColor: '#28a745',
+              borderColor: '#28a745',
+              fontSize: '0.875rem', // Smaller font size
+              padding: '0.25rem 0.5rem', // Reduced padding
+            }}
               onClick={() => handleAddReceipt(row.original)}
               disabled={total_amount === totalPaid} // Disable button if total_amount equals totalPaid
             >

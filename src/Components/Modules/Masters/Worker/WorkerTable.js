@@ -43,25 +43,19 @@ const WorkerTable = () => {
       {
         Header: 'Action',
         Cell: ({ row }) => (
-          <div className="d-flex align-items-center">
-            <button
-              className="action-button view-button"
+          <div >
+            <FaEye
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
               onClick={() => handleView(row.original)}
-            >
-              <FaEye />
-            </button>
-            <button
-              className="action-button edit-button"
+            />            
+            <FaEdit
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
               onClick={() => handleEdit(row.original.account_id)}
-            >
-              <FaEdit />
-            </button>
-            <button
-              className="action-button delete-button"
+            />            
+            <FaTrash
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
               onClick={() => handleDelete(row.original.account_id)}
-            >
-              <FaTrash />
-            </button>
+            />            
           </div>
         ),
       },

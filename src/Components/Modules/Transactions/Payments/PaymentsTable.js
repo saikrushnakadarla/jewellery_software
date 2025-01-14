@@ -57,13 +57,19 @@ const RepairsTable = () => {
         Cell: ({ row }) => (
           <div>
           <FaEdit
-            className="edit-icon"
-            style={{ color: 'blue', cursor: 'pointer', marginRight: '10px' }}
+           style={{
+            cursor: 'pointer',
+            marginLeft: '10px',
+            color: 'blue',
+          }}
             onClick={() => handleEdit(row.original)}
           />
           <FaTrash
-            className="delete-icon"
-            style={{ color: 'red', cursor: 'pointer' }}
+             style={{
+              cursor: 'pointer',
+              marginLeft: '10px',
+              color: 'red',
+            }}
             onClick={() => handleDelete(row.original.id)}
           />
         </div>
