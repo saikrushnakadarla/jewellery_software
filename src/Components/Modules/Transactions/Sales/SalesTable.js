@@ -125,13 +125,13 @@ const RepairsTable = () => {
             />
             {/* Edit Icon */}
             <FaEdit
-              style={{
-                cursor: 'pointer',
-                marginLeft: '10px',
-                color: 'blue',
-              }}
-              onClick={() => handleEdit(row.original.invoice_number)}
-            />
+        style={{
+          cursor: 'pointer',
+          marginLeft: '10px',
+          color: 'blue',
+        }}
+        onClick={() => handleEdit(row.original.invoice_number, row.original.mobile)} // Pass mobile
+      />
             <FaTrash
               style={{
                 cursor: 'pointer',
@@ -166,7 +166,7 @@ const RepairsTable = () => {
     []
   );
 
-  const handleEdit = async (invoice_number) => {
+  const handleEdit = async (invoice_number, mobile) => {
     try {
       const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
       const details = response.data;
@@ -181,12 +181,15 @@ const RepairsTable = () => {
       localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
     
       console.log('fetching repair details:', details.repeatedData);
+
       
+
       // Pass the fetched data to the next route
-      navigate('/sales');
+      navigate('/sales', { state: {invoice_number, mobile, repairDetails: details } });
     
       // Call handleDelete without confirmation
       await handleDelete(invoice_number, true); 
+      
     } catch (error) {
       console.error('Error fetching repair details:', error);
     }
