@@ -264,7 +264,7 @@ const RepairsTable = () => {
     if (result.isConfirmed) {
       try {
         // Fetch repair details
-        const response = await axios.get(`${baseURL}/get-order-details/${invoice_number}`);
+        const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
         const details = response.data;
   
         // Verify if the API returned data
@@ -346,14 +346,14 @@ const RepairsTable = () => {
   //     }
   //   });
   // };
-
   const handleDelete = async (invoiceNumber, skipConfirmation = false, skipMessage = false) => {
     if (skipConfirmation) {
       try {
         const response = await axios.delete(
-          `${baseURL}/repair-details/${invoiceNumber}`,
-          { params: { skipMessage } } // Pass skipMessage as a query parameter
+          `${baseURL}/order-details/${invoiceNumber}`,
+          { params: { skipMessage: skipMessage ? 'true' : 'false' } } // Pass skipMessage as query parameter
         );
+  
         if (response.status === 200 || response.status === 204) {
           if (!skipMessage) {
             Swal.fire('Deleted!', response.data.message, 'success');
@@ -364,7 +364,7 @@ const RepairsTable = () => {
         console.error('Error deleting repair details:', error);
         Swal.fire('Error!', 'Failed to delete repair details. Please try again.', 'error');
       }
-    }  else {
+    } else {
       // Show the confirmation alert
       Swal.fire({
         title: 'Are you sure?',
@@ -377,10 +377,11 @@ const RepairsTable = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            const response = await axios.delete(`${baseURL}/order-details/${invoiceNumber}`);
+            const response = await axios.delete(
+              `${baseURL}/order-details/${invoiceNumber}`
+            );
             if (response.status === 200) {
               Swal.fire('Deleted!', response.data.message, 'success');
-              // Update the table data by removing the deleted record
               setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
             }
           } catch (error) {
@@ -391,6 +392,7 @@ const RepairsTable = () => {
       });
     }
   };
+  
 
   const handleCloseModal = () => {
     setShowModal(false);
