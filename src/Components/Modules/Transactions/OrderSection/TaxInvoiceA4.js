@@ -306,7 +306,7 @@ const TaxINVoiceReceipt = ({
                                                 {/* GSTIN */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>GSTIN:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.gst_in}</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>29ABMCS9253K1ZG</Text>
                                                 </View>
                                         </View>
 

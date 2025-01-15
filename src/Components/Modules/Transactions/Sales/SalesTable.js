@@ -160,7 +160,16 @@ const RepairsTable = () => {
     []
   );
 
-  const handleEdit = async (invoice_number, mobile, scheme_amt, old_exchange_amt, cash_amount, card_amt, chq_amt, online_amt) => {
+  const handleEdit = async (
+    invoice_number,
+    mobile,
+    scheme_amt,
+    old_exchange_amt,
+    cash_amount,
+    card_amt,
+    chq_amt,
+    online_amt
+  ) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to edit this record?',
@@ -174,8 +183,16 @@ const RepairsTable = () => {
   
     if (result.isConfirmed) {
       try {
+        // Fetch repair details
         const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
         const details = response.data;
+  
+        // Verify if the API returned data
+        if (!details || !details.repeatedData) {
+          console.error('No repeatedData found in response:', details);
+          Swal.fire('Error', 'No repair details found for the provided invoice number.', 'error');
+          return;
+        }
   
         // Retrieve existing repair details from localStorage or set to an empty array if not available
         const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
@@ -183,32 +200,48 @@ const RepairsTable = () => {
         // Get today's date in yyyy-mm-dd format
         const today = new Date().toISOString().split('T')[0];
   
-        // Set the date for repeatedData items to today's date
-        const formattedDetails = details.repeatedData.map((item) => {
-          item.date = today; // Override the date with today's date
-          return item;
-        });
+        // Update repeatedData with today's date
+        const formattedDetails = details.repeatedData.map((item) => ({
+          ...item,
+          date: today,
+          invoice_number, // Ensure the invoice_number is explicitly included
+        }));
   
-        // Add the new repair details (flatten the repeatedData if it's an array)
+        // Combine existing details with the new ones
         const updatedDetails = [...existingDetails, ...formattedDetails];
   
-        // Save the updated array back to localStorage
+        // Save updated details back to localStorage
         localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
   
-        console.log('fetching repair details:', formattedDetails);
-        navigate('/sales', { state: { invoice_number, mobile, old_exchange_amt, scheme_amt, cash_amount, card_amt, chq_amt, online_amt, repairDetails: details } });
+        console.log('Updated repair details added to localStorage:', updatedDetails);
+  
+        // Navigate to the sales page with state
+        navigate('/sales', {
+          state: {
+            invoice_number,
+            mobile,
+            old_exchange_amt,
+            scheme_amt,
+            cash_amount,
+            card_amt,
+            chq_amt,
+            online_amt,
+            repairDetails: details,
+          },
+        });
   
         // Call handleDelete without confirmation
         await handleDelete(invoice_number, true, true);
       } catch (error) {
         console.error('Error fetching repair details:', error);
+        Swal.fire('Error', 'Unable to fetch repair details. Please try again.', 'error');
       }
     } else {
       Swal.fire('Cancelled', 'Edit operation was cancelled.', 'info');
     }
   };
   
-  
+   
   const handleDelete = async (invoiceNumber, skipConfirmation = false, skipMessage = false) => {
     if (skipConfirmation) {
       try {

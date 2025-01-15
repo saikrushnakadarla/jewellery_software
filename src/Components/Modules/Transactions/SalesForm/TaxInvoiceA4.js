@@ -269,7 +269,7 @@ const TaxINVoiceReceipt = ({
               <View style={styles.row}>
                 <View style={[styles.column, { marginTop: 20, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
                   <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
-                  <Text style={{ marginBottom: 5 }}>Account Name:{formData.customer_id || ""}</Text>
+                  <Text style={{ marginBottom: 5 }}>Account Name:{formData.account_name || ""}</Text>
                   <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
                   <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
                   <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text>
@@ -305,7 +305,7 @@ const TaxINVoiceReceipt = ({
                   {/* GSTIN */}
                   <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                     <Text>GSTIN:</Text>
-                    <Text style={{ textAlign: "right", flex: 1 }}>{formData.gst_in}</Text>
+                    <Text style={{ textAlign: "right", flex: 1 }}>29ABMCS9253K1ZG</Text>
                   </View>
                 </View>
               </View>
