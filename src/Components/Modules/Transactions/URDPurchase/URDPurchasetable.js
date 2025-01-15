@@ -6,6 +6,7 @@ import baseURL from '../../../../Url/NodeBaseURL';
 import axios from "axios";
 import InputField from "../../../Pages/InputField/InputField";
 import { FaTrash, FaEdit } from 'react-icons/fa'; // Import icons
+import './URDPurchasetable.css';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -444,119 +445,120 @@ const RepairsTable = () => {
         <DataTable columns={columns} data={data} initialSearchValue={initialSearchValue} />
 
         {/* Edit Modal */}
-        <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal 
+  show={showEditModal} 
+  onHide={() => setShowEditModal(false)} 
+  dialogClassName="custom-modal-width"
+>
   <Modal.Header closeButton>
     <Modal.Title>Edit Record</Modal.Title>
   </Modal.Header>
-  <Modal.Body style={{    backgroundColor:" rgba(163, 110, 41, 0.08)"}}>
+  <Modal.Body style={{ backgroundColor: "rgba(163, 110, 41, 0.08)" }}>
     <Row>
-    <Col xs={12} md={2}>
-                <InputField
-                  label="Product"
-                  name="product_name"
-                  value={productDetails.product_name}
-                  onChange={handleInputChange}
-
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Metal"
-                  name="metal"
-                  type="select"
-                  value={formData.metal}
-                  onChange={handleInputChange}
-                  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Purity"
-                  type="select"
-                  name="purity"
-                  value={productDetails.purity}
-                  onChange={handleInputChange}
-                  options={purityOptions.map((purity) => ({
-                    value: purity.name,
-                    label: purity.name,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="HSN Code"
-                  name="hsn_code"
-                  type="text"
-                  value={formData.hsn_code}
-                  onChange={handleInputChange}
-                  readOnly // Make it read-only
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Gross"
-                  type="number"
-                  name="gross"
-                  value={productDetails.gross}
-                  onChange={handleInputChange}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Dust"
-                  type="number"
-                  name="dust"
-                  value={productDetails.dust}
-                  onChange={handleInputChange}
-                />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField
-                  label="ML %"
-                  type="number"
-                  name="ml_percent"
-                  value={productDetails.ml_percent}
-                  onChange={handleInputChange}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Net WT"
-                  type="number"
-                  name="eqt_wt"
-                  value={productDetails.eqt_wt}
-                  onChange={handleInputChange}
-                />
-              </Col>
-                       
-              <Col xs={12} md={2}>
-                     
-                <InputField
-                  label="Rate"
-                  name="rate"
-                  value={productDetails.rate || currentRate}
-                  onChange={handleInputChange}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Amount"
-                  type="number"
-                  name="total_amount"
-                  value={productDetails.total_amount}
-                  onChange={handleInputChange}
-                  readOnly
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Remarks"
-                  type="text"
-                  name="remarks"
-                  value={productDetails.remarks}
-                  onChange={handleInputChange}
-                />
-              </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Product"
+          name="product_name"
+          value={productDetails.product_name}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Metal"
+          name="metal"
+          type="select"
+          value={formData.metal}
+          onChange={handleInputChange}
+          options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Purity"
+          type="select"
+          name="purity"
+          value={productDetails.purity}
+          onChange={handleInputChange}
+          options={purityOptions.map((purity) => ({
+            value: purity.name,
+            label: purity.name,
+          }))}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="HSN Code"
+          name="hsn_code"
+          type="text"
+          value={formData.hsn_code}
+          onChange={handleInputChange}
+          readOnly // Make it read-only
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Gross"
+          type="number"
+          name="gross"
+          value={productDetails.gross}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Dust"
+          type="number"
+          name="dust"
+          value={productDetails.dust}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={1}>
+        <InputField
+          label="ML %"
+          type="number"
+          name="ml_percent"
+          value={productDetails.ml_percent}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Net WT"
+          type="number"
+          name="eqt_wt"
+          value={productDetails.eqt_wt}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Rate"
+          name="rate"
+          value={productDetails.rate || currentRate}
+          onChange={handleInputChange}
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Amount"
+          type="number"
+          name="total_amount"
+          value={productDetails.total_amount}
+          onChange={handleInputChange}
+          readOnly
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Remarks"
+          type="text"
+          name="remarks"
+          value={productDetails.remarks}
+          onChange={handleInputChange}
+        />
+      </Col>
     </Row>
   </Modal.Body>
   <Modal.Footer>
@@ -568,6 +570,7 @@ const RepairsTable = () => {
     </Button>
   </Modal.Footer>
 </Modal>
+
 
       </div>
     </div>
