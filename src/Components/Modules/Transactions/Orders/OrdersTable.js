@@ -240,37 +240,84 @@ const RepairsTable = () => {
     }
   };
 
-  const handleEdit = async (invoice_number, mobile, scheme_amt, old_exchange_amt, cash_amount, card_amt, chq_amt, online_amt) => {
-    try {
-      const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
-      const details = response.data;
+  const handleEdit = async (
+    invoice_number,
+    mobile,
+    scheme_amt,
+    old_exchange_amt,
+    cash_amount,
+    card_amt,
+    chq_amt,
+    online_amt
+  ) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to edit this record?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, go ahead!',
+      cancelButtonText: 'No, cancel',
+    });
   
-      // Retrieve existing repair details from localStorage or set to an empty array if not available
-      const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
+    if (result.isConfirmed) {
+      try {
+        // Fetch repair details
+        const response = await axios.get(`${baseURL}/get-order-details/${invoice_number}`);
+        const details = response.data;
   
-      // Get today's date in yyyy-mm-dd format
-      const today = new Date().toISOString().split('T')[0];
+        // Verify if the API returned data
+        if (!details || !details.repeatedData) {
+          console.error('No repeatedData found in response:', details);
+          Swal.fire('Error', 'No repair details found for the provided invoice number.', 'error');
+          return;
+        }
   
-      // Set the date for repeatedData items to today's date
-      const formattedDetails = details.repeatedData.map((item) => {
-        item.date = today; // Override the date with today's date
-        return item;
-      });
+        // Retrieve existing repair details from localStorage or set to an empty array if not available
+        const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
   
-      // Add the new repair details (flatten the repeatedData if it's an array)
-      const updatedDetails = [...existingDetails, ...formattedDetails];
+        // Get today's date in yyyy-mm-dd format
+        const today = new Date().toISOString().split('T')[0];
   
-      // Save the updated array back to localStorage
-      localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
+        // Update repeatedData with today's date
+        const formattedDetails = details.repeatedData.map((item) => ({
+          ...item,
+          date: today,
+          invoice_number, // Ensure the invoice_number is explicitly included
+        }));
   
-      console.log('fetching repair details:', formattedDetails);
-      navigate('/orders', { state: { invoice_number, mobile, old_exchange_amt, scheme_amt, cash_amount, card_amt, chq_amt, online_amt, repairDetails: details } });
+        // Combine existing details with the new ones
+        const updatedDetails = [...existingDetails, ...formattedDetails];
   
-      // Call handleDelete without confirmation
-      await handleDelete(invoice_number, true, true);
+        // Save updated details back to localStorage
+        localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
   
-    } catch (error) {
-      console.error('Error fetching repair details:', error);
+        console.log('Updated repair details added to localStorage:', updatedDetails);
+  
+        // Navigate to the sales page with state
+        navigate('/sales', {
+          state: {
+            invoice_number,
+            mobile,
+            old_exchange_amt,
+            scheme_amt,
+            cash_amount,
+            card_amt,
+            chq_amt,
+            online_amt,
+            repairDetails: details,
+          },
+        });
+  
+        // Call handleDelete without confirmation
+        await handleDelete(invoice_number, true, true);
+      } catch (error) {
+        console.error('Error fetching repair details:', error);
+        Swal.fire('Error', 'Unable to fetch repair details. Please try again.', 'error');
+      }
+    } else {
+      Swal.fire('Cancelled', 'Edit operation was cancelled.', 'info');
     }
   };
 
