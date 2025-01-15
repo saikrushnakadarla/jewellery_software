@@ -64,6 +64,17 @@ const URDPurchase = () => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
   
+      // Restrict paid_amount to not exceed total_amount
+      if (field === "paid_amount") {
+        const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
+        const paidAmount = parseFloat(value) || 0;
+  
+        if (paidAmount > totalAmount) {
+          alert("Paid amount cannot exceed the total amount.");
+          return prevFormData; // Prevent update
+        }
+      }
+  
       // If the category changes, update the hsn_code automatically
       if (field === "category") {
         const selectedCategory = categories.find(
@@ -154,6 +165,7 @@ const URDPurchase = () => {
       return updatedFormData;
     });
   };
+  
   
   const [tableData, setTableData] = useState(() => {
     const savedData = localStorage.getItem("tableData");
@@ -660,6 +672,16 @@ const URDPurchase = () => {
     navigate("/itemmaster", { state: { from: "/purchase" } });
   };
 
+  useEffect(() => {
+    // Set the current date in the desired format (YYYY-MM-DD)
+    const today = new Date().toISOString().split("T")[0];
+    setFormData((prevState) => ({
+      ...prevState,
+      bill_date: today,
+    }));
+  }, []);
+
+
   return (
     <div className="main-container">
       <div className="purchase-form-container">
@@ -749,10 +771,14 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("rate_cut", e.target.value)} />
                   </Col>
 
-                  <Col xs={12} md={3} >
-                    <InputField label="Bill Date" type="date" value={formData.bill_date}
-                      onChange={(e) => handleChange("bill_date", e.target.value)} />
-                  </Col>
+                  <Col xs={12} md={3}>
+      <InputField
+        label="Bill Date"
+        type="date"
+        value={formData.bill_date}
+        onChange={(e) => handleChange("bill_date", e.target.value)}
+      />
+    </Col>
                   <Col xs={12} md={3} >
                     <InputField label="Due Date" type="date" value={formData.due_date}
                       onChange={(e) => handleChange("due_date", e.target.value)} />
@@ -876,21 +902,21 @@ const URDPurchase = () => {
 
               </Col>
               <Col xs={12} md={2}>
-                <InputField
-                  label="Total Amount"
-                  type="number"
-                  value={formData.total_amount}
-                  readOnly // Prevent editing by the user
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label=" Paid Amount"
-                  type="number"
-                  value={formData.paid_amount}
-                  onChange={(e) => handleChange("paid_amount", e.target.value)}
-                />
-              </Col>
+        <InputField
+          label="Total Amount"
+          type="number"
+          value={formData.total_amount}
+          readOnly // Prevent editing by the user
+        />
+      </Col>
+      <Col xs={12} md={2}>
+        <InputField
+          label="Paid Amount"
+          type="number"
+          value={formData.paid_amount}
+          onChange={(e) => handleChange("paid_amount", e.target.value)}
+        />
+      </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Balance Amount"
