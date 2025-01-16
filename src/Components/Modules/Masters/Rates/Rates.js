@@ -15,7 +15,6 @@ const Rates = () => {
         silverRate: '',
     });
 
-    // Fetch data from the API when the component mounts
     useEffect(() => {
         const fetchRates = async () => {
             try {
@@ -23,10 +22,9 @@ const Rates = () => {
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Adjust UTC date to the local timezone
                     const utcDate = new Date(result.rate_date);
-                    const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000); // Adjust to local timezone
-                    const formattedDate = localDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                    const localDate = new Date(utcDate.getTime() - utcDate.getTimezoneOffset() * 60000);
+                    const formattedDate = localDate.toISOString().split('T')[0];
 
                     setRates({
                         currentDate: formattedDate,
@@ -36,7 +34,6 @@ const Rates = () => {
                         gold24: result.rate_24crt,
                         silverRate: result.silver_rate,
                     });
-                    console.log("Rates=",rates)
                 } else {
                     console.error('Error fetching rates:', result);
                 }
@@ -48,12 +45,34 @@ const Rates = () => {
         fetchRates();
     }, []);
 
+    const calculateRates = (gold22) => {
+        const gold22Value = parseFloat(gold22) || 0;
+
+        return {
+            gold16: (gold22Value * 16) / 22,
+            gold18: (gold22Value * 18) / 22,
+            gold24: (gold22Value * 24) / 22,
+        };
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setRates((prevRates) => ({
-            ...prevRates,
-            [name]: value,
-        }));
+
+        if (name === 'gold22') {
+            const calculatedRates = calculateRates(value);
+            setRates((prevRates) => ({
+                ...prevRates,
+                gold22: value,
+                gold16: calculatedRates.gold16.toFixed(2),
+                gold18: calculatedRates.gold18.toFixed(2),
+                gold24: calculatedRates.gold24.toFixed(2),
+            }));
+        } else {
+            setRates((prevRates) => ({
+                ...prevRates,
+                [name]: value,
+            }));
+        }
     };
 
     const handleUpdateRates = async () => {
@@ -164,7 +183,6 @@ const Rates = () => {
         </div>
     );
 };
-
 export default Rates;
 
 

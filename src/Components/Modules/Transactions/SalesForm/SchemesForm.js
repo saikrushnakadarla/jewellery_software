@@ -109,7 +109,7 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
       });
     } catch (error) {
       console.error("Error fetching scheme details:", error);
-      alert("Failed to fetch scheme details. Please check the mobile number.");
+      alert("There are no schemes available for this mobile number.");
     }
   };
   
