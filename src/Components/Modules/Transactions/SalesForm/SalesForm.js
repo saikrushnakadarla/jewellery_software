@@ -121,16 +121,17 @@ const SalesForm = () => {
     localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
   }, [paymentDetails]);
 
-  // Handle customer change
+  const [selectedMobile, setSelectedMobile] = useState("");
+
   const handleCustomerChange = (customerId) => {
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
-  
+
     if (customer) {
       setFormData((prevData) => ({
         ...prevData,
-        customer_id: customerId, // Update selected customer ID
-        account_name: customer.account_name || "", // Update customer name
-        mobile: customer.mobile || "", // Update mobile
+        customer_id: customerId,
+        account_name: customer.account_name || "",
+        mobile: customer.mobile || "",
         email: customer.email || "",
         address1: customer.address1 || "",
         address2: customer.address2 || "",
@@ -142,10 +143,9 @@ const SalesForm = () => {
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
       }));
+      setSelectedMobile(customer.mobile || ""); // Update selectedMobile
     } else {
-      // Reset the form if no customer matches
-      setFormData((prevData) => ({
-        ...prevData,
+      setFormData({
         customer_id: "",
         account_name: "",
         mobile: "",
@@ -159,10 +159,10 @@ const SalesForm = () => {
         aadhar_card: "",
         gst_in: "",
         pan_card: "",
-      }));
+      });
+      setSelectedMobile(""); // Reset selectedMobile
     }
   };
-  
 
   const [editIndex, setEditIndex] = useState(null);
 
@@ -430,7 +430,9 @@ const schemeAmount = location.state?.scheme_amt
                 handleCustomerChange={handleCustomerChange}
                 handleAddCustomer={handleAddCustomer}
                 customers={customers}
+                setSelectedMobile={setSelectedMobile} // Pass the setSelectedMobile function here
               />
+              
             </div>
             <div className="sales-form-right">
               <InvoiceDetails 
@@ -490,7 +492,11 @@ const schemeAmount = location.state?.scheme_amt
                 setSchemeSalesData={setSchemeSalesData}
                 schemeTableData={schemeTableData}
                 setSchemeTableData={setSchemeTableData}
+                
+               
+                selectedMobile={formData.mobile} // Pass selected mobile
                />
+              
             </div>
 
             <div className="sales-form-fourth">

@@ -1,19 +1,23 @@
+
+
 import React, { useEffect } from "react";
 import { Col, Row } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { useLocation } from "react-router-dom";
-const CustomerDetails = ({ formData, handleCustomerChange, handleAddCustomer, customers }) => {
+const CustomerDetails = ({ formData, handleCustomerChange, handleAddCustomer, customers, setSelectedMobile }) => {
   const location = useLocation();
-  // Update formData.mobile if mobile is passed via location.state
-  useEffect(() => {
+
+   // Inside useEffect
+   useEffect(() => {
     if (location.state?.mobile) {
       console.log("Received Mobile from navigation:", location.state.mobile);
       const customer = customers.find(
         (cust) => cust.mobile === location.state.mobile
       );
       if (customer) {
-        handleCustomerChange(customer.account_id); // Use account_id to update formData
+        handleCustomerChange(customer.account_id); // Update formData
+        setSelectedMobile(location.state.mobile); // Pass the mobile number
       }
     }
   }, [location.state?.mobile, customers]); // Add location.state.mobile and customers as dependencies
@@ -24,16 +28,22 @@ const CustomerDetails = ({ formData, handleCustomerChange, handleAddCustomer, cu
       <Row>
         <Col xs={12} md={3} className="d-flex align-items-center">
           <div style={{ flex: 1 }}>
-            <InputField
+          <InputField
               label="Mobile"
               name="mobile"
               type="select"
-              value={formData.customer_id || ""} // Ensure customer_id is used for selection
-              onChange={(e) => handleCustomerChange(e.target.value)} // Trigger handleCustomerChange
+              value={formData.customer_id || ""}
+              onChange={(e) => {
+                handleCustomerChange(e.target.value);
+                const selectedCustomer = customers.find(
+                  (customer) => customer.account_id === e.target.value
+                );
+                setSelectedMobile(selectedCustomer?.mobile || "");
+              }}
               options={[
                 ...customers.map((customer) => ({
-                  value: customer.account_id, // Use account_id as the value
-                  label: customer.mobile, // Display mobile as the label
+                  value: customer.account_id,
+                  label: customer.mobile,
                 })),
               ]}
             />

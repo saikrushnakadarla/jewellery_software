@@ -1,45 +1,118 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Col, Row, Button, Table } from "react-bootstrap";
 import InputField from "./../../Masters/ItemMaster/Inputfield";
-import baseURL from "../../../../Url/NodeBaseURL";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
 
-
-const SchemeSalesForm = ({ setSchemeSalesData }) => {
-
-   
+const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
   const [schemeDetails, setSchemeDetails] = useState({
-    scheme: '',
-    member_name: '',
-    member_number: '',
-    scheme_name: '',
-    installments_paid: '',
-    duration_months: '',
-    paid_months: '',
-    pending_months: '',
-    paid_amount: '',
-    pending_amount: '',
+    member_name: "",
+    member_number: selectedMobile || "", // Pre-fill member_number
+    scheme_name: "",
+    installments_paid: "",
+    duration_months: "",
+    paid_months: "",
+    pending_months: "",
+    paid_amount: "",
+    pending_amount: "",
     schemes_total_amount: "",
   });
 
-  const [schemeTableData, setSchemeTableData] = useState(() => {
-    const savedData = localStorage.getItem('schemeTableData');
-    return savedData ? JSON.parse(savedData) : [];
-  });
-
-  // Save to localStorage whenever table data changes
   useEffect(() => {
-    localStorage.setItem('schemeTableData', JSON.stringify(schemeTableData));
-    setSchemeSalesData(schemeTableData); // Update parent component's state
-  }, [schemeTableData, setSchemeSalesData]);
-  const [editingRow, setEditingRow] = useState(null);
+    if (selectedMobile && selectedMobile.length === 10) {
+      fetchSchemeDetails(selectedMobile);
+    }
+  }, [selectedMobile]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSchemeDetails((prevDetails) => ({
       ...prevDetails,
-      [name]: isNaN(value) ? value : Number(value),
+      [name]: value,
     }));
+
+    if (name === "member_number" && value.length === 10) {
+      fetchSchemeDetails(value);
+    }
   };
+
+  // const fetchSchemeDetails = async (mobileNumber) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://rahul455.pythonanywhere.com/api/member/phone_number/${mobileNumber}/`
+  //     );
+  //     const memberData = response.data[0];
+  //     setSchemeDetails({
+  //       member_name: memberData.name,
+  //       member_number: mobileNumber,
+  //       scheme_name: memberData.scheme.scheme_name,
+  //       installments_paid: memberData.paid_installments,
+  //       duration_months: memberData.scheme.scheme_maturity_period,
+  //       paid_months: memberData.paid_installments,
+  //       pending_months: memberData.due_installments,
+  //       paid_amount: memberData.total_paid_amount,
+  //       pending_amount: memberData.pending_amount,
+  //       schemes_total_amount: memberData.scheme.scheme_installment_amount,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error fetching scheme details:", error);
+  //     alert("Failed to fetch scheme details. Please check the mobile number.");
+  //   }
+  // };
+
+
+  const [schemeTableData, setSchemeTableData] = useState(() => {
+    const savedData = localStorage.getItem("schemeTableData");
+    return savedData ? JSON.parse(savedData) : [];
+  });
+
+  const [editingRow, setEditingRow] = useState(null);
+
+  useEffect(() => {
+    localStorage.setItem("schemeTableData", JSON.stringify(schemeTableData));
+    setSchemeSalesData(schemeTableData); // Update parent component's state
+  }, [schemeTableData, setSchemeSalesData]);
+
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+  //   if (name === "member_number" && value.length === 10) {
+  //     fetchSchemeDetails(value);
+  //   }
+  //   setSchemeDetails((prevDetails) => ({
+  //     ...prevDetails,
+  //     [name]: value,
+  //   }));
+
+  //   if (name === "member_number" && value.length === 10) {
+  //     fetchSchemeDetails(value);
+  //   }
+  // };
+
+  const fetchSchemeDetails = async (mobileNumber) => {
+    try {
+      const response = await axios.get(
+        `https://rahul455.pythonanywhere.com/api/member/phone_number/${mobileNumber}/`
+      );
+      const memberData = response.data[0];
+  
+      setSchemeDetails({
+        member_name: memberData.name,
+        member_number: mobileNumber,
+        scheme_name: memberData.scheme.scheme_name,
+        installments_paid: memberData.paid_installments,
+        duration_months: memberData.scheme.scheme_maturity_period,
+        paid_months: memberData.paid_installments,
+        pending_months: memberData.due_installments,
+        paid_amount: memberData.total_paid_amount,
+        pending_amount: memberData.pending_amount,
+        schemes_total_amount: memberData.scheme.scheme_installment_amount,
+      });
+    } catch (error) {
+      console.error("Error fetching scheme details:", error);
+      alert("Failed to fetch scheme details. Please check the mobile number.");
+    }
+  };
+  
 
   const handleAddButtonClick = () => {
     if (editingRow) {
@@ -54,7 +127,6 @@ const SchemeSalesForm = ({ setSchemeSalesData }) => {
         const newData = [...schemeTableData, schemeDetails];
         setSchemeTableData(newData);
         setSchemeDetails({
-          scheme: "",
           member_name: "",
           member_number: "",
           scheme_name: "",
@@ -64,7 +136,7 @@ const SchemeSalesForm = ({ setSchemeSalesData }) => {
           pending_months: "",
           paid_amount: "",
           pending_amount: "",
-          schemes_total_amount:"",
+          schemes_total_amount: "",
         });
       } else {
         alert("Please fill in all required fields.");
@@ -78,48 +150,100 @@ const SchemeSalesForm = ({ setSchemeSalesData }) => {
   };
 
   const handleDelete = (memberNumber) => {
-    setSchemeTableData((prevData) => prevData.filter((data) => data.member_number !== memberNumber));
+    setSchemeTableData((prevData) =>
+      prevData.filter((data) => data.member_number !== memberNumber)
+    );
   };
 
   const calculateTotalSum = () => {
-    return schemeTableData.reduce((sum, item) => sum + parseFloat(item.paid_amount || 0), 0).toFixed(2);
+    return schemeTableData
+      .reduce((sum, item) => sum + parseFloat(item.paid_amount || 0), 0)
+      .toFixed(2);
   };
-
-  
 
   return (
     <>
       <Row>
         <h4 className="mb-3">Schemes</h4>
-        {/* <Col xs={12} md={3}>
-          <InputField label="Scheme" name="scheme" value={schemeDetails.scheme} onChange={handleInputChange} />
-        </Col> */}
         <Col xs={12} md={3}>
-          <InputField label="Member Name" name="member_name" value={schemeDetails.member_name} onChange={handleInputChange} />
+          <InputField
+            label="Member Name"
+            name="member_name"
+            value={schemeDetails.member_name}
+            onChange={handleInputChange}
+            disabled
+          />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Member Number" name="member_number" value={schemeDetails.member_number} onChange={handleInputChange} />
+        <InputField
+          label="Member Number"
+          name="member_number"
+          value={schemeDetails.member_number}
+          onChange={handleInputChange}
+        />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Scheme Name" name="scheme_name" value={schemeDetails.scheme_name} onChange={handleInputChange} />
+          <InputField
+            label="Scheme Name"
+            name="scheme_name"
+            value={schemeDetails.scheme_name}
+            onChange={handleInputChange}
+            disabled
+          />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Installments Paid" name="installments_paid" value={schemeDetails.installments_paid} onChange={handleInputChange} />
+          <InputField
+            label="Installments Paid"
+            name="installments_paid"
+            value={schemeDetails.installments_paid}
+            onChange={handleInputChange}
+            disabled
+          />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Duration (Months)" name="duration_months" value={schemeDetails.duration_months} onChange={handleInputChange} />
+          <InputField
+            label="Duration (Months)"
+            name="duration_months"
+            value={schemeDetails.duration_months}
+            onChange={handleInputChange}
+            disabled
+          />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Paid Months" name="paid_months" value={schemeDetails.paid_months} onChange={handleInputChange} />
+          <InputField
+            label="Paid Months"
+            name="paid_months"
+            value={schemeDetails.paid_months}
+            onChange={handleInputChange}
+            disabled
+          />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Pending Months" name="pending_months" value={schemeDetails.pending_months} onChange={handleInputChange} />
+          <InputField
+            label="Pending Months"
+            name="pending_months"
+            value={schemeDetails.pending_months}
+            onChange={handleInputChange}
+            disabled
+          />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Paid Amount" name="paid_amount" value={schemeDetails.paid_amount} onChange={handleInputChange} />
+          <InputField
+            label="Paid Amount"
+            name="paid_amount"
+            value={schemeDetails.paid_amount}
+            onChange={handleInputChange}
+            disabled
+          />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Pending Amount" name="pending_amount" value={schemeDetails.pending_amount} onChange={handleInputChange} />
+          <InputField
+            label="Pending Amount"
+            name="pending_amount"
+            value={schemeDetails.pending_amount}
+            onChange={handleInputChange}
+            disabled
+          />
         </Col>
         <Col xs={12} md={2}>
           <Button onClick={handleAddButtonClick}>
@@ -156,10 +280,19 @@ const SchemeSalesForm = ({ setSchemeSalesData }) => {
               <td>{data.paid_amount}</td>
               <td>{data.pending_amount}</td>
               <td>
-                <Button variant="warning" size="sm" className="mr-2" onClick={() => handleEdit(data)}>
+                <Button
+                  variant="warning"
+                  size="sm"
+                  className="mr-2"
+                  onClick={() => handleEdit(data)}
+                >
                   Edit
                 </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDelete(data.member_number)}>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => handleDelete(data.member_number)}
+                >
                   Delete
                 </Button>
               </td>
@@ -172,8 +305,6 @@ const SchemeSalesForm = ({ setSchemeSalesData }) => {
         <h5>Total Amount for Schemes:</h5>
         <h5>₹ {calculateTotalSum()}</h5>
       </div>
-
-     
     </>
   );
 };
