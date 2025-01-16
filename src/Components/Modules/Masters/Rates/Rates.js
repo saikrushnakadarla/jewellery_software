@@ -47,11 +47,11 @@ const Rates = () => {
 
     const calculateRates = (gold22) => {
         const gold22Value = parseFloat(gold22) || 0;
-
+    
         return {
-            gold16: (gold22Value * 16) / 22,
-            gold18: (gold22Value * 18) / 22,
-            gold24: (gold22Value * 24) / 22,
+            gold16: Math.round((gold22Value * 16) / 22),
+            gold18: Math.round((gold22Value * 18) / 22),
+            gold24: Math.round((gold22Value * 24) / 22),
         };
     };
 
