@@ -3,9 +3,10 @@ import { Col, Row, Button } from "react-bootstrap";
 import OldSalesForm from "./OldForm";
 import SchemeSalesForm from "./SchemesForm";
 
-const SalesFormSection = ({ setOldSalesData, setSchemeSalesData }) => {
+// const SalesFormSection = ({ setOldSalesData, setSchemeSalesData }) => {
+//   const [activeForm, setActiveForm] = useState("old");
+const SalesFormSection = ({ setOldSalesData, setSchemeSalesData, selectedMobile }) => {
   const [activeForm, setActiveForm] = useState("old");
-
   return (
     <Col className="sales-form-section">
       <Row>
@@ -29,7 +30,11 @@ const SalesFormSection = ({ setOldSalesData, setSchemeSalesData }) => {
       {activeForm === "old" ? (
         <OldSalesForm setOldSalesData={setOldSalesData} />
       ) : (
-        <SchemeSalesForm setSchemeSalesData={setSchemeSalesData} />
+        // <SchemeSalesForm setSchemeSalesData={setSchemeSalesData} />
+        <SchemeSalesForm
+        setSchemeSalesData={setSchemeSalesData}
+        selectedMobile={selectedMobile} // Pass the selected mobile number
+      />
       )}
     </Col>
   );
