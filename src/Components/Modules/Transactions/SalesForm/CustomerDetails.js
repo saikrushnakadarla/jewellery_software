@@ -16,7 +16,8 @@ const CustomerDetails = ({ formData, handleCustomerChange, handleAddCustomer, cu
         handleCustomerChange(customer.account_id); // Use account_id to update formData
       }
     }
-  }, [location.state, customers]);
+  }, [location.state?.mobile, customers]); // Add location.state.mobile and customers as dependencies
+  
 
   return (
     <Col className="sales-form-section">

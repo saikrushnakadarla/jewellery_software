@@ -251,7 +251,9 @@ const URDPurchase = () => {
       const dataToSave = {
         formData: { ...formData,  }, // Include form data as it is
         table_data: tableData.map((row) => ({
-          ...row, 
+          ...row, // Include all row data
+          product_id: row.product_id, // Ensure product_id is explicitly sent for each row
+          balance_after_receipt: "0" 
         })),
       };
   
@@ -770,13 +772,13 @@ const URDPurchase = () => {
                   </Col>
 
                   <Col xs={12} md={3}>
-      <InputField
-        label="Bill Date"
-        type="date"
-        value={formData.bill_date}
-        onChange={(e) => handleChange("bill_date", e.target.value)}
-      />
-    </Col>
+                    <InputField
+                      label="Bill Date"
+                      type="date"
+                      value={formData.bill_date}
+                      onChange={(e) => handleChange("bill_date", e.target.value)}
+                    />
+                  </Col>
                   <Col xs={12} md={3} >
                     <InputField label="Due Date" type="date" value={formData.due_date}
                       onChange={(e) => handleChange("due_date", e.target.value)} />

@@ -173,8 +173,12 @@ const SalesForm = () => {
 
   const handleEdit = (index) => {
     setEditIndex(index);
-    setFormData(repairDetails[index]); // Populate form with selected item
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      ...repairDetails[index], // Merge repair details into formData
+    }));
   };
+  
 
   const handleUpdate = () => {
     const updatedDetails = repairDetails.map((item, index) =>

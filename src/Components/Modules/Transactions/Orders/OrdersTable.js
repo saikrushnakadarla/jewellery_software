@@ -296,7 +296,7 @@ const RepairsTable = () => {
         console.log('Updated repair details added to localStorage:', updatedDetails);
   
         // Navigate to the sales page with state
-        navigate('/sales', {
+        navigate('/orders', {
           state: {
             invoice_number,
             mobile,

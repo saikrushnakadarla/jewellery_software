@@ -92,20 +92,6 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
           </tr>
         )}
       </tbody>
-      {/* <tfoot>
-        <tr>
-          <td colSpan="20" className="text-right">Taxable Amount</td> 
-          <td colSpan="5">{taxableAmount.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colSpan="20" className="text-right">Tax Amount</td> 
-          <td colSpan="5">{taxAmount.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colSpan="20" className="text-right">Net Amount</td> 
-          <td colSpan="5">{netAmount.toFixed(2)}</td>
-        </tr>
-      </tfoot> */}
     </Table>
   );
 };
