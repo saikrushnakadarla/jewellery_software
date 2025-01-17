@@ -893,7 +893,7 @@ const URDPurchase = () => {
               </Col>
               <Col xs={12} md={2}>
                 <InputField
-                  label="Rate"
+                  label="Rate-Cut"
                   type="number"
                   value={formData.rate}
                   onChange={(e) => handleChange("rate", e.target.value)}

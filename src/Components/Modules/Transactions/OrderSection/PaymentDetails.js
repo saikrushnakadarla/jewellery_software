@@ -123,7 +123,7 @@ const PaymentDetails = ({
             style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
             // disabled={!isSubmitEnabled} 
           >
-            Check Out
+            Save
           </Button>
         </Col>
         {/* <Col xs={12} md={2}>

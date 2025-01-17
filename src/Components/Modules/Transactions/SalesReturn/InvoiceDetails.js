@@ -63,15 +63,15 @@ const InvoiceDetails = ({ formData, setFormData, filteredInvoices }) => {
         />
       </Row>
       <Row>
-        <Col xs={12} md={6}>
+        {/* <Col xs={12} md={6}>
           <InputField
             label="Terms"
             name="terms"
             value={formData.terms || ""}
             readOnly={true}
           />
-        </Col>
-        <Col xs={12} md={6}>
+        </Col> */}
+        <Col xs={12} md={12}>
           <InputField
             label="Date"
             name="date"

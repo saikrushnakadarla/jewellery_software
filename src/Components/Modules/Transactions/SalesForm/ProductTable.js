@@ -16,8 +16,8 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
     <Table bordered hover responsive>
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Invoice Number</th>
+          {/* <th>Date</th>
+          <th>Invoice Number</th> */}
           <th>Code</th>
           <th>Product Name</th>
           <th>Metal Type</th>
@@ -35,7 +35,7 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
           <th>MC Per Gram</th>
           <th>Making Charges</th>
           <th>Rate</th>
-          <th>Rate Amount</th>
+          {/* <th>Rate Amount</th> */}
           <th>Tax %</th>
           <th>Tax Amount</th>
           <th>Total Price</th>
@@ -47,8 +47,8 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
         {repairDetails.length > 0 ? (
           repairDetails.map((detail, index) => (
             <tr key={index}>
-              <td>{detail.date}</td>
-              <td>{detail.invoice_number}</td>
+              {/* <td>{detail.date}</td>
+              <td>{detail.invoice_number}</td> */}
               <td>{detail.code}</td>
               <td>{detail.product_name}</td>
               <td>{detail.metal_type}</td>
@@ -66,7 +66,7 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
               <td>{detail.mc_per_gram}</td>
               <td>{detail.making_charges}</td>
               <td>{detail.rate}</td>
-              <td>{detail.rate_amt}</td>
+              {/* <td>{detail.rate_amt}</td> */}
               <td>{detail.tax_percent}</td>
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>

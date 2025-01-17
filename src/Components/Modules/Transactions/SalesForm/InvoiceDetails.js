@@ -30,7 +30,7 @@ const InvoiceDetails = ({ formData, setFormData }) => {
   return (
     <Col className="sales-form-section">
       <Row>
-        <Col xs={12} md={6}>
+        {/* <Col xs={12} md={6}>
           <InputField
             label="Terms"
             type="select"
@@ -47,8 +47,8 @@ const InvoiceDetails = ({ formData, setFormData }) => {
               { value: "Credit", label: "Credit" },
             ]}
           />
-        </Col>
-        <Col xs={12} md={6}>
+        </Col> */}
+        <Col xs={12} md={12}>
           <InputField
             label="Date:"
             name="date"

@@ -134,8 +134,9 @@ const PaymentDetails = ({
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
               // disabled={!isSubmitEnabled} 
             >
-              Check Out
+              Save
             </Button>
+            
           </Col>
           {/* <Col xs={12} md={2}>
             <Button
@@ -152,7 +153,7 @@ const PaymentDetails = ({
               className="cus-back-btn"
               variant="secondary"
               onClick={handleBack}
-              style={{ backgroundColor: 'gray', marginRight: '10px' }}
+              style={{ backgroundColor: 'gray', marginLeft: '-60px' }}
             >
               Cancel
             </Button>
