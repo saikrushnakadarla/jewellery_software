@@ -20,11 +20,11 @@
 }
 
 .repair-form-left {
-  flex: 0 0 80%; /* 80% width */
+  flex: 0 0 85%; /* 80% width */
 }
 
 .repair-form-right {
-  flex: 0 0 20%; /* 20% width */
+  flex: 0 0 15%; /* 20% width */
 }
 
 

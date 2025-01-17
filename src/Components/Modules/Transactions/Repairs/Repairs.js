@@ -11,20 +11,19 @@ import { saveAs } from "file-saver";
 import PDFContent from "./RepairInvoice";
 
 const RepairForm = () => {
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date(); // Define today as a Date object
+  const formattedToday = today.toISOString().split("T")[0]; // Format today's date as YYYY-MM-DD
+  
+  const defaultDeliveryDate = new Date(); // Create a new Date object for the default delivery date
+  defaultDeliveryDate.setDate(today.getDate() + 3); // Add 3 days to today's date
+  
+  const formattedDate = defaultDeliveryDate.toISOString().split("T")[0];
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
   const { state } = useLocation();
-  // const { mobile } = state || {};  // Extract mobile from location state
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
-
-
-  // Set the mobile value in formData if passed via location state
-  // Set the mobile value in formData if passed via location state
-
-
   const [formData, setFormData] = useState({
     customer_id: "",
     account_name: "",
@@ -35,14 +34,14 @@ const RepairForm = () => {
     address3: "",
     city: "",
     staff: "",
-    delivery_date: "",
+    delivery_date: formattedDate,
     place: "",
     metal: "",
     counter: "",
     entry_type: "Repair",
     receipt_no: "",
     repair_no: "",
-    date: today,
+    date: formattedToday,
     metal_type: "",
     item: "",
     tag_no: "",
@@ -450,10 +449,6 @@ const RepairForm = () => {
               <InputField label="Delivery Date:" type="date" name="delivery_date" value={formData.delivery_date} onChange={handleChange} />
             </Col>
             <Col xs={12} md={3}>
-              <InputField label="Place:" name="place" value={formData.place} onChange={handleChange} />
-            </Col>
-
-            <Col xs={12} md={3}>
               <InputField label="Counter:" name="counter" value={formData.counter} onChange={handleChange} />
             </Col>
           </Row>
@@ -462,9 +457,18 @@ const RepairForm = () => {
               <Col className="form-section">
                 <h4>Repair Item Details</h4>
                 <Row>
+                <Col xs={12} md={3}>
+                    <InputField label="Category" name="category" value={formData.category} onChange={handleChange} />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField label="Sub Category" name="sub_category" value={formData.sub_category} onChange={handleChange} />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField label="Item name" name="item" value={formData.item} onChange={handleChange} />
+                  </Col>
                   <Col xs={12} md={2}>
                     <InputField
-                      label="Metal Type:"
+                      label="Metal Type"
                       name="metal_type"
                       type="select"
                       value={formData.metal_type}
@@ -477,12 +481,9 @@ const RepairForm = () => {
                       ]}
                     />
                   </Col>
-                  <Col xs={12} md={3}>
-                    <InputField label="Item:" name="item" value={formData.item} onChange={handleChange} />
-                  </Col>
-                  <Col xs={12} md={2}>
+                  {/* <Col xs={12} md={2}>
                     <InputField label="Tag No:" name="tag_no" value={formData.tag_no} onChange={handleChange} />
-                  </Col>
+                  </Col> */}
                   <Col xs={12} md={3}>
                     <InputField label="Description:" name="description" value={formData.description} onChange={handleChange} />
                   </Col>
@@ -501,6 +502,19 @@ const RepairForm = () => {
                       }
                     />
                   </Col>
+                  <Col xs={12} md={2}>
+                    <InputField label="Gross Weight" name="gross_weight" value={formData.gross_weight} onChange={handleChange} />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField label="Pcs" name="pcs" value={formData.pcs} onChange={handleChange} />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField label="Est Dust" name="est_dust" value={formData.est_dust} onChange={handleChange} />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField label="Est Amt" name="est_amt" value={formData.est_amt} onChange={handleChange} />
+                  </Col>
+
                 </Row>
               </Col>
             </div>
