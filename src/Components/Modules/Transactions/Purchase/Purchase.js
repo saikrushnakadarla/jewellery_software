@@ -165,8 +165,7 @@ const URDPurchase = () => {
       return updatedFormData;
     });
   };
-  
-  
+    
   const [tableData, setTableData] = useState(() => {
     const savedData = localStorage.getItem("tableData");
     return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
@@ -296,7 +295,8 @@ const URDPurchase = () => {
       });
       setTableData([]);
       localStorage.removeItem("purchaseFormData");
-      localStorage.removeItem("purchaseTableData");
+      localStorage.removeItem("tableData");
+      window.location.reload();
     } catch (error) {
       console.error("Error saving data:", error);
     }
@@ -770,13 +770,13 @@ const URDPurchase = () => {
                   </Col>
 
                   <Col xs={12} md={3}>
-      <InputField
-        label="Bill Date"
-        type="date"
-        value={formData.bill_date}
-        onChange={(e) => handleChange("bill_date", e.target.value)}
-      />
-    </Col>
+                    <InputField
+                      label="Bill Date"
+                      type="date"
+                      value={formData.bill_date}
+                      onChange={(e) => handleChange("bill_date", e.target.value)}
+                    />
+                  </Col>
                   <Col xs={12} md={3} >
                     <InputField label="Due Date" type="date" value={formData.due_date}
                       onChange={(e) => handleChange("due_date", e.target.value)} />
@@ -946,16 +946,16 @@ const URDPurchase = () => {
               <Table striped bordered hover className="mt-4">
                 <thead>
                   <tr>
-                    <th>product_id</th>
+                    {/* <th>product_id</th> */}
                     <th>Rbarcode</th>
                     <th>Category</th>
                     <th>Pieces</th>
                     <th>Gross</th>
                     <th>Stone</th>
                     <th>Net</th>
-                    <th>HM Charges</th>
+                    {/* <th>HM Charges</th>
                     <th>Other Charges</th>
-                    <th>Charges</th>
+                    <th>Charges</th> */}
                     <th>Metal Type</th>
                     <th>Purity</th>
                     <th>Pure Wt</th>
@@ -969,16 +969,16 @@ const URDPurchase = () => {
                 <tbody>
                   {tableData.map((data, index) => (
                     <tr key={index}>
-                      <td>{data.product_id}</td>
+                      {/* <td>{data.product_id}</td> */}
                       <td>{data.rbarcode}</td>
                       <td>{data.category}</td>
                       <td>{data.pcs}</td>
                       <td>{data.gross_weight}</td>
                       <td>{data.stone_weight}</td>
                       <td>{data.net_weight}</td>
-                      <td>{data.hm_charges}</td>
+                      {/* <td>{data.hm_charges}</td>
                       <td>{data.other_charges}</td>
-                      <td>{data.charges}</td>
+                      <td>{data.charges}</td> */}
                       <td>{data.metal_type}</td>
                       <td>{data.purity}</td>
                       <td>{data.pure_weight}</td>

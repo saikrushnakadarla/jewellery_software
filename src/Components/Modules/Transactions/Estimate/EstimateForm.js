@@ -311,10 +311,6 @@ const handleInputChange = (e) => {
   }
 };
 
-
-
-
-
 const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
 
 const handleBarcodeChange = async (code) => {
@@ -389,7 +385,7 @@ const handleBarcodeChange = async (code) => {
       // Check if tag exists by code
       const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
       if (tag) {
-        setIsBarcodeSelected(true);  // Set the barcode as selected
+        // setIsBarcodeSelected(true);  
         const productId = tag.product_id;
         const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
 

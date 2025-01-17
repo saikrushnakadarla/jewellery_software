@@ -29,10 +29,9 @@ const handleDelete = async (id) => {
   setLoading(true);
 
   try {
-    const response = await fetch(`${baseURL}/delete-purchases`, {
+    const response = await fetch(`${baseURL}/delete-purchases/${id}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ purchaseIds: [id] }),
     });
 
     const result = await response.json();
@@ -42,7 +41,7 @@ const handleDelete = async (id) => {
       // Remove the deleted item from the state
       setData((prevData) => prevData.filter((item) => item.id !== id));
     } else {
-      console.error('Error deleting purchase:', result.error);
+      console.error('Error deleting purchase:', result.message);
       alert(result.message || 'Failed to delete purchase');
     }
   } catch (error) {
@@ -52,6 +51,7 @@ const handleDelete = async (id) => {
     setLoading(false);
   }
 };
+
 
   const columns = React.useMemo(
     () => [
@@ -86,18 +86,6 @@ const handleDelete = async (id) => {
           return balance_after_receipt ? balance_after_receipt : balance_amount || '-';
         },
       },
-      // {
-      //   Header: 'Receipts',
-      //   accessor: 'receipts',
-      //   Cell: ({ row }) => (
-      //     <Button
-      //       style={{ backgroundColor: '#28a745', borderColor: '#28a745' }}
-      //       onClick={() => handleAddReceipt(row.original)}
-      //     >
-      //       Add Receipt
-      //     </Button>
-      //   ),
-      // },
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -146,23 +134,30 @@ const handleDelete = async (id) => {
     navigate("/payments", { state: { from: "/purchasetable", invoiceData } });
   };
 
-  // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`${baseURL}/get/purchases`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const result = await response.json();
-        if (result) {
-          setData(result); // Assuming API returns an array of purchases
+  
+        if (Array.isArray(result)) {
+          setData(result); // Update state if the result is an array
         } else {
-          console.error('Unexpected data structure:', result);
+          console.error('API response is not an array:', result);
+          alert('Unexpected data format from the server.');
         }
       } catch (error) {
         console.error('Error fetching purchases:', error);
+        alert('Failed to fetch data. Please try again later.');
       }
     };
+  
     fetchData();
   }, []);
+  
 
   // Handle navigation to the Create Purchase page
   const handleCreate = () => {
