@@ -195,6 +195,15 @@
 .navbar-hamburger .navbar-bar {
     transition: all 0.3s ease;
 }
+
+.path-heading {
+  font-size: 20px;
+  font-weight: bold;
+  color: #a36e29;
+  margin-top: 15px;
+  margin-left: 10px;
+}
+
   
 /* Responsive styles for mobile and tablet (iPad) */
 @media (max-width: 768px) {

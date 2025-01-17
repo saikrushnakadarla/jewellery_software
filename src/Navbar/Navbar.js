@@ -138,7 +138,7 @@ function Navbar() {
               <Link to="/salestable" onClick={handleItemClick} className={isActive('/salestable')}>Sales</Link>
               <Link to="/salesreturn" onClick={handleItemClick} className={isActive('/salesreturn')}>Sales Return</Link>
               <Link to="/estimatetable" onClick={handleItemClick} className={isActive('/estimatetable')}>Estimate</Link>
-              <Link to="/stockEntryTable" onClick={handleItemClick} className={isActive('/stockEntryTable')}>Stock Entry</Link>
+              <Link to="/stockEntryTable" onClick={handleItemClick} className={isActive('/stockEntryTable')}>Stock</Link>
               <Link to="/paymentstable" onClick={handleItemClick} className={isActive('/paymentstable')}>Payments</Link>
               <Link to="/receiptstable" onClick={handleItemClick} className={isActive('/receiptstable')}>Receipts</Link>
               <Link to="/purchasetable" onClick={handleItemClick} className={isActive('/purchasetable')}>Purchase</Link>
@@ -197,6 +197,32 @@ function Navbar() {
               <Link to="/invoice" onClick={handleItemClick} className={isActive('/invoice')}>Invoice</Link>
             </div>
           )}
+        </div>
+
+        <div>
+          <span>
+            {(location.pathname === '/sales' || location.pathname === '/salestable')  && <h1 className="path-heading">SALES</h1>}
+            {(location.pathname === '/purchase' || location.pathname === '/purchasetable') && <h1 className="path-heading">PURCHASE</h1>}
+            {location.pathname === '/salesreturn' && <h1 className="path-heading">SALES RETURN</h1>}
+            {(location.pathname === '/estimates' || location.pathname === '/estimatetable') && <h1 className="path-heading">ESTIMATE</h1>}
+            {(location.pathname === '/payments' || location.pathname === '/paymentstable') && <h1 className="path-heading">PAYMENTs</h1>}
+            {(location.pathname === '/receipts' || location.pathname === '/receiptstable') && <h1 className="path-heading">RECEIPTS</h1>}
+            {(location.pathname === '/repairs' || location.pathname === '/repairstable') && <h1 className="path-heading">REPAIRS</h1>}
+            {(location.pathname === '/urd_purchase' || location.pathname === '/urdpurchasetable') && <h1 className="path-heading">URD PURCHASE</h1>}
+            {(location.pathname === '/orders' || location.pathname === '/orderstable') && <h1 className="path-heading">ORDERS</h1>}
+            {(location.pathname === '/customermaster' || location.pathname === '/customerstable') && <h1 className="path-heading">CUSTOMERS</h1>}
+            {(location.pathname === '/suppliermaster' || location.pathname === '/suppliertable') && <h1 className="path-heading">SUPPLIERS</h1>}
+            {(location.pathname === '/itemmaster' || location.pathname === '/itemmastertable') && <h1 className="path-heading">CATEGORY</h1>}
+            {location.pathname === '/purity' && <h1 className="path-heading">PURITY</h1>}
+            {location.pathname === '/metaltype' && <h1 className="path-heading">METAL TYPE</h1>}
+            {location.pathname === '/designmaster' && <h1 className="path-heading">DESIGN MASTER</h1>}
+            {(location.pathname === '/accounts' || location.pathname === '/accountstable') && <h1 className="path-heading">ACCOUNTS</h1>}
+            {(location.pathname === '/workermaster' || location.pathname === '/workerstable') && <h1 className="path-heading">WORKERS</h1>}
+            {location.pathname === '/rates' && <h1 className="path-heading">RATES</h1>}
+            {location.pathname === '/company_info' && <h1 className="path-heading">COMPANY INFO</h1>}
+            {location.pathname === '/stockEntryTable' && <h1 className="path-heading">STOCK</h1>}
+
+          </span>
         </div>
       </nav>
       <div className="navbar-logout">

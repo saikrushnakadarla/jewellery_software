@@ -420,10 +420,10 @@ const schemeAmount = location.state?.scheme_amt
     <div className="main-container">
       <Container className="sales-form-container">
         <Form>
-          <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>
+          {/* <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>
             Sales
-          </h3>
-          <div className="sales-form">
+          </h3> */}
+          <div className="sales-form" style={{marginTop:'-40px'}}>
             <div className="sales-form-left">
               <CustomerDetails 
                 formData={formData}

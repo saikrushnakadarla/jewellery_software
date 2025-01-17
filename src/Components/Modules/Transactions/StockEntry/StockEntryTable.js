@@ -312,14 +312,14 @@ const StockEntryTable = (selectedProduct) => {
         <div className="stockentry-table-container">
           <Row className="mb-3">
             <Col className="d-flex justify-content-between align-items-center">
-              <h3>Stock Entry</h3>
-              <Button
+              <h3>Stock</h3>
+              {/* <Button
                 className="create_but"
                 onClick={() => navigate('/stockEntry')}
                 style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
               >
                 + Create
-              </Button>
+              </Button> */}
             </Col>
           </Row>
           {/* DataTable component */}

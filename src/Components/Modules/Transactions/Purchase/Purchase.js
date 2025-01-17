@@ -742,8 +742,9 @@ const URDPurchase = () => {
             </div>
             <div className="purchase-form-right">
               <Col className="urd-form2-section">
+              <h4 className="mb-4">Invoice Details</h4>
                 <Row>
-                  <Col xs={12} md={3}>
+                  {/* <Col xs={12} md={3}>
                     <InputField label="Terms" type="select" value={formData.terms}
                       onChange={(e) => handleChange("terms", e.target.value)}
                       options={[
@@ -751,7 +752,7 @@ const URDPurchase = () => {
                         { value: "Credit", label: "Credit" },
                       ]}
                     />
-                  </Col>
+                  </Col> */}
                   <Col xs={12} md={4}>
                     <InputField
                       label="Invoice"
@@ -764,12 +765,12 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("bill_no", e.target.value)} />
                   </Col> */}
 
-                  <Col xs={12} md={3} >
+                  {/* <Col xs={12} md={3} >
                     <InputField label="Rate-Cut" value={formData.rate_cut}
                       onChange={(e) => handleChange("rate_cut", e.target.value)} />
-                  </Col>
+                  </Col> */}
 
-                  <Col xs={12} md={3}>
+                  <Col xs={12} md={4}>
                     <InputField
                       label="Bill Date"
                       type="date"
@@ -777,7 +778,7 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("bill_date", e.target.value)}
                     />
                   </Col>
-                  <Col xs={12} md={3} >
+                  <Col xs={12} md={4} >
                     <InputField label="Due Date" type="date" value={formData.due_date}
                       onChange={(e) => handleChange("due_date", e.target.value)} />
                   </Col>
