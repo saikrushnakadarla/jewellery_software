@@ -36,12 +36,12 @@ const OldSalesForm = ({ setOldSalesData }) => {
   }, [oldTableData, setOldSalesData]);
 
   const [editingRow, setEditingRow] = useState(null);
-  const [rates, setRates] = useState({
-    rate_24crt: "",
-    rate_22crt: "",
-    rate_18crt: "",
-    rate_16crt: "",
-  });
+  // const [rates, setRates] = useState({
+  //   rate_24crt: "",
+  //   rate_22crt: "",
+  //   rate_18crt: "",
+  //   rate_16crt: "",
+  // });
 
   useEffect(() => {
     const fetchPurity = async () => {
@@ -188,6 +188,38 @@ const OldSalesForm = ({ setOldSalesData }) => {
     return oldTableData.reduce((sum, item) => sum + parseFloat(item.total_amount || 0), 0).toFixed(2);
   };
 
+  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
+
+  useEffect(() => {
+    const fetchCurrentRates = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/current-rates`);
+        console.log('API Response:', response.data);
+
+        // Log the 24crt rate separately
+        console.log('24crt Rate:', response.data.rate_24crt);
+
+        // Dynamically set the rates based on response
+        setRates({
+          rate_24crt: response.data.rate_24crt || "",
+          rate_22crt: response.data.rate_22crt || "",
+          rate_18crt: response.data.rate_18crt || "",
+          rate_16crt: response.data.rate_16crt || "",
+        });
+      } catch (error) {
+        console.error('Error fetching current rates:', error);
+      }
+    };
+    fetchCurrentRates();
+  }, []);
+
+
+  const currentRate =
+  oldDetails.purity === "24K" ? rates.rate_24crt :
+  oldDetails.purity === "22K" ? rates.rate_22crt :
+  oldDetails.purity === "18K" ? rates.rate_18crt :
+  oldDetails.purity === "16K" ? rates.rate_16crt :
+            "";
   
 
   return (
@@ -242,7 +274,12 @@ const OldSalesForm = ({ setOldSalesData }) => {
           <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Rate" name="rate" value={oldDetails.rate} onChange={handleInputChange} />
+        <InputField
+                  label="Rate"
+                  name="rate"
+                  value={oldDetails.rate || currentRate}
+                  onChange={handleInputChange}
+                />
         </Col>
         <Col xs={12} md={3}>
           <InputField label="Total Amount" name="total_amount" value={oldDetails.total_amount.toFixed(2)} onChange={handleInputChange} />
