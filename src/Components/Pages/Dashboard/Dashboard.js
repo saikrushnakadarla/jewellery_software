@@ -98,54 +98,6 @@ function Dashboard() {
       <div className="dashboard-container">
         <div className="row-cards" >
         <div className="metric-card">
-            <Purchases selectedCustomerMobile={selectedMobile} />
-            <a style={{marginRight:'100px'}}
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log("Selected Customer Mobile:", selectedMobile);
-                navigate("/urdpurchasetable", { state: { mobile: selectedMobile } });
-              }}
-            >
-              Details
-            </a>
-            <a 
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/urd_purchase', { state: { mobile: selectedMobile } });
-              }}
-            >
-              New
-            </a>
-          </div>
-        <div className="metric-card">
-            <URDPurchase selectedCustomerMobile={selectedMobile} />
-            <a style={{marginRight:'100px'}}
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log("Selected Customer Mobile:", selectedMobile);
-                navigate("/urdpurchasetable", { state: { mobile: selectedMobile } });
-              }}
-            >
-              Details
-            </a>
-            <a 
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/urd_purchase', { state: { mobile: selectedMobile } });
-              }}
-            >
-              New
-            </a>
-          </div>
-          <div className="metric-card">
             <Sales selectedCustomerMobile={selectedMobile} />
             <a style={{marginRight:'100px'}}
               href="#"
@@ -195,6 +147,55 @@ function Dashboard() {
               New
             </a>
           </div>
+        <div className="metric-card">
+            <Purchases selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/urdpurchasetable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/urd_purchase', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+        <div className="metric-card">
+            <URDPurchase selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/urdpurchasetable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/urd_purchase', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+         
           <div className="metric-card" >
             <Repairs selectedCustomerMobile={selectedMobile} />
             <a style={{marginRight:'100px'}}

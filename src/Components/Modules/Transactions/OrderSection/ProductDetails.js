@@ -69,7 +69,7 @@ const ProductDetails = ({
               </Col>
               <Col xs={12} md={3}>
                 <InputField
-                  label="Design Master"
+                  label="Design Name"
                   name="design_name"
                   value={formData.design_name}
                   onChange={handleChange}
@@ -128,7 +128,7 @@ const ProductDetails = ({
       </Col>
       <Col xs={12} md={2}>
       <InputField
-        label="VA On"
+        label="Wastage On"
         name="va_on"
         type="select"
         value={formData.va_on || ""} // Default to "Gross Weight"
@@ -146,7 +146,7 @@ const ProductDetails = ({
 
       <Col xs={12} md={1}>
         <InputField
-          label="VA%"
+          label="Wastage%"
           name="va_percent"
           value={formData.va_percent || ""}
           onChange={handleChange}
@@ -154,7 +154,7 @@ const ProductDetails = ({
       </Col>
       <Col xs={12} md={1}>
         <InputField
-          label="WW"
+          label="W.Wt"
           name="wastage_weight"
           value={formData.wastage_weight || ""}
           onChange={handleChange}
