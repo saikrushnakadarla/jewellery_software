@@ -835,6 +835,18 @@ const handleBarcodeChange = async (code) => {
             <InputField label="Total Weight:" name="total_weight" value={formData.total_weight} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
+            <InputField label="Rate:" name="rate" value={formData.rate} onChange={handleInputChange} />
+          </Col>
+          <Col xs={12} md={2}>
+                <InputField
+                  label="Amount"
+                  name="rate_amt"
+                  value={formData.rate_amt || "0.00"} 
+                  onChange={handleInputChange} 
+                  readOnly
+                />
+                </Col>
+          <Col xs={12} md={2}>
                   <InputField
                     label="MC On"
                     name="making_charges_on"
@@ -858,18 +870,7 @@ const handleBarcodeChange = async (code) => {
           <Col xs={12} md={2}>
             <InputField label="Total MC:" name="total_mc" value={formData.total_mc} onChange={handleInputChange} />
           </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Rate:" name="rate" value={formData.rate} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={2}>
-                <InputField
-                  label="Amount"
-                  name="rate_amt"
-                  value={formData.rate_amt || "0.00"} 
-                  onChange={handleInputChange} 
-                  readOnly
-                />
-                </Col>
+          
           <Col xs={12} md={2}>
             <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
           </Col>
