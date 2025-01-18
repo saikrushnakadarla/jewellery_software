@@ -154,21 +154,47 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             .catch((error) => console.error("Error fetching products:", error));
     }, []);
 
+useEffect(() => {
+    // Check if the category contains "gold" whenever formData.category changes
+    const isGoldCategory = formData.category && formData.category.toLowerCase().includes("gold");
+
+    if (isGoldCategory) {
+        setFormData((prevData) => ({
+            ...prevData,
+            Making_Charges_On: "By Percentage",
+            MC_Per_Gram_Label: "MC Percentage",
+        }));
+    } else {
+        setFormData((prevData) => ({
+            ...prevData,
+            MC_Per_Gram_Label: "MC Per Gram",
+        }));
+    }
+}, [formData.category]);
+
+
     const handleChange = async (e) => {
         const { name, value } = e.target;
     
-        if (name === "sub_category") {
+        if (name === "category") {
+            // Check if the category value contains "gold" (case-insensitive)
+            const isGoldCategory = value.toLowerCase().includes("gold");
+    
+            setFormData((prevData) => ({
+                ...prevData,
+                category: value,
+                Making_Charges_On: isGoldCategory ? "By Percentage" : prevData.Making_Charges_On,
+                MC_Per_Gram_Label: isGoldCategory ? "MC Percentage" : "MC Per Gram",
+            }));
+        } else if (name === "sub_category") {
             const selectedCategory = subCategories.find(
                 (category) => category.subcategory_id === parseInt(value) // Ensure correct type match
             );
     
             const newPrefix = selectedCategory ? selectedCategory.prefix : "";
     
-            console.log("New Prefix:", newPrefix);
-    
             if (newPrefix) {
                 try {
-                    // Fetch the next unique PCode_BarCode from the backend
                     const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
                         params: { prefix: newPrefix },
                     });
@@ -177,24 +203,23 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     
                     setFormData((prevData) => ({
                         ...prevData,
-                        [name]: selectedCategory ? selectedCategory.sub_category_name : "",
+                        sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
                         subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
                         item_prefix: newPrefix,
                         Prefix: newPrefix,
-                        PCode_BarCode: nextPCodeBarCode, // Update with unique PCode_BarCode
+                        PCode_BarCode: nextPCodeBarCode,
                     }));
                 } catch (error) {
                     console.error("Error fetching PCode_BarCode:", error);
-                    // Optional: Show an error message to the user
                 }
             } else {
                 setFormData((prevData) => ({
                     ...prevData,
-                    [name]: selectedCategory ? selectedCategory.sub_category_name : "",
+                    sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
                     subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
                     item_prefix: "",
                     Prefix: "",
-                    PCode_BarCode: "", // Clear if no prefix
+                    PCode_BarCode: "",
                 }));
             }
         } else {
@@ -204,6 +229,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             }));
         }
     };
+    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -472,12 +498,12 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                         <h4 className="mb-4">Stock Entry</h4>
                                         <Row>
                                             <Col xs={12} md={3}>
-                                                <InputField
+                                            <InputField
                                                     label="Category:"
                                                     name="category"
                                                     value={formData.category}
                                                     onChange={(e) => handleChange(e)}
-                                                />
+                                                /> 
                                             </Col>
                                             <Col xs={12} md={3} className="d-flex align-items-center">
                                                 <div style={{ flex: 1 }}>
@@ -638,33 +664,38 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                         </Row>
                                         <Row>
                                             <Col xs={12} md={3}>
-                                                <InputField
-                                                    label="Making Charges On:"
-                                                    name="Making_Charges_On"
-                                                    type="select"
-                                                    value={formData.Making_Charges_On}
-                                                    onChange={handleChange}
-                                                    options={[
-                                                        { value: "By Weight", label: "By Weight" },
-                                                        { value: "Fixed", label: "Fixed" },
-                                                    ]}
-                                                />
+                                            <InputField
+    label="Making Charges On:"
+    name="Making_Charges_On"
+    type="select"
+    value={formData.Making_Charges_On}
+    onChange={handleChange}
+    options={[
+        { value: "By Weight", label: "By Weight" },
+        { value: "Fixed", label: "Fixed" },
+        { value: "By Percentage", label: "By Percentage" }, // Added for gold-related default
+    ]}
+/>
                                             </Col>
                                             <Col xs={12} md={2}>
-                                                <InputField
-                                                    label="MC Per Gram:"
-                                                    name="MC_Per_Gram"
-                                                    value={formData.MC_Per_Gram}
-                                                    onChange={handleChange}
-                                                />
+                           
+<InputField
+    label={formData.MC_Per_Gram_Label || "MC Per Gram"} // Dynamic label based on category
+    name="MC_Per_Gram"
+    value={formData.MC_Per_Gram}
+    onChange={handleChange}
+/>
                                             </Col>
                                             <Col xs={12} md={2}>
-                                                <InputField
-                                                    label="Making Charges:"
-                                                    name="Making_Charges"
-                                                    value={formData.Making_Charges}
-                                                    onChange={handleChange}
-                                                />
+                                              {/* Conditionally render the Making Charges field */}
+{!formData.category?.toLowerCase().includes("gold") && (
+    <InputField
+        label="Making Charges:"
+        name="Making_Charges"
+        value={formData.Making_Charges}
+        onChange={handleChange}
+    />
+)}
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
