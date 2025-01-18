@@ -234,22 +234,141 @@ const RepairForm = () => {
     }
   };
 
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   // Preserve the current barcode
+  //   const currentBarcode = formData.code;
+
+  //   // Update the specific field in formData
+  //   const updatedFormData = { ...formData, [name]: value };
+
+  //   setFormData(updatedFormData);
+
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+  
+  //   // Trigger recalculation for Total MC if relevant fields are updated
+  //   if (
+  //     formData.metal_type?.toLowerCase() === "gold" &&
+  //     (name === "mc_per_gram" || name === "rate_amt")
+  //   ) {
+  //     const mcPercentage = parseFloat(
+  //       name === "mc_per_gram" ? value : formData.mc_per_gram
+  //     ) || 0;
+  //     const rateAmount = parseFloat(
+  //       name === "rate_amt" ? value : formData.rate_amt
+  //     ) || 0;
+  
+  //     const totalMC = (mcPercentage / 100) * rateAmount;
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       making_charges: totalMC.toFixed(2),
+  //     }));
+  //   }
+  
+
+  //   // Destructure relevant fields
+  //   const { product_name, metal_type, design_name, purity } = updatedFormData;
+
+  //   if (product_name && metal_type && design_name && purity) {
+  //     // Filter matching entries
+  //     const matchingEntries = data.filter(
+  //       (prod) =>
+  //         prod.product_Name === product_name &&
+  //         prod.metal_type === metal_type &&
+  //         prod.design_master === design_name &&
+  //         prod.Purity === purity
+  //     );
+
+  //     console.log("Matching Entries:", matchingEntries);
+
+  //     if (matchingEntries.length > 0) {
+  //       if (matchingEntries.length > 1) {
+  //         // Handle multiple matching entries
+  //         setFormData((prevData) => ({
+  //           ...prevData,
+  //           code: currentBarcode, // Preserve the selected barcode
+  //           barcodeOptions: matchingEntries.map((entry) => ({
+  //             value: entry.PCode_BarCode,
+  //             label: entry.PCode_BarCode,
+  //           })),
+  //         }));
+  //       } else if (matchingEntries.length === 1) {
+  //         const matchingEntry = matchingEntries[0];
+
+
+  //         const productId = matchingEntry.product_id;
+
+  //         const productDetails = products.find(
+  //           (prod) => String(prod.product_id) === String(productId)
+  //         );
+
+  //         // Set the selected form data based on the matching entry
+  //         setFormData((prevData) => ({
+  //           ...prevData,
+  //           code: currentBarcode || matchingEntry.PCode_BarCode, // Use existing barcode or set the new one
+  //           category: matchingEntry.category,
+  //           sub_category: matchingEntry.sub_category,
+  //           gross_weight: matchingEntry.Gross_Weight,
+  //           stones_weight: matchingEntry.Stones_Weight || "",
+  //           stones_price: matchingEntry.Stones_Price || "",
+  //           weight_bw: matchingEntry.Weight_BW || "",
+  //           wastage_on: matchingEntry.Wastage_On || "",
+  //           wastage_percent: matchingEntry.Wastage_Percentage || "",
+  //           wastage_weight: matchingEntry.WastageWeight || "",
+  //           total_weight: matchingEntry.TotalWeight_AW || "",
+  //           making_charges_on: matchingEntry.Making_Charges_On || "",
+  //           mc_per_gram: matchingEntry.MC_Per_Gram || "",
+  //           total_mc: matchingEntry.Making_Charges || "",
+  //           tax_percent: productDetails?.tax_slab || "",
+  //           qty: 1,
+  //           barcodeOptions: [], // Clear barcode options after setting the data
+  //         }));
+  //       }
+  //     } else {
+  //       console.log("No matching entries found. No updates made.");
+  //     }
+  //   } else {
+  //     console.log("Required fields are missing or incomplete. No updates made.");
+  //   }
+  // };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    // Preserve the current barcode
-    const currentBarcode = formData.code;
-
-    // Update the specific field in formData
-    const updatedFormData = { ...formData, [name]: value };
-
-    setFormData(updatedFormData);
-
-    // Destructure relevant fields
-    const { product_name, metal_type, design_name, purity } = updatedFormData;
-
+  
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  
+    // Trigger recalculation for Total MC when relevant fields are updated
+    if (
+      formData.metal_type?.toLowerCase() === "gold" &&
+      (name === "mc_per_gram" || name === "rate_amt")
+    ) {
+      const updatedMcPercentage = parseFloat(
+        name === "mc_per_gram" ? value : formData.mc_per_gram
+      ) || 0;
+      const updatedRateAmount = parseFloat(
+        name === "rate_amt" ? value : formData.rate_amt
+      ) || 0;
+  
+      const calculatedTotalMC = (updatedMcPercentage / 100) * updatedRateAmount;
+      setFormData((prevData) => ({
+        ...prevData,
+        total_mc: calculatedTotalMC.toFixed(2),
+      }));
+    }
+  
+    const { product_name, metal_type, design_name, purity } = {
+      ...formData,
+      [name]: value,
+    };
+  
     if (product_name && metal_type && design_name && purity) {
-      // Filter matching entries
       const matchingEntries = data.filter(
         (prod) =>
           prod.product_Name === product_name &&
@@ -257,15 +376,11 @@ const RepairForm = () => {
           prod.design_master === design_name &&
           prod.Purity === purity
       );
-
-      console.log("Matching Entries:", matchingEntries);
-
+  
       if (matchingEntries.length > 0) {
         if (matchingEntries.length > 1) {
-          // Handle multiple matching entries
           setFormData((prevData) => ({
             ...prevData,
-            code: currentBarcode, // Preserve the selected barcode
             barcodeOptions: matchingEntries.map((entry) => ({
               value: entry.PCode_BarCode,
               label: entry.PCode_BarCode,
@@ -273,18 +388,14 @@ const RepairForm = () => {
           }));
         } else if (matchingEntries.length === 1) {
           const matchingEntry = matchingEntries[0];
-
-
           const productId = matchingEntry.product_id;
-
           const productDetails = products.find(
             (prod) => String(prod.product_id) === String(productId)
           );
-
-          // Set the selected form data based on the matching entry
+  
           setFormData((prevData) => ({
             ...prevData,
-            code: currentBarcode || matchingEntry.PCode_BarCode, // Use existing barcode or set the new one
+            code: matchingEntry.PCode_BarCode,
             category: matchingEntry.category,
             sub_category: matchingEntry.sub_category,
             gross_weight: matchingEntry.Gross_Weight,
@@ -300,14 +411,10 @@ const RepairForm = () => {
             total_mc: matchingEntry.Making_Charges || "",
             tax_percent: productDetails?.tax_slab || "",
             qty: 1,
-            barcodeOptions: [], // Clear barcode options after setting the data
+            barcodeOptions: [],
           }));
         }
-      } else {
-        console.log("No matching entries found. No updates made.");
       }
-    } else {
-      console.log("Required fields are missing or incomplete. No updates made.");
     }
   };
 
@@ -580,33 +687,71 @@ const RepairForm = () => {
     }));
   }, [formData.wastage_on, formData.wastage_percent, formData.gross_weight, formData.weight_bw]);
 
+  // useEffect(() => {
+  //   const totalWeight = parseFloat(formData.total_weight) || 0;
+  //   const mcPerGram = parseFloat(formData.mc_per_gram) || 0;
+  //   const makingCharges = parseFloat(formData.total_mc) || 0;
+
+  //   if (formData.making_charges_on === "By Weight") {
+  //     const calculatedMakingCharges = totalWeight * mcPerGram;
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       total_mc: calculatedMakingCharges.toFixed(2),
+  //     }));
+  //   } else if (formData.making_charges_on === "Fixed") {
+  //     if (totalWeight > 0) {
+  //       const calculatedMcPerGram = makingCharges / totalWeight;
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         mc_per_gram: calculatedMcPerGram.toFixed(2),
+  //       }));
+  //     } else {
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         mc_per_gram: "0.00",
+  //       }));
+  //     }
+  //   }
+  // }, [formData.making_charges_on, formData.mc_per_gram, formData.total_mc, formData.total_weight]);
   useEffect(() => {
     const totalWeight = parseFloat(formData.total_weight) || 0;
     const mcPerGram = parseFloat(formData.mc_per_gram) || 0;
-    const makingCharges = parseFloat(formData.total_mc) || 0;
-
-    if (formData.making_charges_on === "By Weight") {
-      const calculatedMakingCharges = totalWeight * mcPerGram;
+    const totalMc = parseFloat(formData.total_mc) || 0;
+    const rateAmount = parseFloat(formData.rate_amt) || 0;
+    const mcPercentage = parseFloat(formData.mc_per_gram) || 0;
+  
+    if (formData.metal_type?.toLowerCase() === "gold") {
+      // Calculate Total MC for gold based on MC Percentage and Amount
+      const calculatedTotalMC = (mcPercentage / 100) * rateAmount;
       setFormData((prev) => ({
         ...prev,
-        total_mc: calculatedMakingCharges.toFixed(2),
+        total_mc: calculatedTotalMC.toFixed(2), // Update Total MC
       }));
-    } else if (formData.making_charges_on === "Fixed") {
-      if (totalWeight > 0) {
-        const calculatedMcPerGram = makingCharges / totalWeight;
+    } else {
+      // Other calculations for non-gold metals
+      if (formData.mc_on === "By Weight") {
+        const calculatedMakingCharges = totalWeight * mcPerGram;
         setFormData((prev) => ({
           ...prev,
-          mc_per_gram: calculatedMcPerGram.toFixed(2),
+          total_mc: calculatedMakingCharges.toFixed(2), // Update Total MC
         }));
-      } else {
+      } else if (formData.mc_on === "Fixed" && totalWeight > 0) {
+        const calculatedMcPerGram = totalMc / totalWeight;
         setFormData((prev) => ({
           ...prev,
-          mc_per_gram: "0.00",
+          mc_per_gram: calculatedMcPerGram.toFixed(2), // Update MC per gram
         }));
       }
     }
-  }, [formData.making_charges_on, formData.mc_per_gram, formData.total_mc, formData.total_weight]);
-
+  }, [
+    formData.metal_type,
+    formData.mc_per_gram,
+    formData.rate_amt,
+    formData.mc_on,
+    formData.total_mc,
+    formData.total_weight,
+  ]);
+  
   useEffect(() => {
     const rate = parseFloat(formData.rate) || 0;
     const totalWeight = parseFloat(formData.total_weight) || 0;
@@ -853,13 +998,20 @@ const RepairForm = () => {
             <InputField label="Rate:" name="rate" value={formData.rate} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
-            <InputField
+            {/* <InputField
               label="Amount"
               name="rate_amt"
               value={formData.rate_amt || "0.00"}
               onChange={handleInputChange}
               readOnly
-            />
+            /> */}
+                  <InputField
+  label="Amount"
+  name="rate_amt"
+  value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+  onChange={handleInputChange} // Trigger recalculation of Total MC
+  readOnly // Ensure it's editable
+/>
           </Col>
           <Col xs={12} md={2}>
             <InputField
@@ -880,10 +1032,25 @@ const RepairForm = () => {
           </Col>
 
           <Col xs={12} md={2}>
-            <InputField label="MC Per Gram:" name="mc_per_gram" value={formData.mc_per_gram} onChange={handleInputChange} />
+            {/* <InputField label="MC Per Gram:" name="mc_per_gram" value={formData.mc_per_gram} onChange={handleInputChange} /> */}
+            <InputField
+  label={
+    formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"
+  }
+  name="mc_per_gram" // Adjusted to reflect MC Percentage for gold
+  value={formData.mc_per_gram || ""} // Default value handling
+  onChange={handleInputChange}
+/>
+
           </Col>
           <Col xs={12} md={2}>
-            <InputField label="Total MC:" name="total_mc" value={formData.total_mc} onChange={handleInputChange} />
+            {/* <InputField label="Total MC:" name="total_mc" value={formData.total_mc} onChange={handleInputChange} /> */}
+            <InputField
+  label="Total MC"
+  name="total_mc"
+  value={formData.total_mc || ""} // Display calculated Total MC
+  readOnly // Make this field read-only, since it’s auto-calculated
+/>
           </Col>
 
           <Col xs={12} md={2}>
