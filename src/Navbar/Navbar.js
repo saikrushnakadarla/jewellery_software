@@ -5,6 +5,7 @@ import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FaSignOutAlt } from "react-icons/fa";
 import logo from '../../src/Components/Pages/Login/Logo/sadashri_logo.png';
 import './Navbar.css';
+import Swal from 'sweetalert2';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -49,7 +50,21 @@ function Navbar() {
   };
 
   const handleLogout = () => {
-    navigate('/'); // Navigate to the homepage or login page
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you really want to log out?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, log out!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Navigate to the home page or perform logout logic
+        navigate('/');
+      }
+    });
   };
 
   // Function to check if the link is active based on the current location
@@ -227,7 +242,7 @@ function Navbar() {
       </nav>
       <div className="navbar-logout">
       <button className="logout-button" onClick={handleLogout}>
-        <FaSignOutAlt size={20} /> {/* Render the logout icon */}
+        <FaSignOutAlt size={18} /> Logout
       </button>
     </div>
     </header>
