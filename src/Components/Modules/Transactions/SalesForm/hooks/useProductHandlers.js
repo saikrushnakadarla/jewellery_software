@@ -250,6 +250,30 @@ const handleChange = (e) => {
 
   setFormData(updatedFormData);
 
+  setFormData((prevData) => ({
+    ...prevData,
+    [name]: value,
+  }));
+
+  // Trigger recalculation for Total MC if relevant fields are updated
+  if (
+    formData.metal_type?.toLowerCase() === "gold" &&
+    (name === "mc_per_gram" || name === "rate_amt")
+  ) {
+    const mcPercentage = parseFloat(
+      name === "mc_per_gram" ? value : formData.mc_per_gram
+    ) || 0;
+    const rateAmount = parseFloat(
+      name === "rate_amt" ? value : formData.rate_amt
+    ) || 0;
+
+    const totalMC = (mcPercentage / 100) * rateAmount;
+    setFormData((prevData) => ({
+      ...prevData,
+      making_charges: totalMC.toFixed(2),
+    }));
+  }
+
   // Destructure relevant fields
   const { product_name, metal_type, design_name, purity } = updatedFormData;
 

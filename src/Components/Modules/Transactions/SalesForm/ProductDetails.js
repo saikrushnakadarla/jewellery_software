@@ -248,21 +248,31 @@ const ProductDetails = ({
           ]}
         />
       </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="MC/Gm"
-          name="mc_per_gram"
-          value={formData.mc_per_gram || ""}
-          onChange={handleChange}
-        />
+      <Col xs={12} md={2}>
+      {/* <InputField
+  label={formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"} // Dynamic label based on metal type
+  name="mc_per_gram"
+  value={formData.mc_per_gram || ""} // Ensure value is set properly
+  onChange={handleChange}
+/> */}
+
+<InputField
+  label={
+    formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"
+  }
+  name="mc_per_gram" // Adjusted to reflect MC Percentage for gold
+  value={formData.mc_per_gram || ""} // Default value handling
+  onChange={handleChange}
+/>
+
       </Col>
       <Col xs={12} md={1}>
-        <InputField
-          label="Total MC"
-          name="making_charges"
-          value={formData.making_charges || ""}
-          onChange={handleChange}
-        />
+      <InputField
+  label="Total MC"
+  name="making_charges"
+  value={formData.making_charges || ""} // Display calculated Total MC
+  readOnly // Make this field read-only, since it’s auto-calculated
+/>
       </Col>
       <Col xs={12} md={1}>
           <InputField
@@ -283,12 +293,12 @@ const ProductDetails = ({
     </Col>
       <Col xs={12} md={1}>
       <InputField
-        label="Amount"
-        name="rate_amt"
-        value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
-        onChange={handleChange} // Optional, since it's auto-calculated
-        readOnly
-      />
+  label="Amount"
+  name="rate_amt"
+  value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+  onChange={handleChange} // Trigger recalculation of Total MC
+  readOnly={false} // Ensure it's editable
+/>
       </Col>
         <Col xs={12} md={1}>
           <InputField label="Tax%"
@@ -306,7 +316,7 @@ const ProductDetails = ({
           readOnly
         />
       </Col>
-      <Col xs={12} md={2}>
+      <Col xs={12} md={1}>
         <InputField
           label="Total Price"
           name="total_price"
