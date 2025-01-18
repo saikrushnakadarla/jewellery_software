@@ -373,13 +373,156 @@ const useProductHandlers = () => {
   //   }
   // };
 
-  const handleChange = (e) => {
+//   const handleChange = (e) => {
+//   const { name, value } = e.target;
+//   setFormData((prevData) => ({
+//     ...prevData,
+//     [name]: value,
+//   }));
+// };
+
+const handleChange = (e) => {
   const { name, value } = e.target;
+  if (name === "metal_type") {
+    // Check if the category value contains "gold" (case-insensitive)
+    const isGoldCategory = value.toLowerCase().includes("gold");
+
+    setFormData((prevData) => ({
+        ...prevData,
+        metal_type: value,
+        mc_on: isGoldCategory ? "By Percentage" : prevData.mc_on,
+        // MC_Per_Gram_Label: isGoldCategory ? "MC Percentage" : "MC Per Gram",
+    }));
+}
+  // Preserve the current barcode
+  const currentBarcode = formData.code;
+
+  // Update the specific field in formData
+  const updatedFormData = { ...formData, [name]: value };
+
+  setFormData(updatedFormData);
+
   setFormData((prevData) => ({
     ...prevData,
     [name]: value,
   }));
+
+  // Trigger recalculation for Total MC if relevant fields are updated
+  if (
+    formData.metal_type?.toLowerCase() === "gold" &&
+    (name === "mc_per_gram" || name === "rate_amt")
+  ) {
+    const mcPercentage = parseFloat(
+      name === "mc_per_gram" ? value : formData.mc_per_gram
+    ) || 0;
+    const rateAmount = parseFloat(
+      name === "rate_amt" ? value : formData.rate_amt
+    ) || 0;
+
+    const totalMC = (mcPercentage / 100) * rateAmount;
+    setFormData((prevData) => ({
+      ...prevData,
+      making_charges: totalMC.toFixed(2),
+    }));
+  }
+
+  // Destructure relevant fields
+  const { product_name, metal_type, design_name, purity } = updatedFormData;
+
+  if (product_name && metal_type && design_name && purity) {
+    // Filter matching entries
+    const matchingEntries = data.filter(
+      (prod) =>
+        prod.product_Name === product_name &&
+        prod.metal_type === metal_type &&
+        prod.design_master === design_name &&
+        prod.Purity === purity
+    );
+
+    console.log("Matching Entries:", matchingEntries);
+
+    if (matchingEntries.length > 0) {
+      if (matchingEntries.length > 1) {
+        // Handle multiple matching entries
+        setFormData((prevData) => ({
+          ...prevData,
+          code: currentBarcode, // Preserve the selected barcode
+          barcodeOptions: matchingEntries.map((entry) => ({
+            value: entry.PCode_BarCode,
+            label: entry.PCode_BarCode,
+          })),
+        }));
+      } else if (matchingEntries.length === 1) {
+        const matchingEntry = matchingEntries[0];
+
+        // Check if the product is already sold
+        if (matchingEntry.Status === "Sold") {
+          alert("The product is already sold out.");
+          
+          // Clear the form details after the alert, except for the barcode
+          setFormData((prevData) => ({
+            ...prevData,
+            barcodeOptions: [], // Clear barcode options
+            category: "",
+            sub_category: "",
+            gross_weight: "",
+            stone_weight: "",
+            stone_price: "",
+            weight_bw: "",
+            va_on: "",
+            va_percent: "",
+            wastage_weight: "",
+            total_weight_aw: "",
+            mc_on: "",
+            mc_per_gram: "",
+            making_charges: "",
+            rate: "",
+            rate_amt: "",
+            tax_percent: "",
+            tax_amt: "",
+            total_price: "",
+            qty: "",
+          }));
+
+          return; // Stop further execution
+        }
+
+        const productId = matchingEntry.product_id;
+
+        const productDetails = products.find(
+          (prod) => String(prod.product_id) === String(productId)
+        );
+
+        // Set the selected form data based on the matching entry
+        setFormData((prevData) => ({
+          ...prevData,
+          code: currentBarcode || matchingEntry.PCode_BarCode, // Use existing barcode or set the new one
+          category: matchingEntry.category,
+          sub_category: matchingEntry.sub_category,
+          gross_weight: matchingEntry.Gross_Weight,
+          stone_weight: matchingEntry.Stones_Weight || "",
+          stone_price: matchingEntry.Stones_Price || "",
+          weight_bw: matchingEntry.Weight_BW || "",
+          va_on: matchingEntry.Wastage_On || "",
+          va_percent: matchingEntry.Wastage_Percentage || "",
+          wastage_weight: matchingEntry.WastageWeight || "",
+          total_weight_aw: matchingEntry.TotalWeight_AW || "",
+          mc_on: matchingEntry.Making_Charges_On || "",
+          mc_per_gram: matchingEntry.MC_Per_Gram || "",
+          making_charges: matchingEntry.Making_Charges || "",
+          tax_percent: productDetails?.tax_slab || "",
+          qty: 1,
+          barcodeOptions: [], // Clear barcode options after setting the data
+        }));
+      }
+    } else {
+      console.log("No matching entries found. No updates made.");
+    }
+  } else {
+    console.log("Required fields are missing or incomplete. No updates made.");
+  }
 };
+
 
   const handleBarcodeChange = async (code) => {
     try {

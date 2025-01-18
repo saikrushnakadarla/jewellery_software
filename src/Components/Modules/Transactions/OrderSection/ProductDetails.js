@@ -171,7 +171,7 @@ const ProductDetails = ({
         />
       </Col>
       <Col xs={12} md={2}>
-        <InputField
+      <InputField
           label="MC On"
           name="mc_on"
           type="select"
@@ -180,6 +180,7 @@ const ProductDetails = ({
           options={[
             { value: "By Weight", label: "By Weight" },
             { value: "Fixed", label: "Fixed" },
+            { value: "By Percentage", label: "By Percentage" },
             ...(formData.mc_on &&
             !["By Weight", "Fixed"].includes(formData.mc_on)
               ? [{ value: formData.mc_on, label: formData.mc_on }]
@@ -187,21 +188,29 @@ const ProductDetails = ({
           ]}
         />
       </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="MC/Gm"
-          name="mc_per_gram"
-          value={formData.mc_per_gram || ""}
-          onChange={handleChange}
-        />
+      <Col xs={12} md={2}>
+      <InputField
+  label={
+    formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"
+  }
+  name="mc_per_gram" // Adjusted to reflect MC Percentage for gold
+  value={formData.mc_per_gram || ""} // Default value handling
+  onChange={handleChange}
+/>
       </Col>
       <Col xs={12} md={2}>
-        <InputField
+        {/* <InputField
           label="Making Charges"
           name="making_charges"
           value={formData.making_charges || ""}
           onChange={handleChange}
-        />
+        /> */}
+              <InputField
+  label="Making Charges"
+  name="making_charges"
+  value={formData.making_charges || ""} // Display calculated Total MC
+  readOnly // Make this field read-only, since it’s auto-calculated
+/>
       </Col>
       <Col xs={12} md={1}>
         <InputField label="Rate" name="rate"
@@ -219,13 +228,20 @@ const ProductDetails = ({
       />
     </Col>
       <Col xs={12} md={2}>
-      <InputField
+      {/* <InputField
         label="Amount"
         name="rate_amt"
         value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
         onChange={handleChange} // Optional, since it's auto-calculated
         readOnly
-      />
+      /> */}
+            <InputField
+  label="Amount"
+  name="rate_amt"
+  value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+  onChange={handleChange} // Trigger recalculation of Total MC
+  readOnly // Ensure it's editable
+/>
       </Col>
         <Col xs={12} md={1}>
           <InputField label="Tax%"
