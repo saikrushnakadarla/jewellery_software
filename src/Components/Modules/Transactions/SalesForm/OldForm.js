@@ -94,6 +94,15 @@ const OldSalesForm = ({ setOldSalesData }) => {
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, [name]: value };
 
+      updatedDetails.net_wt = name === "net_wt" ? parseFloat(value) || 0 : parseFloat(updatedDetails.net_wt) || 0;
+
+      // Use currentRate if no rate is provided
+      updatedDetails.rate = name === "rate" ? parseFloat(value) || currentRate : parseFloat(updatedDetails.rate) || currentRate;
+  
+      // Recalculate total_amount using net_wt and rate (or currentRate)
+      updatedDetails.total_amount = calculateTotalAmount(updatedDetails, currentRate);
+  
+
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
 
@@ -130,14 +139,13 @@ const OldSalesForm = ({ setOldSalesData }) => {
     return parseFloat(netWeight.toFixed(2));
   };
 
-  const calculateTotalAmount = ({ net_wt, rate }) => {
+  const calculateTotalAmount = ({ net_wt, rate }, currentRate) => {
     const netWeight = parseFloat(net_wt) || 0;
-    const rateAmount = parseFloat(rate) || 0;
+    const rateAmount = parseFloat(rate) || parseFloat(currentRate) || 0;
   
     const totalAmount = netWeight * rateAmount;
     return parseFloat(totalAmount.toFixed(2));
   };
-
   const handleAddButtonClick = () => {
     if (editingRow) {
       setOldTableData((prevData) =>
@@ -262,21 +270,31 @@ const OldSalesForm = ({ setOldSalesData }) => {
           <InputField label="ML Percent" name="ml_percent" value={oldDetails.ml_percent} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Net Weight" name="net_wt" value={oldDetails.net_wt.toFixed(2)} onChange={handleInputChange} />
+        <InputField
+      label="Net Weight"
+      name="net_wt"
+      value={oldDetails.net_wt?.toFixed(2) || "0.00"}
+      onChange={handleInputChange}
+    />
         </Col>
         <Col xs={12} md={3}>
           <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
         <InputField
-                  label="Rate"
-                  name="rate"
-                  value={oldDetails.rate || currentRate}
-                  onChange={handleInputChange}
-                />
+      label="Rate"
+      name="rate"
+      value={oldDetails.rate || currentRate || "0.00"}
+      onChange={handleInputChange}
+    />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Total Amount" name="total_amount" value={oldDetails.total_amount.toFixed(2)} onChange={handleInputChange} />
+        <InputField
+      label="Total Amount"
+      name="total_amount"
+      value={oldDetails.total_amount?.toFixed(2) || "0.00"}
+      readOnly
+    />
         </Col>
         <Col xs={12} md={2}>
           <Button onClick={handleAddButtonClick}>
