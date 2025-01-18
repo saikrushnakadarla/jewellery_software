@@ -154,32 +154,32 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             .catch((error) => console.error("Error fetching products:", error));
     }, []);
 
-useEffect(() => {
-    // Check if the category contains "gold" whenever formData.category changes
-    const isGoldCategory = formData.category && formData.category.toLowerCase().includes("gold");
+    useEffect(() => {
+        // Check if the category contains "gold" whenever formData.category changes
+        const isGoldCategory = formData.category && formData.category.toLowerCase().includes("gold");
 
-    if (isGoldCategory) {
-        setFormData((prevData) => ({
-            ...prevData,
-            Making_Charges_On: "By Percentage",
-            MC_Per_Gram_Label: "MC Percentage",
-        }));
-    } else {
-        setFormData((prevData) => ({
-            ...prevData,
-            MC_Per_Gram_Label: "MC Per Gram",
-        }));
-    }
-}, [formData.category]);
+        if (isGoldCategory) {
+            setFormData((prevData) => ({
+                ...prevData,
+                Making_Charges_On: "By Percentage",
+                MC_Per_Gram_Label: "MC Percentage",
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                MC_Per_Gram_Label: "MC Per Gram",
+            }));
+        }
+    }, [formData.category]);
 
 
     const handleChange = async (e) => {
         const { name, value } = e.target;
-    
+
         if (name === "category") {
             // Check if the category value contains "gold" (case-insensitive)
             const isGoldCategory = value.toLowerCase().includes("gold");
-    
+
             setFormData((prevData) => ({
                 ...prevData,
                 category: value,
@@ -190,17 +190,17 @@ useEffect(() => {
             const selectedCategory = subCategories.find(
                 (category) => category.subcategory_id === parseInt(value) // Ensure correct type match
             );
-    
+
             const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-    
+
             if (newPrefix) {
                 try {
                     const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
                         params: { prefix: newPrefix },
                     });
-    
+
                     const nextPCodeBarCode = response.data.nextPCodeBarCode;
-    
+
                     setFormData((prevData) => ({
                         ...prevData,
                         sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
@@ -229,7 +229,7 @@ useEffect(() => {
             }));
         }
     };
-    
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -241,35 +241,35 @@ useEffect(() => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         // Validate pcs and grossWeight
         if (pcs <= 0 || grossWeight <= 0) {
             alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
             return;
         }
-    
+
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
             return;
         }
-    
+
         try {
             const currentSuffix = parseInt(formData.suffix || "001", 10);
             const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
-    
+
             const updatedGrossWeight = -parseFloat(formData.Gross_Weight || 0);
             const updatedPcs = -1;
-    
+
             // If `prev` is available from the component state, props, or elsewhere:
             const prev = {
                 item_prefix: "", // Replace this with your actual logic for prev
             };
-    
+
             // Save form data
             await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
-    
+
             // Update gross weight and pcs using the API
             // await axios.post(`${baseURL}/add-entry`, {
             //     id: formData.id,
@@ -278,11 +278,11 @@ useEffect(() => {
             //     gross_weight: updatedGrossWeight,
             //     added_at: new Date().toISOString(),
             // });
-    
+
             alert('Data and updated values saved successfully!');
-    
+
             fetchData();
-    
+
             // Reset form data
             setFormData({
                 product_id: selectedProduct.product_id,
@@ -320,7 +320,7 @@ useEffect(() => {
             alert('An error occurred. Please try again.');
         }
     };
-    
+
     useEffect(() => {
         const getLastPcode = async () => {
             try {
@@ -372,7 +372,7 @@ useEffect(() => {
 
     useEffect(() => {
         if (selectedProduct) {
-            console.log("Product ID:", selectedProduct.product_id); 
+            console.log("Product ID:", selectedProduct.product_id);
             console.log("Product ID:", selectedProduct.metal_type); // Use product_id as needed
         }
     }, [selectedProduct]);
@@ -426,13 +426,13 @@ useEffect(() => {
             console.error("Error fetching subcategories:", error);
         }
     };
-    
+
     useEffect(() => {
         if (selectedProduct?.product_id) { // Ensure selectedProduct is defined
             fetchSubCategories();
         }
     }, [selectedProduct]);
-    
+
     const [designOptions, setdesignOptions] = useState([]);
 
     // Fetch design master options from the API
@@ -458,35 +458,35 @@ useEffect(() => {
     }, []);
 
     const [pcs, setPcs] = useState(null);
-  const [grossWeight, setGrossWeight] = useState(null);
+    const [grossWeight, setGrossWeight] = useState(null);
 
-  // Function to fetch data from the API
-  
+    // Function to fetch data from the API
+
     const fetchData = async () => {
-      try {
-        const response = await fetch(`${baseURL}/entry/${selectedProduct.product_id}`);
-        const data = await response.json();
-        setPcs(data.pcs);
-        setGrossWeight(data.gross_weight);
+        try {
+            const response = await fetch(`${baseURL}/entry/${selectedProduct.product_id}`);
+            const data = await response.json();
+            setPcs(data.pcs);
+            setGrossWeight(data.gross_weight);
 
-        // Update formData with the fetched values
-        // setFormData((prev) => ({
-        //   ...prev,
-        //   Gross_Weight: data.gross_weight,
-        // }));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+            // Update formData with the fetched values
+            // setFormData((prev) => ({
+            //   ...prev,
+            //   Gross_Weight: data.gross_weight,
+            // }));
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
     };
     useEffect(() => {
-    fetchData();
-  }, [selectedProduct.product_id]);
+        fetchData();
+    }, [selectedProduct.product_id]);
 
     return (
         <div style={{ paddingTop: "0px" }}>
             <div>
-            <h4>Pieces: {pcs !== null ? pcs : "0"}</h4>
-            <h4>Gross Weight: {grossWeight !== null ? grossWeight : "0"}</h4>
+                <h4>Pieces: {pcs !== null ? pcs : "0"}</h4>
+                <h4>Gross Weight: {grossWeight !== null ? grossWeight : "0"}</h4>
             </div>
             <div className="container mt-4">
                 <div className="row mt-3">
@@ -498,12 +498,12 @@ useEffect(() => {
                                         <h4 className="mb-4">Stock Entry</h4>
                                         <Row>
                                             <Col xs={12} md={3}>
-                                            <InputField
+                                                <InputField
                                                     label="Category:"
                                                     name="category"
                                                     value={formData.category}
                                                     onChange={(e) => handleChange(e)}
-                                                /> 
+                                                />
                                             </Col>
                                             <Col xs={12} md={3} className="d-flex align-items-center">
                                                 <div style={{ flex: 1 }}>
@@ -664,38 +664,38 @@ useEffect(() => {
                                         </Row>
                                         <Row>
                                             <Col xs={12} md={3}>
-                                            <InputField
-    label="Making Charges On:"
-    name="Making_Charges_On"
-    type="select"
-    value={formData.Making_Charges_On}
-    onChange={handleChange}
-    options={[
-        { value: "By Weight", label: "By Weight" },
-        { value: "Fixed", label: "Fixed" },
-        { value: "By Percentage", label: "By Percentage" }, // Added for gold-related default
-    ]}
-/>
+                                                <InputField
+                                                    label="Making Charges On:"
+                                                    name="Making_Charges_On"
+                                                    type="select"
+                                                    value={formData.Making_Charges_On}
+                                                    onChange={handleChange}
+                                                    options={[
+                                                        { value: "By Weight", label: "By Weight" },
+                                                        { value: "Fixed", label: "Fixed" },
+                                                        { value: "By Percentage", label: "By Percentage" }, // Added for gold-related default
+                                                    ]}
+                                                />
                                             </Col>
                                             <Col xs={12} md={2}>
-                           
-<InputField
-    label={formData.MC_Per_Gram_Label || "MC Per Gram"} // Dynamic label based on category
-    name="MC_Per_Gram"
-    value={formData.MC_Per_Gram}
-    onChange={handleChange}
-/>
+
+                                                <InputField
+                                                    label={formData.MC_Per_Gram_Label || "MC Per Gram"} // Dynamic label based on category
+                                                    name="MC_Per_Gram"
+                                                    value={formData.MC_Per_Gram}
+                                                    onChange={handleChange}
+                                                />
                                             </Col>
                                             <Col xs={12} md={2}>
-                                              {/* Conditionally render the Making Charges field */}
-{!formData.category?.toLowerCase().includes("gold") && (
-    <InputField
-        label="Making Charges:"
-        name="Making_Charges"
-        value={formData.Making_Charges}
-        onChange={handleChange}
-    />
-)}
+                                                {/* Conditionally render the Making Charges field */}
+                                                {!formData.category?.toLowerCase().includes("gold") && (
+                                                    <InputField
+                                                        label="Making Charges:"
+                                                        name="Making_Charges"
+                                                        value={formData.Making_Charges}
+                                                        onChange={handleChange}
+                                                    />
+                                                )}
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
