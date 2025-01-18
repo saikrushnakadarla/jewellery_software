@@ -662,7 +662,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                 />
                                             </Col>
                                         </Row>
-                                        <Row>
+                                       
+                                           
+                                            <Row className="dynamic-fields-row">
                                             <Col xs={12} md={3}>
                                                 <InputField
                                                     label="Making Charges On:"
@@ -677,49 +679,49 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     ]}
                                                 />
                                             </Col>
-                                            <Col xs={12} md={2}>
+    <Col>
+        <InputField
+            label={formData.MC_Per_Gram_Label || "MC Per Gram"} // Dynamic label based on category
+            name="MC_Per_Gram"
+            value={formData.MC_Per_Gram}
+            onChange={handleChange}
+        />
+    </Col>
+    {!formData.category?.toLowerCase().includes("gold") && (
+        <Col>
+            <InputField
+                label="Making Charges:"
+                name="Making_Charges"
+                value={formData.Making_Charges}
+                onChange={handleChange}
+            />
+        </Col>
+    )}
+    <Col>
+        <InputField
+            label="HUID No:"
+            name="HUID_No"
+            value={formData.HUID_No}
+            onChange={handleChange}
+        />
+    </Col>
+    <Col>
+        <InputField
+            label="Stock Point:"
+            name="Stock_Point"
+            type="select"
+            value={formData.Stock_Point}
+            onChange={handleChange}
+            options={[
+                { value: "Floor1", label: "Floor1" },
+                { value: "Floor2", label: "Floor2" },
+                { value: "Strong room", label: "Strong room" },
+            ]}
+        />
+    </Col>
+</Row>
 
-                                                <InputField
-                                                    label={formData.MC_Per_Gram_Label || "MC Per Gram"} // Dynamic label based on category
-                                                    name="MC_Per_Gram"
-                                                    value={formData.MC_Per_Gram}
-                                                    onChange={handleChange}
-                                                />
-                                            </Col>
-                                            <Col xs={12} md={2}>
-                                                {/* Conditionally render the Making Charges field */}
-                                                {!formData.category?.toLowerCase().includes("gold") && (
-                                                    <InputField
-                                                        label="Making Charges:"
-                                                        name="Making_Charges"
-                                                        value={formData.Making_Charges}
-                                                        onChange={handleChange}
-                                                    />
-                                                )}
-                                            </Col>
-                                            <Col xs={12} md={2}>
-                                                <InputField
-                                                    label="HUID No:"
-                                                    name="HUID_No"
-                                                    value={formData.HUID_No}
-                                                    onChange={handleChange}
-                                                />
-                                            </Col>
-                                            <Col xs={12} md={3}>
-                                                <InputField
-                                                    label="Stock Point:"
-                                                    name="Stock_Point"
-                                                    type="select"
-                                                    value={formData.Stock_Point}
-                                                    onChange={handleChange}
-                                                    options={[
-                                                        { value: "Floor1", label: "Floor1" },
-                                                        { value: "Floor2", label: "Floor2" },
-                                                        { value: "Strong room", label: "Strong room" },
-                                                    ]}
-                                                />
-                                            </Col>
-                                        </Row>
+                                      
 
                                     </Col>
                                 </div>

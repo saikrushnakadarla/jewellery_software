@@ -78,9 +78,9 @@ const PaymentDetails = ({
               <td colSpan="4">{schemeAmount.toFixed(2)}</td>
             </tr>
             <tr>
-              <td colSpan="20" className="text-right">Net Payable Amount</td>
-              <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
-            </tr>
+    <td colSpan="20" className="text-right">Net Payable Amount</td>
+    <td colSpan="4">{Math.round(netPayableAmount).toFixed(2)}</td>
+  </tr>
           </Table>
         </Row>
       </Col>

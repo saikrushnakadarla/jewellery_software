@@ -16,19 +16,20 @@ const SalesFormSection = ({ setOldSalesData, setSchemeSalesData }) => {
           >
             Old
           </Button>
-          <Button
+          {/* <Button
             variant={activeForm === "schemes" ? "primary" : "secondary"}
             onClick={() => setActiveForm("schemes")}
             className="ms-2"
           >
             Schemes
-          </Button>
+          </Button> */}
         </Col>
       </Row>
 
       {activeForm === "old" ? (
         <OldSalesForm setOldSalesData={setOldSalesData} />
-      ) : (
+      ) 
+      : (
         <SchemeSalesForm setSchemeSalesData={setSchemeSalesData} />
       )}
     </Col>

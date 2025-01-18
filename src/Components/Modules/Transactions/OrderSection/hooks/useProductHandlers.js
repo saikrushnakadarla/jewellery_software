@@ -383,25 +383,21 @@ const useProductHandlers = () => {
 
 const handleChange = (e) => {
   const { name, value } = e.target;
+
   if (name === "metal_type") {
-    // Check if the category value contains "gold" (case-insensitive)
+    // Check if the selected metal type is gold (case-insensitive)
     const isGoldCategory = value.toLowerCase().includes("gold");
 
     setFormData((prevData) => ({
-        ...prevData,
-        metal_type: value,
-        mc_on: isGoldCategory ? "By Percentage" : prevData.mc_on,
-        // MC_Per_Gram_Label: isGoldCategory ? "MC Percentage" : "MC Per Gram",
+      ...prevData,
+      metal_type: value,
+      mc_on: isGoldCategory ? "By Percentage" : prevData.mc_on, // Automatically set to "By Percentage" for gold
     }));
-}
-  // Preserve the current barcode
-  const currentBarcode = formData.code;
+
+    return; // Exit early as we've already updated formData for metal_type
+  }
 
   // Update the specific field in formData
-  const updatedFormData = { ...formData, [name]: value };
-
-  setFormData(updatedFormData);
-
   setFormData((prevData) => ({
     ...prevData,
     [name]: value,
@@ -426,11 +422,11 @@ const handleChange = (e) => {
     }));
   }
 
-  // Destructure relevant fields
+  // Destructure relevant fields for filtering
+  const updatedFormData = { ...formData, [name]: value };
   const { product_name, metal_type, design_name, purity } = updatedFormData;
 
   if (product_name && metal_type && design_name && purity) {
-    // Filter matching entries
     const matchingEntries = data.filter(
       (prod) =>
         prod.product_Name === product_name &&
@@ -443,26 +439,24 @@ const handleChange = (e) => {
 
     if (matchingEntries.length > 0) {
       if (matchingEntries.length > 1) {
-        // Handle multiple matching entries
         setFormData((prevData) => ({
           ...prevData,
-          code: currentBarcode, // Preserve the selected barcode
+          code: formData.code, // Preserve the selected barcode
           barcodeOptions: matchingEntries.map((entry) => ({
             value: entry.PCode_BarCode,
             label: entry.PCode_BarCode,
           })),
         }));
-      } else if (matchingEntries.length === 1) {
+      } else {
         const matchingEntry = matchingEntries[0];
 
-        // Check if the product is already sold
         if (matchingEntry.Status === "Sold") {
           alert("The product is already sold out.");
-          
-          // Clear the form details after the alert, except for the barcode
+
+          // Clear the form details except for the barcode
           setFormData((prevData) => ({
             ...prevData,
-            barcodeOptions: [], // Clear barcode options
+            barcodeOptions: [],
             category: "",
             sub_category: "",
             gross_weight: "",
@@ -483,20 +477,17 @@ const handleChange = (e) => {
             total_price: "",
             qty: "",
           }));
-
-          return; // Stop further execution
+          return;
         }
 
         const productId = matchingEntry.product_id;
-
         const productDetails = products.find(
           (prod) => String(prod.product_id) === String(productId)
         );
 
-        // Set the selected form data based on the matching entry
         setFormData((prevData) => ({
           ...prevData,
-          code: currentBarcode || matchingEntry.PCode_BarCode, // Use existing barcode or set the new one
+          code: formData.code || matchingEntry.PCode_BarCode,
           category: matchingEntry.category,
           sub_category: matchingEntry.sub_category,
           gross_weight: matchingEntry.Gross_Weight,
@@ -512,14 +503,12 @@ const handleChange = (e) => {
           making_charges: matchingEntry.Making_Charges || "",
           tax_percent: productDetails?.tax_slab || "",
           qty: 1,
-          barcodeOptions: [], // Clear barcode options after setting the data
+          barcodeOptions: [],
         }));
       }
     } else {
       console.log("No matching entries found. No updates made.");
     }
-  } else {
-    console.log("Required fields are missing or incomplete. No updates made.");
   }
 };
 

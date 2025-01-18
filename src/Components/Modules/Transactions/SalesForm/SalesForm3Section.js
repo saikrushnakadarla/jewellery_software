@@ -15,7 +15,7 @@ const SalesFormSection = ({ setOldSalesData, setSchemeSalesData, selectedMobile 
             variant={activeForm === "old" ? "primary" : "secondary"}
             onClick={() => setActiveForm("old")}
           >
-            Old
+            URD Purchase
           </Button>
           <Button
             variant={activeForm === "schemes" ? "primary" : "secondary"}

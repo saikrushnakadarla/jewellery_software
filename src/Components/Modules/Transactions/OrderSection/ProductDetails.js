@@ -2,16 +2,16 @@ import React from 'react';
 import { Col, Row, Button } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 
-const ProductDetails = ({ 
-  formData, 
+const ProductDetails = ({
+  formData,
   data,
-  handleChange, 
+  handleChange,
   handleBarcodeChange,
   handleProductNameChange,
   handleImageUpload,
   handleAdd,
   handleUpdate,
-  isEditing, 
+  isEditing,
   products,
   filteredDesignOptions,
   filteredPurityOptions,
@@ -30,7 +30,7 @@ const ProductDetails = ({
         alert('Please upload an image file');
         return;
       }
-      
+
       // Check file size (e.g., 5MB limit)
       const maxSize = 5 * 1024 * 1024; // 5MB in bytes
       if (file.size > maxSize) {
@@ -45,230 +45,227 @@ const ProductDetails = ({
 
   return (
     <Col >
-    <Row>
-            <Col xs={12} md={3}>
-                <InputField
-                  label="Product Name"
-                  name="product_name"
-                  value={formData.product_name}
-                  onChange={handleChange}
-                />
-            </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Metal Type"
-                  name="metal_type"
-                  value={formData.metal_type}
-                  onChange={handleChange}
-                  type="select"
-                  options={metalTypes.map((metalType) => ({
-                    value: metalType.metal_name,
-                    label: metalType.metal_name,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={3}>
-                <InputField
-                  label="Design Name"
-                  name="design_name"
-                  value={formData.design_name}
-                  onChange={handleChange}
-                  type="select"
-                  options={designMaster.map((designOption) => ({
-                    value: designOption.design_name,
-                    label: designOption.design_name,
-                  }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Purity"
-                  name="purity"
-                  value={formData.purity}
-                  onChange={handleChange}
-                  type="select"
-                  options={purity.map((Purity) => ({
-                    value: Purity.name,
-                    label: Purity.name,
-                  }))}
-                />
-              </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Gross Wt"
-          name="gross_weight"
-          value={formData.gross_weight || ""} // Default to "0" if undefined
-          onChange={handleChange}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="Stone Wt"
-          name="stone_weight"
-          value={formData.stone_weight || ""}
-          onChange={handleChange}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="St Price"
-          name="stone_price"
-          value={formData.stone_price || ""}
-          onChange={handleChange}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Weight BW"
-          name="weight_bw"
-          value={formData.weight_bw || ""}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={2}>
-      <InputField
-        label="Wastage On"
-        name="va_on"
-        type="select"
-        value={formData.va_on || ""} // Default to "Gross Weight"
-        onChange={handleChange}
-        options={[
-          { value: "Gross Weight", label: "Gross Weight" },
-          { value: "Weight BW", label: "Weight BW" },
-          ...(formData.va_on &&
-          !["Gross Weight", "Weight BW"].includes(formData.va_on)
-            ? [{ value: formData.va_on, label: formData.va_on }]
-            : []),
-        ]}
-      />
-    </Col>
+      <Row>
+        <Col xs={12} md={3}>
+          <InputField
+            label="Product Name"
+            name="product_name"
+            value={formData.product_name}
+            onChange={handleChange}
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Metal Type"
+            name="metal_type"
+            value={formData.metal_type}
+            onChange={handleChange}
+            type="select"
+            options={metalTypes.map((metalType) => ({
+              value: metalType.metal_name,
+              label: metalType.metal_name,
+            }))}
+          />
 
-      <Col xs={12} md={1}>
-        <InputField
-          label="Wastage%"
-          name="va_percent"
-          value={formData.va_percent || ""}
-          onChange={handleChange}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="W.Wt"
-          name="wastage_weight"
-          value={formData.wastage_weight || ""}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Total Weight AW"
-          name="total_weight_av"
-          value={formData.total_weight_av || ""}
-          onChange={handleChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={2}>
-      <InputField
-          label="MC On"
-          name="mc_on"
-          type="select"
-          value={formData.mc_on || ""} // Default to "By Weight"
-          onChange={handleChange}
-          options={[
-            { value: "By Weight", label: "By Weight" },
-            { value: "Fixed", label: "Fixed" },
-            { value: "By Percentage", label: "By Percentage" },
-            ...(formData.mc_on &&
-            !["By Weight", "Fixed"].includes(formData.mc_on)
-              ? [{ value: formData.mc_on, label: formData.mc_on }]
-              : []),
-          ]}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-      <InputField
-  label={
-    formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"
-  }
-  name="mc_per_gram" // Adjusted to reflect MC Percentage for gold
-  value={formData.mc_per_gram || ""} // Default value handling
-  onChange={handleChange}
-/>
-      </Col>
-      <Col xs={12} md={2}>
-        {/* <InputField
+        </Col>
+        <Col xs={12} md={3}>
+          <InputField
+            label="Design Name"
+            name="design_name"
+            value={formData.design_name}
+            onChange={handleChange}
+            type="select"
+            options={designMaster.map((designOption) => ({
+              value: designOption.design_name,
+              label: designOption.design_name,
+            }))}
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Purity"
+            name="purity"
+            value={formData.purity}
+            onChange={handleChange}
+            type="select"
+            options={purity.map((Purity) => ({
+              value: Purity.name,
+              label: Purity.name,
+            }))}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField
+            label="Gross Wt"
+            name="gross_weight"
+            value={formData.gross_weight || ""} // Default to "0" if undefined
+            onChange={handleChange}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField
+            label="Stone Wt"
+            name="stone_weight"
+            value={formData.stone_weight || ""}
+            onChange={handleChange}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField
+            label="St Price"
+            name="stone_price"
+            value={formData.stone_price || ""}
+            onChange={handleChange}
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Weight BW"
+            name="weight_bw"
+            value={formData.weight_bw || ""}
+            onChange={handleChange}
+            readOnly
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Wastage On"
+            name="va_on"
+            type="select"
+            value={formData.va_on || ""} // Default to "Gross Weight"
+            onChange={handleChange}
+            options={[
+              { value: "Gross Weight", label: "Gross Weight" },
+              { value: "Weight BW", label: "Weight BW" },
+              ...(formData.va_on &&
+                !["Gross Weight", "Weight BW"].includes(formData.va_on)
+                ? [{ value: formData.va_on, label: formData.va_on }]
+                : []),
+            ]}
+          />
+        </Col>
+
+        <Col xs={12} md={1}>
+          <InputField
+            label="Wastage%"
+            name="va_percent"
+            value={formData.va_percent || ""}
+            onChange={handleChange}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField
+            label="W.Wt"
+            name="wastage_weight"
+            value={formData.wastage_weight || ""}
+            onChange={handleChange}
+            readOnly
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Total Weight AW"
+            name="total_weight_av"
+            value={formData.total_weight_av || ""}
+            onChange={handleChange}
+            readOnly
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="MC On"
+            name="mc_on"
+            type="select"
+            value={formData.mc_on || "By Weight"}
+            onChange={handleChange}
+            options={[
+              { value: "By Weight", label: "By Weight" },
+              { value: "Fixed", label: "Fixed" },
+              { value: "By Percentage", label: "By Percentage" }, // Explicitly allow this option
+            ]}
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label={
+              formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"
+            }
+            name="mc_per_gram" // Adjusted to reflect MC Percentage for gold
+            value={formData.mc_per_gram || ""} // Default value handling
+            onChange={handleChange}
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          {/* <InputField
           label="Making Charges"
           name="making_charges"
           value={formData.making_charges || ""}
           onChange={handleChange}
         /> */}
-              <InputField
-  label="Making Charges"
-  name="making_charges"
-  value={formData.making_charges || ""} // Display calculated Total MC
-  readOnly // Make this field read-only, since it’s auto-calculated
-/>
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField label="Rate" name="rate"
-          value={formData.rate}
-          onChange={handleChange} 
-        />
-      </Col>
-      <Col xs={12} md={1}>
-      <InputField
-        label="Qty"
-        name="qty"
-        value={formData.qty}
-        onChange={handleChange}
-        readOnly={!isQtyEditable} // Make it editable when isQtyEditable is true
-      />
-    </Col>
-      <Col xs={12} md={2}>
-      {/* <InputField
+          <InputField
+            label="Making Charges"
+            name="making_charges"
+            value={formData.making_charges || ""} // Display calculated Total MC
+            readOnly // Make this field read-only, since it’s auto-calculated
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField label="Rate" name="rate"
+            value={formData.rate}
+            onChange={handleChange}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField
+            label="Qty"
+            name="qty"
+            value={formData.qty}
+            onChange={handleChange}
+            readOnly={!isQtyEditable} // Make it editable when isQtyEditable is true
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          {/* <InputField
         label="Amount"
         name="rate_amt"
         value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
         onChange={handleChange} // Optional, since it's auto-calculated
         readOnly
       /> */}
-            <InputField
-  label="Amount"
-  name="rate_amt"
-  value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
-  onChange={handleChange} // Trigger recalculation of Total MC
-  readOnly // Ensure it's editable
-/>
-      </Col>
+          <InputField
+            label="Amount"
+            name="rate_amt"
+            value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+            onChange={handleChange} // Trigger recalculation of Total MC
+            readOnly // Ensure it's editable
+          />
+        </Col>
         <Col xs={12} md={1}>
           <InputField label="Tax%"
             name="tax_percent"
             value={formData.tax_percent}
-            onChange={handleChange} 
+            onChange={handleChange}
           />
         </Col>
         <Col xs={12} md={1}>
-        <InputField
-          label="Tax Amt"
-          name="tax_amt"
-          value={formData.tax_amt || "0.00"} // Default to "0.00" if undefined
-          onChange={handleChange} // Optional, since it's auto-calculated
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Total Price"
-          name="total_price"
-          value={formData.total_price || "0.00"} // Default to "0.00" if undefined
-          onChange={handleChange} // Optional, since it's auto-calculated
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={3}>
+          <InputField
+            label="Tax Amt"
+            name="tax_amt"
+            value={formData.tax_amt || "0.00"} // Default to "0.00" if undefined
+            onChange={handleChange} // Optional, since it's auto-calculated
+            readOnly
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Total Price"
+            name="total_price"
+            value={formData.total_price || "0.00"} // Default to "0.00" if undefined
+            onChange={handleChange} // Optional, since it's auto-calculated
+            readOnly
+          />
+        </Col>
+        <Col xs={12} md={3}>
           <div className="mb-3">
             <label className="form-label">Product Image</label>
             <input
@@ -290,17 +287,17 @@ const ProductDetails = ({
         </Col>
         <Col xs={12} md={1}>
           <Button
-                      onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
-                      style={{
-                        backgroundColor: isEditing ? "#a36e29" : "#a36e29",
-                        borderColor: isEditing ? "#a36e29" : "#a36e29",
-                      }}
-                    >
-                      {isEditing ? "Update" : "Add"}
-                    </Button>
+            onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
+            style={{
+              backgroundColor: isEditing ? "#a36e29" : "#a36e29",
+              borderColor: isEditing ? "#a36e29" : "#a36e29",
+            }}
+          >
+            {isEditing ? "Update" : "Add"}
+          </Button>
         </Col>
       </Row>
-      </Col> 
+    </Col>
   );
 };
 

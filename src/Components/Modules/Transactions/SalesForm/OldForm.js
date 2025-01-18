@@ -227,7 +227,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
   return (
     <>
       <Row>
-        <h4 className="mb-3">Old</h4>
+        <h4 className="mb-3">URD Purchase</h4>
         <Col xs={12} md={4}>
           <InputField label="Product" name="product" value={oldDetails.product} onChange={handleInputChange}/>
         </Col>
