@@ -563,12 +563,12 @@ const URDPurchase = () => {
         console.error("Error fetching silver rate:", error);
       }
     };
-
+  
     if (formData.category) {
       const selectedCategory = categories.find(
         (cat) => cat.value === formData.category
       );
-
+  
       if (selectedCategory?.categoryType === "Silver") {
         fetchRateForSilver();
         setPurityOptions([{
@@ -580,17 +580,17 @@ const URDPurchase = () => {
           .get(`${baseURL}/get/products`)
           .then((response) => {
             const products = response.data;
-
+  
             // Filter products based on selected category name
             const filteredProducts = products.filter(
               (product) => product.product_name === formData.category
             );
-
+  
             // Extract unique purity values
             const uniquePurityValues = [
               ...new Set(filteredProducts.map((product) => product.purity)),
             ].filter((purity) => purity); // Exclude null/undefined
-
+  
             // Update purity options
             setPurityOptions(
               uniquePurityValues.map((purity) => ({
@@ -598,12 +598,12 @@ const URDPurchase = () => {
                 label: purity,
               }))
             );
-
-            // Reset rate until purity is selected
+  
+            // Set default purity to "22K" for gold ornaments
             setFormData((prev) => ({
               ...prev,
-              rate: "",
-              
+              purity: "22K", // Default to "22K" for Gold category
+              rate: "", // Reset rate until purity is selected
             }));
           })
           .catch((error) => {
@@ -613,10 +613,10 @@ const URDPurchase = () => {
     } else {
       // Reset purity options and rate if no category is selected
       setPurityOptions([]);
-      setFormData((prev) => ({ ...prev, rate: "",hsn_code:'', }));
+      setFormData((prev) => ({ ...prev, rate: "", hsn_code: '' }));
     }
   }, [formData.category, categories]);
-
+  
   useEffect(() => {
     if (formData.category && formData.purity) {
       axios

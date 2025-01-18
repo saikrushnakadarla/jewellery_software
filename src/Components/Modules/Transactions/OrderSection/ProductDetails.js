@@ -266,7 +266,7 @@ const ProductDetails = ({
           />
         </Col>
         <Col xs={12} md={3}>
-          <div className="mb-3">
+          {/* <div className="mb-3">
             <label className="form-label">Product Image</label>
             <input
               type="file"
@@ -274,6 +274,34 @@ const ProductDetails = ({
               accept="image/*"
               onChange={handleFileChange}
             />
+            {formData.product_image && (
+              <div className="mt-2">
+                <img
+                  src={URL.createObjectURL(formData.product_image)}
+                  alt="Preview"
+                  style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                />
+              </div>
+            )}
+          </div> */}
+          <div className="mb-3">
+            <label className="form-label">Product Image</label>
+            <div className="custom-file-input-wrapper">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => document.getElementById("customFileInput").click()}
+              >
+                Select Image
+              </button>
+              <input
+                id="customFileInput"
+                type="file"
+                className="form-control d-none" /* Hide default input */
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+            </div>
             {formData.product_image && (
               <div className="mt-2">
                 <img
