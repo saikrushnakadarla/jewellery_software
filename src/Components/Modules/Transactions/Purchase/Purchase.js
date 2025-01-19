@@ -31,6 +31,9 @@ const URDPurchase = () => {
         bill_date: new Date().toISOString().split("T")[0],
         due_date: "",
         category: "",
+        cut: "",
+        color: "",
+        clarity: "",
         hsn_code: "",
         rbarcode: "",
         pcs: "",
@@ -40,15 +43,16 @@ const URDPurchase = () => {
         hm_charges: "",
         other_charges: "",
         charges: "",
-        purity: "",
         product_id: "",
         metal_type: "",
         pure_weight: "",
+        paid_pure_weight: "",
+        balance_pure_weight: "0",
         rate: "",
         total_amount: "",
         paid_amount: "",
         balance_amount: "",
-        balance_after_receipt:"0",
+        balance_after_receipt: "0",
       };
   });
 
@@ -63,18 +67,18 @@ const URDPurchase = () => {
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
-  
+
       // Restrict paid_amount to not exceed total_amount
       if (field === "paid_amount") {
         const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
         const paidAmount = parseFloat(value) || 0;
-  
+
         if (paidAmount > totalAmount) {
           alert("Paid amount cannot exceed the total amount.");
           return prevFormData; // Prevent update
         }
       }
-  
+
       // If the category changes, update the hsn_code automatically
       if (field === "category") {
         const selectedCategory = categories.find(
@@ -84,41 +88,41 @@ const URDPurchase = () => {
           updatedFormData.hsn_code = selectedCategory.hsn_code;
         }
       }
-  
+
       // Parse purity to percentage from carats (e.g., "24K" -> 100%)
       const parsePurityToPercentage = (purity) => {
         const caratValue = parseFloat(purity.replace("K", "")); // Extract number from "24K", "22K", etc.
         return (caratValue / 24) * 100; // Convert carats to percentage
       };
-  
+
       // Update rate based on purity
       if (field === "purity") {
         const rate =
           value === "24K"
             ? rates.rate_24crt
             : value === "22K"
-            ? rates.rate_22crt
-            : value === "18K"
-            ? rates.rate_18crt
-            : value === "16K"
-            ? rates.rate_16crt
-            : "";
-  
+              ? rates.rate_22crt
+              : value === "18K"
+                ? rates.rate_18crt
+                : value === "16K"
+                  ? rates.rate_16crt
+                  : "";
+
         updatedFormData.rate = rate;
       }
-  
+
       // Update pure weight when net weight or purity changes
       if (field === "net_weight" || field === "purity") {
         const netWeight = parseFloat(updatedFormData.net_weight) || 0;
         const purityPercentage = parsePurityToPercentage(
           updatedFormData.purity
         ) || 0;
-  
+
         updatedFormData.pure_weight = (
           (netWeight * purityPercentage) / 100
         ).toFixed(2);
       }
-  
+
       // Additional calculations for other fields
       if (
         updatedFormData.gross &&
@@ -127,22 +131,22 @@ const URDPurchase = () => {
         updatedFormData.purity
       ) {
         const purityValue = parsePurityToPercentage(updatedFormData.purity);
-  
+
         if (purityValue) {
           const gross = parseFloat(updatedFormData.gross) || 0;
           const dust = parseFloat(updatedFormData.dust) || 0;
           const mlPercent = parseFloat(updatedFormData.ml_percent) || 0;
-  
+
           const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
           updatedFormData.eqt_wt = netWeight.toFixed(2);
         }
       }
-  
+
       // Update net weight and pure weight
       const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
       const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
       updatedFormData.net_weight = grossWeight - stoneWeight;
-  
+
       const netWeight = parseFloat(updatedFormData.net_weight) || 0;
       const purityPercentage = parsePurityToPercentage(
         updatedFormData.purity
@@ -150,22 +154,27 @@ const URDPurchase = () => {
       updatedFormData.pure_weight = (
         (netWeight * purityPercentage) / 100
       ).toFixed(2);
-  
+
       // Calculate total amount
       const pureWeight = parseFloat(updatedFormData.pure_weight) || 0;
       const rate = parseFloat(updatedFormData.rate) || 0;
       updatedFormData.total_amount = (pureWeight * rate).toFixed(2);
-  
+
       // Calculate balance amount
       const paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
       updatedFormData.balance_amount = (
         parseFloat(updatedFormData.total_amount || 0) - paidAmount
       ).toFixed(2);
-  
+
+      const paid_pure_weight = parseFloat(updatedFormData.paid_pure_weight) || 0;
+      updatedFormData.balance_pure_weight = (
+        parseFloat(updatedFormData.pure_weight || 0) - paid_pure_weight
+      ).toFixed(2);
+
       return updatedFormData;
     });
   };
-    
+
   const [tableData, setTableData] = useState(() => {
     const savedData = localStorage.getItem("tableData");
     return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
@@ -177,14 +186,14 @@ const URDPurchase = () => {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-  
+
     // Prepare data to be sent to the API
     const apiData = {
       product_id: formData.product_id, // Assuming rbarcode maps to product_id
       pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
       gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
     };
-  
+
     try {
       // Make a POST request to the API
       const response = await fetch(`${baseURL}/add-entry`, {
@@ -194,11 +203,11 @@ const URDPurchase = () => {
         },
         body: JSON.stringify(apiData),
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log("Pcs and GrossWeight added to the database successfully:", result);
-  
+
         if (editingIndex === null) {
           // Add new entry to the table
           setTableData([...tableData, formData]);
@@ -210,11 +219,14 @@ const URDPurchase = () => {
           setTableData(updatedTableData);
           setEditingIndex(null); // Reset edit mode
         }
-  
+
         // Reset formData only when needed (optional for editing scenarios)
         setFormData({
           ...formData, // Retain fields as necessary
           category: "",
+          cut: "",
+          color: "",
+          clarity: "",
           hsn_code: "",
           rbarcode: "",
           pcs: "",
@@ -226,11 +238,13 @@ const URDPurchase = () => {
           charges: "",
           purity: "",
           pure_weight: "",
+          paid_pure_weight: "",
+          balance_pure_weight: "",
           rate: "",
           total_amount: "",
           paid_amount: "",
           balance_amount: "",
-          balance_after_receipt:"0",
+          balance_after_receipt: "0",
         });
       } else {
         console.error("Failed to add entry to the database:", response.statusText);
@@ -239,31 +253,31 @@ const URDPurchase = () => {
       console.error("Error while adding entry to the database:", error);
     }
   };
-  
+
   const handleSave = async (e) => {
     e.preventDefault();
-  
+
     console.log("Product ID before submission:", formData.product_id);
-  
+
     try {
       // Prepare data for saving
       const dataToSave = {
-        formData: { ...formData,  }, // Include form data as it is
+        formData: { ...formData, }, // Include form data as it is
         table_data: tableData.map((row) => ({
-          ...row, 
+          ...row,
         })),
       };
-  
+
       console.log("Data to save:", dataToSave);
-  
+
       // Send data to the backend
       const response = await axios.post(`${baseURL}/post/purchase`, dataToSave, {
         headers: { "Content-Type": "application/json" },
       });
-  
+
       console.log("Purchase saved successfully:", response.data);
       alert("Purchase saved successfully");
-  
+
       // Reset formData and tableData
       setFormData({
         mobile: "",
@@ -301,7 +315,7 @@ const URDPurchase = () => {
       console.error("Error saving data:", error);
     }
   };
-  
+
   useEffect(() => {
     localStorage.setItem("purchaseFormData", JSON.stringify(formData));
     localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
@@ -563,12 +577,12 @@ const URDPurchase = () => {
         console.error("Error fetching silver rate:", error);
       }
     };
-  
+
     if (formData.category) {
       const selectedCategory = categories.find(
         (cat) => cat.value === formData.category
       );
-  
+
       if (selectedCategory?.categoryType === "Silver") {
         fetchRateForSilver();
         setPurityOptions([{
@@ -580,17 +594,17 @@ const URDPurchase = () => {
           .get(`${baseURL}/get/products`)
           .then((response) => {
             const products = response.data;
-  
+
             // Filter products based on selected category name
             const filteredProducts = products.filter(
               (product) => product.product_name === formData.category
             );
-  
+
             // Extract unique purity values
             const uniquePurityValues = [
               ...new Set(filteredProducts.map((product) => product.purity)),
             ].filter((purity) => purity); // Exclude null/undefined
-  
+
             // Update purity options
             setPurityOptions(
               uniquePurityValues.map((purity) => ({
@@ -598,7 +612,7 @@ const URDPurchase = () => {
                 label: purity,
               }))
             );
-  
+
             // Set default purity to "22K" for gold ornaments
             setFormData((prev) => ({
               ...prev,
@@ -616,20 +630,20 @@ const URDPurchase = () => {
       setFormData((prev) => ({ ...prev, rate: "", hsn_code: '' }));
     }
   }, [formData.category, categories]);
-  
+
   useEffect(() => {
     if (formData.category && formData.purity) {
       axios
         .get(`${baseURL}/get/products`)
         .then((response) => {
           const products = response.data;
-  
+
           const matchingProduct = products.find(
             (product) =>
               product.product_name === formData.category &&
               product.purity === formData.purity
           );
-  
+
           if (matchingProduct) {
             setFormData((prevFormData) => ({
               ...prevFormData,
@@ -643,7 +657,7 @@ const URDPurchase = () => {
               ...prevFormData,
               product_id: '',
               rbarcode: '',
-              
+
             }));
           }
         })
@@ -659,7 +673,7 @@ const URDPurchase = () => {
       }));
     }
   }, [formData.category, formData.purity]);
-  
+
 
   const handleOpenModal = (data) => {
     setSelectedProduct(data);
@@ -742,7 +756,7 @@ const URDPurchase = () => {
             </div>
             <div className="purchase-form-right">
               <Col className="urd-form2-section">
-              <h4 className="mb-4">Invoice Details</h4>
+                <h4 className="mb-4">Invoice Details</h4>
                 <Row>
                   {/* <Col xs={12} md={3}>
                     <InputField label="Terms" type="select" value={formData.terms}
@@ -795,7 +809,9 @@ const URDPurchase = () => {
                     name="category"
                     type="select"
                     value={formData.category}
-                    onChange={(e) => handleChange("category", e.target.value)}
+                    onChange={(e) => {
+                      handleChange("category", e.target.value);
+                    }}
                     options={categories.map((category) => ({
                       value: category.value,
                       label: category.label,
@@ -813,17 +829,52 @@ const URDPurchase = () => {
                   }}
                 />
               </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Purity"
-                  type="select"
-                  name="purity"
-                  value={formData.purity}
-                  onChange={(e) => handleChange("purity", e.target.value)}
-                  options={purityOptions}
-                />
 
-              </Col>
+              {/* Conditional Rendering of Fields */}
+              {formData.category === "Diamond" ? (
+                <>
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Cut"
+                      name="cut"
+                      type="text"
+                      value={formData.cut || ""}
+                      onChange={(e) => handleChange("cut", e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Color"
+                      name="color"
+                      type="text"
+                      value={formData.color || ""}
+                      onChange={(e) => handleChange("color", e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Clarity"
+                      name="clarity"
+                      type="text"
+                      value={formData.clarity || ""}
+                      onChange={(e) => handleChange("clarity", e.target.value)}
+                    />
+                  </Col>
+                </>
+              ) : (
+                <Col xs={12} md={2}>
+                  <InputField
+                    label="Purity"
+                    type="select"
+                    name="purity"
+                    value={formData.purity}
+                    onChange={(e) => handleChange("purity", e.target.value)}
+                    options={purityOptions}
+                  />
+
+                </Col>
+              )}
+
               <Col xs={12} md={2}>
                 <InputField
                   label="Rbarcode"
@@ -885,10 +936,27 @@ const URDPurchase = () => {
               <Col xs={12} md={2}>
 
                 <InputField
-                  label="Pure Wt"
+                  label="Total Pure Wt"
                   type="number"
                   value={formData.pure_weight}
                   onChange={(e) => handleChange("pure_weight", e.target.value)}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Paid Pure Wt"
+                  type="number"
+                  value={formData.paid_pure_weight}
+                  onChange={(e) => handleChange("paid_pure_weight", e.target.value)}
+                />
+              </Col>
+
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Balance Pure Wt"
+                  type="number"
+                  value={formData.balance_pure_weight}
+                  onChange={(e) => handleChange("balance_pure_weight", e.target.value)}
                 />
               </Col>
               <Col xs={12} md={2}>
@@ -901,21 +969,21 @@ const URDPurchase = () => {
 
               </Col>
               <Col xs={12} md={2}>
-        <InputField
-          label="Total Amount"
-          type="number"
-          value={formData.total_amount}
-          readOnly // Prevent editing by the user
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Paid Amount"
-          type="number"
-          value={formData.paid_amount}
-          onChange={(e) => handleChange("paid_amount", e.target.value)}
-        />
-      </Col>
+                <InputField
+                  label="Total Amount"
+                  type="number"
+                  value={formData.total_amount}
+                  readOnly // Prevent editing by the user
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Paid Amount"
+                  type="number"
+                  value={formData.paid_amount}
+                  onChange={(e) => handleChange("paid_amount", e.target.value)}
+                />
+              </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Balance Amount"
@@ -950,6 +1018,9 @@ const URDPurchase = () => {
                     {/* <th>product_id</th> */}
                     <th>Rbarcode</th>
                     <th>Category</th>
+                    <th>Cut</th>
+                    <th>Color</th>
+                    <th>Clarity</th>
                     <th>Pieces</th>
                     <th>Gross</th>
                     <th>Stone</th>
@@ -959,7 +1030,9 @@ const URDPurchase = () => {
                     <th>Charges</th> */}
                     <th>Metal Type</th>
                     <th>Purity</th>
-                    <th>Pure Wt</th>
+                    <th>Total Pure Wt</th>
+                    <th>paid_pure wt</th>
+                    <th>Balance pure wt</th>
                     <th>Rate</th>
                     <th>Total Amount</th>
                     <th>Paid Amount</th>
@@ -973,6 +1046,9 @@ const URDPurchase = () => {
                       {/* <td>{data.product_id}</td> */}
                       <td>{data.rbarcode}</td>
                       <td>{data.category}</td>
+                      <td>{data.cut}</td>
+                      <td>{data.color}</td>
+                      <td>{data.clarity}</td>
                       <td>{data.pcs}</td>
                       <td>{data.gross_weight}</td>
                       <td>{data.stone_weight}</td>
@@ -983,6 +1059,8 @@ const URDPurchase = () => {
                       <td>{data.metal_type}</td>
                       <td>{data.purity}</td>
                       <td>{data.pure_weight}</td>
+                      <td>{data.paid_pure_weight}</td>
+                      <td>{data.balance_pure_weight}</td>
                       <td>{data.rate}</td>
                       <td>{data.total_amount}</td>
                       <td>{data.paid_amount}</td>
@@ -991,7 +1069,7 @@ const URDPurchase = () => {
                         <button
                           type="button"
                           className="btn btn-primary"
-                          style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', width: '102px',fontSize: '0.875rem', }}
+                          style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', width: '102px', fontSize: '0.875rem', }}
                           onClick={() => handleOpenModal(data)} // Pass entire row data
                         >
                           Tag Entry
