@@ -220,7 +220,7 @@ const TaxINVoiceReceipt = ({
         oldItemsAmount,
         schemeAmount,
         netPayableAmount,
-      }) => {
+}) => {
         // Log customer details to verify they are dynamically fetched
         console.log("Customer Details:");
         console.log("Account Name:", formData.account_name);
@@ -230,85 +230,85 @@ const TaxINVoiceReceipt = ({
         console.log("GSTIN:", formData.gst_in);
         console.log("Invoice Number:", formData.invoice_number);
         console.log("Date:", formData.date);
-      
+
         // Calculate total values
         const totalValues = repairDetails.reduce(
-          (totals, item) => {
-            return {
-              qty: totals.qty + Number(item.qty || 0),
-              grossWeight: totals.grossWeight + Number(item.gross_weight || 0),
-              stoneWeight: totals.stoneWeight + Number(item.stone_weight || 0),
-              netWeight: totals.netWeight + Number(item.weight_bw || 0),
-              rate: totals.rate + Number(item.rate || 0),
-              makingCharges: totals.makingCharges + Number(item.making_charges || 0),
-              stonePrice: totals.stonePrice + Number(item.stone_price || 0),
-              rateAmount: totals.rateAmount + Number(item.rate_amt || 0),
-            };
-          },
-          {
-            qty: 0,
-            grossWeight: 0,
-            stoneWeight: 0,
-            netWeight: 0,
-            rate: 0,
-            makingCharges: 0,
-            stonePrice: 0,
-            rateAmount: 0,
-          }
+                (totals, item) => {
+                        return {
+                                qty: totals.qty + Number(item.qty || 0),
+                                grossWeight: totals.grossWeight + Number(item.gross_weight || 0),
+                                stoneWeight: totals.stoneWeight + Number(item.stone_weight || 0),
+                                netWeight: totals.netWeight + Number(item.weight_bw || 0),
+                                rate: totals.rate + Number(item.rate || 0),
+                                makingCharges: totals.makingCharges + Number(item.making_charges || 0),
+                                stonePrice: totals.stonePrice + Number(item.stone_price || 0),
+                                rateAmount: totals.rateAmount + Number(item.rate_amt || 0),
+                        };
+                },
+                {
+                        qty: 0,
+                        grossWeight: 0,
+                        stoneWeight: 0,
+                        netWeight: 0,
+                        rate: 0,
+                        makingCharges: 0,
+                        stonePrice: 0,
+                        rateAmount: 0,
+                }
         );
-      
+
         const netBillValue = totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount;
-      
+
         // Convert the value into words
         const netBillValueInWords = toWords(netBillValue).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase()); // Capitalize words
-      
+
         return (
-          <Document>
-            <Page size="A4" style={styles.page}>
-              {/* First Row */}
-              <View style={styles.row}>
-                <View style={[styles.column, { marginTop: 20, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
-                  <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
-                  <Text style={{ marginBottom: 5 }}>Account Name:{formData.account_name || ""}</Text>
-                  <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
-                  <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
-                  <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text>
-                </View>
-      
-                <View style={[styles.column, { width: "40%" }]}>
-                  <Image style={styles.image1} src={logo1} />
-                </View>
-      
-                <View style={[styles.column, { width: "10%" }]}></View>
-      
-                <View style={[styles.column, { marginTop: 0, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
-                  <Text style={{ fontWeight: "bold", fontSize: 12, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text>
-      
-                  {/* BILL NO */}
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
-                    <Text>BILL NO:</Text>
-                    <Text style={{ textAlign: "right", flex: 1 }}>{formData.invoice_number}</Text>
-                  </View>
-      
-                  {/* DATE */}
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
-                    <Text>DATE:</Text>
-                    <Text style={{ textAlign: "right", flex: 1 }}>{formData.date}</Text>
-                  </View>
-      
-                  {/* STAFF */}
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
-                    <Text>STAFF:</Text>
-                    <Text style={{ textAlign: "right", flex: 1 }}>Sadashri Jewels</Text>
-                  </View>
-      
-                  {/* GSTIN */}
-                  <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
-                    <Text>GSTIN:</Text>
-                    <Text style={{ textAlign: "right", flex: 1 }}>29ABMCS9253K1ZG</Text>
-                  </View>
-                </View>
-              </View>
+                <Document>
+                        <Page size="A4" style={styles.page}>
+                                {/* First Row */}
+                                <View style={styles.row}>
+                                        <View style={[styles.column, { marginTop: 20, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
+                                                <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
+                                                <Text style={{ marginBottom: 5 }}>Account Name:{formData.account_name || ""}</Text>
+                                                <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
+                                                <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
+                                                <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text>
+                                        </View>
+
+                                        <View style={[styles.column, { width: "40%" }]}>
+                                                <Image style={styles.image1} src={logo1} />
+                                        </View>
+
+                                        <View style={[styles.column, { width: "10%" }]}></View>
+
+                                        <View style={[styles.column, { marginTop: 0, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
+                                                <Text style={{ fontWeight: "bold", fontSize: 12, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text>
+
+                                                {/* BILL NO */}
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                                        <Text>BILL NO:</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.invoice_number}</Text>
+                                                </View>
+
+                                                {/* DATE */}
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                                        <Text>DATE:</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.date}</Text>
+                                                </View>
+
+                                                {/* STAFF */}
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                                        <Text>STAFF:</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>Sadashri Jewels</Text>
+                                                </View>
+
+                                                {/* GSTIN */}
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                                        <Text>GSTIN:</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>29ABMCS9253K1ZG</Text>
+                                                </View>
+                                        </View>
+                                </View>
 
 
                                 <View style={styles.container}>
@@ -500,23 +500,30 @@ const TaxINVoiceReceipt = ({
 
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", fontFamily: 'Times-Bold' }}>
                                                         {/* Left Side Content */}
-                                                        
+
                                                         <View style={{ paddingLeft: 10, marginTop: 20 }}>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>
-                                                                Cash Recd: {cash_amount ?? "0.00"}
+                                                                        Cash Recd: {cash_amount ?? "0.00"}
                                                                 </Text>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>
-                                                                Card Recd: {card_amt ?? "0.00"}
+                                                                        Card Recd: {card_amt ?? "0.00"}
                                                                 </Text>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>
-                                                                Cheque Recd: {chq_amt ?? "0.00"}
+                                                                        Cheque Recd: {chq_amt ?? "0.00"}
                                                                 </Text>
                                                                 <Text style={[styles.bold]}>
-                                                                NEFT Recd: {online_amt ?? "0.00"} #: Bank:
+                                                                        NEFT Recd: {online_amt ?? "0.00"} #: Bank:
+                                                                </Text>
+                                                                <Text style={[styles.bold]}>
+                                                                        Balance Amount:
+                                                                        {(
+                                                                                netPayableAmount -
+                                                                                ((cash_amount ?? 0.00) + (chq_amt ?? 0.00) + (card_amt ?? 0.00) + (online_amt ?? 0.00))
+                                                                        ).toFixed(2)}
                                                                 </Text>
                                                         </View>
 
-                                                        
+
                                                         {/* {repairDetails.map((item, index) => ( */}
                                                         <View style={{ paddingRight: 10, marginTop: 5 }}>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
@@ -534,8 +541,8 @@ const TaxINVoiceReceipt = ({
                                                                         <Text style={{ textAlign: "right" }}>
                                                                                 {(taxAmount / 2).toFixed(2)}
                                                                         </Text>
-                                                                        </View>
-                                                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                </View>
+                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>SGST @1.50%:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
                                                                                 {(taxAmount / 2).toFixed(2)}
@@ -545,8 +552,8 @@ const TaxINVoiceReceipt = ({
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text style={[styles.bold]}>Net Bill Value: </Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                        {/* {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)} */}
-                                                                        {netBillValue.toFixed(2)}
+                                                                                {/* {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)} */}
+                                                                                {netBillValue.toFixed(2)}
                                                                         </Text>
 
                                                                 </View>
@@ -561,7 +568,7 @@ const TaxINVoiceReceipt = ({
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text style={[styles.bold]}>Net Amount:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                        {netPayableAmount.toFixed(2)}
+                                                                                {netPayableAmount.toFixed(2)}
                                                                         </Text>
                                                                 </View>
                                                         </View>
@@ -569,9 +576,9 @@ const TaxINVoiceReceipt = ({
 
                                                 </View>
                                                 <View style={{ alignItems: "center", fontFamily: 'Times-Bold' }}>
-                                                <Text>
-                                                        (Rupees {netBillValueInWords} Only)
-                                                </Text>
+                                                        <Text>
+                                                                (Rupees {netBillValueInWords} Only)
+                                                        </Text>
                                                 </View>
 
                                                 <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "space-between", marginBottom: 3, fontFamily: 'Times-Bold' }}>
