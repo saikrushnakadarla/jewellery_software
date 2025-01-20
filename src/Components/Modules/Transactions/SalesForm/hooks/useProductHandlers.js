@@ -143,7 +143,7 @@ const useProductHandlers = () => {
   
       // Remove duplicate product_Name entries
       const uniqueProductNames = Array.from(
-        new Map(result.result.map((prod) => [prod.product_Name, prod])).values()
+        new Map(result.result.map((prod) => [prod.sub_category, prod])).values()
       );
   
       // Extract unique metal types
@@ -281,7 +281,7 @@ const handleChange = (e) => {
     // Filter matching entries
     const matchingEntries = data.filter(
       (prod) =>
-        prod.product_Name === product_name &&
+        prod.sub_category === product_name &&
         prod.metal_type === metal_type &&
         prod.design_master === design_name &&
         prod.Purity === purity
@@ -372,7 +372,7 @@ const handleChange = (e) => {
 };
 
 const handleProductNameChange = (productName) => {
-  const productEntries = data.filter((prod) => prod.product_Name === productName);
+  const productEntries = data.filter((prod) => prod.sub_category === productName);
 
   if (productEntries.length > 0) {
     const uniqueMetalTypes = Array.from(
@@ -425,7 +425,7 @@ const handleProductNameChange = (productName) => {
 
 const handleMetalTypeChange = (metalType) => {
   const productEntries = data.filter(
-    (prod) => prod.product_Name === formData.product_name && prod.metal_type === metalType
+    (prod) => prod.sub_category === formData.product_name && prod.metal_type === metalType
   );
 
   if (productEntries.length > 0) {
@@ -455,7 +455,7 @@ const handleMetalTypeChange = (metalType) => {
 const handleDesignNameChange = (designName) => {
   const productEntries = data.filter(
     (prod) =>
-      prod.product_Name === formData.product_name &&
+      prod.sub_category === formData.product_name &&
       prod.metal_type === formData.metal_type &&
       prod.design_master === designName
   );
@@ -576,7 +576,7 @@ const handleBarcodeChange = async (code) => {
           code: tag.PCode_BarCode || "", // Retain the barcode
           product_id: tag.product_id || "",
           opentag_id: tag.opentag_id || "",
-          product_name: tag.product_Name || "", // Make editable
+          product_name: tag.sub_category || "", // Make editable
           metal_type: tag.metal_type || "",
           design_name: tag.design_master || "", // Make editable
           purity: tag.Purity || "",

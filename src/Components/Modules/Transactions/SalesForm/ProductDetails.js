@@ -60,7 +60,7 @@ const ProductDetails = ({
   <Col xs={12} md={2}>
     {isBarcodeSelected ? (
       <InputField
-        label="Product Name"
+        label="Sub Category"
         name="product_name"
         value={formData.product_name}
         onChange={handleChange}
@@ -68,14 +68,14 @@ const ProductDetails = ({
       />
     ) : (
       <InputField
-        label="Product Name"
+        label="Sub Category"
         name="product_name"
         value={formData.product_name}
         onChange={(e) => handleProductNameChange(e.target.value)}
         type="select"
         options={uniqueProducts.map((prod) => ({
-          value: prod.product_Name,
-          label: prod.product_Name,
+          value: prod.sub_category,
+          label: prod.sub_category,
         }))}
       />
     )}

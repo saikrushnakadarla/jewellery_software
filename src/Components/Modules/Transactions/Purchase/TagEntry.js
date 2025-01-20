@@ -27,6 +27,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         product_Name: "",
         design_master: "",
         Pricing: "",
+        cut: "",
+        clarity: "",
+        color: "",
         Tag_ID: "",
         Prefix: "", // Default value
         // Category: selectedProduct.metal_type,
@@ -292,6 +295,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 product_Name: "",
                 design_master: "",
                 Pricing: "",
+                cut: "",
+                color: "",
+                clarity: "",
                 Tag_ID: "",
                 Prefix: "",
                 metal_type: selectedProduct.metal_type,
@@ -563,10 +569,33 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     ]}
                                                 />
                                             </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Cut:"
+                                                    name="cut"
+                                                    value={formData.cut}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
 
                                         </Row>
                                         <Row>
-
+                                        <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Color:"
+                                                    name="color"
+                                                    value={formData.color}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Clarity:"
+                                                    name="clarity"
+                                                    value={formData.clarity}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
                                             <Col xs={12} md={2}>
                                                 {/* <InputField
                                                     label="PCode/BarCode:"
@@ -601,7 +630,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     onChange={handleChange}
                                                 />
                                             </Col>
-                                            <Col xs={12} md={3}>
+                                            <Col xs={12} md={2}>
                                                 <InputField
                                                     label="Stones Price:"
                                                     name="Stones_Price"
@@ -609,14 +638,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     onChange={handleChange}
                                                 />
                                             </Col>
-                                            <Col xs={12} md={3}>
-                                                <InputField
-                                                    label="Weight BW:"
-                                                    name="Weight_BW"
-                                                    value={formData.Weight_BW}
-                                                    onChange={handleChange}
-                                                />
-                                            </Col>
+                                           
                                         </Row>
 
                                     </Col>
@@ -624,6 +646,14 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                 <div className="stock-entry-form-right">
                                     <Col className="stock-form-section">
                                         <Row>
+                                        <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Weight BW:"
+                                                    name="Weight_BW"
+                                                    value={formData.Weight_BW}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
                                             <Col xs={12} md={3}>
                                                 <InputField
                                                     label="Wastage On:"
@@ -637,7 +667,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     ]}
                                                 />
                                             </Col>
-                                            <Col xs={12} md={3}>
+                                            <Col xs={12} md={2}>
                                                 <InputField
                                                     label="Wastage %:"
                                                     name="Wastage_Percentage"
@@ -645,7 +675,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     onChange={handleChange}
                                                 />
                                             </Col>
-                                            <Col xs={12} md={3}>
+                                            <Col xs={12} md={2}>
                                                 <InputField
                                                     label="Wastage Weight:"
                                                     name="WastageWeight"
