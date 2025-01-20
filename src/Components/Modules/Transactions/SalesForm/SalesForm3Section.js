@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { Col, Row, Button } from "react-bootstrap";
 import OldSalesForm from "./OldForm";
 import SchemeSalesForm from "./SchemesForm";
+import SaleReturnForm from "./SaleReturnForm"; // Import the SaleReturnForm component
+import { useNavigate } from "react-router-dom";
 
-// const SalesFormSection = ({ setOldSalesData, setSchemeSalesData }) => {
-//   const [activeForm, setActiveForm] = useState("old");
 const SalesFormSection = ({ setOldSalesData, setSchemeSalesData, selectedMobile }) => {
   const [activeForm, setActiveForm] = useState("old");
+  const navigate = useNavigate();
+
   return (
     <Col className="sales-form-section">
       <Row>
@@ -24,18 +26,46 @@ const SalesFormSection = ({ setOldSalesData, setSchemeSalesData, selectedMobile 
           >
             Schemes
           </Button>
+          <Button
+            variant={activeForm === "sale_return" ? "primary" : "secondary"}
+            onClick={() => setActiveForm("sale_return")}
+            className="ms-2"
+          >
+            Sale Return
+          </Button>
+          <Button
+            variant={activeForm === "orders" ? "primary" : "secondary"}
+            onClick={() => {
+              setActiveForm("orders");
+              console.log("Navigating to Orders with Mobile:", selectedMobile); // Log before navigation
+              navigate("/orders", { state: { mobile: selectedMobile } });
+            }}
+            className="ms-2"
+          >
+            Orders
+          </Button>
+          <Button
+            variant={activeForm === "repairs" ? "primary" : "secondary"}
+            onClick={() => {
+              setActiveForm("repairs");
+              console.log("Navigating to Repairs with Mobile:", selectedMobile); // Log before navigation
+              navigate("/repairs", { state: { mobile: selectedMobile } });
+            }}
+            className="ms-2"
+          >
+            Repairs
+          </Button>
         </Col>
       </Row>
 
-      {activeForm === "old" ? (
-        <OldSalesForm setOldSalesData={setOldSalesData} />
-      ) : (
-        // <SchemeSalesForm setSchemeSalesData={setSchemeSalesData} />
+      {activeForm === "old" && <OldSalesForm setOldSalesData={setOldSalesData} />}
+      {activeForm === "schemes" && (
         <SchemeSalesForm
-        setSchemeSalesData={setSchemeSalesData}
-        selectedMobile={selectedMobile} // Pass the selected mobile number
-      />
+          setSchemeSalesData={setSchemeSalesData}
+          selectedMobile={selectedMobile} // Pass the selected mobile number
+        />
       )}
+      {activeForm === "sale_return" && <SaleReturnForm />} {/* Render SaleReturnForm */}
     </Col>
   );
 };
