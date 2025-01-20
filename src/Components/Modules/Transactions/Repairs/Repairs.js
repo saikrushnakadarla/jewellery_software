@@ -47,6 +47,12 @@ const RepairForm = () => {
     tag_no: "",
     description: "",
     purity: "",
+    category:"",
+    sub_category:"",
+    gross_weight:"",
+    pcs:"",
+    estimated_dust:"",
+    estimated_amt:"",
     extra_weight: "",
     stone_value: "",
     making_charge: "",
@@ -288,7 +294,6 @@ const RepairForm = () => {
     }
   };
 
-
   const handleAddCustomer = () => {
     navigate("/customermaster", { state: { from: "/repairs" } });
   };
@@ -314,7 +319,6 @@ const RepairForm = () => {
       fetchLastRPNNumber();
     }
   }, [id]);
-
 
   return (
     <div className="main-container">
@@ -509,10 +513,10 @@ const RepairForm = () => {
                     <InputField label="Pcs" name="pcs" value={formData.pcs} onChange={handleChange} />
                   </Col>
                   <Col xs={12} md={2}>
-                    <InputField label="Est Dust" name="est_dust" value={formData.est_dust} onChange={handleChange} />
+                    <InputField label="Est Dust" name="estimated_dust" value={formData.estimated_dust} onChange={handleChange} />
                   </Col>
                   <Col xs={12} md={2}>
-                    <InputField label="Est Amt" name="est_amt" value={formData.est_amt} onChange={handleChange} />
+                    <InputField label="Est Amt" name="estimated_amt" value={formData.estimated_amt} onChange={handleChange} />
                   </Col>
 
                 </Row>
