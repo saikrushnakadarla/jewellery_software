@@ -5,7 +5,7 @@ import axios from 'axios';
 import CustomerDetails from '../SalesReturn/CustomerDetails';
 import InvoiceDetails from './SalereturnInvoice';
 import ProductDetails from '../SalesReturn/ProductDetails';
-import ProductTable from '../SalesReturn/ProductTable';
+import ProductTable from './SalesProductTable';
 import PaymentDetails from './Salespaymentdetails';
 import useProductHandlers from '../SalesReturn/hooks/useProductHandlers';
 import useCalculations from '../SalesReturn/hooks/useCalculations';
@@ -305,11 +305,11 @@ const SalesForm = () => {
 
   return (
     <div style={{paddingTop:'0px'}}>
-      <Container className="sales-form-container">
+      <Container >
         <Form>
-          <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>
+          {/* <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>
             Sales Return
-          </h3>
+          </h3> */}
           <div className="sales-form">
             {/* <div className="sales-form-left">
               <CustomerDetails 
@@ -353,7 +353,7 @@ const SalesForm = () => {
             />
           </div> */}
 
-          <div className="sales-form-section">
+          <div >
             <ProductTable 
               repairDetails={repairDetails} 
               invoiceDetails={invoiceDetails}
@@ -364,7 +364,7 @@ const SalesForm = () => {
               onEdit={handleEdit} 
               onDelete={handleDelete}/>
           </div>
-          <div className="sales-form-section">
+          <div>
           <PaymentDetails 
                 paymentDetails={paymentDetails}
                 setPaymentDetails={setPaymentDetails}

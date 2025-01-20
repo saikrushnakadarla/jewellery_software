@@ -48,7 +48,7 @@ const InvoiceDetails = ({ formData, setFormData, filteredInvoices }) => {
   };
 
   return (
-    <Col className="sales-form-section" style={{width:'454%'}}>
+    <Col style={{width:'454%'}}>
       <Row>
       <Col xs={12} md={6}>
         <InputField
@@ -63,14 +63,14 @@ const InvoiceDetails = ({ formData, setFormData, filteredInvoices }) => {
           }))}
         />
          </Col>
-            <Col xs={12} md={6}>
+            {/* <Col xs={12} md={6}>
           <InputField
             label="Date"
             name="date"
             value={formData.date || ""}
             readOnly={true}
           />
-        </Col>
+        </Col> */}
       </Row>
     
     </Col>
