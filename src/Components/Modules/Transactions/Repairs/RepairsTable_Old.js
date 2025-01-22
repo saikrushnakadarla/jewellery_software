@@ -556,9 +556,6 @@ const handlePopoverToggle = (event, repairId) => {
           </Button>
         </Modal.Footer>
       </Modal>
-
-
-
       </div>
     </div>
   );

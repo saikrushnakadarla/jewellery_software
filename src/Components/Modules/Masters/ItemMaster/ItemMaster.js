@@ -30,8 +30,8 @@ const FormWithTable = () => {
     Prefix: "Gold",
     item_prefix: "",
     Category: "", // Set a default value for Category
-    Purity: "",
-    purity: "",
+    Purity: "24K",
+    purity: "24K",
     PCode_BarCode: "",
     Gross_Weight: "",
     Stones_Weight: "",

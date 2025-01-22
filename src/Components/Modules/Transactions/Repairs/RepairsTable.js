@@ -20,16 +20,22 @@ const RepairsTable = () => {
     qty: '',
     weight: '',
   });
+
+  const [receivedData, setReceivedData] = useState({
+    itemName: '',
+    purity: '',
+    qty: '',
+    weight: '',
+  });
   
-     // Extract mobile from location state
-       const { mobile } = location.state || {};
-       const initialSearchValue = location.state?.mobile || '';
+    const { mobile } = location.state || {};
+    const initialSearchValue = location.state?.mobile || '';
     
-       useEffect(() => {
-         if (mobile) {
-           console.log("Selected Mobile from Dashboard:", mobile);
-         }
-       }, [mobile]);
+    useEffect(() => {
+     if (mobile) {
+      console.log("Selected Mobile from Dashboard:", mobile);
+    }
+    }, [mobile]);
 
   useEffect(() => {
     const fetchRepairs = async () => {
@@ -44,21 +50,18 @@ const RepairsTable = () => {
     fetchRepairs();
   }, []);
 
-  // Handle dropdown action selection
   const handleActionChange = (repairId, action) => {
     if (action === 'Assign to Workshop') {
       const repair = repairs.find((repair) => repair.repair_no === repairId);
       setSelectedRepair(repair);
-      setShowModal(true); // Show modal when "Assign to Workshop" is selected
+      setShowModal(true); 
     } else if (action === 'Receive from Workshop') {
       const repair = repairs.find((repair) => repair.repair_no === repairId);
       setSelectedRepair(repair);
       setShowReceiveModal(true);
     }
   };
-  
 
-  // Handle input field changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setAssignedData((prevData) => ({
@@ -67,15 +70,26 @@ const RepairsTable = () => {
     }));
   };
 
-  // Handle modal form submission
   const handleSubmit = () => {
-    // Submit logic for assigning to the workshop (e.g., API call)
     console.log('Assigned data submitted:', assignedData);
-    setShowModal(false); // Close the modal after submission
-    setAssignedData({ itemName: '', purity: '', qty: '', weight: '' }); // Reset form
+    setShowModal(false);
+    setAssignedData({ itemName: '', purity: '', qty: '', weight: '' });
   };
 
-  // Define columns for the table
+  const handleReceiveInputChange = (e) => {
+    const { name, value } = e.target;
+    setReceivedData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleReceiveSubmit = () => {
+    console.log('Assigned data submitted:', receivedData);
+    setShowReceiveModal(false);
+    setReceivedData({ itemName: '', purity: '', qty: '', weight: '' });
+  };
+
   const columns = React.useMemo(
     () => [
       {
@@ -165,16 +179,13 @@ const RepairsTable = () => {
             </Row>
         <DataTable columns={columns} data={[...repairs].reverse()} initialSearchValue={initialSearchValue}/>
 
-        {/* Modal for Assign to Workshop */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
             <Modal.Title>Assign to Workshop</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {/* Display selected repair details above the form */}
             {selectedRepair && (
               <div className="mb-3">
-              {/* <h5>Repair Details</h5> */}
               <Row>
               <Col md="4">
                   <strong>Item:</strong> {selectedRepair.item}
@@ -188,10 +199,9 @@ const RepairsTable = () => {
               </Row>
             </div>  
             )}
-
             <Form>
-                <Row>
-                    <Col md={6}>
+            <Row>
+            <Col md={6}>
               <Form.Group controlId="itemName">
                 <Form.Label>Item Name</Form.Label>
                 <Form.Control
@@ -253,10 +263,8 @@ const RepairsTable = () => {
             <Modal.Title>Assign to Workshop</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {/* Display selected repair details above the form */}
             {selectedRepair && (
               <div className="mb-3">
-              {/* <h5>Repair Details</h5> */}
               <Row>
               <Col md="4">
                   <strong>Item:</strong> {selectedRepair.item}
@@ -270,17 +278,16 @@ const RepairsTable = () => {
               </Row>
             </div>  
             )}
-
             <Form>
-                <Row>
-                    <Col md={6}>
+              <Row>
+              <Col md={6}>
               <Form.Group controlId="itemName">
                 <Form.Label>Item Name</Form.Label>
                 <Form.Control
                   type="text"
                   name="itemName"
-                  value={assignedData.itemName}
-                  onChange={handleInputChange}
+                  value={receivedData.itemName}
+                  onChange={handleReceiveInputChange}
                 />
               </Form.Group>
               </Col>
@@ -290,8 +297,8 @@ const RepairsTable = () => {
                 <Form.Control
                   type="text"
                   name="purity"
-                  value={assignedData.purity}
-                  onChange={handleInputChange}
+                  value={receivedData.purity}
+                  onChange={handleReceiveInputChange}
                 />
               </Form.Group>
               </Col>
@@ -301,8 +308,8 @@ const RepairsTable = () => {
                 <Form.Control
                   type="number"
                   name="qty"
-                  value={assignedData.qty}
-                  onChange={handleInputChange}
+                  value={receivedData.qty}
+                  onChange={handleReceiveInputChange}
                 />
               </Form.Group>
               </Col>
@@ -312,8 +319,8 @@ const RepairsTable = () => {
                 <Form.Control
                   type="number"
                   name="weight"
-                  value={assignedData.weight}
-                  onChange={handleInputChange}
+                  value={receivedData.weight}
+                  onChange={handleReceiveInputChange}
                 />
               </Form.Group>
               </Col>
@@ -324,7 +331,7 @@ const RepairsTable = () => {
             <Button variant="secondary" onClick={() => setShowReceiveModal(false)}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleSubmit}>
+            <Button variant="primary" onClick={handleReceiveSubmit}>
               Submit
             </Button>
           </Modal.Footer>
