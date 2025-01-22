@@ -226,7 +226,7 @@ function Navbar() {
             {(location.pathname === '/purchase' || location.pathname === '/purchasetable') && <h1 className="path-heading">PURCHASE</h1>}
             {location.pathname === '/salesreturn' && <h1 className="path-heading">SALES RETURN</h1>}
             {(location.pathname === '/estimates' || location.pathname === '/estimatetable') && <h1 className="path-heading">ESTIMATE</h1>}
-            {(location.pathname === '/payments' || location.pathname === '/paymentstable') && <h1 className="path-heading">PAYMENTs</h1>}
+            {(location.pathname === '/payments' || location.pathname === '/paymentstable') && <h1 className="path-heading">PAYMENTS</h1>}
             {(location.pathname === '/receipts' || location.pathname === '/receiptstable') && <h1 className="path-heading">RECEIPTS</h1>}
             {(location.pathname === '/repairs' || location.pathname === '/repairstable') && <h1 className="path-heading">REPAIRS</h1>}
             {(location.pathname === '/urd_purchase' || location.pathname === '/urdpurchasetable') && <h1 className="path-heading">URD PURCHASE</h1>}

@@ -14,7 +14,7 @@ const URDPurchase = () => {
   const today = new Date().toISOString().split("T")[0];
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
-   const { state } = useLocation();
+  const { state } = useLocation();
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
   const [items, setItems] = useState(
@@ -220,39 +220,39 @@ const URDPurchase = () => {
   };
 
   // Set the mobile value in formData if passed via location state
-useEffect(() => {
-  if (mobile) {
-    console.log("Selected Mobile from New Link:", mobile);
+  useEffect(() => {
+    if (mobile) {
+      console.log("Selected Mobile from New Link:", mobile);
 
-    // Find the customer with the matching mobile
-    const matchedCustomer = customers.find((cust) => cust.mobile === mobile);
+      // Find the customer with the matching mobile
+      const matchedCustomer = customers.find((cust) => cust.mobile === mobile);
 
-    if (matchedCustomer) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        customer_id: matchedCustomer.account_id, // Set customer_id to match the dropdown
-        account_name: matchedCustomer.account_name,
-        mobile: matchedCustomer.mobile || "",
-        email: matchedCustomer.email || "",
-        address1: matchedCustomer.address1 || "",
-        address2: matchedCustomer.address2 || "",
-        city: matchedCustomer.city || "",
-        pincode: matchedCustomer.pincode || "",
-        state: matchedCustomer.state || "",
-        state_code: matchedCustomer.state_code || "",
-        aadhar_card: matchedCustomer.aadhar_card || "",
-        gst_in: matchedCustomer.gst_in || "",
-        pan_card: matchedCustomer.pan_card || "",
-      }));
-    } else {
-      // If no customer matches, just set the mobile
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        mobile: mobile,
-      }));
+      if (matchedCustomer) {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          customer_id: matchedCustomer.account_id, // Set customer_id to match the dropdown
+          account_name: matchedCustomer.account_name,
+          mobile: matchedCustomer.mobile || "",
+          email: matchedCustomer.email || "",
+          address1: matchedCustomer.address1 || "",
+          address2: matchedCustomer.address2 || "",
+          city: matchedCustomer.city || "",
+          pincode: matchedCustomer.pincode || "",
+          state: matchedCustomer.state || "",
+          state_code: matchedCustomer.state_code || "",
+          aadhar_card: matchedCustomer.aadhar_card || "",
+          gst_in: matchedCustomer.gst_in || "",
+          pan_card: matchedCustomer.pan_card || "",
+        }));
+      } else {
+        // If no customer matches, just set the mobile
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          mobile: mobile,
+        }));
+      }
     }
-  }
-}, [mobile, customers]);
+  }, [mobile, customers]);
 
   const handleBack = () => {
     navigate('/urdpurchasetable');
@@ -450,19 +450,19 @@ useEffect(() => {
                 <Row>
                   <Col xs={12} md={3} className="d-flex align-items-center">
                     <div style={{ flex: 1 }}>
-                    <InputField
-                      label="Mobile"
-                      name="mobile"
-                      type="select"
-                      value={formData.customer_id || ""} // Use customer_id to match the selected value
-                      onChange={(e) => handleCustomerChange(e.target.value)}
-                      options={[
-                        ...customers.map((customer) => ({
-                          value: customer.account_id, // Use account_id as the value
-                          label: customer.mobile, // Display mobile as the label
-                        })),
-                      ]}
-                    />
+                      <InputField
+                        label="Mobile"
+                        name="mobile"
+                        type="select"
+                        value={formData.customer_id || ""} // Use customer_id to match the selected value
+                        onChange={(e) => handleCustomerChange(e.target.value)}
+                        options={[
+                          ...customers.map((customer) => ({
+                            value: customer.account_id, // Use account_id as the value
+                            label: customer.mobile, // Display mobile as the label
+                          })),
+                        ]}
+                      />
                     </div>
                     <AiOutlinePlus
                       size={20}
@@ -652,7 +652,7 @@ useEffect(() => {
                   onChange={handleInputChange}
                 />
               </Col>
-                        {/* <Col xs={12} md={1}>
+              {/* <Col xs={12} md={1}>
                   <InputField
                     label="Touch %"
                     type="number"
@@ -662,7 +662,7 @@ useEffect(() => {
                   />
                 </Col> */}
               <Col xs={12} md={2}>
-                        {/* <InputField
+                {/* <InputField
                     label="Rate"
                     type="select"
                     name="rate"
@@ -747,11 +747,11 @@ useEffect(() => {
                     <td>{item.rate}</td>
                     <td>{item.total_amount}</td>
                     <td>
-                    <FaTrash
-                      style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
-                      onClick={() => handleDeleteItem(index)}
-                    />
-                  </td>
+                      <FaTrash
+                        style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
+                        onClick={() => handleDeleteItem(index)}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -767,7 +767,7 @@ useEffect(() => {
             </div>
           </div>
           <div className="form-buttons">
-            
+
             {/* <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button> */}
             <Button
               variant="secondary"

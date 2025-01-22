@@ -146,7 +146,7 @@ const ProductDetails = ({
       readOnly
     />
   </Col>
-  <Col xs={12} md={2}>
+  {/* <Col xs={12} md={2}>
     <InputField
       label="Sub Category"
       name="sub_category"
@@ -154,7 +154,7 @@ const ProductDetails = ({
       onChange={handleChange}
       readOnly={!isBarcodeSelected}
     />
-  </Col>
+  </Col> */}
   <Col xs={12} md={1}>
     <InputField
       label="Gross Wt"

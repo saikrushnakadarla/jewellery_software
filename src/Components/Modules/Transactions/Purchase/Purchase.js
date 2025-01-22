@@ -1032,9 +1032,9 @@ const URDPurchase = () => {
                     {/* <th>product_id</th> */}
                     <th>Rbarcode</th>
                     <th>Category</th>
-                    <th>Cut</th>
+                    {/* <th>Cut</th>
                     <th>Color</th>
-                    <th>Clarity</th>
+                    <th>Clarity</th> */}
                     <th>Pieces</th>
                     <th>Gross</th>
                     <th>Stone</th>
@@ -1060,9 +1060,9 @@ const URDPurchase = () => {
                       {/* <td>{data.product_id}</td> */}
                       <td>{data.rbarcode}</td>
                       <td>{data.category}</td>
-                      <td>{data.cut}</td>
+                      {/* <td>{data.cut}</td>
                       <td>{data.color}</td>
-                      <td>{data.clarity}</td>
+                      <td>{data.clarity}</td> */}
                       <td>{data.pcs}</td>
                       <td>{data.gross_weight}</td>
                       <td>{data.stone_weight}</td>
