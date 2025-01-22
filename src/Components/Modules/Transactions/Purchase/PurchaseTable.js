@@ -65,9 +65,9 @@ const handleDelete = async (id) => {
       { Header: 'Gross Weight', accessor: 'gross_weight' },
       { Header: 'Purity', accessor: 'purity' },
       { Header: 'Pure Weight', accessor: 'pure_weight' },
-      { Header: 'Total Amount', accessor: 'total_amount' },
+      { Header: 'Total Amount/Weight', accessor: 'total_amount' },
       { 
-        Header: 'Paid Amount', 
+        Header: 'Paid Amount/Weight', 
         accessor: 'paid_amount',
         Cell: ({ row }) => {
           const { paid_amount, paid_amt } = row.original;
@@ -76,7 +76,7 @@ const handleDelete = async (id) => {
         },
       },
       { 
-        Header: 'Bal Amount', 
+        Header: 'Bal Amount/Weight', 
         accessor: 'balance_amount',
         Cell: ({ row }) => {
           const { balance_amount, balance_after_receipt, paid_amt } = row.original;
