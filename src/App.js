@@ -131,6 +131,7 @@ function App() {
         <Route path="/receivables" element={<Receivables />} />
         <Route path="/usermaster" element={<UserMaster />} />
         <Route path="/usertable" element={<UserMasterTable />} />
+        <Route path="/usermaster/:id" element={<UserMaster />} />
       </Routes>
     </>
   );
