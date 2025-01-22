@@ -71,6 +71,7 @@ function Navbar() {
   const isActive = (path) => {
     return location.pathname === path ? 'active' : '';  // Return 'active' if the path matches the current location
   };
+  const userRole = localStorage.getItem('role'); // 'admin' or other roles
 
   return (
     <header className="navbar-header">
@@ -117,6 +118,11 @@ function Navbar() {
           </span>
           {mastersDropdownOpen && (
             <div className="navbar-dropdown-content">
+              {userRole === 'admin' && (
+                <Link to="/usertable" onClick={handleItemClick} className={isActive('/usertable')}>
+                  User_Master
+                </Link>
+              )}
               <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable')}>Customer_Master</Link>
               <Link to="/suppliertable" onClick={handleItemClick} className={isActive('/suppliertable')}>Supplier_Master</Link>
               <Link to="/itemmastertable" onClick={handleItemClick} className={isActive('/itemmastertable')}>Category Master</Link>

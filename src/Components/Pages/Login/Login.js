@@ -18,6 +18,43 @@ function Login() {
     setShowPassword(!showPassword);
   };
 
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setErrorMessage('');
+  
+  //   if (!email || !password) {
+  //     setErrorMessage('Please provide both email and password.');
+  //     return;
+  //   }
+  
+  //   try {
+  //     const response = await axios.post(`${baseURL}/login`, { email, password });
+  
+  //     if (response.data.success) {
+  //       Swal.fire({
+  //         title: 'Update Rates?',
+  //         text: 'Do you want to update rates?',
+  //         icon: 'question',
+  //         showCancelButton: true,
+  //         confirmButtonText: 'Yes, update rates',
+  //         cancelButtonText: 'No, go to dashboard',
+  //       }).then((result) => {
+  //         if (result.isConfirmed) {
+  //           navigate('/rates');
+  //         } else {
+  //           navigate('/dashboard');
+  //         }
+  //       });
+  //     } else {
+  //       setErrorMessage(response.data.message || 'You do not have admin access.');
+  //     }
+  //   } catch (error) {
+  //     const errorMessage =
+  //       error.response?.data?.message || 'An error occurred. Please try again.';
+  //     setErrorMessage(errorMessage);
+  //   }
+  // };
+  
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage('');
@@ -31,6 +68,9 @@ function Login() {
       const response = await axios.post(`${baseURL}/login`, { email, password });
   
       if (response.data.success) {
+        // Store the user's role in localStorage
+        localStorage.setItem('role', response.data.role); // Assuming the role is returned in the response
+  
         Swal.fire({
           title: 'Update Rates?',
           text: 'Do you want to update rates?',

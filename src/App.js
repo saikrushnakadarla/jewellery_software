@@ -56,7 +56,8 @@ import SalesReturn from './Components/Modules/Transactions/SalesReturn/SalesForm
 import EstimateReceipt from './Components/Modules/Transactions/Estimate/EstimateReceipt';
 import AccountDetails from './Components/Pages/Dashboard/AccountDetails';
 import Receivables from "./Components/Pages/Dashboard/Payables";
-
+import UserMaster from "./Components/Modules/Masters/UserMaster/UserMaster";
+import UserMasterTable from "./Components/Modules/Masters/UserMaster/UserMasterTable";
 
 function App() {
   const location = useLocation();
@@ -128,6 +129,8 @@ function App() {
 
         <Route path="/accountdetails" element={<AccountDetails />} />
         <Route path="/receivables" element={<Receivables />} />
+        <Route path="/usermaster" element={<UserMaster />} />
+        <Route path="/usertable" element={<UserMasterTable />} />
       </Routes>
     </>
   );
