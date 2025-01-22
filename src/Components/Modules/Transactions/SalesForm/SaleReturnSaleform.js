@@ -16,7 +16,7 @@ import { pdf } from '@react-pdf/renderer';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import PDFLayout from '../SalesReturn/PDFLayout';
 
-const SalesForm = () => {
+const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqueInvoice}) => {
   const navigate = useNavigate();
   const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
@@ -56,66 +56,66 @@ const SalesForm = () => {
 
   // Apply calculations
   useCalculations(formData, setFormData);
-  const [uniqueInvoice, setUniqueInvoice] = useState([]);
-  const [filteredInvoices, setFilteredInvoices] = useState([]);
-  const [invoiceDetails, setInvoiceDetails] = useState(null);
+  // const [uniqueInvoice, setUniqueInvoice] = useState([]);
+  // const [filteredInvoices, setFilteredInvoices] = useState([]);
+  // const [invoiceDetails, setInvoiceDetails] = useState(null);
 
-  // Fetch customers
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const response = await fetch(`${baseURL}/get/account-details`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch customers');
-        }
-        const result = await response.json();
-        const filteredCustomers = result.filter(item => item.account_group === 'CUSTOMERS');
-        setCustomers(filteredCustomers);
-      } catch (error) {
-        console.error('Error fetching customers:', error);
-      }
-    };
+  // // Fetch customers
+  // useEffect(() => {
+  //   const fetchCustomers = async () => {
+  //     try {
+  //       const response = await fetch(`${baseURL}/get/account-details`);
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch customers');
+  //       }
+  //       const result = await response.json();
+  //       const filteredCustomers = result.filter(item => item.account_group === 'CUSTOMERS');
+  //       setCustomers(filteredCustomers);
+  //     } catch (error) {
+  //       console.error('Error fetching customers:', error);
+  //     }
+  //   };
   
-    fetchCustomers();
-  }, []);
+  //   fetchCustomers();
+  // }, []);
   
-  useEffect(() => {
-    const fetchRepairs = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
-        const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
-        setUniqueInvoice(filteredData);
-        setFilteredInvoices(filteredData); // Initially, show all invoices
-      } catch (error) {
-        console.error('Error fetching repair details:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchRepairs = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+  //       const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
+  //       setUniqueInvoice(filteredData);
+  //       setFilteredInvoices(filteredData); // Initially, show all invoices
+  //     } catch (error) {
+  //       console.error('Error fetching repair details:', error);
+  //     }
+  //   };
   
-    fetchRepairs();
-  }, []);
+  //   fetchRepairs();
+  // }, []);
 
-  useEffect(() => {
-    const fetchInvoiceDetails = async () => {
-      if (!formData.invoice_number) {
-        setInvoiceDetails(null); // Clear details if no invoice is selected
-        return;
-      }
+  // useEffect(() => {
+  //   const fetchInvoiceDetails = async () => {
+  //     if (!formData.invoice_number) {
+  //       setInvoiceDetails(null); // Clear details if no invoice is selected
+  //       return;
+  //     }
   
-      try {
-        const response = await axios.get(`${baseURL}/getsales/${formData.invoice_number}`);
+  //     try {
+  //       const response = await axios.get(`${baseURL}/getsales/${formData.invoice_number}`);
         
-        // Filter the results to exclude those with status 'Sale Returned'
-        const filteredData = response.data.filter((invoice) => invoice.status !== 'Sale Returned');
+  //       // Filter the results to exclude those with status 'Sale Returned'
+  //       const filteredData = response.data.filter((invoice) => invoice.status !== 'Sale Returned');
         
-        setInvoiceDetails(filteredData); // Update state with filtered details
-        console.log("Fetched Invoice Details:", filteredData);
-      } catch (error) {
-        console.error(`Error fetching details for invoice ${formData.invoice_number}:`, error);
-      }
-    };
+  //       setInvoiceDetails(filteredData); // Update state with filtered details
+  //       console.log("Fetched Invoice Details:", filteredData);
+  //     } catch (error) {
+  //       console.error(`Error fetching details for invoice ${formData.invoice_number}:`, error);
+  //     }
+  //   };
   
-    fetchInvoiceDetails();
-  }, [formData.invoice_number]);
+  //   fetchInvoiceDetails();
+  // }, [formData.invoice_number]);
   
   
   
@@ -128,55 +128,55 @@ const SalesForm = () => {
     localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
   }, [paymentDetails]);
 
-  const handleCustomerChange = (customerId) => {
-    const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
+  // const handleCustomerChange = (customerId) => {
+  //   const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
     
-    if (customer) {
-      // Update customer details in formData
-      setFormData({
-        ...formData,
-        customer_id: customerId,
-        account_name: customer.account_name,
-        mobile: customer.mobile || "",
-        email: customer.email || "",
-        address1: customer.address1 || "",
-        address2: customer.address2 || "",
-        city: customer.city || "",
-        pincode: customer.pincode || "",
-        state: customer.state || "",
-        state_code: customer.state_code || "",
-        aadhar_card: customer.aadhar_card || "",
-        gst_in: customer.gst_in || "",
-        pan_card: customer.pan_card || "",
-      });
+  //   if (customer) {
+  //     // Update customer details in formData
+  //     setFormData({
+  //       ...formData,
+  //       customer_id: customerId,
+  //       account_name: customer.account_name,
+  //       mobile: customer.mobile || "",
+  //       email: customer.email || "",
+  //       address1: customer.address1 || "",
+  //       address2: customer.address2 || "",
+  //       city: customer.city || "",
+  //       pincode: customer.pincode || "",
+  //       state: customer.state || "",
+  //       state_code: customer.state_code || "",
+  //       aadhar_card: customer.aadhar_card || "",
+  //       gst_in: customer.gst_in || "",
+  //       pan_card: customer.pan_card || "",
+  //     });
   
-      // Filter invoices by customer account_name or mobile
-      const filtered = uniqueInvoice.filter(
-        (invoice) =>
-          invoice.customer_name === customer.account_name || invoice.mobile === customer.mobile
-      );
-      setFilteredInvoices(filtered);
-    } else {
-      // Reset formData and invoices if no customer is selected
-      setFormData({
-        ...formData,
-        customer_id: "",
-        account_name: "",
-        mobile: "",
-        email: "",
-        address1: "",
-        address2: "",
-        city: "",
-        pincode: "",
-        state: "",
-        state_code: "",
-        aadhar_card: "",
-        gst_in: "",
-        pan_card: "",
-      });
-      setFilteredInvoices(uniqueInvoice);
-    }
-  };
+  //     // Filter invoices by customer account_name or mobile
+  //     const filtered = uniqueInvoice.filter(
+  //       (invoice) =>
+  //         invoice.customer_name === customer.account_name || invoice.mobile === customer.mobile
+  //     );
+  //     setFilteredInvoices(filtered);
+  //   } else {
+  //     // Reset formData and invoices if no customer is selected
+  //     setFormData({
+  //       ...formData,
+  //       customer_id: "",
+  //       account_name: "",
+  //       mobile: "",
+  //       email: "",
+  //       address1: "",
+  //       address2: "",
+  //       city: "",
+  //       pincode: "",
+  //       state: "",
+  //       state_code: "",
+  //       aadhar_card: "",
+  //       gst_in: "",
+  //       pan_card: "",
+  //     });
+  //     setFilteredInvoices(uniqueInvoice);
+  //   }
+  // };
   
 
   const [editIndex, setEditIndex] = useState(null);
@@ -191,14 +191,14 @@ const SalesForm = () => {
     setFormData(repairDetails[index]); // Populate form with selected item
   };
 
-  const handleUpdate = () => {
-    const updatedDetails = repairDetails.map((item, index) =>
-      index === editIndex ? { ...formData } : item
-    );
-    setRepairDetails(updatedDetails);
-    setEditIndex(null);
-    resetProductFields();
-  };
+  // const handleUpdate = () => {
+  //   const updatedDetails = repairDetails.map((item, index) =>
+  //     index === editIndex ? { ...formData } : item
+  //   );
+  //   setRepairDetails(updatedDetails);
+  //   setEditIndex(null);
+  //   resetProductFields();
+  // };
   const handleDelete = (indexToDelete) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       setRepairDetails(repairDetails.filter((_, index) => index !== indexToDelete));

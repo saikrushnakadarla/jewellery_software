@@ -122,6 +122,49 @@ const SalesForm = () => {
   }, [paymentDetails]);
 
   const [selectedMobile, setSelectedMobile] = useState("");
+  const [uniqueInvoice, setUniqueInvoice] = useState([]);
+  const [filteredInvoices, setFilteredInvoices] = useState([]);
+  const [invoiceDetails, setInvoiceDetails] = useState(null);
+
+  useEffect(() => {
+    const fetchRepairs = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+        const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
+        setUniqueInvoice(filteredData);
+        setFilteredInvoices(filteredData); // Initially, show all invoices
+      } catch (error) {
+        console.error('Error fetching repair details:', error);
+      }
+    };
+  
+    fetchRepairs();
+  }, []);
+
+
+
+  useEffect(() => {
+    const fetchInvoiceDetails = async () => {
+      if (!formData.invoice_number) {
+        setInvoiceDetails(null); // Clear details if no invoice is selected
+        return;
+      }
+  
+      try {
+        const response = await axios.get(`${baseURL}/getsales/${formData.invoice_number}`);
+        
+        // Filter the results to exclude those with status 'Sale Returned'
+        const filteredData = response.data.filter((invoice) => invoice.status !== 'Sale Returned');
+        
+        setInvoiceDetails(filteredData); // Update state with filtered details
+        console.log("Fetched Invoice Details:", filteredData);
+      } catch (error) {
+        console.error(`Error fetching details for invoice ${formData.invoice_number}:`, error);
+      }
+    };
+  
+    fetchInvoiceDetails();
+  }, [formData.invoice_number]);
 
   const handleCustomerChange = (customerId) => {
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
@@ -144,6 +187,12 @@ const SalesForm = () => {
         pan_card: customer.pan_card || "",
       }));
       setSelectedMobile(customer.mobile || ""); // Update selectedMobile
+      const filtered = uniqueInvoice.filter(
+        (invoice) =>
+          invoice.customer_name === customer.account_name || invoice.mobile === customer.mobile
+      );
+      setFilteredInvoices(filtered);
+      // console.log("FilteredInvoices=",filtered)
     } else {
       setFormData({
         customer_id: "",
@@ -161,6 +210,7 @@ const SalesForm = () => {
         pan_card: "",
       });
       setSelectedMobile(""); // Reset selectedMobile
+      setFilteredInvoices(uniqueInvoice);
     }
   };
 
@@ -492,8 +542,10 @@ const schemeAmount = location.state?.scheme_amt
                 setSchemeSalesData={setSchemeSalesData}
                 schemeTableData={schemeTableData}
                 setSchemeTableData={setSchemeTableData}
-                
-               
+                filteredInvoices={filteredInvoices}
+                setFilteredInvoices={setFilteredInvoices}
+                uniqueInvoice={uniqueInvoice}
+                invoiceDetails={invoiceDetails}
                 selectedMobile={formData.mobile} // Pass selected mobile
                />
               
