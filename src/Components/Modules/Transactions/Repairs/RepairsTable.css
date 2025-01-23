@@ -7,21 +7,11 @@
     background-color: rgba(163, 110, 41, 0.08);
   }
   
-  .sticky-note-button {
-    background: gray;
-    border: none;
-    color: white;
-    cursor: pointer;
-    margin-left: 5px;
-  }
+/* Custom CSS for the select dropdown */
+.custom-select {
+  height: 30px; /* Adjust the height */
+  padding: 5px 10px; /* Adjust the padding for height control */
+  font-size: 14px; /* Adjust the font size */
+}
 
-  .popover-options{
-    cursor: pointer;
-  }
- 
-  .popover {
-    margin-top: 155px; /* Optional: Add spacing between popover and table */
-    margin-left: 1280px;
-
-  }
   

@@ -3,7 +3,7 @@ import { Row, Col, Modal, Button, Form, Table } from 'react-bootstrap';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaEdit } from 'react-icons/fa';
 
 import './RepairsTable.css';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -16,6 +16,8 @@ const RepairsTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [selectedRepair, setSelectedRepair] = useState(null);
+  const { mobile } = location.state || {};
+  const initialSearchValue = location.state?.mobile || '';
   const [assignedData, setAssignedData] = useState({
     item_name: '',
     purity: '',
@@ -31,16 +33,14 @@ const RepairsTable = () => {
     gross_wt_after_repair: '',
     total_amt: '',
   });
-
-  const { mobile } = location.state || {};
-  const initialSearchValue = location.state?.mobile || '';
+  const [isEditing, setIsEditing] = useState(false); // Track if editing
+  const [editIndex, setEditIndex] = useState(null);
 
   useEffect(() => {
     if (mobile) {
       console.log("Selected Mobile from Dashboard:", mobile);
     }
   }, [mobile]);
-
 
   const fetchRepairs = async () => {
     try {
@@ -75,23 +75,21 @@ const RepairsTable = () => {
       setSelectedRepair(repair);
       setShowReceiveModal(true);
     } else if (action === 'Delivery to Customer') {
-      // Call function to update the database
       await updateRepairStatus(repairId, 'Delivery to Customer');
-      // Optionally refresh data after the update
-      fetchRepairs(); // Replace with your data fetch logic
+      fetchRepairs();
     }
   };
-  
+
   const updateRepairStatus = async (repairId, status) => {
     try {
-      const response = await fetch('/api/updateRepairStatus', {
+      const response = await fetch(`${baseURL}/update-status`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ repairId, status }),
       });
-  
+
       if (response.ok) {
         console.log('Repair status updated successfully');
       } else {
@@ -101,14 +99,23 @@ const RepairsTable = () => {
       console.error('Error updating repair status:', error);
     }
   };
-  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setAssignedData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const newData = { ...assignedData, [name]: value };
+
+    // If the rate_type is selected, calculate the amount based on the rate type
+    if (name === 'qty' || name === 'weight' || name === 'rate_type' || name === 'rate') {
+      if (newData.rate_type === 'Rate per Qty' && newData.qty && newData.rate) {
+        newData.amount = newData.qty * newData.rate;
+      } else if (newData.rate_type === 'Rate for Weight' && newData.weight && newData.rate) {
+        newData.amount = newData.weight * newData.rate;
+      } else {
+        newData.amount = ''; // Reset amount if no calculation is possible
+      }
+    }
+
+    setAssignedData(newData);
   };
 
   const handleAddToTable = () => {
@@ -117,6 +124,30 @@ const RepairsTable = () => {
     setAssignedData({ item_name: '', purity: '', qty: '', weight: '', rate_type: '', rate: '', amount: '', });
 
     // Save to local storage
+    localStorage.setItem('tempTableData', JSON.stringify(updatedData));
+  };
+
+  const handleEdit = (index) => {
+    const selectedData = tempTableData[index];
+    setAssignedData(selectedData);
+    setIsEditing(true);
+    setEditIndex(index);
+  };
+
+  const handleUpdate = () => {
+    const updatedData = [...tempTableData];
+    updatedData[editIndex] = assignedData; // Replace the row with the updated data
+    setTempTableData(updatedData);
+    setAssignedData({ item_name: '', purity: '', qty: '', weight: '', rate_type: '', rate: '', amount: '' });
+    setIsEditing(false);
+    setEditIndex(null);
+    localStorage.setItem('tempTableData', JSON.stringify(updatedData));
+  };
+
+  // Handle Delete action
+  const handleDeleteTempData = (index) => {
+    const updatedData = tempTableData.filter((_, i) => i !== index);
+    setTempTableData(updatedData);
     localStorage.setItem('tempTableData', JSON.stringify(updatedData));
   };
 
@@ -134,7 +165,7 @@ const RepairsTable = () => {
         repair_id: selectedRepair.repair_id, // Ensure the key matches backend
       }));
       await axios.post(`${baseURL}/assign/repairdetails`, requestData);
-      alert('Data submitted successfully!');
+      alert('Repair Details assigned successfully!');
       setTempTableData([]);
       localStorage.removeItem('tempTableData'); // Clear local storage
       setShowModal(false);
@@ -152,7 +183,7 @@ const RepairsTable = () => {
       deleteRepairRecord(id);
     }
   };
-  
+
   const deleteRepairRecord = (id) => {
     // Call API to delete the record by its `id` from the database
     axios
@@ -165,15 +196,14 @@ const RepairsTable = () => {
           prevDetails.filter((repair) => repair.id !== id) // Remove deleted record from the state
         );
         fetchRepairs();
-      fetchAssignedRepairDetails();
+        fetchAssignedRepairDetails();
       })
-    
+
       .catch((error) => {
         // Handle error
         console.error('Error deleting repair:', error);
       });
   };
-  
 
   const handleReceiveInputChange = (e) => {
     const { name, value } = e.target;
@@ -185,39 +215,62 @@ const RepairsTable = () => {
 
   const handleReceiveSubmit = () => {
     if (!selectedRepair) return;
-  
+
     const grossWtAfterRepair =
       selectedRepair.gross_weight -
       selectedRepair.estimated_dust +
       assignedRepairDetails
         .filter((repair) => repair.repair_id === selectedRepair.repair_id)
         .reduce((total, repair) => total + (repair.weight || 0), 0);
-  
+
     const totalAmt = assignedRepairDetails
       .filter((repair) => repair.repair_id === selectedRepair.repair_id)
       .reduce((total, repair) => total + (repair.amount || 0), 0);
-  
+
     // Prepare the payload
     const payload = {
       repair_id: selectedRepair.repair_id,
       gross_wt_after_repair: grossWtAfterRepair,
       total_amt: totalAmt,
     };
-  
+
     // API call to update the repair details
     axios
       .put(`${baseURL}/repairs/${selectedRepair.repair_id}`, payload)
       .then((response) => {
-        console.log('Repair updated successfully:', response.data);
+        alert('Received from Workshop successfully!');
         setShowReceiveModal(false); // Close the modal
         fetchRepairs();
-      fetchAssignedRepairDetails();
+        fetchAssignedRepairDetails();
       })
       .catch((error) => {
         console.error('Error updating repair:', error);
       });
   };
-  
+
+  const handleRepairEdit = (id) => {
+    navigate(`/repairs/${id}`);
+  };
+
+  const handleDeleteRepair = async (repairId) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this repair?");
+    if (!isConfirmed) {
+      return; // Exit if the user cancels
+    }
+
+    try {
+      const response = await axios.delete(`${baseURL}/delete/repairs/${repairId}`);
+      if (response.status === 200) {
+        alert(response.data.message);
+
+        // Update the state to remove the deleted repair
+        setRepairs((prevRepairs) => prevRepairs.filter((repair) => repair.repair_id !== repairId));
+      }
+    } catch (error) {
+      console.error('Error deleting repair:', error.message);
+      alert('Failed to delete repair entry. Please try again.');
+    }
+  };
 
   const columns = React.useMemo(
     () => [
@@ -233,10 +286,6 @@ const RepairsTable = () => {
         Header: 'Mobile',
         accessor: 'mobile',
       },
-      // {
-      //   Header: 'Email',
-      //   accessor: 'email',
-      // },
       {
         Header: 'Entry Type',
         accessor: 'entry_type',
@@ -266,40 +315,61 @@ const RepairsTable = () => {
         accessor: 'total_amt',
         Cell: ({ value }) => (value !== null ? value : 0), // Display 0 if value is null
       },
-      
       {
         Header: 'Status',
         accessor: 'status',
       },
       {
-        Header: 'Action',
-        accessor: 'action',
+        Header: 'Update Status',
+        accessor: 'update_status',
         Cell: ({ row }) => {
           const status = row.original.status;
-      
           return (
-            <select
-              className="form-select"
-              onChange={(e) => handleActionChange(row.original.repair_id, e.target.value)}
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Select Action
-              </option>
-              <option value="Assign to Workshop" disabled={status === 'Assign to Workshop' || status === 'Receive from Workshop'}>
-                Assign to Workshop
-              </option>
-              <option value="Receive from Workshop" disabled={status === 'Pending' || status === 'Receive from Workshop'}>
-                Receive from Workshop
-              </option>
-              <option value="Delivery to Customer" disabled={status === 'Pending' || status === 'Assign to Workshop'}>
-                Delivery to Customer
-              </option>
-            </select>
+            <div className="d-flex align-items-center">
+              <select
+                className="form-select custom-select"
+                onChange={(e) => handleActionChange(row.original.repair_id, e.target.value)}
+                defaultValue=""
+                disabled={status === 'Delivery to Customer'} // Disable the dropdown if status is "Delivery to Customer"
+              >
+                <option value="" disabled>
+                  Select Status
+                </option>
+                <option value="Assign to Workshop"
+                  disabled={status === 'Assign to Workshop' || status === 'Receive from Workshop'}
+                >
+                  Assign to Workshop
+                </option>
+                <option value="Receive from Workshop"
+                  disabled={status === 'Pending' || status === 'Receive from Workshop'}
+                >
+                  Receive from Workshop
+                </option>
+                <option value="Delivery to Customer"
+                  disabled={status === 'Pending' || status === 'Assign to Workshop'}
+                >
+                  Delivery to Customer
+                </option>
+              </select>
+            </div>
           );
         },
       },
-      
+      {
+        Header: 'ACTION',
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center">
+            <FaEdit
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
+              onClick={() => handleRepairEdit(row.original.repair_id)}
+            />
+            <FaTrash
+              style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
+              onClick={() => handleDeleteRepair(row.original.repair_id)}
+            />
+          </div>
+        ),
+      },
     ],
     [repairs]
   );
@@ -421,14 +491,18 @@ const RepairsTable = () => {
                       name="amount"
                       value={assignedData.amount}
                       onChange={handleInputChange}
-                      disabled
+                      readOnly
                     />
                   </Form.Group>
                 </Col>
               </Row>
             </Form>
-            <Button style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }} onClick={handleAddToTable} className="mt-3">
-              Add
+            <Button
+              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+              onClick={isEditing ? handleUpdate : handleAddToTable}
+              className="mt-3"
+            >
+              {isEditing ? 'Update' : 'Add'}
             </Button>
             <Table striped bordered hover className="mt-3">
               <thead>
@@ -440,6 +514,7 @@ const RepairsTable = () => {
                   <th>Rate Type</th>
                   <th>Rate</th>
                   <th>Amount</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -452,6 +527,18 @@ const RepairsTable = () => {
                     <td>{data.rate_type}</td>
                     <td>{data.rate}</td>
                     <td>{data.amount}</td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <FaEdit
+                          style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
+                          onClick={() => handleEdit(index)}
+                        />
+                        <FaTrash
+                          style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
+                          onClick={() => handleDeleteTempData(index)}
+                        />
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -629,7 +716,7 @@ const RepairsTable = () => {
                           assignedRepairDetails
                             .filter((repair) => repair.repair_id === selectedRepair.repair_id)
                             .reduce((total, repair) => total + (repair.weight || 0), 0)
-                          : '' 
+                          : ''
                       }
                     />
                   </Form.Group>
@@ -641,11 +728,11 @@ const RepairsTable = () => {
                       type="text"
                       name="total_amt"
                       value={
-                        selectedRepair ? 
+                        selectedRepair ?
                           assignedRepairDetails
                             .filter((repair) => repair.repair_id === selectedRepair.repair_id)
                             .reduce((total, repair) => total + (repair.amount || 0), 0)
-                          : '' 
+                          : ''
                       }
                       onChange={handleReceiveInputChange}
                     />

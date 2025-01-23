@@ -21,6 +21,7 @@ const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
+  console.log("ID=",id)
   const { state } = useLocation();
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
@@ -109,7 +110,6 @@ const RepairForm = () => {
       try {
         const response = await axios.get(`${baseURL}/metaltype`);
         setMetalTypes(response.data);
-        console.log("Metal Type=", response.data)
       } catch (error) {
         console.error("Error fetching metal types:", error);
       }
@@ -217,43 +217,44 @@ const RepairForm = () => {
     }
   };
 
+  const parseDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+
   useEffect(() => {
-    if (id) {
-      const fetchRepairDetails = async () => {
+    const fetchRepairById = async () => {
+      if (id) {
         try {
           const response = await axios.get(`${baseURL}/get/repairs/${id}`);
-          if (response.status === 200) {
-            const repairData = response.data;
+          const fetchedData = response.data;
 
-            const parseDate = (dateString) => {
-              if (!dateString) return '';
-              const date = new Date(dateString);
-              const year = date.getFullYear();
-              const month = String(date.getMonth() + 1).padStart(2, '0');
-              const day = String(date.getDate()).padStart(2, '0');
-              return `${year}-${month}-${day}`;
-            };
+          // Format the date and delivery_date fields
+          const formattedData = {
+            ...fetchedData,
+            date: parseDate(fetchedData.date),
+            delivery_date: parseDate(fetchedData.delivery_date),
+          };
 
-            setFormData((prev) => ({
-              ...prev,
-              ...repairData,
-              date: parseDate(repairData.date),
-              delivery_date: parseDate(repairData.delivery_date),
-              repair_no: repairData.repair_no, // Ensure repair_no is set correctly
-            }));
-
-            if (repairData.customer_id) {
-              handleCustomerChange(repairData.customer_id);
-            }
-          }
+          setFormData((prevData) => ({
+            ...prevData,
+            ...formattedData, // Merge formatted data into the form data
+          }));
         } catch (error) {
-          console.error("Error fetching repair details:", error);
+          console.error("Error fetching repair data:", error);
+          alert("Failed to load repair details. Please try again later.");
         }
-      };
+      }
+    };
 
-      fetchRepairDetails();
-    }
+    fetchRepairById();
   }, [id]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
