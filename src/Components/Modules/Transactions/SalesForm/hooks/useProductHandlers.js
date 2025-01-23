@@ -67,6 +67,8 @@ const useProductHandlers = () => {
     product_image: null,
   });
 
+
+
   const [uniqueProducts, setUniqueProducts] = useState([]); 
     const [metalTypes, setMetalTypes] = useState([]);
     const [purity, setPurity] = useState([]);

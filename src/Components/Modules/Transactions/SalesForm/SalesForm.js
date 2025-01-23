@@ -126,6 +126,54 @@ const SalesForm = () => {
   const [filteredInvoices, setFilteredInvoices] = useState([]);
   const [invoiceDetails, setInvoiceDetails] = useState(null);
 
+  const [returnData, setReturnData] = useState({
+    invoice_number: '',
+  })
+
+  useEffect(() => {
+    // Set the default date value to the current date in dd-mm-yyyy format if not already set
+    if (!returnData.date) {
+      const currentDate = new Date();
+      setReturnData({
+        ...returnData,
+        date: formatDate(currentDate),
+      });
+    }
+  }, [returnData, setReturnData]);
+
+  // Utility function to format date as dd-mm-yyyy
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  // Handle invoice number change
+  const handleInvoiceChange = (e) => {
+    const selectedInvoiceNumber = e.target.value;
+    const selectedInvoice = filteredInvoices.find(
+      (invoice) => invoice.invoice_number === selectedInvoiceNumber
+    );
+
+    if (selectedInvoice) {
+      setReturnData({
+        ...returnData,
+        invoice_number: selectedInvoiceNumber,
+        date: selectedInvoice.date ? formatDate(selectedInvoice.date) : "", // Format date
+        terms: selectedInvoice.terms || "", // Set the terms from the selected invoice
+      });
+    } else {
+      setReturnData({
+        ...returnData,
+        invoice_number: selectedInvoiceNumber,
+        date: "",
+        terms: "",
+      });
+    }
+  };
+
   useEffect(() => {
     const fetchRepairs = async () => {
       try {
@@ -145,13 +193,13 @@ const SalesForm = () => {
 
   useEffect(() => {
     const fetchInvoiceDetails = async () => {
-      if (!formData.invoice_number) {
+      if (!returnData.invoice_number) {
         setInvoiceDetails(null); // Clear details if no invoice is selected
         return;
       }
   
       try {
-        const response = await axios.get(`${baseURL}/getsales/${formData.invoice_number}`);
+        const response = await axios.get(`${baseURL}/getsales/${returnData.invoice_number}`);
         
         // Filter the results to exclude those with status 'Sale Returned'
         const filteredData = response.data.filter((invoice) => invoice.status !== 'Sale Returned');
@@ -159,12 +207,12 @@ const SalesForm = () => {
         setInvoiceDetails(filteredData); // Update state with filtered details
         console.log("Fetched Invoice Details:", filteredData);
       } catch (error) {
-        console.error(`Error fetching details for invoice ${formData.invoice_number}:`, error);
+        console.error(`Error fetching details for invoice ${returnData.invoice_number}:`, error);
       }
     };
   
     fetchInvoiceDetails();
-  }, [formData.invoice_number]);
+  }, [returnData.invoice_number]);
 
   const handleCustomerChange = (customerId) => {
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
@@ -545,7 +593,12 @@ const schemeAmount = location.state?.scheme_amt
                 filteredInvoices={filteredInvoices}
                 setFilteredInvoices={setFilteredInvoices}
                 uniqueInvoice={uniqueInvoice}
+                setUniqueInvoice={setUniqueInvoice}
                 invoiceDetails={invoiceDetails}
+                setInvoiceDetails={setInvoiceDetails}
+                handleInvoiceChange={handleInvoiceChange}
+                returnData={returnData}
+                setReturnData={setReturnData}
                 selectedMobile={formData.mobile} // Pass selected mobile
                />
               

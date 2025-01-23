@@ -200,14 +200,13 @@ const CustomerDetails = ({
           />
         </Col>
         <Col xs={12} md={2}>
-  <InputField
-    label="Balance Amount:"
-    name="balance"
-    value={loading ? "Loading..." : `₹ ${balance}`}
-    readOnly
-  />
-</Col>
-
+          <InputField
+            label="Balance Amount:"
+            name="balance"
+            value={loading ? "Loading..." : `₹ ${balance}`}
+            readOnly
+          />
+        </Col>
       </Row>
     </Col>
   );

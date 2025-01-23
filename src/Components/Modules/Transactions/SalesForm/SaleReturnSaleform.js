@@ -16,7 +16,7 @@ import { pdf } from '@react-pdf/renderer';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import PDFLayout from '../SalesReturn/PDFLayout';
 
-const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqueInvoice}) => {
+const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqueInvoice,handleInvoiceChange,setReturnData,returnData,}) => {
   const navigate = useNavigate();
   const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
@@ -303,6 +303,8 @@ const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqu
     setIsAllSelected(isChecked); // Update "Check All" checkbox state
   };
 
+
+
   return (
     <div style={{paddingTop:'0px'}}>
       <Container >
@@ -326,6 +328,9 @@ const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqu
                 uniqueInvoice={uniqueInvoice}
                 filteredInvoices={filteredInvoices}
                 invoiceDetails={invoiceDetails}
+                handleInvoiceChange={handleInvoiceChange}
+                returnData={returnData}
+      setReturnData={setReturnData}
               />
             </div>
           </div>
@@ -357,6 +362,8 @@ const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqu
             <ProductTable 
               repairDetails={repairDetails} 
               invoiceDetails={invoiceDetails}
+              uniqueInvoice={uniqueInvoice}
+              filteredInvoices={filteredInvoices}
               isAllSelected={isAllSelected}
               selectedRows={selectedRows}
               handleSelectAllChange={handleSelectAllChange}
@@ -372,6 +379,8 @@ const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqu
                 totalPrice={totalPrice} 
                 repairDetails={repairDetails} 
                 invoiceDetails={invoiceDetails}
+                uniqueInvoice={uniqueInvoice}
+                filteredInvoices={filteredInvoices}
                 isAllSelected={isAllSelected}
                 selectedRows={selectedRows}
                 handleSelectAllChange={handleSelectAllChange}

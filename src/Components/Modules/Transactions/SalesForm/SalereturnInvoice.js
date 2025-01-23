@@ -2,50 +2,8 @@ import React, { useEffect } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 
-const InvoiceDetails = ({ formData, setFormData, filteredInvoices }) => {
-  useEffect(() => {
-    // Set the default date value to the current date in dd-mm-yyyy format if not already set
-    if (!formData.date) {
-      const currentDate = new Date();
-      setFormData({
-        ...formData,
-        date: formatDate(currentDate),
-      });
-    }
-  }, [formData, setFormData]);
+const InvoiceDetails = ({ setReturnData,returnData, invoiceDetails, filteredInvoices, setFilteredInvoices, uniqueInvoice,handleInvoiceChange }) => {
 
-  // Utility function to format date as dd-mm-yyyy
-  const formatDate = (date) => {
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
-
-  // Handle invoice number change
-  const handleInvoiceChange = (e) => {
-    const selectedInvoiceNumber = e.target.value;
-    const selectedInvoice = filteredInvoices.find(
-      (invoice) => invoice.invoice_number === selectedInvoiceNumber
-    );
-
-    if (selectedInvoice) {
-      setFormData({
-        ...formData,
-        invoice_number: selectedInvoiceNumber,
-        date: selectedInvoice.date ? formatDate(selectedInvoice.date) : "", // Format date
-        terms: selectedInvoice.terms || "", // Set the terms from the selected invoice
-      });
-    } else {
-      setFormData({
-        ...formData,
-        invoice_number: selectedInvoiceNumber,
-        date: "",
-        terms: "",
-      });
-    }
-  };
 
   return (
     <Col style={{width:'454%'}}>
@@ -55,7 +13,7 @@ const InvoiceDetails = ({ formData, setFormData, filteredInvoices }) => {
           label="Invoice Number"
           name="invoice_number"
           type="select"
-          value={formData.invoice_number || ""}
+          value={returnData.invoice_number || ""}
           onChange={handleInvoiceChange}
           options={filteredInvoices.map((invoice) => ({
             value: invoice.invoice_number,

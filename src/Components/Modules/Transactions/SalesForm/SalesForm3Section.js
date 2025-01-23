@@ -5,8 +5,18 @@ import SchemeSalesForm from "./SchemesForm";
 import SaleReturnForm from "./SaleReturnForm"; // Import the SaleReturnForm component
 import { useNavigate } from "react-router-dom";
 import './SalesForm3section.css';
-const SalesFormSection = ({ setOldSalesData, setSchemeSalesData, selectedMobile, invoiceDetails, filteredInvoices, setFilteredInvoices, uniqueInvoice }) => {
-  // console.log("FilteredInvoices=",filteredInvoices)
+const SalesFormSection = ({ setOldSalesData,
+   setSchemeSalesData,
+    selectedMobile,
+     invoiceDetails,
+      filteredInvoices,
+       setFilteredInvoices,
+        uniqueInvoice,
+        handleInvoiceChange,
+        setReturnData,
+        returnData,
+       }) => {
+  console.log("invoiceDetails=",invoiceDetails)
   const [activeForm, setActiveForm] = useState("old");
   const navigate = useNavigate();
 
@@ -92,6 +102,9 @@ const SalesFormSection = ({ setOldSalesData, setSchemeSalesData, selectedMobile,
       filteredInvoices={filteredInvoices}
       setFilteredInvoices={setFilteredInvoices}
       uniqueInvoice={uniqueInvoice}
+      handleInvoiceChange={handleInvoiceChange}
+      returnData={returnData}
+      setReturnData={setReturnData}
       />} {/* Render SaleReturnForm */}
     </Col>
   );

@@ -7,11 +7,14 @@ const ProductTable = ({
   onDelete,
   onEdit,
   invoiceDetails,
+  uniqueInvoice,
+  filteredInvoices,
   selectedRows,
   isAllSelected,
   handleCheckboxChange,
   handleSelectAllChange,
 }) => {
+  console.log("invoiceDetails=",invoiceDetails)
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
