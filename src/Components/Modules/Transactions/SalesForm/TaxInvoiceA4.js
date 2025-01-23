@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
-import logo1 from '../../../../logo_dark.png'
+import logo1 from '../../../Pages/Login/Logo/logo_dark.png'
 import { toWords } from "number-to-words";
 
 
