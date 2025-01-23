@@ -176,34 +176,90 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     }, [formData.category]);
 
 
+    // const handleChange = async (e) => {
+    //     const { name, value } = e.target;
+
+    //     if (name === "category") {
+    //         // Check if the category value contains "gold" (case-insensitive)
+    //         const isGoldCategory = value.toLowerCase().includes("gold");
+
+    //         setFormData((prevData) => ({
+    //             ...prevData,
+    //             category: value,
+    //             Making_Charges_On: isGoldCategory ? "By Percentage" : prevData.Making_Charges_On,
+    //             MC_Per_Gram_Label: isGoldCategory ? "MC Percentage" : "MC Per Gram",
+    //         }));
+    //     } else if (name === "sub_category") {
+    //         const selectedCategory = subCategories.find(
+    //             (category) => category.subcategory_id === parseInt(value) // Ensure correct type match
+    //         );
+
+    //         const newPrefix = selectedCategory ? selectedCategory.prefix : "";
+
+    //         if (newPrefix) {
+    //             try {
+    //                 const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+    //                     params: { prefix: newPrefix },
+    //                 });
+
+    //                 const nextPCodeBarCode = response.data.nextPCodeBarCode;
+
+    //                 setFormData((prevData) => ({
+    //                     ...prevData,
+    //                     sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
+    //                     subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
+    //                     item_prefix: newPrefix,
+    //                     Prefix: newPrefix,
+    //                     PCode_BarCode: nextPCodeBarCode,
+    //                 }));
+    //             } catch (error) {
+    //                 console.error("Error fetching PCode_BarCode:", error);
+    //             }
+    //         } else {
+    //             setFormData((prevData) => ({
+    //                 ...prevData,
+    //                 sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
+    //                 subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
+    //                 item_prefix: "",
+    //                 Prefix: "",
+    //                 PCode_BarCode: "",
+    //             }));
+    //         }
+    //     } else {
+    //         setFormData((prevData) => ({
+    //             ...prevData,
+    //             [name]: value,
+    //         }));
+    //     }
+    // };
+
     const handleChange = async (e) => {
         const { name, value } = e.target;
-
+    
         if (name === "category") {
-            // Check if the category value contains "gold" (case-insensitive)
             const isGoldCategory = value.toLowerCase().includes("gold");
-
+    
             setFormData((prevData) => ({
                 ...prevData,
                 category: value,
                 Making_Charges_On: isGoldCategory ? "By Percentage" : prevData.Making_Charges_On,
-                MC_Per_Gram_Label: isGoldCategory ? "MC Percentage" : "MC Per Gram",
+                MC_Per_Gram_Label: isGoldCategory ? "MC Percentage" : prevData.MC_Per_Gram_Label, // Ensure consistency
             }));
         } else if (name === "sub_category") {
             const selectedCategory = subCategories.find(
                 (category) => category.subcategory_id === parseInt(value) // Ensure correct type match
             );
-
+    
             const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-
+    
             if (newPrefix) {
                 try {
                     const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
                         params: { prefix: newPrefix },
                     });
-
+    
                     const nextPCodeBarCode = response.data.nextPCodeBarCode;
-
+    
                     setFormData((prevData) => ({
                         ...prevData,
                         sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
@@ -232,8 +288,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             }));
         }
     };
-
-
+    
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -242,38 +297,123 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         }));
     };
 
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+
+    //     // Validate pcs and grossWeight
+    //     if (pcs <= 0 || grossWeight <= 0) {
+    //         alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
+    //         return;
+    //     }
+
+    //     if (!formData.sub_category || !formData.subcategory_id) {
+    //         alert("Please select a valid sub-category before submitting.");
+    //         return;
+    //     }
+
+    //     try {
+    //         const currentSuffix = parseInt(formData.suffix || "001", 10);
+    //         const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
+
+    //         const updatedGrossWeight = -parseFloat(formData.Gross_Weight || 0);
+    //         const updatedPcs = -1;
+
+    //         // If `prev` is available from the component state, props, or elsewhere:
+    //         const prev = {
+    //             item_prefix: "", // Replace this with your actual logic for prev
+    //         };
+
+    //         // Save form data
+    //         await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
+    //             headers: { 'Content-Type': 'application/json' },
+    //         });
+
+    //         // Update gross weight and pcs using the API
+    //         // await axios.post(`${baseURL}/add-entry`, {
+    //         //     id: formData.id,
+    //         //     product_id: formData.product_id,
+    //         //     pcs: updatedPcs,
+    //         //     gross_weight: updatedGrossWeight,
+    //         //     added_at: new Date().toISOString(),
+    //         // });
+
+    //         alert('Data and updated values saved successfully!');
+
+    //         fetchData();
+
+    //         // Reset form data
+    //         setFormData({
+    //             product_id: selectedProduct.product_id,
+    //             category: selectedProduct.category,
+    //             sub_category: "",
+    //             subcategory_id: "",
+    //             product_Name: "",
+    //             design_master: "",
+    //             Pricing: "",
+    //             cut: "",
+    //             color: "",
+    //             clarity: "",
+    //             Tag_ID: "",
+    //             Prefix: "",
+    //             metal_type: selectedProduct.metal_type,
+    //             Purity: selectedProduct.purity,
+    //             PCode_BarCode: `${prev?.item_prefix || ""}${nextSuffix}`,
+    //             suffix: nextSuffix,
+    //             Gross_Weight: "",
+    //             Stones_Weight: "",
+    //             Stones_Price: "",
+    //             HUID_No: "",
+    //             Wastage_On: "",
+    //             Wastage_Percentage: "",
+    //             Status: "Available",
+    //             Source: "Purchase",
+    //             Stock_Point: "",
+    //             WastageWeight: "",
+    //             TotalWeight_AW: "",
+    //             MC_Per_Gram: "",
+    //             Making_Charges_On: "",
+    //             Making_Charges: "",
+    //             Design_Master: selectedProduct.design_name,
+    //             Weight_BW: "",
+    //         });
+    //     } catch (error) {
+    //         console.error(error);
+    //         alert('An error occurred. Please try again.');
+    //     }
+    // };
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Validate pcs and grossWeight
+    
+        // Validate PCS and Gross Weight
         if (pcs <= 0 || grossWeight <= 0) {
             alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
             return;
         }
-
+    
+        // Validate sub-category
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
             return;
         }
-
+    
         try {
             const currentSuffix = parseInt(formData.suffix || "001", 10);
             const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
-
+    
             const updatedGrossWeight = -parseFloat(formData.Gross_Weight || 0);
             const updatedPcs = -1;
-
-            // If `prev` is available from the component state, props, or elsewhere:
+    
+            // Replace with actual logic for `prev`
             const prev = {
-                item_prefix: "", // Replace this with your actual logic for prev
+                item_prefix: "", // Adjust as needed
             };
-
+    
             // Save form data
             await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
-
-            // Update gross weight and pcs using the API
+    
+            // Uncomment if the additional API is needed
             // await axios.post(`${baseURL}/add-entry`, {
             //     id: formData.id,
             //     product_id: formData.product_id,
@@ -281,13 +421,14 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
             //     gross_weight: updatedGrossWeight,
             //     added_at: new Date().toISOString(),
             // });
-
-            alert('Data and updated values saved successfully!');
-
+    
+            alert("Data and updated values saved successfully!");
+    
             fetchData();
-
-            // Reset form data
-            setFormData({
+    
+            // Reset form data but preserve `Making_Charges_On` and `MC_Per_Gram_Label`
+            setFormData((prevData) => ({
+                ...prevData,
                 product_id: selectedProduct.product_id,
                 category: selectedProduct.category,
                 sub_category: "",
@@ -316,17 +457,18 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 WastageWeight: "",
                 TotalWeight_AW: "",
                 MC_Per_Gram: "",
-                Making_Charges_On: "",
+                Making_Charges_On: prevData.Making_Charges_On, // Preserve value
+                MC_Per_Gram_Label: prevData.MC_Per_Gram_Label, // Preserve value
                 Making_Charges: "",
                 Design_Master: selectedProduct.design_name,
                 Weight_BW: "",
-            });
+            }));
         } catch (error) {
             console.error(error);
-            alert('An error occurred. Please try again.');
+            alert("An error occurred. Please try again.");
         }
     };
-
+    
     useEffect(() => {
         const getLastPcode = async () => {
             try {
