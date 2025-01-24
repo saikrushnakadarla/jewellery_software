@@ -310,11 +310,11 @@ const SalesForm = () => {
       stone_weight: "",
       weight_bw: "",
       stone_price: "",
-      va_on: "",
+      va_on: "Gross Weight",
       va_percent: "",
       wastage_weight: "",
       total_weight_av: "",
-      mc_on: "",
+      mc_on: "By Percentage",
       mc_per_gram: "",
       making_charges: "",
       rate: "",
@@ -339,8 +339,6 @@ const SalesForm = () => {
     return savedData ? JSON.parse(savedData) : [];
   });
 
-
-  
   const resetForm = () => {
     setFormData({
       customer_id: "",

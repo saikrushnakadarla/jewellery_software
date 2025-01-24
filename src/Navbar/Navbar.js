@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FaSignOutAlt } from "react-icons/fa";
-import logo from './qqq.png';
+import logo from './sadashri.png';
 // import logo from './jewels_logo.jpg';
 import './Navbar.css';
 import Swal from 'sweetalert2';
@@ -226,6 +226,7 @@ function Navbar() {
           <span>
             {(location.pathname === '/sales' || location.pathname === '/salestable')  && <h1 className="path-heading">SALES</h1>}
             {(location.pathname === '/purchase' || location.pathname === '/purchasetable') && <h1 className="path-heading">PURCHASE</h1>}
+            {(location.pathname === '/subcategory' || location.pathname === '/subcategorytable') && <h1 className="path-heading">SUB CATEGORY</h1>}
             {location.pathname === '/salesreturn' && <h1 className="path-heading">SALES RETURN</h1>}
             {(location.pathname === '/estimates' || location.pathname === '/estimatetable') && <h1 className="path-heading">ESTIMATE</h1>}
             {(location.pathname === '/payments' || location.pathname === '/paymentstable') && <h1 className="path-heading">PAYMENTS</h1>}

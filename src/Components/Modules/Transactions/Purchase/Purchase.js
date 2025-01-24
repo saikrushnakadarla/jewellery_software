@@ -64,21 +64,26 @@ const URDPurchase = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [categories, setCategories] = useState([]);
 
+  const [tableData, setTableData] = useState(() => {
+    const savedData = localStorage.getItem("tableData");
+    return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
+  });
+
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
-  
+
       // Restrict paid_amount to not exceed total_amount
       if (field === "paid_amount") {
         const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
         const paidAmount = parseFloat(value) || 0;
-  
+
         if (paidAmount > totalAmount) {
           alert("Paid amount cannot exceed the total amount.");
           return prevFormData; // Prevent update
         }
       }
-  
+
       // If the category changes, update the hsn_code automatically
       if (field === "category") {
         const selectedCategory = categories.find(
@@ -88,51 +93,51 @@ const URDPurchase = () => {
           updatedFormData.hsn_code = selectedCategory.hsn_code;
         }
       }
-  
+
       // Parse purity value to percentage
       const parsePurityToPercentage = (purity) => {
         if (!purity) return null;
-  
+
         const match = purity.match(/(\d+)(k|K)/); // Match formats like "22K", "24k", etc.
         if (match) {
           const caratValue = parseInt(match[1], 10); // Extract carat number
           return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
         }
-  
+
         // Handle other formats like "916HM" directly if required
         if (purity.toLowerCase() === "916hm") return 91.6;
-  
+
         return null; // Default if no match
       };
-  
+
       // Update rate based on purity
       if (field === "purity") {
         const rate =
           value === "24K"
             ? rates.rate_24crt
             : value === "22K"
-            ? rates.rate_22crt
-            : value === "18K"
-            ? rates.rate_18crt
-            : value === "16K"
-            ? rates.rate_16crt
-            : "";
-  
+              ? rates.rate_22crt
+              : value === "18K"
+                ? rates.rate_18crt
+                : value === "16K"
+                  ? rates.rate_16crt
+                  : "";
+
         updatedFormData.rate = rate;
       }
-  
+
       // Update pure weight when net weight or purity changes
       if (field === "net_weight" || field === "purity") {
         const netWeight = parseFloat(updatedFormData.net_weight) || 0;
         const purityPercentage = parsePurityToPercentage(
           updatedFormData.purity
         ) || 0;
-  
+
         updatedFormData.pure_weight = (
           (netWeight * purityPercentage) / 100
         ).toFixed(2);
       }
-  
+
       // Additional calculations for other fields
       if (
         updatedFormData.gross &&
@@ -141,22 +146,22 @@ const URDPurchase = () => {
         updatedFormData.purity
       ) {
         const purityValue = parsePurityToPercentage(updatedFormData.purity);
-  
+
         if (purityValue) {
           const gross = parseFloat(updatedFormData.gross) || 0;
           const dust = parseFloat(updatedFormData.dust) || 0;
           const mlPercent = parseFloat(updatedFormData.ml_percent) || 0;
-  
+
           const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
           updatedFormData.eqt_wt = netWeight.toFixed(2);
         }
       }
-  
+
       // Update net weight and pure weight
       const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
       const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
       updatedFormData.net_weight = grossWeight - stoneWeight;
-  
+
       const netWeight = parseFloat(updatedFormData.net_weight) || 0;
       const purityPercentage = parsePurityToPercentage(
         updatedFormData.purity
@@ -164,37 +169,31 @@ const URDPurchase = () => {
       updatedFormData.pure_weight = (
         (netWeight * purityPercentage) / 100
       ).toFixed(2);
-  
+
       // Calculate total amount
       const pureWeight = parseFloat(updatedFormData.pure_weight) || 0;
       const rate = parseFloat(updatedFormData.rate) || 0;
       updatedFormData.total_amount = (pureWeight * rate).toFixed(2);
-  
+
       // Calculate balance amount
       const paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
       updatedFormData.balance_amount = (
         parseFloat(updatedFormData.total_amount || 0) - paidAmount
       ).toFixed(2);
-  
+
       const paid_pure_weight = parseFloat(updatedFormData.paid_pure_weight) || 0;
-  
+
       // Set Balance Pure Wt to zero if rate_cut is empty or not equal to zero
       const rateCut = parseFloat(updatedFormData.rate) || 0;
-      updatedFormData.balance_pure_weight = 
+      updatedFormData.balance_pure_weight =
         rateCut === 0
           ? (parseFloat(updatedFormData.pure_weight || 0) - paid_pure_weight).toFixed(2)
           : "0";
-  
+
       return updatedFormData;
     });
   };
-  
 
-  const [tableData, setTableData] = useState(() => {
-    const savedData = localStorage.getItem("tableData");
-    return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
-  });
-  // Save table data to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("tableData", JSON.stringify(tableData));
   }, [tableData]);
@@ -336,20 +335,11 @@ const URDPurchase = () => {
     localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
   }, [formData, tableData]);
 
-  // const handleEdit = (index) => {
-  //   setFormData(tableData[index]); // Populate the form with selected row data
-  //   setEditingIndex(index); // Track the index being edited
-  // };
   const handleEdit = async (index) => {
     const selectedData = tableData[index]; // Get the data for the selected row
     const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
-
-    // Ensure pcs and gross_weight are not undefined, and if so, default to 0
     const pcsToSend = pcs || 0;
     const grossWeightToSend = gross_weight || 0;
-
-    console.log("Sending to server:", { pcs: pcsToSend, gross_weight: grossWeightToSend });
-
     try {
       // Send a request to the backend to update the product_id entry
       const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
@@ -372,15 +362,9 @@ const URDPurchase = () => {
     }
   };
 
-  // const handleDelete = (index) => {
-  //   const updatedTableData = tableData.filter((_, i) => i !== index);
-  //   setTableData(updatedTableData); // Remove the selected row
-  // };
   const handleDelete = async (index) => {
     const selectedData = tableData[index]; // Get the data for the selected row
     const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
-
-    // Ensure pcs and gross_weight are not undefined, and if so, default to 0
     const pcsToSend = pcs || 0;
     const grossWeightToSend = gross_weight || 0;
 
@@ -419,14 +403,13 @@ const URDPurchase = () => {
         }
         const result = await response.json();
 
-        // Filter only suppliers
-        const customers = result.filter(
-          (item) => item.account_group === 'SUPPLIERS'
+        // Filter only suppliers or customers
+        const filteredCustomers = result.filter(
+          (item) => item.account_group === 'SUPPLIERS' || item.account_group === 'CUSTOMERS'
         );
 
-        setCustomers(customers);
-        // setLoading(false);
-        console.log("Customers=", customers)
+        setCustomers(filteredCustomers);
+        console.log("Filtered Customers and Suppliers =", filteredCustomers);
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
@@ -530,6 +513,7 @@ const URDPurchase = () => {
     };
     fetchCurrentRates();
   }, []);
+
   useEffect(() => {
     const fetchLastInvoice = async () => {
       try {
@@ -689,18 +673,17 @@ const URDPurchase = () => {
     }
   }, [formData.category, formData.purity]);
 
-
   const handleOpenModal = (data) => {
     setSelectedProduct(data);
     setShowModal(true);
   };
+
   const handleAddCategory = () => {
     console.log("Add Category button clicked");
     navigate("/itemmaster", { state: { from: "/purchase" } });
   };
 
   useEffect(() => {
-    // Set the current date in the desired format (YYYY-MM-DD)
     const today = new Date().toISOString().split("T")[0];
     setFormData((prevState) => ({
       ...prevState,

@@ -49,11 +49,11 @@ const useProductHandlers = () => {
     stone_weight: "",
     weight_bw: "",
     stone_price: "",
-    va_on: "",
+    va_on: "Gross Weight",
     va_percent: "",
     wastage_weight: "",
     total_weight_av: "",
-    mc_on: "",
+    mc_on: "By Percentage",
     mc_per_gram: "",
     making_charges: "",
     rate: "",
@@ -559,7 +559,7 @@ const handleBarcodeChange = async (code) => {
       // Check if tag exists by code
       const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
       if (tag) {
-        setIsBarcodeSelected(true);  // Set the barcode as selected
+        // setIsBarcodeSelected(true);  
         // If the tag is marked as "Sold"
         // if (tag.Status === "Sold") {
         //   alert("The product is already sold out!");

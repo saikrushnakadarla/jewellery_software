@@ -74,6 +74,7 @@ const SalesForm = () => {
     designMaster,
     purity,
     metalTypes,
+    isBarcodeSelected,
   } = useProductHandlers();
 
   // Apply calculations
@@ -547,7 +548,8 @@ const schemeAmount = location.state?.scheme_amt
               filteredDesignOptions={filteredDesignOptions}
               isQtyEditable={isQtyEditable}   
               handleUpdate={handleUpdate}
-              isEditing={editIndex !== null}           
+              isEditing={editIndex !== null}   
+              isBarcodeSelected={isBarcodeSelected}        
             />
           </div>
 
