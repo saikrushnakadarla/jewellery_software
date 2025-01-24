@@ -187,7 +187,7 @@ const [taxOptions, setTaxOptions] = useState([]);
       { Header: 'Barcode', accessor: 'rbarcode' },
       { Header: 'Metal Type', accessor: 'Category' },
       // { Header: 'Design Master', accessor: 'design_master' },
-      { Header: 'Purity', accessor: 'purity' },
+      // { Header: 'Purity', accessor: 'purity' },
       // { Header: 'Item Prefix', accessor: 'item_prefix' },
       // { Header: 'Short Name:', accessor: 'short_name' },
       // { Header: 'Sale Account Head', accessor: 'sale_account_head' },

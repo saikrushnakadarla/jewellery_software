@@ -140,11 +140,11 @@ const FormWithTable = () => {
     setFormData(prevState => {
       const updatedData = { ...prevState, [name]: value };
 
-      // If "Category" changes, update the "hsn_code" based on selected metal type
-      if (name === 'Category') {
-        const selectedMetal = metalOptions.find(option => option.value === value);
-        updatedData.hsn_code = selectedMetal ? selectedMetal.hsn_code : '';
-      }
+      // // If "Category" changes, update the "hsn_code" based on selected metal type
+      // if (name === 'Category') {
+      //   const selectedMetal = metalOptions.find(option => option.value === value);
+      //   updatedData.hsn_code = selectedMetal ? selectedMetal.hsn_code : '';
+      // }
 
       return updatedData;
     });
@@ -392,94 +392,94 @@ const FormWithTable = () => {
   // Save the product and related entries
   const handleSave = async () => {
     try {
-        const { product_name, Category, purity, metal_type_id, design_id } = formData;
+      const { product_name, Category, purity, metal_type_id, design_id } = formData;
 
-        // Check if the product exists
-        const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
-            product_name,
-            Category,
-            purity,
-        });
+      // Check if the product exists
+      const checkResponse = await axios.post(`${baseURL}/api/check-and-insert`, {
+        product_name,
+        Category,
+        purity,
+      });
 
-        if (checkResponse.data.exists) {
-            alert('This category already exists.');
-            return;
-        }
+      if (checkResponse.data.exists) {
+        alert('This category already exists.');
+        return;
+      }
 
-        // Debugging: Log purity and dropdownOptions
-        console.log("Selected purity:", purity);
-        console.log("Dropdown options:", dropdownOptions);
+      // Debugging: Log purity and dropdownOptions
+      console.log("Selected purity:", purity);
+      console.log("Dropdown options:", dropdownOptions);
 
-        // Ensure Category and other fields are not empty
-        const updatedFormData = {
-            ...formData,
-            Category: formData.Category || "Gold",
-            purity_id: purity ? dropdownOptions.find(option => option.value === purity)?.id || null : null, // Default to null if not found
-        };
+      // Ensure Category and other fields are not empty
+      const updatedFormData = {
+        ...formData,
+        Category: formData.Category || "Gold",
+        purity_id: purity ? dropdownOptions.find(option => option.value === purity)?.id || null : null, // Default to null if not found
+      };
 
-        if (!updatedFormData.purity_id) {
-            alert("Invalid purity selected. Please try again.");
-            return;
-        }
+      if (!updatedFormData.purity_id) {
+        alert("Invalid purity selected. Please try again.");
+        return;
+      }
 
-        // Save product details, now including design_id and purity_id
-        const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
-        const { product_id } = productResponse.data;
+      // Save product details, now including design_id and purity_id
+      const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);
+      const { product_id } = productResponse.data;
 
-        // Append product_id to openTagsEntries
-        const entriesWithProductId = openTagsEntries.map((entry) => ({
-            ...entry,
-            product_id,
-            product_Name: product_name,
-        }));
+      // Append product_id to openTagsEntries
+      const entriesWithProductId = openTagsEntries.map((entry) => ({
+        ...entry,
+        product_id,
+        product_Name: product_name,
+      }));
 
-        // Save opening tag entries
-        const saveEntriesPromises = entriesWithProductId.map((entry) =>
-            axios.post(`${baseURL}/post/opening-tags-entry`, entry)
-        );
+      // Save opening tag entries
+      const saveEntriesPromises = entriesWithProductId.map((entry) =>
+        axios.post(`${baseURL}/post/opening-tags-entry`, entry)
+      );
 
-        await Promise.all(saveEntriesPromises);
-        alert("Category added successfully!");
-        const from = location.state?.from || "/itemmastertable";
-    navigate(from);
-        // Reset the form fields
-        setFormData({
-            product_name: "",
-            rbarcode: "",
-            Category: "",
-            design_master: "",
-            purity: "",
-            design_id: "",
-            purity_id: "",
-            metal_type_id: "",
-            item_prefix: "",
-            short_name: "",
-            sale_account_head: "Sale",
-            purchase_account_head: "Purchase",
-            status: "",
-            tax_slab: "",
-            tax_slab_id: "",
-            hsn_code: "",
-            op_qty: "0",
-            op_value: "",
-            op_weight: "0",
-            huid_no: "",
-        });
+      await Promise.all(saveEntriesPromises);
+      alert("Category added successfully!");
+      const from = location.state?.from || "/itemmastertable";
+      navigate(from);
+      // Reset the form fields
+      setFormData({
+        product_name: "",
+        rbarcode: "",
+        Category: "",
+        design_master: "",
+        purity: "",
+        design_id: "",
+        purity_id: "",
+        metal_type_id: "",
+        item_prefix: "",
+        short_name: "",
+        sale_account_head: "Sale",
+        purchase_account_head: "Purchase",
+        status: "",
+        tax_slab: "",
+        tax_slab_id: "",
+        hsn_code: "",
+        op_qty: "0",
+        op_value: "",
+        op_weight: "0",
+        huid_no: "",
+      });
 
-        // Clear the tag entries
-        setOpenTagsEntries([]);
-        // Refresh the window
-        // window.location.reload();
-        setIsMaintainTagsChecked(false); // Reset checkbox
+      // Clear the tag entries
+      setOpenTagsEntries([]);
+      // Refresh the window
+      // window.location.reload();
+      setIsMaintainTagsChecked(false); // Reset checkbox
     } catch (error) {
-        console.error("Error saving data:", error);
-        alert("Failed to save data. Please try again.");
-       
-    }
-};
+      console.error("Error saving data:", error);
+      alert("Failed to save data. Please try again.");
 
-  
-const location = useLocation();
+    }
+  };
+
+
+  const location = useLocation();
 
   const handleBack = () => {
     const from = location.state?.from || "/itemmastertable";
@@ -504,63 +504,63 @@ const location = useLocation();
         console.error('Error fetching metal types:', error);
       }
     };
-  
+
     fetchMetalTypes();
   }, []);
 
- // Fetch design master options from the API
-useEffect(() => {
-  const fetchDesignMaster = async () => {
-    try {
-      const response = await axios.get(`${baseURL}/designmaster`);
-      const designMasters = response.data.map((item) => {
-        console.log('Design ID:', item.design_id); // Log design_id
-        return {
-          value: item.design_name, // Assuming the column name is "design_name"
-          label: item.design_name,
-          id: item.design_id, // Assuming the column name is "design_id"
-        };
-      });
-      setdesignOptions(designMasters);
-    } catch (error) {
-      console.error('Error fetching design masters:', error);
+  // Fetch design master options from the API
+  useEffect(() => {
+    const fetchDesignMaster = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/designmaster`);
+        const designMasters = response.data.map((item) => {
+          console.log('Design ID:', item.design_id); // Log design_id
+          return {
+            value: item.design_name, // Assuming the column name is "design_name"
+            label: item.design_name,
+            id: item.design_id, // Assuming the column name is "design_id"
+          };
+        });
+        setdesignOptions(designMasters);
+      } catch (error) {
+        console.error('Error fetching design masters:', error);
+      }
+    };
+
+    fetchDesignMaster();
+  }, []);
+
+  // Fetch purity options from the API
+  useEffect(() => {
+    const fetchPurity = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+        const purityOptions = response.data.map(item => ({
+          value: item.name, // Assuming the column name is "name"
+          label: item.name,
+          id: item.purity_id, // Assuming the column name is "purity_id"
+          metal: item.metal, // Assuming "metal" is the column for related metal type
+        }));
+        setDropdownOptions(purityOptions);
+      } catch (error) {
+        console.error('Error fetching purity options:', error);
+      }
+    };
+
+    fetchPurity();
+  }, []);
+  const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
+  useEffect(() => {
+    // Filter purity options based on selected metal type
+    if (formData.Category) {
+      const filteredPurityOptions = dropdownOptions.filter(
+        option => option.metal === formData.Category
+      );
+      setFilteredPurityOptions(filteredPurityOptions); // Add a state for filtered purity options
+    } else {
+      setFilteredPurityOptions([]); // Reset if no metal type is selected
     }
-  };
-
-  fetchDesignMaster();
-}, []);
-
-// Fetch purity options from the API
-useEffect(() => {
-  const fetchPurity = async () => {
-    try {
-      const response = await axios.get(`${baseURL}/purity`);
-      const purityOptions = response.data.map(item => ({
-        value: item.name, // Assuming the column name is "name"
-        label: item.name,
-        id: item.purity_id, // Assuming the column name is "purity_id"
-        metal: item.metal, // Assuming "metal" is the column for related metal type
-      }));
-      setDropdownOptions(purityOptions);
-    } catch (error) {
-      console.error('Error fetching purity options:', error);
-    }
-  };
-
-  fetchPurity();
-}, []);
-const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
-useEffect(() => {
-  // Filter purity options based on selected metal type
-  if (formData.Category) {
-    const filteredPurityOptions = dropdownOptions.filter(
-      option => option.metal === formData.Category
-    );
-    setFilteredPurityOptions(filteredPurityOptions); // Add a state for filtered purity options
-  } else {
-    setFilteredPurityOptions([]); // Reset if no metal type is selected
-  }
-}, [formData.Category, dropdownOptions]);
+  }, [formData.Category, dropdownOptions]);
 
 
   useEffect(() => {
@@ -614,7 +614,14 @@ useEffect(() => {
             <div className="form-container">
               <h4 style={{ marginBottom: "15px" }}>Category Details</h4>
               <div className="form-row">
-
+                <InputField
+                  label="Metal Type:"
+                  name="Category"
+                  type="select"
+                  value={formData.Category}
+                  onChange={handleChange}
+                  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+                />
                 <InputField
                   label="Category:"
                   name="product_name"
@@ -628,14 +635,7 @@ useEffect(() => {
                   onChange={handleChange}
 
                 />
-               <InputField
-  label="Metal Type:"
-  name="Category"
-  type="select"
-  value={formData.Category}
-  onChange={handleChange}
-  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
-/>
+
                 {/* <InputField
                   label="Design Master:"
                   name="design_master"
@@ -644,16 +644,16 @@ useEffect(() => {
                   onChange={handleChange}
                   options={designOptions.map(option => ({ value: option.value, label: option.label }))}
                 /> */}
-             
 
-<InputField
-  label="Purity:"
-  name="purity"
-  type="select"
-  value={formData.purity}
-  onChange={handleChange}
-  options={filteredPurityOptions.map(option => ({ value: option.value, label: option.label }))}
-/>
+
+                {/* <InputField
+                  label="Purity:"
+                  name="purity"
+                  type="select"
+                  value={formData.purity}
+                  onChange={handleChange}
+                  options={filteredPurityOptions.map(option => ({ value: option.value, label: option.label }))}
+                /> */}
                 {/* <InputField
                   label="Item Prefix:"
                   name="item_prefix"
@@ -662,12 +662,12 @@ useEffect(() => {
                 /> */}
               </div>
               <div className="form-row">
-                <InputField
+                {/* <InputField
                   label="Short Name:"
                   name="short_name"
                   value={formData.short_name}
                   onChange={handleChange}
-                />
+                /> */}
                 <InputField
                   label="Tax Slab:"
                   name="tax_slab"
@@ -681,31 +681,31 @@ useEffect(() => {
                   name="hsn_code"
                   value={formData.hsn_code}
                   onChange={handleChange}
-                  readOnly
+                  // readOnly
                 />
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-              <button
-                type="button"
-                className="cus-back-btn"
-                variant="secondary"
-                onClick={handleBack}
-                style={{ backgroundColor: 'gray', marginRight: '10px' }}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary"
-                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-                onClick={handleSave}
-              >
-                Save
-              </button>
+                <button
+                  type="button"
+                  className="cus-back-btn"
+                  variant="secondary"
+                  onClick={handleBack}
+                  style={{ backgroundColor: 'gray', marginRight: '10px' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-primary"
+                  style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
+              </div>
             </div>
-            </div>
-           
+
           </div>
-          
+
 
         </div>
       </div>

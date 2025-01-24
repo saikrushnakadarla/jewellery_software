@@ -58,6 +58,8 @@ import AccountDetails from './Components/Pages/Dashboard/AccountDetails';
 import Receivables from "./Components/Pages/Dashboard/Payables";
 import UserMaster from "./Components/Modules/Masters/UserMaster/UserMaster";
 import UserMasterTable from "./Components/Modules/Masters/UserMaster/UserMasterTable";
+import SubCategory from "./Components/Modules/Masters/SubCategory/SubCategory";
+import SubCategoryTable from "./Components/Modules/Masters/SubCategory/SubCategoryTable";
 
 function App() {
   const location = useLocation();
@@ -132,6 +134,8 @@ function App() {
         <Route path="/usermaster" element={<UserMaster />} />
         <Route path="/usertable" element={<UserMasterTable />} />
         <Route path="/usermaster/:id" element={<UserMaster />} />
+        <Route path="/subcategory" element={<SubCategory />} />
+        <Route path="/subcategorytable" element={<SubCategoryTable />} />
       </Routes>
     </>
   );
