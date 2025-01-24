@@ -40,7 +40,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
         Stones_Weight: "",
         Stones_Price: "",
         HUID_No: "",
-        Wastage_On: "",
+        Wastage_On: "Gross Weight",
         Wastage_Percentage: "",
         Status: "Available",
         Source: "Purchase",
@@ -160,17 +160,18 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
     useEffect(() => {
         // Check if the category contains "gold" whenever formData.category changes
         const isGoldCategory = formData.category && formData.category.toLowerCase().includes("gold");
+        const isSilverCategory = formData.category && formData.category.toLowerCase().includes("gold");
 
         if (isGoldCategory) {
             setFormData((prevData) => ({
                 ...prevData,
                 Making_Charges_On: "By Percentage",
-                MC_Per_Gram_Label: "MC Percentage",
+                MC_Per_Gram_Label: "MC%",
             }));
         } else {
             setFormData((prevData) => ({
                 ...prevData,
-                MC_Per_Gram_Label: "MC Per Gram",
+                MC_Per_Gram_Label: "MC/Gm",
             }));
         }
     }, [formData.category]);
@@ -449,7 +450,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 Stones_Weight: "",
                 Stones_Price: "",
                 HUID_No: "",
-                Wastage_On: "",
+                Wastage_On: "Gross Weight",
                 Wastage_Percentage: "",
                 Status: "Available",
                 Source: "Purchase",
@@ -533,7 +534,8 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 subcategory_id: 1, // Assuming this is a static value or comes from somewhere else
                 sub_category_name: newSubCategory.name,
                 category: newSubCategory.category || formData.category,
-                prefix: newSubCategory.prefix
+                prefix: newSubCategory.prefix,
+                metal_type:selectedProduct.metal_type,
             };
 
             // Make POST request to the API
@@ -543,7 +545,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 // Successfully added the subcategory
                 handleCloseModal();
                 console.log('Subcategory added successfully');
-                alert("Data saved successfully");
+                alert("Subcategory added successfully");
 
                 // Clear the form
                 setNewSubCategory({
@@ -645,9 +647,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                     <Col className="stock-form-section">
                                         <h4 className="mb-4">Stock Entry</h4>
                                         <Row>
-                                            <Col xs={12} md={3}>
+                                            <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Category:"
+                                                    label="Category"
                                                     name="category"
                                                     value={formData.category}
                                                     onChange={(e) => handleChange(e)}
@@ -656,7 +658,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             <Col xs={12} md={3} className="d-flex align-items-center">
                                                 <div style={{ flex: 1 }}>
                                                     <InputField
-                                                        label="Sub Category:"
+                                                        label="Sub Category"
                                                         name="sub_category"
                                                         type="select"
                                                         value={formData.sub_category}
@@ -687,9 +689,9 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     onChange={handleChange}  // Pass the event handler correctly
                                                 />
                                             </Col> */}
-                                            <Col xs={12} md={2}>
+                                            <Col xs={12} md={3}>
                                                 <InputField
-                                                    label="Design Master:"
+                                                    label="Product Design Name"
                                                     name="design_master"
                                                     type="select"
                                                     value={formData.design_master}
@@ -700,7 +702,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Pricing:"
+                                                    label="Pricing"
                                                     name="Pricing"
                                                     type="select"
                                                     value={formData.Pricing}
@@ -713,7 +715,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Cut:"
+                                                    label="Cut"
                                                     name="cut"
                                                     value={formData.cut}
                                                     onChange={handleChange}
@@ -724,7 +726,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                         <Row>
                                         <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Color:"
+                                                    label="Color"
                                                     name="color"
                                                     value={formData.color}
                                                     onChange={handleChange}
@@ -732,7 +734,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Clarity:"
+                                                    label="Clarity"
                                                     name="clarity"
                                                     value={formData.clarity}
                                                     onChange={handleChange}
@@ -747,7 +749,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     onChange={handleChange}
                                                 /> */}
                                                 <InputField
-                                                    label="PCode/BarCode:"
+                                                    label="PCode/BarCode"
                                                     name="PCode_BarCode"
                                                     type="text"
                                                     value={formData.PCode_BarCode}
@@ -758,7 +760,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
 
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Gross Weight:"
+                                                    label="Gross Weight"
                                                     name="Gross_Weight"
                                                     value={formData.Gross_Weight}
                                                     onChange={handleChange}
@@ -766,7 +768,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Stones Weight:"
+                                                    label="Stones Weight"
                                                     name="Stones_Weight"
                                                     value={formData.Stones_Weight}
                                                     onChange={handleChange}
@@ -774,15 +776,13 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Stones Price:"
+                                                    label="Stones Price"
                                                     name="Stones_Price"
                                                     value={formData.Stones_Price}
                                                     onChange={handleChange}
                                                 />
-                                            </Col>
-                                           
+                                            </Col>                                   
                                         </Row>
-
                                     </Col>
                                 </div>
                                 <div className="stock-entry-form-right">
@@ -790,7 +790,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                         <Row>
                                         <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Weight BW:"
+                                                    label="Weight BW"
                                                     name="Weight_BW"
                                                     value={formData.Weight_BW}
                                                     onChange={handleChange}
@@ -798,7 +798,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={3}>
                                                 <InputField
-                                                    label="Wastage On:"
+                                                    label="Wastage On"
                                                     name="Wastage_On"
                                                     type="select"
                                                     value={formData.Wastage_On}
@@ -811,7 +811,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Wastage %:"
+                                                    label="Wastage %"
                                                     name="Wastage_Percentage"
                                                     value={formData.Wastage_Percentage}
                                                     onChange={handleChange}
@@ -819,7 +819,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Wastage Weight:"
+                                                    label="Wastage Weight"
                                                     name="WastageWeight"
                                                     value={formData.WastageWeight}
                                                     onChange={handleChange}
@@ -827,19 +827,17 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={3}>
                                                 <InputField
-                                                    label="Total Weight:"
+                                                    label="Total Weight"
                                                     name="TotalWeight_AW"
                                                     value={formData.TotalWeight_AW}
                                                     onChange={handleChange}
                                                 />
                                             </Col>
                                         </Row>
-
-
                                         <Row className="dynamic-fields-row">
                                             <Col xs={12} md={3}>
                                                 <InputField
-                                                    label="Making Charges On:"
+                                                    label="MC On"
                                                     name="Making_Charges_On"
                                                     type="select"
                                                     value={formData.Making_Charges_On}
@@ -851,35 +849,35 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                                     ]}
                                                 />
                                             </Col>
-                                            <Col>
+                                            <Col xs={12} md={2}>
                                                 <InputField
-                                                    label={formData.MC_Per_Gram_Label || "MC Per Gram"} // Dynamic label based on category
+                                                    label={formData.MC_Per_Gram_Label || "MC/Gm"} // Dynamic label based on category
                                                     name="MC_Per_Gram"
                                                     value={formData.MC_Per_Gram}
                                                     onChange={handleChange}
                                                 />
                                             </Col>
                                             {!formData.category?.toLowerCase().includes("gold") && (
-                                                <Col>
+                                                <Col xs={12} md={2}>
                                                     <InputField
-                                                        label="Making Charges:"
+                                                        label="MC"
                                                         name="Making_Charges"
                                                         value={formData.Making_Charges}
                                                         onChange={handleChange}
                                                     />
                                                 </Col>
                                             )}
-                                            <Col>
+                                            <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="HUID No:"
+                                                    label="HUID No"
                                                     name="HUID_No"
                                                     value={formData.HUID_No}
                                                     onChange={handleChange}
                                                 />
                                             </Col>
-                                            <Col>
+                                            <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Stock Point:"
+                                                    label="Stock Point"
                                                     name="Stock_Point"
                                                     type="select"
                                                     value={formData.Stock_Point}
@@ -920,6 +918,17 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
+                    <Form.Group controlId="categoryName">
+                            <Form.Label>Category</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="category"
+                                value={newSubCategory.category || formData.category}
+                                onChange={handleModalChange}
+                                placeholder="Enter category"
+                                readOnly
+                            />
+                        </Form.Group>
                         <Form.Group controlId="subCategoryName">
                             <Form.Label>Sub Category Name</Form.Label>
                             <Form.Control
@@ -927,7 +936,7 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                 name="name"
                                 value={newSubCategory.name}
                                 onChange={handleModalChange}
-                                placeholder="Enter sub category name"
+                                
                             />
                         </Form.Group>
                         <Form.Group controlId="subCategoryPrefix">
@@ -937,19 +946,10 @@ const TagEntry = ({ handleCloseModal1, selectedProduct }) => {
                                 name="prefix"
                                 value={newSubCategory.prefix}
                                 onChange={handleModalChange}
-                                placeholder="Enter prefix"
+                                
                             />
                         </Form.Group>
-                        <Form.Group controlId="categoryName">
-                            <Form.Label>Category</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="category"
-                                value={newSubCategory.category || formData.category}
-                                onChange={handleModalChange}
-                                placeholder="Enter category"
-                            />
-                        </Form.Group>
+                        
                         {/* <Form.Group controlId="categoryName">
                 <Form.Label>Category</Form.Label>
                 <Form.Control
