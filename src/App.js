@@ -136,6 +136,7 @@ function App() {
         <Route path="/usermaster/:id" element={<UserMaster />} />
         <Route path="/subcategory" element={<SubCategory />} />
         <Route path="/subcategorytable" element={<SubCategoryTable />} />
+        <Route path="/subcategory/:id" element={<SubCategory />} />
       </Routes>
     </>
   );

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; 
 import { useNavigate } from "react-router-dom";
 import DataTable from "../../../Pages/InputField/TableLayout"; // Import the reusable DataTable component
 import { Button, Row, Col } from "react-bootstrap";
 import Swal from "sweetalert2"; // Import SweetAlert2
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 const SubCategoryTable = () => {
   const navigate = useNavigate();
@@ -32,9 +33,70 @@ const SubCategoryTable = () => {
         Header: "Prefix",
         accessor: "prefix", // Accessor for prefix
       },
+      {
+        Header: "Actions",
+        Cell: ({ row }) => {
+          const handleDelete = async (subcategory_id) => {
+            try {
+              // Confirm the deletion using SweetAlert2
+              const result = await Swal.fire({
+                title: "Are you sure?",
+                text: "You will not be able to recover this subcategory!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+              });
+
+              if (result.isConfirmed) {
+                // Send DELETE request to the server
+                const response = await fetch(`http://localhost:5000/subcategory/${subcategory_id}`, {
+                  method: "DELETE", // HTTP DELETE method
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ subcategory_id }), // Send subcategory_id in the body
+                });
+
+                if (!response.ok) {
+                  throw new Error("Failed to delete subcategory");
+                }
+
+                // Show success message
+                Swal.fire("Deleted!", "Your subcategory has been deleted.", "success");
+
+                // Remove deleted item from state
+                setData(data.filter(item => item.subcategory_id !== subcategory_id));
+              }
+            } catch (error) {
+              console.error("Error deleting subcategory:", error);
+              Swal.fire("Error", "Failed to delete the subcategory.", "error");
+            }
+          };
+
+          return (
+            <div>
+               <FaEdit
+                style={{ cursor: "pointer", color: "blue", marginRight: "10px" }}
+                onClick={() => handleEdit(row.original.subcategory_id)} // Navigate to edit page
+              />
+              <FaTrash
+                style={{ cursor: "pointer", color: "red" }}
+                onClick={() => handleDelete(row.original.subcategory_id)} // Call handleDelete function
+              />
+            </div>
+          );
+        },
+      },
     ],
-    []
+    [data] // Add 'data' to dependencies to ensure the data is updated after deletion
   );
+
+  // Navigate to the edit page with the selected subcategory ID
+  const handleEdit = (subcategory_id) => {
+    const userLocation = "User's Location"; // Replace this with actual logic to fetch the user's location
+    navigate(`/subcategory/${subcategory_id}`, { state: { subcategory_id, location: userLocation } });
+  };
 
   // Fetch data from the API
   useEffect(() => {
@@ -74,7 +136,6 @@ const SubCategoryTable = () => {
   
     fetchData();
   }, []);
-  
 
   // Navigate to create subcategory page
   const handleCreate = () => {
