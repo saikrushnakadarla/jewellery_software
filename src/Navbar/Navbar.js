@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FaSignOutAlt } from "react-icons/fa";
-import logo from './sadashri_logo.png';
+import logo from './qqq.png';
 // import logo from './jewels_logo.jpg';
 import './Navbar.css';
 import Swal from 'sweetalert2';
