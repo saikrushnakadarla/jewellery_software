@@ -73,6 +73,7 @@ const SalesForm = () => {
     filteredPurityOptions,
     filteredMetalTypes,
     uniqueProducts,
+    subcategoryOptions,
     isBarcodeSelected,
   } = useProductHandlers();
 
@@ -551,6 +552,7 @@ const schemeAmount = location.state?.scheme_amt
               products={products}
               data={data}
               uniqueProducts={uniqueProducts}
+              subcategoryOptions={subcategoryOptions}
               filteredMetalTypes={filteredMetalTypes}
               filteredPurityOptions={filteredPurityOptions}
               filteredDesignOptions={filteredDesignOptions}

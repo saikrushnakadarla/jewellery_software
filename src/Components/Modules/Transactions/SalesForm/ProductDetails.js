@@ -19,6 +19,7 @@ const ProductDetails = ({
   filteredDesignOptions,
   filteredPurityOptions,
   filteredMetalTypes,
+  subcategoryOptions,
   uniqueProducts,
   isBarcodeSelected,
   isQtyEditable
@@ -28,6 +29,7 @@ const ProductDetails = ({
   console.log("Filtered Purity Options:", filteredPurityOptions);
   console.log("Filtered Metal Types:", filteredMetalTypes);
   console.log("Unique Products:", uniqueProducts);
+  console.log("subcategory Options:", subcategoryOptions);
 
   return (
     <Col >
@@ -81,13 +83,15 @@ const ProductDetails = ({
 
         <Col xs={12} md={2}>
           {isBarcodeSelected ? (
-            <InputField
-              label="Sub Category"
-              name="product_name"
-              value={formData.product_name}
-              onChange={handleChange}
-              type="text"
-            />
+          <InputField
+          label="Sub Category"
+          name="product_name"
+          value={formData.product_name || ""}
+          onChange={handleChange}
+          type="select"
+          options={subcategoryOptions} // Dynamically fetched options
+        />
+          
           ) : (
             <InputField
               label="Sub Category"

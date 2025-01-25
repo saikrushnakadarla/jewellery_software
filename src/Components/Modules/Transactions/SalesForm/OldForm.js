@@ -90,30 +90,34 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, [name]: value };
-
+  
       updatedDetails.net_wt = name === "net_wt" ? parseFloat(value) || 0 : parseFloat(updatedDetails.net_wt) || 0;
-
+  
       // Use currentRate if no rate is provided
       updatedDetails.rate = name === "rate" ? parseFloat(value) || currentRate : parseFloat(updatedDetails.rate) || currentRate;
   
       // Recalculate total_amount using net_wt and rate (or currentRate)
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails, currentRate);
   
-
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
-
+  
       if (name === "metal") {
         const selectedMetal = metalOptions.find((option) => option.value === value);
         updatedDetails.hsn_code = selectedMetal?.hsn_code || "";
       }
-
+  
+      if (name === "purity" && value !== "Other") {
+        updatedDetails.purityPercentage = ""; // Clear custom purity if another option is selected
+      }
+  
       return updatedDetails;
     });
   };
+  
 
   const parsePurityToPercentage = (purity) => {
     if (!purity) return null;
@@ -245,18 +249,34 @@ const OldSalesForm = ({ setOldSalesData }) => {
           />
         </Col>
         <Col xs={12} md={3}>
-          <InputField
-            label="Purity"
-            type="select"
-            name="purity"
-            value={oldDetails.purity}
-            onChange={handleInputChange}
-            options={purityOptions.map((purity) => ({
-              value: purity.name,
-              label: purity.name,
-            }))}
-          />
-        </Col>
+  <InputField
+    label="Purity"
+    type="select"
+    name="purity"
+    value={oldDetails.purity}
+    onChange={handleInputChange}
+    options={[
+      ...purityOptions.map((purity) => ({
+        value: purity.name,
+        label: purity.name,
+      })),
+      { value: "Other", label: "Other" }, // Add static "Other" option
+    ]}
+  />
+</Col>
+
+{oldDetails.purity === "Other" && (
+  <Col xs={12} md={3}>
+    <InputField
+      label="Custom Purity (%)"
+      type="number"
+      name="purityPercentage"
+      value={oldDetails.purityPercentage || ""}
+      onChange={handleInputChange}
+    />
+  </Col>
+)}
+
         <Col xs={12} md={2}>
           <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} readOnly />
         </Col>
