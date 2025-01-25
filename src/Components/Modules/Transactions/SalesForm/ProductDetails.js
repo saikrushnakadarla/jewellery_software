@@ -83,14 +83,14 @@ const ProductDetails = ({
 
         <Col xs={12} md={2}>
           {isBarcodeSelected ? (
-          <InputField
-          label="Sub Category"
-          name="product_name"
-          value={formData.product_name || ""}
-          onChange={handleChange}
-          type="select"
-          options={subcategoryOptions} // Dynamically fetched options
-        />
+           <InputField
+           label="Sub Category"
+           name="product_name"
+           value={formData.product_name || ""}
+           onChange={handleChange}
+           type="select"
+           options={subcategoryOptions} // Dynamically fetched options based on category
+         />
           
           ) : (
             <InputField

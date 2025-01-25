@@ -491,38 +491,42 @@ const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
 const [subcategoryOptions, setSubcategoryOptions] = useState([]);
 
  // Fetch subcategories dynamically from the API
-  useEffect(() => {
-    if (isBarcodeSelected) {
-      axios
-        .get("http://localhost:5000/subcategory")
-        .then((response) => {
-          // Log the raw response to inspect its structure
-          console.log("API Response:", response.data);
+ useEffect(() => {
+  if (formData.category) {
+    axios
+      .get("http://localhost:5000/subcategory")
+      .then((response) => {
+        // Log the raw response to inspect its structure
+        console.log("API Response:", response.data);
 
-          // Ensure 'data' exists in the response and it's an array
-          const fetchedSubcategories = Array.isArray(response.data.data)
-            ? response.data.data
-            : [];
+        // Ensure 'data' exists in the response and it's an array
+        const fetchedSubcategories = Array.isArray(response.data.data)
+          ? response.data.data
+          : [];
 
-          // Map the fetched data to match the format for the dropdown
-          const options = fetchedSubcategories.map((subcategory) => {
-            // Log each subcategory object to check its structure
-            console.log("Subcategory Item:", subcategory);
-            return {
-              value: subcategory.subcategory_id,   // Correct field
-              label: subcategory.sub_category_name, // Correct field
-            };
-          });
+        // Filter subcategories by the selected category
+        const filteredSubcategories = fetchedSubcategories.filter(
+          (subcategory) => subcategory.category === formData.category
+        );
 
-          console.log("Mapped Subcategory Options:", options); // Console log to check mapped options
-
-          setSubcategoryOptions(options);
-        })
-        .catch((error) => {
-          console.error("Error fetching subcategory data:", error);
+        // Map the filtered data to match the format for the dropdown
+        const options = filteredSubcategories.map((subcategory) => {
+          return {
+            value: subcategory.subcategory_id, // Correct field
+            label: subcategory.sub_category_name, // Correct field
+          };
         });
-    }
-  }, [isBarcodeSelected]);
+
+        console.log("Mapped Subcategory Options:", options); // Console log to check mapped options
+
+        setSubcategoryOptions(options);
+      })
+      .catch((error) => {
+        console.error("Error fetching subcategory data:", error);
+      });
+  }
+}, [formData.category]);
+
 
 
 const handleBarcodeChange = async (code) => {
