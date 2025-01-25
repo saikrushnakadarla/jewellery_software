@@ -241,12 +241,12 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
 
     const handleChange = async (e) => {
         const { name, value } = e.target;
-    
+
         if (name === "category") {
             // Check if the category is related to gold or silver
             const isGoldCategory = value.toLowerCase().includes("gold");
             const isSilverCategory = value.toLowerCase().includes("silver");
-    
+
             // Set the appropriate Making_Charges_On based on category
             setFormData((prevData) => ({
                 ...prevData,
@@ -254,8 +254,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 Making_Charges_On: isGoldCategory
                     ? "MC %"
                     : isSilverCategory
-                    ? "MC / Gram" // Default to "MC / Gram" for silver
-                    : prevData.Making_Charges_On,
+                        ? "MC / Gram" // Default to "MC / Gram" for silver
+                        : prevData.Making_Charges_On,
                 MC_Per_Gram_Label: isGoldCategory
                     ? "MC Percentage"
                     : "MC Per Gram",
@@ -264,7 +264,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         } else if (name === "Making_Charges_On") {
             // Handle Making Charges On field changes
             const shouldShowMCField = value !== "MC %";
-    
+
             setFormData((prevData) => ({
                 ...prevData,
                 Making_Charges_On: value,
@@ -278,17 +278,17 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             const selectedCategory = subCategories.find(
                 (category) => category.subcategory_id === parseInt(value)
             );
-    
+
             const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-    
+
             if (newPrefix) {
                 try {
                     const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
                         params: { prefix: newPrefix },
                     });
-    
+
                     const nextPCodeBarCode = response.data.nextPCodeBarCode;
-    
+
                     setFormData((prevData) => ({
                         ...prevData,
                         sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
@@ -318,9 +318,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             }));
         }
     };
-    
-    
-    
+
+
+
 
 
 
@@ -882,7 +882,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             readOnly
                                         />
                                     </Col>
-                                    <Col xs={12} md={2}>
+                                    {/* <Col xs={12} md={2}>
                                         <InputField
                                             label="MC On"
                                             name="Making_Charges_On"
@@ -895,7 +895,22 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                 { value: "MC %", label: "MC %" }, // Gold-related default
                                             ]}
                                         />
+                                    </Col> */}
+                                    <Col xs={12} md={2}>
+                                        <InputField
+                                            label="MC On"
+                                            name="Making_Charges_On"
+                                            type="select"
+                                            value={formData.Making_Charges_On || "MC / Gram"} // Default to "MC / Gram" if empty
+                                            onChange={handleChange}
+                                            options={[
+                                                { value: "MC / Gram", label: "MC / Gram" },
+                                                { value: "Fixed", label: "Fixed" },
+                                                { value: "MC %", label: "MC %" }, // Gold-related default
+                                            ]}
+                                        />
                                     </Col>
+
 
                                     <Col xs={12} md={2}>
                                         <InputField
