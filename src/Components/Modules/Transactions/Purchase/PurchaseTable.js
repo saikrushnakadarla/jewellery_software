@@ -5,12 +5,15 @@ import { Button, Row, Col } from 'react-bootstrap';
 import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import './PurchaseTable.css';
 import baseURL from '../../../../Url/NodeBaseURL'; // Update with your base URL setup
+import TagEntry from "./TagEntry";
+import { Modal } from "react-bootstrap";
 
 const PurchaseTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store fetched table data
   const [loading, setLoading] = useState(false); // Loading state for delete actions
-
+ const [showModal, setShowModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   // Function to format date to DD/MM/YYYY
   const formatDate = (date) => {
     if (!date) return '';
@@ -52,6 +55,11 @@ const handleDelete = async (id) => {
   }
 };
 
+const handleOpenModal = (data) => {
+  setSelectedProduct(data);
+  setShowModal(true);
+};
+
 
   const columns = React.useMemo(
     () => [
@@ -90,17 +98,32 @@ const handleDelete = async (id) => {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => (
-          <FaTrash
-            style={{
-              cursor: 'pointer',
-              marginLeft: '10px',
-              color: 'red',
-            }}
-          onClick={() => handleDelete(row.original.id)}
-          disabled={loading}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{
+                backgroundColor: '#a36e29',
+                borderColor: '#a36e29',
+                width: '102px',
+                fontSize: '0.875rem',
+              }}
+              onClick={() => handleOpenModal(row.original)} // Pass entire row data
+            >
+              Tag Entry
+            </button>
+            <FaTrash
+              style={{
+                cursor: 'pointer',
+                color: 'red',
+              }}
+              onClick={() => handleDelete(row.original.id)}
+              disabled={loading}
+            />
+          </div>
         ),
       },
+      
       {
         Header: 'Payments',
         accessor: 'payment',
@@ -163,6 +186,12 @@ const handleDelete = async (id) => {
   const handleCreate = () => {
     navigate('/purchase'); // Update with your correct route
   };
+  
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedProduct(null);
+  };
+
 
   return (
     <div className="main-container">
@@ -181,6 +210,27 @@ const handleDelete = async (id) => {
         </Row>
         <DataTable columns={columns} data={[...data].reverse()} />
       </div>
+      <Modal
+        show={showModal}
+        onHide={handleCloseModal}
+        size="lg"
+        backdrop="static"
+        keyboard={false}
+        dialogClassName="custom-tagentrymodal-width"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Tag Entry</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedProduct && (
+            <TagEntry
+              handleCloseTagModal={handleCloseModal}
+              selectedProduct={selectedProduct}
+            />
+          )}
+        </Modal.Body>
+
+      </Modal>
     </div>
   );
 };

@@ -124,22 +124,31 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         const makingCharges = parseFloat(formData.Making_Charges) || 0;
 
         if (formData.Making_Charges_On === "MC / Gram") {
+            // Calculate Making Charges based on MC/Gram
             const calculatedMakingCharges = totalWeight * mcPerGram;
             setFormData((prev) => ({
                 ...prev,
-                Making_Charges: calculatedMakingCharges.toFixed(2),
+                Making_Charges: calculatedMakingCharges.toFixed(2), // Automatically set Making Charges
             }));
         } else if (formData.Making_Charges_On === "Fixed") {
-            const calculatedMcPerGram = makingCharges / totalWeight;
+            // Calculate MC/Gram based on fixed Making Charges
+            const calculatedMcPerGram = totalWeight ? makingCharges / totalWeight : 0;
             setFormData((prev) => ({
                 ...prev,
-                MC_Per_Gram: calculatedMcPerGram.toFixed(2),
+                MC_Per_Gram: calculatedMcPerGram.toFixed(2), // Automatically set MC/Gram
             }));
         }
     };
+
     useEffect(() => {
         handleMakingChargesCalculation();
-    }, [formData.Making_Charges_On, formData.MC_Per_Gram, formData.Making_Charges, formData.TotalWeight_AW]);
+    }, [
+        formData.Making_Charges_On,
+        formData.MC_Per_Gram,
+        formData.Making_Charges,
+        formData.TotalWeight_AW,
+    ]);
+
 
     useEffect(() => {
         axios.get(`${baseURL}/get/products`)
@@ -232,31 +241,54 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
 
     const handleChange = async (e) => {
         const { name, value } = e.target;
-
+    
         if (name === "category") {
+            // Check if the category is related to gold or silver
             const isGoldCategory = value.toLowerCase().includes("gold");
-
+            const isSilverCategory = value.toLowerCase().includes("silver");
+    
+            // Set the appropriate Making_Charges_On based on category
             setFormData((prevData) => ({
                 ...prevData,
                 category: value,
-                Making_Charges_On: isGoldCategory ? "MC %" : prevData.Making_Charges_On,
-                MC_Per_Gram_Label: isGoldCategory ? "MC Percentage" : prevData.MC_Per_Gram_Label, // Ensure consistency
+                Making_Charges_On: isGoldCategory
+                    ? "MC %"
+                    : isSilverCategory
+                    ? "MC / Gram" // Default to "MC / Gram" for silver
+                    : prevData.Making_Charges_On,
+                MC_Per_Gram_Label: isGoldCategory
+                    ? "MC Percentage"
+                    : "MC Per Gram",
+                showMCField: isGoldCategory ? false : prevData.showMCField,
+            }));
+        } else if (name === "Making_Charges_On") {
+            // Handle Making Charges On field changes
+            const shouldShowMCField = value !== "MC %";
+    
+            setFormData((prevData) => ({
+                ...prevData,
+                Making_Charges_On: value,
+                MC_Per_Gram_Label: value === "MC %" ? "MC Percentage" : "MC Per Gram",
+                showMCField: shouldShowMCField,
+                MC_Per_Gram: "",
+                Making_Charges: "",
             }));
         } else if (name === "sub_category") {
+            // Handle sub_category field changes
             const selectedCategory = subCategories.find(
-                (category) => category.subcategory_id === parseInt(value) // Ensure correct type match
+                (category) => category.subcategory_id === parseInt(value)
             );
-
+    
             const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-
+    
             if (newPrefix) {
                 try {
                     const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
                         params: { prefix: newPrefix },
                     });
-
+    
                     const nextPCodeBarCode = response.data.nextPCodeBarCode;
-
+    
                     setFormData((prevData) => ({
                         ...prevData,
                         sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
@@ -279,12 +311,18 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 }));
             }
         } else {
+            // Handle generic field changes
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: value,
             }));
         }
     };
+    
+    
+    
+
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -636,9 +674,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                     (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
                 );
                 setPurityOptions(filteredPurity);
-    
+
                 console.log("Purity=", filteredPurity);
-    
+
                 // Set the default option based on metal type
                 if (formData.metal_type.toLowerCase() === "gold") {
                     const defaultOption = filteredPurity.find((option) =>
@@ -669,12 +707,12 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 console.error("Error fetching data:", error);
             }
         };
-    
+
         if (formData.metal_type) {
             fetchPurity();
         }
     }, [formData.metal_type]);
-     
+
 
 
     return (
@@ -753,7 +791,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             options={purityOptions.map((option) => ({
                                                 value: `${option.name} | ${option.purity}`, // Combined name and purity
                                                 label: `${option.name} | ${option.purity}`,
-                                              }))}
+                                            }))}
                                         />
                                     </Col>
 
@@ -854,10 +892,11 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             options={[
                                                 { value: "MC / Gram", label: "MC / Gram" },
                                                 { value: "Fixed", label: "Fixed" },
-                                                { value: "MC %", label: "MC %" }, // Added for gold-related default
+                                                { value: "MC %", label: "MC %" }, // Gold-related default
                                             ]}
                                         />
                                     </Col>
+
                                     <Col xs={12} md={2}>
                                         <InputField
                                             label={formData.MC_Per_Gram_Label || "MC/Gm"} // Dynamic label based on category
@@ -866,7 +905,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             onChange={handleChange}
                                         />
                                     </Col>
-                                    {!formData.category?.toLowerCase().includes("gold") && (
+
+                                    {formData.showMCField && (
                                         <Col xs={12} md={2}>
                                             <InputField
                                                 label="MC"
@@ -876,6 +916,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             />
                                         </Col>
                                     )}
+
+
+
                                     <Col xs={12} md={2}>
                                         <InputField
                                             label="Wastage On"
@@ -915,7 +958,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             readOnly
                                         />
                                     </Col>
-                                   
+
                                     <Col xs={12} md={2}>
                                         <InputField
                                             label="HUID No"
