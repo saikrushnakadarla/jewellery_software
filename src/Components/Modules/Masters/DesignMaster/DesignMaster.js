@@ -271,7 +271,7 @@ function DesignMaster() {
           {/* Row 1 */}
           <div className="form-row">
            <InputField
-              label="Metal :"
+              label="Metal"
               name="metal"
                type="select"
               value={formData.metal}
@@ -289,7 +289,7 @@ function DesignMaster() {
             />
             
             <InputField
-              label="Short Id:"
+              label="Short Id"
               name="short_id"
               value={formData.short_id}
               onChange={handleChange}
@@ -300,7 +300,7 @@ function DesignMaster() {
 
          
             <InputField
-              label="Item Type:"
+              label="Item Type"
               name="item_type"
               value={formData.item_type}
               onChange={handleChange}
@@ -311,7 +311,7 @@ function DesignMaster() {
             />
 
             <InputField
-              label="Design Item:"
+              label="Design Item"
               name="design_item"
               value={formData.design_item}
               onChange={handleChange}
@@ -321,7 +321,7 @@ function DesignMaster() {
             />
 
             <InputField
-              label="Design Name:"
+              label="Design Name"
               name="design_name"
               value={formData.design_name}
               onChange={handleChange}
@@ -335,7 +335,7 @@ function DesignMaster() {
           {/* Row 2 */}
           <div className="form-row">
             <InputField
-              label="Wastage Percentage:"
+              label="Wastage %"
               name="wastage_percentage"
               value={formData.wastage_percentage}
               onChange={handleChange}
@@ -345,7 +345,7 @@ function DesignMaster() {
             />
 
             <InputField
-              label="Making Charge:"
+              label="Making Charge"
               name="making_charge"
               value={formData.making_charge}
               onChange={handleChange}
@@ -355,7 +355,7 @@ function DesignMaster() {
             />
 
             <InputField
-              label="Design Short Code:"
+              label="Design Short Code"
               name="design_short_code"
               value={formData.design_short_code}
               onChange={handleChange}
@@ -365,7 +365,7 @@ function DesignMaster() {
             />
 
             <InputField
-              label="Brand/Category:"
+              label="Brand/Category"
               name="brand_category"
               value={formData.brand_category}
               onChange={handleChange}
@@ -376,7 +376,7 @@ function DesignMaster() {
             />
 
             <InputField
-              label="MC Type:"
+              label="MC Type"
               name="mc_type"
               type="select"
               value={formData.mc_type}

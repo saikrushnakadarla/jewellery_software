@@ -15,11 +15,49 @@ const URDPurchase = () => {
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
   const [productIdAndRbarcode, setProductIdAndRbarcode] = useState({});
-  const [formData, setFormData] = useState(() => {
-    const savedData = localStorage.getItem("purchaseFormData");
-    return savedData
-      ? JSON.parse(savedData)
-      : {
+  // const [formData, setFormData] = useState(() => {
+  //   const savedData = localStorage.getItem("purchaseFormData");
+  //   return savedData
+  //     ? JSON.parse(savedData)
+  //     : 
+  //     {
+  //       mobile: "",
+  //       account_name: "",
+  //       gst_in: "",
+  //       terms: "Cash",
+  //       invoice: "",
+  //       bill_no: "",
+  //       rate_cut: "",
+  //       date: new Date().toISOString().split("T")[0],
+  //       bill_date: new Date().toISOString().split("T")[0],
+  //       due_date: "",
+  //       category: "",
+  //       cut: "",
+  //       color: "",
+  //       clarity: "",
+  //       hsn_code: "",
+  //       rbarcode: "",
+  //       pcs: "",
+  //       gross_weight: "",
+  //       stone_weight: "",
+  //       net_weight: "",
+  //       hm_charges: "",
+  //       other_charges: "",
+  //       charges: "",
+  //       product_id: "",
+  //       metal_type: "",
+  //       pure_weight: "",
+  //       paid_pure_weight: "",
+  //       balance_pure_weight: "0",
+  //       rate: "",
+  //       total_amount: "",
+  //       paid_amount: "",
+  //       balance_amount: "",
+  //       balance_after_receipt: "0",
+  //     };
+  // });
+
+  const [formData, setFormData] = useState({
         mobile: "",
         account_name: "",
         gst_in: "",
@@ -53,13 +91,12 @@ const URDPurchase = () => {
         paid_amount: "",
         balance_amount: "",
         balance_after_receipt: "0",
-      };
-  });
+      });
 
   // const [tableData, setTableData] = useState([]);
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
   const [purityOptions, setPurityOptions] = useState([]);
-  const [showModal1, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [categories, setCategories] = useState([]);
@@ -68,6 +105,24 @@ const URDPurchase = () => {
     const savedData = localStorage.getItem("tableData");
     return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
   });
+
+  useEffect(() => {
+    const fetchCurrentRates = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/current-rates`);
+        setRates({
+          rate_24crt: response.data.rate_24crt || "",
+          rate_22crt: response.data.rate_22crt || "",
+          rate_18crt: response.data.rate_18crt || "",
+          rate_16crt: response.data.rate_16crt || "",
+          silver_rate: response.data.silver_rate || "",
+        });
+      } catch (error) {
+        console.error('Error fetching current rates:', error);
+      }
+    };
+    fetchCurrentRates();
+  }, []);
 
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
@@ -83,50 +138,68 @@ const URDPurchase = () => {
           return prevFormData; // Prevent update
         }
       }
-
-      // If the category changes, update the hsn_code automatically
-      if (field === "category") {
-        const selectedCategory = categories.find(
-          (category) => category.value === value
-        );
-        if (selectedCategory) {
-          updatedFormData.hsn_code = selectedCategory.hsn_code;
-        }
-      }
-
       // Parse purity value to percentage
       const parsePurityToPercentage = (purity) => {
         if (!purity) return null;
-
-        const match = purity.match(/(\d+)(k|K)/); // Match formats like "22K", "24k", etc.
+      
+        // Match formats like "22K", "24k", "22kt", "22KT", "22"
+        const match = purity.match(/(\d+)(k|K|kt|KT)?/); 
         if (match) {
           const caratValue = parseInt(match[1], 10); // Extract carat number
-          return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
+          if (caratValue) {
+            return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
+          }
         }
-
-        // Handle other formats like "916HM" directly if required
+      
+        // Handle specific formats like "916HM" directly
         if (purity.toLowerCase() === "916hm") return 91.6;
-
+      
         return null; // Default if no match
       };
+      
 
-      // Update rate based on purity
-      if (field === "purity") {
-        const rate =
-          value === "24K"
-            ? rates.rate_24crt
-            : value === "22K"
-              ? rates.rate_22crt
-              : value === "18K"
-                ? rates.rate_18crt
-                : value === "16K"
-                  ? rates.rate_16crt
-                  : "";
-
-        updatedFormData.rate = rate;
+      if (field === "purity" || field === "metal_type") {
+        // Separate condition for gold
+        if (formData.metal_type.toLowerCase() === "gold") {
+          // Check for different purity values and set the rate accordingly for gold
+          if (
+            value.toLowerCase().includes("22") || // Check for 22 KT, 22K, 22k, etc.
+            value.toLowerCase().includes("22kt") ||
+            value.toLowerCase().includes("22k")
+          ) {
+            updatedFormData.rate = rates.rate_22crt;
+          } else if (
+            value.toLowerCase().includes("24") || // Check for 24 KT, 24K, etc.
+            value.toLowerCase().includes("24kt") ||
+            value.toLowerCase().includes("24k")
+          ) {
+            updatedFormData.rate = rates.rate_24crt;
+          } else if (
+            value.toLowerCase().includes("18") || // Check for 18 KT, 18K, etc.
+            value.toLowerCase().includes("18kt") ||
+            value.toLowerCase().includes("18k")
+          ) {
+            updatedFormData.rate = rates.rate_18crt;
+          } else if (
+            value.toLowerCase().includes("16") || // Check for 16 KT, 16K, etc.
+            value.toLowerCase().includes("16kt") ||
+            value.toLowerCase().includes("16k")
+          ) {
+            updatedFormData.rate = rates.rate_16crt;
+          } else {
+            updatedFormData.rate = "";
+          }
+        }
       }
-
-      // Update pure weight when net weight or purity changes
+      
+      if (field === "metal_type") {
+        // Additional condition to ensure silver rate is fetched without purity
+        if (formData.metal_type.toLowerCase() === "silver") {
+          updatedFormData.rate = rates.silver_rate; // Set rate based on silver
+        }
+      }
+      
+      
       if (field === "net_weight" || field === "purity") {
         const netWeight = parseFloat(updatedFormData.net_weight) || 0;
         const purityPercentage = parsePurityToPercentage(
@@ -407,9 +480,7 @@ const URDPurchase = () => {
         const filteredCustomers = result.filter(
           (item) => item.account_group === 'SUPPLIERS' || item.account_group === 'CUSTOMERS'
         );
-
         setCustomers(filteredCustomers);
-        console.log("Filtered Customers and Suppliers =", filteredCustomers);
       } catch (error) {
         console.error('Error fetching data:', error);
         setLoading(false);
@@ -476,7 +547,7 @@ const URDPurchase = () => {
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      if (showModal1) {
+      if (showModal) {
         e.preventDefault();
         e.returnValue = ""; // This triggers the confirmation dialog in some browsers.
       }
@@ -484,35 +555,14 @@ const URDPurchase = () => {
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [showModal1]);
+  }, [showModal]);
 
-  const handleCloseModal1 = () => {
+  const handleCloseModal = () => {
     setShowModal(false);
     setSelectedProduct(null);
   };
 
-  useEffect(() => {
-    const fetchCurrentRates = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get/current-rates`);
-        console.log('API Response:', response.data);
 
-        // Log the 24crt rate separately
-        console.log('24crt Rate:', response.data.rate_24crt);
-
-        // Dynamically set the rates based on response
-        setRates({
-          rate_24crt: response.data.rate_24crt || "",
-          rate_22crt: response.data.rate_22crt || "",
-          rate_18crt: response.data.rate_18crt || "",
-          rate_16crt: response.data.rate_16crt || "",
-        });
-      } catch (error) {
-        console.error('Error fetching current rates:', error);
-      }
-    };
-    fetchCurrentRates();
-  }, []);
 
   useEffect(() => {
     const fetchLastInvoice = async () => {
@@ -564,74 +614,7 @@ const URDPurchase = () => {
   }, []);
 
   useEffect(() => {
-    const fetchRateForSilver = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get/current-rates`);
-        setFormData((prev) => ({
-          ...prev,
-          purity: "24K", // Directly set purity to 24K for silver
-          rate: response.data.silver_rate || "",
-        }));
-      } catch (error) {
-        console.error("Error fetching silver rate:", error);
-      }
-    };
-
     if (formData.category) {
-      const selectedCategory = categories.find(
-        (cat) => cat.value === formData.category
-      );
-
-      if (selectedCategory?.categoryType === "Silver") {
-        fetchRateForSilver();
-        setPurityOptions([{
-          value: "24K",
-          label: "24K",
-        }]); // Only show 24K for silver
-      } else if (selectedCategory?.categoryType === "Gold") {
-        axios
-          .get(`${baseURL}/get/products`)
-          .then((response) => {
-            const products = response.data;
-
-            // Filter products based on selected category name
-            const filteredProducts = products.filter(
-              (product) => product.product_name === formData.category
-            );
-
-            // Extract unique purity values
-            const uniquePurityValues = [
-              ...new Set(filteredProducts.map((product) => product.purity)),
-            ].filter((purity) => purity); // Exclude null/undefined
-
-            // Update purity options
-            setPurityOptions(
-              uniquePurityValues.map((purity) => ({
-                value: purity,
-                label: purity,
-              }))
-            );
-
-            // Set default purity to "22K" for gold ornaments
-            setFormData((prev) => ({
-              ...prev,
-              purity: "22K", // Default to "22K" for Gold category
-              rate: "", // Reset rate until purity is selected
-            }));
-          })
-          .catch((error) => {
-            console.error("Error fetching products:", error);
-          });
-      }
-    } else {
-      // Reset purity options and rate if no category is selected
-      setPurityOptions([]);
-      setFormData((prev) => ({ ...prev, rate: "", hsn_code: '' }));
-    }
-  }, [formData.category, categories]);
-
-  useEffect(() => {
-    if (formData.category && formData.purity) {
       axios
         .get(`${baseURL}/get/products`)
         .then((response) => {
@@ -639,8 +622,7 @@ const URDPurchase = () => {
 
           const matchingProduct = products.find(
             (product) =>
-              product.product_name === formData.category &&
-              product.purity === formData.purity
+              product.product_name === formData.category
           );
 
           if (matchingProduct) {
@@ -649,6 +631,7 @@ const URDPurchase = () => {
               product_id: matchingProduct.product_id, // Update product_id
               rbarcode: matchingProduct.rbarcode,    // Update rbarcode
               metal_type: matchingProduct.Category,
+              hsn_code: matchingProduct.hsn_code
             }));
           } else {
             // Reset product_id and rbarcode if no match
@@ -656,7 +639,9 @@ const URDPurchase = () => {
               ...prevFormData,
               product_id: '',
               rbarcode: '',
-
+              hsn_code: '',
+              purity:'',
+              rate:'',
             }));
           }
         })
@@ -669,9 +654,104 @@ const URDPurchase = () => {
         ...prevFormData,
         product_id: '',
         rbarcode: '',
+        hsn_code: '',
+        purity:'',
+        rate:'',
       }));
     }
-  }, [formData.category, formData.purity]);
+  }, [formData.category]);
+
+  useEffect(() => {
+    const fetchPurity = async () => {
+      if (!formData.category) {
+        // Clear purity and rate if category is cleared
+        setFormData((prev) => ({
+          ...prev,
+          purity: "", // Clear purity
+          rate: "",   // Clear rate
+        }));
+        setPurityOptions([]); // Clear purity options
+        return; // Exit early
+      }
+  
+      if (!formData.metal_type) {
+        // If metal_type is empty, don't fetch purity options
+        setPurityOptions([]);
+        return;
+      }
+  
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+  
+        // Filter purity options based on selected metal type
+        const filteredPurity = response.data.filter(
+          (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
+        );
+  
+        setPurityOptions(filteredPurity);
+        console.log("Purity Options:", filteredPurity);
+  
+        // Set default value for "Gold" or "gold" metal type
+        if (formData.metal_type.toLowerCase() === "gold") {
+          const defaultOption = filteredPurity.find((option) =>
+            ["22k", "22 kt", "22"].some((match) =>
+              option.name.toLowerCase().includes(match)
+            )
+          );
+  
+          if (defaultOption) {
+            setFormData((prev) => {
+              const updatedData = {
+                ...prev,
+                purity: `${defaultOption.name} | ${defaultOption.purity}`, // Set default purity value
+                rate: rates.rate_22crt, // Adjust rate for 22K gold
+              };
+              return updatedData;
+            });
+          }
+        }
+  
+        // Set default value for "Silver" or "silver" metal type
+        if (formData.metal_type.toLowerCase() === "silver") {
+          const defaultOption = filteredPurity.find((option) =>
+            ["22k", "22 kt", "22"].some((match) =>
+              option.name.toLowerCase().includes(match)
+            )
+          );
+  
+          if (defaultOption) {
+            setFormData((prev) => {
+              const updatedData = {
+                ...prev,
+                purity: `${defaultOption.name} | ${defaultOption.purity}`, // Set default purity value
+                rate: rates.silver_rate, // Adjust rate for silver
+              };
+              return updatedData;
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    // Fetch purity or reset data based on conditions
+    if (formData.category) {
+      fetchPurity();
+    } else {
+      // Reset purity and rate if category is cleared
+      setFormData((prev) => ({
+        ...prev,
+        purity: "", // Clear purity
+        rate: "",   // Clear rate
+      }));
+      setPurityOptions([]);
+    }
+  }, [formData.metal_type, formData.category]);
+  
+  
+  
+  
 
   const handleOpenModal = (data) => {
     setSelectedProduct(data);
@@ -690,7 +770,6 @@ const URDPurchase = () => {
       bill_date: today,
     }));
   }, []);
-
 
   return (
     <div className="main-container">
@@ -828,7 +907,6 @@ const URDPurchase = () => {
                 />
               </Col>
 
-              {/* Conditional Rendering of Fields */}
               {formData.category === "Diamond" ? (
                 <>
                   <Col xs={12} md={2}>
@@ -861,15 +939,25 @@ const URDPurchase = () => {
                 </>
               ) : (
                 <Col xs={12} md={2}>
-                  <InputField
+                  {/* <InputField
                     label="Purity"
                     type="select"
                     name="purity"
                     value={formData.purity}
                     onChange={(e) => handleChange("purity", e.target.value)}
                     options={purityOptions}
+                  /> */}
+                  <InputField
+                    label="Purity"
+                    type="select"
+                    name="purity"
+                    value={formData.purity}
+                    onChange={(e) => handleChange("purity", e.target.value)}
+                    options={purityOptions.map((option) => ({
+                      value: `${option.name} | ${option.purity}`, // Combined name and purity
+                      label: `${option.name} | ${option.purity}`,
+                    }))}
                   />
-
                 </Col>
               )}
 
@@ -879,6 +967,7 @@ const URDPurchase = () => {
                   name="rbarcode"
                   value={formData.rbarcode}
                   onChange={(e) => handleChange("rbarcode", e.target.value)}
+                  readOnly
                 />
               </Col>
               <Col xs={12} md={2}>
@@ -940,9 +1029,9 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("pure_weight", e.target.value)}
                 />
               </Col>
-              <Col xs={12} md={2}>
+              <Col xs={12} md={1}>
                 <InputField
-                  label="Paid Pure Wt"
+                  label="Paid Wt"
                   type="number"
                   value={formData.paid_pure_weight}
                   onChange={(e) => handleChange("paid_pure_weight", e.target.value)}
@@ -951,7 +1040,7 @@ const URDPurchase = () => {
 
               <Col xs={12} md={2}>
                 <InputField
-                  label="Balance Pure Wt"
+                  label="Balance Wt"
                   type="number"
                   value={formData.balance_pure_weight}
                   onChange={(e) => handleChange("balance_pure_weight", e.target.value)}
@@ -1000,8 +1089,7 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("total_amount", e.target.value)} />
               </Col> */}
               <Col xs={12} md={1}>
-                <Button onClick={handleAdd}>
-
+                <Button onClick={handleAdd} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
                   {editingIndex !== null ? "Update" : "Add"}
                 </Button>
               </Col>
@@ -1013,7 +1101,7 @@ const URDPurchase = () => {
                 <thead>
                   <tr>
                     {/* <th>product_id</th> */}
-                    <th>Rbarcode</th>
+                    {/* <th>Rbarcode</th> */}
                     <th>Category</th>
                     {/* <th>Cut</th>
                     <th>Color</th>
@@ -1025,15 +1113,15 @@ const URDPurchase = () => {
                     {/* <th>HM Charges</th>
                     <th>Other Charges</th>
                     <th>Charges</th> */}
-                    <th>Metal Type</th>
+                    <th>Metal</th>
                     <th>Purity</th>
-                    <th>Total Pure Wt</th>
-                    <th>paid pure wt</th>
-                    <th>Balance pure wt</th>
+                    <th>Total Wt</th>
+                    <th>Paid wt</th>
+                    <th>Bal wt</th>
                     <th>Rate</th>
-                    <th>Total Amount</th>
-                    <th>Paid Amount</th>
-                    <th>Balance Amount</th>
+                    <th>Total Amt</th>
+                    <th>Paid Amt</th>
+                    <th>Balance Amt</th>
                     <th>Actions</th> {/* New Action column */}
                   </tr>
                 </thead>
@@ -1041,7 +1129,7 @@ const URDPurchase = () => {
                   {tableData.map((data, index) => (
                     <tr key={index}>
                       {/* <td>{data.product_id}</td> */}
-                      <td>{data.rbarcode}</td>
+                      {/* <td>{data.rbarcode}</td> */}
                       <td>{data.category}</td>
                       {/* <td>{data.cut}</td>
                       <td>{data.color}</td>
@@ -1102,8 +1190,8 @@ const URDPurchase = () => {
       </div>
 
       <Modal
-        show={showModal1}
-        onHide={handleCloseModal1}
+        show={showModal}
+        onHide={handleCloseModal}
         size="lg"
         backdrop="static"
         keyboard={false}
@@ -1115,16 +1203,12 @@ const URDPurchase = () => {
         <Modal.Body>
           {selectedProduct && (
             <TagEntry
-              handleCloseModal={handleCloseModal1}
+              handleCloseTagModal={handleCloseModal}
               selectedProduct={selectedProduct}
             />
           )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal1}>
-            Close
-          </Button>
-        </Modal.Footer>
+
       </Modal>
 
 

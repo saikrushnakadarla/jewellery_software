@@ -112,7 +112,7 @@ useEffect(() => {
           <Row>
             <Col md={4}>
               <InputField
-                label="User Name:"
+                label="User Name"
                 name="user_name"
                 value={formData.user_name}
                 onChange={handleChange}
@@ -122,7 +122,7 @@ useEffect(() => {
 
             <Col md={4}>
               <InputField
-                label="Email:"
+                label="Email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -131,7 +131,7 @@ useEffect(() => {
             </Col>
             <Col md={4}>
               <InputField
-                label="Phone Number:"
+                label="Phone Number"
                 name="phone_number"
                 value={formData.phone_number}
                 onChange={handleChange}
@@ -140,7 +140,7 @@ useEffect(() => {
             </Col>
             <Col md={4}>
               <InputField
-                label="User Type:"
+                label="User Type"
                 name="role"
                 type="select"
                 value={formData.role}
@@ -155,7 +155,7 @@ useEffect(() => {
             </Col>
             <Col md={4}>
               <InputField
-                label="Password:"
+                label="Password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -164,7 +164,7 @@ useEffect(() => {
             </Col>
             <Col md={4}>
               <InputField
-                label="Retype Password:"
+                label="Retype Password"
                 name="retype_password"
                 value={formData.retype_password}
                 onChange={handleChange}

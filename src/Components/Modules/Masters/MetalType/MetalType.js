@@ -239,7 +239,7 @@ function MetalType() {
           {/* Row 1 */}
           <div className="form-row">
             <InputField
-              label="Metal Name:"
+              label="Metal Name"
               name="metal_name"
               value={formData.metal_name}
               onChange={handleChange}
@@ -248,7 +248,7 @@ function MetalType() {
             />
 
             <InputField
-              label="HSN Code:"
+              label="HSN Code"
               name="hsn_code"
               value={formData.hsn_code}
               onChange={handleChange}
@@ -276,7 +276,7 @@ function MetalType() {
             {errors.description && <p style={{ color: 'red', fontSize: '15px' }} className="error-message">{errors.description}</p>} */}
 
             <InputField
-              label="Default Purity:"
+              label="Default Purity"
               name="default_purity"
               type="select"
               value={formData.default_purity}
@@ -297,7 +297,7 @@ function MetalType() {
           {/* Row 2 */}
           <div className="form-row">
             <InputField
-              label="Default Purity for Rate Entry:"
+              label="Default Purity for Rate Entry"
               name="default_purity_for_rate_entry"
               type="select"
               value={formData.default_purity_for_rate_entry}
@@ -314,7 +314,7 @@ function MetalType() {
             {errors.default_purity_for_rate_entry && <p style={{ color: 'red', fontSize: '15px' }} className="error-message">{errors.default_purity_for_rate_entry}</p>}
 
             <InputField
-              label="Default Purity for Old Metal:"
+              label="Default Purity for Old Metal"
               name="default_purity_for_old_metal"
               type="select"
               value={formData.default_purity_for_old_metal}
@@ -327,7 +327,7 @@ function MetalType() {
               ]}
             />
             <InputField
-              label="Default Issue Purity:"
+              label="Default Issue Purity"
               name="default_issue_purity"
               type="select"
               value={formData.default_issue_purity}

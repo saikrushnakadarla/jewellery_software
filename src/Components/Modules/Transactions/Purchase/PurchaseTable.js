@@ -62,12 +62,12 @@ const handleDelete = async (id) => {
       { Header: 'Date', accessor: 'date', Cell: ({ value }) => <span>{formatDate(value)}</span> },
       { Header: 'Category', accessor: 'category' },
       { Header: 'Pcs', accessor: 'pcs' },
-      { Header: 'Gross Weight', accessor: 'gross_weight' },
+      { Header: 'Gross Wt', accessor: 'gross_weight' },
       { Header: 'Purity', accessor: 'purity' },
-      { Header: 'Pure Weight', accessor: 'pure_weight' },
-      { Header: 'Total Amount/Weight', accessor: 'total_amount' },
+      { Header: 'Pure Wt', accessor: 'pure_weight' },
+      { Header: 'Tot Amt / Wt', accessor: 'total_amount' },
       { 
-        Header: 'Paid Amount/Weight', 
+        Header: 'Paid Amt / Wt', 
         accessor: 'paid_amount',
         Cell: ({ row }) => {
           const { paid_amount, paid_amt } = row.original;
@@ -76,7 +76,7 @@ const handleDelete = async (id) => {
         },
       },
       { 
-        Header: 'Bal Amount/Weight', 
+        Header: 'Bal Amt / Wt', 
         accessor: 'balance_amount',
         Cell: ({ row }) => {
           const { balance_amount, balance_after_receipt, paid_amt } = row.original;

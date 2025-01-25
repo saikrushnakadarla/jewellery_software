@@ -207,7 +207,7 @@ function Purity() {
         accessor: "metal",
       },
       {
-        Header: "Purity Percentage",
+        Header: "Purity %",
         accessor: "purity_percentage",
       },
       {
@@ -272,7 +272,7 @@ function Purity() {
             /> */}
 
             <InputField
-              label="Purity Name:"
+              label="Purity Name"
               name="name"
               value={formData.name}
               onChange={handleChange}
@@ -280,7 +280,7 @@ function Purity() {
               error={errors.name}
             />
             <InputField
-              label="Metal:"
+              label="Metal"
               name="metal"
               value={formData.metal}
               onChange={handleChange}
@@ -304,7 +304,7 @@ function Purity() {
             /> */}
 
             <InputField
-              label="Purity Percentage:"
+              label="Purity %"
               name="purity_percentage"
               value={formData.purity_percentage}
               onChange={handleChange}
@@ -313,7 +313,7 @@ function Purity() {
             />
 
             <InputField
-              label="Purity:"
+              label="Purity"
               name="purity"
               value={formData.purity}
               onChange={handleChange}
@@ -327,7 +327,7 @@ function Purity() {
           {/* Row 2 */}
           <div className="form-row">
             <InputField
-              label="URD Purity:"
+              label="URD Purity"
               name="urd_purity"
               value={formData.urd_purity}
               onChange={handleChange}
@@ -337,7 +337,7 @@ function Purity() {
             />
 
             <InputField
-              label="DESC:"
+              label="DESC"
               name="desc"
               value={formData.desc}
               onChange={handleChange}
@@ -347,7 +347,7 @@ function Purity() {
             />
 
             <InputField
-              label="Old Purity Desc:"
+              label="Old Purity Desc"
               name="old_purity_desc"
               value={formData.old_purity_desc}
               onChange={handleChange}
@@ -357,7 +357,7 @@ function Purity() {
             />
 
             <InputField
-              label="Cut Issue:"
+              label="Cut Issue"
               name="cut_issue"
               value={formData.cut_issue}
               onChange={handleChange}
@@ -367,7 +367,7 @@ function Purity() {
             />
 
             <InputField
-              label="Skin Print:"
+              label="Skin Print"
               name="skin_print"
               value={formData.skin_print}
               onChange={handleChange}

@@ -221,7 +221,7 @@ function Customer_Master() {
           <Row>
             <Col md={4}>
               <InputField
-                label="Trade Name:"
+                label="Trade / Customer Name"
                 name="account_name"
                 value={formData.account_name}
                 onChange={handleChange}
@@ -230,7 +230,7 @@ function Customer_Master() {
             </Col>
             <Col md={4}>
               <InputField
-                label="Print Name:"
+                label="Print Name"
                 name="print_name"
                 value={formData.print_name}
                 onChange={handleChange}
@@ -275,7 +275,7 @@ function Customer_Master() {
             </Col>
             <Col md={4}>
               <InputField
-                label="Pincode:"
+                label="Pincode"
                 name="pincode"
                 value={formData.pincode}
                 onChange={handleChange}
@@ -286,7 +286,7 @@ function Customer_Master() {
 
             <Col md={3}>
               <InputField
-                label="State:"
+                label="State"
                 name="state"
                 type="select"
                 value={formData.state}
@@ -302,7 +302,7 @@ function Customer_Master() {
             </Col>
             <Col md={3}>
               <InputField
-                label="Phone:"
+                label="Phone"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
@@ -311,7 +311,7 @@ function Customer_Master() {
             </Col>
             <Col md={3}>
               <InputField
-                label="Mobile:"
+                label="Mobile"
                 name="mobile"
                 value={formData.mobile}
                 onChange={handleChange}
@@ -320,7 +320,7 @@ function Customer_Master() {
             </Col>
             <Col md={4}>
               <InputField
-                label="Email:"
+                label="Email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
@@ -330,7 +330,7 @@ function Customer_Master() {
 
             <Col md={2}>
               <InputField
-                label="Birthday:"
+                label="Birthday"
                 name="birthday"
                 type="date"
                 value={formData.birthday}
@@ -340,7 +340,7 @@ function Customer_Master() {
             </Col>
             <Col md={2}>
               <InputField
-                label="Anniversary:"
+                label="Anniversary"
                 name="anniversary"
                 type="date"
                 value={formData.anniversary}
@@ -350,7 +350,7 @@ function Customer_Master() {
             </Col>
             <Col md={4}>
               <InputField
-                label="Bank Account No:"
+                label="Bank Account No"
                 name="bank_account_no"
                 value={formData.bank_account_no}
                 onChange={handleChange}
@@ -359,7 +359,7 @@ function Customer_Master() {
             </Col>
             <Col md={3}>
               <InputField
-                label="Bank Name:"
+                label="Bank Name"
                 name="bank_name"
                 value={formData.bank_name}
                 onChange={handleChange}
@@ -369,7 +369,7 @@ function Customer_Master() {
 
             <Col md={3}>
               <InputField
-                label="IFSC Code:"
+                label="IFSC Code"
                 name="ifsc_code"
                 value={formData.ifsc_code}
                 onChange={handleChange}
@@ -378,7 +378,7 @@ function Customer_Master() {
             </Col>
             <Col md={3}>
               <InputField
-                label="Branch:"
+                label="Branch"
                 name="branch"
                 value={formData.branch}
                 onChange={handleChange}
@@ -387,7 +387,7 @@ function Customer_Master() {
             </Col>
             <Col md={3}>
               <InputField
-                label="GSTIN:"
+                label="GSTIN"
                 name="gst_in"
                 value={formData.gst_in}
                 onChange={handleChange}
@@ -396,7 +396,7 @@ function Customer_Master() {
             </Col>
             <Col md={4}>
               <InputField
-                label="Aadhar Card:"
+                label="Aadhar Card"
                 name="aadhar_card"
                 value={formData.aadhar_card}
                 onChange={handleChange}
@@ -405,7 +405,7 @@ function Customer_Master() {
             </Col>
             <Col md={4}>
               <InputField
-                label="PAN Card:"
+                label="PAN Card"
                 name="pan_card"
                 value={formData.pan_card}
                 onChange={handleChange}

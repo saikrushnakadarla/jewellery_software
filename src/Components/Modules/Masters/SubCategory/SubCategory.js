@@ -10,9 +10,6 @@ function SubCategory() {
   const { state } = useLocation();
   const { subcategory_id, location } = state || {}; // Destructure state to get subcategory_id and location
 
-  console.log("subcategory_id:", subcategory_id);  // This should log the passed subcategory_id
-  console.log("User Location:", location); // Thi
-  // Form state
   const [formData, setFormData] = useState({
     category_id: "",
     metal_type_id: "",
@@ -77,53 +74,22 @@ function SubCategory() {
     }));
   }, [formData.metal_type, allCategoryOptions]);
 
-  // Fetch subcategory data for editing
   useEffect(() => {
-    const fetchSubcategoryData = async () => {
-      if (subcategory_id) {
-        console.log("Fetching data for subcategory_id:", subcategory_id); // Log the subcategory_id being fetched
+    if (subcategory_id) {
+      const fetchSubcategoryData = async () => {
         try {
+          // Axios automatically parses JSON
           const response = await axios.get(`${baseURL}/subcategory/${subcategory_id}`);
-          
-          // Log the full response for debugging
-          console.log("API Response:", response);
-  
-          if (response.data && response.data.data) {
-            // Log the data being used to set the form state
-            console.log("Subcategory Data:", response.data.data);
-  
-            setFormData({
-              category_id: response.data.data.category_id || "",
-              metal_type_id: response.data.data.metal_type_id || "",
-              metal_type: response.data.data.metal_type || "",
-              category: response.data.data.category || "",
-              sub_category_name: response.data.data.sub_category_name || "",
-              prefix: response.data.data.prefix || "",
-            });
-          } else {
-            console.warn("Subcategory data is empty. Please verify the API response.");
-          }
+          setFormData(response.data); // Use response.data directly
+          console.log("Sub Category=",response.data)
         } catch (error) {
-          console.error(
-            "Error fetching subcategory data:",
-            error.response?.data || error.message
-          );
-          if (error.response?.status === 404) {
-            alert("Subcategory not found. Please check the ID or try again later.");
-          } else {
-            alert("Failed to fetch subcategory data. Please try again.");
-          }
+          console.error('Error fetching subcategory:', error);
         }
-      } else {
-        console.warn("No subcategory_id provided. Skipping fetch.");
-      }
-    };
-  
-    fetchSubcategoryData();
+      };
+      fetchSubcategoryData();
+    }
   }, [subcategory_id]);
   
-  
-
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;

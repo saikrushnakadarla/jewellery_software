@@ -308,7 +308,7 @@ const RepairForm = () => {
             </Col> */}
             <Col xs={12} md={2}>
               <InputField
-                label="State:"
+                label="State"
                 name="state"
                 type="select"
                 value={formData.state}
@@ -320,7 +320,7 @@ const RepairForm = () => {
               />
             </Col>
             <Col xs={12} md={2}>
-              <InputField label="State Code:" name="state_code" value={formData.state_code} onChange={handleChange} readOnly />
+              <InputField label="State Code" name="state_code" value={formData.state_code} onChange={handleChange} readOnly />
             </Col>
 
             <Col xs={12} md={3}>
