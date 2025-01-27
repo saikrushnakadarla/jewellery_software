@@ -246,7 +246,7 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
           />
         </Col>
         <Col xs={12} md={2}>
-          <Button onClick={handleAddButtonClick}>
+          <Button onClick={handleAddButtonClick} style={{backgroundColor:'rgb(163, 110, 41)',borderColor:'rgb(163, 110, 41)'}}>
             {editingRow ? "Update" : "Add"}
           </Button>
         </Col>

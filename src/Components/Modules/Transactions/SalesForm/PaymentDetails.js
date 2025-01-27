@@ -18,10 +18,13 @@ const PaymentDetails = ({
   oldItemsAmount,
   schemeAmount,
   netPayableAmount,
-  netAmount
+  netAmount,
+  salesnetAmount
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const location = useLocation();
+  const updatedOldItemsAmount = parseFloat(oldItemsAmount || 0) + parseFloat(salesnetAmount || 0);
+
 
   useEffect(() => {
     // Set the default payment details from location.state if available
@@ -57,31 +60,31 @@ const PaymentDetails = ({
         <Row>
           <h4 className="mb-3">Summary</h4>
           <Table bordered hover responsive>
-            <tr>
-              <td colSpan="20" className="text-right">Taxable Amount</td>
-              <td colSpan="4">{taxableAmount.toFixed(2)}</td>
-            </tr>
-            <tr>
-              <td colSpan="20" className="text-right">Tax Amount</td>
-              <td colSpan="4">{taxAmount.toFixed(2)}</td>
-            </tr>
-            <tr>
-              <td colSpan="20" className="text-right">Net Amount</td>
-              <td colSpan="4">{netAmount.toFixed(2)}</td>
-            </tr>
-            <tr>
+  <tr>
+    <td colSpan="20" className="text-right">Taxable Amount</td>
+    <td colSpan="4">{taxableAmount.toFixed(2)}</td>
+  </tr>
+  <tr>
+    <td colSpan="20" className="text-right">Tax Amount</td>
+    <td colSpan="4">{taxAmount.toFixed(2)}</td>
+  </tr>
+  <tr>
+    <td colSpan="20" className="text-right">Net Amount</td>
+    <td colSpan="4">{netAmount.toFixed(2)}</td>
+  </tr>
+  <tr>
               <td colSpan="20" className="text-right">Old Items Amount</td>
-              <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
+              <td colSpan="4">{updatedOldItemsAmount.toFixed(2)}</td> {/* Updated value */}
             </tr>
-            <tr>
-              <td colSpan="20" className="text-right">Scheme Amount</td>
-              <td colSpan="4">{schemeAmount.toFixed(2)}</td>
-            </tr>
-            <tr>
+  <tr>
+    <td colSpan="20" className="text-right">Scheme Amount</td>
+    <td colSpan="4">{schemeAmount.toFixed(2)}</td>
+  </tr>
+  <tr>
     <td colSpan="20" className="text-right">Net Payable Amount</td>
     <td colSpan="4">{Math.round(netPayableAmount).toFixed(2)}</td>
   </tr>
-          </Table>
+</Table>
         </Row>
       </Col>
 
