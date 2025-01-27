@@ -527,7 +527,59 @@ const [subcategoryOptions, setSubcategoryOptions] = useState([]);
   }
 }, [formData.category]);
 
+const [metaltypeOptions, setMetaltypeOptions] = useState([]);
 
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/get/products');
+        const data = await response.json();
+
+        // Extract unique categories (metal types) from the data
+        const categories = Array.from(
+          new Set(data.map((product) => product.Category))
+        );
+
+        // Set the metal type options
+        setMetaltypeOptions(categories.map((category) => ({
+          value: category,
+          label: category,
+        })));
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []); // Empty dependency array ensures the effect runs only once on mount 
+
+  const [purityOptions, setpurityOptions] = useState([]);
+
+  // Fetch data from the API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/purity');
+        const data = await response.json();
+
+        // Extract unique categories (metal types) from the data
+        const categories = Array.from(
+          new Set(data.map((product) => product.name))
+        );
+
+        // Set the metal type options
+        setpurityOptions(categories.map((name) => ({
+          value: name,
+          label: name,
+        })));
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []); // Empty dependency array ensures the effect runs only once on mount
 
 const handleBarcodeChange = async (code) => {
   try {
@@ -695,6 +747,8 @@ return {
   filteredPurityOptions,
   filteredMetalTypes,
   subcategoryOptions,
+  purityOptions,
+  metaltypeOptions,
   uniqueProducts,
   isBarcodeSelected,
 };
