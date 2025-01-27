@@ -21,6 +21,8 @@ const ProductDetails = ({
   filteredMetalTypes,
   subcategoryOptions,
   uniqueProducts,
+  purityOptions,
+  metaltypeOptions,
   isBarcodeSelected,
   isQtyEditable
 }) => {
@@ -58,6 +60,17 @@ const ProductDetails = ({
           />
         </Col>
         <Col xs={12} md={2}>
+        {isBarcodeSelected ? (
+          <InputField
+          label="Metal Type"
+          name="metal_type"
+          value={formData.metal_type || ""}
+          onChange={handleChange}
+          type="select"
+          options={metaltypeOptions} // Set options dynamically from the API
+        />
+          
+          ) : (
           <InputField
             label="Metal Type"
             name="metal_type"
@@ -69,6 +82,7 @@ const ProductDetails = ({
               label: metalType.metal_type,
             }))}
           />
+        )}
         </Col>
 
         <Col xs={12} md={2}>
@@ -132,6 +146,17 @@ const ProductDetails = ({
         </Col>
 
         <Col xs={12} md={2}>
+        {isBarcodeSelected ? (
+          <InputField
+          label="Purity"
+          name="purity"
+          value={formData.purity || ""}
+          onChange={handleChange}
+          type="select"
+          options={purityOptions} // Set options dynamically from the API
+        />
+          
+          ) : (
           <InputField
             label="Purity"
             name="purity"
@@ -143,6 +168,7 @@ const ProductDetails = ({
               label: Purity.Purity,
             }))}
           />
+          )}
         </Col>
 
         {/* <Col xs={12} md={2}>

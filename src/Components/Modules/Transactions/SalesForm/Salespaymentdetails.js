@@ -75,7 +75,7 @@ const PaymentDetails = ({
       resetForm();
   
       // Refresh the window
-      window.location.reload();
+      // window.location.reload();
     } catch (error) {
       console.error("Error during checkout:", error);
       alert("An error occurred during checkout. Please try again.");
@@ -140,10 +140,10 @@ const PaymentDetails = ({
               style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
               // disabled={!isSubmitEnabled}
             >
-              Save
+              Add
             </Button>
           </Col>
-          <Col xs={12} md={2}>
+          {/* <Col xs={12} md={2}>
             <Button
               type="button"
               className="cus-back-btn"
@@ -153,7 +153,7 @@ const PaymentDetails = ({
             >
               Cancel
             </Button>
-          </Col>
+          </Col> */}
         </Row>
       </Col>
     </div>
