@@ -14,7 +14,10 @@ const PaymentDetails = ({
   invoiceDetails,
   selectedRows,
   totalPrice,
-  resetForm
+  resetForm,
+  salesTaxableAmount,
+                salesTaxAmount,
+                salesNetAmount,
 }) => {
 
 

@@ -16,7 +16,15 @@ import { pdf } from '@react-pdf/renderer';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import PDFLayout from '../SalesReturn/PDFLayout';
 
-const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqueInvoice,handleInvoiceChange,setReturnData,returnData,}) => {
+const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqueInvoice,handleInvoiceChange,setReturnData,returnData,
+  isAllSelected,
+  handleCheckboxChange,
+  handleSelectAllChange,
+  salesTaxableAmount,
+          salesTaxAmount,
+          salesNetAmount,
+          selectedRows,
+}) => {
   const navigate = useNavigate();
   const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
@@ -272,36 +280,52 @@ const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqu
     navigate("/customermaster", { state: { from: "/sales" } });
   };
 
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
+  // const [selectedRows, setSelectedRows] = useState([]);
+  // const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
   
-  const handleCheckboxChange = (event, index) => {
-    const isChecked = event.target.checked;
-    let updatedSelectedRows;
+  // const handleCheckboxChange = (event, index) => {
+  //   const isChecked = event.target.checked;
+  //   let updatedSelectedRows;
   
-    if (isChecked) {
-      updatedSelectedRows = [...selectedRows, index]; // Add index to selectedRows
-    } else {
-      updatedSelectedRows = selectedRows.filter((i) => i !== index); // Remove index from selectedRows
-    }
+  //   if (isChecked) {
+  //     updatedSelectedRows = [...selectedRows, index]; // Add index to selectedRows
+  //   } else {
+  //     updatedSelectedRows = selectedRows.filter((i) => i !== index); // Remove index from selectedRows
+  //   }
   
-    setSelectedRows(updatedSelectedRows);
+  //   setSelectedRows(updatedSelectedRows);
   
-    // Update "Select All" checkbox state
-    setIsAllSelected(updatedSelectedRows.length === invoiceDetails.length);
-  };
+  //   // Update "Select All" checkbox state
+  //   setIsAllSelected(updatedSelectedRows.length === invoiceDetails.length);
+  // };
   
-  const handleSelectAllChange = (event) => {
-    const isChecked = event.target.checked;
-    if (isChecked) {
-      // Select all rows
-      setSelectedRows(invoiceDetails.map((_, index) => index));
-    } else {
-      // Deselect all rows
-      setSelectedRows([]);
-    }
-    setIsAllSelected(isChecked); // Update "Check All" checkbox state
-  };
+  // const handleSelectAllChange = (event) => {
+  //   const isChecked = event.target.checked;
+  //   if (isChecked) {
+  //     // Select all rows
+  //     setSelectedRows(invoiceDetails.map((_, index) => index));
+  //   } else {
+  //     // Deselect all rows
+  //     setSelectedRows([]);
+  //   }
+  //   setIsAllSelected(isChecked); // Update "Check All" checkbox state
+  // };
+
+  //   // Calculate taxable amount based on selected rows
+  //   const salesTaxableAmount = selectedRows.reduce((sum, rowIndex) => {
+  //     const detail = invoiceDetails[rowIndex];
+  //     const stonePrice = parseFloat(detail.stone_price) || 0;
+  //     const makingCharges = parseFloat(detail.making_charges) || 0;
+  //     const rateAmt = parseFloat(detail.rate_amt) || 0;
+  //     return sum + stonePrice + makingCharges + rateAmt;
+  //   }, 0);
+  
+  //   const salesTaxAmount = selectedRows.reduce((sum, rowIndex) => {
+  //     const detail = invoiceDetails[rowIndex];
+  //     return sum + parseFloat(detail.tax_amt || 0);
+  //   }, 0);
+  
+  //   const salesNetAmount = taxableAmount + taxAmount;
 
 
 
@@ -330,7 +354,7 @@ const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqu
                 invoiceDetails={invoiceDetails}
                 handleInvoiceChange={handleInvoiceChange}
                 returnData={returnData}
-      setReturnData={setReturnData}
+                setReturnData={setReturnData}
               />
             </div>
           </div>
@@ -385,7 +409,10 @@ const SalesForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqu
                 selectedRows={selectedRows}
                 handleSelectAllChange={handleSelectAllChange}
                 handleCheckboxChange={handleCheckboxChange}
-                resetForm={resetForm}
+                resetForm={resetForm}             
+                salesTaxableAmount={salesTaxableAmount}
+                salesTaxAmount={salesTaxAmount}
+                salesNetAmount={salesNetAmount}
               />
           </div>
 

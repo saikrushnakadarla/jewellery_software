@@ -511,7 +511,54 @@ const schemeAmount = location.state?.scheme_amt
       alert("Error saving data");
     }
   };
+
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
+    
+    const handleCheckboxChange = (event, index) => {
+      const isChecked = event.target.checked;
+      let updatedSelectedRows;
+    
+      if (isChecked) {
+        updatedSelectedRows = [...selectedRows, index]; // Add index to selectedRows
+      } else {
+        updatedSelectedRows = selectedRows.filter((i) => i !== index); // Remove index from selectedRows
+      }
+    
+      setSelectedRows(updatedSelectedRows);
+    
+      // Update "Select All" checkbox state
+      setIsAllSelected(updatedSelectedRows.length === invoiceDetails.length);
+    };
+    
+    const handleSelectAllChange = (event) => {
+      const isChecked = event.target.checked;
+      if (isChecked) {
+        // Select all rows
+        setSelectedRows(invoiceDetails.map((_, index) => index));
+      } else {
+        // Deselect all rows
+        setSelectedRows([]);
+      }
+      setIsAllSelected(isChecked); // Update "Check All" checkbox state
+    };
   
+      // Calculate taxable amount based on selected rows
+      const salesTaxableAmount = selectedRows.reduce((sum, rowIndex) => {
+        const detail = invoiceDetails[rowIndex];
+        const stonePrice = parseFloat(detail.stone_price) || 0;
+        const makingCharges = parseFloat(detail.making_charges) || 0;
+        const rateAmt = parseFloat(detail.rate_amt) || 0;
+        return sum + stonePrice + makingCharges + rateAmt;
+      }, 0);
+    
+      const salesTaxAmount = selectedRows.reduce((sum, rowIndex) => {
+        const detail = invoiceDetails[rowIndex];
+        return sum + parseFloat(detail.tax_amt || 0);
+      }, 0);
+    
+      const salesNetAmount = taxableAmount + taxAmount;
+      console.log("salesTaxableAmount=",salesTaxableAmount)
 
   return (
     <div className="main-container">
@@ -599,7 +646,14 @@ const schemeAmount = location.state?.scheme_amt
                 handleInvoiceChange={handleInvoiceChange}
                 returnData={returnData}
                 setReturnData={setReturnData}
-                selectedMobile={formData.mobile} // Pass selected mobile
+                selectedMobile={formData.mobile}
+                selectedRows={selectedRows}
+                isAllSelected={isAllSelected}
+                handleCheckboxChange={handleCheckboxChange}
+                handleSelectAllChange={handleSelectAllChange}
+                salesTaxableAmount={salesTaxableAmount}
+                salesTaxAmount={salesTaxAmount}
+                salesNetAmount={salesNetAmount}
                />
               
             </div>
@@ -618,6 +672,7 @@ const schemeAmount = location.state?.scheme_amt
                 oldItemsAmount={oldItemsAmount}
                 schemeAmount={schemeAmount}
                 netPayableAmount={netPayableAmount}
+                salesNetAmount={salesNetAmount}
                 oldSalesData={oldSalesData} schemeSalesData={schemeSalesData} 
               />
             </div>

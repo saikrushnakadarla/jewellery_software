@@ -15,6 +15,13 @@ const SalesFormSection = ({ setOldSalesData,
         handleInvoiceChange,
         setReturnData,
         returnData,
+        isAllSelected,
+        handleCheckboxChange,
+        handleSelectAllChange,
+        salesTaxableAmount,
+                salesTaxAmount,
+                salesNetAmount,
+                selectedRows,
        }) => {
   console.log("invoiceDetails=",invoiceDetails)
   const [activeForm, setActiveForm] = useState("old");
@@ -105,6 +112,13 @@ const SalesFormSection = ({ setOldSalesData,
       handleInvoiceChange={handleInvoiceChange}
       returnData={returnData}
       setReturnData={setReturnData}
+      selectedRows={selectedRows}
+                isAllSelected={isAllSelected}
+                handleCheckboxChange={handleCheckboxChange}
+                handleSelectAllChange={handleSelectAllChange}
+                salesTaxableAmount={salesTaxableAmount}
+                salesTaxAmount={salesTaxAmount}
+                salesNetAmount={salesNetAmount}
       />} {/* Render SaleReturnForm */}
     </Col>
   );

@@ -2,7 +2,15 @@ import React from 'react'
 import Salesform from'./SaleReturnSaleform'
 
 const SaleReturnForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, uniqueInvoice,handleInvoiceChange,setReturnData,
-  returnData,}) => {
+  returnData,
+  isAllSelected,
+        handleCheckboxChange,
+        handleSelectAllChange,
+        salesTaxableAmount,
+                salesTaxAmount,
+                salesNetAmount,
+                selectedRows,
+}) => {
   console.log("FilteredInvoices=",filteredInvoices)
   return (
     <div>
@@ -14,6 +22,13 @@ const SaleReturnForm = ({invoiceDetails, filteredInvoices, setFilteredInvoices, 
       handleInvoiceChange={handleInvoiceChange}
       returnData={returnData}
       setReturnData={setReturnData}
+      selectedRows={selectedRows}
+                isAllSelected={isAllSelected}
+                handleCheckboxChange={handleCheckboxChange}
+                handleSelectAllChange={handleSelectAllChange}
+                salesTaxableAmount={salesTaxableAmount}
+                salesTaxAmount={salesTaxAmount}
+                salesNetAmount={salesNetAmount}
       />
     </div>
   )
