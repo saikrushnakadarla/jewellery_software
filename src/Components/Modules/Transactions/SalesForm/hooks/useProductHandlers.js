@@ -258,6 +258,40 @@ const handleChange = (e) => {
     [name]: value,
   }));
 
+  if (name === "purity" || name === "metal_type") {
+    // Separate condition for gold
+    if (formData.metal_type.toLowerCase() === "gold") {
+      // Check for different purity values and set the rate accordingly for gold
+      if (
+        value.toLowerCase().includes("22") || // Check for 22 KT, 22K, 22k, etc.
+        value.toLowerCase().includes("22kt") ||
+        value.toLowerCase().includes("22k")
+      ) {
+        updatedFormData.rate = rates.rate_22crt;
+      } else if (
+        value.toLowerCase().includes("24") || // Check for 24 KT, 24K, etc.
+        value.toLowerCase().includes("24kt") ||
+        value.toLowerCase().includes("24k")
+      ) {
+        updatedFormData.rate = rates.rate_24crt;
+      } else if (
+        value.toLowerCase().includes("18") || // Check for 18 KT, 18K, etc.
+        value.toLowerCase().includes("18kt") ||
+        value.toLowerCase().includes("18k")
+      ) {
+        updatedFormData.rate = rates.rate_18crt;
+      } else if (
+        value.toLowerCase().includes("16") || // Check for 16 KT, 16K, etc.
+        value.toLowerCase().includes("16kt") ||
+        value.toLowerCase().includes("16k")
+      ) {
+        updatedFormData.rate = rates.rate_16crt;
+      } else {
+        updatedFormData.rate = "";
+      }
+    }
+  }
+  
   // Trigger recalculation for Total MC if relevant fields are updated
   if (
     formData.metal_type?.toLowerCase() === "gold" &&
@@ -361,6 +395,7 @@ const handleChange = (e) => {
           mc_on: matchingEntry.Making_Charges_On || "",
           mc_per_gram: matchingEntry.MC_Per_Gram || "",
           making_charges: matchingEntry.Making_Charges || "",
+          rate: matchingEntry.rate || "",
           tax_percent: productDetails?.tax_slab || "",
           qty: 1,
           barcodeOptions: [], // Clear barcode options after setting the data

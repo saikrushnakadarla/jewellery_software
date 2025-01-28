@@ -19,13 +19,12 @@ const PaymentDetails = ({
   schemeAmount,
   netPayableAmount,
   netAmount,
-  salesnetAmount
+  salesNetAmount
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const location = useLocation();
-  const updatedOldItemsAmount = parseFloat(oldItemsAmount || 0) + parseFloat(salesnetAmount || 0);
-
-
+  const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
+  const netPayAmount=netPayableAmount-salesNetAmount
   useEffect(() => {
     // Set the default payment details from location.state if available
     if (location.state?.cash_amount || location.state?.card_amt || location.state?.chq_amt || location.state?.online_amt) {
@@ -73,16 +72,16 @@ const PaymentDetails = ({
     <td colSpan="4">{netAmount.toFixed(2)}</td>
   </tr>
   <tr>
-              <td colSpan="20" className="text-right">Old Items Amount</td>
-              <td colSpan="4">{updatedOldItemsAmount.toFixed(2)}</td> {/* Updated value */}
-            </tr>
+    <td colSpan="20" className="text-right">Old Items Amount</td>
+    <td colSpan="4">{updatedOldItemsAmount.toFixed(2)}</td> {/* Display the updated amount */}
+  </tr>
   <tr>
     <td colSpan="20" className="text-right">Scheme Amount</td>
     <td colSpan="4">{schemeAmount.toFixed(2)}</td>
   </tr>
   <tr>
     <td colSpan="20" className="text-right">Net Payable Amount</td>
-    <td colSpan="4">{Math.round(netPayableAmount).toFixed(2)}</td>
+    <td colSpan="4">{Math.round(netPayAmount).toFixed(2)}</td>
   </tr>
 </Table>
         </Row>

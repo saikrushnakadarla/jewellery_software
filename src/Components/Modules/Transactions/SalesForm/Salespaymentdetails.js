@@ -22,20 +22,20 @@ const PaymentDetails = ({
 
 
   // Calculate taxable amount based on selected rows
-  const taxableAmount = selectedRows.reduce((sum, rowIndex) => {
-    const detail = invoiceDetails[rowIndex];
-    const stonePrice = parseFloat(detail.stone_price) || 0;
-    const makingCharges = parseFloat(detail.making_charges) || 0;
-    const rateAmt = parseFloat(detail.rate_amt) || 0;
-    return sum + stonePrice + makingCharges + rateAmt;
-  }, 0);
+  // const taxableAmount = selectedRows.reduce((sum, rowIndex) => {
+  //   const detail = invoiceDetails[rowIndex];
+  //   const stonePrice = parseFloat(detail.stone_price) || 0;
+  //   const makingCharges = parseFloat(detail.making_charges) || 0;
+  //   const rateAmt = parseFloat(detail.rate_amt) || 0;
+  //   return sum + stonePrice + makingCharges + rateAmt;
+  // }, 0);
 
-  const taxAmount = selectedRows.reduce((sum, rowIndex) => {
-    const detail = invoiceDetails[rowIndex];
-    return sum + parseFloat(detail.tax_amt || 0);
-  }, 0);
+  // const taxAmount = selectedRows.reduce((sum, rowIndex) => {
+  //   const detail = invoiceDetails[rowIndex];
+  //   return sum + parseFloat(detail.tax_amt || 0);
+  // }, 0);
 
-  const netAmount = taxableAmount + taxAmount;
+  // const netAmount = taxableAmount + taxAmount;
 
 
 
@@ -94,19 +94,19 @@ const PaymentDetails = ({
                   <td colSpan="20" className="text-right">
                     Taxable Amount
                   </td>
-                  <td colSpan="4">{taxableAmount}</td>
+                  <td colSpan="4">{salesTaxableAmount}</td>
                 </tr>
                 <tr>
                   <td colSpan="20" className="text-right">
                     Tax Amount
                   </td>
-                  <td colSpan="4">{taxAmount}</td>
+                  <td colSpan="4">{salesTaxAmount}</td>
                 </tr>
                 <tr>
                   <td colSpan="20" className="text-right">
                     Net Amount
                   </td>
-                  <td colSpan="4">{netAmount}</td>
+                  <td colSpan="4">{salesNetAmount}</td>
                 </tr>
               </>
             ) : (
