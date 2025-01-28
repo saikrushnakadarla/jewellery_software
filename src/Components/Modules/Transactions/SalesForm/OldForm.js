@@ -40,17 +40,39 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
 
   useEffect(() => {
-    const fetchPurity = async () => {
+    const fetchAndFilterPurity = async () => {
       try {
         const response = await axios.get(`${baseURL}/purity`);
-        setPurityOptions(response.data);
+        const allPurityOptions = response.data;
+  
+        // Filter purity options based on selected metal
+        const filteredPurityOptions = allPurityOptions.filter(
+          (option) => option.metal === oldDetails.metal
+        );
+  
+        // Find default purity (e.g., 22k for Gold) or set empty if not found
+        const defaultPurity = filteredPurityOptions.find(
+          (option) => option.name === "22K"
+        )?.name || "";
+  
+        // Update state with filtered purities and set the default purity
+        setPurityOptions(filteredPurityOptions);
+        setOldDetails((prevDetails) => ({
+          ...prevDetails,
+          purity: defaultPurity, // Set default purity
+        }));
       } catch (error) {
         console.error("Error fetching purity options:", error);
       }
     };
-
-    fetchPurity();
-  }, []);
+  
+    // Fetch and filter purities when metal changes
+    if (oldDetails.metal) {
+      fetchAndFilterPurity();
+    }
+  }, [oldDetails.metal]);
+  
+  
 
   useEffect(() => {
     const fetchMetalTypes = async () => {
@@ -91,28 +113,31 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, [name]: value };
-
-      if (name === "purity" && value !== "Other") {
-        updatedDetails.purityPercentage = parsePurityToPercentage(value); // Update percentage for dropdown
-      } else if (name === "purityPercentage") {
-        updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity
+  
+      if (name === "metal") {
+        updatedDetails.purity = ""; // Reset purity when metal changes
+        updatedDetails.purityPercentage = ""; // Reset purity percentage
       }
-
+  
+      if (name === "purity" && value !== "Other") {
+        updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
+      } else if (name === "purityPercentage") {
+        updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
+      }
+  
       // Update calculations
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails, currentRate);
-
-      if (name === "metal") {
-        const selectedMetal = metalOptions.find((option) => option.value === value);
-        updatedDetails.hsn_code = selectedMetal?.hsn_code || "";
-      }
-
+  
       return updatedDetails;
     });
   };
+  
+  
+  
 
   const parsePurityToPercentage = (purity) => {
     if (!purity) return null;
@@ -245,34 +270,37 @@ const OldSalesForm = ({ setOldSalesData }) => {
           <InputField label="Product" name="product" value={oldDetails.product} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
-          <InputField
-            label="Metal"
-            name="metal"
-            type="select"
-            value={oldDetails.metal}
-            onChange={handleInputChange}
-            options={metalOptions.map((option) => ({
-              value: option.value,
-              label: option.label,
-            }))}
-          />
-        </Col>
-        <Col xs={12} md={3}>
-          <InputField
-            label="Purity"
-            type="select"
-            name="purity"
-            value={oldDetails.purity}
-            onChange={handleInputChange}
-            options={[
-              ...purityOptions.map((purity) => ({
-                value: purity.name,
-                label: purity.name,
-              })),
-              { value: "Other", label: "Other" }, // Add static "Other" option
-            ]}
-          />
-        </Col>
+  <InputField
+    label="Metal"
+    name="metal"
+    type="select"
+    value={oldDetails.metal}
+    onChange={handleInputChange}
+    options={metalOptions.map((option) => ({
+      value: option.value,
+      label: option.label,
+    }))}
+  />
+</Col>
+<Col xs={12} md={3}>
+  <InputField
+    label="Purity"
+    type="select"
+    name="purity"
+    value={oldDetails.purity}
+    onChange={handleInputChange}
+    options={[
+      ...purityOptions.map((purity) => ({
+        value: purity.name, // Show the name column from matching purity rows
+        label: purity.name,
+      })),
+      { value: "Other", label: "Other" }, // Add static "Other" option
+    ]}
+  />
+</Col>
+
+
+
 
         {oldDetails.purity === "Other" && (
           <Col xs={12} md={3}>
