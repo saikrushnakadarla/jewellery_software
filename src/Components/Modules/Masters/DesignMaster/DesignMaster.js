@@ -383,8 +383,8 @@ function DesignMaster() {
               onChange={handleChange}
               // required={true}
               options={[
-                { value: 'fixed', label: 'By Fixed' },
-                { value: 'percentage', label: 'By Weight' },
+                { value: 'By Fixed', label: 'By Fixed' },
+                { value: 'By Weight', label: 'By Weight' },
               ]}
               error={errors.mc_type}
 

@@ -211,22 +211,22 @@ function MetalType() {
         Header: "Default Issue Purity",
         accessor: "default_issue_purity",
       },
-      // {
-      //   Header: "Action",
-      //   Cell: ({ row }) => (
-      //     <div className="d-flex align-items-center">
-      //       <button className="action-button edit-button" onClick={() => handleEdit(row.original.metal_type_id)}>
-      //         <FaEdit />
-      //       </button>
-      //       <button
-      //         className="action-button delete-button"
-      //         onClick={() => handleDelete(row.original.metal_type_id)}
-      //       >
-      //         <FaTrash />
-      //       </button>
-      //     </div>
-      //   ),
-      // },
+      {
+        Header: "Action",
+        Cell: ({ row }) => (
+          <div className="d-flex align-items-center">
+            <button className="action-button edit-button" onClick={() => handleEdit(row.original.metal_type_id)}>
+              <FaEdit />
+            </button>
+            <button
+              className="action-button delete-button"
+              onClick={() => handleDelete(row.original.metal_type_id)}
+            >
+              <FaTrash />
+            </button>
+          </div>
+        ),
+      },
     ],
     [submittedData]
   );

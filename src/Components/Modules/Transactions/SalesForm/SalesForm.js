@@ -559,7 +559,7 @@ const schemeAmount = location.state?.scheme_amt
         return sum + parseFloat(detail.tax_amt || 0);
       }, 0);
     
-      const salesNetAmount = taxableAmount + salesTaxAmount;
+      const salesNetAmount = salesTaxableAmount + salesTaxAmount;
       console.log("salesTaxableAmount=",salesTaxableAmount)
 
   return (
