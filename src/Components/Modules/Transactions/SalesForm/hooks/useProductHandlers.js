@@ -78,26 +78,31 @@ const useProductHandlers = () => {
     const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
   
 
-  // Determine the current rate based on purity
-  useEffect(() => {
-    let currentRate = "";
+    useEffect(() => {
+      let currentRate = "";
+    
+      if (formData.metal_type === "Gold" && formData.purity) {
+        // Check if the purity value includes specific numbers
+        if (formData.purity.includes("24")) {
+          currentRate = rates.rate_24crt;
+        } else if (formData.purity.includes("22")) {
+          currentRate = rates.rate_22crt;
+        } else if (formData.purity.includes("18")) {
+          currentRate = rates.rate_18crt;
+        } else if (formData.purity.includes("16")) {
+          currentRate = rates.rate_16crt;
+        }
+      } else if (formData.metal_type === "Silver" && formData.purity) {
+        currentRate = rates.silver_rate;
+      }
+    
+      setFormData((prevData) => ({
+        ...prevData,
+        rate: currentRate,
+      }));
+    }, [formData.purity, formData.metal_type, rates]);
+    
   
-    if (formData.metal_type === "Gold" && formData.purity) {
-      currentRate = 
-        formData.purity === "24K" ? rates.rate_24crt :
-        formData.purity === "22K" ? rates.rate_22crt :
-        formData.purity === "18K" ? rates.rate_18crt :
-        formData.purity === "16K" ? rates.rate_16crt :
-        "";
-    } else if (formData.metal_type === "Silver" && formData.purity) {
-      currentRate = rates.silver_rate;
-    }
-  
-    setFormData((prevData) => ({
-      ...prevData,
-      rate: currentRate
-    }));
-  }, [formData.purity, formData.metal_type, rates]);
   
 
   // Fetch rates on mount
