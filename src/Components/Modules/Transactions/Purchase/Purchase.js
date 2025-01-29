@@ -701,7 +701,7 @@ const URDPurchase = () => {
         // Set default value for "Silver" or "silver" metal type
         if (formData.metal_type.toLowerCase() === "silver") {
           const defaultOption = filteredPurity.find((option) =>
-            ["22k", "22 kt", "22"].some((match) =>
+            ["24k", "24 kt", "24"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );

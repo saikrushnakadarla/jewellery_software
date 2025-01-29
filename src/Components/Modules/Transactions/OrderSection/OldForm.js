@@ -113,29 +113,34 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, [name]: value };
-
+  
       if (name === "metal") {
         updatedDetails.purity = ""; // Reset purity when metal changes
         updatedDetails.purityPercentage = ""; // Reset purity percentage
+  
+        // Set rate for silver
+        if (value.toLowerCase() === "silver") {
+          updatedDetails.rate = rates.silver_rate || "0.00"; // Default to silver_rate from rates
+        }
       }
-
+  
       if (name === "purity" && value !== "Other") {
         updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
       } else if (name === "purityPercentage") {
         updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
       }
-
+  
       // Update calculations
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails, currentRate);
-
+  
       return updatedDetails;
     });
   };
-
+  
 
 
 
@@ -224,36 +229,28 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
 
-  useEffect(() => {
-    const fetchCurrentRates = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get/current-rates`);
-        console.log('API Response:', response.data);
+ // Update the rates fetching logic to include silver_rate:
+useEffect(() => {
+  const fetchCurrentRates = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/get/current-rates`);
+      console.log('API Response:', response.data);
 
-        // Log the 24crt rate separately
-        console.log('24crt Rate:', response.data.rate_24crt);
+      setRates({
+        rate_24crt: response.data.rate_24crt || "",
+        rate_22crt: response.data.rate_22crt || "",
+        rate_18crt: response.data.rate_18crt || "",
+        rate_16crt: response.data.rate_16crt || "",
+        silver_rate: response.data.silver_rate || "", // Ensure silver_rate is fetched
+      });
+    } catch (error) {
+      console.error('Error fetching current rates:', error);
+    }
+  };
+  fetchCurrentRates();
+}, []);
 
-        // Dynamically set the rates based on response
-        setRates({
-          rate_24crt: response.data.rate_24crt || "",
-          rate_22crt: response.data.rate_22crt || "",
-          rate_18crt: response.data.rate_18crt || "",
-          rate_16crt: response.data.rate_16crt || "",
-        });
-      } catch (error) {
-        console.error('Error fetching current rates:', error);
-      }
-    };
-    fetchCurrentRates();
-  }, []);
-
-
-  // const currentRate =
-  //   oldDetails.purity === "24K" ? rates.rate_24crt :
-  //     oldDetails.purity === "22K" ? rates.rate_22crt :
-  //       oldDetails.purity === "18K" ? rates.rate_18crt :
-  //         oldDetails.purity === "16K" ? rates.rate_16crt :
-  //           "";
+ 
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
 
   const currentRate =

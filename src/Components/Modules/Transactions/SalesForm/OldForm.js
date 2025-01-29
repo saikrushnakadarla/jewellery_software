@@ -3,7 +3,7 @@ import axios from "axios";
 import { Col, Row, Button, Table } from "react-bootstrap";
 import InputField from "./../../Masters/ItemMaster/Inputfield";
 import baseURL from "../../../../Url/NodeBaseURL";
-
+import { FaEdit, FaTrash } from "react-icons/fa";
 const OldSalesForm = ({ setOldSalesData }) => {
 
 
@@ -176,47 +176,53 @@ const OldSalesForm = ({ setOldSalesData }) => {
     const totalAmount = netWeight * rateAmount;
     return parseFloat(totalAmount.toFixed(2));
   };
+  const handleEdit = (data, index) => {
+    setOldDetails(data);  // Populate form fields with existing data
+    setEditingRow(index); // Store index for updating
+  };
+
   const handleAddButtonClick = () => {
-    if (editingRow) {
+    if (editingRow !== null) {
+      // Update existing row
       setOldTableData((prevData) =>
-        prevData.map((data) =>
-          data.hsn_code === editingRow ? oldDetails : data
+        prevData.map((data, index) =>
+          index === editingRow ? oldDetails : data
         )
       );
-      setEditingRow(null);
+      setEditingRow(null); // Reset editing state
     } else {
-      if (oldDetails.metal && oldDetails.purity && oldDetails.hsn_code) {
-        const newData = [...oldTableData, oldDetails];
-        setOldTableData(newData);
-        setOldDetails({
-          product: "",
-          metal: "",
-          purity: "",
-          purityPercentage: "",
-          hsn_code: "",
-          gross: 0,
-          dust: 0,
-          ml_percent: 0,
-          net_wt: 0,
-          remarks: "",
-          rate: 0,
-          total_amount: 0,
-          total_old_amount: 0,
-        });
+      // Allow submission even if HSN Code is empty
+      if (oldDetails.product && oldDetails.metal && oldDetails.purity) {
+        setOldTableData([...oldTableData, oldDetails]);
       } else {
-        alert("Please fill in all required fields.");
+        alert("Please fill in all required fields (Product, Metal, Purity).");
+        return;
       }
     }
+
+    // Reset form fields
+    setOldDetails({
+      product: "",
+      metal: "",
+      purity: "",
+      purityPercentage: "",
+      hsn_code: "",  // Can be empty now
+      gross: 0,
+      dust: 0,
+      ml_percent: 0,
+      net_wt: 0,
+      remarks: "",
+      rate: 0,
+      total_amount: 0,
+      total_old_amount: 0,
+    });
   };
 
-  const handleEdit = (data) => {
-    setOldDetails(data);
-    setEditingRow(data.hsn_code);
+
+  const handleDelete = (index) => {
+    setOldTableData((prevData) => prevData.filter((_, i) => i !== index));
   };
 
-  const handleDelete = (hsnCode) => {
-    setOldTableData((prevData) => prevData.filter((data) => data.hsn_code !== hsnCode));
-  };
 
   const calculateTotalSum = () => {
     return oldTableData.reduce((sum, item) => sum + parseFloat(item.total_amount || 0), 0).toFixed(2);
@@ -294,16 +300,13 @@ const OldSalesForm = ({ setOldSalesData }) => {
             onChange={handleInputChange}
             options={[
               ...purityOptions.map((purity) => ({
-                value: purity.name, // Show the name column from matching purity rows
+                value: purity.name,
                 label: purity.name,
               })),
-              { value: "Other", label: "Other" }, // Add static "Other" option
+              { value: "Other", label: "Other" },
             ]}
           />
         </Col>
-
-
-
 
         {oldDetails.purity === "Other" && (
           <Col xs={12} md={3}>
@@ -318,7 +321,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
         )}
 
         <Col xs={12} md={3}>
-          <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} readOnly />
+          <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
           <InputField label="Gross" name="gross" value={oldDetails.gross} onChange={handleInputChange} />
@@ -358,7 +361,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
         </Col>
         <Col xs={12} md={2}>
           <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)' }}>
-            {editingRow ? "Update" : "Add"}
+            {editingRow !== null ? "Update" : "Add"}
           </Button>
         </Col>
       </Row>
@@ -395,12 +398,22 @@ const OldSalesForm = ({ setOldSalesData }) => {
               <td>{data.rate}</td>
               <td>{data.total_amount}</td>
               <td>
-                <Button variant="warning" size="sm" className="mr-2" onClick={() => handleEdit(data)}>
-                  Edit
-                </Button>
-                <Button variant="danger" size="sm" onClick={() => handleDelete(data.hsn_code)}>
-                  Delete
-                </Button>
+              {/* <Button variant="warning" size="sm" className="mr-2" onClick={() => handleEdit(data, index)}>
+              Edit
+            </Button>
+            <Button variant="danger" size="sm" onClick={() => handleDelete(index)}>
+              Delete
+            </Button> */}
+                <FaEdit
+                  style={{ cursor: "pointer", marginLeft: "10px", color: "blue" }}
+                  onClick={() => handleEdit(data, index)}
+                  // disabled={editingIndex !== null}
+                />
+                <FaTrash
+                  style={{ cursor: "pointer", marginLeft: "10px", color: "red" }}
+                  onClick={() => handleDelete(index)}
+                  // disabled={editingIndex !== null}
+                />
               </td>
             </tr>
           ))}
