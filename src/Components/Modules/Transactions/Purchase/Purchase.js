@@ -651,18 +651,16 @@ const URDPurchase = () => {
   useEffect(() => {
     const fetchPurity = async () => {
       if (!formData.category) {
-        // Clear purity and rate if category is cleared
         setFormData((prev) => ({
           ...prev,
           purity: "", // Clear purity
           rate: "",   // Clear rate
         }));
-        setPurityOptions([]); // Clear purity options
-        return; // Exit early
+        setPurityOptions([]);
+        return;
       }
   
       if (!formData.metal_type) {
-        // If metal_type is empty, don't fetch purity options
         setPurityOptions([]);
         return;
       }
@@ -678,43 +676,46 @@ const URDPurchase = () => {
         setPurityOptions(filteredPurity);
         console.log("Purity Options:", filteredPurity);
   
-        // Set default value for "Gold" or "gold" metal type
+        let defaultOption = null;
+  
         if (formData.metal_type.toLowerCase() === "gold") {
-          const defaultOption = filteredPurity.find((option) =>
+          defaultOption = filteredPurity.find((option) =>
             ["22k", "22 kt", "22"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
   
           if (defaultOption) {
-            setFormData((prev) => {
-              const updatedData = {
-                ...prev,
-                purity: `${defaultOption.name} | ${defaultOption.purity}`, // Set default purity value
-                rate: rates.rate_22crt, // Adjust rate for 22K gold
-              };
-              return updatedData;
-            });
+            setFormData((prev) => ({
+              ...prev,
+              purity: `${defaultOption.name} | ${defaultOption.purity}`,
+              rate: rates.rate_22crt,
+            }));
           }
         }
   
-        // Set default value for "Silver" or "silver" metal type
         if (formData.metal_type.toLowerCase() === "silver") {
-          const defaultOption = filteredPurity.find((option) =>
+          const silver22K = filteredPurity.find((option) =>
+            ["22k", "22 kt", "22"].some((match) =>
+              option.name.toLowerCase().includes(match)
+            )
+          );
+  
+          const silver24K = filteredPurity.find((option) =>
             ["24k", "24 kt", "24"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
   
+          // Set default priority: 24K > 22K
+          defaultOption = silver24K || silver22K;
+  
           if (defaultOption) {
-            setFormData((prev) => {
-              const updatedData = {
-                ...prev,
-                purity: `${defaultOption.name} | ${defaultOption.purity}`, // Set default purity value
-                rate: rates.silver_rate, // Adjust rate for silver
-              };
-              return updatedData;
-            });
+            setFormData((prev) => ({
+              ...prev,
+              purity: `${defaultOption.name} | ${defaultOption.purity}`,
+              rate: rates.silver_rate,
+            }));
           }
         }
       } catch (error) {
@@ -722,22 +723,17 @@ const URDPurchase = () => {
       }
     };
   
-    // Fetch purity or reset data based on conditions
     if (formData.category) {
       fetchPurity();
     } else {
-      // Reset purity and rate if category is cleared
       setFormData((prev) => ({
         ...prev,
-        purity: "", // Clear purity
-        rate: "",   // Clear rate
+        purity: "",
+        rate: "",
       }));
       setPurityOptions([]);
     }
   }, [formData.metal_type, formData.category]);
-  
-  
-  
   
 
   const handleOpenModal = (data) => {
@@ -820,7 +816,7 @@ const URDPurchase = () => {
             </div>
             <div className="purchase-form-right">
               <Col className="urd-form2-section">
-                <h4 className="mb-4">Invoice Details</h4>
+                <h4 className="mb-4">Invoice Details</h4>
                 <Row>
                   {/* <Col xs={12} md={3}>
                     <InputField label="Terms" type="select" value={formData.terms}
