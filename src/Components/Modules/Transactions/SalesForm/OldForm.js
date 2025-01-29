@@ -113,29 +113,35 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, [name]: value };
-
+  
       if (name === "metal") {
         updatedDetails.purity = ""; // Reset purity when metal changes
         updatedDetails.purityPercentage = ""; // Reset purity percentage
+        // Set rate based on metal type selection
+        if (value === "Silver") {
+          updatedDetails.rate = rates.rate_silver || "0.00"; // Set silver rate if metal is silver
+        } else {
+          updatedDetails.rate = ""; // Reset rate for other metals
+        }
       }
-
+  
       if (name === "purity" && value !== "Other") {
         updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
       } else if (name === "purityPercentage") {
         updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
       }
-
+  
       // Update calculations
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails, currentRate);
-
+  
       return updatedDetails;
     });
   };
-
+  
 
 
 
@@ -235,21 +241,19 @@ const OldSalesForm = ({ setOldSalesData }) => {
       try {
         const response = await axios.get(`${baseURL}/get/current-rates`);
         console.log('API Response:', response.data);
-
-        // Log the 24crt rate separately
-        console.log('24crt Rate:', response.data.rate_24crt);
-
-        // Dynamically set the rates based on response
+    
         setRates({
           rate_24crt: response.data.rate_24crt || "",
           rate_22crt: response.data.rate_22crt || "",
           rate_18crt: response.data.rate_18crt || "",
           rate_16crt: response.data.rate_16crt || "",
+          rate_silver: response.data.silver_rate || "", // Add rate_silver from the response
         });
       } catch (error) {
         console.error('Error fetching current rates:', error);
       }
     };
+    
     fetchCurrentRates();
   }, []);
 
@@ -262,13 +266,23 @@ const OldSalesForm = ({ setOldSalesData }) => {
   //           "";
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
 
+  // const currentRate =
+  //   normalizePurity(oldDetails.purity).includes("24") ? rates.rate_24crt :
+  //     normalizePurity(oldDetails.purity).includes("22") ? rates.rate_22crt :
+  //       normalizePurity(oldDetails.purity).includes("18") ? rates.rate_18crt :
+  //         normalizePurity(oldDetails.purity).includes("16") ? rates.rate_16crt :
+  //           oldDetails.purity === "Other" ? rates.rate_22crt :  // Default to 22K rate when "Other" is selected
+  //             ""; 
+
   const currentRate =
-    normalizePurity(oldDetails.purity).includes("24") ? rates.rate_24crt :
-      normalizePurity(oldDetails.purity).includes("22") ? rates.rate_22crt :
-        normalizePurity(oldDetails.purity).includes("18") ? rates.rate_18crt :
-          normalizePurity(oldDetails.purity).includes("16") ? rates.rate_16crt :
-            oldDetails.purity === "Other" ? rates.rate_22crt :  // Default to 22K rate when "Other" is selected
-              "";
+  normalizePurity(oldDetails.purity).includes("24") ? rates.rate_24crt :
+  normalizePurity(oldDetails.purity).includes("22") ? rates.rate_22crt :
+  normalizePurity(oldDetails.purity).includes("18") ? rates.rate_18crt :
+  normalizePurity(oldDetails.purity).includes("16") ? rates.rate_16crt :
+  oldDetails.metal === "Silver" ? rates.silver_rate :  // Add silver rate logic
+  oldDetails.purity === "Other" ? rates.rate_22crt :  // Default to 22K rate when "Other" is selected
+  "";
+
 
 
   return (
