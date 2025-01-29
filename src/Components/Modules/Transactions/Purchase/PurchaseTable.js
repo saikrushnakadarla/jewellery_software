@@ -6,6 +6,7 @@ import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import './PurchaseTable.css';
 import baseURL from '../../../../Url/NodeBaseURL'; // Update with your base URL setup
 import TagEntry from "./TagEntry";
+import UpdatePurchaseForm from "./UpdatePurchaseForm";
 import { Modal } from "react-bootstrap";
 
 const PurchaseTable = () => {
@@ -14,6 +15,10 @@ const PurchaseTable = () => {
   const [loading, setLoading] = useState(false); // Loading state for delete actions
  const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [openUpdateShow, setOpenUpdateShow] = useState(false); // State for the update modal
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false); // State for update modal
+ 
   // Function to format date to DD/MM/YYYY
   const formatDate = (date) => {
     if (!date) return '';
@@ -60,6 +65,16 @@ const handleOpenModal = (data) => {
   setShowModal(true);
 };
 
+  // Separate function to open the update modal
+  const handleOpenUpdateModal = (data) => {
+    setSelectedProduct(data);
+    setShowUpdateModal(true); // Show update modal
+  };
+
+  const handleCloseUpdateModal = () => {
+    setShowUpdateModal(false);
+    setSelectedProduct(null);
+  };
 
   const columns = React.useMemo(
     () => [
@@ -112,6 +127,10 @@ const handleOpenModal = (data) => {
             >
               Tag Entry
             </button>
+            <FaEdit
+              style={{ cursor: 'pointer', color: '#0056b3' }}
+              onClick={() => handleOpenUpdateModal(row.original)} // Use the new function for update
+            />
             <FaTrash
               style={{
                 cursor: 'pointer',
@@ -230,6 +249,17 @@ const handleOpenModal = (data) => {
           )}
         </Modal.Body>
 
+      </Modal>
+     {/* Separate modal for update */}
+     <Modal show={showUpdateModal} onHide={handleCloseUpdateModal} size="lg" backdrop="static" keyboard={false} dialogClassName="custom-tagentrymodal-width">
+        <Modal.Header closeButton>
+          <Modal.Title>Update Purchase</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedProduct && (
+            <UpdatePurchaseForm selectedProduct={selectedProduct} handleCloseModal={handleCloseUpdateModal} />
+          )}
+        </Modal.Body>
       </Modal>
     </div>
   );

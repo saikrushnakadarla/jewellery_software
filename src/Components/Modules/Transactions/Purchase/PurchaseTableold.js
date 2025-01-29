@@ -1,120 +1,236 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import DataTable from '../../../Pages/InputField/TableLayout'; // Reusable DataTable component
 import { Button, Row, Col } from 'react-bootstrap';
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import './PurchaseTable.css';
-import baseURL from "../../../../Url/NodeBaseURL";
+import baseURL from '../../../../Url/NodeBaseURL'; // Update with your base URL setup
+import TagEntry from "./TagEntry";
+import { Modal } from "react-bootstrap";
 
 const PurchaseTable = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState([]); // State to store table data
-
+  const [data, setData] = useState([]); // State to store fetched table data
+  const [loading, setLoading] = useState(false); // Loading state for delete actions
+ const [showModal, setShowModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  // Function to format date to DD/MM/YYYY
   const formatDate = (date) => {
-    if (!date) return ''; // Return an empty string if no date is provided
-  
+    if (!date) return '';
     const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');  // Pad single digit days with 0
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Pad months with 0
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    
     return `${day}/${month}/${year}`;
   };
 
+// Function to handle delete request
+const handleDelete = async (id) => {
+  const confirmDelete = window.confirm('Are you sure you want to delete this purchase?');
+  if (!confirmDelete) return;
+
+  setLoading(true);
+
+  try {
+    const response = await fetch(`${baseURL}/delete-purchases/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert(result.message || 'Purchase deleted successfully');
+      // Remove the deleted item from the state
+      setData((prevData) => prevData.filter((item) => item.id !== id));
+    } else {
+      console.error('Error deleting purchase:', result.message);
+      alert(result.message || 'Failed to delete purchase');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Something went wrong while deleting the purchase');
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleOpenModal = (data) => {
+  setSelectedProduct(data);
+  setShowModal(true);
+};
+
+
   const columns = React.useMemo(
     () => [
+      { Header: 'Sr.No', accessor: 'id' },
       { Header: 'Name', accessor: 'account_name' },
       { Header: 'Mobile', accessor: 'mobile' },
-      { Header: 'Email', accessor: 'email' },
-      // { Header: 'A/C Address:', accessor: 'address1' },
-      // { Header: 'Address 2', accessor: 'address2' },
-      // { Header: 'City', accessor: 'city' },
-      // { Header: 'Pincode', accessor: 'pincode' },
-      // { Header: 'State', accessor: 'state' },
-      // { Header: 'State Code', accessor: 'state_code' },
-      // { Header: 'Aadhar Card', accessor: 'aadhar_card' },
-      // { Header: 'GSTIN', accessor: 'gst_in' },
-      // { Header: 'PAN Card', accessor: 'pan_card' },
-      // { Header: 'Indent', accessor: 'indent' },
-      // { Header: 'Bill No:', accessor: 'bill_no' },
-      // { Header: 'Type', accessor: 'type' },
-      // { Header: 'Rate Cut', accessor: 'rate_cut' },
-      { Header: 'Date', accessor: 'date',Cell: ({ value }) => <span>{formatDate(value)}</span>, },
-      { Header: 'Bill Date:', accessor: 'bill_date',Cell: ({ value }) => <span>{formatDate(value)}</span>, },
-      { Header: 'Due Date', accessor: 'due_date',Cell: ({ value }) => <span>{formatDate(value)}</span>, },
-      // { Header: 'Purchase Rate', accessor: 'Purchase_rate' },
-      // { Header: 'Product ID', accessor: 'product_id' },
-      { Header: 'Product Name', accessor: 'product_name' },
-      { Header: 'Metal Type', accessor: 'metal_type' },
-      { Header: 'Design Name', accessor: 'design_name' },
+      { Header: 'Invoice', accessor: 'invoice' },
+      { Header: 'Date', accessor: 'date', Cell: ({ value }) => <span>{formatDate(value)}</span> },
+      { Header: 'Category', accessor: 'category' },
+      { Header: 'Pcs', accessor: 'pcs' },
+      { Header: 'Gross Wt', accessor: 'gross_weight' },
       { Header: 'Purity', accessor: 'purity' },
-      // { Header: 'HSN', accessor: 'hsn' },
-      // { Header: 'Product Type', accessor: 'product_type' },
-      // { Header: 'Stock Type', accessor: 'stock_type' },
-      // { Header: 'Pcs', accessor: 'pcs' },
-      { Header: 'Gross Weight', accessor: 'gross_weight' },
-      { Header: 'Stone Weight', accessor: 'stone_weight' },
-      // { Header: 'Net Weight', accessor: 'net_weight' },
-      // { Header: 'Nit Weight', accessor: 'nit_weight' },
-      // { Header: 'Waste Percentage', accessor: 'waste_percentage' },
-      // { Header: 'Waste Amount', accessor: 'waste_amount' },
-      // { Header: 'Pure Weight', accessor: 'pure_weight' },
-      // { Header: 'Alloy', accessor: 'alloy' },
-      // { Header: 'Cost', accessor: 'cost' },
-      // { Header: 'Total Weight', accessor: 'total_weight' },
-      // { Header: 'WT*Rate Amount', accessor: 'wt_rate_amount' },
-      // { Header: 'MC/GM', accessor: 'mc_per_gram' },
-      // { Header: 'MC', accessor: 'mc' },
-      // { Header: 'Stone Amount', accessor: 'stone_amount' },
-      // { Header: 'Total Amount', accessor: 'total_amount' },
-      // { Header: 'Stone', accessor: 'stone' },
-      // { Header: 'Stone Pcs', accessor: 'stone_pcs' },
-      // { Header: 'Stone CT', accessor: 'stone_ct' },
-      // { Header: 'CWP', accessor: 'cwp' },
-      // { Header: 'GMS', accessor: 'gms' },
-      // { Header: 'Stone Rate', accessor: 'stone_rate' },
-      // { Header: 'Clarity', accessor: 'clarity' },
-      // { Header: 'Rate', accessor: 'rate' },
-      // { Header: 'Clear', accessor: 'clear' },
-      // { Header: 'Class', accessor: 'class' },
-      // { Header: 'Cut', accessor: 'cut' },
-      // { Header: 'Action', accessor: 'action' },
+      { Header: 'Pure Wt', accessor: 'pure_weight' },
+      { Header: 'Tot Amt / Wt', accessor: 'total_amount' },
+      { 
+        Header: 'Paid Amt / Wt', 
+        accessor: 'paid_amount',
+        Cell: ({ row }) => {
+          const { paid_amount, paid_amt } = row.original;
+          const totalPaid = (paid_amount || 0) + (paid_amt || 0);
+          return totalPaid;
+        },
+      },
+      { 
+        Header: 'Bal Amt / Wt', 
+        accessor: 'balance_amount',
+        Cell: ({ row }) => {
+          const { balance_amount, balance_after_receipt, paid_amt } = row.original;
+          if (balance_amount === paid_amt) {
+            return balance_after_receipt ;
+          }
+          return balance_after_receipt ? balance_after_receipt : balance_amount || '-';
+        },
+      },
+      {
+        Header: 'Actions',
+        accessor: 'actions',
+        Cell: ({ row }) => (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              style={{
+                backgroundColor: '#a36e29',
+                borderColor: '#a36e29',
+                width: '102px',
+                fontSize: '0.875rem',
+              }}
+              onClick={() => handleOpenModal(row.original)} // Pass entire row data
+            >
+              Tag Entry
+            </button>
+            <FaTrash
+              style={{
+                cursor: 'pointer',
+                color: 'red',
+              }}
+              onClick={() => handleDelete(row.original.id)}
+              disabled={loading}
+            />
+          </div>
+        ),
+      },
+      
+      {
+        Header: 'Payments',
+        accessor: 'payment',
+        Cell: ({ row }) => {
+          const { total_amount, paid_amount, paid_amt } = row.original;
+          const totalPaid = (paid_amount || 0) + (paid_amt || 0);
+  
+          return (
+            <Button
+            style={{
+              backgroundColor: '#28a745',
+              borderColor: '#28a745',
+              fontSize: '0.875rem', // Smaller font size
+              padding: '0.25rem 0.5rem', // Reduced padding
+            }}
+              onClick={() => handleAddReceipt(row.original)}
+              disabled={total_amount === totalPaid} // Disable button if total_amount equals totalPaid
+            >
+              Add Payment
+            </Button>
+          );
+        },
+      },
     ],
-    []
+    [loading]
   );
   
+
+  const handleAddReceipt = (invoiceData) => {
+    console.log("Invoice Data:", invoiceData);
+    navigate("/payments", { state: { from: "/purchasetable", invoiceData } });
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${baseURL}/get/purchases`); // Fetch data from the endpoint
+        const response = await fetch(`${baseURL}/get/purchases`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const result = await response.json();
-        if (result?.purchases) {
-          setData(result.purchases); // Set fetched data
+  
+        if (Array.isArray(result)) {
+          setData(result); // Update state if the result is an array
+        } else {
+          console.error('API response is not an array:', result);
+          alert('Unexpected data format from the server.');
         }
       } catch (error) {
-        console.error('Error fetching payments:', error);
+        console.error('Error fetching purchases:', error);
+        alert('Failed to fetch data. Please try again later.');
       }
     };
+  
     fetchData();
   }, []);
+  
 
+  // Handle navigation to the Create Purchase page
   const handleCreate = () => {
-    navigate('/purchase'); // Navigate to the /suppliers page
+    navigate('/purchase'); // Update with your correct route
   };
+  
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedProduct(null);
+  };
+
 
   return (
     <div className="main-container">
       <div className="purchase-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Purchase</h3>
-            <Button  className='create_but' onClick={handleCreate} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+            <h3>Purchases</h3>
+            <Button
+              className="create_but"
+              onClick={handleCreate}
+              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+            >
               + Create
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={[...data].reverse()} />
       </div>
+      <Modal
+        show={showModal}
+        onHide={handleCloseModal}
+        size="lg"
+        backdrop="static"
+        keyboard={false}
+        dialogClassName="custom-tagentrymodal-width"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Tag Entry</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedProduct && (
+            <TagEntry
+              handleCloseTagModal={handleCloseModal}
+              selectedProduct={selectedProduct}
+            />
+          )}
+        </Modal.Body>
+
+      </Modal>
     </div>
   );
 };
