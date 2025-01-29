@@ -255,7 +255,7 @@ const handleOpenModal = (data) => {
         <Modal.Header closeButton>
           <Modal.Title>Update Purchase</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{marginTop:'-90px'}}>
           {selectedProduct && (
             <UpdatePurchaseForm selectedProduct={selectedProduct} handleCloseModal={handleCloseUpdateModal} />
           )}
