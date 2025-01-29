@@ -38,48 +38,29 @@ const useCalculations = (formData, setFormData) => {
   }, [formData.va_on, formData.va_percent, formData.gross_weight, formData.weight_bw]);
 
   // Calculate Making Charges
-  // useEffect(() => {
-  //   const totalWeight = parseFloat(formData.total_weight_av) || 0;
-  //   const mcPerGram = parseFloat(formData.mc_per_gram) || 0;
-  //   const makingCharges = parseFloat(formData.making_charges) || 0;
-
-  //   if (formData.mc_on === "By Weight") {
-  //     const calculatedMakingCharges = totalWeight * mcPerGram;
-  //     setFormData(prev => ({
-  //       ...prev,
-  //       making_charges: calculatedMakingCharges.toFixed(2),
-  //     }));
-  //   } else if (formData.mc_on === "Fixed" && totalWeight > 0) {
-  //     const calculatedMcPerGram = makingCharges / totalWeight;
-  //     setFormData(prev => ({
-  //       ...prev,
-  //       mc_per_gram: calculatedMcPerGram.toFixed(2),
-  //     }));
-  //   }
-  // }, [formData.mc_on, formData.mc_per_gram, formData.making_charges, formData.total_weight_av]);
   useEffect(() => {
     const totalWeight = parseFloat(formData.total_weight_av) || 0;
     const mcPerGram = parseFloat(formData.mc_per_gram) || 0;
     const makingCharges = parseFloat(formData.making_charges) || 0;
     const rateAmount = parseFloat(formData.rate_amt) || 0;
-    const mcPercentage = parseFloat(formData.mc_per_gram) || 0;
   
-    if (formData.metal_type?.toLowerCase() === "gold") {
-      // Calculate Total MC for gold
-      const totalMC = (mcPercentage / 100) * rateAmount;
+    if (formData.mc_on === "MC / Gram") {
+      // Calculate making_charges as mcPerGram * totalWeight
+      const calculatedMakingCharges = mcPerGram * totalWeight;
       setFormData((prev) => ({
         ...prev,
-        making_charges: totalMC.toFixed(2), // Set calculated Total MC
+        making_charges: calculatedMakingCharges.toFixed(2),
       }));
-    } else {
-      // Other calculations remain the same
-      if (formData.mc_on === "By Weight") {
-        const calculatedMakingCharges = totalWeight * mcPerGram;
-        setFormData((prev) => ({
-          ...prev,
-          making_charges: calculatedMakingCharges.toFixed(2),
-        }));
-      } else if (formData.mc_on === "Fixed" && totalWeight > 0) {
+    } else if (formData.mc_on === "MC %") {
+      // Calculate making_charges as (mcPerGram * rateAmount) / 100
+      const calculatedMakingCharges = (mcPerGram * rateAmount) / 100;
+      setFormData((prev) => ({
+        ...prev,
+        making_charges: calculatedMakingCharges.toFixed(2),
+      }));
+    } else if (formData.mc_on === "Fixed") {
+      // If making_charges is manually entered, calculate mc_per_gram
+      if (makingCharges && totalWeight > 0) {
         const calculatedMcPerGram = makingCharges / totalWeight;
         setFormData((prev) => ({
           ...prev,
@@ -88,15 +69,15 @@ const useCalculations = (formData, setFormData) => {
       }
     }
   }, [
-    formData.metal_type,
-    formData.va_percent,
-    formData.rate_amt,
     formData.mc_on,
     formData.mc_per_gram,
     formData.making_charges,
     formData.total_weight_av,
+    formData.rate_amt,
   ]);
   
+  
+
   // Calculate Rate Amount
   useEffect(() => {
     const rate = parseFloat(formData.rate) || 0;

@@ -53,7 +53,7 @@ const useProductHandlers = () => {
     va_percent: "",
     wastage_weight: "",
     total_weight_av: "",
-    mc_on: "By Percentage",
+    mc_on: "MC %",
     mc_per_gram: "",
     making_charges: "",
     rate: "",
@@ -67,8 +67,6 @@ const useProductHandlers = () => {
     product_image: null,
   });
 
-
- 
   const [uniqueProducts, setUniqueProducts] = useState([]); 
     const [metalTypes, setMetalTypes] = useState([]);
     const [purity, setPurity] = useState([]);
@@ -76,28 +74,31 @@ const useProductHandlers = () => {
     const [designOptions, setDesignOptions] = useState([]); 
     const [filteredDesignOptions, setFilteredDesignOptions] = useState([]); 
     const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
-  
 
-  // Determine the current rate based on purity
   useEffect(() => {
     let currentRate = "";
   
     if (formData.metal_type === "Gold" && formData.purity) {
-      currentRate = 
-        formData.purity === "24K" ? rates.rate_24crt :
-        formData.purity === "22K" ? rates.rate_22crt :
-        formData.purity === "18K" ? rates.rate_18crt :
-        formData.purity === "16K" ? rates.rate_16crt :
-        "";
+      // Check if the purity value includes specific numbers
+      if (formData.purity.includes("24")) {
+        currentRate = rates.rate_24crt;
+      } else if (formData.purity.includes("22")) {
+        currentRate = rates.rate_22crt;
+      } else if (formData.purity.includes("18")) {
+        currentRate = rates.rate_18crt;
+      } else if (formData.purity.includes("16")) {
+        currentRate = rates.rate_16crt;
+      }
     } else if (formData.metal_type === "Silver" && formData.purity) {
       currentRate = rates.silver_rate;
     }
   
     setFormData((prevData) => ({
       ...prevData,
-      rate: currentRate
+      rate: currentRate,
     }));
   }, [formData.purity, formData.metal_type, rates]);
+  
   
 
   // Fetch rates on mount
@@ -525,7 +526,6 @@ const handleDesignNameChange = (designName) => {
 const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
 const [subcategoryOptions, setSubcategoryOptions] = useState([]);
 
- // Fetch subcategories dynamically from the API
  useEffect(() => {
   if (formData.category) {
     axios
@@ -564,7 +564,6 @@ const [subcategoryOptions, setSubcategoryOptions] = useState([]);
 
 const [metaltypeOptions, setMetaltypeOptions] = useState([]);
 
-  // Fetch data from the API
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -587,34 +586,53 @@ const [metaltypeOptions, setMetaltypeOptions] = useState([]);
     };
 
     fetchProducts();
-  }, []); // Empty dependency array ensures the effect runs only once on mount 
+  }, []); 
 
   const [purityOptions, setpurityOptions] = useState([]);
 
-  // Fetch data from the API
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/purity');
-        const data = await response.json();
+useEffect(() => {
+  const fetchPurity = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/purity');
+      const data = await response.json();
 
-        // Extract unique categories (metal types) from the data
-        const categories = Array.from(
-          new Set(data.map((product) => product.name))
-        );
+      // Filter the data based on the formData.metal_type
+      const filteredData = data.filter((product) => {
+        return product.metal?.toLowerCase() === formData.metal_type?.toLowerCase();
+      });
 
-        // Set the metal type options
-        setpurityOptions(categories.map((name) => ({
-          value: name,
-          label: name,
-        })));
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
+      // Extract unique purities (name | purity) from the filtered data
+      const purities = Array.from(
+        new Set(filteredData.map((product) => `${product.name} | ${product.purity}`))
+      );
 
-    fetchProducts();
-  }, []); // Empty dependency array ensures the effect runs only once on mount
+      // Set the filtered purity options
+      const purityOptions = purities.map((purity) => ({
+        value: purity,
+        label: purity,
+      }));
+
+      setpurityOptions(purityOptions);
+
+      // Automatically set the default purity to "22" if available in the filtered options
+      const defaultPurity = purityOptions.find((option) =>
+        /22/i.test(option.value)
+      )?.value;
+
+      setFormData((prevData) => ({
+        ...prevData,
+        purity: defaultPurity || "", // Set default purity or empty if not found
+      }));
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  if (formData.metal_type) {
+    fetchPurity(); // Fetch purity only when metal_type is defined
+  }
+}, [formData.metal_type]);
+
 
 const handleBarcodeChange = async (code) => {
   try {
@@ -635,11 +653,11 @@ const handleBarcodeChange = async (code) => {
         stone_weight: "",
         stone_price: "",
         weight_bw: "",
-        va_on: "",
+        va_on: "Gross Weight",
         va_percent: "",
         wastage_weight: "",
         total_weight_aw: "",
-        mc_on: "",
+        mc_on: "MC %",
         mc_per_gram: "",
         making_charges: "",
         rate: "",
@@ -656,8 +674,12 @@ const handleBarcodeChange = async (code) => {
     // Check for product by code
     const product = products.find((prod) => String(prod.rbarcode) === String(code));
     if (product) {
-      // If product found by code, populate the form and make fields editable
-      setIsBarcodeSelected(true);  // Set the barcode as selected
+      setIsBarcodeSelected(true);
+
+      // Find the default purity value that includes "22"
+      const defaultPurity = purityOptions.find((option) =>
+        /22/i.test(option.value)
+      )?.value;  // Set the barcode as selected
       setFormData((prevData) => ({
         ...prevData,
         code: product.rbarcode,  // Retain the selected barcode
@@ -665,18 +687,18 @@ const handleBarcodeChange = async (code) => {
         product_name: "", // Make editable
         metal_type: product.Category,
         design_name: "", // Make editable
-        purity: product.purity,
+        purity: defaultPurity || "",
         category: product.product_name,
         sub_category: "",
         gross_weight: "",
         stone_weight: "",
         stone_price: "",
         weight_bw: "",
-        va_on: "",
+        va_on: "Gross Weight",
         va_percent: "",
         wastage_weight: "",
         total_weight_aw: "",
-        mc_on: "",
+        mc_on: "MC %",
         mc_per_gram: "",
         making_charges: "",
         tax_percent: product.tax_slab,
@@ -743,11 +765,11 @@ const handleBarcodeChange = async (code) => {
           stone_weight: "",
           stone_price: "",
           weight_bw: "",
-          va_on: "",
+          va_on: "Gross Weight",
           va_percent: "",
           wastage_weight: "",
           total_weight_aw: "",
-          mc_on: "",
+          mc_on: "MC %",
           mc_per_gram: "",
           making_charges: "",
           rate: "",

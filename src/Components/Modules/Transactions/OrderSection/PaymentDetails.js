@@ -9,7 +9,7 @@ const PaymentDetails = ({
   handleBack,
   repairDetails,
   totalPrice,
-  schemeSalesData, 
+  schemeSalesData,
   oldSalesData,
   taxableAmount,
   taxAmount,
@@ -18,18 +18,18 @@ const PaymentDetails = ({
   netPayableAmount,
   netAmount // Assuming total price is passed as a prop
 }) => {
-    const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
-    // const taxableAmount = repairDetails.reduce((sum, item) => {
-    //   const stonePrice = parseFloat(item.stone_price) || 0;
-    //   const makingCharges = parseFloat(item.making_charges) || 0;
-    //   const rateAmt = parseFloat(item.rate_amt) || 0;
-    //   return sum + stonePrice + makingCharges + rateAmt;
-    // }, 0);
-    // console.log("Total Price=",taxableAmount)
-    
-    // const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
-    // const netAmount = taxableAmount + taxAmount;
-    // console.log("Net Amount=",netAmount)
+  const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
+  // const taxableAmount = repairDetails.reduce((sum, item) => {
+  //   const stonePrice = parseFloat(item.stone_price) || 0;
+  //   const makingCharges = parseFloat(item.making_charges) || 0;
+  //   const rateAmt = parseFloat(item.rate_amt) || 0;
+  //   return sum + stonePrice + makingCharges + rateAmt;
+  // }, 0);
+  // console.log("Total Price=",taxableAmount)
+
+  // const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  // const netAmount = taxableAmount + taxAmount;
+  // console.log("Net Amount=",netAmount)
 
   // Calculate total entered amount
   useEffect(() => {
@@ -48,35 +48,42 @@ const PaymentDetails = ({
   }, [paymentDetails, totalPrice]);
 
   return (
-    <Col className="sales-form-section">
-      <Row>
-        <h4 className="mb-3">Payment Details</h4>
+    <div>
+      <Col className="sales-form-section">
+              <Row>
+                <h4 className="mb-3">Summary</h4>
         <Table bordered hover responsive>
-        <tr>
-          <td colSpan="20" className="text-right">Taxable Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{taxableAmount.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colSpan="20" className="text-right">Tax Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{taxAmount.toFixed(2)}</td>
-        </tr>
-        <tr>
-          <td colSpan="20" className="text-right">Net Amount</td> {/* Adjusted colspan to 20 */}
-          <td colSpan="4">{netAmount.toFixed(2)}</td>
-        </tr>
-        <tr>
-              <td colSpan="20" className="text-right">Old Items Amount</td>
-              <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
-            </tr>
-            <tr>
-              <td colSpan="20" className="text-right">Scheme Amount</td>
-              <td colSpan="4">{schemeAmount.toFixed(2)}</td>
-            </tr>
-            <tr>
-              <td colSpan="20" className="text-right">Net Payable Amount</td>
-              <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
-            </tr>
+          <tr>
+            <td colSpan="20" className="text-right">Taxable Amount</td> {/* Adjusted colspan to 20 */}
+            <td colSpan="4">{taxableAmount.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colSpan="20" className="text-right">Tax Amount</td> {/* Adjusted colspan to 20 */}
+            <td colSpan="4">{taxAmount.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colSpan="20" className="text-right">Net Amount</td> {/* Adjusted colspan to 20 */}
+            <td colSpan="4">{netAmount.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colSpan="20" className="text-right">Old Items Amount</td>
+            <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colSpan="20" className="text-right">Scheme Amount</td>
+            <td colSpan="4">{schemeAmount.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colSpan="20" className="text-right">Net Payable Amount</td>
+            <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
+          </tr>
         </Table>
+                </Row>
+              </Col>
+        
+              <Col className="sales-form-section">
+                <Row>
+                  <h4 className="mb-3">Payment Details</h4>
         <Col xs={12} md={4}>
           <InputField
             label="Cash Amt"
@@ -121,7 +128,7 @@ const PaymentDetails = ({
           <Button
             onClick={handleSave}
             style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-            // disabled={!isSubmitEnabled} 
+          // disabled={!isSubmitEnabled} 
           >
             Save
           </Button>
@@ -141,13 +148,14 @@ const PaymentDetails = ({
             className="cus-back-btn"
             variant="secondary"
             onClick={handleBack}
-            style={{ backgroundColor: 'gray', marginRight: '10px' }}
+            style={{ backgroundColor: 'gray', marginLeft: '-60px' }}
           >
             Cancel
           </Button>
         </Col>
-      </Row>
-    </Col>
+        </Row>
+      </Col>
+    </div>
   );
 };
 

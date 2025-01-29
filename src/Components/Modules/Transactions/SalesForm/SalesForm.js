@@ -20,8 +20,6 @@ import { useLocation } from 'react-router-dom';
 const SalesForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // const { mobile } = location.state || {};
- 
   const [showPDFDownload, setShowPDFDownload] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [metal, setMetal] = useState("");
@@ -188,7 +186,7 @@ const SalesForm = () => {
         console.error('Error fetching repair details:', error);
       }
     };
-  
+
     fetchRepairs();
   }, []);
 
@@ -200,20 +198,20 @@ const SalesForm = () => {
         setInvoiceDetails(null); // Clear details if no invoice is selected
         return;
       }
-  
+
       try {
         const response = await axios.get(`${baseURL}/getsales/${returnData.invoice_number}`);
-        
+
         // Filter the results to exclude those with status 'Sale Returned'
         const filteredData = response.data.filter((invoice) => invoice.status !== 'Sale Returned');
-        
+
         setInvoiceDetails(filteredData); // Update state with filtered details
         console.log("Fetched Invoice Details:", filteredData);
       } catch (error) {
         console.error(`Error fetching details for invoice ${returnData.invoice_number}:`, error);
       }
     };
-  
+
     fetchInvoiceDetails();
   }, [returnData.invoice_number]);
 
@@ -279,7 +277,6 @@ const SalesForm = () => {
       ...repairDetails[index], // Merge repair details into formData
     }));
   };
-  
 
   const handleUpdate = () => {
     const updatedDetails = repairDetails.map((item, index) =>
@@ -307,8 +304,8 @@ const SalesForm = () => {
       metal_type: "",
       design_name: "",
       purity: "",
-      category:"",
-      sub_category:"",
+      category: "",
+      sub_category: "",
       gross_weight: "",
       stone_weight: "",
       weight_bw: "",
@@ -317,7 +314,7 @@ const SalesForm = () => {
       va_percent: "",
       wastage_weight: "",
       total_weight_av: "",
-      mc_on: "By Percentage",
+      mc_on: "MC %",
       mc_per_gram: "",
       making_charges: "",
       rate: "",
@@ -384,22 +381,22 @@ const SalesForm = () => {
     const rateAmt = parseFloat(item.rate_amt) || 0;
     return sum + stonePrice + makingCharges + rateAmt;
   }, 0);
-  console.log("Total Price=",taxableAmount)
-  
+  console.log("Total Price=", taxableAmount)
+
   const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
-  console.log("Net Amount=",netAmount)
+  console.log("Net Amount=", netAmount)
 
   const oldItemsAmount = location.state?.old_exchange_amt
-  ? parseFloat(location.state.old_exchange_amt)
-  : oldSalesData.reduce(
+    ? parseFloat(location.state.old_exchange_amt)
+    : oldSalesData.reduce(
       (sum, item) => sum + parseFloat(item.total_amount || 0),
       0
     );
 
-const schemeAmount = location.state?.scheme_amt
-  ? parseFloat(location.state.scheme_amt)
-  : schemeSalesData.reduce(
+  const schemeAmount = location.state?.scheme_amt
+    ? parseFloat(location.state.scheme_amt)
+    : schemeSalesData.reduce(
       (sum, item) => sum + parseFloat(item.paid_amount || 0),
       0
     );
@@ -428,11 +425,9 @@ const schemeAmount = location.state?.scheme_amt
     localStorage.removeItem('paymentDetails');
     localStorage.removeItem('oldTableData'); // Explicitly remove oldTableData from local storage
     localStorage.removeItem('schemeTableData'); // Explicitly remove oldTableData from local storage
-  
+
     console.log("Data cleared successfully");
   };
-  
-  
 
   const handleSave = async () => {
     // Include customer details in the data being saved
@@ -466,15 +461,15 @@ const schemeAmount = location.state?.scheme_amt
       oldItemsAmount: oldItemsAmount || 0, // Explicitly include value
       schemeAmount: schemeAmount || 0,    // Explicitly include value
     };
-  
+
     console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-  
+
     console.log("Saving data:", dataToSave);
-  
+
     try {
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Sales added successfully");
-  
+
       // Generate PDF Blob
       const pdfDoc = (
         <PDFLayout
@@ -490,21 +485,21 @@ const schemeAmount = location.state?.scheme_amt
           netPayableAmount={netPayableAmount}
         />
       );
-  
+
       const pdfBlob = await pdf(pdfDoc).toBlob();
-  
+
       // Create a download link and trigger it
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
       link.download = `invoice-${formData.invoice_number}.pdf`;
       link.click();
-  
+
       // Clean up
       URL.revokeObjectURL(link.href);
-  
+
       // Clear all data after saving
       clearData();
-  
+
       // Reset the form and reload the page if necessary
       resetForm();
       window.location.reload();
@@ -514,53 +509,53 @@ const schemeAmount = location.state?.scheme_amt
     }
   };
 
-    const [selectedRows, setSelectedRows] = useState([]);
-    const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
-    
-    const handleCheckboxChange = (event, index) => {
-      const isChecked = event.target.checked;
-      let updatedSelectedRows;
-    
-      if (isChecked) {
-        updatedSelectedRows = [...selectedRows, index]; // Add index to selectedRows
-      } else {
-        updatedSelectedRows = selectedRows.filter((i) => i !== index); // Remove index from selectedRows
-      }
-    
-      setSelectedRows(updatedSelectedRows);
-    
-      // Update "Select All" checkbox state
-      setIsAllSelected(updatedSelectedRows.length === invoiceDetails.length);
-    };
-    
-    const handleSelectAllChange = (event) => {
-      const isChecked = event.target.checked;
-      if (isChecked) {
-        // Select all rows
-        setSelectedRows(invoiceDetails.map((_, index) => index));
-      } else {
-        // Deselect all rows
-        setSelectedRows([]);
-      }
-      setIsAllSelected(isChecked); // Update "Check All" checkbox state
-    };
-  
-      // Calculate taxable amount based on selected rows
-      const salesTaxableAmount = selectedRows.reduce((sum, rowIndex) => {
-        const detail = invoiceDetails[rowIndex];
-        const stonePrice = parseFloat(detail.stone_price) || 0;
-        const makingCharges = parseFloat(detail.making_charges) || 0;
-        const rateAmt = parseFloat(detail.rate_amt) || 0;
-        return sum + stonePrice + makingCharges + rateAmt;
-      }, 0);
-    
-      const salesTaxAmount = selectedRows.reduce((sum, rowIndex) => {
-        const detail = invoiceDetails[rowIndex];
-        return sum + parseFloat(detail.tax_amt || 0);
-      }, 0);
-    
-      const salesNetAmount = salesTaxableAmount + salesTaxAmount;
-      console.log("salesTaxableAmount=",salesTaxableAmount)
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
+
+  const handleCheckboxChange = (event, index) => {
+    const isChecked = event.target.checked;
+    let updatedSelectedRows;
+
+    if (isChecked) {
+      updatedSelectedRows = [...selectedRows, index]; // Add index to selectedRows
+    } else {
+      updatedSelectedRows = selectedRows.filter((i) => i !== index); // Remove index from selectedRows
+    }
+
+    setSelectedRows(updatedSelectedRows);
+
+    // Update "Select All" checkbox state
+    setIsAllSelected(updatedSelectedRows.length === invoiceDetails.length);
+  };
+
+  const handleSelectAllChange = (event) => {
+    const isChecked = event.target.checked;
+    if (isChecked) {
+      // Select all rows
+      setSelectedRows(invoiceDetails.map((_, index) => index));
+    } else {
+      // Deselect all rows
+      setSelectedRows([]);
+    }
+    setIsAllSelected(isChecked); // Update "Check All" checkbox state
+  };
+
+  // Calculate taxable amount based on selected rows
+  const salesTaxableAmount = selectedRows.reduce((sum, rowIndex) => {
+    const detail = invoiceDetails[rowIndex];
+    const stonePrice = parseFloat(detail.stone_price) || 0;
+    const makingCharges = parseFloat(detail.making_charges) || 0;
+    const rateAmt = parseFloat(detail.rate_amt) || 0;
+    return sum + stonePrice + makingCharges + rateAmt;
+  }, 0);
+
+  const salesTaxAmount = selectedRows.reduce((sum, rowIndex) => {
+    const detail = invoiceDetails[rowIndex];
+    return sum + parseFloat(detail.tax_amt || 0);
+  }, 0);
+
+  const salesNetAmount = salesTaxableAmount + salesTaxAmount;
+  console.log("salesTaxableAmount=", salesTaxableAmount)
 
   return (
     <div className="main-container">
@@ -569,19 +564,19 @@ const schemeAmount = location.state?.scheme_amt
           {/* <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>
             Sales
           </h3> */}
-          <div className="sales-form" style={{marginTop:'-40px'}}>
+          <div className="sales-form" style={{ marginTop: '-40px' }}>
             <div className="sales-form-left">
-              <CustomerDetails 
+              <CustomerDetails
                 formData={formData}
                 handleCustomerChange={handleCustomerChange}
                 handleAddCustomer={handleAddCustomer}
                 customers={customers}
                 setSelectedMobile={setSelectedMobile} // Pass the setSelectedMobile function here
               />
-              
+
             </div>
             <div className="sales-form-right">
-              <InvoiceDetails 
+              <InvoiceDetails
                 formData={formData}
                 setFormData={setFormData}
               />
@@ -589,7 +584,7 @@ const schemeAmount = location.state?.scheme_amt
           </div>
 
           <div className="sales-form-section">
-            <ProductDetails 
+            <ProductDetails
               formData={formData}
               handleChange={handleChange}
               handleBarcodeChange={handleBarcodeChange}
@@ -608,14 +603,14 @@ const schemeAmount = location.state?.scheme_amt
               filteredPurityOptions={filteredPurityOptions}
               filteredDesignOptions={filteredDesignOptions}
               isBarcodeSelected={isBarcodeSelected}
-              isQtyEditable={isQtyEditable}  
+              isQtyEditable={isQtyEditable}
               handleUpdate={handleUpdate}
-              isEditing={editIndex !== null}           
+              isEditing={editIndex !== null}
             />
           </div>
 
           <div className="sales-form-section">
-            <ProductTable repairDetails={repairDetails} onEdit={handleEdit}  onDelete={handleDelete}/>
+            <ProductTable repairDetails={repairDetails} onEdit={handleEdit} onDelete={handleDelete} />
           </div>
 
           {/* <div className="sales-form2">
@@ -633,11 +628,11 @@ const schemeAmount = location.state?.scheme_amt
 
           <div className="sales-form2">
             <div className="sales-form-third">
-              <SalesFormSection metal={metal} 
-                setMetal={setMetal} 
-                setOldSalesData={setOldSalesData} 
+              <SalesFormSection metal={metal}
+                setMetal={setMetal}
+                setOldSalesData={setOldSalesData}
                 oldTableData={oldTableData}
-                setOldTableData={setOldTableData} 
+                setOldTableData={setOldTableData}
                 setSchemeSalesData={setSchemeSalesData}
                 schemeTableData={schemeTableData}
                 setSchemeTableData={setSchemeTableData}
@@ -658,17 +653,17 @@ const schemeAmount = location.state?.scheme_amt
                 salesTaxableAmount={salesTaxableAmount}
                 salesTaxAmount={salesTaxAmount}
                 salesNetAmount={salesNetAmount}
-               />
-              
+              />
+
             </div>
 
             <div className="sales-form-fourth">
-              <PaymentDetails 
+              <PaymentDetails
                 paymentDetails={paymentDetails}
                 setPaymentDetails={setPaymentDetails}
                 handleSave={handleSave}
                 handleBack={handleBack}
-                totalPrice={totalPrice} 
+                totalPrice={totalPrice}
                 repairDetails={repairDetails}
                 taxableAmount={taxableAmount}
                 taxAmount={taxAmount}
@@ -677,26 +672,26 @@ const schemeAmount = location.state?.scheme_amt
                 schemeAmount={schemeAmount}
                 netPayableAmount={netPayableAmount}
                 salesNetAmount={salesNetAmount}
-                oldSalesData={oldSalesData} schemeSalesData={schemeSalesData} 
+                oldSalesData={oldSalesData} schemeSalesData={schemeSalesData}
               />
             </div>
           </div>
           {showPDFDownload && (
-        <PDFDownloadLink
-          document={
-            <PDFLayout
-              formData={formData}
-              repairDetails={repairDetails}
-              paymentDetails={paymentDetails}
-            />
-          }
-          fileName={`invoice-${formData.invoice_number}.pdf`}
-        >
-          {({ blob, url, loading, error }) =>
-            loading ? "Generating PDF..." : "Download Invoice PDF"
-          }
-        </PDFDownloadLink>
-      )}
+            <PDFDownloadLink
+              document={
+                <PDFLayout
+                  formData={formData}
+                  repairDetails={repairDetails}
+                  paymentDetails={paymentDetails}
+                />
+              }
+              fileName={`invoice-${formData.invoice_number}.pdf`}
+            >
+              {({ blob, url, loading, error }) =>
+                loading ? "Generating PDF..." : "Download Invoice PDF"
+              }
+            </PDFDownloadLink>
+          )}
         </Form>
       </Container>
     </div>

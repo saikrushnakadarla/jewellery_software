@@ -69,18 +69,28 @@ const RepairForm = () => {
 
   // Determine the current rate based on purity
   useEffect(() => {
-    const currentRate =
-      formData.purity === "24K" ? rates.rate_24crt :
-        formData.purity === "22K" ? rates.rate_22crt :
-          formData.purity === "18K" ? rates.rate_18crt :
-            formData.purity === "16K" ? rates.rate_16crt :
-              "";
-
+    let currentRate = "";
+  
+    if (formData.metal_type === "Gold" && formData.purity) {
+      // Check if the purity value includes specific numbers
+      if (formData.purity.includes("24")) {
+        currentRate = rates.rate_24crt;
+      } else if (formData.purity.includes("22")) {
+        currentRate = rates.rate_22crt;
+      } else if (formData.purity.includes("18")) {
+        currentRate = rates.rate_18crt;
+      } else if (formData.purity.includes("16")) {
+        currentRate = rates.rate_16crt;
+      }
+    } else if (formData.metal_type === "Silver" && formData.purity) {
+      currentRate = rates.silver_rate;
+    }
+  
     setFormData((prevData) => ({
       ...prevData,
-      rate: currentRate
+      rate: currentRate,
     }));
-  }, [formData.purity, rates]);
+  }, [formData.purity, formData.metal_type, rates]);
 
   // Fetch rates on mount
   useEffect(() => {
@@ -124,9 +134,9 @@ const RepairForm = () => {
       }
       const result = await response.json();
 
-      // Remove duplicate product_Name entries
+      // Remove duplicate sub_category entries
       const uniqueProductNames = Array.from(
-        new Map(result.result.map((prod) => [prod.product_Name, prod])).values()
+        new Map(result.result.map((prod) => [prod.sub_category, prod])).values()
       );
 
       // Extract unique metal types
@@ -144,7 +154,8 @@ const RepairForm = () => {
       ).map((Purity) => ({ Purity: Purity }));
 
       setData(result.result); // Set the full data
-      setUniqueProducts(uniqueProductNames); // Set unique product_Name options
+      setUniqueProducts(uniqueProductNames); // Set unique sub_category options
+      console.log("Product Name=",uniqueProductNames)
       setMetalTypes(uniqueMetalTypes); // Set all unique metal types
       setFilteredMetalTypes(uniqueMetalTypes); // Initially, show all metal types
       setDesignOptions(uniqueDesigns); // Set all unique designs
@@ -162,47 +173,27 @@ const RepairForm = () => {
   }, []);
 
   const handleProductNameChange = (productName) => {
-    const product = data.find((prod) => String(prod.product_Name) === String(productName));
-
-    if (product) {
+    const productEntries = data.filter((prod) => prod.sub_category === productName);
+  
+    if (productEntries.length > 0) {
+      const uniqueMetalTypes = Array.from(
+        new Set(productEntries.map((prod) => prod.metal_type))
+      ).map((metalType) => ({ metal_type: metalType }));
+  
       setFormData((prevData) => ({
         ...prevData,
-        code: product.rbarcode,
-        product_id: product.product_id || "",
-        product_name: product.product_Name || "",
-
+        product_name: productName,
+        metal_type: "",
+        design_name: "",
       }));
-
-      // Filter metal types based on the selected product's metal type
-      const filteredMetalTypes = metalTypes.filter(
-        (metalType) => metalType.metal_type === product.metal_type
-      );
-      setFilteredMetalTypes(filteredMetalTypes); // Update filtered metal types
-
-      // Filter and deduplicate design_master options for the selected product
-      const filteredDesignOptions = Array.from(
-        new Set(
-          data
-            .filter((prod) => prod.product_Name === productName)
-            .map((prod) => prod.design_master)
-        )
-      ).map((designMaster) => ({ design_master: designMaster }));
-      setFilteredDesignOptions(filteredDesignOptions); // Update filtered design options
-
-      // Filter and deduplicate purity options for the selected product
-      const filteredPurityOptions = Array.from(
-        new Set(
-          data
-            .filter((prod) => prod.product_Name === productName)
-            .map((prod) => prod.Purity)
-        )
-      ).map((Purity) => ({ Purity }));
-      setFilteredPurityOptions(filteredPurityOptions); // Update filtered purity options
+  
+      setFilteredMetalTypes(uniqueMetalTypes); // Update metal types based on selected product
+      setFilteredDesignOptions([]); // Clear design options initially
     } else {
+      // Reset fields if no matching product entries found
       setFormData((prevData) => ({
         ...prevData,
-        code: "",
-        product_id: "",
+        code: "",  
         product_name: "",
         metal_type: "",
         design_name: "",
@@ -216,7 +207,7 @@ const RepairForm = () => {
         wastage_on: "",
         wastage_percent: "",
         wastage_weight: "",
-        total_weight: "",
+        total_weight_aw: "",
         making_charges_on: "",
         mc_per_gram: "",
         total_mc: "",
@@ -224,13 +215,73 @@ const RepairForm = () => {
         rate_amt: "",
         tax_percent: "",
         tax_amt: "",
-        total_rs: "",
-        qty: "",
+        total_price: "",
+        qty: "", // Rese
       }));
+  
+      setFilteredMetalTypes(metalTypes);
+      setFilteredDesignOptions(designOptions);
+    }
+  };
 
-      setFilteredMetalTypes(metalTypes); // Reset to all metal types
-      setFilteredDesignOptions(designOptions); // Clear design_master options
-      setFilteredPurityOptions(purity); // Clear purity options
+  const handleMetalTypeChange = (metalType) => {
+    const productEntries = data.filter(
+      (prod) => prod.sub_category === formData.product_name && prod.metal_type === metalType
+    );
+  
+    if (productEntries.length > 0) {
+      const uniqueDesignOptions = Array.from(
+        new Set(productEntries.map((prod) => prod.design_master))
+      ).map((designMaster) => ({ design_master: designMaster }));
+  
+      setFormData((prevData) => ({
+        ...prevData,
+        metal_type: metalType,
+        design_name: "",
+      }));
+  
+      setFilteredDesignOptions(uniqueDesignOptions); // Update design options based on metal type
+    } else {
+      // Reset if no matching entries found
+      setFormData((prevData) => ({
+        ...prevData,
+        metal_type: "",
+        design_name: "",
+      }));
+  
+      setFilteredDesignOptions([]);
+    }
+  };
+  
+  const handleDesignNameChange = (designName) => {
+    const productEntries = data.filter(
+      (prod) =>
+        prod.sub_category === formData.product_name &&
+        prod.metal_type === formData.metal_type &&
+        prod.design_master === designName
+    );
+  
+    if (productEntries.length > 0) {
+      const uniquePurityOptions = Array.from(
+        new Set(productEntries.map((prod) => prod.Purity))
+      ).map((Purity) => ({ Purity }));
+  
+      setFormData((prevData) => ({
+        ...prevData,
+        design_name: designName,
+        purity: "",
+      }));
+  
+      setFilteredPurityOptions(uniquePurityOptions); // Update purity options based on design
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        design_name: "",
+        purity: "",
+        
+      }));
+  
+      setFilteredPurityOptions([]);
     }
   };
 
@@ -249,7 +300,7 @@ const RepairForm = () => {
   //     ...prevData,
   //     [name]: value,
   //   }));
-  
+
   //   // Trigger recalculation for Total MC if relevant fields are updated
   //   if (
   //     formData.metal_type?.toLowerCase() === "gold" &&
@@ -261,14 +312,14 @@ const RepairForm = () => {
   //     const rateAmount = parseFloat(
   //       name === "rate_amt" ? value : formData.rate_amt
   //     ) || 0;
-  
+
   //     const totalMC = (mcPercentage / 100) * rateAmount;
   //     setFormData((prevData) => ({
   //       ...prevData,
-  //       making_charges: totalMC.toFixed(2),
+  //       total_mc: totalMC.toFixed(2),
   //     }));
   //   }
-  
+
 
   //   // Destructure relevant fields
   //   const { product_name, metal_type, design_name, purity } = updatedFormData;
@@ -277,7 +328,7 @@ const RepairForm = () => {
   //     // Filter matching entries
   //     const matchingEntries = data.filter(
   //       (prod) =>
-  //         prod.product_Name === product_name &&
+  //         prod.sub_category === product_name &&
   //         prod.metal_type === metal_type &&
   //         prod.design_master === design_name &&
   //         prod.Purity === purity
@@ -338,12 +389,12 @@ const RepairForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
-  
+
     // Trigger recalculation for Total MC when relevant fields are updated
     if (
       formData.metal_type?.toLowerCase() === "gold" &&
@@ -355,28 +406,28 @@ const RepairForm = () => {
       const updatedRateAmount = parseFloat(
         name === "rate_amt" ? value : formData.rate_amt
       ) || 0;
-  
+
       const calculatedTotalMC = (updatedMcPercentage / 100) * updatedRateAmount;
       setFormData((prevData) => ({
         ...prevData,
         total_mc: calculatedTotalMC.toFixed(2),
       }));
     }
-  
+
     const { product_name, metal_type, design_name, purity } = {
       ...formData,
       [name]: value,
     };
-  
+
     if (product_name && metal_type && design_name && purity) {
       const matchingEntries = data.filter(
         (prod) =>
-          prod.product_Name === product_name &&
+          prod.sub_category === product_name &&
           prod.metal_type === metal_type &&
           prod.design_master === design_name &&
           prod.Purity === purity
       );
-  
+
       if (matchingEntries.length > 0) {
         if (matchingEntries.length > 1) {
           setFormData((prevData) => ({
@@ -392,7 +443,7 @@ const RepairForm = () => {
           const productDetails = products.find(
             (prod) => String(prod.product_id) === String(productId)
           );
-  
+
           setFormData((prevData) => ({
             ...prevData,
             code: matchingEntry.PCode_BarCode,
@@ -418,6 +469,114 @@ const RepairForm = () => {
     }
   };
 
+  useEffect(() => {
+    if (formData.category) {
+      axios
+        .get("http://localhost:5000/subcategory")
+        .then((response) => {
+          // Log the raw response to inspect its structure
+          console.log("API Response:", response.data);
+  
+          // Ensure 'data' exists in the response and it's an array
+          const fetchedSubcategories = Array.isArray(response.data.data)
+            ? response.data.data
+            : [];
+  
+          // Filter subcategories by the selected category
+          const filteredSubcategories = fetchedSubcategories.filter(
+            (subcategory) => subcategory.category === formData.category
+          );
+  
+          // Map the filtered data to match the format for the dropdown
+          const options = filteredSubcategories.map((subcategory) => {
+            return {
+              value: subcategory.subcategory_id, // Correct field
+              label: subcategory.sub_category_name, // Correct field
+            };
+          });
+  
+          console.log("Mapped Subcategory Options:", options); // Console log to check mapped options
+  
+          setSubcategoryOptions(options);
+        })
+        .catch((error) => {
+          console.error("Error fetching subcategory data:", error);
+        });
+    }
+  }, [formData.category]);
+  
+  const [metaltypeOptions, setMetaltypeOptions] = useState([]);
+  
+    // Fetch data from the API
+    useEffect(() => {
+      const fetchProducts = async () => {
+        try {
+          const response = await fetch('http://localhost:5000/get/products');
+          const data = await response.json();
+  
+          // Extract unique categories (metal types) from the data
+          const categories = Array.from(
+            new Set(data.map((product) => product.Category))
+          );
+  
+          // Set the metal type options
+          setMetaltypeOptions(categories.map((category) => ({
+            value: category,
+            label: category,
+          })));
+        } catch (error) {
+          console.error('Error fetching products:', error);
+        }
+      };
+  
+      fetchProducts();
+    }, []); // Empty dependency array ensures the effect runs only once on mount 
+  
+    const [purityOptions, setpurityOptions] = useState([]);
+  
+  useEffect(() => {
+    const fetchPurity = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/purity');
+        const data = await response.json();
+  
+        // Filter the data based on the formData.metal_type
+        const filteredData = data.filter((product) => {
+          return product.metal?.toLowerCase() === formData.metal_type?.toLowerCase();
+        });
+  
+        // Extract unique purities (name | purity) from the filtered data
+        const purities = Array.from(
+          new Set(filteredData.map((product) => `${product.name} | ${product.purity}`))
+        );
+  
+        // Set the filtered purity options
+        const purityOptions = purities.map((purity) => ({
+          value: purity,
+          label: purity,
+        }));
+  
+        setpurityOptions(purityOptions);
+  
+        // Automatically set the default purity to "22" if available in the filtered options
+        const defaultPurity = purityOptions.find((option) =>
+          /22/i.test(option.value)
+        )?.value;
+  
+        setFormData((prevData) => ({
+          ...prevData,
+          purity: defaultPurity || "", // Set default purity or empty if not found
+        }));
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+  
+    if (formData.metal_type) {
+      fetchPurity(); // Fetch purity only when metal_type is defined
+    }
+  }, [formData.metal_type]);
+
   const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
 
   const handleBarcodeChange = async (code) => {
@@ -439,29 +598,33 @@ const RepairForm = () => {
           stones_weight: "",
           stones_price: "",
           weight_bw: "",
-          wastage_on: "",
+          wastage_on: "Gross Weight",
           wastage_percent: "",
           wastage_weight: "",
-          total_weight: "",
-          making_charges_on: "",
+          total_weight_aw: "",
+          making_charges_on: "MC %",
           mc_per_gram: "",
           total_mc: "",
           rate: "",
           rate_amt: "",
           tax_percent: "",
           tax_amt: "",
-          total_rs: "",
+          total_price: "",
           qty: "", // Reset qty
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
       }
-
+  
       // Check for product by code
       const product = products.find((prod) => String(prod.rbarcode) === String(code));
       if (product) {
-        // If product found by code, populate the form and make fields editable
-        setIsBarcodeSelected(true);  // Set the barcode as selected
+        setIsBarcodeSelected(true);
+  
+        // Find the default purity value that includes "22"
+        const defaultPurity = purityOptions.find((option) =>
+          /22/i.test(option.value)
+        )?.value;  // Set the barcode as selected
         setFormData((prevData) => ({
           ...prevData,
           code: product.rbarcode,  // Retain the selected barcode
@@ -469,22 +632,21 @@ const RepairForm = () => {
           product_name: "", // Make editable
           metal_type: product.Category,
           design_name: "", // Make editable
-          purity: product.purity,
+          purity: defaultPurity || "",
           category: product.product_name,
           sub_category: "",
           gross_weight: "",
           stones_weight: "",
           stones_price: "",
           weight_bw: "",
-          wastage_on: "",
+          wastage_on: "Gross Weight",
           wastage_percent: "",
           wastage_weight: "",
-          total_weight: "",
-          making_charges_on: "",
+          total_weight_aw: "",
+          making_charges_on: "MC %",
           mc_per_gram: "",
           total_mc: "",
           tax_percent: product.tax_slab,
-          total_rs: "",
           qty: 1, // Set qty to 1 for product
         }));
         setIsQtyEditable(false); // Set qty as read-only
@@ -493,15 +655,25 @@ const RepairForm = () => {
         const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
         if (tag) {
           // setIsBarcodeSelected(true);  
+          // If the tag is marked as "Sold"
+          // if (tag.Status === "Sold") {
+          //   alert("The product is already sold out!");
+          //   setFormData((prevData) => ({
+          //     ...prevData,
+          //   }));
+          //   setIsQtyEditable(true); // Allow editing of qty
+          //   return;
+          // }
+  
           const productId = tag.product_id;
           const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-
+  
           setFormData((prevData) => ({
             ...prevData,
             code: tag.PCode_BarCode || "", // Retain the barcode
             product_id: tag.product_id || "",
             opentag_id: tag.opentag_id || "",
-            product_name: tag.product_Name || "", // Make editable
+            product_name: tag.sub_category || "", // Make editable
             metal_type: tag.metal_type || "",
             design_name: tag.design_master || "", // Make editable
             purity: tag.Purity || "",
@@ -514,7 +686,7 @@ const RepairForm = () => {
             wastage_on: tag.Wastage_On || "",
             wastage_percent: tag.Wastage_Percentage || "",
             wastage_weight: tag.WastageWeight || "",
-            total_weight: tag.TotalWeight_AW || "",
+            total_weight_aw: tag.TotalWeight_AW || "",
             making_charges_on: tag.Making_Charges_On || "",
             mc_per_gram: tag.MC_Per_Gram || "",
             total_mc: tag.Making_Charges || "",
@@ -538,18 +710,18 @@ const RepairForm = () => {
             stones_weight: "",
             stones_price: "",
             weight_bw: "",
-            wastage_on: "",
+            wastage_on: "Gross Weight",
             wastage_percent: "",
             wastage_weight: "",
-            total_weight: "",
-            making_charges_on: "",
+            total_weight_aw: "",
+            making_charges_on: "MC %",
             mc_per_gram: "",
             total_mc: "",
             rate: "",
             rate_amt: "",
             tax_percent: "",
             tax_amt: "",
-            total_rs: "",
+            total_price: "",
             qty: "", // Reset qty
           }));
           setIsQtyEditable(true); // Default to editable
@@ -594,7 +766,6 @@ const RepairForm = () => {
     setEntries(updatedEntries);
   };
 
-
   const handlePrint = async () => {
     try {
       const totalAmount = entries.reduce(
@@ -635,7 +806,6 @@ const RepairForm = () => {
       alert("Failed to save or generate PDF. Please try again.");
     }
   };
-
 
   useEffect(() => {
     const fetchLastEstimateNumber = async () => {
@@ -716,42 +886,41 @@ const RepairForm = () => {
   useEffect(() => {
     const totalWeight = parseFloat(formData.total_weight) || 0;
     const mcPerGram = parseFloat(formData.mc_per_gram) || 0;
-    const totalMc = parseFloat(formData.total_mc) || 0;
+    const makingCharges = parseFloat(formData.total_mc) || 0;
     const rateAmount = parseFloat(formData.rate_amt) || 0;
-    const mcPercentage = parseFloat(formData.mc_per_gram) || 0;
   
-    if (formData.metal_type?.toLowerCase() === "gold") {
-      // Calculate Total MC for gold based on MC Percentage and Amount
-      const calculatedTotalMC = (mcPercentage / 100) * rateAmount;
+    if (formData.making_charges_on === "MC / Gram") {
+      // Calculate total_mc as mcPerGram * totalWeight
+      const calculatedMakingCharges = mcPerGram * totalWeight;
       setFormData((prev) => ({
         ...prev,
-        total_mc: calculatedTotalMC.toFixed(2), // Update Total MC
+        total_mc: calculatedMakingCharges.toFixed(2),
       }));
-    } else {
-      // Other calculations for non-gold metals
-      if (formData.mc_on === "By Weight") {
-        const calculatedMakingCharges = totalWeight * mcPerGram;
+    } else if (formData.making_charges_on === "MC %") {
+      // Calculate total_mc as (mcPerGram * rateAmount) / 100
+      const calculatedMakingCharges = (mcPerGram * rateAmount) / 100;
+      setFormData((prev) => ({
+        ...prev,
+        total_mc: calculatedMakingCharges.toFixed(2),
+      }));
+    } else if (formData.making_charges_on === "Fixed") {
+      // If total_mc is manually entered, calculate mc_per_gram
+      if (makingCharges && totalWeight > 0) {
+        const calculatedMcPerGram = makingCharges / totalWeight;
         setFormData((prev) => ({
           ...prev,
-          total_mc: calculatedMakingCharges.toFixed(2), // Update Total MC
-        }));
-      } else if (formData.mc_on === "Fixed" && totalWeight > 0) {
-        const calculatedMcPerGram = totalMc / totalWeight;
-        setFormData((prev) => ({
-          ...prev,
-          mc_per_gram: calculatedMcPerGram.toFixed(2), // Update MC per gram
+          mc_per_gram: calculatedMcPerGram.toFixed(2),
         }));
       }
     }
   }, [
-    formData.metal_type,
+    formData.making_charges_on,
     formData.mc_per_gram,
-    formData.rate_amt,
-    formData.mc_on,
     formData.total_mc,
     formData.total_weight,
+    formData.rate_amt,
   ]);
-  
+
   useEffect(() => {
     const rate = parseFloat(formData.rate) || 0;
     const totalWeight = parseFloat(formData.total_weight) || 0;
@@ -806,6 +975,45 @@ const RepairForm = () => {
     fetchLastEstimateNumber();
   }, []);
 
+  const [subcategoryOptions, setSubcategoryOptions] = useState([]);
+
+ // Fetch subcategories dynamically from the API
+ useEffect(() => {
+  if (formData.category) {
+    axios
+      .get("http://localhost:5000/subcategory")
+      .then((response) => {
+        // Log the raw response to inspect its structure
+        console.log("API Response:", response.data);
+
+        // Ensure 'data' exists in the response and it's an array
+        const fetchedSubcategories = Array.isArray(response.data.data)
+          ? response.data.data
+          : [];
+
+        // Filter subcategories by the selected category
+        const filteredSubcategories = fetchedSubcategories.filter(
+          (subcategory) => subcategory.category === formData.category
+        );
+
+        // Map the filtered data to match the format for the dropdown
+        const options = filteredSubcategories.map((subcategory) => {
+          return {
+            value: subcategory.subcategory_id, // Correct field
+            label: subcategory.sub_category_name, // Correct field
+          };
+        });
+
+        console.log("Mapped Subcategory Options:", options); // Console log to check mapped options
+
+        setSubcategoryOptions(options);
+      })
+      .catch((error) => {
+        console.error("Error fetching subcategory data:", error);
+      });
+  }
+}, [formData.category]);
+
   return (
     <div className="main-container">
       <Container className="estimate-form-container">
@@ -813,26 +1021,26 @@ const RepairForm = () => {
           <h2>Estimate</h2>
 
           {/* First Row with Date and Estimate Number */}
-  <Row className="d-flex justify-content-end align-items-center mb-3" style={{marginLeft:'9px', marginTop:'-60px'}}>
-    <Col xs={12} md={2}>
-      <InputField
-        label="Date:"
-        name="date"
-        value={formData.date}
-        type="date"
-        onChange={handleInputChange}
-      />
-    </Col>
-    <Col xs={12} md={2}>
-      <InputField
-        label="Estimate Number:"
-        name="estimate_number"
-        value={formData.estimate_number}
-        onChange={handleInputChange}
-        readOnly
-      />
-    </Col>
-  </Row>
+          <Row className="d-flex justify-content-end align-items-center mb-3" style={{ marginLeft: '9px', marginTop: '-60px' }}>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Date:"
+                name="date"
+                value={formData.date}
+                type="date"
+                onChange={handleInputChange}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Estimate Number:"
+                name="estimate_number"
+                value={formData.estimate_number}
+                onChange={handleInputChange}
+                readOnly
+              />
+            </Col>
+          </Row>
 
           <Col xs={12} md={2}>
             <InputField
@@ -859,7 +1067,7 @@ const RepairForm = () => {
           </Col>
 
           {/* Product Name Field */}
-          <Col xs={12} md={2}>
+          {/* <Col xs={12} md={2}>
             {isBarcodeSelected ? (
               <InputField
                 label="Product Name"
@@ -876,93 +1084,134 @@ const RepairForm = () => {
                 onChange={(e) => handleProductNameChange(e.target.value)}
                 type="select"
                 options={uniqueProducts.map((prod) => ({
-                  value: prod.product_Name,
-                  label: prod.product_Name,
+                  value: prod.sub_category,
+                  label: prod.sub_category,
                 }))}
               />
             )}
-          </Col>
+          </Col> */}
 
           {/* Metal Type Field */}
           <Col xs={12} md={2}>
-            <InputField
-              label="Metal Type"
-              name="metal_type"
-              value={formData.metal_type}
-              onChange={handleInputChange}
-              type="select"
-              options={filteredMetalTypes.map((metalType) => ({
-                value: metalType.metal_type,
-                label: metalType.metal_type,
-              }))}
-            />
-          </Col>
+        {isBarcodeSelected ? (
+          <InputField
+          label="Metal Type"
+          name="metal_type"
+          value={formData.metal_type || ""}
+          onChange={handleInputChange}
+          type="select"
+          options={metaltypeOptions} // Set options dynamically from the API
+        />
+          
+          ) : (
+          <InputField
+            label="Metal Type"
+            name="metal_type"
+            value={formData.metal_type}
+            onChange={(e) => handleMetalTypeChange(e.target.value)}
+            type="select"
+            options={filteredMetalTypes.map((metalType) => ({
+              value: metalType.metal_type,
+              label: metalType.metal_type,
+            }))}
+          />
+        )}
+        </Col>
 
-          {/* Design Master Field */}
-          <Col xs={12} md={2}>
-            {isBarcodeSelected ? (
-              <InputField
-                label="Design Master"
-                name="design_name"
-                value={formData.design_name}
-                onChange={handleInputChange}
-                type="text"
-              />
-            ) : (
-              <InputField
-                label="Design Master"
-                name="design_name"
-                value={formData.design_name}
-                onChange={handleInputChange}
-                type="select"
-                options={filteredDesignOptions.map((designOption) => ({
-                  value: designOption.design_master,
-                  label: designOption.design_master,
-                }))}
-              />
-            )}
-          </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Category"
+            name="category"
+            value={formData.category || ""}
+            onChange={handleInputChange}
+            readOnly
+          />
+        </Col>
 
-          {/* Purity Field */}
-          <Col xs={12} md={2}>
-            <InputField
-              label="Purity"
-              name="purity"
-              value={formData.purity}
-              onChange={handleInputChange}
-              type="select"
-              options={filteredPurityOptions.map((Purity) => ({
-                value: Purity.Purity,
-                label: Purity.Purity,
-              }))}
-            />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField
-              label="Category"
-              name="category"
-              value={formData.category || ""}
-              onChange={handleInputChange}
-              readOnly
-            />
-          </Col>
-          <Col xs={12} md={2}>
+        <Col xs={12} md={2}>
+          {isBarcodeSelected ? (
+           <InputField
+           label="Sub Category"
+           name="product_name"
+           value={formData.product_name || ""}
+           onChange={handleInputChange}
+           type="select"
+           options={subcategoryOptions} // Dynamically fetched options based on category
+         />
+          
+          ) : (
             <InputField
               label="Sub Category"
-              name="sub_category"
-              value={formData.sub_category || ""}
-              onChange={handleInputChange}
-              readOnly={!isBarcodeSelected}
+              name="product_name"
+              value={formData.product_name}
+              onChange={(e) => handleProductNameChange(e.target.value)}
+              type="select"
+              options={uniqueProducts.map((prod) => ({
+                value: prod.sub_category,
+                label: prod.sub_category,
+              }))}
             />
+          )}
+        </Col>
+
+        <Col xs={12} md={2}>
+          {isBarcodeSelected ? (
+            <InputField
+              label="Product Design Name"
+              name="design_name"
+              value={formData.design_name}
+              onChange={handleInputChange}
+              type="text"
+            />
+          ) : (
+            <InputField
+              label="Product Design Name"
+              name="design_name"
+              value={formData.design_name}
+              onChange={(e) => handleDesignNameChange(e.target.value)}
+              type="select"
+              options={filteredDesignOptions.map((designOption) => ({
+                value: designOption.design_master,
+                label: designOption.design_master,
+              }))}
+            />
+          )}
+        </Col>
+
+        <Col xs={12} md={2}>
+        {isBarcodeSelected ? (
+          <InputField
+          label="Purity"
+          name="purity"
+          value={formData.purity || ""}
+          onChange={handleInputChange}
+          type="select"
+          options={purityOptions} // Set options dynamically from the API
+        />
+          
+          ) : (
+          <InputField
+            label="Purity"
+            name="purity"
+            value={formData.purity}
+            onChange={handleInputChange}
+            type="select"
+            options={filteredPurityOptions.map((Purity) => ({
+              value: Purity.Purity,
+              label: Purity.Purity,
+            }))}
+          />
+          )}
+        </Col>
+          
+          <Col xs={12} md={1}>
+            <InputField label="Gross Wt" name="gross_weight" value={formData.gross_weight} onChange={handleInputChange} />
           </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Gross Weight:" name="gross_weight" value={formData.gross_weight} onChange={handleInputChange} />
+          <Col xs={12} md={1}>
+            <InputField label="Stones Wt" name="stones_weight" value={formData.stones_weight} onChange={handleInputChange} />
           </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Stones Weight:" name="stones_weight" value={formData.stones_weight} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Stones Price:" name="stones_price" value={formData.stones_price} onChange={handleInputChange} />
+          <Col xs={12} md={1}>
+            <InputField label="St Price" name="stones_price" value={formData.stones_price} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
             <InputField label="Weight BW:" name="weight_bw" value={formData.weight_bw} onChange={handleInputChange} />
@@ -986,18 +1235,18 @@ const RepairForm = () => {
           </Col>
 
           <Col xs={12} md={2}>
-            <InputField label="Wastage %:" name="wastage_percent" value={formData.wastage_percent} onChange={handleInputChange} />
+            <InputField label="Wastage %" name="wastage_percent" value={formData.wastage_percent} onChange={handleInputChange} />
+          </Col>
+          <Col xs={12} md={1}>
+            <InputField label="W.Wt" name="wastage_weight" value={formData.wastage_weight} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
-            <InputField label="Wastage Weight:" name="wastage_weight" value={formData.wastage_weight} onChange={handleInputChange} />
+            <InputField label="Total Weight AW" name="total_weight" value={formData.total_weight} onChange={handleInputChange} />
           </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Total Weight:" name="total_weight" value={formData.total_weight} onChange={handleInputChange} />
+          <Col xs={12} md={1}>
+            <InputField label="Rate" name="rate" value={formData.rate} onChange={handleInputChange} />
           </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Rate:" name="rate" value={formData.rate} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={2}>
+          <Col xs={12} md={1}>
             {/* <InputField
               label="Amount"
               name="rate_amt"
@@ -1005,62 +1254,69 @@ const RepairForm = () => {
               onChange={handleInputChange}
               readOnly
             /> */}
-                  <InputField
-  label="Amount"
-  name="rate_amt"
-  value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
-  onChange={handleInputChange} // Trigger recalculation of Total MC
-  readOnly // Ensure it's editable
-/>
+            <InputField
+              label="Amount"
+              name="rate_amt"
+              value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+              onChange={handleInputChange} // Trigger recalculation of Total MC
+              readOnly // Ensure it's editable
+            />
           </Col>
           <Col xs={12} md={2}>
+          <InputField
+            label="MC On"
+            name="making_charges_on"
+            type="select"
+            value={formData.making_charges_on || ""} // Default to "MC / Gram"
+            onChange={handleInputChange}
+            options={[
+              { value: "MC / Gram", label: "MC / Gram" },
+              { value: "Fixed", label: "Fixed" },
+              { value: "MC %", label: "MC %" },
+              ...(formData.making_charges_on &&
+                !["MC / Gram", "Fixed", "MC %"].includes(formData.making_charges_on)
+                ? [{ value: formData.making_charges_on, label: formData.making_charges_on }]
+                : []),
+            ]}
+          />
+        </Col>
+
+        <Col xs={12} md={1}>
+          {/* <InputField
+            label={formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"} // Dynamic label based on metal type
+            name="mc_per_gram"
+            value={formData.mc_per_gram || ""} // Ensure value is set properly
+            onChange={handleChange}
+          /> */}
+          <InputField
+            label={
+              formData.making_charges_on === "MC %"
+                ? "MC %"
+                : "MC/Gm"
+            } // Dynamic label based on making_charges_on value
+            name="mc_per_gram"
+            value={formData.mc_per_gram || ""} // Default value handling
+            onChange={handleInputChange}
+          />
+        </Col>
+          <Col xs={12} md={1}>
+            {/* <InputField label="Total MC:" name="total_mc" value={formData.total_mc} onChange={handleInputChange} /> */}
             <InputField
-              label="MC On"
-              name="making_charges_on"
-              type="select"
-              value={formData.making_charges_on || ""} // Default to "By Weight"
-              onChange={handleInputChange}
-              options={[
-                { value: "By Weight", label: "By Weight" },
-                { value: "Fixed", label: "Fixed" },
-                ...(formData.making_charges_on &&
-                  !["By Weight", "Fixed"].includes(formData.making_charges_on)
-                  ? [{ value: formData.making_charges_on, label: formData.making_charges_on }]
-                  : []),
-              ]}
+              label="Total MC"
+              name="total_mc"
+              value={formData.total_mc || ""} // Display calculated Total MC
+              readOnly // Make this field read-only, since it’s auto-calculated
             />
           </Col>
 
-          <Col xs={12} md={2}>
-            {/* <InputField label="MC Per Gram:" name="mc_per_gram" value={formData.mc_per_gram} onChange={handleInputChange} /> */}
-            <InputField
-  label={
-    formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"
-  }
-  name="mc_per_gram" // Adjusted to reflect MC Percentage for gold
-  value={formData.mc_per_gram || ""} // Default value handling
-  onChange={handleInputChange}
-/>
-
-          </Col>
-          <Col xs={12} md={2}>
-            {/* <InputField label="Total MC:" name="total_mc" value={formData.total_mc} onChange={handleInputChange} /> */}
-            <InputField
-  label="Total MC"
-  name="total_mc"
-  value={formData.total_mc || ""} // Display calculated Total MC
-  readOnly // Make this field read-only, since it’s auto-calculated
-/>
-          </Col>
-
-          <Col xs={12} md={2}>
+          <Col xs={12} md={1}>
             <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
           </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Tax VAT Amt:" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
+          <Col xs={12} md={1}>
+            <InputField label="Tax Amt" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
-            <InputField label="Total Rs:" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
+            <InputField label="Total Price" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={2}>
             <Button

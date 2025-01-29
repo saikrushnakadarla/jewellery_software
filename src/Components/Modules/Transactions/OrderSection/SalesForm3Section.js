@@ -10,12 +10,16 @@ const SalesFormSection = ({ setOldSalesData, setSchemeSalesData }) => {
     <Col className="sales-form-section">
       <Row>
         <Col xs={12} className="mb-3">
-          <Button
-            variant={activeForm === "old" ? "primary" : "secondary"}
-            onClick={() => setActiveForm("old")}
-          >
-            Old
-          </Button>
+           <Button
+              style={{
+                backgroundColor: activeForm === "old" ? "rgb(163, 110, 41)" : "gray",
+                borderColor: activeForm === "old" ? "rgb(163, 110, 41)" : "gray",
+                color: "white",
+              }}
+              onClick={() => setActiveForm("old")}
+            >
+              URD Purchase
+            </Button>
           {/* <Button
             variant={activeForm === "schemes" ? "primary" : "secondary"}
             onClick={() => setActiveForm("schemes")}

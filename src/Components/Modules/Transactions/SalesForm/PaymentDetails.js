@@ -11,7 +11,7 @@ const PaymentDetails = ({
   handleBack,
   repairDetails,
   totalPrice,
-  schemeSalesData, 
+  schemeSalesData,
   oldSalesData,
   taxableAmount,
   taxAmount,
@@ -24,7 +24,7 @@ const PaymentDetails = ({
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const location = useLocation();
   const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
-  const netPayAmount=netPayableAmount-salesNetAmount
+  const netPayAmount = netPayableAmount - salesNetAmount
   useEffect(() => {
     // Set the default payment details from location.state if available
     if (location.state?.cash_amount || location.state?.card_amt || location.state?.chq_amt || location.state?.online_amt) {
@@ -59,31 +59,31 @@ const PaymentDetails = ({
         <Row>
           <h4 className="mb-3">Summary</h4>
           <Table bordered hover responsive>
-  <tr>
-    <td colSpan="20" className="text-right">Taxable Amount</td>
-    <td colSpan="4">{taxableAmount.toFixed(2)}</td>
-  </tr>
-  <tr>
-    <td colSpan="20" className="text-right">Tax Amount</td>
-    <td colSpan="4">{taxAmount.toFixed(2)}</td>
-  </tr>
-  <tr>
-    <td colSpan="20" className="text-right">Net Amount</td>
-    <td colSpan="4">{netAmount.toFixed(2)}</td>
-  </tr>
-  <tr>
-    <td colSpan="20" className="text-right">Old Items Amount</td>
-    <td colSpan="4">{updatedOldItemsAmount.toFixed(2)}</td> {/* Display the updated amount */}
-  </tr>
-  <tr>
-    <td colSpan="20" className="text-right">Scheme Amount</td>
-    <td colSpan="4">{schemeAmount.toFixed(2)}</td>
-  </tr>
-  <tr>
-    <td colSpan="20" className="text-right">Net Payable Amount</td>
-    <td colSpan="4">{Math.round(netPayAmount).toFixed(2)}</td>
-  </tr>
-</Table>
+            <tr>
+              <td colSpan="20" className="text-right">Taxable Amount</td>
+              <td colSpan="4">{taxableAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Tax Amount</td>
+              <td colSpan="4">{taxAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Net Amount</td>
+              <td colSpan="4">{netAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Old Items Amount</td>
+              <td colSpan="4">{updatedOldItemsAmount.toFixed(2)}</td> {/* Display the updated amount */}
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Scheme Amount</td>
+              <td colSpan="4">{schemeAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Net Payable Amount</td>
+              <td colSpan="4">{Math.round(netPayAmount).toFixed(2)}</td>
+            </tr>
+          </Table>
         </Row>
       </Col>
 
@@ -134,11 +134,11 @@ const PaymentDetails = ({
             <Button
               onClick={handleSave}
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-              // disabled={!isSubmitEnabled} 
+            // disabled={!isSubmitEnabled} 
             >
               Save
             </Button>
-            
+
           </Col>
           {/* <Col xs={12} md={2}>
             <Button

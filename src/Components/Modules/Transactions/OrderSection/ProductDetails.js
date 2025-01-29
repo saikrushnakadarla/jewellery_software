@@ -227,50 +227,6 @@ const ProductDetails = ({
             readOnly
           />
         </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="MC On"
-            name="mc_on"
-            type="select"
-            value={formData.mc_on || ""} // Default to "By Weight"
-            onChange={handleChange}
-            options={[
-              { value: "By Weight", label: "By Weight" },
-              { value: "Fixed", label: "Fixed" },
-              { value: "By Percentage", label: "By Percentage" },
-              ...(formData.mc_on &&
-                !["By Weight", "Fixed", "By Percentage"].includes(formData.mc_on)
-                ? [{ value: formData.mc_on, label: formData.mc_on }]
-                : []),
-            ]}
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          {/* <InputField
-            label={formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"} // Dynamic label based on metal type
-            name="mc_per_gram"
-            value={formData.mc_per_gram || ""} // Ensure value is set properly
-            onChange={handleChange}
-          /> */}
-          <InputField
-            label={
-              formData.mc_on === "By Percentage"
-                ? "MC Percentage"
-                : "MC/Gm"
-            } // Dynamic label based on mc_on value
-            name="mc_per_gram"
-            value={formData.mc_per_gram || ""} // Default value handling
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Total MC"
-            name="making_charges"
-            value={formData.making_charges || ""} // Display calculated Total MC
-            readOnly // Make this field read-only, since it’s auto-calculated
-          />
-        </Col>
         <Col xs={12} md={1}>
           <InputField
             label="Rate"
@@ -288,6 +244,51 @@ const ProductDetails = ({
             readOnly={false} // Ensure it's editable
           />
         </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="MC On"
+            name="mc_on"
+            type="select"
+            value={formData.mc_on || ""} // Default to "MC / Gram"
+            onChange={handleChange}
+            options={[
+              { value: "MC / Gram", label: "MC / Gram" },
+              { value: "Fixed", label: "Fixed" },
+              { value: "MC %", label: "MC %" },
+              ...(formData.mc_on &&
+                !["MC / Gram", "Fixed", "MC %"].includes(formData.mc_on)
+                ? [{ value: formData.mc_on, label: formData.mc_on }]
+                : []),
+            ]}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          {/* <InputField
+            label={formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"} // Dynamic label based on metal type
+            name="mc_per_gram"
+            value={formData.mc_per_gram || ""} // Ensure value is set properly
+            onChange={handleChange}
+          /> */}
+          <InputField
+            label={
+              formData.mc_on === "MC %"
+                ? "MC %"
+                : "MC/Gm"
+            } // Dynamic label based on mc_on value
+            name="mc_per_gram"
+            value={formData.mc_per_gram || ""} // Default value handling
+            onChange={handleChange}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField
+            label="Total MC"
+            name="making_charges"
+            value={formData.making_charges || ""} // Display calculated Total MC
+            readOnly // Make this field read-only, since it’s auto-calculated
+          />
+        </Col>
+       
         <Col xs={12} md={1}>
           <InputField
             label="Qty"
@@ -322,24 +323,34 @@ const ProductDetails = ({
             readOnly
           />
         </Col>
-        <Col xs={12} md={2}>
-            <label className="form-label">Product Image</label>
-            <input
-              type="file"
-              className="form-control"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-            {formData.product_image && (
-              <div className="mt-2">
-                <img
-                  src={URL.createObjectURL(formData.product_image)}
-                  alt="Preview"
-                  style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-                />
-              </div>
-            )}
-          </Col>
+        <Col xs={12} md={3}>
+          <InputField
+            type="file"
+            label="Product Image"
+            name="product_image"
+            value={formData.product_image}
+            onChange={handleFileChange}
+          />
+        </Col>
+
+        {/* <Col xs={12} md={2}>
+          <label className="form-label">Product Image</label>
+          <input
+            type="file"
+            className="form-control"
+            accept="image/*"
+            onChange={handleFileChange}
+          />
+          {formData.product_image && (
+            <div className="mt-2">
+              <img
+                src={URL.createObjectURL(formData.product_image)}
+                alt="Preview"
+                style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+              />
+            </div>
+          )}
+        </Col> */}
         {/* <div className="mb-3">
             <label className="form-label">Product Image</label>
             <div className="custom-file-input-wrapper">

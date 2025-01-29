@@ -161,36 +161,23 @@ const URDPurchase = () => {
       if (field === "purity" || field === "metal_type") {
         // Separate condition for gold
         if (formData.metal_type.toLowerCase() === "gold") {
-          // Check for different purity values and set the rate accordingly for gold
-          if (
-            value.toLowerCase().includes("22") || // Check for 22 KT, 22K, 22k, etc.
-            value.toLowerCase().includes("22kt") ||
-            value.toLowerCase().includes("22k")
-          ) {
-            updatedFormData.rate = rates.rate_22crt;
-          } else if (
-            value.toLowerCase().includes("24") || // Check for 24 KT, 24K, etc.
-            value.toLowerCase().includes("24kt") ||
-            value.toLowerCase().includes("24k")
-          ) {
-            updatedFormData.rate = rates.rate_24crt;
-          } else if (
-            value.toLowerCase().includes("18") || // Check for 18 KT, 18K, etc.
-            value.toLowerCase().includes("18kt") ||
-            value.toLowerCase().includes("18k")
-          ) {
-            updatedFormData.rate = rates.rate_18crt;
-          } else if (
-            value.toLowerCase().includes("16") || // Check for 16 KT, 16K, etc.
-            value.toLowerCase().includes("16kt") ||
-            value.toLowerCase().includes("16k")
-          ) {
-            updatedFormData.rate = rates.rate_16crt;
+          // Normalize the value for consistent comparison
+          const normalizedValue = value.toLowerCase().replace(/\s+/g, "");
+      
+          if (normalizedValue.includes("22")) {
+            updatedFormData.rate = rates.rate_22crt; // 22 carat value
+          } else if (normalizedValue.includes("24")) {
+            updatedFormData.rate = rates.rate_24crt; // 24 carat value
+          } else if (normalizedValue.includes("18")) {
+            updatedFormData.rate = rates.rate_18crt; // 18 carat value
+          } else if (normalizedValue.includes("16")) {
+            updatedFormData.rate = rates.rate_16crt; // 16 carat value
           } else {
             updatedFormData.rate = "";
           }
         }
       }
+      
       
       if (field === "metal_type") {
         // Additional condition to ensure silver rate is fetched without purity

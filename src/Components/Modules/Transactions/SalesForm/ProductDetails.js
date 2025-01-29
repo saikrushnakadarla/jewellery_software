@@ -213,6 +213,7 @@ const ProductDetails = ({
             readOnly
           />
         </Col>
+
         <Col xs={12} md={2}>
           <InputField
             label="Wastage On"
@@ -256,50 +257,7 @@ const ProductDetails = ({
             readOnly
           />
         </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="MC On"
-            name="mc_on"
-            type="select"
-            value={formData.mc_on || ""} // Default to "By Weight"
-            onChange={handleChange}
-            options={[
-              { value: "By Weight", label: "By Weight" },
-              { value: "Fixed", label: "Fixed" },
-              { value: "By Percentage", label: "By Percentage" },
-              ...(formData.mc_on &&
-                !["By Weight", "Fixed", "By Percentage"].includes(formData.mc_on)
-                ? [{ value: formData.mc_on, label: formData.mc_on }]
-                : []),
-            ]}
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          {/* <InputField
-            label={formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"} // Dynamic label based on metal type
-            name="mc_per_gram"
-            value={formData.mc_per_gram || ""} // Ensure value is set properly
-            onChange={handleChange}
-          /> */}
-          <InputField
-            label={
-              formData.mc_on === "By Percentage"
-                ? "MC Percentage"
-                : "MC/Gm"
-            } // Dynamic label based on mc_on value
-            name="mc_per_gram"
-            value={formData.mc_per_gram || ""} // Default value handling
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Total MC"
-            name="making_charges"
-            value={formData.making_charges || ""} // Display calculated Total MC
-            readOnly // Make this field read-only, since it’s auto-calculated
-          />
-        </Col>
+
         <Col xs={12} md={1}>
           <InputField
             label="Rate"
@@ -315,6 +273,50 @@ const ProductDetails = ({
             value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
             onChange={handleChange} // Trigger recalculation of Total MC
             readOnly={false} // Ensure it's editable
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="MC On"
+            name="mc_on"
+            type="select"
+            value={formData.mc_on || ""} // Default to "MC / Gram"
+            onChange={handleChange}
+            options={[
+              { value: "MC / Gram", label: "MC / Gram" },
+              { value: "Fixed", label: "Fixed" },
+              { value: "MC %", label: "MC %" },
+              ...(formData.mc_on &&
+                !["MC / Gram", "Fixed", "MC %"].includes(formData.mc_on)
+                ? [{ value: formData.mc_on, label: formData.mc_on }]
+                : []),
+            ]}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          {/* <InputField
+            label={formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"} // Dynamic label based on metal type
+            name="mc_per_gram"
+            value={formData.mc_per_gram || ""} // Ensure value is set properly
+            onChange={handleChange}
+          /> */}
+          <InputField
+            label={
+              formData.mc_on === "MC %"
+                ? "MC %"
+                : "MC/Gm"
+            } // Dynamic label based on mc_on value
+            name="mc_per_gram"
+            value={formData.mc_per_gram || ""} // Default value handling
+            onChange={handleChange}
+          />
+        </Col>
+        <Col xs={12} md={1}>
+          <InputField
+            label="Total MC"
+            name="making_charges"
+            value={formData.making_charges || ""} // Display calculated Total MC
+            readOnly 
           />
         </Col>
         <Col xs={12} md={1}>

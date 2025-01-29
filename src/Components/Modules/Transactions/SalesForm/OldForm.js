@@ -44,17 +44,17 @@ const OldSalesForm = ({ setOldSalesData }) => {
       try {
         const response = await axios.get(`${baseURL}/purity`);
         const allPurityOptions = response.data;
-  
+
         // Filter purity options based on selected metal
         const filteredPurityOptions = allPurityOptions.filter(
           (option) => option.metal === oldDetails.metal
         );
-  
+
         // Find default purity (e.g., 22k for Gold) or set empty if not found
         const defaultPurity = filteredPurityOptions.find(
           (option) => option.name === "22K"
         )?.name || "";
-  
+
         // Update state with filtered purities and set the default purity
         setPurityOptions(filteredPurityOptions);
         setOldDetails((prevDetails) => ({
@@ -65,14 +65,14 @@ const OldSalesForm = ({ setOldSalesData }) => {
         console.error("Error fetching purity options:", error);
       }
     };
-  
+
     // Fetch and filter purities when metal changes
     if (oldDetails.metal) {
       fetchAndFilterPurity();
     }
   }, [oldDetails.metal]);
-  
-  
+
+
 
   useEffect(() => {
     const fetchMetalTypes = async () => {
@@ -113,48 +113,48 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, [name]: value };
-  
+
       if (name === "metal") {
         updatedDetails.purity = ""; // Reset purity when metal changes
         updatedDetails.purityPercentage = ""; // Reset purity percentage
       }
-  
+
       if (name === "purity" && value !== "Other") {
         updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
       } else if (name === "purityPercentage") {
         updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
       }
-  
+
       // Update calculations
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails, currentRate);
-  
+
       return updatedDetails;
     });
   };
-  
-  
-  
+
+
+
 
   const parsePurityToPercentage = (purity) => {
     if (!purity) return null;
 
-    const match = purity.match(/(\d+)(k|K)/);
+    // Match formats like "22K", "24k", "22kt", "22KT", "22"
+    const match = purity.match(/(\d+)(k|K|kt|KT)?/);
     if (match) {
-      const caratValue = parseInt(match[1], 10);
-      return (caratValue / 24) * 100; // Convert carats to percentage
+      const caratValue = parseInt(match[1], 10); // Extract carat number
+      if (caratValue) {
+        return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
+      }
     }
 
+    // Handle specific formats like "916HM" directly
     if (purity.toLowerCase() === "916hm") return 91.6;
 
-    // Handle numeric input for custom purity
-    const numericPurity = parseFloat(purity);
-    if (!isNaN(numericPurity)) return numericPurity;
-
-    return null;
+    return null; // Default if no match
   };
 
   const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
@@ -254,50 +254,53 @@ const OldSalesForm = ({ setOldSalesData }) => {
   //       oldDetails.purity === "18K" ? rates.rate_18crt :
   //         oldDetails.purity === "16K" ? rates.rate_16crt :
   //           "";
+  const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
+
   const currentRate =
-    oldDetails.purity === "24K" ? rates.rate_24crt :
-      oldDetails.purity === "22K" ? rates.rate_22crt :
-        oldDetails.purity === "18K" ? rates.rate_18crt :
-          oldDetails.purity === "16K" ? rates.rate_16crt :
+    normalizePurity(oldDetails.purity).includes("24") ? rates.rate_24crt :
+      normalizePurity(oldDetails.purity).includes("22") ? rates.rate_22crt :
+        normalizePurity(oldDetails.purity).includes("18") ? rates.rate_18crt :
+          normalizePurity(oldDetails.purity).includes("16") ? rates.rate_16crt :
             oldDetails.purity === "Other" ? rates.rate_22crt :  // Default to 22K rate when "Other" is selected
               "";
+
 
   return (
     <>
       <Row>
         <h4 className="mb-3">URD Purchase</h4>
-        <Col xs={12} md={4}>
+        <Col xs={12} md={3}>
           <InputField label="Product" name="product" value={oldDetails.product} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
-  <InputField
-    label="Metal"
-    name="metal"
-    type="select"
-    value={oldDetails.metal}
-    onChange={handleInputChange}
-    options={metalOptions.map((option) => ({
-      value: option.value,
-      label: option.label,
-    }))}
-  />
-</Col>
-<Col xs={12} md={3}>
-  <InputField
-    label="Purity"
-    type="select"
-    name="purity"
-    value={oldDetails.purity}
-    onChange={handleInputChange}
-    options={[
-      ...purityOptions.map((purity) => ({
-        value: purity.name, // Show the name column from matching purity rows
-        label: purity.name,
-      })),
-      { value: "Other", label: "Other" }, // Add static "Other" option
-    ]}
-  />
-</Col>
+          <InputField
+            label="Metal"
+            name="metal"
+            type="select"
+            value={oldDetails.metal}
+            onChange={handleInputChange}
+            options={metalOptions.map((option) => ({
+              value: option.value,
+              label: option.label,
+            }))}
+          />
+        </Col>
+        <Col xs={12} md={3}>
+          <InputField
+            label="Purity"
+            type="select"
+            name="purity"
+            value={oldDetails.purity}
+            onChange={handleInputChange}
+            options={[
+              ...purityOptions.map((purity) => ({
+                value: purity.name, // Show the name column from matching purity rows
+                label: purity.name,
+              })),
+              { value: "Other", label: "Other" }, // Add static "Other" option
+            ]}
+          />
+        </Col>
 
 
 
@@ -314,7 +317,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
           </Col>
         )}
 
-        <Col xs={12} md={2}>
+        <Col xs={12} md={3}>
           <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} readOnly />
         </Col>
         <Col xs={12} md={3}>
@@ -354,7 +357,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
           />
         </Col>
         <Col xs={12} md={2}>
-          <Button onClick={handleAddButtonClick} style={{backgroundColor:'rgb(163, 110, 41)',borderColor:'rgb(163, 110, 41)'}}>
+          <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)' }}>
             {editingRow ? "Update" : "Add"}
           </Button>
         </Col>
