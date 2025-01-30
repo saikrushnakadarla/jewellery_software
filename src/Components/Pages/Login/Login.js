@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import baseURL from "../../../Url/NodeBaseURL";
 import backgroundImage from './sadashribg-2.jpg';
 import googleImage from './Logo/google.png';
 import Swal from 'sweetalert2';
-
+import { AuthContext } from './Context';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -14,6 +14,7 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
+  const { login ,userId, userName} = useContext(AuthContext);
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -68,8 +69,10 @@ function Login() {
       const response = await axios.post(`${baseURL}/login`, { email, password });
   
       if (response.data.success) {
-        // Store the user's role in localStorage
-        localStorage.setItem('role', response.data.role); // Assuming the role is returned in the response
+        const { token, userId, role, fullName } = response.data; // Extract necessary values
+  
+        // Call the login function from context
+        login(token, userId, role, fullName);
   
         Swal.fire({
           title: 'Update Rates?',

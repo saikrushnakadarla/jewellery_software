@@ -60,7 +60,7 @@ import UserMaster from "./Components/Modules/Masters/UserMaster/UserMaster";
 import UserMasterTable from "./Components/Modules/Masters/UserMaster/UserMasterTable";
 import SubCategory from "./Components/Modules/Masters/SubCategory/SubCategory";
 import SubCategoryTable from "./Components/Modules/Masters/SubCategory/SubCategoryTable";
-
+import { AuthProvider } from "./Components/Pages/Login/Context";
 function App() {
   const location = useLocation();
 
@@ -69,6 +69,7 @@ function App() {
 
   return (
     <>
+    <AuthProvider>
       {!isAuthPage && <Navbar />}
       <Routes>
       <Route path="/" exact element={<Login />} />
@@ -138,7 +139,9 @@ function App() {
         <Route path="/subcategorytable" element={<SubCategoryTable />} />
         <Route path="/subcategory/:id" element={<SubCategory />} />
       </Routes>
+      </AuthProvider>
     </>
+   
   );
 }
 

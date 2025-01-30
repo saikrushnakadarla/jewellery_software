@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import Repairs from './Repairs';
@@ -14,6 +14,7 @@ import Receivables from './Receivables';
 import Payables from './Payables';
 import AmountBilledToday from './AmountBilledToday';
 import { Bar, Pie, Line } from 'react-chartjs-2';
+import { AuthContext } from "../Login/Context";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -40,6 +41,8 @@ ChartJS.register(
 );
 
 function Dashboard() {
+  const { authToken ,userId, userName} = useContext(AuthContext);
+  console.log(userId, userName)
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [selectedMobile, setSelectedMobile] = useState(null);
   const navigate = useNavigate();
@@ -92,7 +95,7 @@ function Dashboard() {
   return (
     <div className="main-container" style={{backgroundColor:'#b7721834'}}>
       <div className="dashboard-header">
-        <h2 style={{marginTop:"25px", marginLeft:"15px"}}>Dashboard</h2>
+        <h2 style={{marginTop:"25px", marginLeft:"15px"}}>Dashboard {userName}</h2>
         <CustomerDashboard onSelectCustomer={setSelectedMobile} />
       </div>
       <div className="dashboard-container">
