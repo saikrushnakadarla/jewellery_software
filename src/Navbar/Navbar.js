@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useContext} from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -6,6 +6,7 @@ import { FaSignOutAlt } from "react-icons/fa";
 import logo from './sadashri.png';
 // import logo from './jewels_logo.jpg';
 import './Navbar.css';
+import { AuthContext } from "../Components/Pages/Login/Context";
 import Swal from 'sweetalert2';
 
 function Navbar() {
@@ -14,7 +15,8 @@ function Navbar() {
   const [transactionsDropdownOpen, setTransactionsDropdownOpen] = useState(false);
   const [reportsDropdownOpen, setReportsDropdownOpen] = useState(false);
   const [utilityDropdownOpen, setUtilityDropdownOpen] = useState(false);
-
+   const { authToken ,userId, userName} = useContext(AuthContext);
+   console.log(userId, userName)
   const location = useLocation();  // Get the current location from React Router
   const navigate = useNavigate();
 
@@ -249,6 +251,9 @@ function Navbar() {
           </span>
         </div>
       </nav>
+      <div className='username'>
+{userName}
+      </div>
       <div className="navbar-logout">
       <button className="logout-button" onClick={handleLogout}>
         <FaSignOutAlt size={18} /> Logout

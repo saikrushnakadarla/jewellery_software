@@ -197,11 +197,19 @@
 }
 
 .path-heading {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
   color: #a36e29;
   margin-top: 15px;
-  margin-left: 10px;
+  margin-left: 0px;
+}
+
+.username{
+  margin-right: 115px;
+  margin-top: 5px;
+  font-size: 23px;
+  font-weight: bold;
+  color: rgb(163, 110, 41);
 }
 
   
