@@ -175,15 +175,23 @@ const SalesForm = () => {
   };
 
   // Add product to repair details
-  const handleAdd = () => {
-    setRepairDetails((prevDetails) => {
-      const updatedDetails = [...prevDetails, { ...formData }];
-      console.log("Updated repair details:", updatedDetails);
-      return updatedDetails;
-    });
-    resetProductFields();
-    alert("Product added successfully");
-  };
+ const handleAdd = () => {
+  setRepairDetails((prevDetails) => {
+    const updatedDetails = [
+      ...prevDetails,
+      { 
+        ...formData, 
+        product_image: formData.product_image ? URL.createObjectURL(formData.product_image) : "" 
+      },
+    ];
+    console.log("Updated repair details:", updatedDetails);
+    return updatedDetails;
+  });
+
+  resetProductFields();
+  alert("Product added successfully");
+};
+
 
   const handleEdit = (index) => {
     setEditIndex(index);

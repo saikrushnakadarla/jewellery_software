@@ -288,6 +288,24 @@ const ProductDetails = ({
             readOnly // Make this field read-only, since it’s auto-calculated
           />
         </Col>
+
+        <Col xs={12} md={1}>
+          <InputField
+            label="Discount %"
+            name="discount_percentage"
+            value={formData.discount_percentage || ""} // Display calculated Total MC
+            readOnly // Make this field read-only, since it’s auto-calculated
+          />
+        </Col>
+
+        <Col xs={12} md={2}>
+          <InputField
+            label="Total Discount"
+            name="discount"
+            value={formData.discount || ""} // Display calculated Total MC
+            readOnly // Make this field read-only, since it’s auto-calculated
+          />
+        </Col>
        
         <Col xs={12} md={1}>
           <InputField
@@ -329,7 +347,7 @@ const ProductDetails = ({
             label="Product Image"
             name="product_image"
             value={formData.product_image}
-            onChange={handleFileChange}
+            onChange={handleChange}
           />
         </Col>
 
