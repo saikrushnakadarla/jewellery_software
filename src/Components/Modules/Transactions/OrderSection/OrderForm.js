@@ -460,86 +460,91 @@ const SalesForm = () => {
   //     alert("Error saving data");
   //   }
   // };
-  
-  const handleSave = async () => {
-    // Include customer details in the data being saved
-    const dataToSave = {
-      repairDetails: repairDetails.map(item => ({
-        ...item,
-        customer_id: formData.customer_id,
-        mobile: formData.mobile,
-        account_name: formData.account_name,
-        email: formData.email,
-        address1: formData.address1,
-        address2: formData.address2,
-        city: formData.city,
-        pincode: formData.pincode,
-        state: formData.state,
-        state_code: formData.state_code,
-        aadhar_card: formData.aadhar_card,
-        gst_in: formData.gst_in,
-        pan_card: formData.pan_card,
-        terms: formData.terms,
-        cash_amount: paymentDetails.cash_amount || 0,
-        card_amount: paymentDetails.card || 0,
-        card_amt: paymentDetails.card_amt || 0,
-        chq: paymentDetails.chq || "",
-        chq_amt: paymentDetails.chq_amt || 0,
-        online: paymentDetails.online || "",
-        online_amt: paymentDetails.online_amt || 0,
-      })),
-      oldItems: oldSalesData,
-      memberSchemes: schemeSalesData,
-      oldItemsAmount: oldItemsAmount || 0, // Explicitly include value
-      schemeAmount: schemeAmount || 0,    // Explicitly include value
-    };
 
-    console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
+const handleSave = async () => {
+  // Validate required customer details before saving
+  if (!formData.customer_id || !formData.account_name || !formData.mobile || !formData.email) {
+    alert("Please fill in all required customer details before saving.");
+    return;
+  }
 
-    console.log("Saving data:", dataToSave);
-
-    try {
-      await axios.post(`${baseURL}/save-repair-details`, dataToSave);
-      alert("Sales added successfully");
-
-      // Generate PDF Blob
-      const pdfDoc = (
-        <PDFLayout
-          formData={formData}
-          repairDetails={repairDetails}
-          cash_amount={paymentDetails.cash_amount || 0}
-          card_amt={paymentDetails.card_amt || 0}
-          chq_amt={paymentDetails.chq_amt || 0}
-          online_amt={paymentDetails.online_amt || 0}
-          taxAmount={taxAmount}
-          oldItemsAmount={oldItemsAmount}
-          schemeAmount={schemeAmount}
-          netPayableAmount={netPayableAmount}
-        />
-      );
-
-      const pdfBlob = await pdf(pdfDoc).toBlob();
-
-      // Create a download link and trigger it
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(pdfBlob);
-      link.download = `invoice-${formData.invoice_number}.pdf`;
-      link.click();
-
-      // Clean up
-      URL.revokeObjectURL(link.href);
-
-      // Clear all data after saving
-      clearData();
-
-      // Reset the form and reload the page if necessary
-      resetForm();
-      window.location.reload();
-    } catch (error) {
-      console.error("Error saving data:", error);
-      alert("Error saving data");
-    }
+  // Include customer details in the data being saved
+  const dataToSave = {
+    repairDetails: repairDetails.map(item => ({
+      ...item,
+      customer_id: formData.customer_id,
+      mobile: formData.mobile,
+      account_name: formData.account_name,
+      email: formData.email,
+      address1: formData.address1,
+      address2: formData.address2,
+      city: formData.city,
+      pincode: formData.pincode,
+      state: formData.state,
+      state_code: formData.state_code,
+      aadhar_card: formData.aadhar_card,
+      gst_in: formData.gst_in,
+      pan_card: formData.pan_card,
+      terms: formData.terms,
+      cash_amount: paymentDetails.cash_amount || 0,
+      card_amount: paymentDetails.card || 0,
+      card_amt: paymentDetails.card_amt || 0,
+      chq: paymentDetails.chq || "",
+      chq_amt: paymentDetails.chq_amt || 0,
+      online: paymentDetails.online || "",
+      online_amt: paymentDetails.online_amt || 0,
+    })),
+    oldItems: oldSalesData,
+    memberSchemes: schemeSalesData,
+    oldItemsAmount: oldItemsAmount || 0, 
+    schemeAmount: schemeAmount || 0,    
   };
+
+  console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
+
+  try {
+    await axios.post(`${baseURL}/save-repair-details`, dataToSave);
+    alert("Order added successfully");
+
+    // Generate PDF Blob
+    const pdfDoc = (
+      <PDFLayout
+        formData={formData}
+        repairDetails={repairDetails}
+        cash_amount={paymentDetails.cash_amount || 0}
+        card_amt={paymentDetails.card_amt || 0}
+        chq_amt={paymentDetails.chq_amt || 0}
+        online_amt={paymentDetails.online_amt || 0}
+        taxAmount={taxAmount}
+        oldItemsAmount={oldItemsAmount}
+        schemeAmount={schemeAmount}
+        netPayableAmount={netPayableAmount}
+      />
+    );
+
+    const pdfBlob = await pdf(pdfDoc).toBlob();
+
+    // Create a download link and trigger it
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(pdfBlob);
+    link.download = `invoice-${formData.invoice_number}.pdf`;
+    link.click();
+
+    // Clean up
+    URL.revokeObjectURL(link.href);
+
+    // Clear all data after saving
+    clearData();
+
+    // Reset the form and reload the page if necessary
+    resetForm();
+    window.location.reload();
+  } catch (error) {
+    console.error("Error saving data:", error);
+    alert("Error saving data");
+  }
+};
+
 
   return (
     <div className="main-container">

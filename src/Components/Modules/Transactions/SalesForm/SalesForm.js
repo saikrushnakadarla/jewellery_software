@@ -446,6 +446,11 @@ const SalesForm = () => {
 
   const handleSave = async () => {
     // Include customer details in the data being saved
+     // Validate required customer details before saving
+  if (!formData.customer_id || !formData.account_name || !formData.mobile || !formData.email) {
+    alert("Please fill in all required customer details before saving.");
+    return;
+  }
     const dataToSave = {
       repairDetails: repairDetails.map(item => ({
         ...item,
