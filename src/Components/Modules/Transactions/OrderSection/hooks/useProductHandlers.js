@@ -258,7 +258,7 @@ const useProductHandlers = () => {
     return; // Exit early to avoid unnecessary updates
   }
 
-
+    
     // Preserve the current barcode
     const currentBarcode = formData.code;
 
@@ -324,6 +324,18 @@ const useProductHandlers = () => {
         making_charges: totalMC.toFixed(2),
       }));
     }
+
+      // Handle discount calculation
+      if (name === "disscount_percentage") {
+        const discountPercentage = parseFloat(value) || 0;
+        const rateAmount = parseFloat(formData.rate_amt) || 0;
+        const discountAmount = (discountPercentage / 100) * rateAmount;
+    
+        updatedFormData.disscount = discountAmount.toFixed(2);
+      }
+      
+        setFormData(updatedFormData);
+
 
     // Destructure relevant fields
     const { product_name, metal_type, design_name, purity } = updatedFormData;

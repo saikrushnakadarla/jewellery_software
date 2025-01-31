@@ -289,21 +289,21 @@ const ProductDetails = ({
           />
         </Col>
 
-        <Col xs={12} md={1}>
+        <Col xs={12} md={2}>
           <InputField
-            label="Discount %"
-            name="discount_percentage"
-            value={formData.discount_percentage || ""} // Display calculated Total MC
-            readOnly // Make this field read-only, since it’s auto-calculated
+            label="Disscount %"
+            name="disscount_percentage"
+            value={formData.disscount_percentage || ""} // Display calculated Total MC
+            onChange={handleChange}
           />
         </Col>
 
         <Col xs={12} md={2}>
           <InputField
-            label="Total Discount"
-            name="discount"
-            value={formData.discount || ""} // Display calculated Total MC
-            readOnly // Make this field read-only, since it’s auto-calculated
+            label="Total Disscount"
+            name="disscount"
+            value={formData.disscount || ""} // Display calculated Total MC
+            onChange={handleChange}
           />
         </Col>
        

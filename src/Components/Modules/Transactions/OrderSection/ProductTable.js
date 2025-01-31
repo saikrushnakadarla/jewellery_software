@@ -33,13 +33,15 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
           <th>Making Charges On</th>
           <th>MC Per Gram</th>
           <th>Making Charges</th>
+          <th>Discount %</th>
+          <th>Discount Amount</th>
           <th>Rate</th>
           <th>Rate Amount</th>
           <th>Tax %</th>
           <th>Tax Amount</th>
           <th>Total Price</th>
           <th>image</th>
-          <th>Action</th> {/* Add Action column for delete */}
+          <th>Actions</th> {/* Add Action column for delete */}
         </tr>
       </thead>
       <tbody>
@@ -63,6 +65,8 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
               <td>{detail.mc_on}</td>
               <td>{detail.mc_per_gram}</td>
               <td>{detail.making_charges}</td>
+              <td>{detail.disscount_percentage}</td>
+              <td>{detail.disscount}</td>
               <td>{detail.rate}</td>
               <td>{detail.rate_amt}</td>
               <td>{detail.tax_percent}</td>
