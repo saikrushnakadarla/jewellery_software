@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useContext } from "react";
 import "./Repairs.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
@@ -9,6 +9,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import PDFContent from "./RepairInvoice";
+import { AuthContext } from "../../../Pages/Login/Context";
 
 const RepairForm = () => {
   const today = new Date(); // Define today as a Date object
@@ -21,6 +22,8 @@ const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
+  const { authToken, userId, userName } = useContext(AuthContext);
+  console.log(userId, userName)
   console.log("ID=",id)
   const { state } = useLocation();
   const { mobile } = location.state || {};
@@ -34,7 +37,7 @@ const RepairForm = () => {
     address2: "",
     address3: "",
     city: "",
-    staff: "",
+    staff: userName,
     delivery_date: formattedDate,
     place: "",
     metal: "",
@@ -448,7 +451,7 @@ const RepairForm = () => {
           </div>
           <Row className="form-section pt-4">
             <Col xs={12} md={2}>
-              <InputField label="Staff:" name="staff" value={formData.staff} onChange={handleChange} />
+              <InputField label="Staff:" name="staff" value={formData.staff} onChange={handleChange} readOnly/>
             </Col>
             <Col xs={12} md={2}>
               <InputField label="Delivery Date:" type="date" name="delivery_date" value={formData.delivery_date} onChange={handleChange} />

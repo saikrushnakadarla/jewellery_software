@@ -554,7 +554,7 @@ const useProductHandlers = () => {
   useEffect(() => {
     if (formData.category) {
       axios
-        .get("http://localhost:5000/subcategory")
+        .get(`${baseURL}/subcategory`)
         .then((response) => {
           // Log the raw response to inspect its structure
           console.log("API Response:", response.data);
@@ -592,7 +592,7 @@ const useProductHandlers = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/get/products');
+        const response = await fetch(`${baseURL}/get/products`);
         const data = await response.json();
 
         // Extract unique categories (metal types) from the data
@@ -618,7 +618,7 @@ const useProductHandlers = () => {
   useEffect(() => {
     const fetchPurity = async () => {
       try {
-        const response = await fetch('http://localhost:5000/purity');
+        const response = await fetch(`${baseURL}/purity`);
         const data = await response.json();
 
         // Filter the data based on the formData.metal_type

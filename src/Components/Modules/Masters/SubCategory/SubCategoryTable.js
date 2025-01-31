@@ -4,6 +4,7 @@ import DataTable from "../../../Pages/InputField/TableLayout"; // Import the reu
 import { Button, Row, Col } from "react-bootstrap";
 import Swal from "sweetalert2"; // Import SweetAlert2
 import { FaEdit, FaTrash } from "react-icons/fa";
+import baseURL from '../../../../Url/NodeBaseURL';
 
 const SubCategoryTable = () => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const SubCategoryTable = () => {
 
               if (result.isConfirmed) {
                 // Send DELETE request to the server
-                const response = await fetch(`http://localhost:5000/subcategory/${subcategory_id}`, {
+                const response = await fetch(`${baseURL}/subcategory/${subcategory_id}`, {
                   method: "DELETE", // HTTP DELETE method
                   headers: {
                     "Content-Type": "application/json",
@@ -102,7 +103,7 @@ const SubCategoryTable = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/subcategory"); // Use the correct API endpoint
+        const response = await fetch(`${baseURL}/subcategory`); // Use the correct API endpoint
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }

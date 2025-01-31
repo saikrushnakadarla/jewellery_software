@@ -128,7 +128,7 @@ const handleOpenModal = (data) => {
               Tag Entry
             </button>
             <FaEdit
-              style={{ cursor: 'pointer', color: '#0056b3' }}
+              style={{ cursor: 'pointer', color: 'blue' }}
               onClick={() => handleOpenUpdateModal(row.original)} // Use the new function for update
             />
             <FaTrash
