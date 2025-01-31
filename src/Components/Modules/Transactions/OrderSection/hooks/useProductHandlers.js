@@ -246,6 +246,19 @@ const useProductHandlers = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+     // Handle file input separately
+  if (e.target.type === "file") {
+    const selectedFile = e.target.files[0]; // Ensure files exist
+    if (selectedFile) {
+      setFormData((prevData) => ({
+        ...prevData,
+        product_image: selectedFile, // Store the File object
+      }));
+    }
+    return; // Exit early to avoid unnecessary updates
+  }
+
+
     // Preserve the current barcode
     const currentBarcode = formData.code;
 

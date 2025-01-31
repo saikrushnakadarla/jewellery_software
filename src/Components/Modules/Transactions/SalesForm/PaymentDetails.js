@@ -14,6 +14,8 @@ const PaymentDetails = ({
   schemeSalesData,
   oldSalesData,
   taxableAmount,
+  discountAmt,
+  totalAmount,
   taxAmount,
   oldItemsAmount,
   schemeAmount,
@@ -59,6 +61,14 @@ const PaymentDetails = ({
         <Row>
           <h4 className="mb-3">Summary</h4>
           <Table bordered hover responsive>
+          <tr>
+              <td colSpan="20" className="text-right">Total Amount</td>
+              <td colSpan="4">{totalAmount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan="20" className="text-right">Discount Amount</td>
+              <td colSpan="4">{discountAmt.toFixed(2)}</td>
+            </tr>
             <tr>
               <td colSpan="20" className="text-right">Taxable Amount</td>
               <td colSpan="4">{taxableAmount.toFixed(2)}</td>

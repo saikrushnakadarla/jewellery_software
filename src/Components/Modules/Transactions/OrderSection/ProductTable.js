@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
+const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
@@ -71,29 +71,30 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
               <td>
                 {detail.product_image ? (
                   <img
-                    src={detail.product_image instanceof File ? URL.createObjectURL(detail.product_image) : detail.product_image}
+                    src={detail.product_image} // Directly use the stored URL
                     alt="Product"
                     style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'placeholder-image-url.jpg'; // Add a placeholder image URL
+                      e.target.src = 'placeholder-image-url.jpg'; // Placeholder in case of error
                     }}
                   />
                 ) : (
                   'No Image'
                 )}
               </td>
+
               <td>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FaEdit                  
+                  <FaEdit
                     onClick={() => onEdit(index)}
                     style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue' }}
-                  />                
-                  <FaTrash 
+                  />
+                  <FaTrash
                     style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
                     onClick={() => onDelete(index)}
-                  /> 
-                </div> 
+                  />
+                </div>
               </td>
             </tr>
           ))

@@ -54,6 +54,8 @@ const useProductHandlers = () => {
     wastage_weight: "",
     total_weight_av: "",
     mc_on: "MC %",
+    disscount_percentage: "",
+    disscount: "",
     mc_per_gram: "",
     making_charges: "",
     rate: "",
@@ -312,6 +314,17 @@ const handleChange = (e) => {
     }));
   }
 
+     // Handle discount calculation
+  if (name === "disscount_percentage") {
+    const discountPercentage = parseFloat(value) || 0;
+    const rateAmount = parseFloat(formData.rate_amt) || 0;
+    const discountAmount = (discountPercentage / 100) * rateAmount;
+
+    updatedFormData.disscount = discountAmount.toFixed(2);
+  }
+  
+    setFormData(updatedFormData);
+
   // Destructure relevant fields
   const { product_name, metal_type, design_name, purity } = updatedFormData;
 
@@ -362,6 +375,8 @@ const handleChange = (e) => {
             mc_on: "",
             mc_per_gram: "",
             making_charges: "",
+            disscount_percentage: "",
+            disscount: "",
             rate: "",
             rate_amt: "",
             tax_percent: "",
@@ -396,6 +411,8 @@ const handleChange = (e) => {
           mc_on: matchingEntry.Making_Charges_On || "",
           mc_per_gram: matchingEntry.MC_Per_Gram || "",
           making_charges: matchingEntry.Making_Charges || "",
+          disscount_percentage: matchingEntry.disscount_percentage || "",
+          disscount: matchingEntry.disscount || "",
           rate: matchingEntry.rate || "",
           tax_percent: productDetails?.tax_slab || "",
           qty: 1,
