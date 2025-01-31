@@ -1,4 +1,4 @@
-import React, { useState , useContext} from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -15,8 +15,8 @@ function Navbar() {
   const [transactionsDropdownOpen, setTransactionsDropdownOpen] = useState(false);
   const [reportsDropdownOpen, setReportsDropdownOpen] = useState(false);
   const [utilityDropdownOpen, setUtilityDropdownOpen] = useState(false);
-   const { authToken ,userId, userName} = useContext(AuthContext);
-   console.log(userId, userName)
+  const { authToken, userId, userName } = useContext(AuthContext);
+  console.log(userId, userName)
   const location = useLocation();  // Get the current location from React Router
   const navigate = useNavigate();
 
@@ -79,7 +79,7 @@ function Navbar() {
   return (
     <header className="navbar-header">
       <div className="navbar-brand">
-      <img src={logo} alt="Logo" className="" style={{ width: "200px" }} />
+        <img src={logo} alt="Logo" className="" style={{ width: "200px" }} />
       </div>
 
       <div
@@ -92,21 +92,21 @@ function Navbar() {
       </div>
 
       <nav className={`navbar-links ${isOpen ? 'open' : ''}`}>
-      <div>
-      <span>
-        <Link
-          to="/dashboard"
-          onClick={handleItemClick}
-          style={{
-            color: window.location.pathname === '/dashboard' ? '#a36e29' : 'black',
-            backgroundColor: 'transparent',
-            textDecoration: 'none',
-          }}
-        >
-          DASHBOARD
-        </Link>
-      </span>
-    </div>
+        <div>
+          <span>
+            <Link
+              to="/dashboard"
+              onClick={handleItemClick}
+              style={{
+                color: window.location.pathname === '/dashboard' ? '#a36e29' : 'black',
+                backgroundColor: 'transparent',
+                textDecoration: 'none',
+              }}
+            >
+              DASHBOARD
+            </Link>
+          </span>
+        </div>
         <div
           className="navbar-dropdown"
           onMouseEnter={() => toggleDropdown('masters')}
@@ -126,19 +126,19 @@ function Navbar() {
                   User_Master
                 </Link>
               )}
-              <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable')}>Customer_Master</Link>
-              <Link to="/suppliertable" onClick={handleItemClick} className={isActive('/suppliertable')}>Supplier_Master</Link>
-              <Link to="/itemmastertable" onClick={handleItemClick} className={isActive('/itemmastertable')}>Category Master</Link>
-              <Link to="/subcategorytable" onClick={handleItemClick} className={isActive('/subcategorytable')}>Sub Category Master</Link>
+              <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable') || isActive('/customermaster')}>Customer_Master</Link>
+              <Link to="/suppliertable" onClick={handleItemClick} className={isActive('/suppliertable') || isActive('/suppliermaster')}>Supplier_Master</Link>
+              <Link to="/itemmastertable" onClick={handleItemClick} className={isActive('/itemmastertable') || isActive('/itemmaster')}>Category Master</Link>
+              <Link to="/subcategorytable" onClick={handleItemClick} className={isActive('/subcategorytable') || isActive('/subcategory')}>Sub Category Master</Link>
               <Link to="/purity" onClick={handleItemClick} className={isActive('/purity')}>Purity</Link>
               <Link to="/metaltype" onClick={handleItemClick} className={isActive('/metaltype')}>Metal Type</Link>
               <Link to="/designmaster" onClick={handleItemClick} className={isActive('/designmaster')}>Design Master</Link>
-              <Link to="/accountstable" onClick={handleItemClick} className={isActive('/accountstable')}>Accounts</Link>
-              <Link to="/workerstable" onClick={handleItemClick} className={isActive('/workerstable')}>Worker_Master</Link>
+              <Link to="/accountstable" onClick={handleItemClick} className={isActive('/accountstable') || isActive('/accounts')}>Accounts</Link>
+              <Link to="/workerstable" onClick={handleItemClick} className={isActive('/workerstable') || isActive('/workermaster')}>Worker_Master</Link>
               <Link to="/rates" onClick={handleItemClick} className={isActive('/rates')}>Rates</Link>
               <Link to="/company_info" onClick={handleItemClick} className={isActive('/company_info')}>Company Info</Link>
 
-              
+
 
             </div>
           )}
@@ -160,18 +160,18 @@ function Navbar() {
           {transactionsDropdownOpen && (
             <div className="navbar-dropdown-content">
 
-              <Link to="/salestable" onClick={handleItemClick} className={isActive('/salestable')}>Sales</Link>
+              <Link to="/salestable" onClick={handleItemClick} className={isActive('/salestable') || isActive('/sales')}>Sales</Link>
               <Link to="/salesreturn" onClick={handleItemClick} className={isActive('/salesreturn')}>Sales Return</Link>
-              <Link to="/estimatetable" onClick={handleItemClick} className={isActive('/estimatetable')}>Estimate</Link>
+              <Link to="/estimatetable" onClick={handleItemClick} className={isActive('/estimatetable') || isActive('/estimates')}>Estimate</Link>
               <Link to="/stockEntryTable" onClick={handleItemClick} className={isActive('/stockEntryTable')}>Stock</Link>
-              <Link to="/paymentstable" onClick={handleItemClick} className={isActive('/paymentstable')}>Payments</Link>
-              <Link to="/receiptstable" onClick={handleItemClick} className={isActive('/receiptstable')}>Receipts</Link>
-              <Link to="/purchasetable" onClick={handleItemClick} className={isActive('/purchasetable')}>Purchase</Link>
-              <Link to="/repairstable" onClick={handleItemClick} className={isActive('/repairstable')}>Repairs</Link>
-              <Link to="/orderstable" onClick={handleItemClick} className={isActive('/orderstable')}>Orders</Link>
-              <Link to="/urdpurchasetable" onClick={handleItemClick} className={isActive('/urdpurchasetable')}>URD Purchase</Link>
-              
-             
+              <Link to="/paymentstable" onClick={handleItemClick} className={isActive('/paymentstable') || isActive('/payments')}>Payments</Link>
+              <Link to="/receiptstable" onClick={handleItemClick} className={isActive('/receiptstable') || isActive('/receipts')}>Receipts</Link>
+              <Link to="/purchasetable" onClick={handleItemClick} className={isActive('/purchasetable') || isActive('/purchase')}>Purchase</Link>
+              <Link to="/repairstable" onClick={handleItemClick} className={isActive('/repairstable') || isActive('/repairs')}>Repairs</Link>
+              <Link to="/orderstable" onClick={handleItemClick} className={isActive('/orderstable') || isActive('/orders')}>Orders</Link>
+              <Link to="/urdpurchasetable" onClick={handleItemClick} className={isActive('/urdpurchasetable') || isActive('/urd_purchase')}>URD Purchase</Link>
+
+
 
             </div>
           )}
@@ -226,7 +226,7 @@ function Navbar() {
 
         <div>
           <span>
-            {(location.pathname === '/sales' || location.pathname === '/salestable')  && <h1 className="path-heading">SALES</h1>}
+            {(location.pathname === '/sales' || location.pathname === '/salestable') && <h1 className="path-heading">SALES</h1>}
             {(location.pathname === '/purchase' || location.pathname === '/purchasetable') && <h1 className="path-heading">PURCHASE</h1>}
             {(location.pathname === '/subcategory' || location.pathname === '/subcategorytable') && <h1 className="path-heading">SUB CATEGORY</h1>}
             {location.pathname === '/salesreturn' && <h1 className="path-heading">SALES RETURN</h1>}
@@ -247,18 +247,18 @@ function Navbar() {
             {location.pathname === '/rates' && <h1 className="path-heading">RATES</h1>}
             {location.pathname === '/company_info' && <h1 className="path-heading">COMPANY INFO</h1>}
             {location.pathname === '/stockEntryTable' && <h1 className="path-heading">STOCK</h1>}
-
+            {(location.pathname === '/usertable' || location.pathname === '/usermaster') && <h1 className="path-heading">USER</h1>}
           </span>
         </div>
       </nav>
       <div className='username'>
-{userName}
+        {userName}
       </div>
       <div className="navbar-logout">
-      <button className="logout-button" onClick={handleLogout}>
-        <FaSignOutAlt size={18} /> Logout
-      </button>
-    </div>
+        <button className="logout-button" onClick={handleLogout}>
+          <FaSignOutAlt size={18} /> Logout
+        </button>
+      </div>
     </header>
   );
 }

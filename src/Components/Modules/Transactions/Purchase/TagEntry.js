@@ -257,7 +257,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                         ? "MC / Gram" // Default to "MC / Gram" for silver
                         : prevData.Making_Charges_On,
                 MC_Per_Gram_Label: isGoldCategory
-                    ? "MC Percentage"
+                    ? "MC %"
                     : "MC Per Gram",
                 showMCField: isGoldCategory ? false : prevData.showMCField,
             }));
@@ -268,7 +268,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             setFormData((prevData) => ({
                 ...prevData,
                 Making_Charges_On: value,
-                MC_Per_Gram_Label: value === "MC %" ? "MC Percentage" : "MC Per Gram",
+                MC_Per_Gram_Label: value === "MC %" ? "MC %" : "MC Per Gram",
                 showMCField: shouldShowMCField,
                 MC_Per_Gram: "",
                 Making_Charges: "",
@@ -457,7 +457,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             //     added_at: new Date().toISOString(),
             // });
 
-            alert("Data and updated values saved successfully!");
+            alert("Stock added successfully!");
 
             fetchData();
 
@@ -957,7 +957,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                     </Col>
                                     <Col xs={12} md={2}>
                                         <InputField
-                                            label="Wastage Weight"
+                                            label="W.Wt"
                                             name="WastageWeight"
                                             value={formData.WastageWeight}
                                             onChange={handleChange}

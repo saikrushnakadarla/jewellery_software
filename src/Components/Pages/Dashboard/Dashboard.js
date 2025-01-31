@@ -95,7 +95,7 @@ function Dashboard() {
   return (
     <div className="main-container" style={{backgroundColor:'#b7721834'}}>
       <div className="dashboard-header">
-        <h2 style={{marginTop:"25px", marginLeft:"15px"}}>Dashboard {userName}</h2>
+        <h2 style={{marginTop:"25px", marginLeft:"15px"}}>Dashboard</h2>
         <CustomerDashboard onSelectCustomer={setSelectedMobile} />
       </div>
       <div className="dashboard-container">
