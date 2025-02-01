@@ -516,6 +516,7 @@ const handleAdd = () => {
           chq_amt={paymentDetails.chq_amt || 0}
           online_amt={paymentDetails.online_amt || 0}
           taxAmount={taxAmount}
+          discountAmt={discountAmt}
           oldItemsAmount={oldItemsAmount}
           schemeAmount={schemeAmount}
           netPayableAmount={netPayableAmount}

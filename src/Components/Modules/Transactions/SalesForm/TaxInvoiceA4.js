@@ -213,6 +213,7 @@ const TaxINVoiceReceipt = ({
         formData,
         repairDetails,
         cash_amount,
+        discountAmt,
         card_amt,
         chq_amt,
         online_amt,
@@ -526,10 +527,7 @@ const TaxINVoiceReceipt = ({
 
                                                         {/* {repairDetails.map((item, index) => ( */}
                                                         <View style={{ paddingRight: 10, marginTop: 5 }}>
-                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text>Discount:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>0</Text>
-                                                                </View>
+
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>GST Value:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
@@ -558,8 +556,8 @@ const TaxINVoiceReceipt = ({
 
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text>(-) Discount Amount:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>{oldItemsAmount.toFixed(2)}</Text>
+                                                                        <Text>(-) Discount:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{discountAmt.toFixed(2)}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>(-) OLD:</Text>
@@ -572,9 +570,10 @@ const TaxINVoiceReceipt = ({
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text style={[styles.bold]}>Net Amount:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {netPayableAmount.toFixed(2)}
+                                                                                {Math.round(netPayableAmount.toFixed(2))}
                                                                         </Text>
                                                                 </View>
+
                                                         </View>
 
 
