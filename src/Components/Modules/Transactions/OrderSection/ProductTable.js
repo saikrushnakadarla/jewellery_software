@@ -2,14 +2,14 @@ import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
-  const taxableAmount = repairDetails.reduce((sum, item) => {
+const ProductTable = ({ orderDetails, onDelete, onEdit }) => {
+  const taxableAmount = orderDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
     return sum + stonePrice + makingCharges + rateAmt;
   }, 0);
-  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  const taxAmount = orderDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
 
   return (
@@ -45,11 +45,11 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
         </tr>
       </thead>
       <tbody>
-        {repairDetails.length > 0 ? (
-          repairDetails.map((detail, index) => (
+        {orderDetails.length > 0 ? (
+          orderDetails.map((detail, index) => (
             <tr key={index}>
               <td>{detail.date}</td>
-              <td>{detail.invoice_number}</td>
+              <td>{detail.order_number}</td>
               <td>{detail.product_name}</td>
               <td>{detail.metal_type}</td>
               <td>{detail.design_name}</td>

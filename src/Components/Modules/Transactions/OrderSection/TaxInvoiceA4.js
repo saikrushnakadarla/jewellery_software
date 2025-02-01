@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
 
 const TaxINVoiceReceipt = ({
         formData,
-        repairDetails,
+        orderDetails,
         cash_amount,
         card_amt,
         chq_amt,
@@ -222,7 +222,7 @@ const TaxINVoiceReceipt = ({
         netPayableAmount,
       }) => {
         // Calculate total values
-        const totalValues = repairDetails.reduce(
+        const totalValues = orderDetails.reduce(
                 (totals, item) => {
                         return {
                                 qty: totals.qty + Number(item.qty || 0),
@@ -399,7 +399,7 @@ const TaxINVoiceReceipt = ({
                                                         <View style={styles.horizontalLine} />
 
                                                         {/* Add rows of data below */}
-                                                        {repairDetails.map((item, index) => (
+                                                        {orderDetails.map((item, index) => (
                                                                 <View style={[styles.tableRow, { fontFamily: 'Times-Roman' }]} key={index}>
                                                                         <Text style={[styles.tableCell, styles.tableCellHeader]}>{index + 1}</Text>
                                                                         <View style={[styles.divider1, { marginTop: -2 }]} />
@@ -520,7 +520,7 @@ const TaxINVoiceReceipt = ({
                                                         </View>
 
                                                         
-                                                        {/* {repairDetails.map((item, index) => ( */}
+                                                        {/* {orderDetails.map((item, index) => ( */}
                                                         <View style={{ paddingRight: 10, marginTop: 5 }}>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>Discount:</Text>

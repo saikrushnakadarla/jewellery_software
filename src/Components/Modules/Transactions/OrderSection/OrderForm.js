@@ -41,8 +41,8 @@ const SalesForm = () => {
     localStorage.setItem('schemeSalesData', JSON.stringify(schemeSalesData));
   }, [schemeSalesData]);
 
-  const [repairDetails, setRepairDetails] = useState(
-    JSON.parse(localStorage.getItem('repairDetails')) || []
+  const [orderDetails, setOrderDetails] = useState(
+    JSON.parse(localStorage.getItem('orderDetails')) || []
   );
 
   const [paymentDetails, setPaymentDetails] = useState(
@@ -104,8 +104,8 @@ const SalesForm = () => {
   useEffect(() => {
     const fetchLastInvoiceNumber = async () => {
       try {
-        const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
-        setFormData(prev => ({ ...prev, invoice_number: response.data.lastInvoiceNumber }));
+        const response = await axios.get(`${baseURL}/lastOrderNumber`);
+        setFormData(prev => ({ ...prev, order_number: response.data.lastOrderNumber }));
       } catch (error) {
         console.error("Error fetching invoice number:", error);
       }
@@ -114,10 +114,10 @@ const SalesForm = () => {
     fetchLastInvoiceNumber();
   }, []);
 
-  // Save data to localStorage whenever repairDetails or paymentDetails change
+  // Save data to localStorage whenever orderDetails or paymentDetails change
   useEffect(() => {
-    localStorage.setItem('repairDetails', JSON.stringify(repairDetails));
-  }, [repairDetails]);
+    localStorage.setItem('orderDetails', JSON.stringify(orderDetails));
+  }, [orderDetails]);
 
   useEffect(() => {
     localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
@@ -176,7 +176,7 @@ const SalesForm = () => {
 
   // Add product to repair details
   const handleAdd = () => {
-    setRepairDetails((prevDetails) => {
+    setOrderDetails((prevDetails) => {
       const updatedDetails = [
         ...prevDetails,
         { 
@@ -194,21 +194,21 @@ const SalesForm = () => {
 
   const handleEdit = (index) => {
     setEditIndex(index);
-    setFormData(repairDetails[index]); // Populate form with selected item
+    setFormData(orderDetails[index]); // Populate form with selected item
   };
 
   const handleUpdate = () => {
-    const updatedDetails = repairDetails.map((item, index) =>
+    const updatedDetails = orderDetails.map((item, index) =>
       index === editIndex ? { ...formData } : item
     );
-    setRepairDetails(updatedDetails);
+    setOrderDetails(updatedDetails);
     setEditIndex(null);
     resetProductFields();
   };
 
   const handleDelete = (indexToDelete) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
-      setRepairDetails(repairDetails.filter((_, index) => index !== indexToDelete));
+      setOrderDetails(orderDetails.filter((_, index) => index !== indexToDelete));
       alert("Product deleted successfully");
     }
   };
@@ -246,8 +246,8 @@ const SalesForm = () => {
     }));
   };
 
-  // Calculate totalPrice (sum of total_price from all repairDetails)
-  const totalPrice = repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
+  // Calculate totalPrice (sum of total_price from all orderDetails)
+  const totalPrice = orderDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
   const [oldTableData, setOldTableData] = useState(() => {
     const savedData = localStorage.getItem('oldTableData');
@@ -275,7 +275,7 @@ const SalesForm = () => {
       gst_in: "",
       pan_card: "",
       date: "",
-      invoice_number: "",
+      order_number: "",
     });
     setPaymentDetails({
       cash_amount: 0,
@@ -295,7 +295,7 @@ const SalesForm = () => {
     navigate("/customermaster", { state: { from: "/sales" } });
   };
 
-  const taxableAmount = repairDetails.reduce((sum, item) => {
+  const taxableAmount = orderDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
@@ -304,11 +304,11 @@ const SalesForm = () => {
   }, 0);
   console.log("Total Price=", taxableAmount);
 
-  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  const taxAmount = orderDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
   console.log("Net Amount=", netAmount);
 
-  const totalAmount = repairDetails.reduce((sum, item) => {
+  const totalAmount = orderDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
@@ -316,7 +316,7 @@ const SalesForm = () => {
   }, 0);
   console.log("Total Price=", totalAmount);
 
-  const discountAmt = repairDetails.reduce((sum, item) => {
+  const discountAmt = orderDetails.reduce((sum, item) => {
     const discountAmt = parseFloat(item.disscount) || 0;
     return sum + discountAmt;
   }, 0);
@@ -342,7 +342,7 @@ const SalesForm = () => {
   const clearData = () => {
     setOldSalesData([]);
     setSchemeSalesData([]);
-    setRepairDetails([]);
+    setOrderDetails([]);
     setPaymentDetails({
       cash_amount: 0,
       card_amt: 0,
@@ -355,7 +355,7 @@ const SalesForm = () => {
     setSchemeTableData([]);
     localStorage.removeItem('oldSalesData');
     localStorage.removeItem('schemeSalesData');
-    localStorage.removeItem('repairDetails');
+    localStorage.removeItem('orderDetails');
     localStorage.removeItem('paymentDetails');
     localStorage.removeItem('oldTableData'); // Explicitly remove oldTableData from local storage
     localStorage.removeItem('schemeTableData'); // Explicitly remove oldTableData from local storage
@@ -383,7 +383,7 @@ const SalesForm = () => {
   //   formDataToSend.append('pan_card', formData.pan_card);
 
   //   // Append repair details
-  //   const repairDetailsWithPayment = repairDetails.map(item => ({
+  //   const repairDetailsWithPayment = orderDetails.map(item => ({
   //     ...item,
   //     cash_amount: paymentDetails.cash_amount || 0,
   //     card_amount: paymentDetails.card || 0,
@@ -394,12 +394,12 @@ const SalesForm = () => {
   //     online_amt: paymentDetails.online_amt || 0,
   //   }));
 
-  //   formDataToSend.append('repairDetails', JSON.stringify(repairDetailsWithPayment));
+  //   formDataToSend.append('orderDetails', JSON.stringify(repairDetailsWithPayment));
   //   formDataToSend.append('oldItems', JSON.stringify(oldSalesData));
   //   formDataToSend.append('memberSchemes', JSON.stringify(schemeSalesData));
 
   //   // Append each product image
-  //   repairDetails.forEach((item, index) => {
+  //   orderDetails.forEach((item, index) => {
   //     if (item.product_image instanceof File) {
   //       formDataToSend.append(`product_image_${index}`, item.product_image);
   //     }
@@ -421,7 +421,7 @@ const SalesForm = () => {
   //     const pdfDoc = (
   //       <PDFLayout
   //         formData={formData}
-  //         repairDetails={repairDetails}
+  //         orderDetails={orderDetails}
   //         cash_amount={paymentDetails.cash_amount || 0}
   //         card_amt={paymentDetails.card_amt || 0}
   //         chq_amt={paymentDetails.chq_amt || 0}
@@ -440,7 +440,7 @@ const SalesForm = () => {
   //     console.log("Triggering download for PDF...");
   //     const link = document.createElement("a");
   //     link.href = URL.createObjectURL(pdfBlob);
-  //     link.download = `invoice-${formData.invoice_number}.pdf`;
+  //     link.download = `invoice-${formData.order_number}.pdf`;
   //     link.click();
 
   //     // Clean up
@@ -470,7 +470,7 @@ const handleSave = async () => {
 
   // Include customer details in the data being saved
   const dataToSave = {
-    repairDetails: repairDetails.map(item => ({
+    orderDetails: orderDetails.map(item => ({
       ...item,
       customer_id: formData.customer_id,
       mobile: formData.mobile,
@@ -503,14 +503,14 @@ const handleSave = async () => {
   console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
 
   try {
-    await axios.post(`${baseURL}/save-repair-details`, dataToSave);
+    await axios.post(`${baseURL}/save-order-details`, dataToSave);
     alert("Order added successfully");
 
     // Generate PDF Blob
     const pdfDoc = (
       <PDFLayout
         formData={formData}
-        repairDetails={repairDetails}
+        orderDetails={orderDetails}
         cash_amount={paymentDetails.cash_amount || 0}
         card_amt={paymentDetails.card_amt || 0}
         chq_amt={paymentDetails.chq_amt || 0}
@@ -527,7 +527,7 @@ const handleSave = async () => {
     // Create a download link and trigger it
     const link = document.createElement("a");
     link.href = URL.createObjectURL(pdfBlob);
-    link.download = `invoice-${formData.invoice_number}.pdf`;
+    link.download = `invoice-${formData.order_number}.pdf`;
     link.click();
 
     // Clean up
@@ -599,7 +599,7 @@ const handleSave = async () => {
           </div>
 
           <div className="sales-form-section">
-            <ProductTable repairDetails={repairDetails} onEdit={handleEdit} onDelete={handleDelete} />
+            <ProductTable orderDetails={orderDetails} onEdit={handleEdit} onDelete={handleDelete} />
           </div>
 
           <div className="sales-form2">
@@ -622,7 +622,7 @@ const handleSave = async () => {
                 handleSave={handleSave}
                 handleBack={handleBack}
                 totalPrice={totalPrice}
-                repairDetails={repairDetails}
+                orderDetails={orderDetails}
                 taxableAmount={taxableAmount}
                 discountAmt={discountAmt}
                 totalAmount={totalAmount}
@@ -640,11 +640,11 @@ const handleSave = async () => {
               document={
                 <PDFLayout
                   formData={formData}
-                  repairDetails={repairDetails}
+                  orderDetails={orderDetails}
                   paymentDetails={paymentDetails}
                 />
               }
-              fileName={`invoice-${formData.invoice_number}.pdf`}
+              fileName={`invoice-${formData.order_number}.pdf`}
             >
               {({ blob, url, loading, error }) =>
                 loading ? "Generating PDF..." : "Download Invoice PDF"

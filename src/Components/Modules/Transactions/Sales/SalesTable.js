@@ -13,7 +13,7 @@ const RepairsTable = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [repairDetails, setRepairDetails] = useState(null);
+  const [orderDetails, setOrderDetails] = useState(null);
 
   // Extract mobile from location state
   const { mobile } = location.state || {};
@@ -195,7 +195,7 @@ const RepairsTable = () => {
         }
   
         // Retrieve existing repair details from localStorage or set to an empty array if not available
-        const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
+        const existingDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
   
         // Get today's date in yyyy-mm-dd format
         const today = new Date().toISOString().split('T')[0];
@@ -211,7 +211,7 @@ const RepairsTable = () => {
         const updatedDetails = [...existingDetails, ...formattedDetails];
   
         // Save updated details back to localStorage
-        localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
+        localStorage.setItem('orderDetails', JSON.stringify(updatedDetails));
   
         console.log('Updated repair details added to localStorage:', updatedDetails);
   
@@ -226,7 +226,7 @@ const RepairsTable = () => {
             card_amt,
             chq_amt,
             online_amt,
-            repairDetails: details,
+            orderDetails: details,
           },
         });
   
@@ -321,7 +321,7 @@ const RepairsTable = () => {
   const handleViewDetails = async (invoice_number) => {
     try {
       const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
-      setRepairDetails(response.data);
+      setOrderDetails(response.data);
       setShowModal(true); // Show the modal with repair details
     } catch (error) {
       console.error('Error fetching repair details:', error);
@@ -334,7 +334,7 @@ const RepairsTable = () => {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setRepairDetails(null); // Clear repair details on modal close
+    setOrderDetails(null); // Clear repair details on modal close
   };
 
 
@@ -367,34 +367,34 @@ const RepairsTable = () => {
           <Modal.Title>Sales Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {repairDetails && (
+          {orderDetails && (
             <>
               <h5>Customer Info</h5>
               <Table bordered>
                 <tbody>
                   <tr>
                     <td>Mobile</td>
-                    <td>{repairDetails.uniqueData.mobile}</td>
+                    <td>{orderDetails.uniqueData.mobile}</td>
                   </tr>
                   <tr>
                     <td>Account Name</td>
-                    <td>{repairDetails.uniqueData.account_name}</td>
+                    <td>{orderDetails.uniqueData.account_name}</td>
                   </tr>
                   <tr>
                     <td>Email</td>
-                    <td>{repairDetails.uniqueData.email}</td>
+                    <td>{orderDetails.uniqueData.email}</td>
                   </tr>
                   <tr>
                     <td>Address</td>
-                    <td>{repairDetails.uniqueData.address1}</td>
+                    <td>{orderDetails.uniqueData.address1}</td>
                   </tr>
                   <tr>
                     <td>Invoice Number</td>
-                    <td>{repairDetails.uniqueData.invoice_number}</td>
+                    <td>{orderDetails.uniqueData.invoice_number}</td>
                   </tr>
                   <tr>
                     <td>Total Amount</td>
-                    <td>{repairDetails.uniqueData.net_amount}</td>
+                    <td>{orderDetails.uniqueData.net_amount}</td>
                   </tr>
                 </tbody>
               </Table>
@@ -418,7 +418,7 @@ const RepairsTable = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {repairDetails.repeatedData.map((product, index) => (
+                  {orderDetails.repeatedData.map((product, index) => (
                     <tr key={index}>
                       <td>{product.code}</td>
                       <td>{product.product_name}</td>
@@ -438,7 +438,7 @@ const RepairsTable = () => {
                     <td colSpan="11" className="text-end">
                       Total Amount
                     </td>
-                    <td>{repairDetails.uniqueData.net_amount}</td>
+                    <td>{orderDetails.uniqueData.net_amount}</td>
                   </tr>
                 </tbody>
               </Table>

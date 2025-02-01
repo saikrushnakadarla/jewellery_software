@@ -42,8 +42,8 @@ const SalesForm = () => {
   }, [schemeSalesData]);
 
 
-  const [repairDetails, setRepairDetails] = useState(
-    JSON.parse(localStorage.getItem('repairDetails')) || []
+  const [orderDetails, setOrderDetails] = useState(
+    JSON.parse(localStorage.getItem('orderDetails')) || []
   );
   const [paymentDetails, setPaymentDetails] = useState(
     JSON.parse(localStorage.getItem('paymentDetails')) || {
@@ -105,7 +105,7 @@ const SalesForm = () => {
     const fetchLastInvoiceNumber = async () => {
       try {
         const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
-        setFormData(prev => ({ ...prev, invoice_number: response.data.lastInvoiceNumber }));
+        setFormData(prev => ({ ...prev, order_number: response.data.lastInvoiceNumber }));
       } catch (error) {
         console.error("Error fetching invoice number:", error);
       }
@@ -114,10 +114,10 @@ const SalesForm = () => {
     fetchLastInvoiceNumber();
   }, []);
 
-  // Save data to localStorage whenever repairDetails or paymentDetails change
+  // Save data to localStorage whenever orderDetails or paymentDetails change
   useEffect(() => {
-    localStorage.setItem('repairDetails', JSON.stringify(repairDetails));
-  }, [repairDetails]);
+    localStorage.setItem('orderDetails', JSON.stringify(orderDetails));
+  }, [orderDetails]);
 
   useEffect(() => {
     localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
@@ -176,7 +176,7 @@ const SalesForm = () => {
 
   // Add product to repair details
  const handleAdd = () => {
-  setRepairDetails((prevDetails) => {
+  setOrderDetails((prevDetails) => {
     const updatedDetails = [
       ...prevDetails,
       { 
@@ -195,21 +195,21 @@ const SalesForm = () => {
 
   const handleEdit = (index) => {
     setEditIndex(index);
-    setFormData(repairDetails[index]); // Populate form with selected item
+    setFormData(orderDetails[index]); // Populate form with selected item
   };
 
   const handleUpdate = () => {
-    const updatedDetails = repairDetails.map((item, index) =>
+    const updatedDetails = orderDetails.map((item, index) =>
       index === editIndex ? { ...formData } : item
     );
-    setRepairDetails(updatedDetails);
+    setOrderDetails(updatedDetails);
     setEditIndex(null);
     resetProductFields();
   };
 
   const handleDelete = (indexToDelete) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
-      setRepairDetails(repairDetails.filter((_, index) => index !== indexToDelete));
+      setOrderDetails(orderDetails.filter((_, index) => index !== indexToDelete));
       alert("Product deleted successfully");
     }
   };
@@ -247,8 +247,8 @@ const resetProductFields = () => {
     }));
   };
 
-  // Calculate totalPrice (sum of total_price from all repairDetails)
-  const totalPrice = repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
+  // Calculate totalPrice (sum of total_price from all orderDetails)
+  const totalPrice = orderDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
   const [oldTableData, setOldTableData] = useState(() => {
     const savedData = localStorage.getItem('oldTableData');
@@ -276,7 +276,7 @@ const resetProductFields = () => {
       gst_in: "",
       pan_card: "",
       date: "",
-      invoice_number: "",
+      order_number: "",
     });
     setPaymentDetails({
       cash_amount: 0,
@@ -296,7 +296,7 @@ const resetProductFields = () => {
     navigate("/customermaster", { state: { from: "/sales" } });
   };
 
-  const taxableAmount = repairDetails.reduce((sum, item) => {
+  const taxableAmount = orderDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
@@ -305,11 +305,11 @@ const resetProductFields = () => {
   }, 0);
   console.log("Total Price=", taxableAmount)
 
-  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  const taxAmount = orderDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
   console.log("Net Amount=", netAmount)
 
-  const totalAmount = repairDetails.reduce((sum, item) => {
+  const totalAmount = orderDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
@@ -317,7 +317,7 @@ const resetProductFields = () => {
   }, 0);
   console.log("Total Price=", totalAmount)
 
-  const discountAmt = repairDetails.reduce((sum, item) => {
+  const discountAmt = orderDetails.reduce((sum, item) => {
     const discountAmt = parseFloat(item.disscount) || 0;
     return sum + discountAmt;
   }, 0);
@@ -343,7 +343,7 @@ const resetProductFields = () => {
   const clearData = () => {
     setOldSalesData([]);
     setSchemeSalesData([]);
-    setRepairDetails([]);
+    setOrderDetails([]);
     setPaymentDetails({
       cash_amount: 0,
       card_amt: 0,
@@ -356,7 +356,7 @@ const resetProductFields = () => {
     setSchemeTableData([])
     localStorage.removeItem('oldSalesData');
     localStorage.removeItem('schemeSalesData');
-    localStorage.removeItem('repairDetails');
+    localStorage.removeItem('orderDetails');
     localStorage.removeItem('paymentDetails');
     localStorage.removeItem('oldTableData'); // Explicitly remove oldTableData from local storage
     localStorage.removeItem('schemeTableData'); // Explicitly remove oldTableData from local storage
@@ -369,7 +369,7 @@ const resetProductFields = () => {
     const formData = new FormData();
 
     // First, append all the repair details as JSON string
-    const repairDetailsWithPayment = repairDetails.map(item => ({
+    const repairDetailsWithPayment = orderDetails.map(item => ({
       ...item,
       cash_amount: paymentDetails.cash_amount || 0,
       card_amount: paymentDetails.card || 0,
@@ -381,13 +381,13 @@ const resetProductFields = () => {
     }));
 
     // Append the JSON data as strings
-    formData.append('repairDetails', JSON.stringify(repairDetailsWithPayment));
+    formData.append('orderDetails', JSON.stringify(repairDetailsWithPayment));
     formData.append('oldItems', JSON.stringify(oldSalesData));
     formData.append('memberSchemes', JSON.stringify(schemeSalesData));
 
     // Append each product image
      // Append images correctly with unique keys for each product image
-  repairDetails.forEach((item, index) => {
+  orderDetails.forEach((item, index) => {
     if (item.product_image instanceof File) {
       formData.append(`product_image_${index}`, item.product_image);
     }
@@ -409,7 +409,7 @@ const resetProductFields = () => {
       const pdfDoc = (
         <PDFLayout
           formData={formData}
-          repairDetails={repairDetails}
+          orderDetails={orderDetails}
           cash_amount={paymentDetails.cash_amount || 0}
           card_amt={paymentDetails.card_amt || 0}
           chq_amt={paymentDetails.chq_amt || 0}
@@ -428,7 +428,7 @@ const resetProductFields = () => {
       console.log("Triggering download for PDF...");
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = `invoice-${formData.invoice_number}.pdf`;
+      link.download = `invoice-${formData.order_number}.pdf`;
       link.click();
 
       // Clean up
@@ -503,7 +503,7 @@ const resetProductFields = () => {
           </div>
 
           <div className="sales-form-section">
-            <ProductTable repairDetails={repairDetails} onEdit={handleEdit} onDelete={handleDelete} />
+            <ProductTable orderDetails={orderDetails} onEdit={handleEdit} onDelete={handleDelete} />
           </div>
 
           <div className="sales-form2">
@@ -526,7 +526,7 @@ const resetProductFields = () => {
                 handleSave={handleSave}
                 handleBack={handleBack}
                 totalPrice={totalPrice}
-                repairDetails={repairDetails}
+                orderDetails={orderDetails}
                 taxableAmount={taxableAmount}
                 discountAmt={discountAmt}
                 totalAmount={totalAmount}
@@ -544,11 +544,11 @@ const resetProductFields = () => {
               document={
                 <PDFLayout
                   formData={formData}
-                  repairDetails={repairDetails}
+                  orderDetails={orderDetails}
                   paymentDetails={paymentDetails}
                 />
               }
-              fileName={`invoice-${formData.invoice_number}.pdf`}
+              fileName={`invoice-${formData.order_number}.pdf`}
             >
               {({ blob, url, loading, error }) =>
                 loading ? "Generating PDF..." : "Download Invoice PDF"

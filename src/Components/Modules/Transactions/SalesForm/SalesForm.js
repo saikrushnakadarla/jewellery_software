@@ -333,6 +333,8 @@ const handleAdd = () => {
       mc_on: "MC %",
       mc_per_gram: "",
       making_charges: "",
+      disscount_percentage: "",
+      disscount: "",
       rate: "",
       rate_amt: "",
       tax_percent: "",
@@ -461,8 +463,6 @@ const handleAdd = () => {
   };
 
   const handleSave = async () => {
-    // Include customer details in the data being saved
-     // Validate required customer details before saving
   if (!formData.customer_id || !formData.account_name || !formData.mobile || !formData.email) {
     alert("Please fill in all required customer details before saving.");
     return;

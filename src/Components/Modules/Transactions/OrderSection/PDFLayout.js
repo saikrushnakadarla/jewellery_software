@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const PDFLayout = ({ formData, repairDetails, paymentDetails }) => (
+const PDFLayout = ({ formData, orderDetails, paymentDetails }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       {/* Header */}
@@ -134,7 +134,7 @@ const PDFLayout = ({ formData, repairDetails, paymentDetails }) => (
           <Text style={styles.tableCell}>Amount</Text>
         </View>
         
-        {repairDetails.map((item, index) => (
+        {orderDetails.map((item, index) => (
           <View key={index} style={styles.tableRow}>
             <Text style={styles.tableCell}>{index + 1}</Text>
             <Text style={styles.tableCell}>{item.product_name}</Text>
@@ -161,7 +161,7 @@ const PDFLayout = ({ formData, repairDetails, paymentDetails }) => (
           <View style={styles.column}>
             <Text style={styles.label}>Total Amount</Text>
             <Text style={styles.value}>
-              ₹{repairDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0)}
+              ₹{orderDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0)}
             </Text>
           </View>
         </View>

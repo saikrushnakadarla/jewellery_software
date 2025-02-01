@@ -12,7 +12,7 @@ const RepairsTable = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [repairDetails, setRepairDetails] = useState(null);
+  const [orderDetails, setRepairDetails] = useState(null);
   const [accounts, setAccounts] = useState([]);
 
 
@@ -43,7 +43,7 @@ const RepairsTable = () => {
       },
       {
         Header: 'Invoice Number',
-        accessor: 'invoice_number',
+        accessor: 'order_number',
       },
       {
         Header: 'Account Name',
@@ -65,7 +65,7 @@ const RepairsTable = () => {
         Cell: ({ row }) => (
           <select
             value={row.original.order_status}
-            onChange={(e) => handleStatusChange(row.original.invoice_number, e.target.value)}
+            onChange={(e) => handleStatusChange(row.original.order_number, e.target.value)}
             style={{
               padding: '5px',
               border: '1px solid #ccc',
@@ -90,7 +90,7 @@ const RepairsTable = () => {
           <div>
             <FaEye
               style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
-              onClick={() => handleViewDetails(row.original.invoice_number)}
+              onClick={() => handleViewDetails(row.original.order_number)}
             />
             <FaEdit
                         style={{
@@ -98,7 +98,7 @@ const RepairsTable = () => {
                           marginLeft: '10px',
                           color: 'blue',
                         }}
-                        onClick={() => handleEdit(row.original.invoice_number,
+                        onClick={() => handleEdit(row.original.order_number,
                           row.original.mobile,
                           row.original.old_exchange_amt,
                           row.original.scheme_amt,
@@ -114,7 +114,7 @@ const RepairsTable = () => {
                 marginLeft: '10px',
                 color: 'red',
               }}
-              onClick={() => handleDelete(row.original.invoice_number)}
+              onClick={() => handleDelete(row.original.order_number)}
             />
           </div>
         ),
@@ -124,11 +124,11 @@ const RepairsTable = () => {
   );
 
 
-  const handleStatusChange = async (invoiceNumber, newStatus) => {
+  const handleStatusChange = async (orderNumber, newStatus) => {
     try {
       // Make the PUT request to update the status in the backend
       const response = await axios.put(`${baseURL}/update-order-status`, {
-        invoice_number: invoiceNumber,
+        order_number: orderNumber,
         order_status: newStatus,
       });
   
@@ -136,7 +136,7 @@ const RepairsTable = () => {
         // Update the local state with the new status
         setData((prevData) =>
           prevData.map((item) =>
-            item.invoice_number === invoiceNumber
+            item.order_number === orderNumber
               ? { ...item, order_status: newStatus }
               : item
           )
@@ -155,7 +155,7 @@ const RepairsTable = () => {
   useEffect(() => {
     const fetchRepairs = async () => {
       try {
-        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+        const response = await axios.get(`${baseURL}/get-unique-order-details`);
         const filteredData = response.data.filter(
           (item) => item.transaction_status === 'Orders'
         );
@@ -187,9 +187,9 @@ const RepairsTable = () => {
     fetchEmployeeCompensationAccounts();
   }, []);
 
-  const handleViewDetails = async (invoice_number) => {
+  const handleViewDetails = async (order_number) => {
     try {
-      const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
+      const response = await axios.get(`${baseURL}/get-order-details/${order_number}`);
       setRepairDetails(response.data);
       setShowModal(true);
     } catch (error) {
@@ -197,7 +197,7 @@ const RepairsTable = () => {
     }
   };
 
-  const handleWorkerAssignment = async (invoice_number, code, worker_name) => {
+  const handleWorkerAssignment = async (order_number, code, worker_name) => {
     try {
       // Find the selected account and get its account_id
       const selectedAccount = accounts.find(account => account.account_name === worker_name);
@@ -209,7 +209,7 @@ const RepairsTable = () => {
       }
 
       const response = await axios.post(`${baseURL}/assign-worker`, {
-        invoice_number,
+        order_number,
         code,
         worker_name,
         account_id, // Pass the account_id to the backend
@@ -241,7 +241,7 @@ const RepairsTable = () => {
   };
 
   const handleEdit = async (
-    invoice_number,
+    order_number,
     mobile,
     scheme_amt,
     old_exchange_amt,
@@ -264,18 +264,18 @@ const RepairsTable = () => {
     if (result.isConfirmed) {
       try {
         // Fetch repair details
-        const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
+        const response = await axios.get(`${baseURL}/get-order-details/${order_number}`);
         const details = response.data;
   
         // Verify if the API returned data
         if (!details || !details.repeatedData) {
           console.error('No repeatedData found in response:', details);
-          Swal.fire('Error', 'No repair details found for the provided invoice number.', 'error');
+          Swal.fire('Error', 'No repair details found for the provided order number.', 'error');
           return;
         }
   
         // Retrieve existing repair details from localStorage or set to an empty array if not available
-        const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
+        const existingDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
   
         // Get today's date in yyyy-mm-dd format
         const today = new Date().toISOString().split('T')[0];
@@ -284,21 +284,21 @@ const RepairsTable = () => {
         const formattedDetails = details.repeatedData.map((item) => ({
           ...item,
           date: today,
-          invoice_number, // Ensure the invoice_number is explicitly included
+          order_number, // Ensure the order_number is explicitly included
         }));
   
         // Combine existing details with the new ones
         const updatedDetails = [...existingDetails, ...formattedDetails];
   
         // Save updated details back to localStorage
-        localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
+        localStorage.setItem('orderDetails', JSON.stringify(updatedDetails));
   
         console.log('Updated repair details added to localStorage:', updatedDetails);
   
         // Navigate to the sales page with state
         navigate('/orders', {
           state: {
-            invoice_number,
+            order_number,
             mobile,
             old_exchange_amt,
             scheme_amt,
@@ -306,12 +306,12 @@ const RepairsTable = () => {
             card_amt,
             chq_amt,
             online_amt,
-            repairDetails: details,
+            orderDetails: details,
           },
         });
   
         // Call handleDelete without confirmation
-        await handleDelete(invoice_number, true, true);
+        await handleDelete(order_number, true, true);
       } catch (error) {
         console.error('Error fetching repair details:', error);
         Swal.fire('Error', 'Unable to fetch repair details. Please try again.', 'error');
@@ -321,36 +321,11 @@ const RepairsTable = () => {
     }
   };
 
-  // const handleDelete = async (invoiceNumber) => {
-  //   Swal.fire({
-  //     title: 'Are you sure?',
-  //     text: `Do you really want to delete invoice ${invoiceNumber}?`,
-  //     icon: 'warning',
-  //     showCancelButton: true,
-  //     confirmButtonColor: '#d33',
-  //     cancelButtonColor: '#3085d6',
-  //     confirmButtonText: 'Yes, delete it!',
-  //   }).then(async (result) => {
-  //     if (result.isConfirmed) {
-  //       try {
-  //         const response = await axios.delete(`${baseURL}/order-details/${invoiceNumber}`);
-  //         if (response.status === 200) {
-  //           Swal.fire('Deleted!', response.data.message, 'success');
-  //           // Update the table data by removing the deleted record
-  //           setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
-  //         }
-  //       } catch (error) {
-  //         console.error('Error deleting order details:', error);
-  //         Swal.fire('Error!', 'Failed to delete order details. Please try again.', 'error');
-  //       }
-  //     }
-  //   });
-  // };
-  const handleDelete = async (invoiceNumber, skipConfirmation = false, skipMessage = false) => {
+  const handleDelete = async (orderNumber, skipConfirmation = false, skipMessage = false) => {
     if (skipConfirmation) {
       try {
         const response = await axios.delete(
-          `${baseURL}/order-details/${invoiceNumber}`,
+          `${baseURL}/order-details/${orderNumber}`,
           { params: { skipMessage: skipMessage ? 'true' : 'false' } } // Pass skipMessage as query parameter
         );
   
@@ -358,7 +333,7 @@ const RepairsTable = () => {
           if (!skipMessage) {
             Swal.fire('Deleted!', response.data.message, 'success');
           }
-          setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
+          setData((prevData) => prevData.filter((item) => item.order_number !== orderNumber));
         }
       } catch (error) {
         console.error('Error deleting repair details:', error);
@@ -368,7 +343,7 @@ const RepairsTable = () => {
       // Show the confirmation alert
       Swal.fire({
         title: 'Are you sure?',
-        text: `Do you really want to delete invoice ${invoiceNumber}?`,
+        text: `Do you really want to delete order ${orderNumber}?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -378,11 +353,11 @@ const RepairsTable = () => {
         if (result.isConfirmed) {
           try {
             const response = await axios.delete(
-              `${baseURL}/order-details/${invoiceNumber}`
+              `${baseURL}/order-details/${orderNumber}`
             );
             if (response.status === 200) {
               Swal.fire('Deleted!', response.data.message, 'success');
-              setData((prevData) => prevData.filter((item) => item.invoice_number !== invoiceNumber));
+              setData((prevData) => prevData.filter((item) => item.order_number !== orderNumber));
             }
           } catch (error) {
             console.error('Error deleting repair details:', error);
@@ -435,38 +410,38 @@ const RepairsTable = () => {
           <Modal.Title>Orders Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {repairDetails && (
+          {orderDetails && (
             <>
               <h5>Customer Info</h5>
               <Table bordered>
                 <tbody>
                   <tr>
                     <td>Customer ID</td>
-                    <td>{repairDetails.uniqueData.customer_id}</td>
+                    <td>{orderDetails.uniqueData.customer_id}</td>
                   </tr>
                   <tr>
                     <td>Mobile</td>
-                    <td>{repairDetails.uniqueData.mobile}</td>
+                    <td>{orderDetails.uniqueData.mobile}</td>
                   </tr>
                   <tr>
                     <td>Account Name</td>
-                    <td>{repairDetails.uniqueData.account_name}</td>
+                    <td>{orderDetails.uniqueData.account_name}</td>
                   </tr>
                   <tr>
                     <td>Email</td>
-                    <td>{repairDetails.uniqueData.email}</td>
+                    <td>{orderDetails.uniqueData.email}</td>
                   </tr>
                   <tr>
                     <td>Address</td>
-                    <td>{repairDetails.uniqueData.address1}</td>
+                    <td>{orderDetails.uniqueData.address1}</td>
                   </tr>
                   <tr>
                     <td>Invoice Number</td>
-                    <td>{repairDetails.uniqueData.invoice_number}</td>
+                    <td>{orderDetails.uniqueData.order_number}</td>
                   </tr>
                   <tr>
                     <td>Total Amount</td>
-                    <td>{repairDetails.uniqueData.net_amount}</td>
+                    <td>{orderDetails.uniqueData.net_amount}</td>
                   </tr>
                 </tbody>
               </Table>
@@ -494,7 +469,7 @@ const RepairsTable = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {repairDetails.repeatedData.map((product, index) => (
+                    {orderDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>
                           {product.product_image ? (
@@ -523,7 +498,7 @@ const RepairsTable = () => {
                           {product.assigning === 'pending' ? (
                             <Form.Select
                               onChange={(e) => handleWorkerAssignment(
-                                repairDetails.uniqueData.invoice_number,
+                                orderDetails.uniqueData.order_number,
                                 product.code,
                                 e.target.value
                               )}

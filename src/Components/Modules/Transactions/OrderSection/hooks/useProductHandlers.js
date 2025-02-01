@@ -10,7 +10,7 @@ const useProductHandlers = () => {
   const location = useLocation();
 
   // Access the passed state (default to an empty object if undefined)
-  const { invoice_number = "", mobile = "" } = location.state || {};
+  const { order_number = "", mobile = "" } = location.state || {};
 
   const [rates, setRates] = useState({
     rate_24crt: "",
@@ -35,7 +35,7 @@ const useProductHandlers = () => {
     pan_card: "",
     terms: "Cash",
     date: "",
-    invoice_number: invoice_number,
+    order_number: order_number,
     code: "",
     product_id: "",
     metal: "",

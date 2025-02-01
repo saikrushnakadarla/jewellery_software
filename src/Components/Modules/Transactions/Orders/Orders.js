@@ -77,7 +77,7 @@ const RepairForm = () => {
   }, []);
 
 
-  const [repairDetails, setRepairDetails] = useState([]);
+  const [orderDetails, setRepairDetails] = useState([]);
   const [isQtyEditable, setIsQtyEditable] = useState(false);
   useEffect(() => {
     const fetchLastInvoiceNumber = async () => {
@@ -440,7 +440,7 @@ const RepairForm = () => {
   };
 
   const handleAdd = () => {
-    setRepairDetails([...repairDetails, { ...formData }]); // Add current formData to repairDetails
+    setRepairDetails([...orderDetails, { ...formData }]); // Add current formData to orderDetails
     
     // Reset only the product-related fields, keeping the customer details intact
     setFormData((prevData) => ({
@@ -473,7 +473,7 @@ const RepairForm = () => {
   };
   
   const handleSave = async () => {
-    const dataToSave = repairDetails.map((item) => ({
+    const dataToSave = orderDetails.map((item) => ({
       ...item,
       cash_amount: paymentDetails.cash_amount || 0,
       card_amount: paymentDetails.card || 0,
@@ -486,7 +486,7 @@ const RepairForm = () => {
 
     try {
       await axios.post(`${baseURL}/save-repair-details`, {
-        repairDetails: dataToSave,
+        orderDetails: dataToSave,
       });
       alert("Data saved successfully");
       setRepairDetails([]);
@@ -1047,8 +1047,8 @@ const RepairForm = () => {
       </tr>
     </thead>
     <tbody>
-      {repairDetails.length > 0 ? (
-        repairDetails.map((detail, index) => (
+      {orderDetails.length > 0 ? (
+        orderDetails.map((detail, index) => (
           <tr key={index}>
             <td>{detail.date}</td>
             <td>{detail.invoice_number}</td>

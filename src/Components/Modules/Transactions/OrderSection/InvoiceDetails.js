@@ -16,16 +16,16 @@ const InvoiceDetails = ({ formData, setFormData }) => {
     }
   }, [formData, setFormData]);
 
-  // Update formData.invoice_number from location.state
+  // Update formData.order_number from location.state
   useEffect(() => {
-    if (location.state?.invoice_number && formData.invoice_number !== location.state.invoice_number) {
-      console.log("Received Invoice Number from navigation:", location.state.invoice_number);
+    if (location.state?.order_number && formData.order_number !== location.state.order_number) {
+      console.log("Received Invoice Number from navigation:", location.state.order_number);
       setFormData((prev) => ({
         ...prev,
-        invoice_number: location.state.invoice_number,
+        order_number: location.state.order_number,
       }));
     }
-  }, [location.state, formData.invoice_number, setFormData]);
+  }, [location.state, formData.order_number, setFormData]);
 
   return (
     <Col className="sales-form-section">
@@ -68,12 +68,12 @@ const InvoiceDetails = ({ formData, setFormData }) => {
         <Col xs={12}>
           <InputField
             label="Invoice Number"
-            name="invoice_number"
-            value={formData.invoice_number || ""}
+            name="order_number"
+            value={formData.order_number || ""}
             onChange={(e) =>
               setFormData((prev) => ({
                 ...prev,
-                invoice_number: e.target.value,
+                order_number: e.target.value,
               }))
             }
           />
