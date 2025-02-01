@@ -281,17 +281,6 @@ const RepairForm = () => {
         }
       }
       navigate("/repairstable");
-
-      // // Generate PDF
-      // const pdfDoc = pdf(
-      //   <PDFContent
-      //     formData={formData}
-      //     image={image}
-      //   />
-      // );
-  
-      // const blob = await pdfDoc.toBlob();
-      // saveAs(blob, `repair-${formData.repair_no}.pdf`);
     } catch (error) {
       console.error("Error submitting the form:", error);
       alert("Failed to submit the repair entry");
