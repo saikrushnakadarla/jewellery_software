@@ -265,10 +265,26 @@ const SalesForm = () => {
 
   const [editIndex, setEditIndex] = useState(null);
 
-  const handleAdd = () => {
-    setRepairDetails([...repairDetails, { ...formData }]);
-    resetProductFields();
-  };
+  // const handleAdd = () => {
+  //   setRepairDetails([...repairDetails, { ...formData }]);
+  //   resetProductFields();
+  // };
+const handleAdd = () => {
+  setRepairDetails([
+    ...repairDetails,
+    { ...formData, imagePreview: formData.imagePreview },
+  ]);
+
+  // Reset the relevant fields
+  setFormData((prevData) => ({
+    ...prevData,
+    disscount: "",
+    disscount_percentage: "",
+  }));
+
+  resetProductFields();
+};
+
 
   const handleEdit = (index) => {
     setEditIndex(index);

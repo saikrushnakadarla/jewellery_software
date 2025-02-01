@@ -558,6 +558,10 @@ const TaxINVoiceReceipt = ({
 
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                        <Text>(-) Discount Amount:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{oldItemsAmount.toFixed(2)}</Text>
+                                                                </View>
+                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>(-) OLD:</Text>
                                                                         <Text style={{ textAlign: "right" }}>{oldItemsAmount.toFixed(2)}</Text>
                                                                 </View>

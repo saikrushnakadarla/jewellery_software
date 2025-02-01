@@ -243,6 +243,22 @@ useEffect(() => {
 //     setFilteredPurityOptions(purity);
 //   }
 // };
+const handleImageChange = (e) => {
+  const file = e.target.files[0];
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setFormData((prevData) => ({
+        ...prevData,
+        image: file, // Store the file itself
+        imagePreview: reader.result, // Store preview URL
+      }));
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
 
 
 const handleChange = (e) => {
@@ -411,9 +427,9 @@ const handleChange = (e) => {
           mc_on: matchingEntry.Making_Charges_On || "",
           mc_per_gram: matchingEntry.MC_Per_Gram || "",
           making_charges: matchingEntry.Making_Charges || "",
-          disscount_percentage: matchingEntry.disscount_percentage || "",
-          disscount: matchingEntry.disscount || "",
-          rate: matchingEntry.rate || "",
+          // disscount_percentage: matchingEntry.disscount_percentage || "",
+          // disscount: matchingEntry.disscount || "",
+          // rate: matchingEntry.rate || "",
           tax_percent: productDetails?.tax_slab || "",
           qty: 1,
           barcodeOptions: [], // Clear barcode options after setting the data
@@ -813,6 +829,7 @@ return {
   products,
   isQtyEditable,
   handleChange,
+  handleImageChange,
   handleBarcodeChange,
   handleProductNameChange,
   handleMetalTypeChange,

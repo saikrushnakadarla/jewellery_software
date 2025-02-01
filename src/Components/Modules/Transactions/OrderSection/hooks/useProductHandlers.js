@@ -421,7 +421,7 @@ const useProductHandlers = () => {
             mc_on: matchingEntry.Making_Charges_On || "",
             mc_per_gram: matchingEntry.MC_Per_Gram || "",
             making_charges: matchingEntry.Making_Charges || "",
-            rate: matchingEntry.rate || "",
+            // rate: matchingEntry.rate || "",
             tax_percent: productDetails?.tax_slab || "",
             qty: 1,
             barcodeOptions: [], // Clear barcode options after setting the data

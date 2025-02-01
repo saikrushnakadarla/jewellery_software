@@ -41,7 +41,7 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
           <th>Tax %</th>
           <th>Tax Amount</th>
           <th>Total Price</th>
-         
+          <th>Image</th> {/* New Image Column */}
           <th>Action</th> {/* Add Action column for delete */}
         </tr>
       </thead>
@@ -74,6 +74,17 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
               <td>{detail.tax_percent}</td>
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>
+              <td>
+          {detail.imagePreview ? (
+            <img
+              src={detail.imagePreview}
+              alt="Uploaded"
+              style={{ width: "50px", height: "50px" }}
+            />
+          ) : (
+            "No Image"
+          )}
+        </td>
               <td>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <FaEdit                  

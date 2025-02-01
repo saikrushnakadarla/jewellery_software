@@ -11,6 +11,7 @@ const ProductDetails = ({
   formData,
   data,
   handleChange,
+  handleImageChange,
   handleBarcodeChange,
   handleProductNameChange,
   handleMetalTypeChange,
@@ -60,29 +61,29 @@ const ProductDetails = ({
           />
         </Col>
         <Col xs={12} md={2}>
-        {isBarcodeSelected ? (
-          <InputField
-          label="Metal Type"
-          name="metal_type"
-          value={formData.metal_type || ""}
-          onChange={handleChange}
-          type="select"
-          options={metaltypeOptions} // Set options dynamically from the API
-        />
-          
+          {isBarcodeSelected ? (
+            <InputField
+              label="Metal Type"
+              name="metal_type"
+              value={formData.metal_type || ""}
+              onChange={handleChange}
+              type="select"
+              options={metaltypeOptions} // Set options dynamically from the API
+            />
+
           ) : (
-          <InputField
-            label="Metal Type"
-            name="metal_type"
-            value={formData.metal_type}
-            onChange={(e) => handleMetalTypeChange(e.target.value)}
-            type="select"
-            options={filteredMetalTypes.map((metalType) => ({
-              value: metalType.metal_type,
-              label: metalType.metal_type,
-            }))}
-          />
-        )}
+            <InputField
+              label="Metal Type"
+              name="metal_type"
+              value={formData.metal_type}
+              onChange={(e) => handleMetalTypeChange(e.target.value)}
+              type="select"
+              options={filteredMetalTypes.map((metalType) => ({
+                value: metalType.metal_type,
+                label: metalType.metal_type,
+              }))}
+            />
+          )}
         </Col>
 
         <Col xs={12} md={2}>
@@ -97,15 +98,15 @@ const ProductDetails = ({
 
         <Col xs={12} md={2}>
           {isBarcodeSelected ? (
-           <InputField
-           label="Sub Category"
-           name="product_name"
-           value={formData.product_name || ""}
-           onChange={handleChange}
-           type="select"
-           options={subcategoryOptions} // Dynamically fetched options based on category
-         />
-          
+            <InputField
+              label="Sub Category"
+              name="product_name"
+              value={formData.product_name || ""}
+              onChange={handleChange}
+              type="select"
+              options={subcategoryOptions} // Dynamically fetched options based on category
+            />
+
           ) : (
             <InputField
               label="Sub Category"
@@ -146,28 +147,28 @@ const ProductDetails = ({
         </Col>
 
         <Col xs={12} md={2}>
-        {isBarcodeSelected ? (
-          <InputField
-          label="Purity"
-          name="purity"
-          value={formData.purity || ""}
-          onChange={handleChange}
-          type="select"
-          options={purityOptions} // Set options dynamically from the API
-        />
-          
+          {isBarcodeSelected ? (
+            <InputField
+              label="Purity"
+              name="purity"
+              value={formData.purity || ""}
+              onChange={handleChange}
+              type="select"
+              options={purityOptions} // Set options dynamically from the API
+            />
+
           ) : (
-          <InputField
-            label="Purity"
-            name="purity"
-            value={formData.purity}
-            onChange={handleChange}
-            type="select"
-            options={filteredPurityOptions.map((Purity) => ({
-              value: Purity.Purity,
-              label: Purity.Purity,
-            }))}
-          />
+            <InputField
+              label="Purity"
+              name="purity"
+              value={formData.purity}
+              onChange={handleChange}
+              type="select"
+              options={filteredPurityOptions.map((Purity) => ({
+                value: Purity.Purity,
+                label: Purity.Purity,
+              }))}
+            />
           )}
         </Col>
 
@@ -316,7 +317,7 @@ const ProductDetails = ({
             label="Total MC"
             name="making_charges"
             value={formData.making_charges || ""} // Display calculated Total MC
-            readOnly 
+            readOnly
           />
         </Col>
 
@@ -371,6 +372,23 @@ const ProductDetails = ({
             readOnly
           />
         </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Upload Image"
+            name="image"
+            type="file"
+            onChange={(e) => handleImageChange(e)}
+            accept="image/*"
+          />
+          {formData.imagePreview && (
+            <img
+              src={formData.imagePreview}
+              alt="Selected"
+              style={{ width: "100px", height: "100px", marginTop: "10px" }}
+            />
+          )}
+        </Col>
+
         <Col xs={12} md={1}>
           <Button
             onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
