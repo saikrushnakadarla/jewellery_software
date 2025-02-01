@@ -46,6 +46,7 @@ const RepairsTable = () => {
     try {
       const response = await axios.get(`${baseURL}/get/repairs`);
       setRepairs(response.data);
+      console.log("Repairs=",response.data)
     } catch (error) {
       console.error('Error fetching repairs:', error);
     }
@@ -319,6 +320,62 @@ const RepairsTable = () => {
         Header: 'Status',
         accessor: 'status',
       },
+      {
+        Header: 'Image',
+        accessor: 'image',
+        Cell: ({ value }) => {
+          if (!value) return "No Image"; 
+          const handleImageClick = () => {
+            const newWindow = window.open();
+            newWindow.document.write(`<img src="${value}" alt="Repair Image" style="width: 100%; height: auto;" />`);
+          };
+      
+          return (
+            <img
+              src={value}
+              alt="Repair Image"
+              style={{
+                width: "50px",
+                height: "50px",
+                objectFit: "cover",
+                borderRadius: "5px",
+                cursor: "pointer", 
+              }}
+              onClick={handleImageClick} 
+              onError={(e) => e.target.src = "/placeholder.png"} 
+            />
+          );
+        },
+      },
+
+      // {
+      //   Header: 'Image',
+      //   accessor: 'image',
+      //   Cell: ({ value }) => {
+      //     if (!value) return "No Image"; 
+      //     const handleImageClick = () => {
+      //       const newWindow = window.open();
+      //       newWindow.document.write(`<img src="${value}" alt="Repair Image" style="width: 100%; height: auto;" />`);
+      //     };
+      
+      //     return (
+      //       <div>
+      //         <span
+      //           style={{
+      //             color: "blue",
+      //             textDecoration: "none",
+      //             cursor: "pointer",
+      //           }}
+      //           onClick={handleImageClick} 
+      //         >
+      //           View
+      //         </span>
+      //       </div>
+      //     );
+      //   },
+      // },
+      
+      
       {
         Header: 'Update Status',
         accessor: 'update_status',
