@@ -94,67 +94,128 @@ function Customer_Master() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Restrict the 'mobile' field to 10 numeric characters
-    if (name === 'mobile') {
-      const numericValue = value.replace(/\D/g, ''); // Remove non-numeric characters
-      if (numericValue.length <= 10) {
-        setFormData({ ...formData, [name]: numericValue });
-      }
-    } else if (name === 'account_name') {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-        print_name: prevData.print_name === prevData.account_name ? value : prevData.print_name,
-      }));
-    } else {
-      setFormData({ ...formData, [name]: value });
+    let updatedValue = value;
+  
+    switch (name) {
+      case "account_name":
+        // Capitalize first letter and update print_name if it matches account_name
+        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: updatedValue,
+          print_name: prevData.print_name === prevData.account_name ? updatedValue : prevData.print_name,
+        }));
+        return; // Return early since we've already updated state
+  
+      case "print_name":
+        // Capitalize first letter
+        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
+        break;
+  
+      case "mobile":
+      case "phone":
+        // Allow only numbers and limit to 10 digits
+        updatedValue = value.replace(/\D/g, "").slice(0, 10);
+        break;
+  
+      case "aadhar_card":
+        // Allow only numbers and limit to 12 digits
+        updatedValue = value.replace(/\D/g, "").slice(0, 12);
+        break;
+  
+      case "pincode":
+        // Allow only numbers and limit to 6 digits
+        updatedValue = value.replace(/\D/g, "").slice(0, 6);
+        break;
+  
+      case "gst_in":
+        // GSTIN must be 15 alphanumeric characters (uppercase)
+        updatedValue = value.toUpperCase().slice(0, 15);
+        break;
+  
+      case "pan_card":
+        // PAN must be 10 alphanumeric characters (uppercase)
+        updatedValue = value.toUpperCase().slice(0, 10);
+        break;
+  
+      case "ifsc_code":
+        // IFSC must be exactly 11 alphanumeric characters (uppercase)
+        updatedValue = value.toUpperCase().slice(0, 11);
+        break;
+  
+      default:
+        break;
     }
+  
+    // Update state
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: updatedValue,
+    }));
   };
-
+  
 
   const handleCheckboxChange = () => {
     setTcsApplicable(!tcsApplicable);
   };
 
+  const validateForm = () => {
+    if (!formData.account_name.trim()) {
+      alert("Customer Name is required.");
+      return false;
+    }
+    if (!formData.mobile.trim()) {
+      alert("Mobile number is required.");
+      return false;
+    }
+    if (formData.mobile.length !== 10) {
+      alert("Mobile number must be exactly 10 digits.");
+      return false;
+    }
+    if (formData.aadhar_card.length !== 12) {
+      alert("Aadhar Card must be exactly 12 digits.");
+      return false;
+    }
+    if (formData.pan_card.length !== 10) {
+      alert("PAN Card must be exactly 10 characters.");
+      return false;
+    }
+    if (formData.gst_in.length !== 15) {
+      alert("GSTIN must be exactly 15 characters.");
+      return false;
+    }
+    if (formData.ifsc_code.length !== 11) {
+      alert("IFSC Code must be exactly 11 characters.");
+      return false;
+    }
+    return true;
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Validation
-    if (!formData.account_name.trim()) {
-      alert('Customer Name is required.');
-      return;
-    }
-    if (!formData.mobile.trim()) {
-      alert('Mobile number is required.');
-      return;
-    }
-    if (formData.mobile.length !== 10) {
-      alert('Mobile number must be exactly 10 digits.');
+    if (!validateForm()) {
       return;
     }
   
     try {
-      // Only check for duplicates if this is a new record (POST request)
+      // Check for duplicate mobile only when creating a new customer
       if (!id) {
-        // Fetch existing data to check for duplicate mobile numbers
         const response = await fetch(`${baseURL}/get/account-details`);
         if (!response.ok) {
-          throw new Error('Failed to fetch data for duplicate check.');
+          throw new Error("Failed to fetch data for duplicate check.");
         }
         const result = await response.json();
-  
-        // Check if the mobile number already exists
         const isDuplicateMobile = result.some((item) => item.mobile === formData.mobile);
   
         if (isDuplicateMobile) {
-          alert('This mobile number is already associated with another entry.');
+          alert("This mobile number is already associated with another entry.");
           return;
         }
       }
   
-      // Proceed with saving the record (POST or PUT based on id)
-      const method = id ? 'PUT' : 'POST';
+      // Proceed with saving the record (POST or PUT)
+      const method = id ? "PUT" : "POST";
       const endpoint = id
         ? `${baseURL}/edit/account-details/${id}`
         : `${baseURL}/account-details`;
@@ -162,24 +223,23 @@ function Customer_Master() {
       const saveResponse = await fetch(endpoint, {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
   
       if (saveResponse.ok) {
-        alert(`Customer ${id ? 'updated' : 'created'} successfully!`);
-        const from = location.state?.from || "/customerstable";
-        navigate(from);
+        alert(`Customer ${id ? "updated" : "created"} successfully!`);
+        navigate("/customerstable");
       } else {
-        console.error('Failed to save supplier');
-        alert('Failed to save supplier.');
+        alert("Failed to save customer.");
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred while processing the request.');
+      console.error("Error:", error);
+      alert("An error occurred while processing the request.");
     }
   };
+  
   
 
 

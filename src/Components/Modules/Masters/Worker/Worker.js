@@ -67,8 +67,8 @@ function Customer_Master() {
             const result = await response.json();
             // setFormData(result);
 
-             // Parse dates without timezone adjustment
-             const parseDate = (dateString) => {
+            // Parse dates without timezone adjustment
+            const parseDate = (dateString) => {
               if (!dateString) return '';
               const date = new Date(dateString);
               const year = date.getFullYear();
@@ -76,11 +76,11 @@ function Customer_Master() {
               const day = String(date.getDate()).padStart(2, '0');
               return `${year}-${month}-${day}`;
             };
-          setFormData({
-            ...result,
-            birthday: parseDate(result.birthday),
-            anniversary: parseDate(result.anniversary),
-          });
+            setFormData({
+              ...result,
+              birthday: parseDate(result.birthday),
+              anniversary: parseDate(result.anniversary),
+            });
           }
         } catch (error) {
           console.error('Error fetching customer:', error);
@@ -94,22 +94,64 @@ function Customer_Master() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    let updatedValue = value;
 
-    // Restrict the 'mobile' field to 10 numeric characters
-    if (name === 'mobile') {
-      const numericValue = value.replace(/\D/g, ''); // Remove non-numeric characters
-      if (numericValue.length <= 10) {
-        setFormData({ ...formData, [name]: numericValue });
-      }
-    } else if (name === 'account_name') {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-        print_name: prevData.print_name === prevData.account_name ? value : prevData.print_name,
-      }));
-    } else {
-      setFormData({ ...formData, [name]: value });
+    switch (name) {
+      case "account_name":
+        // Capitalize first letter and update print_name if it matches account_name
+        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: updatedValue,
+          print_name: prevData.print_name === prevData.account_name ? updatedValue : prevData.print_name,
+        }));
+        return; // Return early since we've already updated state
+
+      case "print_name":
+        // Capitalize first letter
+        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
+        break;
+
+      case "mobile":
+      case "phone":
+        // Allow only numbers and limit to 10 digits
+        updatedValue = value.replace(/\D/g, "").slice(0, 10);
+        break;
+
+      case "aadhar_card":
+        // Allow only numbers and limit to 12 digits
+        updatedValue = value.replace(/\D/g, "").slice(0, 12);
+        break;
+
+      case "pincode":
+        // Allow only numbers and limit to 6 digits
+        updatedValue = value.replace(/\D/g, "").slice(0, 6);
+        break;
+
+      case "gst_in":
+        // GSTIN must be 15 alphanumeric characters (uppercase)
+        updatedValue = value.toUpperCase().slice(0, 15);
+        break;
+
+      case "pan_card":
+        // PAN must be 10 alphanumeric characters (uppercase)
+        updatedValue = value.toUpperCase().slice(0, 10);
+        break;
+
+      case "ifsc_code":
+        // IFSC must be exactly 11 alphanumeric characters (uppercase)
+        updatedValue = value.toUpperCase().slice(0, 11);
+        break;
+
+      default:
+        break;
     }
+
+    // Update state
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: updatedValue,
+    }));
   };
 
 
@@ -117,23 +159,45 @@ function Customer_Master() {
     setTcsApplicable(!tcsApplicable);
   };
 
+  const validateForm = () => {
+    if (!formData.account_name.trim()) {
+      alert("Worker Name is required.");
+      return false;
+    }
+    if (!formData.mobile.trim()) {
+      alert("Mobile number is required.");
+      return false;
+    }
+    if (formData.mobile.length !== 10) {
+      alert("Mobile number must be exactly 10 digits.");
+      return false;
+    }
+    if (formData.aadhar_card.trim() && formData.aadhar_card.length !== 12) {
+      alert("Aadhar Card must be exactly 12 digits.");
+      return false;
+    }
+    if (formData.pan_card.trim() && formData.pan_card.length !== 10) {
+      alert("PAN Card must be exactly 10 characters.");
+      return false;
+    }
+    if (formData.gst_in.trim() && formData.gst_in.length !== 15) {
+      alert("GSTIN must be exactly 15 characters.");
+      return false;
+    }
+    if (formData.ifsc_code.trim() && formData.ifsc_code.length !== 11) {
+      alert("IFSC Code must be exactly 11 characters.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
-    if (!formData.account_name.trim()) {
-      alert('Worker Name is required.');
+    // Call validateForm() before submitting
+    if (!validateForm()) {
       return;
     }
-    if (!formData.mobile.trim()) {
-      alert('Mobile number is required.');
-      return;
-    }
-    if (formData.mobile.length !== 10) {
-      alert('Mobile number must be exactly 10 digits.');
-      return;
-    }
-
     try {
       // Only check for duplicates if this is a new record (POST request)
       if (!id) {
@@ -280,7 +344,7 @@ function Customer_Master() {
 
               />
             </Col>
-           
+
 
             <Col md={3}>
               <InputField

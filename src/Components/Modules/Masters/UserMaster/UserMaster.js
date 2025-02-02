@@ -59,11 +59,24 @@ useEffect(() => {
   // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Capitalize first letter of username
+    let updatedValue = value;
+    if (name === "user_name") {
+        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    // Ensure phone number contains only digits and is limited to 10 characters
+    if (name === "phone_number") {
+        updatedValue = value.replace(/\D/g, "").slice(0, 10);
+    }
+
     setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
+        ...prevData,
+        [name]: updatedValue,
     }));
-  };
+};
+
 
   // Handle form submission
   const handleSubmit = async (e) => {

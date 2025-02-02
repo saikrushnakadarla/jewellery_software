@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import './Rates.css';
 import InputField from '../../../Pages/InputField/InputField';
 import baseURL from "../../../../Url/NodeBaseURL";
+import { useNavigate } from 'react-router-dom';
 
 const Rates = () => {
     const [rates, setRates] = useState({
@@ -14,6 +15,14 @@ const Rates = () => {
         gold24: '',
         silverRate: '',
     });
+
+    const navigate = useNavigate(); // Initialize navigate
+    // const [allowEdit, setAllowEdit] = useState(false); // Track if editing is allowed for all fields
+
+     // Separate state for each field confirmation
+     const [allowEdit16, setAllowEdit16] = useState(false);
+     const [allowEdit18, setAllowEdit18] = useState(false);
+     const [allowEdit24, setAllowEdit24] = useState(false);
 
     useEffect(() => {
         const fetchRates = async () => {
@@ -57,6 +66,34 @@ const Rates = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+
+        if (name === 'gold16' && !allowEdit16) {
+            const confirmChange = window.confirm("You are modifying the 16K gold rate. Do you want to proceed?");
+            if (!confirmChange) return;
+            setAllowEdit16(true);
+        }
+
+        if (name === 'gold18' && !allowEdit18) {
+            const confirmChange = window.confirm("You are modifying the 18K gold rate. Do you want to proceed?");
+            if (!confirmChange) return;
+            setAllowEdit18(true);
+        }
+
+        if (name === 'gold24' && !allowEdit24) {
+            const confirmChange = window.confirm("You are modifying the 24K gold rate. Do you want to proceed?");
+            if (!confirmChange) return;
+            setAllowEdit24(true);
+        }
+        
+        // if (name === 'gold16' || name === 'gold18' || name === 'gold24') {
+        //     if (!allowEdit) {
+        //         const confirmChange = window.confirm(
+        //             "You are modifying an auto-calculated value. Do you want to proceed?"
+        //         );
+        //         if (!confirmChange) return; // If "No", stop here
+        //         setAllowEdit(true); // Allow future modifications
+        //     }
+        // }
 
         if (name === 'gold22') {
             const calculatedRates = calculateRates(value);
@@ -102,6 +139,7 @@ const Rates = () => {
             if (response.ok) {
                 alert('Rates updated successfully!');
                 console.log(result);
+                navigate('/dashboard'); // Redirect to Dashboard
             } else {
                 alert(`Error: ${result.error}`);
             }
@@ -110,6 +148,7 @@ const Rates = () => {
             console.error('Error:', error);
         }
     };
+
 
     return (
         <div className="main-container">
