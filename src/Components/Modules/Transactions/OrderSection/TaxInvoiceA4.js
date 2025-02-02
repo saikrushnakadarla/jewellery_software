@@ -280,7 +280,7 @@ const TaxINVoiceReceipt = ({
                                         </View>
 
                                         <View style={[styles.column, { marginTop: 0, width: '20%', marginLeft: 20, fontFamily: 'Times-Bold' }]}>
-                                                <Text style={{ fontWeight: 'bold', fontSize: 12, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text>
+                                                {/* <Text style={{ fontWeight: 'bold', fontSize: 12, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text> */}
                                                 {/* <View style={{ alignItems: 'center', marginBottom: 10 }}>
                                                         <Barcode value="SV1224" format="CODE128" width={1.5} height={50} />
                                                 </View> */}

@@ -13,7 +13,7 @@ const RepairsTable = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [orderDetails, setOrderDetails] = useState(null);
+  const [repairDetails, setRepairDetails] = useState(null);
 
   // Extract mobile from location state
   const { mobile } = location.state || {};
@@ -41,8 +41,12 @@ const RepairsTable = () => {
         accessor: 'mobile',
       },
       {
-        Header: 'Invoice Number',
+        Header: 'Invoice No.',
         accessor: 'invoice_number',
+      },
+      {
+        Header: 'Order No.',
+        accessor: 'order_number',
       },
       {
         Header: 'Account Name',
@@ -98,38 +102,83 @@ const RepairsTable = () => {
       //   accessor: 'cash_amount',
       //   Cell: ({ value }) => value || 0
       // },
-     
 
 
       {
         Header: 'Actions',
         accessor: 'actions',
-        Cell: ({ row }) => (
-          <div>
-            <FaEye
-              style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
-              onClick={() => handleViewDetails(row.original.invoice_number)} // Pass invoice_number
-            />
-            {/* Edit Icon */}
-            <FaEdit
-              style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
-              onClick={() => handleEdit(row.original.invoice_number,
-                row.original.mobile,
-                row.original.old_exchange_amt,
-                row.original.scheme_amt,
-                row.original.cash_amount,
-                row.original.card_amt,
-                row.original.chq_amt,
-                row.original.online_amt,
-              )} 
-          />
-            <FaTrash
-              style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
-              onClick={() => handleDelete(row.original.invoice_number)}
-            />
-          </div>
-        ),
+        Cell: ({ row }) => {
+          const isDisabled = row.original.invoice === "Converted";
+
+          return (
+            <div>
+              <FaEye
+                style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
+                onClick={() => handleViewDetails(row.original.invoice_number)}
+              />
+              <FaEdit
+                style={{
+                  cursor: 'pointer',
+                  marginLeft: '10px',
+                  color: 'blue',
+                }}
+                onClick={() => handleEdit(row.original.invoice_number,
+                  row.original.mobile,
+                  row.original.old_exchange_amt,
+                  row.original.scheme_amt,
+                  row.original.cash_amount,
+                  row.original.card_amt,
+                  row.original.chq_amt,
+                  row.original.online_amt,
+                )}
+              />
+              {/* <FaEdit
+                style={{
+                  cursor: isDisabled ? 'not-allowed' : 'pointer',
+                  marginLeft: '10px',
+                  color: isDisabled ? 'gray' : 'blue',
+                }}
+                onClick={() => {
+                  if (!isDisabled) {
+                    handleEdit(
+                      row.original.invoice_number,
+                      row.original.mobile,
+                      row.original.old_exchange_amt,
+                      row.original.scheme_amt,
+                      row.original.cash_amount,
+                      row.original.card_amt,
+                      row.original.chq_amt,
+                      row.original.online_amt
+                    );
+                  }
+                }}
+              /> */}
+              {/* Delete Icon - Disabled if isDisabled is true */}
+              {/* <FaTrash
+                style={{
+                  cursor: isDisabled ? 'not-allowed' : 'pointer',
+                  marginLeft: '10px',
+                  color: isDisabled ? 'gray' : 'red',
+                }}
+                onClick={() => {
+                  if (!isDisabled) {
+                    handleDelete(row.original.invoice_number);
+                  }
+                }}
+              /> */}
+              <FaTrash
+                style={{
+                  cursor: 'pointer',
+                  marginLeft: '10px',
+                  color: 'red',
+                }}
+                onClick={() => handleDelete(row.original.invoice_number)}
+              />
+            </div>
+          );
+        },
       },
+
       {
         Header: 'Receipts',
         accessor: 'receipts',
@@ -151,8 +200,6 @@ const RepairsTable = () => {
               Add Receipt
             </Button>
           );
-          
-          
         },
       },
 
@@ -194,14 +241,25 @@ const RepairsTable = () => {
           return;
         }
   
+        // Filter repeatedData to include only items with transaction_status "Sales" or "ConvertedInvoice"
+        const filteredData = details.repeatedData.filter(
+          (item) => item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice"
+        );
+  
+        // Check if no data was found after filtering
+        if (filteredData.length === 0) {
+          Swal.fire('No data', 'No records found with the required transaction status.', 'info');
+          return;
+        }
+  
         // Retrieve existing repair details from localStorage or set to an empty array if not available
-        const existingDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
+        const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
   
         // Get today's date in yyyy-mm-dd format
         const today = new Date().toISOString().split('T')[0];
   
-        // Update repeatedData with today's date
-        const formattedDetails = details.repeatedData.map((item) => ({
+        // Update filteredData with today's date
+        const formattedDetails = filteredData.map((item) => ({
           ...item,
           date: today,
           invoice_number, // Ensure the invoice_number is explicitly included
@@ -211,7 +269,7 @@ const RepairsTable = () => {
         const updatedDetails = [...existingDetails, ...formattedDetails];
   
         // Save updated details back to localStorage
-        localStorage.setItem('orderDetails', JSON.stringify(updatedDetails));
+        localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
   
         console.log('Updated repair details added to localStorage:', updatedDetails);
   
@@ -226,7 +284,7 @@ const RepairsTable = () => {
             card_amt,
             chq_amt,
             online_amt,
-            orderDetails: details,
+            repairDetails: details,
           },
         });
   
@@ -241,7 +299,8 @@ const RepairsTable = () => {
     }
   };
   
-   
+
+
   const handleDelete = async (invoiceNumber, skipConfirmation = false, skipMessage = false) => {
     if (skipConfirmation) {
       try {
@@ -259,7 +318,7 @@ const RepairsTable = () => {
         console.error('Error deleting repair details:', error);
         Swal.fire('Error!', 'Failed to delete repair details. Please try again.', 'error');
       }
-    }  else {
+    } else {
       // Show the confirmation alert
       Swal.fire({
         title: 'Are you sure?',
@@ -286,7 +345,7 @@ const RepairsTable = () => {
       });
     }
   };
-  
+
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -294,39 +353,64 @@ const RepairsTable = () => {
       date.getMonth() + 1
     ).padStart(2, '0')}-${date.getFullYear()}`;
   };
-
-  useEffect(() => {
-    const fetchRepairs = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
-
-        // Filter the data based on the 'transaction_status' column
-        const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
-
-        setData(filteredData); // Set the filtered data
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching repair details:', error);
-        setLoading(false);
-      }
-    };
-
-    fetchRepairs();
-  }, []);
-
   const handleCreate = () => {
     navigate('/sales');
   };
 
+  // Fetch repair data
+  const fetchRepairs = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+      console.log("Full response data: ", response.data);
+
+      // Filter out only 'Sales' items
+      const filteredData = response.data.filter(
+        (item) => item.transaction_status === 'Sales' || item.transaction_status === "ConvertedInvoice"
+      );
+      console.log("Filtered Orders: ", filteredData);
+
+      // Set the filtered data
+      setData(filteredData);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching repair details:', error);
+      setLoading(false);
+    }
+  };
+
+  // Handle view details of a specific invoice
   const handleViewDetails = async (invoice_number) => {
     try {
       const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
-      setOrderDetails(response.data);
-      setShowModal(true); // Show the modal with repair details
+      console.log("Fetched order details: ", response.data);
+
+      // Filter repeatedData to include only 'Sales' or 'ConvertedInvoice'
+      const filteredData = response.data.repeatedData.filter(
+        (item) => item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice"
+      );
+
+      // Check if any item in repeatedData has invoice === "Converted"
+      const isInvoiceConverted = filteredData.some(item => item.invoice === "Converted");
+      console.log("isInvoiceConverted=", isInvoiceConverted)
+
+      // Set repair details with filtered data and conversion status
+      setRepairDetails({
+        ...response.data,
+        repeatedData: filteredData,
+        isInvoiceConverted,
+      });
+
+      setShowModal(true);
     } catch (error) {
-      console.error('Error fetching repair details:', error);
+      console.error("Error fetching repair details:", error);
     }
   };
+
+  // useEffect hook to fetch data when the component is mounted
+  useEffect(() => {
+    fetchRepairs();
+  }, []);
+
 
   const handleAddReceipt = (invoiceData) => {
     navigate("/receipts", { state: { from: "/salestable", invoiceData } });
@@ -334,7 +418,7 @@ const RepairsTable = () => {
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setOrderDetails(null); // Clear repair details on modal close
+    setRepairDetails(null); // Clear repair details on modal close
   };
 
 
@@ -367,34 +451,34 @@ const RepairsTable = () => {
           <Modal.Title>Sales Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {orderDetails && (
+          {repairDetails && (
             <>
               <h5>Customer Info</h5>
               <Table bordered>
                 <tbody>
                   <tr>
                     <td>Mobile</td>
-                    <td>{orderDetails.uniqueData.mobile}</td>
+                    <td>{repairDetails.uniqueData.mobile}</td>
                   </tr>
                   <tr>
                     <td>Account Name</td>
-                    <td>{orderDetails.uniqueData.account_name}</td>
+                    <td>{repairDetails.uniqueData.account_name}</td>
                   </tr>
                   <tr>
                     <td>Email</td>
-                    <td>{orderDetails.uniqueData.email}</td>
+                    <td>{repairDetails.uniqueData.email}</td>
                   </tr>
                   <tr>
                     <td>Address</td>
-                    <td>{orderDetails.uniqueData.address1}</td>
+                    <td>{repairDetails.uniqueData.address1}</td>
                   </tr>
                   <tr>
                     <td>Invoice Number</td>
-                    <td>{orderDetails.uniqueData.invoice_number}</td>
+                    <td>{repairDetails.uniqueData.invoice_number}</td>
                   </tr>
                   <tr>
                     <td>Total Amount</td>
-                    <td>{orderDetails.uniqueData.net_amount}</td>
+                    <td>{repairDetails.uniqueData.net_amount}</td>
                   </tr>
                 </tbody>
               </Table>
@@ -415,10 +499,11 @@ const RepairsTable = () => {
                     <th>Rate</th>
                     <th>Tax Amount</th>
                     <th>Total Price</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {orderDetails.repeatedData.map((product, index) => (
+                  {repairDetails.repeatedData.map((product, index) => (
                     <tr key={index}>
                       <td>{product.code}</td>
                       <td>{product.product_name}</td>
@@ -432,13 +517,14 @@ const RepairsTable = () => {
                       <td>{product.rate}</td>
                       <td>{product.tax_amt}</td>
                       <td>{product.total_price}</td>
+                      <td>{product.transaction_status}</td>
                     </tr>
                   ))}
                   <tr style={{ fontWeight: 'bold' }}>
                     <td colSpan="11" className="text-end">
                       Total Amount
                     </td>
-                    <td>{orderDetails.uniqueData.net_amount}</td>
+                    <td>{repairDetails.uniqueData.net_amount}</td>
                   </tr>
                 </tbody>
               </Table>

@@ -24,12 +24,6 @@ const ProductDetails = ({
   isQtyEditable,
   handleFileChange
 }) => {
-
-  console.log("Filtered Design Options:", filteredDesignOptions);
-  console.log("Filtered Purity Options:", filteredPurityOptions);
-  console.log("Filtered Metal Types:", filteredMetalTypes);
-  console.log("Unique Products:", uniqueProducts);
-
   return (
     <Col >
       <Row>

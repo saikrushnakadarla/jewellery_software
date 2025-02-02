@@ -32,7 +32,6 @@ const SalesForm = () => {
     JSON.parse(localStorage.getItem('schemeSalesData')) || []
   );
 
-  // Save to localStorage whenever data changes
   useEffect(() => {
     localStorage.setItem('oldSalesData', JSON.stringify(oldSalesData));
   }, [oldSalesData]);
@@ -78,10 +77,8 @@ const SalesForm = () => {
     isBarcodeSelected,
   } = useProductHandlers();
 
-  // Apply calculations
   useCalculations(formData, setFormData);
 
-  // Fetch customers
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -100,21 +97,19 @@ const SalesForm = () => {
     fetchCustomers();
   }, []);
 
-  // Fetch last invoice number
   useEffect(() => {
     const fetchLastInvoiceNumber = async () => {
       try {
         const response = await axios.get(`${baseURL}/lastOrderNumber`);
         setFormData(prev => ({ ...prev, order_number: response.data.lastOrderNumber }));
       } catch (error) {
-        console.error("Error fetching invoice number:", error);
+        console.error("Error fetching order number:", error);
       }
     };
 
     fetchLastInvoiceNumber();
   }, []);
 
-  // Save data to localStorage whenever orderDetails or paymentDetails change
   useEffect(() => {
     localStorage.setItem('orderDetails', JSON.stringify(orderDetails));
   }, [orderDetails]);
@@ -123,7 +118,6 @@ const SalesForm = () => {
     localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
   }, [paymentDetails]);
 
-  // Handle customer change
   const handleCustomerChange = (customerId) => {
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
 
@@ -174,27 +168,26 @@ const SalesForm = () => {
     }));
   };
 
-  // Add product to repair details
   const handleAdd = () => {
     setOrderDetails((prevDetails) => {
       const updatedDetails = [
         ...prevDetails,
-        { 
-          ...formData, 
-          product_image: formData.product_image ? URL.createObjectURL(formData.product_image) : "" 
+        {
+          ...formData,
+          product_image: formData.product_image ? URL.createObjectURL(formData.product_image) : ""
         },
       ];
-      console.log("Updated repair details:", updatedDetails);
       return updatedDetails;
     });
-
     resetProductFields();
-    alert("Product added successfully");
   };
 
   const handleEdit = (index) => {
     setEditIndex(index);
-    setFormData(orderDetails[index]); // Populate form with selected item
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      ...orderDetails[index], // Merge repair details into formData
+    }));
   };
 
   const handleUpdate = () => {
@@ -213,7 +206,6 @@ const SalesForm = () => {
     }
   };
 
-  // Handle product delete
   const resetProductFields = () => {
     setFormData(prev => ({
       ...prev,
@@ -246,7 +238,6 @@ const SalesForm = () => {
     }));
   };
 
-  // Calculate totalPrice (sum of total_price from all orderDetails)
   const totalPrice = orderDetails.reduce((sum, item) => sum + parseFloat(item.total_price || 0), 0);
 
   const [oldTableData, setOldTableData] = useState(() => {
@@ -302,11 +293,9 @@ const SalesForm = () => {
     const discountAmt = parseFloat(item.disscount) || 0;
     return sum + stonePrice + makingCharges + rateAmt - discountAmt;
   }, 0);
-  console.log("Total Price=", taxableAmount);
 
   const taxAmount = orderDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
-  console.log("Net Amount=", netAmount);
 
   const totalAmount = orderDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
@@ -314,13 +303,11 @@ const SalesForm = () => {
     const rateAmt = parseFloat(item.rate_amt) || 0;
     return sum + stonePrice + makingCharges + rateAmt;
   }, 0);
-  console.log("Total Price=", totalAmount);
 
   const discountAmt = orderDetails.reduce((sum, item) => {
     const discountAmt = parseFloat(item.disscount) || 0;
     return sum + discountAmt;
   }, 0);
-  console.log("Total Price=", discountAmt);
 
   const oldItemsAmount = location.state?.old_exchange_amt
     ? parseFloat(location.state.old_exchange_amt)
@@ -351,200 +338,65 @@ const SalesForm = () => {
       online: "",
       online_amt: 0,
     });
-    setOldTableData([]); // Clear the oldTableData state
+    setOldTableData([]);
     setSchemeTableData([]);
     localStorage.removeItem('oldSalesData');
     localStorage.removeItem('schemeSalesData');
     localStorage.removeItem('orderDetails');
     localStorage.removeItem('paymentDetails');
-    localStorage.removeItem('oldTableData'); // Explicitly remove oldTableData from local storage
-    localStorage.removeItem('schemeTableData'); // Explicitly remove oldTableData from local storage
-
-    console.log("Data cleared successfully");
+    localStorage.removeItem('oldTableData');
+    localStorage.removeItem('schemeTableData');
   };
 
-  // const handleSave = async () => {
-  //   console.log("Preparing to save data...");
-  //   const formDataToSend = new FormData();
+  const handleSave = async () => {
+    if (!formData.customer_id || !formData.account_name || !formData.mobile || !formData.email) {
+      alert("Please fill in all required customer details before saving.");
+      return;
+    }
 
-  //   // Append customer details
-  //   formDataToSend.append('customer_id', formData.customer_id);
-  //   formDataToSend.append('account_name', formData.account_name);
-  //   formDataToSend.append('mobile', formData.mobile);
-  //   formDataToSend.append('email', formData.email);
-  //   formDataToSend.append('address1', formData.address1);
-  //   formDataToSend.append('address2', formData.address2);
-  //   formDataToSend.append('city', formData.city);
-  //   formDataToSend.append('pincode', formData.pincode);
-  //   formDataToSend.append('state', formData.state);
-  //   formDataToSend.append('state_code', formData.state_code);
-  //   formDataToSend.append('aadhar_card', formData.aadhar_card);
-  //   formDataToSend.append('gst_in', formData.gst_in);
-  //   formDataToSend.append('pan_card', formData.pan_card);
+    const dataToSave = {
+      orderDetails: orderDetails.map(item => ({
+        ...item,
+        customer_id: formData.customer_id,
+        mobile: formData.mobile,
+        account_name: formData.account_name,
+        email: formData.email,
+        address1: formData.address1,
+        address2: formData.address2,
+        city: formData.city,
+        pincode: formData.pincode,
+        state: formData.state,
+        state_code: formData.state_code,
+        aadhar_card: formData.aadhar_card,
+        gst_in: formData.gst_in,
+        pan_card: formData.pan_card,
+        terms: formData.terms,
+        cash_amount: paymentDetails.cash_amount || 0,
+        card_amount: paymentDetails.card || 0,
+        card_amt: paymentDetails.card_amt || 0,
+        chq: paymentDetails.chq || "",
+        chq_amt: paymentDetails.chq_amt || 0,
+        online: paymentDetails.online || "",
+        online_amt: paymentDetails.online_amt || 0,
+      })),
+      oldItems: oldSalesData,
+      memberSchemes: schemeSalesData,
+      oldItemsAmount: oldItemsAmount || 0,
+      schemeAmount: schemeAmount || 0,
+    };
 
-  //   // Append repair details
-  //   const repairDetailsWithPayment = orderDetails.map(item => ({
-  //     ...item,
-  //     cash_amount: paymentDetails.cash_amount || 0,
-  //     card_amount: paymentDetails.card || 0,
-  //     card_amt: paymentDetails.card_amt || 0,
-  //     chq: paymentDetails.chq || "",
-  //     chq_amt: paymentDetails.chq_amt || 0,
-  //     online: paymentDetails.online || "",
-  //     online_amt: paymentDetails.online_amt || 0,
-  //   }));
-
-  //   formDataToSend.append('orderDetails', JSON.stringify(repairDetailsWithPayment));
-  //   formDataToSend.append('oldItems', JSON.stringify(oldSalesData));
-  //   formDataToSend.append('memberSchemes', JSON.stringify(schemeSalesData));
-
-  //   // Append each product image
-  //   orderDetails.forEach((item, index) => {
-  //     if (item.product_image instanceof File) {
-  //       formDataToSend.append(`product_image_${index}`, item.product_image);
-  //     }
-  //   });
-
-  //   try {
-  //     console.log("Sending data to API...");
-  //     const response = await axios.post(`${baseURL}/save-order-details`, formDataToSend, {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data',
-  //       }
-  //     });
-
-  //     console.log("Data saved successfully.");
-  //     alert("Data saved successfully");
-
-  //     // Generate PDF Blob
-  //     console.log("Generating PDF document...");
-  //     const pdfDoc = (
-  //       <PDFLayout
-  //         formData={formData}
-  //         orderDetails={orderDetails}
-  //         cash_amount={paymentDetails.cash_amount || 0}
-  //         card_amt={paymentDetails.card_amt || 0}
-  //         chq_amt={paymentDetails.chq_amt || 0}
-  //         online_amt={paymentDetails.online_amt || 0}
-  //         taxAmount={taxAmount}
-  //         oldItemsAmount={oldItemsAmount}
-  //         schemeAmount={schemeAmount}
-  //         netPayableAmount={netPayableAmount}
-  //       />
-  //     );
-
-  //     const pdfBlob = await pdf(pdfDoc).toBlob();
-  //     console.log("PDF blob created:", pdfBlob);
-
-  //     // Create a download link and trigger it
-  //     console.log("Triggering download for PDF...");
-  //     const link = document.createElement("a");
-  //     link.href = URL.createObjectURL(pdfBlob);
-  //     link.download = `invoice-${formData.order_number}.pdf`;
-  //     link.click();
-
-  //     // Clean up
-  //     console.log("Cleaning up after download...");
-  //     URL.revokeObjectURL(link.href);
-
-  //     // Clear all data after saving
-  //     console.log("Clearing data...");
-  //     clearData();
-
-  //     // Reset the form and reload the page if necessary
-  //     console.log("Resetting form and reloading page...");
-  //     resetForm();
-  //     window.location.reload();
-  //   } catch (error) {
-  //     console.error("Error saving data:", error);
-  //     alert("Error saving data");
-  //   }
-  // };
-
-const handleSave = async () => {
-  // Validate required customer details before saving
-  if (!formData.customer_id || !formData.account_name || !formData.mobile || !formData.email) {
-    alert("Please fill in all required customer details before saving.");
-    return;
-  }
-
-  // Include customer details in the data being saved
-  const dataToSave = {
-    orderDetails: orderDetails.map(item => ({
-      ...item,
-      customer_id: formData.customer_id,
-      mobile: formData.mobile,
-      account_name: formData.account_name,
-      email: formData.email,
-      address1: formData.address1,
-      address2: formData.address2,
-      city: formData.city,
-      pincode: formData.pincode,
-      state: formData.state,
-      state_code: formData.state_code,
-      aadhar_card: formData.aadhar_card,
-      gst_in: formData.gst_in,
-      pan_card: formData.pan_card,
-      terms: formData.terms,
-      cash_amount: paymentDetails.cash_amount || 0,
-      card_amount: paymentDetails.card || 0,
-      card_amt: paymentDetails.card_amt || 0,
-      chq: paymentDetails.chq || "",
-      chq_amt: paymentDetails.chq_amt || 0,
-      online: paymentDetails.online || "",
-      online_amt: paymentDetails.online_amt || 0,
-    })),
-    oldItems: oldSalesData,
-    memberSchemes: schemeSalesData,
-    oldItemsAmount: oldItemsAmount || 0, 
-    schemeAmount: schemeAmount || 0,    
+    console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
+    try { 
+      clearData();  // Ensure data is cleared before reloading
+      resetForm();
+      window.location.reload();
+      alert("Order added successfully");
+      await axios.post(`${baseURL}/save-order-details`, dataToSave);
+    } catch (error) {
+      console.error("Error saving data:", error);
+      alert("Error saving data");
+    }
   };
-
-  console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-
-  try {
-    await axios.post(`${baseURL}/save-order-details`, dataToSave);
-    alert("Order added successfully");
-
-    // Generate PDF Blob
-    const pdfDoc = (
-      <PDFLayout
-        formData={formData}
-        orderDetails={orderDetails}
-        cash_amount={paymentDetails.cash_amount || 0}
-        card_amt={paymentDetails.card_amt || 0}
-        chq_amt={paymentDetails.chq_amt || 0}
-        online_amt={paymentDetails.online_amt || 0}
-        taxAmount={taxAmount}
-        oldItemsAmount={oldItemsAmount}
-        schemeAmount={schemeAmount}
-        netPayableAmount={netPayableAmount}
-      />
-    );
-
-    const pdfBlob = await pdf(pdfDoc).toBlob();
-
-    // Create a download link and trigger it
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(pdfBlob);
-    link.download = `invoice-${formData.order_number}.pdf`;
-    link.click();
-
-    // Clean up
-    URL.revokeObjectURL(link.href);
-
-    // Clear all data after saving
-    clearData();
-
-    // Reset the form and reload the page if necessary
-    resetForm();
-    window.location.reload();
-  } catch (error) {
-    console.error("Error saving data:", error);
-    alert("Error saving data");
-  }
-};
-
 
   return (
     <div className="main-container">
@@ -644,7 +496,7 @@ const handleSave = async () => {
                   paymentDetails={paymentDetails}
                 />
               }
-              fileName={`invoice-${formData.order_number}.pdf`}
+              fileName={`order-${formData.order_number}.pdf`}
             >
               {({ blob, url, loading, error }) =>
                 loading ? "Generating PDF..." : "Download Invoice PDF"

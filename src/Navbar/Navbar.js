@@ -16,8 +16,8 @@ function Navbar() {
   const [reportsDropdownOpen, setReportsDropdownOpen] = useState(false);
   const [utilityDropdownOpen, setUtilityDropdownOpen] = useState(false);
   const { authToken, userId, userName } = useContext(AuthContext);
-  console.log(userId, userName)
-  const location = useLocation();  // Get the current location from React Router
+  // console.log(userId, userName)
+  const location = useLocation();  
   const navigate = useNavigate();
 
   const toggleMenu = () => {
