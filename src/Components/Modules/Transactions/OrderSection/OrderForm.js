@@ -387,6 +387,12 @@ const SalesForm = () => {
 
     console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
     try { 
+      const existingDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
+
+      if (existingDetails.length > 0) {
+        navigate("/orderstable");
+      
+      }
       clearData();  // Ensure data is cleared before reloading
       resetForm();
       window.location.reload();

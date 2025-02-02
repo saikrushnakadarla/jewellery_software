@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTable, usePagination, useGlobalFilter, useSortBy } from 'react-table';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './TableLayout.css';
+import './TableLayout.css'
 
 // Global Search Filter Component
 function GlobalFilter({ globalFilter, setGlobalFilter }) {
@@ -20,19 +20,6 @@ function GlobalFilter({ globalFilter, setGlobalFilter }) {
 
 // Reusable DataTable Component
 export default function DataTable({ columns, data, initialSearchValue }) {
-  const filterAllColumns = (rows, id, filterValue) => {
-    if (!filterValue) return rows;
-    const lowercasedFilter = filterValue.toLowerCase();
-    
-    return rows.filter((row) => {
-      return Object.values(row.original).some(
-        (value) =>
-          value &&
-          value.toString().toLowerCase().includes(lowercasedFilter)
-      );
-    });
-  };
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -52,7 +39,6 @@ export default function DataTable({ columns, data, initialSearchValue }) {
       columns,
       data,
       initialState: { pageIndex: 0, globalFilter: initialSearchValue }, // Set initial global filter
-      globalFilter: filterAllColumns, // Use the custom filter function
     },
     useGlobalFilter,
     useSortBy,
