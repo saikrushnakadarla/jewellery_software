@@ -498,8 +498,9 @@ const RepairsTable = () => {
                     <th>Making Charges</th>
                     <th>Rate</th>
                     <th>Tax Amount</th>
-                    <th>Total Price</th>
                     <th>Status</th>
+                    <th>Total Price</th>
+                    
                   </tr>
                 </thead>
                 <tbody>
@@ -516,12 +517,13 @@ const RepairsTable = () => {
                       <td>{product.making_charges}</td>
                       <td>{product.rate}</td>
                       <td>{product.tax_amt}</td>
-                      <td>{product.total_price}</td>
                       <td>{product.transaction_status}</td>
+                      <td>{product.total_price}</td>
+                      
                     </tr>
                   ))}
                   <tr style={{ fontWeight: 'bold' }}>
-                    <td colSpan="11" className="text-end">
+                    <td colSpan="12" className="text-end">
                       Total Amount
                     </td>
                     <td>{repairDetails.uniqueData.net_amount}</td>
