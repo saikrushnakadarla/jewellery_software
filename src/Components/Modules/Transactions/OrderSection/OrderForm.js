@@ -387,6 +387,7 @@ const SalesForm = () => {
 
     console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
     try { 
+        navigate("/orderstable");
       clearData();  // Ensure data is cleared before reloading
       resetForm();
       window.location.reload();
