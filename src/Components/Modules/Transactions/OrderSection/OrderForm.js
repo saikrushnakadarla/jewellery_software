@@ -279,7 +279,7 @@ const SalesForm = () => {
   };
 
   const handleBack = () => {
-    navigate("/salestable");
+    navigate("/orderstable");
   };
 
   const handleAddCustomer = () => {
