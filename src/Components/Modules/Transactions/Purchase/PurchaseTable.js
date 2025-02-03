@@ -117,11 +117,12 @@ const handleOpenModal = (data) => {
             <button
               type="button"
               className="btn btn-primary"
+              
               style={{
                 backgroundColor: '#a36e29',
                 borderColor: '#a36e29',
-                width: '102px',
-                fontSize: '0.875rem',
+                fontSize: '0.875rem', // Smaller font size
+                padding: '0.25rem 0.5rem', // Reduced padding
               }}
               onClick={() => handleOpenModal(row.original)} // Pass entire row data
             >

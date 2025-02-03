@@ -29,7 +29,7 @@ const RepairsTable = () => {
   });
   const [tempTableData, setTempTableData] = useState([]);
   const [mcForRepair, setMcForRepair] = useState(""); // Manual entry for MC for Repair
-const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
+  const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
   const [receivedData, setReceivedData] = useState({
     gross_wt_after_repair: '',
     total_amt: '',
@@ -212,18 +212,18 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
       const fetchedTotal = assignedRepairDetails
         .filter((repair) => repair.repair_id === selectedRepair.repair_id)
         .reduce((total, repair) => total + (repair.amount || 0), 0);
-  
+
       setTotalAmount(fetchedTotal + (parseFloat(mcForRepair) || 0)); // Add MC for Repair
     }
   }, [mcForRepair, selectedRepair, assignedRepairDetails]); // Recalculate on change
-  
+
   const handleReceiveInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     if (name === "mc_for_repair") {
       setMcForRepair(value); // Update MC for Repair field
     }
-  
+
     setReceivedData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -239,15 +239,16 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
         .filter((repair) => repair.repair_id === selectedRepair.repair_id)
         .reduce((total, repair) => total + (repair.weight || 0), 0);
 
-    const totalAmt = assignedRepairDetails
-      .filter((repair) => repair.repair_id === selectedRepair.repair_id)
-      .reduce((total, repair) => total + (repair.amount || 0), 0);
-
+    const totalAmt =
+      assignedRepairDetails
+        .filter((repair) => repair.repair_id === selectedRepair.repair_id)
+        .reduce((total, repair) => total + Number(repair.amount || 0), 0) +
+      Number(mcForRepair || 0); // Ensure numeric addition
     // Prepare the payload
     const payload = {
       repair_id: selectedRepair.repair_id,
       gross_wt_after_repair: grossWtAfterRepair,
-      // mc_for_repair:mcforRepair,
+      mc_for_repair: mcForRepair,
       total_amt: totalAmt,
     };
 
@@ -414,12 +415,12 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
                   Assign to Workshop
                 </option>
                 <option value="Receive from Workshop"
-                  disabled={status === 'Pending' || status === 'Receive from Workshop'}
+                  // disabled={status === 'Pending' || status === 'Receive from Workshop'}
                 >
                   Receive from Workshop
                 </option>
                 <option value="Delivery to Customer"
-                  disabled={status === 'Pending' || status === 'Assign to Workshop'}
+                  // disabled={status === 'Pending' || status === 'Assign to Workshop'}
                 >
                   Delivery to Customer
                 </option>
@@ -795,28 +796,28 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
                   </Form.Group>
                 </Col>
                 <Col md={4}>
-      <Form.Group controlId="mc_for_repair">
-        <Form.Label><strong>MC for Repair</strong></Form.Label>
-        <Form.Control
-          type="text"
-          name="mc_for_repair"
-          value={mcForRepair}
-          onChange={handleReceiveInputChange} // Manual entry
-        />
-      </Form.Group>
-    </Col>
+                  <Form.Group controlId="mc_for_repair">
+                    <Form.Label><strong>MC for Repair</strong></Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="mc_for_repair"
+                      value={mcForRepair}
+                      onChange={handleReceiveInputChange} // Manual entry
+                    />
+                  </Form.Group>
+                </Col>
 
-    <Col md={4}>
-      <Form.Group controlId="total_amt">
-        <Form.Label><strong>Total Amount</strong></Form.Label>
-        <Form.Control
-          type="text"
-          name="total_amt"
-          value={totalAmount}
-          readOnly // Prevent manual edits
-        />
-      </Form.Group>
-    </Col>
+                <Col md={4}>
+                  <Form.Group controlId="total_amt">
+                    <Form.Label><strong>Total Amount</strong></Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="total_amt"
+                      value={totalAmount}
+                      readOnly // Prevent manual edits
+                    />
+                  </Form.Group>
+                </Col>
               </Row>
             </Form>
           </Modal.Body>
