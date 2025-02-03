@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { FaEdit, FaTrash } from "react-icons/fa";
 
-const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
+const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
@@ -77,27 +77,27 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
               <td>{detail.total_price}</td>
               {/* <td>{detail.transaction_status}</td> */}
               <td>
-          {detail.imagePreview ? (
-            <img
-              src={detail.imagePreview}
-              alt="Uploaded"
-              style={{ width: "50px", height: "50px" }}
-            />
-          ) : (
-            "No Image"
-          )}
-        </td>
+                {detail.imagePreview ? (
+                  <img
+                    src={detail.imagePreview}
+                    alt="Uploaded"
+                    style={{ width: "50px", height: "50px" }}
+                  />
+                ) : (
+                  "No Image"
+                )}
+              </td>
               <td>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <FaEdit                  
+                  <FaEdit
                     onClick={() => onEdit(index)}
                     style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue' }}
-                  />                
-                  <FaTrash 
+                  />
+                  <FaTrash
                     style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
                     onClick={() => onDelete(index)}
-                  /> 
-                </div> 
+                  />
+                </div>
               </td>
             </tr>
           ))

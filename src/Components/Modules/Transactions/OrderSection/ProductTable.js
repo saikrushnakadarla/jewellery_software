@@ -73,21 +73,16 @@ const ProductTable = ({ orderDetails, onDelete, onEdit }) => {
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>
               <td>
-                {detail.product_image ? (
+                {detail.imagePreview ? (
                   <img
-                    src={detail.product_image} // Directly use the stored URL
-                    alt="Product"
-                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'placeholder-image-url.jpg'; // Placeholder in case of error
-                    }}
+                    src={detail.imagePreview}
+                    alt="Uploaded"
+                    style={{ width: "50px", height: "50px" }}
                   />
                 ) : (
-                  'No Image'
+                  "No Image"
                 )}
               </td>
-
               <td>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <FaEdit

@@ -75,6 +75,8 @@ const SalesForm = () => {
     purityOptions,
     subcategoryOptions,
     isBarcodeSelected,
+    handleImageChange,
+    image,
   } = useProductHandlers();
 
   useCalculations(formData, setFormData);
@@ -174,7 +176,7 @@ const SalesForm = () => {
         ...prevDetails,
         {
           ...formData,
-          product_image: formData.product_image ? URL.createObjectURL(formData.product_image) : ""
+          imagePreview: formData.imagePreview
         },
       ];
       return updatedDetails;
@@ -235,6 +237,7 @@ const SalesForm = () => {
       tax_amt: "",
       total_price: "",
       qty: "",
+      imagePreview:null,
     }));
   };
 
@@ -453,6 +456,8 @@ const SalesForm = () => {
               handleUpdate={handleUpdate}
               isEditing={editIndex !== null}
               handleImageUpload={handleImageUpload}
+              handleImageChange={handleImageChange}
+              image={image}
             />
           </div>
 
