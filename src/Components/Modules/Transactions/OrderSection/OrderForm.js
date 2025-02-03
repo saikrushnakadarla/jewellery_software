@@ -179,6 +179,13 @@ const SalesForm = () => {
       ];
       return updatedDetails;
     });
+    // Reset the relevant fields
+  setFormData((prevData) => ({
+    ...prevData,
+    disscount: "",
+    disscount_percentage: "",
+  }));
+
     resetProductFields();
   };
 

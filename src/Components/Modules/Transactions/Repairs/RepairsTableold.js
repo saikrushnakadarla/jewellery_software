@@ -28,8 +28,7 @@ const RepairsTable = () => {
     amount: '',
   });
   const [tempTableData, setTempTableData] = useState([]);
-  const [mcForRepair, setMcForRepair] = useState(""); // Manual entry for MC for Repair
-const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
+
   const [receivedData, setReceivedData] = useState({
     gross_wt_after_repair: '',
     total_amt: '',
@@ -47,7 +46,7 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
     try {
       const response = await axios.get(`${baseURL}/get/repairs`);
       setRepairs(response.data);
-      console.log("Repairs=", response.data)
+      console.log("Repairs=",response.data)
     } catch (error) {
       console.error('Error fetching repairs:', error);
     }
@@ -207,28 +206,14 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
       });
   };
 
-  useEffect(() => {
-    if (selectedRepair) {
-      const fetchedTotal = assignedRepairDetails
-        .filter((repair) => repair.repair_id === selectedRepair.repair_id)
-        .reduce((total, repair) => total + (repair.amount || 0), 0);
-  
-      setTotalAmount(fetchedTotal + (parseFloat(mcForRepair) || 0)); // Add MC for Repair
-    }
-  }, [mcForRepair, selectedRepair, assignedRepairDetails]); // Recalculate on change
-  
   const handleReceiveInputChange = (e) => {
     const { name, value } = e.target;
-  
-    if (name === "mc_for_repair") {
-      setMcForRepair(value); // Update MC for Repair field
-    }
-  
     setReceivedData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
   };
+
   const handleReceiveSubmit = () => {
     if (!selectedRepair) return;
 
@@ -247,7 +232,6 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
     const payload = {
       repair_id: selectedRepair.repair_id,
       gross_wt_after_repair: grossWtAfterRepair,
-      // mc_for_repair:mcforRepair,
       total_amt: totalAmt,
     };
 
@@ -340,12 +324,12 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
         Header: 'Image',
         accessor: 'image',
         Cell: ({ value }) => {
-          if (!value) return "No Image";
+          if (!value) return "No Image"; 
           const handleImageClick = () => {
             const newWindow = window.open();
             newWindow.document.write(`<img src="${value}" alt="Repair Image" style="width: 100%; height: auto;" />`);
           };
-
+      
           return (
             <img
               src={value}
@@ -355,10 +339,10 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
                 height: "50px",
                 objectFit: "cover",
                 borderRadius: "5px",
-                cursor: "pointer",
+                cursor: "pointer", 
               }}
-              onClick={handleImageClick}
-              onError={(e) => e.target.src = "/placeholder.png"}
+              onClick={handleImageClick} 
+              onError={(e) => e.target.src = "/placeholder.png"} 
             />
           );
         },
@@ -373,7 +357,7 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
       //       const newWindow = window.open();
       //       newWindow.document.write(`<img src="${value}" alt="Repair Image" style="width: 100%; height: auto;" />`);
       //     };
-
+      
       //     return (
       //       <div>
       //         <span
@@ -390,8 +374,8 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
       //     );
       //   },
       // },
-
-
+      
+      
       {
         Header: 'Update Status',
         accessor: 'update_status',
@@ -777,7 +761,7 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
             )}
             <Form>
               <Row>
-                <Col md={4}>
+                <Col md={6}>
                   <Form.Group controlId="gross_wt_after_repair">
                     <Form.Label><strong>Gross Weight after Repair</strong></Form.Label>
                     <Form.Control
@@ -794,29 +778,23 @@ const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
                     />
                   </Form.Group>
                 </Col>
-                <Col md={4}>
-      <Form.Group controlId="mc_for_repair">
-        <Form.Label><strong>MC for Repair</strong></Form.Label>
-        <Form.Control
-          type="text"
-          name="mc_for_repair"
-          value={mcForRepair}
-          onChange={handleReceiveInputChange} // Manual entry
-        />
-      </Form.Group>
-    </Col>
-
-    <Col md={4}>
-      <Form.Group controlId="total_amt">
-        <Form.Label><strong>Total Amount</strong></Form.Label>
-        <Form.Control
-          type="text"
-          name="total_amt"
-          value={totalAmount}
-          readOnly // Prevent manual edits
-        />
-      </Form.Group>
-    </Col>
+                <Col md={6}>
+                  <Form.Group controlId="total_amt">
+                    <Form.Label><strong>Total Amount</strong></Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="total_amt"
+                      value={
+                        selectedRepair ?
+                          assignedRepairDetails
+                            .filter((repair) => repair.repair_id === selectedRepair.repair_id)
+                            .reduce((total, repair) => total + (repair.amount || 0), 0)
+                          : ''
+                      }
+                      onChange={handleReceiveInputChange}
+                    />
+                  </Form.Group>
+                </Col>
               </Row>
             </Form>
           </Modal.Body>
