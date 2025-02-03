@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { FaEdit, FaTrash } from "react-icons/fa";
+import "./ProductTable.css";
 
 const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
   const taxableAmount = repairDetails.reduce((sum, item) => {
@@ -111,7 +112,7 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
     //   </tbody>
     // </Table>
     <div style={{ maxHeight: "200px", overflowY: "auto", position: "relative" }}>
-    <Table bordered hover responsive style={{ width: "130%" }}>
+    <Table className='dataTable_headerCell1' bordered hover responsive>
       <thead style={{ position: "sticky", top: 0, background: "white", zIndex: 2 }}>
         <tr>
           <th>Code</th>
