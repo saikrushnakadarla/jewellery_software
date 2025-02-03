@@ -2,83 +2,39 @@ import React, { useEffect } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 
-const InvoiceDetails = ({ formData, setFormData, filteredInvoices }) => {
+const InvoiceDetails = ({ formData, setFormData }) => {
   useEffect(() => {
-    // Set the default date value to the current date in dd-mm-yyyy format if not already set
+    // Set the default date value to the current date if it's not already set
     if (!formData.date) {
-      const currentDate = new Date();
-      setFormData({
-        ...formData,
-        date: formatDate(currentDate),
-      });
+      setFormData({ ...formData, date: new Date().toISOString().split("T")[0] });
     }
   }, [formData, setFormData]);
-
-  // Utility function to format date as dd-mm-yyyy
-  const formatDate = (date) => {
-    const d = new Date(date);
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
-
-  // Handle invoice number change
-  const handleInvoiceChange = (e) => {
-    const selectedInvoiceNumber = e.target.value;
-    const selectedInvoice = filteredInvoices.find(
-      (invoice) => invoice.invoice_number === selectedInvoiceNumber
-    );
-
-    if (selectedInvoice) {
-      setFormData({
-        ...formData,
-        invoice_number: selectedInvoiceNumber,
-        date: selectedInvoice.date ? formatDate(selectedInvoice.date) : "", // Format date
-        terms: selectedInvoice.terms || "", // Set the terms from the selected invoice
-      });
-    } else {
-      setFormData({
-        ...formData,
-        invoice_number: selectedInvoiceNumber,
-        date: "",
-        terms: "",
-      });
-    }
-  };
 
   return (
     <Col className="sales-form-section">
       <Row>
+      <Col xs={12} md={6}>
+        <InputField label="Terms" type="select" value={formData.terms} name="terms"
+          onChange={(e) => setFormData({ ...formData, terms: e.target.value })} 
+          options={[
+            { value: "Cash", label: "Cash" },
+            { value: "Credit", label: "Credit" },
+          ]}
+        />
+      </Col>
+      <Col xs={12} md={6}>
+        <InputField label="Date:" name="date" value={formData.date} type="date" 
+          onChange={(e) => setFormData({ ...formData, date: e.target.value })} 
+          max={new Date().toISOString().split("T")[0]}/>
+      </Col>
+      </Row>
+      <Row>
         <InputField
           label="Invoice Number"
           name="invoice_number"
-          type="select"
-          value={formData.invoice_number || ""}
-          onChange={handleInvoiceChange}
-          options={filteredInvoices.map((invoice) => ({
-            value: invoice.invoice_number,
-            label: invoice.invoice_number,
-          }))}
+          value={formData.invoice_number}
+          onChange={(e) => setFormData({ ...formData, invoice_number: e.target.value })}
         />
-      </Row>
-      <Row>
-        {/* <Col xs={12} md={6}>
-          <InputField
-            label="Terms"
-            name="terms"
-            value={formData.terms || ""}
-            readOnly={true}
-          />
-        </Col> */}
-        <Col xs={12} md={12}>
-          <InputField
-            label="Date"
-            name="date"
-            value={formData.date || ""}
-            readOnly={true}
-          />
-        </Col>
       </Row>
     </Col>
   );

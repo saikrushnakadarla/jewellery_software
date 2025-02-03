@@ -377,16 +377,16 @@ const ProductDetails = ({
             label="Upload Image"
             name="image"
             type="file"
-            onChange={(e) => handleImageChange(e)}
+            onChange={handleImageChange}
             accept="image/*"
           />
-          {formData.imagePreview && (
+          {/* {formData.imagePreview && (
             <img
               src={formData.imagePreview}
               alt="Selected"
               style={{ width: "100px", height: "100px", marginTop: "10px" }}
             />
-          )}
+          )} */}
         </Col>
 
         <Col xs={12} md={1}>

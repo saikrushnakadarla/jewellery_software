@@ -65,7 +65,8 @@ const useProductHandlers = () => {
     qty: "1",
     opentag_id: "",
     product_image: null,
-    order_status: 'In Progress'
+    order_status: 'In Progress',
+    imagePreview: null,
   });
 
   const [uniqueProducts, setUniqueProducts] = useState([]);
@@ -755,6 +756,22 @@ const useProductHandlers = () => {
   };
 
 
+  const [image, setImage] = useState(null);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prevData) => ({
+          ...prevData,
+          imagePreview: reader.result, // Update image preview in formData
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+
 
   return {
     formData,
@@ -763,6 +780,8 @@ const useProductHandlers = () => {
     products,
     isQtyEditable,
     handleChange,
+    handleImageChange,
+    image,
     handleBarcodeChange,
     handleProductNameChange,
     handleMetalTypeChange,

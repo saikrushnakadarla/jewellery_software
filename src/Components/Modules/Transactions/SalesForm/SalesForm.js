@@ -75,10 +75,14 @@ const SalesForm = () => {
     purityOptions,
     subcategoryOptions,
     isBarcodeSelected,
+    handleImageChange,
+    image,
   } = useProductHandlers();
+
 
   // Apply calculations
   useCalculations(formData, setFormData);
+
 
   // Fetch customers
   useEffect(() => {
@@ -269,21 +273,22 @@ const SalesForm = () => {
   //   setRepairDetails([...repairDetails, { ...formData }]);
   //   resetProductFields();
   // };
-const handleAdd = () => {
-  setRepairDetails([
-    ...repairDetails,
-    { ...formData, imagePreview: formData.imagePreview },
-  ]);
-
-  // Reset the relevant fields
-  setFormData((prevData) => ({
-    ...prevData,
-    disscount: "",
-    disscount_percentage: "",
-  }));
-
-  resetProductFields();
-};
+  const handleAdd = () => {
+    setRepairDetails([
+      ...repairDetails,
+      { ...formData, imagePreview: formData.imagePreview }, // Ensure imagePreview is set
+    ]);
+  
+    // Reset fields
+    setFormData((prevData) => ({
+      ...prevData,
+      disscount: "",
+      disscount_percentage: "",
+      imagePreview: null, // Clear image preview
+    }));
+  
+    resetProductFields();
+  };
 
 
   const handleEdit = (index) => {
@@ -341,6 +346,7 @@ const handleAdd = () => {
       tax_amt: "",
       total_price: "",
       qty: "",
+      imagePreview:null,
     }));
   };
 
@@ -644,6 +650,8 @@ const handleAdd = () => {
               isQtyEditable={isQtyEditable}
               handleUpdate={handleUpdate}
               isEditing={editIndex !== null}
+              handleImageChange={handleImageChange}
+              image={image}
             />
           </div>
 

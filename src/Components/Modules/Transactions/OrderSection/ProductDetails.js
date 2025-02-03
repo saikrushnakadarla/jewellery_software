@@ -11,6 +11,7 @@ const ProductDetails = ({
   formData,
   data,
   handleChange,
+  handleImageChange,
   handleBarcodeChange,
   handleProductNameChange,
   handleMetalTypeChange,
@@ -300,7 +301,7 @@ const ProductDetails = ({
             onChange={handleChange}
           />
         </Col>
-       
+
         <Col xs={12} md={1}>
           <InputField
             label="Qty"
@@ -335,14 +336,21 @@ const ProductDetails = ({
             readOnly
           />
         </Col>
-        <Col xs={12} md={3}>
+        <Col xs={12} md={2}>
           <InputField
+            label="Upload Image"
+            name="image"
             type="file"
-            label="Product Image"
-            name="product_image"
-            value={formData.product_image}
-            onChange={handleChange}
+            onChange={handleImageChange}
+            accept="image/*"
           />
+          {/* {formData.imagePreview && (
+            <img
+              src={formData.imagePreview}
+              alt="Selected"
+              style={{ width: "100px", height: "100px", marginTop: "10px" }}
+            />
+          )} */}
         </Col>
 
         {/* <Col xs={12} md={2}>

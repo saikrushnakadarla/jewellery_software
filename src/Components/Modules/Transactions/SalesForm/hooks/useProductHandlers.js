@@ -67,6 +67,7 @@ const useProductHandlers = () => {
     qty: "",
     opentag_id: "",
     product_image: null,
+    imagePreview: null,
   });
 
   const [uniqueProducts, setUniqueProducts] = useState([]);
@@ -76,6 +77,7 @@ const useProductHandlers = () => {
   const [designOptions, setDesignOptions] = useState([]);
   const [filteredDesignOptions, setFilteredDesignOptions] = useState([]);
   const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
+ 
 
   useEffect(() => {
     let currentRate = "";
@@ -243,21 +245,7 @@ const useProductHandlers = () => {
   //     setFilteredPurityOptions(purity);
   //   }
   // };
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
 
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData((prevData) => ({
-          ...prevData,
-          image: file, // Store the file itself
-          imagePreview: reader.result, // Store preview URL
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
 
 
@@ -782,6 +770,21 @@ const useProductHandlers = () => {
     }
   };
 
+  const [image, setImage] = useState(null);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prevData) => ({
+          ...prevData,
+          imagePreview: reader.result, // Update image preview in formData
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
 
 
   return {
@@ -792,6 +795,7 @@ const useProductHandlers = () => {
     isQtyEditable,
     handleChange,
     handleImageChange,
+    image,
     handleBarcodeChange,
     handleProductNameChange,
     handleMetalTypeChange,
