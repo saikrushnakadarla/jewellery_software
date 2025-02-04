@@ -412,17 +412,17 @@ const RepairsTable = () => {
                   Select Status
                 </option>
                 <option value="Assign to Workshop"
-                // disabled={status === 'Assign to Workshop' || status === 'Receive from Workshop'}
+                disabled={status === 'Assign to Workshop' || status === 'Receive from Workshop'}
                 >
                   Assign to Workshop
                 </option>
                 <option value="Receive from Workshop"
-                  // disabled={status === 'Pending' || status === 'Receive from Workshop'}
+                  disabled={status === 'Pending' || status === 'Receive from Workshop'}
                 >
                   Receive from Workshop
                 </option>
                 <option value="Delivery to Customer"
-                  // disabled={status === 'Pending' || status === 'Assign to Workshop'}
+                  disabled={status === 'Pending' || status === 'Assign to Workshop'}
                 >
                   Delivery to Customer
                 </option>

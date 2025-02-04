@@ -158,7 +158,8 @@ const EditRepairForm = ({ repairData, baseURL, onClose, refreshData }) => {
         <Button variant="secondary" onClick={onClose} className="me-2">
           Cancel
         </Button>
-        <Button type="submit" variant="primary">
+        <Button type="submit" variant="primary" style={{    backgroundColor: 'rgb(163, 110, 41)',
+    borderColor: 'rgb(163, 110, 41)'}}>
           Update
         </Button>
       </div>
