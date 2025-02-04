@@ -241,15 +241,16 @@ const RepairsTable = () => {
         .filter((repair) => repair.repair_id === selectedRepair.repair_id)
         .reduce((total, repair) => total + (repair.weight || 0), 0);
 
-    const totalAmt = assignedRepairDetails
-      .filter((repair) => repair.repair_id === selectedRepair.repair_id)
-      .reduce((total, repair) => total + (repair.amount || 0), 0);
-
+    const totalAmt =
+      assignedRepairDetails
+        .filter((repair) => repair.repair_id === selectedRepair.repair_id)
+        .reduce((total, repair) => total + Number(repair.amount || 0), 0) +
+      Number(mcForRepair || 0); // Ensure numeric addition
     // Prepare the payload
     const payload = {
       repair_id: selectedRepair.repair_id,
       gross_wt_after_repair: grossWtAfterRepair,
-      // mc_for_repair:mcforRepair,
+      mc_for_repair: mcForRepair,
       total_amt: totalAmt,
     };
 
@@ -416,12 +417,12 @@ const RepairsTable = () => {
                   Assign to Workshop
                 </option>
                 <option value="Receive from Workshop"
-                  disabled={status === 'Pending' || status === 'Receive from Workshop'}
+                  // disabled={status === 'Pending' || status === 'Receive from Workshop'}
                 >
                   Receive from Workshop
                 </option>
                 <option value="Delivery to Customer"
-                  disabled={status === 'Pending' || status === 'Assign to Workshop'}
+                  // disabled={status === 'Pending' || status === 'Assign to Workshop'}
                 >
                   Delivery to Customer
                 </option>
