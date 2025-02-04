@@ -4,7 +4,7 @@ import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reu
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
 import { FaTrash, FaEdit } from 'react-icons/fa';
-import EditRepairForm from "./EditRepairForm";
+
 import './RepairsTable.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -14,12 +14,10 @@ const RepairsTable = () => {
   const [repairs, setRepairs] = useState([]);
   const [assignedRepairDetails, setAssignedRepairDetails] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [editshowModal, seteditShowModal] = useState(false);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [selectedRepair, setSelectedRepair] = useState(null);
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
-  const [editData, setEditData] = useState(null);
   const [assignedData, setAssignedData] = useState({
     item_name: '',
     purity: '',
@@ -31,7 +29,7 @@ const RepairsTable = () => {
   });
   const [tempTableData, setTempTableData] = useState([]);
   const [mcForRepair, setMcForRepair] = useState(""); // Manual entry for MC for Repair
-  const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
+const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
   const [receivedData, setReceivedData] = useState({
     gross_wt_after_repair: '',
     total_amt: '',
@@ -214,18 +212,18 @@ const RepairsTable = () => {
       const fetchedTotal = assignedRepairDetails
         .filter((repair) => repair.repair_id === selectedRepair.repair_id)
         .reduce((total, repair) => total + (repair.amount || 0), 0);
-
+  
       setTotalAmount(fetchedTotal + (parseFloat(mcForRepair) || 0)); // Add MC for Repair
     }
   }, [mcForRepair, selectedRepair, assignedRepairDetails]); // Recalculate on change
-
+  
   const handleReceiveInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     if (name === "mc_for_repair") {
       setMcForRepair(value); // Update MC for Repair field
     }
-
+  
     setReceivedData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -411,7 +409,7 @@ const RepairsTable = () => {
                   Select Status
                 </option>
                 <option value="Assign to Workshop"
-                // disabled={status === 'Assign to Workshop' || status === 'Receive from Workshop'}
+                  disabled={status === 'Assign to Workshop' || status === 'Receive from Workshop'}
                 >
                   Assign to Workshop
                 </option>
@@ -448,27 +446,6 @@ const RepairsTable = () => {
     ],
     [repairs]
   );
-
-  const handleEditing = (repair) => {
-    setEditData(repair);
-    seteditShowModal(true);
-  };
-
-  // Function to fetch and refresh data
-  const refreshData = async () => {
-    try {
-      const response = await axios.get(`${baseURL}/assigned-repairdetails`);
-      if (response.status === 200) {
-        setAssignedRepairDetails(response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching repair details:", error);
-    }
-  };
-
-  useEffect(() => {
-    refreshData();
-  }, []);
 
   return (
     <div className="main-container">
@@ -752,9 +729,11 @@ const RepairsTable = () => {
                     </Form.Group>
                   </Col>
                 </Row>
-                {assignedRepairDetails.filter((r) => r.repair_id === selectedRepair.repair_id).length > 0 ? (
+                {assignedRepairDetails
+                  .filter((repair) => repair.repair_id === selectedRepair.repair_id)
+                  .length > 0 ? (
                   <>
-                    <h5 style={{ fontWeight: "bold" }}>Assigned Details</h5>
+                    <h5 style={{ fontWeight: 'bold' }}>Assigned Details</h5>
                     <Table size="sm">
                       <thead>
                         <tr>
@@ -770,7 +749,7 @@ const RepairsTable = () => {
                       </thead>
                       <tbody>
                         {assignedRepairDetails
-                          .filter((r) => r.repair_id === selectedRepair.repair_id)
+                          .filter((repair) => repair.repair_id === selectedRepair.repair_id)
                           .map((repair, index) => (
                             <tr key={index}>
                               <td>{repair.item_name}</td>
@@ -781,13 +760,9 @@ const RepairsTable = () => {
                               <td>{repair.rate}</td>
                               <td>{repair.amount}</td>
                               <td>
-                                <FaEdit
-                                  style={{ cursor: "pointer", marginLeft: "10px", color: "blue" }}
-                                  onClick={() => handleEditing(repair)}
-                                />
                                 <FaTrash
-                                  style={{ cursor: "pointer", color: "red" }}
-                                  onClick={() => handleDelete(repair.id)}
+                                  style={{ cursor: 'pointer', color: 'red' }}
+                                  onClick={() => handleDelete(repair.id)} // Use `id` for deletion
                                 />
                               </td>
                             </tr>
@@ -798,24 +773,6 @@ const RepairsTable = () => {
                 ) : (
                   <div>No assigned details available</div>
                 )}
-
-/* Modal for Editing */
-                <Modal show={editshowModal} onHide={() => seteditShowModal(false)} centered>
-                  <Modal.Header closeButton>
-                    <Modal.Title>Edit Repair Details</Modal.Title>
-                  </Modal.Header>
-                  <Modal.Body>
-                    {editData && (
-                      <EditRepairForm
-                        repairData={editData}
-                        baseURL={baseURL}
-                        onClose={() => seteditShowModal(false)}
-                        refreshData={refreshData}  // Pass refresh function
-                      />
-                    )}
-                  </Modal.Body>
-                </Modal>
-
               </div>
             )}
             <Form>
@@ -838,28 +795,28 @@ const RepairsTable = () => {
                   </Form.Group>
                 </Col>
                 <Col md={4}>
-                  <Form.Group controlId="mc_for_repair">
-                    <Form.Label><strong>MC for Repair</strong></Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="mc_for_repair"
-                      value={mcForRepair}
-                      onChange={handleReceiveInputChange} // Manual entry
-                    />
-                  </Form.Group>
-                </Col>
+      <Form.Group controlId="mc_for_repair">
+        <Form.Label><strong>MC for Repair</strong></Form.Label>
+        <Form.Control
+          type="text"
+          name="mc_for_repair"
+          value={mcForRepair}
+          onChange={handleReceiveInputChange} // Manual entry
+        />
+      </Form.Group>
+    </Col>
 
-                <Col md={4}>
-                  <Form.Group controlId="total_amt">
-                    <Form.Label><strong>Total Amount</strong></Form.Label>
-                    <Form.Control
-                      type="text"
-                      name="total_amt"
-                      value={totalAmount}
-                      readOnly // Prevent manual edits
-                    />
-                  </Form.Group>
-                </Col>
+    <Col md={4}>
+      <Form.Group controlId="total_amt">
+        <Form.Label><strong>Total Amount</strong></Form.Label>
+        <Form.Control
+          type="text"
+          name="total_amt"
+          value={totalAmount}
+          readOnly // Prevent manual edits
+        />
+      </Form.Group>
+    </Col>
               </Row>
             </Form>
           </Modal.Body>
