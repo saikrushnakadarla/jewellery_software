@@ -47,7 +47,7 @@ function Receivables({ selectedCustomerMobile }) {
       : parseFloat(balance_amount) || 0;
   
     return sum + balance;
-  }, 0);
+  }, 0).toFixed(2);
   
 
   if (loading) {

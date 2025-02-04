@@ -231,23 +231,27 @@ const RepairsTable = () => {
     if (result.isConfirmed) {
       try {
         // Fetch repair details
-        const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
-        const details = response.data;
+        const repairResponse = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
+        const repairDetails = repairResponse.data;
   
-        // Verify if the API returned data
-        if (!details || !details.repeatedData) {
-          console.error('No repeatedData found in response:', details);
+        // Fetch old items details
+        const oldItemsResponse = await axios.get(`${baseURL}/get/olditems/${invoice_number}`);
+        const oldItemsDetails = oldItemsResponse.data;
+  
+        // Verify if the repair API returned data
+        if (!repairDetails || !repairDetails.repeatedData) {
+          console.error('No repeatedData found in response:', repairDetails);
           Swal.fire('Error', 'No repair details found for the provided invoice number.', 'error');
           return;
         }
   
         // Filter repeatedData to include only items with transaction_status "Sales" or "ConvertedInvoice"
-        const filteredData = details.repeatedData.filter(
+        const filteredRepairData = repairDetails.repeatedData.filter(
           (item) => item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice"
         );
   
         // Check if no data was found after filtering
-        if (filteredData.length === 0) {
+        if (filteredRepairData.length === 0) {
           Swal.fire('No data', 'No records found with the required transaction status.', 'info');
           return;
         }
@@ -255,49 +259,65 @@ const RepairsTable = () => {
         // Retrieve existing repair details from localStorage or set to an empty array if not available
         const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
   
+        // Retrieve existing old items details from localStorage or set to an empty array if not available
+        const existingOldItems = JSON.parse(localStorage.getItem('oldTableData')) || [];
+  
         // Get today's date in yyyy-mm-dd format
         const today = new Date().toISOString().split('T')[0];
   
-        // Update filteredData with today's date
-        const formattedDetails = filteredData.map((item) => ({
+        // Update filteredRepairData with today's date
+        const formattedRepairDetails = filteredRepairData.map((item) => ({
           ...item,
           date: today,
           invoice_number, // Ensure the invoice_number is explicitly included
         }));
   
-        // Combine existing details with the new ones
-        const updatedDetails = [...existingDetails, ...formattedDetails];
+        // Format old items details with today's date
+        const formattedOldItems = oldItemsDetails.map((item) => ({
+          ...item,
+          date: today,
+          invoice_number, // Ensure invoice_number is included
+        }));
+  
+        // Combine existing repair details with new ones
+        const updatedRepairDetails = [...existingDetails, ...formattedRepairDetails];
+  
+        // Combine existing old items with new ones
+        const updatedOldItems = [...existingOldItems, ...formattedOldItems];
   
         // Save updated details back to localStorage
-        localStorage.setItem('repairDetails', JSON.stringify(updatedDetails));
+        localStorage.setItem('repairDetails', JSON.stringify(updatedRepairDetails));
+        localStorage.setItem('oldTableData', JSON.stringify(updatedOldItems));
   
-        console.log('Updated repair details added to localStorage:', updatedDetails);
+        console.log('Updated repair details added to localStorage:', updatedRepairDetails);
+        console.log('Updated old items details added to localStorage:', updatedOldItems);
   
-        // Navigate to the sales page with state
+        // Navigate to the sales page with state, including both repair and old items details
         navigate('/sales', {
           state: {
             invoice_number,
             mobile,
-            old_exchange_amt,
-            scheme_amt,
+            // old_exchange_amt,
+            // scheme_amt,
             cash_amount,
             card_amt,
             chq_amt,
             online_amt,
-            repairDetails: details,
+            repairDetails,// Include fetched old items data
           },
         });
   
         // Call handleDelete without confirmation
         await handleDelete(invoice_number, true, true);
       } catch (error) {
-        console.error('Error fetching repair details:', error);
-        Swal.fire('Error', 'Unable to fetch repair details. Please try again.', 'error');
+        console.error('Error fetching details:', error);
+        Swal.fire('Error', 'Unable to fetch repair or old item details. Please try again.', 'error');
       }
     } else {
       Swal.fire('Cancelled', 'Edit operation was cancelled.', 'info');
     }
   };
+  
   
 
 

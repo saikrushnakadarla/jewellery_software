@@ -92,14 +92,14 @@ const RepairsTable = () => {
         accessor: 'actions',
         Cell: ({ row }) => {
           const isEditDisabled = row.original.invoice === "Converted"; // Check if the invoice is "Converted"
-      
+
           return (
             <div>
               <FaEye
                 style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
                 onClick={() => handleViewDetails(row.original.order_number)}
               />
-              
+
               <FaEdit
                 style={{
                   cursor: isEditDisabled ? 'not-allowed' : 'pointer', // Change cursor style when disabled
@@ -121,7 +121,7 @@ const RepairsTable = () => {
                   }
                 }}
               />
-              
+
               <FaTrash
                 style={{
                   cursor: 'pointer',
@@ -133,7 +133,7 @@ const RepairsTable = () => {
             </div>
           );
         },
-      },      
+      },
       {
         Header: 'Invoice',
         accessor: 'convert',
@@ -156,7 +156,7 @@ const RepairsTable = () => {
           );
         },
       }
-       
+
     ],
     []
   );
@@ -173,14 +173,14 @@ const RepairsTable = () => {
       confirmButtonText: 'Yes, convert it!',
       cancelButtonText: 'No, cancel',
     });
-  
+
     // If the user confirms, proceed with the conversion
     if (result.isConfirmed) {
       try {
         const response = await axios.post(`${baseURL}/convert-order`, {
           order_number: order.order_number,
         });
-  
+
         if (response.data.success) {
           Swal.fire('Converted!', 'Order has been converted to invoice.', 'success'); // Success message
           setData((prevData) =>
@@ -200,8 +200,6 @@ const RepairsTable = () => {
       Swal.fire('Cancelled', 'Order conversion has been cancelled.', 'info'); // Cancellation message
     }
   };
-  
-
 
   const handleStatusChange = async (orderNumber, newStatus) => {
     try {
@@ -230,23 +228,24 @@ const RepairsTable = () => {
       Swal.fire('Error', 'An error occurred while updating the order status.', 'error');
     }
   };
-    const fetchRepairs = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get-unique-order-details`);
-        // console.log("Full response data: ", response.data); 
-        // const filteredData = response.data.filter(
-        //   (item) => item.transaction_status === 'Orders'
-        // );
-        // console.log("Filtered Orders: ", filteredData); 
-        setData(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching repair details:', error);
-        setLoading(false);
-      }
-    };
+  const fetchRepairs = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/get-unique-order-details`);
+      // console.log("Full response data: ", response.data); 
+      // const filteredData = response.data.filter(
+      //   (item) => item.transaction_status === 'Orders'
+      // );
+      // console.log("Filtered Orders: ", filteredData); 
+      setData(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching repair details:', error);
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     fetchRepairs();
+    handleViewDetails();
   }, []);
 
   useEffect(() => {
@@ -270,30 +269,30 @@ const RepairsTable = () => {
     try {
       const response = await axios.get(`${baseURL}/get-order-details/${order_number}`);
       console.log("Fetched order details: ", response.data); // Log full response data
-  
+
       // Filter repeatedData to include only items where transaction_status is "Orders"
       const filteredData = response.data.repeatedData.filter(
         (item) => item.transaction_status === "Orders"
       );
-  
+
       // Check if any item in repeatedData has invoice === "Converted"
       const isInvoiceConverted = filteredData.some(item => item.invoice === "Converted");
-      console.log("isInvoiceConverted=",isInvoiceConverted)
-  
+      console.log("isInvoiceConverted=", isInvoiceConverted)
+
       // Set state with filtered repeatedData and invoice status
       setOrderDetails({
         ...response.data,
         repeatedData: filteredData,
-        isInvoiceConverted, 
+        isInvoiceConverted,
       });
-  
+
       setShowModal(true);
-      
+
     } catch (error) {
       console.error("Error fetching repair details:", error);
     }
   };
-  
+
   const handleWorkerAssignment = async (order_number, code, worker_name) => {
     try {
       // Find the selected account and get its account_id
@@ -331,6 +330,8 @@ const RepairsTable = () => {
         // Show success message
         alert('Worker assigned successfully!');
       }
+      fetchRepairs();
+      handleViewDetails();
     } catch (error) {
       console.error('Error assigning worker:', error);
       alert('Failed to assign worker. Please try again.');
@@ -364,6 +365,10 @@ const RepairsTable = () => {
         const response = await axios.get(`${baseURL}/get-order-details/${order_number}`);
         const details = response.data;
 
+        // Fetch old items details
+        const oldItemsResponse = await axios.get(`${baseURL}/get/olditems/${order_number}`);
+        const oldItemsDetails = oldItemsResponse.data;
+
         // Verify if the API returned data
         if (!details || !details.repeatedData) {
           console.error('No repeatedData found in response:', details);
@@ -373,6 +378,9 @@ const RepairsTable = () => {
 
         // Retrieve existing repair details from localStorage or set to an empty array if not available
         const existingDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
+
+        // Retrieve existing old items details from localStorage or set to an empty array if not available
+        const existingOldItems = JSON.parse(localStorage.getItem('oldTableData')) || [];
 
         // Get today's date in yyyy-mm-dd format
         const today = new Date().toISOString().split('T')[0];
@@ -384,11 +392,22 @@ const RepairsTable = () => {
           order_number, // Ensure the order_number is explicitly included
         }));
 
+          // Format old items details with today's date
+          const formattedOldItems = oldItemsDetails.map((item) => ({
+            ...item,
+            date: today,
+            order_number, // Ensure invoice_number is included
+          }));
+
         // Combine existing details with the new ones
         const updatedDetails = [...existingDetails, ...formattedDetails];
 
+         // Combine existing old items with new ones
+         const updatedOldItems = [...existingOldItems, ...formattedOldItems];
+
         // Save updated details back to localStorage
         localStorage.setItem('orderDetails', JSON.stringify(updatedDetails));
+        localStorage.setItem('oldTableData', JSON.stringify(updatedOldItems));
 
         console.log('Updated repair details added to localStorage:', updatedDetails);
 
@@ -397,8 +416,8 @@ const RepairsTable = () => {
           state: {
             order_number,
             mobile,
-            old_exchange_amt,
-            scheme_amt,
+            // old_exchange_amt,
+            // scheme_amt,
             cash_amount,
             card_amt,
             chq_amt,
