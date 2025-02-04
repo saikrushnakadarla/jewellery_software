@@ -69,7 +69,7 @@ const RepairForm = () => {
   const [purityData, setPurityData] = useState([]);
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [filteredPurity, setFilteredPurity] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -95,6 +95,7 @@ const RepairForm = () => {
     fetchData();
   }, []);
 
+  // Fetch Purity Data when Metal Type changes
   useEffect(() => {
     const fetchPurity = async () => {
       try {
@@ -107,6 +108,18 @@ const RepairForm = () => {
 
     fetchPurity();
   }, []);
+
+  // Filter Purity Data based on selected Metal Type
+  useEffect(() => {
+    if (formData.metal_type) {
+      const filtered = purityData.filter(
+        (item) => item.metal === formData.metal_type
+      );
+      setFilteredPurity(filtered);
+    } else {
+      setFilteredPurity([]);
+    }
+  }, [formData.metal_type, purityData]);
 
   useEffect(() => {
     const fetchMetalTypes = async () => {
@@ -464,20 +477,18 @@ const RepairForm = () => {
                     <InputField label="Item name" name="item" value={formData.item} onChange={handleChange} />
                   </Col>
                   <Col xs={12} md={2}>
-                    <InputField
-                      label="Metal Type"
-                      name="metal_type"
-                      type="select"
-                      value={formData.metal_type}
-                      onChange={handleChange}
-                      options={[
-                        ...metalTypes.map((metal) => ({
-                          value: metal.metal_name,
-                          label: metal.metal_name
-                        }))
-                      ]}
-                    />
-                  </Col>
+        <InputField
+          label="Metal Type"
+          name="metal_type"
+          type="select"
+          value={formData.metal_type}
+          onChange={handleChange}
+          options={metalTypes.map((metal) => ({
+            value: metal.metal_name,
+            label: metal.metal_name
+          }))}
+        />
+      </Col>
                   {/* <Col xs={12} md={2}>
                     <InputField label="Tag No:" name="tag_no" value={formData.tag_no} onChange={handleChange} />
                   </Col> */}
@@ -485,20 +496,18 @@ const RepairForm = () => {
                     <InputField label="Description:" name="description" value={formData.description} onChange={handleChange} />
                   </Col>
                   <Col xs={12} md={2}>
-                    <InputField
-                      label="Purity:"
-                      name="purity"
-                      type="select"
-                      value={formData.purity}
-                      onChange={handleChange}
-                      options={
-                        purityData.map((item) => ({
-                          value: item.name,
-                          label: item.name,
-                        }))
-                      }
-                    />
-                  </Col>
+        <InputField
+          label="Purity"
+          name="purity"
+          type="select"
+          value={formData.purity}
+          onChange={handleChange}
+          options={filteredPurity.map((item) => ({
+            value: item.name,
+            label: item.name
+          }))}
+        />
+      </Col>
                   <Col xs={12} md={2}>
                     <InputField label="Gross Weight" name="gross_weight" value={formData.gross_weight} onChange={handleChange} />
                   </Col>

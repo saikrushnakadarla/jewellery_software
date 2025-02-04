@@ -471,36 +471,104 @@ const RepairsTable = () => {
       const data = await response.json();
       console.log("Fetched Repair Data:", data);
   
-      if (!data) {
+      if (!data || data.length === 0) {
         alert("No repair details found for this ID.");
         return;
       }
   
-      setRepairDetails(data);
+      setRepairDetails(data);  // Store array of repair details
       setModalOpen(true);
     } catch (error) {
       console.error("Error fetching repair details:", error.message);
       alert(`Error fetching repair details: ${error.message}`);
     }
   };
+  
   const RepairDetailsModal = ({ details, onClose }) => {
     return (
-      <div className="modal" style={{ display: 'block' }}>
-        <div className="modal-content">
-          <span className="close" onClick={onClose}>&times;</span>
-          <h2>Repair Details</h2>
-          <p><strong>Repair ID:</strong> {details.repair_id}</p>
-          <p><strong>Item Name:</strong> {details.item_name}</p>
-          <p><strong>Purity:</strong> {details.purity}</p>
-          <p><strong>Quantity:</strong> {details.qty}</p>
-          <p><strong>Weight:</strong> {details.weight}</p>
-          <p><strong>Rate Type:</strong> {details.rate_type}</p>
-          <p><strong>Rate:</strong> {details.rate}</p>
-          <p><strong>Amount:</strong> {details.amount}</p>
-        </div>
-      </div>
-    );
-  };
+    
+          <div 
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'white',
+              padding: '20px',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+              width: '60%', // Reduced width
+              maxHeight: '80%',
+              overflowY: 'auto',
+              borderRadius: '8px',
+              border: '1px solid #ccc'
+            }}
+          >
+            <div style={{ textAlign: 'center' }}>
+              <span 
+                onClick={onClose} 
+                style={{
+                  float: 'right',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  color: '#333'
+                }}
+              >
+                &times;
+              </span>
+              <h2 style={{ marginBottom: '15px' }}>Repair Details</h2>
+      
+              <table style={{ 
+                width: '100%', 
+                borderCollapse: 'collapse', 
+                marginTop: '15px' 
+              }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f4f4f4',color:'black' }}>
+                    <th style={tableHeaderStyle}>Repair ID</th>
+                    <th style={tableHeaderStyle}>Item Name</th>
+                    <th style={tableHeaderStyle}>Purity</th>
+                    <th style={tableHeaderStyle}>Quantity</th>
+                    <th style={tableHeaderStyle}>Weight</th>
+                    <th style={tableHeaderStyle}>Rate Type</th>
+                    <th style={tableHeaderStyle}>Rate</th>
+                    <th style={tableHeaderStyle}>Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {details.map((repair, index) => (
+                    <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
+                      <td style={tableCellStyle}>{repair.repair_id}</td>
+                      <td style={tableCellStyle}>{repair.item_name}</td>
+                      <td style={tableCellStyle}>{repair.purity}</td>
+                      <td style={tableCellStyle}>{repair.qty}</td>
+                      <td style={tableCellStyle}>{repair.weight}</td>
+                      <td style={tableCellStyle}>{repair.rate_type}</td>
+                      <td style={tableCellStyle}>{repair.rate}</td>
+                      <td style={tableCellStyle}>{repair.amount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      };
+      
+      // Table cell styles
+      const tableHeaderStyle = {
+        border: '1px solid #ddd',
+        padding: '8px',
+        textAlign: 'center',
+        fontWeight: 'bold'
+      };
+      
+      const tableCellStyle = {
+        border: '1px solid #ddd',
+        padding: '8px',
+        textAlign: 'center'
+      };
+    
 
   const handleEditing = (repair) => {
     setEditData(repair);
@@ -925,12 +993,12 @@ const RepairsTable = () => {
         </Modal>
 
          {/* Render Modal if it's open */}
-    {isModalOpen && repairDetails && (
-      <RepairDetailsModal 
-        details={repairDetails} 
-        onClose={() => setModalOpen(false)} 
-      />
-    )}
+         {isModalOpen && repairDetails.length > 0 && (
+  <RepairDetailsModal 
+    details={repairDetails} 
+    onClose={() => setModalOpen(false)} 
+  />
+)}
       </div>
     </div>
   );
