@@ -136,7 +136,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
   
       // Update calculations
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
-      updatedDetails.total_amount = calculateTotalAmount(updatedDetails, currentRate);
+      updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
   
       return updatedDetails;
     });
@@ -240,6 +240,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
     const fetchCurrentRates = async () => {
       try {
         const response = await axios.get(`${baseURL}/get/current-rates`);
+        console.log('API Response:', response.data);
     
         setRates({
           rate_24crt: response.data.rate_24crt || "",
@@ -257,30 +258,19 @@ const OldSalesForm = ({ setOldSalesData }) => {
   }, []);
 
 
-  // const currentRate =
-  //   oldDetails.purity === "24K" ? rates.rate_24crt :
-  //     oldDetails.purity === "22K" ? rates.rate_22crt :
-  //       oldDetails.purity === "18K" ? rates.rate_18crt :
-  //         oldDetails.purity === "16K" ? rates.rate_16crt :
-  //           "";
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
+  useEffect(() => {
+    const currentRate =
+      normalizePurity(oldDetails.purity).includes("24") ? rates.rate_24crt :
+      normalizePurity(oldDetails.purity).includes("22") ? rates.rate_22crt :
+      normalizePurity(oldDetails.purity).includes("18") ? rates.rate_18crt :
+      normalizePurity(oldDetails.purity).includes("16") ? rates.rate_16crt :
+      oldDetails.metal === "Silver" ? rates.silver_rate : // Add silver rate logic
+      oldDetails.purity === "Other" ? rates.rate_22crt : // Default to 22K rate when "Other" is selected
+      0;
 
-  // const currentRate =
-  //   normalizePurity(oldDetails.purity).includes("24") ? rates.rate_24crt :
-  //     normalizePurity(oldDetails.purity).includes("22") ? rates.rate_22crt :
-  //       normalizePurity(oldDetails.purity).includes("18") ? rates.rate_18crt :
-  //         normalizePurity(oldDetails.purity).includes("16") ? rates.rate_16crt :
-  //           oldDetails.purity === "Other" ? rates.rate_22crt :  // Default to 22K rate when "Other" is selected
-  //             ""; 
-
-  const currentRate =
-  normalizePurity(oldDetails.purity).includes("24") ? rates.rate_24crt :
-  normalizePurity(oldDetails.purity).includes("22") ? rates.rate_22crt :
-  normalizePurity(oldDetails.purity).includes("18") ? rates.rate_18crt :
-  normalizePurity(oldDetails.purity).includes("16") ? rates.rate_16crt :
-  oldDetails.metal === "Silver" ? rates.silver_rate :  // Add silver rate logic
-  oldDetails.purity === "Other" ? rates.rate_22crt :  // Default to 22K rate when "Other" is selected
-  "";
+    setOldDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
+  }, [oldDetails.purity, oldDetails.metal, rates]);
 
 
 
@@ -360,7 +350,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
           <InputField
             label="Rate"
             name="rate"
-            value={oldDetails.rate || currentRate || "0.00"}
+            value={oldDetails.rate || "0.00"}
             onChange={handleInputChange}
           />
         </Col>
