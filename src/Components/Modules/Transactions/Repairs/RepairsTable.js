@@ -489,21 +489,20 @@ const RepairsTable = () => {
   // Modal component to display repair details
   const RepairDetailsModal = ({ details, onClose }) => {
     return (
-      <div className={`modal ${isModalOpen ? 'show' : ''}`}>
-      <div className={`modal-content ${isModalOpen ? 'show' : ''}`}>
-        <span className="close" onClick={onClose}>&times;</span>
-        <h2>Repair Details</h2>
-        <p><strong>Repair ID:</strong> {details.repair_id}</p>
-        <p><strong>Item Name:</strong> {details.item_name}</p>
-        <p><strong>Purity:</strong> {details.purity}</p>
-        <p><strong>Quantity:</strong> {details.qty}</p>
-        <p><strong>Weight:</strong> {details.weight}</p>
-        <p><strong>Rate Type:</strong> {details.rate_type}</p>
-        <p><strong>Rate:</strong> {details.rate}</p>
-        <p><strong>Amount:</strong> {details.amount}</p>
+      <div className="modal" style={{ display: 'block' }}>
+        <div className="modal-content">
+          <span className="close" onClick={onClose}>&times;</span>
+          <h2>Repair Details</h2>
+          <p><strong>Repair ID:</strong> {details.repair_id}</p>
+          <p><strong>Item Name:</strong> {details.item_name}</p>
+          <p><strong>Purity:</strong> {details.purity}</p>
+          <p><strong>Quantity:</strong> {details.qty}</p>
+          <p><strong>Weight:</strong> {details.weight}</p>
+          <p><strong>Rate Type:</strong> {details.rate_type}</p>
+          <p><strong>Rate:</strong> {details.rate}</p>
+          <p><strong>Amount:</strong> {details.amount}</p>
+        </div>
       </div>
-    </div>
-    
     );
   };
 
