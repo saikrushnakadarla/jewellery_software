@@ -484,74 +484,55 @@ const RepairsTable = () => {
     }
   };
   
-  const RepairDetailsModal = ({ details, onClose }) => {
+  const RepairDetailsModal = ({show, details, onClose }) => {
     return (
     
-          <div 
-            style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: 'white',
-              padding: '20px',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-              width: '60%', // Reduced width
-              maxHeight: '80%',
-              overflowY: 'auto',
-              borderRadius: '8px',
-              border: '1px solid #ccc'
-            }}
-          >
-            <div style={{ textAlign: 'center' }}>
-              <span 
-                onClick={onClose} 
-                style={{
-                  float: 'right',
-                  fontSize: '24px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  color: '#333'
-                }}
-              >
-                &times;
-              </span>
-              <h2 style={{ marginBottom: '15px' }}>Repair Details</h2>
-      
-              <table style={{ 
-                width: '100%', 
-                borderCollapse: 'collapse', 
-                marginTop: '15px' 
-              }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#f4f4f4',color:'black' }}>
-                    <th style={tableHeaderStyle}>Repair ID</th>
-                    <th style={tableHeaderStyle}>Item Name</th>
-                    <th style={tableHeaderStyle}>Purity</th>
-                    <th style={tableHeaderStyle}>Quantity</th>
-                    <th style={tableHeaderStyle}>Weight</th>
-                    <th style={tableHeaderStyle}>Rate Type</th>
-                    <th style={tableHeaderStyle}>Rate</th>
-                    <th style={tableHeaderStyle}>Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {details.map((repair, index) => (
-                    <tr key={index} style={{ borderBottom: '1px solid #ddd' }}>
-                      <td style={tableCellStyle}>{repair.repair_id}</td>
-                      <td style={tableCellStyle}>{repair.item_name}</td>
-                      <td style={tableCellStyle}>{repair.purity}</td>
-                      <td style={tableCellStyle}>{repair.qty}</td>
-                      <td style={tableCellStyle}>{repair.weight}</td>
-                      <td style={tableCellStyle}>{repair.rate_type}</td>
-                      <td style={tableCellStyle}>{repair.rate}</td>
-                      <td style={tableCellStyle}>{repair.amount}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+      <>
+      {/* Background blur effect */}
+      {show && <div className="modal-backdrop fade show"></div>}
+
+      <Modal show={show} onHide={onClose} size="xl" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Repair Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* <h5>Repair Items</h5> */}
+          <Table bordered>
+            <thead>
+              <tr>
+                {/* <th>Repair ID</th> */}
+                <th>Item Name</th>
+                <th>Purity</th>
+                <th>Quantity</th>
+                <th>Weight</th>
+                <th>Rate Type</th>
+                <th>Rate</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {details.map((repair, index) => (
+                <tr key={index}>
+                  {/* <td>{repair.repair_id}</td> */}
+                  <td>{repair.item_name}</td>
+                  <td>{repair.purity}</td>
+                  <td>{repair.qty}</td>
+                  <td>{repair.weight}</td>
+                  <td>{repair.rate_type}</td>
+                  <td>{repair.rate}</td>
+                  <td>{repair.amount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={onClose}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
         );
       };
       
@@ -994,10 +975,11 @@ const RepairsTable = () => {
 
          {/* Render Modal if it's open */}
          {isModalOpen && repairDetails.length > 0 && (
-  <RepairDetailsModal 
-    details={repairDetails} 
-    onClose={() => setModalOpen(false)} 
-  />
+  <RepairDetailsModal
+  show={isModalOpen}
+  onClose={() => setModalOpen(false)}
+  details={repairDetails}
+/>
 )}
       </div>
     </div>
