@@ -6,7 +6,6 @@ import { Button, Row, Col, Modal, Table, Form } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from '../../../../Url/NodeBaseURL';
 import Swal from 'sweetalert2';
-import PDFLayout from '../../Transactions/OrderSection/TaxInvoiceA4';
 const RepairsTable = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -162,112 +161,44 @@ const RepairsTable = () => {
     []
   );
 
- 
- // Initialize missing variables as state
- const [formData, setFormData] = useState({});
- const [repairDetails, setRepairDetails] = useState({});
- const [paymentDetails, setPaymentDetails] = useState({});
- const [taxAmount, setTaxAmount] = useState(0);
- const [discountAmt, setDiscountAmt] = useState(0);
- const [oldItemsAmount, setOldItemsAmount] = useState(0);
- const [schemeAmount, setSchemeAmount] = useState(0);
- const [netPayableAmount, setNetPayableAmount] = useState(0);
+  const handleConvert = async (order) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to convert this sale order to an invoice?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, convert it!',
+      cancelButtonText: 'No, cancel',
+    });
 
- const fetchOrderDetails = async (orderNumber) => {
-   try {
-     const response = await axios.get(`http://localhost:5000/invoice/${orderNumber}`);
-     if (response.data.success) {
-       // Assign values based on the API response or some other source
-       setFormData(response.data.formData);
-       setRepairDetails(response.data.repairDetails);
-       setPaymentDetails(response.data.paymentDetails);
-       setTaxAmount(response.data.taxAmount);
-       setDiscountAmt(response.data.discountAmt);
-       setOldItemsAmount(response.data.oldItemsAmount);
-       setSchemeAmount(response.data.schemeAmount);
-       setNetPayableAmount(response.data.netPayableAmount);
-     }
-   } catch (error) {
-     console.error("Error fetching order details:", error);
-   }
- };
+    // If the user confirms, proceed with the conversion
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.post(`${baseURL}/convert-order`, {
+          order_number: order.order_number,
+        });
 
- const handleConvert = async (order) => {
-   const result = await Swal.fire({
-     title: 'Are you sure?',
-     text: 'Do you want to convert this sale order to an invoice?',
-     icon: 'warning',
-     showCancelButton: true,
-     confirmButtonColor: '#3085d6',
-     cancelButtonColor: '#d33',
-     confirmButtonText: 'Yes, convert it!',
-     cancelButtonText: 'No, cancel',
-   });
-
-   // If the user confirms, proceed with the conversion
-   if (result.isConfirmed) {
-     try {
-       const response = await axios.post(`${baseURL}/convert-order`, {
-         order_number: order.order_number,
-       });
-
-       if (response.data.success) {
-         Swal.fire('Converted!', 'Order has been converted to invoice.', 'success'); // Success message
-
-         // Fetch the invoice number after conversion
-         const invoiceResponse = await axios.get(`${baseURL}/invoice/${order.order_number}`);
-
-         if (invoiceResponse.data.success) {
-           const invoiceNumber = invoiceResponse.data.invoice_number;
-
-           // Generate PDF Blob
-           const pdfDoc = (
-             <PDFLayout
-               formData={formData}
-               repairDetails={repairDetails}
-               cash_amount={paymentDetails.cash_amount || 0}
-               card_amt={paymentDetails.card_amt || 0}
-               chq_amt={paymentDetails.chq_amt || 0}
-               online_amt={paymentDetails.online_amt || 0}
-               taxAmount={taxAmount}
-               discountAmt={discountAmt}
-               oldItemsAmount={oldItemsAmount}
-               schemeAmount={schemeAmount}
-               netPayableAmount={netPayableAmount}
-             />
-           );
-
-           // Assuming you have a function to generate and download the PDF
-           const pdfBlob = generatePDF(pdfDoc);
-           downloadPDF(pdfBlob, `${invoiceNumber}.pdf`);
-         }
-       }
-
-       // Additional logic to update state or re-fetch data
-       fetchRepairs(); // Refresh the list of repairs
-     } catch (error) {
-       console.error('Error converting order:', error);
-       Swal.fire('Error', 'Unable to convert the order. Please try again.', 'error'); // Error message
-     }
-   } else {
-     Swal.fire('Cancelled', 'Order conversion has been cancelled.', 'info'); // Cancellation message
-   }
- };
-
- // Add the generatePDF and downloadPDF helper functions here
- const generatePDF = (pdfDoc) => {
-   // Implement PDF generation logic here (e.g., using react-pdf or jsPDF)
-   const pdfBlob = new Blob([pdfDoc], { type: 'application/pdf' });
-   return pdfBlob;
- };
-
- const downloadPDF = (pdfBlob, filename) => {
-   const link = document.createElement('a');
-   link.href = URL.createObjectURL(pdfBlob);
-   link.download = filename;
-   link.click();
- };
-
+        if (response.data.success) {
+          Swal.fire('Converted!', 'Order has been converted to invoice.', 'success'); // Success message
+          setData((prevData) =>
+            prevData.map((item) =>
+              item.order_number === order.order_number
+                ? { ...item, transaction_status: 'ConvertedInvoice' }
+                : item
+            )
+          );
+        }
+        fetchRepairs(); // Refresh the list of repairs
+      } catch (error) {
+        console.error('Error converting order:', error);
+        Swal.fire('Error', 'Unable to convert the order. Please try again.', 'error'); // Error message
+      }
+    } else {
+      Swal.fire('Cancelled', 'Order conversion has been cancelled.', 'info'); // Cancellation message
+    }
+  };
 
   const handleStatusChange = async (orderNumber, newStatus) => {
     try {
