@@ -227,6 +227,7 @@ const RepairsTable = () => {
       Swal.fire('Error', 'An error occurred while updating the order status.', 'error');
     }
   };
+  
   const fetchRepairs = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-order-details`);

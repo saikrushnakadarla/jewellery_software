@@ -3,7 +3,7 @@ import { Row, Col, Modal, Button, Form, Table } from 'react-bootstrap';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
-import { FaTrash, FaEdit , FaEye } from 'react-icons/fa';
+import { FaTrash, FaEdit, FaEye } from 'react-icons/fa';
 import EditRepairForm from "./EditRepairForm";
 import './RepairsTable.css';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -30,14 +30,16 @@ const RepairsTable = () => {
     amount: '',
   });
   const [tempTableData, setTempTableData] = useState([]);
-  const [mcForRepair, setMcForRepair] = useState(""); // Manual entry for MC for Repair
-  const [totalAmount, setTotalAmount] = useState(0); // Total Amount calculation
+  const [mcForRepair, setMcForRepair] = useState("");
+  const [totalAmount, setTotalAmount] = useState(0);
   const [receivedData, setReceivedData] = useState({
     gross_wt_after_repair: '',
     total_amt: '',
   });
-  const [isEditing, setIsEditing] = useState(false); // Track if editing
-  const [editIndex, setEditIndex] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editIndex, setEditIndex] = useState(null); 
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [repairDetails, setRepairDetails] = useState(null);
 
   useEffect(() => {
     if (mobile) {
@@ -126,8 +128,6 @@ const RepairsTable = () => {
     const updatedData = [...tempTableData, assignedData];
     setTempTableData(updatedData);
     setAssignedData({ item_name: '', purity: '', qty: '', weight: '', rate_type: '', rate: '', amount: '', });
-
-    // Save to local storage
     localStorage.setItem('tempTableData', JSON.stringify(updatedData));
   };
 
@@ -148,7 +148,6 @@ const RepairsTable = () => {
     localStorage.setItem('tempTableData', JSON.stringify(updatedData));
   };
 
-  // Handle Delete action
   const handleDeleteTempData = (index) => {
     const updatedData = tempTableData.filter((_, i) => i !== index);
     setTempTableData(updatedData);
@@ -217,7 +216,7 @@ const RepairsTable = () => {
 
       setTotalAmount(fetchedTotal + (parseFloat(mcForRepair) || 0)); // Add MC for Repair
     }
-  }, [mcForRepair, selectedRepair, assignedRepairDetails]); // Recalculate on change
+  }, [mcForRepair, selectedRepair, assignedRepairDetails]);
 
   const handleReceiveInputChange = (e) => {
     const { name, value } = e.target;
@@ -412,7 +411,7 @@ const RepairsTable = () => {
                   Select Status
                 </option>
                 <option value="Assign to Workshop"
-                disabled={status === 'Assign to Workshop' || status === 'Receive from Workshop'}
+                  disabled={status === 'Assign to Workshop' || status === 'Receive from Workshop'}
                 >
                   Assign to Workshop
                 </option>
@@ -454,28 +453,25 @@ const RepairsTable = () => {
     ],
     [repairs]
   );
-  
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [repairDetails, setRepairDetails] = useState(null);
-  
+
   const handleViewRepair = async (id) => {
     try {
       console.log(`Fetching repair details for ID: ${id}`);
-      
+
       const response = await fetch(`http://localhost:5000/assigned-repairdetails/${id}`);
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-  
+
       const data = await response.json();
       console.log("Fetched Repair Data:", data);
-  
+
       if (!data || data.length === 0) {
         alert("No repair details found for this ID.");
         return;
       }
-  
+
       setRepairDetails(data);  // Store array of repair details
       setModalOpen(true);
     } catch (error) {
@@ -483,80 +479,61 @@ const RepairsTable = () => {
       alert(`Error fetching repair details: ${error.message}`);
     }
   };
-  
-  const RepairDetailsModal = ({show, details, onClose }) => {
-    return (
-    
-      <>
-      {/* Background blur effect */}
-      {show && <div className="modal-backdrop fade show"></div>}
 
-      <Modal show={show} onHide={onClose} size="xl" centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Repair Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {/* <h5>Repair Items</h5> */}
-          <Table bordered>
-            <thead>
-              <tr>
-                {/* <th>Repair ID</th> */}
-                <th>Item Name</th>
-                <th>Purity</th>
-                <th>Quantity</th>
-                <th>Weight</th>
-                <th>Rate Type</th>
-                <th>Rate</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {details.map((repair, index) => (
-                <tr key={index}>
-                  {/* <td>{repair.repair_id}</td> */}
-                  <td>{repair.item_name}</td>
-                  <td>{repair.purity}</td>
-                  <td>{repair.qty}</td>
-                  <td>{repair.weight}</td>
-                  <td>{repair.rate_type}</td>
-                  <td>{repair.rate}</td>
-                  <td>{repair.amount}</td>
+  const RepairDetailsModal = ({ show, details, onClose }) => {
+    return (
+      <>
+        {show && <div className="modal-backdrop fade show"></div>}
+        <Modal show={show} onHide={onClose} size="xl" centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Repair Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {/* <h5>Repair Items</h5> */}
+            <Table bordered>
+              <thead>
+                <tr>
+                  {/* <th>Repair ID</th> */}
+                  <th>Item Name</th>
+                  <th>Purity</th>
+                  <th>Quantity</th>
+                  <th>Weight</th>
+                  <th>Rate Type</th>
+                  <th>Rate</th>
+                  <th>Amount</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={onClose}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
-        );
-      };
-      
-      // Table cell styles
-      const tableHeaderStyle = {
-        border: '1px solid #ddd',
-        padding: '8px',
-        textAlign: 'center',
-        fontWeight: 'bold'
-      };
-      
-      const tableCellStyle = {
-        border: '1px solid #ddd',
-        padding: '8px',
-        textAlign: 'center'
-      };
-    
+              </thead>
+              <tbody>
+                {details.map((repair, index) => (
+                  <tr key={index}>
+                    {/* <td>{repair.repair_id}</td> */}
+                    <td>{repair.item_name}</td>
+                    <td>{repair.purity}</td>
+                    <td>{repair.qty}</td>
+                    <td>{repair.weight}</td>
+                    <td>{repair.rate_type}</td>
+                    <td>{repair.rate}</td>
+                    <td>{repair.amount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={onClose}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </>
+    );
+  };
 
   const handleEditing = (repair) => {
     setEditData(repair);
     seteditShowModal(true);
   };
 
-  // Function to fetch and refresh data
   const refreshData = async () => {
     try {
       const response = await axios.get(`${baseURL}/assigned-repairdetails`);
@@ -973,14 +950,13 @@ const RepairsTable = () => {
           </Modal.Footer>
         </Modal>
 
-         {/* Render Modal if it's open */}
-         {isModalOpen && repairDetails.length > 0 && (
-  <RepairDetailsModal
-  show={isModalOpen}
-  onClose={() => setModalOpen(false)}
-  details={repairDetails}
-/>
-)}
+        {isModalOpen && repairDetails.length > 0 && (
+          <RepairDetailsModal
+            show={isModalOpen}
+            onClose={() => setModalOpen(false)}
+            details={repairDetails}
+          />
+        )}
       </div>
     </div>
   );
