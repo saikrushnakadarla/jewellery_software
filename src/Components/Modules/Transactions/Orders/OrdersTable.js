@@ -162,7 +162,6 @@ const RepairsTable = () => {
   );
 
   const handleConvert = async (order) => {
-    // Show confirmation alert first
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to convert this sale order to an invoice?',
