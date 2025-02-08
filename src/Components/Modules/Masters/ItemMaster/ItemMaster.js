@@ -417,10 +417,10 @@ const FormWithTable = () => {
         purity_id: purity ? dropdownOptions.find(option => option.value === purity)?.id || null : null, // Default to null if not found
       };
 
-      if (!updatedFormData.purity_id) {
-        alert("Invalid purity selected. Please try again.");
-        return;
-      }
+      // if (!updatedFormData.purity_id) {
+      //   alert("Invalid purity selected. Please try again.");
+      //   return;
+      // }
 
       // Save product details, now including design_id and purity_id
       const productResponse = await axios.post(`${baseURL}/post/products`, updatedFormData);

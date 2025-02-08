@@ -297,14 +297,14 @@ const [taxOptions, setTaxOptions] = useState([]);
               onChange={handleChange}
               options={designOptions}
             /> */}
-            <InputField
+            {/* <InputField
               label="Purity:"
               name="purity"
               type="select"
               value={formData.purity}
               onChange={handleChange}
               options={dropdownOptions}
-            />
+            /> */}
             {/* <InputField
               label="Item Prefix:"
               name="item_prefix"
@@ -313,12 +313,12 @@ const [taxOptions, setTaxOptions] = useState([]);
             /> */}
           </div>
           <div className="form-row">
-            <InputField
+            {/* <InputField
               label="Short Name:"
               name="short_name"
               value={formData.short_name}
               onChange={handleChange}
-            />
+            /> */}
             <InputField
               label="Tax Slab:"
               name="tax_slab"
