@@ -168,26 +168,26 @@ function Customer_Master() {
       alert("Mobile number is required.");
       return false;
     }
-    if (formData.mobile.length !== 10) {
-      alert("Mobile number must be exactly 10 digits.");
-      return false;
-    }
-    if (formData.aadhar_card.length !== 12) {
-      alert("Aadhar Card must be exactly 12 digits.");
-      return false;
-    }
-    if (formData.pan_card.length !== 10) {
-      alert("PAN Card must be exactly 10 characters.");
-      return false;
-    }
-    if (formData.gst_in.length !== 15) {
-      alert("GSTIN must be exactly 15 characters.");
-      return false;
-    }
-    if (formData.ifsc_code.length !== 11) {
-      alert("IFSC Code must be exactly 11 characters.");
-      return false;
-    }
+    // if (formData.mobile.length !== 10) {
+    //   alert("Mobile number must be exactly 10 digits.");
+    //   return false;
+    // }
+    // if (formData.aadhar_card.length !== 12) {
+    //   alert("Aadhar Card must be exactly 12 digits.");
+    //   return false;
+    // }
+    // if (formData.pan_card.length !== 10) {
+    //   alert("PAN Card must be exactly 10 characters.");
+    //   return false;
+    // }
+    // if (formData.gst_in.length !== 15) {
+    //   alert("GSTIN must be exactly 15 characters.");
+    //   return false;
+    // }
+    // if (formData.ifsc_code.length !== 11) {
+    //   alert("IFSC Code must be exactly 11 characters.");
+    //   return false;
+    // }
     return true;
   };
   
