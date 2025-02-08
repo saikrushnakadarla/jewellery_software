@@ -168,10 +168,10 @@ function Customer_Master() {
       alert("Mobile number is required.");
       return false;
     }
-    // if (formData.mobile.length !== 10) {
-    //   alert("Mobile number must be exactly 10 digits.");
-    //   return false;
-    // }
+    if (formData.mobile.length !== 10) {
+      alert("Mobile number must be exactly 10 digits.");
+      return false;
+    }
     // if (formData.aadhar_card.length !== 12) {
     //   alert("Aadhar Card must be exactly 12 digits.");
     //   return false;
