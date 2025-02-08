@@ -30,17 +30,15 @@ function Receivables({ selectedCustomerMobile }) {
 
   // Calculate the total balance amount
   const totalBalance = customerData.reduce((sum, item) => {
-    const { bal_amt, bal_after_receipts, receipts_amt } = item;
+    const bal_amt = Number(item.bal_amt) || 0;
+    const bal_after_receipts = Number(item.bal_after_receipts) || 0;
+    const receipts_amt = Number(item.receipts_amt) || 0;
   
     // If bal_amt equals receipts_amt, use bal_after_receipts
-    const balance = bal_amt === receipts_amt
-      ? parseFloat(bal_after_receipts) || 0
-      : bal_after_receipts
-      ? parseFloat(bal_after_receipts) || 0
-      : parseFloat(bal_amt) || 0;
+    const balance = bal_amt === receipts_amt ? bal_after_receipts : bal_after_receipts || bal_amt;
   
     return sum + balance;
-  }, 0).toFixed(2);;
+  }, 0).toFixed(2);
   
 
   if (loading) {

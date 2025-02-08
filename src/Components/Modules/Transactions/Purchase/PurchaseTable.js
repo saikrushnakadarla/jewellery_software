@@ -89,26 +89,27 @@ const handleOpenModal = (data) => {
       { Header: 'Purity', accessor: 'purity' },
       { Header: 'Pure Wt', accessor: 'pure_weight' },
       { Header: 'Tot Amt / Wt', accessor: 'total_amount' },
-      { 
-        Header: 'Paid Amt / Wt', 
+      {
+        Header: 'Paid Amt / Wt',
         accessor: 'paid_amount',
         Cell: ({ row }) => {
-          const { paid_amount, paid_amt } = row.original;
-          const totalPaid = (paid_amount || 0) + (paid_amt || 0);
-          return totalPaid;
+          const paid_amount = Number(row.original.paid_amount) || 0;
+          const paid_amt = Number(row.original.paid_amt) || 0;
+          return paid_amount + paid_amt;
         },
       },
-      { 
-        Header: 'Bal Amt / Wt', 
+      {
+        Header: 'Bal Amt / Wt',
         accessor: 'balance_amount',
         Cell: ({ row }) => {
-          const { balance_amount, balance_after_receipt, paid_amt } = row.original;
-          if (balance_amount === paid_amt) {
-            return balance_after_receipt ;
-          }
-          return balance_after_receipt ? balance_after_receipt : balance_amount || '-';
+          const balance_amount = Number(row.original.balance_amount) || 0;
+          const balance_after_receipt = Number(row.original.balance_after_receipt) || 0;
+          const paid_amt = Number(row.original.paid_amt) || 0;
+      
+          return balance_amount === paid_amt ? balance_after_receipt : balance_after_receipt || balance_amount || '-';
         },
       },
+      
       {
         Header: 'Actions',
         accessor: 'actions',

@@ -42,7 +42,6 @@ ChartJS.register(
 
 function Dashboard() {
   const { authToken ,userId, userName} = useContext(AuthContext);
-  console.log(userId, userName)
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const [selectedMobile, setSelectedMobile] = useState(null);
   const navigate = useNavigate();

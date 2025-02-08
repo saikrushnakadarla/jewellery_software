@@ -57,12 +57,49 @@ const RepairsTable = () => {
       {
         Header: 'Total Amt',
         accessor: 'net_amount',
-        Cell: ({ value }) => value || '-',
+        Cell: ({ value }) => value || 0
       },
       {
-        Header: 'Paid Amount',
-        accessor: 'paid_amount',
-        Cell: ({ row }) => row.original.net_amount || '-',
+        Header: 'Old Amt',
+        accessor: 'old_exchange_amt',
+        Cell: ({ value }) => value || 0
+      },
+      {
+        Header: 'Net Amt',
+        accessor: 'net_bill_amount',
+        Cell: ({ value }) => value || 0
+      },
+      {
+        Header: 'Paid Amt',
+        accessor: 'paid_amt',
+        Cell: ({ row }) => {
+          const paid_amt = Number(row.original.paid_amt) || 0;
+          const receipts_amt = Number(row.original.receipts_amt) || 0;
+          const totalPaid = paid_amt + receipts_amt;
+      
+          console.log("Row Data:", row.original);
+          console.log("Calculated Total Paid:", totalPaid);
+      
+          return totalPaid;
+        },
+      },
+      {
+        Header: 'Bal Amt',
+        accessor: 'bal_amt',
+        Cell: ({ row }) => {
+          const bal_amt = Number(row.original.bal_amt) || 0;
+          const bal_after_receipts = Number(row.original.bal_after_receipts) || 0;
+          const receipts_amt = Number(row.original.receipts_amt) || 0;
+      
+          console.log("Row Data:", row.original);
+          console.log("Bal Amt:", bal_amt, "Bal After Receipts:", bal_after_receipts, "Receipts Amt:", receipts_amt);
+      
+          if (bal_amt === receipts_amt) {
+            return bal_after_receipts || 0;
+          }
+      
+          return bal_after_receipts ? bal_after_receipts : bal_amt || 0;
+        },
       },
       {
         Header: 'Status',

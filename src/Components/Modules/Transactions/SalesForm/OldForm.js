@@ -38,42 +38,6 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const [editingRow, setEditingRow] = useState(null);
 
-
-  useEffect(() => {
-    const fetchAndFilterPurity = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        const allPurityOptions = response.data;
-
-        // Filter purity options based on selected metal
-        const filteredPurityOptions = allPurityOptions.filter(
-          (option) => option.metal === oldDetails.metal
-        );
-
-        // Find default purity (e.g., 22k for Gold) or set empty if not found
-        const defaultPurity = filteredPurityOptions.find(
-          (option) => option.name === "22K"
-        )?.name || "";
-
-        // Update state with filtered purities and set the default purity
-        setPurityOptions(filteredPurityOptions);
-        setOldDetails((prevDetails) => ({
-          ...prevDetails,
-          purity: defaultPurity, // Set default purity
-        }));
-      } catch (error) {
-        console.error("Error fetching purity options:", error);
-      }
-    };
-
-    // Fetch and filter purities when metal changes
-    if (oldDetails.metal) {
-      fetchAndFilterPurity();
-    }
-  }, [oldDetails.metal]);
-
-
-
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
@@ -113,10 +77,10 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, [name]: value };
-  
+
       if (name === "metal") {
         updatedDetails.purity = ""; // Reset purity when metal changes
         updatedDetails.purityPercentage = ""; // Reset purity percentage
@@ -127,23 +91,20 @@ const OldSalesForm = ({ setOldSalesData }) => {
           updatedDetails.rate = ""; // Reset rate for other metals
         }
       }
-  
+
       if (name === "purity" && value !== "Other") {
         updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
       } else if (name === "purityPercentage") {
         updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
       }
-  
+
       // Update calculations
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
-  
+
       return updatedDetails;
     });
   };
-  
-
-
 
   const parsePurityToPercentage = (purity) => {
     if (!purity) return null;
@@ -176,16 +137,17 @@ const OldSalesForm = ({ setOldSalesData }) => {
     return parseFloat(netWeight.toFixed(2));
   };
   const calculateTotalAmount = ({ net_wt, rate }, currentRate) => {
-    const netWeight = parseFloat(net_wt) || 0;
-    const rateAmount = parseFloat(rate) || parseFloat(currentRate) || 0;
+    const netWeight = Number(net_wt) || 0;
+    const rateAmount = Number(rate) || Number(currentRate) || 0;
 
     const totalAmount = netWeight * rateAmount;
-    return parseFloat(totalAmount.toFixed(2));
+    return Number(totalAmount.toFixed(2));
   };
   const handleEdit = (data, index) => {
     setOldDetails(data);  // Populate form fields with existing data
     setEditingRow(index); // Store index for updating
   };
+
 
   const handleAddButtonClick = () => {
     if (editingRow !== null) {
@@ -226,7 +188,10 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
 
   const handleDelete = (index) => {
-    setOldTableData((prevData) => prevData.filter((_, i) => i !== index));
+    if (window.confirm('Are you sure you want to delete this item?')) {
+      setOldTableData((prevData) => prevData.filter((_, i) => i !== index));
+      alert("Old Item deleted successfully");
+    }
   };
 
 
@@ -241,7 +206,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
       try {
         const response = await axios.get(`${baseURL}/get/current-rates`);
         console.log('API Response:', response.data);
-    
+
         setRates({
           rate_24crt: response.data.rate_24crt || "",
           rate_22crt: response.data.rate_22crt || "",
@@ -253,26 +218,62 @@ const OldSalesForm = ({ setOldSalesData }) => {
         console.error('Error fetching current rates:', error);
       }
     };
-    
+
     fetchCurrentRates();
   }, []);
 
+  useEffect(() => {
+    const fetchAndFilterPurity = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+        const allPurityOptions = response.data;
+
+        // Filter purity options based on selected metal
+        const filteredPurityOptions = allPurityOptions.filter(
+          (option) => option.metal === oldDetails.metal
+        );
+
+        // Normalize and find default purity that includes "22" in any form
+        const defaultPurity =
+          filteredPurityOptions.find(option =>
+            option.name.toLowerCase().replace(/\s/g, "").includes("22k")
+          )?.name || "";
+
+        // Update state with filtered purities and set the default purity
+        setPurityOptions(filteredPurityOptions);
+        setOldDetails((prevDetails) => ({
+          ...prevDetails,
+          purity: defaultPurity, // Set default purity
+        }));
+      } catch (error) {
+        console.error("Error fetching purity options:", error);
+      }
+    };
+
+    // Fetch and filter purities when metal changes
+    if (oldDetails.metal) {
+      fetchAndFilterPurity();
+    }
+  }, [oldDetails.metal]);
+
 
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
+
   useEffect(() => {
+    const normalizedMetal = oldDetails.metal.toLowerCase();
+    const normalizedPurity = normalizePurity(oldDetails.purity);
+
     const currentRate =
-      normalizePurity(oldDetails.purity).includes("24") ? rates.rate_24crt :
-      normalizePurity(oldDetails.purity).includes("22") ? rates.rate_22crt :
-      normalizePurity(oldDetails.purity).includes("18") ? rates.rate_18crt :
-      normalizePurity(oldDetails.purity).includes("16") ? rates.rate_16crt :
-      oldDetails.metal === "Silver" ? rates.silver_rate : // Add silver rate logic
-      oldDetails.purity === "Other" ? rates.rate_22crt : // Default to 22K rate when "Other" is selected
-      0;
+      normalizedMetal === "silver" && normalizedPurity.includes("22") ? rates.rate_silver :
+        normalizedPurity.includes("24") ? rates.rate_24crt :
+          normalizedPurity.includes("22") ? rates.rate_22crt :
+            normalizedPurity.includes("18") ? rates.rate_18crt :
+              normalizedPurity.includes("16") ? rates.rate_16crt :
+                oldDetails.purity === "Other" ? rates.rate_22crt :
+                  0;
 
     setOldDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
   }, [oldDetails.purity, oldDetails.metal, rates]);
-
-
 
   return (
     <>
@@ -333,15 +334,15 @@ const OldSalesForm = ({ setOldSalesData }) => {
           <InputField label="Dust" name="dust" value={oldDetails.dust} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="ML Percent" name="ml_percent" value={oldDetails.ml_percent} onChange={handleInputChange} />
-        </Col>
-        <Col xs={12} md={3}>
           <InputField
             label="Net Weight"
             name="net_wt"
-            value={oldDetails.net_wt?.toFixed(2) || "0.00"}
+            value={isNaN(oldDetails.net_wt) || oldDetails.net_wt === "" ? "0.00" : Number(oldDetails.net_wt).toFixed(2)}
             onChange={handleInputChange}
           />
+        </Col>
+        <Col xs={12} md={3}>
+          <InputField label="ML %" name="ml_percent" value={oldDetails.ml_percent} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
           <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
@@ -358,9 +359,10 @@ const OldSalesForm = ({ setOldSalesData }) => {
           <InputField
             label="Total Amount"
             name="total_amount"
-            value={oldDetails.total_amount?.toFixed(2) || "0.00"}
+            value={(Number(oldDetails.total_amount) || 0).toFixed(2)}
             readOnly
           />
+
         </Col>
         <Col xs={12} md={2}>
           <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)' }}>
@@ -401,7 +403,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
               <td>{data.rate}</td>
               <td>{data.total_amount}</td>
               <td>
-              {/* <Button variant="warning" size="sm" className="mr-2" onClick={() => handleEdit(data, index)}>
+                {/* <Button variant="warning" size="sm" className="mr-2" onClick={() => handleEdit(data, index)}>
               Edit
             </Button>
             <Button variant="danger" size="sm" onClick={() => handleDelete(index)}>
@@ -410,12 +412,12 @@ const OldSalesForm = ({ setOldSalesData }) => {
                 <FaEdit
                   style={{ cursor: "pointer", marginLeft: "10px", color: "blue" }}
                   onClick={() => handleEdit(data, index)}
-                  // disabled={editingIndex !== null}
+                // disabled={editingIndex !== null}
                 />
                 <FaTrash
                   style={{ cursor: "pointer", marginLeft: "10px", color: "red" }}
                   onClick={() => handleDelete(index)}
-                  // disabled={editingIndex !== null}
+                // disabled={editingIndex !== null}
                 />
               </td>
             </tr>

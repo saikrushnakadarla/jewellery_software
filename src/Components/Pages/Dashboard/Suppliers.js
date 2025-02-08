@@ -32,7 +32,7 @@ function Customers() {
           }));
 
         setData(customers);
-        console.log("Customers=", customers);
+        
       } catch (error) {
         console.error('Error fetching data:', error);
       }

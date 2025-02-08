@@ -13,9 +13,7 @@ const URDPurchases = ({ selectedCustomerMobile }) => {
     try {
       const response = await axios.get(`${baseURL}/get-purchases`);
       const data = response.data;
-      console.log("URD=",data)
-
-      // Filter purchases by customer if `selectedCustomerId` is provided
+      
       const filteredPurchases = selectedCustomerMobile
         ? data.filter((purchase) => purchase.mobile === selectedCustomerMobile)
         : data;

@@ -76,34 +76,34 @@ const RepairsTable = () => {
         Header: 'Paid Amt',
         accessor: 'paid_amt',
         Cell: ({ row }) => {
-          const { paid_amt, receipts_amt } = row.original;
-          const totalPaid = (paid_amt || 0) + (receipts_amt || 0);
+          const paid_amt = Number(row.original.paid_amt) || 0;
+          const receipts_amt = Number(row.original.receipts_amt) || 0;
+          const totalPaid = paid_amt + receipts_amt;
+      
+          console.log("Row Data:", row.original);
+          console.log("Calculated Total Paid:", totalPaid);
+      
           return totalPaid;
         },
       },
-
       {
         Header: 'Bal Amt',
         accessor: 'bal_amt',
         Cell: ({ row }) => {
-          const { bal_amt, bal_after_receipts, receipts_amt } = row.original;
-
-          // If bal_amt equals receipts_amt, show bal_after_receipts
+          const bal_amt = Number(row.original.bal_amt) || 0;
+          const bal_after_receipts = Number(row.original.bal_after_receipts) || 0;
+          const receipts_amt = Number(row.original.receipts_amt) || 0;
+      
+          console.log("Row Data:", row.original);
+          console.log("Bal Amt:", bal_amt, "Bal After Receipts:", bal_after_receipts, "Receipts Amt:", receipts_amt);
+      
           if (bal_amt === receipts_amt) {
-            return bal_after_receipts || 0
+            return bal_after_receipts || 0;
           }
-
-          // Default logic: Show bal_after_receipts if it exists, otherwise bal_amt
-          return bal_after_receipts ? bal_after_receipts : bal_amt || 0
+      
+          return bal_after_receipts ? bal_after_receipts : bal_amt || 0;
         },
       },
-      // {
-      //   Header: 'Scheme Amt',
-      //   accessor: 'cash_amount',
-      //   Cell: ({ value }) => value || 0
-      // },
-
-
       {
         Header: 'Actions',
         accessor: 'actions',
