@@ -101,49 +101,45 @@ function MetalType() {
     return Object.keys(formErrors).length === 0;
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-      // if (!validateForm()) {
-      //   return; 
-      // }
-
     try {
       if (editing) {
-        // Update existing record
+        // Send update request with the existing ID
         const response = await axios.put(`${baseURL}/metaltype/${editing}`, formData);
         console.log("Data updated:", response.data);
-
-        // Update the table with the edited data
+        alert(`Metal Type updated successfully!`);
+  
+        // Update the existing row instead of adding a new one
         setSubmittedData(submittedData.map((item) =>
           item.metal_type_id === editing ? { ...item, ...formData } : item
         ));
       } else {
-        // Submit new record
+        // Create a new metal type
         const response = await axios.post(`${baseURL}/metaltype`, formData);
         console.log("Data submitted:", response.data);
-
-        // Update the table with the new data
-        setSubmittedData([...submittedData, { ...formData, id: response.data.id }]);
+        alert(`Metal Type created successfully!`);
+  
+        setSubmittedData([...submittedData, { ...formData, metal_type_id: response.data.id }]);
       }
-
-      // Reset the form and stop editing mode
+  
       setFormData({
         metal_name: '',
-        // item_type: '',
-        hsn_code:'',
+        hsn_code: '',
         description: '',
         default_purity: '',
         default_purity_for_rate_entry: '',
         default_purity_for_old_metal: '',
         default_issue_purity: '',
       });
+  
       setEditing(null); // Reset editing state
-      alert(`Metal Type created successfully!`);
+  
     } catch (error) {
       console.error("Error submitting data:", error);
     }
   };
+  
 
   const handleDelete = async (id) => {
     const isConfirmed = window.confirm(`Are you sure you want to delete the record with ID ${id}?`);

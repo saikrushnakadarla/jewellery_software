@@ -36,8 +36,6 @@ const URDPurchase = () => {
     pan_card: "",
     date: today,
     urdpurchase_number: "",
-
-
   });
   const [productDetails, setProductDetails] = useState({
     product_id: "",
@@ -54,94 +52,71 @@ const URDPurchase = () => {
     rate: 0,
     total_amount: 0,
   });
-
+  const [editingRow, setEditingRow] = useState(null);
   const [purityOptions, setPurityOptions] = useState([]);
 
-  // Function to parse purity value to percentage
   const parsePurityToPercentage = (purity) => {
     if (!purity) return null;
-
-    const match = purity.match(/(\d+)(k|K)/); // Match formats like "22K", "24k", etc.
+    const match = purity.match(/(\d+)(k|K|kt|KT)?/);
     if (match) {
       const caratValue = parseInt(match[1], 10); // Extract carat number
-      return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
+      if (caratValue) {
+        return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
+      }
     }
-
-    // Handle other formats like "916HM" directly if required
     if (purity.toLowerCase() === "916hm") return 91.6;
-
-    return null; // Default if no match
+    return null;
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    setProductDetails(prevState => {
-      const updatedData = { ...prevState, [name]: value };
+    setProductDetails((prevDetails) => {
+      const updatedDetails = { ...prevDetails, [name]: value };
 
-      if (name === "purity") {
-        // Update the rate based on the selected purity
-        const rate =
-          value === "24K" ? rates.rate_24crt :
-            value === "22K" ? rates.rate_22crt :
-              value === "18K" ? rates.rate_18crt :
-                value === "16K" ? rates.rate_16crt :
-                  "";
-
-        updatedDetails.rate = rate;
+      if (name === "metal") {
+        updatedDetails.purity = ""; // Reset purity when metal changes
+        updatedDetails.purityPercentage = ""; // Reset purity percentage
+        // Set rate based on metal type selection
+        if (value === "Silver") {
+          updatedDetails.rate = rates.rate_silver || "0.00"; // Set silver rate if metal is silver
+        } else {
+          updatedDetails.rate = ""; // Reset rate for other metals
+        }
       }
 
-      // Update HSN Code based on selected metal
-      if (name === 'metal') {
-        const selectedMetal = metalOptions.find(option => option.value === value);
-        updatedDetails.hsn_code = selectedMetal ? selectedMetal.hsn_code : '';
+      if (name === "purity" && value !== "Other") {
+        updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
+      } else if (name === "purityPercentage") {
+        updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
       }
 
-      return updatedData;
+      // Update calculations
+      updatedDetails.eqt_wt = calculateNetWeight(updatedDetails);
+      updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
+
+      return updatedDetails;
     });
+  };
 
-    // Update the product details
-    const updatedDetails = {
-      ...productDetails,
-      [name]: value,
-    };
+  const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
+    const purityPercentageValue = purity === "Other"
+      ? parseFloat(purityPercentage) || 0
+      : parsePurityToPercentage(purity) || 0;
 
-    // Calculate Net WT based on updated details
-    if (
-      updatedDetails.gross &&
-      updatedDetails.dust &&
-      updatedDetails.ml_percent &&
-      updatedDetails.purity
-    ) {
-      const purityValue = parsePurityToPercentage(updatedDetails.purity);
+    const grossWeight = parseFloat(gross) || 0;
+    const dustWeight = parseFloat(dust) || 0;
+    const mlPercentValue = parseFloat(ml_percent) || 0;
 
-      if (purityValue) {
-        const gross = parseFloat(updatedDetails.gross) || 0;
-        const dust = parseFloat(updatedDetails.dust) || 0;
-        const mlPercent = parseFloat(updatedDetails.ml_percent) || 0;
+    const netWeight = ((grossWeight - dustWeight) * (purityPercentageValue - mlPercentValue)) / 100;
+    return parseFloat(netWeight.toFixed(2));
+  };
+  const calculateTotalAmount = ({ eqt_wt, rate }, currentRate) => {
+    const netWeight = Number(eqt_wt) || 0;
+    const rateAmount = Number(rate) || Number(currentRate) || 0;
 
-        const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
-
-        updatedDetails.eqt_wt = netWeight.toFixed(2); // Display as a string with 2 decimal points
-      }
-    }
-
-    // Recalculate Amount when Net WT or Rate changes
-    if (updatedDetails.eqt_wt && updatedDetails.rate) {
-      const netWT = parseFloat(updatedDetails.eqt_wt) || 0;
-      const rate = parseFloat(updatedDetails.rate) || 0;
-
-      const totalAmount = netWT * rate; // Calculate Amount
-      updatedDetails.total_amount = totalAmount.toFixed(2); // Display as a string with 2 decimal points
-    }
-
-    setProductDetails(updatedDetails);
-
-    setProductDetails(updatedDetails);
-    setProductDetails((prevDetails) => ({
-      ...prevDetails,
-      [name]: value,
-    }));
+    const totalAmount = netWeight * rateAmount;
+    return Number(totalAmount.toFixed(2));
   };
 
   useEffect(() => {
@@ -219,7 +194,6 @@ const URDPurchase = () => {
     }
   };
 
-  // Set the mobile value in formData if passed via location state
   useEffect(() => {
     if (mobile) {
       console.log("Selected Mobile from New Link:", mobile);
@@ -271,16 +245,20 @@ const URDPurchase = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleAddItem = () => {
-    // Ensure product_name and metal are selected before adding the item
+  const handleAddOrUpdateItem = () => {
     if (productDetails.product_name && productDetails.metal) {
-      // Create a new item with the current productDetails
-      const newItem = { ...productDetails };
+      if (editingRow !== null) {
+        // Update existing item
+        const updatedItems = [...items];
+        updatedItems[editingRow] = { ...productDetails };
+        setItems(updatedItems);
+        setEditingRow(null); // Reset editing state
+      } else {
+        // Add new item
+        setItems([...items, { ...productDetails }]);
+      }
 
-      // Update the items array with the new item
-      setItems([...items, newItem]);
-
-      // Clear the productDetails state after adding the item
+      // Reset form fields
       setProductDetails({
         product_id: "",
         product_name: "",
@@ -299,8 +277,13 @@ const URDPurchase = () => {
     }
   };
 
+
+  const handleEditItem = (item, index) => {
+    setProductDetails(item);  // Populate form fields with existing data
+    setEditingRow(index); // Store index for updating
+  };
+
   const handleDeleteItem = (index) => {
-    // Remove the item at the specified index from the items array
     const updatedItems = items.filter((_, i) => i !== index);
     setItems(updatedItems); // Update the state
     localStorage.setItem('purchaseItems', JSON.stringify(updatedItems)); // Update localStorage
@@ -320,7 +303,7 @@ const URDPurchase = () => {
 
       // Check if the response is successful
       if (response.status === 200 || response.status === 201) {
-        alert("Purchase saved successfully!");
+        alert("URD Purchase saved successfully!");
         localStorage.removeItem("purchaseItems");
         setItems([]);
         navigate("/urdpurchasetable"); // Navigate to the desired page
@@ -334,17 +317,38 @@ const URDPurchase = () => {
   };
 
   useEffect(() => {
-    const fetchPurity = async () => {
+    const fetchAndFilterPurity = async () => {
       try {
         const response = await axios.get(`${baseURL}/purity`);
-        setPurityOptions(response.data); // Populate purity options dynamically
+        const allPurityOptions = response.data;
+
+        // Filter purity options based on selected metal
+        const filteredPurityOptions = allPurityOptions.filter(
+          (option) => option.metal === productDetails.metal
+        );
+
+        // Normalize and find default purity that includes "22" in any form
+        const defaultPurity =
+          filteredPurityOptions.find(option =>
+            option.name.toLowerCase().replace(/\s/g, "").includes("22k")
+          )?.name || "";
+
+        // Update state with filtered purities and set the default purity
+        setPurityOptions(filteredPurityOptions);
+        setProductDetails((prevDetails) => ({
+          ...prevDetails,
+          purity: defaultPurity, // Set default purity
+        }));
       } catch (error) {
         console.error("Error fetching purity options:", error);
       }
     };
 
-    fetchPurity();
-  }, []);
+    // Fetch and filter purities when metal changes
+    if (productDetails.metal) {
+      fetchAndFilterPurity();
+    }
+  }, [productDetails.metal]);
 
   const [metalOptions, setMetalOptions] = useState([]);
 
@@ -401,8 +405,6 @@ const URDPurchase = () => {
     fetchLastURDPurchaseNumber();
   }, []);
 
-  const [rateOptions, setRateOptions] = useState([]);
-
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
 
   useEffect(() => {
@@ -411,30 +413,38 @@ const URDPurchase = () => {
         const response = await axios.get(`${baseURL}/get/current-rates`);
         console.log('API Response:', response.data);
 
-        // Log the 24crt rate separately
-        console.log('24crt Rate:', response.data.rate_24crt);
-
-        // Dynamically set the rates based on response
         setRates({
           rate_24crt: response.data.rate_24crt || "",
           rate_22crt: response.data.rate_22crt || "",
           rate_18crt: response.data.rate_18crt || "",
           rate_16crt: response.data.rate_16crt || "",
+          rate_silver: response.data.silver_rate || "", // Add rate_silver from the response
         });
       } catch (error) {
         console.error('Error fetching current rates:', error);
       }
     };
+
     fetchCurrentRates();
   }, []);
 
+  const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
 
-  const currentRate =
-    productDetails.purity === "24K" ? rates.rate_24crt :
-      productDetails.purity === "22K" ? rates.rate_22crt :
-        productDetails.purity === "18K" ? rates.rate_18crt :
-          productDetails.purity === "16K" ? rates.rate_16crt :
-            "";
+  useEffect(() => {
+    const normalizedMetal = productDetails.metal.toLowerCase();
+    const normalizedPurity = normalizePurity(productDetails.purity);
+
+    const currentRate =
+      normalizedMetal === "silver" && normalizedPurity.includes("22") ? rates.rate_silver :
+        normalizedPurity.includes("24") ? rates.rate_24crt :
+          normalizedPurity.includes("22") ? rates.rate_22crt :
+            normalizedPurity.includes("18") ? rates.rate_18crt :
+              normalizedPurity.includes("16") ? rates.rate_16crt :
+                productDetails.purity === "Other" ? rates.rate_22crt :
+                  0;
+
+    setProductDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
+  }, [productDetails.purity, productDetails.metal, rates]);
 
 
   return (
@@ -613,7 +623,7 @@ const URDPurchase = () => {
                   type="text"
                   value={productDetails.hsn_code}
                   onChange={handleInputChange}
-                  readOnly // Make it read-only
+
                 />
               </Col>
               <Col xs={12} md={2}>
@@ -673,7 +683,7 @@ const URDPurchase = () => {
                 <InputField
                   label="Rate"
                   name="rate"
-                  value={productDetails.rate || currentRate}
+                  value={productDetails.rate}
                   onChange={handleInputChange}
                 />
               </Col>
@@ -699,11 +709,12 @@ const URDPurchase = () => {
               <Col xs={12} md={1}>
                 <Button
                   style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
-                  onClick={handleAddItem}
+                  onClick={handleAddOrUpdateItem}
                 >
-                  Add
+                  {editingRow !== null ? "Update" : "Add"}
                 </Button>
               </Col>
+
             </Row>
           </div>
           <div className="urd-form-section mt-1">
@@ -747,6 +758,10 @@ const URDPurchase = () => {
                     <td>{item.rate}</td>
                     <td>{item.total_amount}</td>
                     <td>
+                      <FaEdit
+                        style={{ cursor: "pointer", marginLeft: "10px", color: "blue" }}
+                        onClick={() => handleEditItem(item, index)}
+                      />
                       <FaTrash
                         style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
                         onClick={() => handleDeleteItem(index)}

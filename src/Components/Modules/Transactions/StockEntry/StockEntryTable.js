@@ -241,12 +241,12 @@ const StockEntryTable = (selectedProduct) => {
       setFormData((prevData) => ({
         ...prevData,
         Making_Charges_On: "MC %",
-        MC_Per_Gram: "MC%",
+        // MC_Per_Gram: "MC%",
       }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
-        MC_Per_Gram: "MC/Gm",
+        // MC_Per_Gram: "MC/Gm",
       }));
     }
   }, [formData.category]);
@@ -633,7 +633,7 @@ const StockEntryTable = (selectedProduct) => {
                 </div>
                 <div className="col-md-2">
                   <InputField
-                    label={formData.MC_Per_Gram || "MC/Gm"} // Dynamic label based on category
+                    label="MC %" // Dynamic label based on category
                     name="MC_Per_Gram"
                     value={formData.MC_Per_Gram}
                     onChange={handleChange}

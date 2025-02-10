@@ -321,8 +321,8 @@ const useProductHandlers = () => {
     // Handle discount calculation
     if (name === "disscount_percentage") {
       const discountPercentage = parseFloat(value) || 0;
-      const rateAmount = parseFloat(formData.rate_amt) || 0;
-      const discountAmount = (discountPercentage / 100) * rateAmount;
+      const makingCharges = parseFloat(formData.making_charges) || 0;
+      const discountAmount = (discountPercentage / 100) * makingCharges;
 
       updatedFormData.disscount = discountAmount.toFixed(2);
     }

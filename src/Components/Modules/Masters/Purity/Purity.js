@@ -54,14 +54,16 @@ function Purity() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Update formData state
+  
+    // Convert 'name' field to uppercase automatically
+    const updatedValue = name === "name" ? value.toUpperCase() : value;
+  
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: updatedValue,
     });
-
-  }
+  };
+  
 
   const validateForm = () => {
     let formErrors = {};

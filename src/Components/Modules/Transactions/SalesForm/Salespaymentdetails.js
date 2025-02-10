@@ -71,7 +71,7 @@ const PaymentDetails = ({
       await axios.post(`${baseURL}/updateProduct`, { updates: productUpdates });
       await axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries });
   
-      alert("Checkout successful and records updated!");
+      alert("Sale Return added Successfully!");
       resetForm();
   
       // Refresh the window

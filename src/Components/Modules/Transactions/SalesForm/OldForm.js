@@ -108,8 +108,6 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const parsePurityToPercentage = (purity) => {
     if (!purity) return null;
-
-    // Match formats like "22K", "24k", "22kt", "22KT", "22"
     const match = purity.match(/(\d+)(k|K|kt|KT)?/);
     if (match) {
       const caratValue = parseInt(match[1], 10); // Extract carat number
@@ -117,11 +115,8 @@ const OldSalesForm = ({ setOldSalesData }) => {
         return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
       }
     }
-
-    // Handle specific formats like "916HM" directly
     if (purity.toLowerCase() === "916hm") return 91.6;
-
-    return null; // Default if no match
+    return null; 
   };
 
   const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
@@ -143,16 +138,17 @@ const OldSalesForm = ({ setOldSalesData }) => {
     const totalAmount = netWeight * rateAmount;
     return Number(totalAmount.toFixed(2));
   };
+
   const handleEdit = (data, index) => {
     setOldDetails(data);  // Populate form fields with existing data
     setEditingRow(index); // Store index for updating
   };
 
-
   const handleAddButtonClick = () => {
     if (editingRow !== null) {
       // Update existing row
       setOldTableData((prevData) =>
+        
         prevData.map((data, index) =>
           index === editingRow ? oldDetails : data
         )
@@ -186,14 +182,12 @@ const OldSalesForm = ({ setOldSalesData }) => {
     });
   };
 
-
   const handleDelete = (index) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       setOldTableData((prevData) => prevData.filter((_, i) => i !== index));
       alert("Old Item deleted successfully");
     }
   };
-
 
   const calculateTotalSum = () => {
     return oldTableData.reduce((sum, item) => sum + parseFloat(item.total_amount || 0), 0).toFixed(2);

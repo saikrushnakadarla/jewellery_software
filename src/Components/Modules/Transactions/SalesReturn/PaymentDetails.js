@@ -68,7 +68,7 @@ const PaymentDetails = ({
       await axios.post(`${baseURL}/updateProduct`, { updates: productUpdates });
       await axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries });
   
-      alert("Checkout successful and records updated!");
+      alert("Sale Returned Successfully!");
       resetForm();
   
       // Refresh the window
@@ -140,7 +140,7 @@ const PaymentDetails = ({
               Save
             </Button>
           </Col>
-          <Col xs={12} md={2}>
+          {/* <Col xs={12} md={2}>
             <Button
               type="button"
               className="cus-back-btn"
@@ -150,7 +150,7 @@ const PaymentDetails = ({
             >
               Cancel
             </Button>
-          </Col>
+          </Col> */}
         </Row>
       </Col>
     </div>

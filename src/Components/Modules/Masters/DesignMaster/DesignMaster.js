@@ -129,8 +129,7 @@ function DesignMaster() {
             item.design_id === editId ? { ...formData, design_id: editId } : item
           )
         );
-
-        // Reset the form and exit edit mode
+        alert(`Design Name updated successfully!`);
         resetForm();
       } catch (error) {
         console.error("Error updating data:", error);
@@ -144,7 +143,7 @@ function DesignMaster() {
         // Update the table with the new data
         setSubmittedData([...submittedData, { ...formData, design_id: response.data.id }]);
 
-        // Reset the form
+        alert(`Design Name added successfully!`);
         resetForm();
       } catch (error) {
         console.error("Error submitting data:", error);
