@@ -22,6 +22,7 @@ function Customer_Master() {
     state: '',
     state_code: '',
     phone: '',
+    religion: '',
     mobile: '',
     email: '',
     birthday: '',
@@ -485,6 +486,14 @@ function Customer_Master() {
                 value={formData.pan_card}
                 onChange={handleChange}
 
+              />
+            </Col>
+            <Col md={3}>
+              <InputField
+                label="Religion"
+                name="religion"
+                value={formData.religion}
+                onChange={handleChange}
               />
             </Col>
           </Row>
