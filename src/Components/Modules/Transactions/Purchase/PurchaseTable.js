@@ -150,24 +150,28 @@ const handleOpenModal = (data) => {
         accessor: 'payment',
         Cell: ({ row }) => {
           const { total_amount, paid_amount, paid_amt } = row.original;
-          const totalPaid = (paid_amount || 0) + (paid_amt || 0);
-  
+          
+          // Ensure all values are treated as numbers
+          const totalPaid = (Number(paid_amount) || 0) + (Number(paid_amt) || 0);
+          const totalAmount = Number(total_amount) || 0;
+      
           return (
             <Button
-            style={{
-              backgroundColor: '#28a745',
-              borderColor: '#28a745',
-              fontSize: '0.875rem', // Smaller font size
-              padding: '0.25rem 0.5rem', // Reduced padding
-            }}
+              style={{
+                backgroundColor: '#28a745',
+                borderColor: '#28a745',
+                fontSize: '0.875rem', // Smaller font size
+                padding: '0.25rem 0.5rem', // Reduced padding
+              }}
               onClick={() => handleAddReceipt(row.original)}
-              disabled={total_amount === totalPaid} // Disable button if total_amount equals totalPaid
+              disabled={totalAmount === totalPaid} // Disable button if totalAmount equals totalPaid
             >
               Add Payment
             </Button>
           );
         },
-      },
+      }
+      
     ],
     [loading]
   );

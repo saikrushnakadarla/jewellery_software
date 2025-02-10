@@ -7,7 +7,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
 import { pdf } from "@react-pdf/renderer";
 
-import PDFContent from "./ReceiptPdf"; 
+import PDFContent from "./ReceiptPdf";
 
 const RepairForm = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const RepairForm = () => {
     cheque_number: "",
     receipt_no: "",
     account_name: "",
-    invoice_number:"",
+    invoice_number: "",
     total_amt: "",
     discount_amt: "",
     cash_amt: "",
@@ -33,7 +33,7 @@ const RepairForm = () => {
   const [purchases, setPurchases] = useState([]);
   const [invoiceOptions, setInvoiceOptions] = useState([]);
 
- const { invoiceData } = location.state || {};
+  const { invoiceData } = location.state || {};
 
   useEffect(() => {
     if (invoiceData) {
@@ -42,7 +42,7 @@ const RepairForm = () => {
         account_name: invoiceData.account_name || "", // Set account name
         invoice_number: invoiceData.invoice || "", // Set invoice number
       }));
-  
+
       // Populate invoice number options based on account_name
       const filteredInvoices = purchases
         ?.filter((item) => item.account_name === invoiceData.account_name)
@@ -50,16 +50,27 @@ const RepairForm = () => {
           value: item.invoice_number,
           label: item.invoice_number,
         }));
-  
-        setInvoiceOptions(filteredInvoices);
-  
+
+      setInvoiceOptions(filteredInvoices);
+
       // Automatically set total amount based on selected invoice
       const selectedInvoice = purchases?.find(
         (item) => item.invoice_number === invoiceData.invoice
       );
-  
+
+      // if (selectedInvoice) {
+      //   const totalAmt = selectedInvoice.balance_after_receipt || selectedInvoice.balance_amount || "";
+      //   setFormData((prevData) => ({
+      //     ...prevData,
+      //     total_amt: totalAmt,
+      //   }));
+      // }
+
       if (selectedInvoice) {
-        const totalAmt = selectedInvoice.balance_after_receipt || selectedInvoice.balance_amount || "";
+        const balAfterReceipts = Number(selectedInvoice.balance_after_receipt) || 0;
+        const balAmt = Number(selectedInvoice.balance_amount) || 0;
+        const totalAmt = balAfterReceipts || balAmt || 0;
+        console.log("totalAmt=",totalAmt)
         setFormData((prevData) => ({
           ...prevData,
           total_amt: totalAmt,
@@ -99,7 +110,7 @@ const RepairForm = () => {
     axios.get(`${baseURL}/get/purchases`)
       .then((response) => {
         setPurchases(response.data);
-        
+
         // Extract account names for options
         const accounts = response.data.map((purchase) => purchase.account_name);
         setAccountOptions([...new Set(accounts)]); // Remove duplicates
@@ -118,7 +129,7 @@ const RepairForm = () => {
           value: purchase.invoice, // Assuming `invoice` is the key for invoice number
           label: purchase.invoice,
         }));
-  
+
       setInvoiceOptions(filteredInvoices); // Update invoice dropdown options
     } else {
       // Reset invoice options, invoice_number, and total_amt when account_name is cleared
@@ -130,37 +141,39 @@ const RepairForm = () => {
       }));
     }
   }, [formData.account_name, purchases]);
-  
-useEffect(() => {
-  if (formData.invoice_number) {
-    const selectedInvoice = purchases.find(
-      (purchase) => purchase.invoice === formData.invoice_number
-    );
 
-    if (selectedInvoice) {
+  useEffect(() => {
+    if (formData.invoice_number) {
+      const selectedInvoice = purchases.find(
+        (purchase) => purchase.invoice === formData.invoice_number
+      );
+  
+      if (selectedInvoice) {
+        const paidAmt = Number(selectedInvoice.paid_amt) || 0;
+        const paidAmount = Number(selectedInvoice.paid_amount) || 0;
+        const totalAmount = Number(selectedInvoice.total_amount) || 0;
+        const balanceAfterReceipt = Number(selectedInvoice.balance_after_receipt) || 0;
+        const balanceAmount = Number(selectedInvoice.balance_amount) || 0;
+  
+        setFormData((prevData) => ({
+          ...prevData,
+          total_amt:
+            paidAmt + paidAmount === totalAmount
+              ? balanceAfterReceipt
+              : balanceAfterReceipt > 0
+                ? balanceAfterReceipt
+                : balanceAmount,
+        }));
+      }
+    } else {
+      // Clear total_amt when invoice_number is cleared
       setFormData((prevData) => ({
         ...prevData,
-        total_amt: 
-          selectedInvoice.paid_amt + selectedInvoice.paid_amount === selectedInvoice.total_amount
-            ? parseFloat(selectedInvoice.balance_after_receipt) || 0
-            : selectedInvoice.balance_after_receipt > 0
-            ? parseFloat(selectedInvoice.balance_after_receipt) || 0
-            : parseFloat(selectedInvoice.balance_amount) || 0,
+        total_amt: "",
       }));
     }
-    
-  } else {
-    // Clear total_amt when invoice_number is cleared
-    setFormData((prevData) => ({
-      ...prevData,
-      total_amt: "",
-    }));
-  }
-}, [formData.invoice_number, purchases]);
-
+  }, [formData.invoice_number, purchases]);
   
-
-  // Fetch account names on component mount
   useEffect(() => {
     // Set default date to today
     const today = new Date().toISOString().split("T")[0];
@@ -189,7 +202,6 @@ useEffect(() => {
     fetchAccountNames();
   }, []);
 
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -200,8 +212,8 @@ useEffect(() => {
       };
 
       if (name === "total_amt" || name === "discount_amt") {
-        const totalAmt = parseFloat(updatedData.total_amt) || 0;
-        const discountAmt = parseFloat(updatedData.discount_amt) || 0;
+        const totalAmt = Number(updatedData.total_amt) || 0;
+        const discountAmt = Number(updatedData.discount_amt) || 0;
 
         // Ensure discount amount is not greater than total amount
         if (discountAmt > totalAmt) {
@@ -216,8 +228,6 @@ useEffect(() => {
     });
   };
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -225,32 +235,32 @@ useEffect(() => {
         ? `${baseURL}/edit/payments/${repairData.id}`
         : `${baseURL}/post/payments`;
       const method = repairData ? "PUT" : "POST";
-  
+
       // Save payment details to the server
       const response = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) throw new Error("Failed to save data");
-  
+
       // Notify user about successful save
       window.alert("Payment saved successfully!");
-  
+
       // Generate the PDF
       const pdfDoc = <PDFContent formData={formData} />;
       const pdfBlob = await pdf(pdfDoc).toBlob();
-  
+
       // Create a download link and trigger it
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
       link.download = `payment-receipt-${formData.id || "new"}.pdf`;
       link.click();
-  
+
       // Clean up the download link
       URL.revokeObjectURL(link.href);
-  
+
       // Navigate to the payments table after saving
       navigate("/paymentstable");
     } catch (error) {
@@ -261,7 +271,7 @@ useEffect(() => {
   const handleBack = () => {
     const from = location.state?.from || "/paymentstable"; // Default to /receiptstable if no from location provided
     navigate(from);
-  }; 
+  };
 
   return (
     <div className="main-container">

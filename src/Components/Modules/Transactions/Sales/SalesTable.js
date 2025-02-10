@@ -178,14 +178,16 @@ const RepairsTable = () => {
           );
         },
       },
-
       {
         Header: 'Receipts',
         accessor: 'receipts',
         Cell: ({ row }) => {
-          const { net_bill_amount, paid_amt, receipts_amt } = row.original;
-          const totalPaid = (paid_amt || 0) + (receipts_amt || 0);
-
+          const { net_bill_amount, paid_amt, receipts_amt, transaction_status } = row.original;
+      
+          // Ensure numerical calculations are performed correctly
+          const totalPaid = Number(paid_amt) + Number(receipts_amt);
+          const netBill = Number(net_bill_amount);
+      
           return (
             <Button
               style={{
@@ -194,15 +196,14 @@ const RepairsTable = () => {
                 fontSize: '0.875rem', // Smaller font size
                 padding: '0.25rem 0.5rem', // Reduced padding
               }}
-              onClick={() => handleAddReceipt(row.original)} // Pass the row data to handle the receipt creation
-              disabled={net_bill_amount === totalPaid} // Disable button if net_bill_amount equals totalPaid
+              onClick={() => handleAddReceipt(row.original)} // Pass row data to handle receipt creation
+              disabled={netBill === totalPaid || transaction_status === "ConvertedInvoice"} // Disable if transaction_status is ConvertedInvoice or netBill equals totalPaid
             >
               Add Receipt
             </Button>
           );
         },
       },
-
     ],
     []
   );

@@ -77,7 +77,11 @@ const RepairForm = () => {
   
         if (selectedRepair) {
           // Use bal_after_receipts if it exists, otherwise fall back to bal_amt
-          const totalAmt = selectedRepair.bal_after_receipts || selectedRepair.bal_amt || "";
+          const totalAmt = Number(
+            selectedRepair.bal_after_receipts || selectedRepair.bal_amt || 0
+          );
+          console.log("totalAmt=",totalAmt)
+  
           setFormData((prev) => ({
             ...prev,
             total_amt: totalAmt,
@@ -89,6 +93,7 @@ const RepairForm = () => {
       setFormData((prev) => ({ ...prev, date: today }));
     }
   }, [repairData, repairDetails]);
+  
 
   useEffect(() => {
     const fetchAccountNames = async () => {
@@ -146,8 +151,8 @@ const RepairForm = () => {
   
       // Handle changes to `total_amt` or `discount_amt`
       if (name === "total_amt" || name === "discount_amt") {
-        const totalAmt = parseFloat(updatedData.total_amt) || 0;
-        const discountAmt = parseFloat(updatedData.discount_amt) || 0;
+        const totalAmt = Number(updatedData.total_amt) || 0;
+        const discountAmt = Number(updatedData.discount_amt) || 0;
   
         // If `total_amt` is cleared, clear `cash_amt`
         if (name === "total_amt" && value === "") {
@@ -175,9 +180,9 @@ const RepairForm = () => {
       // Update `total_amt` when `invoice_number` changes
       if (name === "invoice_number") {
         if (value === "") {
-          // Clear `total_amt` when `invoice_number` is cleared
+          // Clear `total_amt` and `cash_amt` when `invoice_number` is cleared
           updatedData.total_amt = "";
-          updatedData.cash_amt = ""; // Also clear cash_amt when invoice is cleared
+          updatedData.cash_amt = "";
         } else {
           // Set `total_amt` to the `bal_amt` of the selected invoice
           const selectedRepair = repairDetails.find(
@@ -185,22 +190,36 @@ const RepairForm = () => {
           );
   
           if (selectedRepair) {
-            updatedData.total_amt = 
-              selectedRepair.paid_amt + selectedRepair.receipts_amt === selectedRepair.net_bill_amount
-                ? parseFloat(selectedRepair.bal_after_receipts) || 0
-                : selectedRepair.bal_after_receipts
-                ? parseFloat(selectedRepair.bal_after_receipts) || 0
-                : parseFloat(selectedRepair.bal_amt) || 0;
+            const paidAmt = Number(selectedRepair.paid_amt) || 0;
+            const receiptsAmt = Number(selectedRepair.receipts_amt) || 0;
+            const netBillAmount = Number(selectedRepair.net_bill_amount) || 0;
+            const balAfterReceipts = Number(selectedRepair.bal_after_receipts) || 0;
+            const balAmt = Number(selectedRepair.bal_amt) || 0;
           
-            updatedData.cash_amt = ""; // Reset cash_amt when new total_amt is populated
+            updatedData.total_amt =
+              paidAmt + receiptsAmt === netBillAmount
+                ? balAfterReceipts
+                : balAfterReceipts || balAmt;
+          
+            updatedData.cash_amt = ""; 
           }
           
+
+          // if (selectedRepair) {
+          //   updatedData.total_amt = Number(
+          //      selectedRepair.bal_amt || 0
+          //   );
+  
+          //   updatedData.cash_amt = ""; 
+          // }
+
         }
       }
   
       return updatedData;
     });
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -247,7 +266,6 @@ const RepairForm = () => {
     }
   };
   
-
   useEffect(() => {
     if (invoiceData) {
       setFormData((prevData) => ({
@@ -272,7 +290,10 @@ const RepairForm = () => {
       );
   
       if (selectedInvoice) {
-        const totalAmt = selectedInvoice.bal_after_receipts || selectedInvoice.bal_amt || "";
+        const balAfterReceipts = Number(selectedInvoice.bal_after_receipts) || 0;
+        const balAmt = Number(selectedInvoice.bal_amt) || 0;
+        const totalAmt = balAfterReceipts || balAmt || 0;
+        console.log("totalAmt=",totalAmt)
         setFormData((prevData) => ({
           ...prevData,
           total_amt: totalAmt,
@@ -286,8 +307,6 @@ const RepairForm = () => {
     navigate(from);
   };
   
-  
-
   return (
     <div className="main-container">
       <Container className="payments-form-container">
