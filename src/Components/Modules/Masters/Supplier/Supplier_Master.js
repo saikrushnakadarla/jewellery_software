@@ -77,19 +77,28 @@ function Supplier_Master() {
   
     switch (name) {
       case "account_name":
-        // Capitalize first letter and update print_name if it matches account_name
-        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
-        setFormData((prevData) => ({
-          ...prevData,
-          [name]: updatedValue,
-          print_name: prevData.print_name === prevData.account_name ? updatedValue : prevData.print_name,
-        }));
-        return; // Return early since we've already updated state
-  
-      case "print_name":
-        // Capitalize first letter
-        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
-        break;
+        case "print_name":
+          // Capitalize first letter
+          updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
+    
+          // Ensure it contains at least one letter
+          if (!/[a-zA-Z]/.test(updatedValue)) {
+            return; // Prevent update if only numbers
+          }
+    
+          // If updating account_name, sync print_name when identical
+          if (name === "account_name") {
+            setFormData((prevData) => ({
+              ...prevData,
+              [name]: updatedValue,
+              print_name:
+                prevData.print_name === prevData.account_name
+                  ? updatedValue
+                  : prevData.print_name,
+            }));
+            return; // Return early after setting state
+          }
+          break;
   
       case "mobile":
       case "phone":

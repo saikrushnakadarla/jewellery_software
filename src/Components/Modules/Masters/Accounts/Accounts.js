@@ -147,6 +147,13 @@ const RepairForm = () => {
   };
 
   const validateForm = () => {
+
+    const { bank_account_no, bank_name, ifsc_code, branch, mobile } = formData;
+  
+    if (!bank_account_no.trim() || !bank_name.trim() || !ifsc_code.trim() || !branch.trim()) {
+      alert("Please fill in all required fields: Bank Account No., Bank Name, IFSC Code, and Branch.");
+      return false;
+    }
     if (!formData.account_name.trim()) {
       alert("Supplier Name is required.");
       return false;
