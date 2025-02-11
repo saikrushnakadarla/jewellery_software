@@ -232,21 +232,26 @@ const StockEntryTable = (selectedProduct) => {
       .catch((error) => console.error("Error fetching products:", error));
   }, []);
 
+  const isGoldCategory = formData.category && formData.category.toLowerCase().includes("gold");
+  const isSilverCategory = formData.category && formData.category.toLowerCase().includes("silver");
   useEffect(() => {
-    // Check if the category contains "gold" whenever formData.category changes
-    const isGoldCategory = formData.category && formData.category.toLowerCase().includes("gold");
-    const isSilverCategory = formData.category && formData.category.toLowerCase().includes("gold");
-
     if (isGoldCategory) {
       setFormData((prevData) => ({
         ...prevData,
         Making_Charges_On: "MC %",
-        // MC_Per_Gram: "MC%",
+        MC_Per_Gram_Label: "MC%",
+        Making_Charges: "", // Clear MC field if hidden
+      }));
+    } else if (isSilverCategory) {
+      setFormData((prevData) => ({
+        ...prevData,
+        Making_Charges_On: "MC / Gram",
+        MC_Per_Gram_Label: "MC/Gm",
       }));
     } else {
       setFormData((prevData) => ({
         ...prevData,
-        // MC_Per_Gram: "MC/Gm",
+        MC_Per_Gram_Label: "MC/Gm",
       }));
     }
   }, [formData.category]);
@@ -254,39 +259,7 @@ const StockEntryTable = (selectedProduct) => {
   // Handle field changes
   const handleChange = async (e) => {
     const { name, value } = e.target;
-
-    if (name === "category") {
-      // Check if the category is related to gold or silver
-      const isGoldCategory = value.toLowerCase().includes("gold");
-      const isSilverCategory = value.toLowerCase().includes("silver");
-
-      // Set the appropriate Making_Charges_On based on category
-      setFormData((prevData) => ({
-        ...prevData,
-        category: value,
-        Making_Charges_On: isGoldCategory
-          ? "MC %"
-          : isSilverCategory
-            ? "MC / Gram" // Default to "MC / Gram" for silver
-            : prevData.Making_Charges_On,
-        MC_Per_Gram: isGoldCategory
-          ? "MC %"
-          : "MC Per Gram",
-        showMCField: isGoldCategory ? false : prevData.showMCField,
-      }));
-    } else if (name === "Making_Charges_On") {
-      // Handle Making Charges On field changes
-      const shouldShowMCField = value !== "MC %";
-
-      setFormData((prevData) => ({
-        ...prevData,
-        Making_Charges_On: value,
-        MC_Per_Gram: value === "MC %" ? "MC %" : "MC Per Gram",
-        showMCField: shouldShowMCField,
-        MC_Per_Gram: "",
-        Making_Charges: "",
-      }));
-    } else if (name === "sub_category") {
+    if (name === "sub_category") {
       // Handle sub_category field changes
       const selectedCategory = subCategories.find(
         (category) => category.subcategory_id === parseInt(value)
@@ -622,24 +595,24 @@ const StockEntryTable = (selectedProduct) => {
                     label="MC On"
                     name="Making_Charges_On"
                     type="select"
-                    value={formData.Making_Charges_On || "MC / Gram"} // Default to "MC / Gram" if empty
+                    value={formData.Making_Charges_On}
                     onChange={handleChange}
                     options={[
                       { value: "MC / Gram", label: "MC / Gram" },
                       { value: "Fixed", label: "Fixed" },
-                      { value: "MC %", label: "MC %" }, // Gold-related default
+                      { value: "MC %", label: "MC %" },
                     ]}
                   />
                 </div>
                 <div className="col-md-2">
                   <InputField
-                    label="MC %" // Dynamic label based on category
+                    label={formData.MC_Per_Gram_Label}
                     name="MC_Per_Gram"
                     value={formData.MC_Per_Gram}
                     onChange={handleChange}
                   />
                 </div>
-                {formData.showMCField && (
+                {isSilverCategory && (
                   <div className="col-md-2">
                     <InputField
                       label="MC"
