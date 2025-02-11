@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import baseURL from './../../../../../Url/NodeBaseURL';
 import { useLocation } from "react-router-dom";
@@ -60,11 +60,11 @@ const useProductHandlers = () => {
     making_charges: "",
     rate: "",
     rate_amt: "",
-    tax_percent: "",
+    tax_percent: "03% GST",
     tax_amt: "",
     total_price: "",
     transaction_status: "Sales",
-    qty: "",
+    qty: "1",
     opentag_id: "",
     product_image: null,
     imagePreview: null,
@@ -74,10 +74,9 @@ const useProductHandlers = () => {
   const [metalTypes, setMetalTypes] = useState([]);
   const [purity, setPurity] = useState([]);
   const [filteredMetalTypes, setFilteredMetalTypes] = useState([]);
-  const [designOptions, setDesignOptions] = useState([]);
   const [filteredDesignOptions, setFilteredDesignOptions] = useState([]);
   const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
- 
+
 
   useEffect(() => {
     let currentRate = "";
@@ -103,9 +102,6 @@ const useProductHandlers = () => {
     }));
   }, [formData.purity, formData.metal_type, rates]);
 
-
-
-  // Fetch rates on mount
   useEffect(() => {
     const fetchCurrentRates = async () => {
       try {
@@ -184,70 +180,6 @@ const useProductHandlers = () => {
     fetchProducts();
     fetchTags();
   }, []);
-
-  // const handleProductNameChange = (productName) => {
-  //   const productEntries = data.filter((prod) => prod.product_Name === productName);
-
-  //   if (productEntries.length > 0) {
-  //     const uniqueMetalTypes = Array.from(
-  //       new Set(productEntries.map((prod) => prod.metal_type))
-  //     ).map((metalType) => ({ metal_type: metalType }));
-
-  //     const uniqueDesignOptions = Array.from(
-  //       new Set(productEntries.map((prod) => prod.design_master))
-  //     ).map((designMaster) => ({ design_master: designMaster }));
-
-  //     const uniquePurityOptions = Array.from(
-  //       new Set(productEntries.map((prod) => prod.Purity))
-  //     ).map((Purity) => ({ Purity }));
-
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       code: productEntries[0]?.rbarcode || "",
-  //       product_id: productEntries[0]?.product_id || "",
-  //       product_name: productName,
-  //     }));
-
-  //     setFilteredMetalTypes(uniqueMetalTypes);
-  //     setFilteredDesignOptions(uniqueDesignOptions);
-  //     setFilteredPurityOptions(uniquePurityOptions);
-  //   } else {
-  //     // Reset if no matching product entries found
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       code: "",
-  //       product_id: "",
-  //       product_name: "",
-  //       metal_type: "",
-  //       design_name: "",
-  //       purity: "",
-  //       gross_weight: "",
-  //       stone_weight: "",
-  //       stone_price: "",
-  //       weight_bw: "",
-  //       va_on: "",
-  //       va_percent: "",
-  //       wastage_weight: "",
-  //       total_weight_aw: "",
-  //       mc_on: "",
-  //       mc_per_gram: "",
-  //       making_charges: "",
-  //       rate: "",
-  //       rate_amt: "",
-  //       tax_percent: "",
-  //       tax_amt: "",
-  //       total_price: "",
-  //       qty: "",
-  //     }));
-
-  //     setFilteredMetalTypes(metalTypes);
-  //     setFilteredDesignOptions(designOptions);
-  //     setFilteredPurityOptions(purity);
-  //   }
-  // };
-
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -501,58 +433,71 @@ const useProductHandlers = () => {
   };
 
   const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState([]);
   const [subcategoryOptions, setSubcategoryOptions] = useState([]);
-
-  useEffect(() => {
-    if (formData.category) {
-      axios
-        .get(`${baseURL}/subcategory`)
-        .then((response) => {
-          // Log the raw response to inspect its structure
-          console.log("API Response:", response.data);
-
-          // Ensure 'data' exists in the response and it's an array
-          const fetchedSubcategories = Array.isArray(response.data.data)
-            ? response.data.data
-            : [];
-
-          // Filter subcategories by the selected category
-          const filteredSubcategories = fetchedSubcategories.filter(
-            (subcategory) => subcategory.category === formData.category
-          );
-
-          // Map the filtered data to match the format for the dropdown
-          const options = filteredSubcategories.map((subcategory) => {
-            return {
-              value: subcategory.subcategory_id, // Correct field
-              label: subcategory.sub_category_name, // Correct field
-            };
-          });
-
-          console.log("Mapped Subcategory Options:", options); // Console log to check mapped options
-
-          setSubcategoryOptions(options);
-        })
-        .catch((error) => {
-          console.error("Error fetching subcategory data:", error);
-        });
-    }
-  }, [formData.category]);
-
   const [metaltypeOptions, setMetaltypeOptions] = useState([]);
+  const [purityOptions, setpurityOptions] = useState([]);
+  const [designOptions, setDesignOptions] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchCategory = async () => {
       try {
         const response = await fetch(`${baseURL}/get/products`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const result = await response.json();
+        if (result && Array.isArray(result)) {
+          const formattedOptions = result.map((item) => ({
+            label: item.product_name, // Display name
+            value: item.product_name, // Unique value
+          }));
+          setCategoryOptions(formattedOptions);
+        } else {
+          console.error("Invalid API response format", result);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchCategory();
+  }, []);
+
+  useEffect(() => {
+    const fetchSubCategory = async () => {
+      try {
+        const response = await fetch(`${baseURL}/subcategory`); // Use the correct API endpoint
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const result = await response.json();
+        if (result && result.data) {
+          const formattedOptions = result.data.map((item) => ({
+            label: item.sub_category_name, // Display value
+            value: item.sub_category_name, // Unique ID for value
+          }));
+
+          setSubcategoryOptions(formattedOptions);
+        } else {
+          console.error("Invalid API response format", result);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchSubCategory();
+  }, []);
+
+  useEffect(() => {
+    const fetchMetalType = async () => {
+      try {
+        const response = await fetch(`${baseURL}/metaltype`);
         const data = await response.json();
-
-        // Extract unique categories (metal types) from the data
         const categories = Array.from(
-          new Set(data.map((product) => product.Category))
+          new Set(data.map((product) => product.metal_name))
         );
-
-        // Set the metal type options
         setMetaltypeOptions(categories.map((category) => ({
           value: category,
           label: category,
@@ -562,10 +507,33 @@ const useProductHandlers = () => {
       }
     };
 
-    fetchProducts();
+    fetchMetalType();
   }, []);
 
-  const [purityOptions, setpurityOptions] = useState([]);
+  useEffect(() => {
+    const fetchDesignName = async () => {
+      try {
+        const response = await fetch(`${baseURL}/designmaster`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const result = await response.json();
+        if (result && Array.isArray(result)) {
+          const formattedOptions = result.map((item) => ({
+            label: item.design_name, // Display name
+            value: item.design_name, // Unique value
+          }));
+          setDesignOptions(formattedOptions);
+        } else {
+          console.error("Invalid API response format", result);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchDesignName();
+  }, []);
 
   useEffect(() => {
     const fetchPurity = async () => {
@@ -573,32 +541,25 @@ const useProductHandlers = () => {
         const response = await fetch(`${baseURL}/purity`);
         const data = await response.json();
 
-        // Filter the data based on the formData.metal_type
         const filteredData = data.filter((product) => {
           return product.metal?.toLowerCase() === formData.metal_type?.toLowerCase();
         });
-
-        // Extract unique purities (name | purity) from the filtered data
         const purities = Array.from(
           new Set(filteredData.map((product) => `${product.name} | ${product.purity}`))
         );
-
-        // Set the filtered purity options
         const purityOptions = purities.map((purity) => ({
           value: purity,
           label: purity,
         }));
 
         setpurityOptions(purityOptions);
-
-        // Automatically set the default purity to "22" if available in the filtered options
         const defaultPurity = purityOptions.find((option) =>
           /22/i.test(option.value)
         )?.value;
 
         setFormData((prevData) => ({
           ...prevData,
-          purity: defaultPurity || "", // Set default purity or empty if not found
+          purity: defaultPurity || "",
         }));
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -606,10 +567,9 @@ const useProductHandlers = () => {
     };
 
     if (formData.metal_type) {
-      fetchPurity(); // Fetch purity only when metal_type is defined
+      fetchPurity();
     }
   }, [formData.metal_type]);
-
 
   const handleBarcodeChange = async (code) => {
     try {
@@ -771,6 +731,7 @@ const useProductHandlers = () => {
   };
 
   const [image, setImage] = useState(null);
+  const fileInputRef = useRef(null);
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -785,6 +746,18 @@ const useProductHandlers = () => {
     }
   };
 
+  const clearImage = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      imagePreview: null,
+    }));
+
+    // Reset the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
 
 
   return {
@@ -795,6 +768,8 @@ const useProductHandlers = () => {
     isQtyEditable,
     handleChange,
     handleImageChange,
+    fileInputRef,
+    clearImage,
     image,
     handleBarcodeChange,
     handleProductNameChange,
@@ -803,7 +778,9 @@ const useProductHandlers = () => {
     filteredDesignOptions,
     filteredPurityOptions,
     filteredMetalTypes,
+    categoryOptions,
     subcategoryOptions,
+    designOptions,
     purityOptions,
     metaltypeOptions,
     uniqueProducts,

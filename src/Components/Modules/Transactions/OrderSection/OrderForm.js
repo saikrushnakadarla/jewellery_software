@@ -72,8 +72,10 @@ const SalesForm = () => {
     filteredMetalTypes,
     uniqueProducts,
     metaltypeOptions,
-    purityOptions,
+    categoryOptions,
     subcategoryOptions,
+    designOptions,
+    purityOptions,
     isBarcodeSelected,
     handleImageChange,
     image,
@@ -452,8 +454,10 @@ const SalesForm = () => {
               products={products}
               data={data}
               uniqueProducts={uniqueProducts}
+              categoryOptions={categoryOptions}
               subcategoryOptions={subcategoryOptions}
               purityOptions={purityOptions}
+              designOptions={designOptions}
               metaltypeOptions={metaltypeOptions}
               filteredMetalTypes={filteredMetalTypes}
               filteredPurityOptions={filteredPurityOptions}

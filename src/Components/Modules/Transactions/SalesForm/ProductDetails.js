@@ -3,6 +3,7 @@ import { Col, Row, Button } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 import axios from 'axios';
 import baseURL from "../../../../Url/NodeBaseURL";
+import { FaTrash } from "react-icons/fa";
 
 const ProductDetails = ({
   handleAdd,
@@ -12,6 +13,8 @@ const ProductDetails = ({
   data,
   handleChange,
   handleImageChange,
+  fileInputRef,
+  clearImage,
   handleBarcodeChange,
   handleProductNameChange,
   handleMetalTypeChange,
@@ -20,7 +23,9 @@ const ProductDetails = ({
   filteredDesignOptions,
   filteredPurityOptions,
   filteredMetalTypes,
+  categoryOptions,
   subcategoryOptions,
+  designOptions,
   uniqueProducts,
   purityOptions,
   metaltypeOptions,
@@ -61,126 +66,55 @@ const ProductDetails = ({
           />
         </Col>
         <Col xs={12} md={2}>
-          {isBarcodeSelected ? (
-            <InputField
-              label="Metal Type"
-              name="metal_type"
-              value={formData.metal_type || ""}
-              onChange={handleChange}
-              type="select"
-              options={metaltypeOptions} // Set options dynamically from the API
-            />
-
-          ) : (
-            <InputField
-              label="Metal Type"
-              name="metal_type"
-              value={formData.metal_type}
-              onChange={(e) => handleMetalTypeChange(e.target.value)}
-              type="select"
-              options={filteredMetalTypes.map((metalType) => ({
-                value: metalType.metal_type,
-                label: metalType.metal_type,
-              }))}
-            />
-          )}
+          <InputField
+            label="Metal Type"
+            name="metal_type"
+            value={formData.metal_type || ""}
+            onChange={handleChange}
+            type="select"
+            options={metaltypeOptions}
+          />
         </Col>
-
         <Col xs={12} md={2}>
           <InputField
             label="Category"
             name="category"
             value={formData.category || ""}
+            type="select"
             onChange={handleChange}
-            readOnly
+            options={categoryOptions}
           />
         </Col>
-
         <Col xs={12} md={2}>
-          {isBarcodeSelected ? (
-            <InputField
-              label="Sub Category"
-              name="product_name"
-              value={formData.product_name || ""}
-              onChange={handleChange}
-              type="select"
-              options={subcategoryOptions} // Dynamically fetched options based on category
-            />
-
-          ) : (
-            <InputField
-              label="Sub Category"
-              name="product_name"
-              value={formData.product_name}
-              onChange={(e) => handleProductNameChange(e.target.value)}
-              type="select"
-              options={uniqueProducts.map((prod) => ({
-                value: prod.sub_category,
-                label: prod.sub_category,
-              }))}
-            />
-          )}
+          <InputField
+            label="Sub Category"
+            name="product_name"
+            value={formData.product_name || ""}
+            onChange={handleChange}
+            type="select"
+            options={subcategoryOptions}
+          />
         </Col>
-
         <Col xs={12} md={2}>
-          {isBarcodeSelected ? (
-            <InputField
-              label="Product Design Name"
-              name="design_name"
-              value={formData.design_name}
-              onChange={handleChange}
-              type="text"
-            />
-          ) : (
-            <InputField
-              label="Product Design Name"
-              name="design_name"
-              value={formData.design_name}
-              onChange={(e) => handleDesignNameChange(e.target.value)}
-              type="select"
-              options={filteredDesignOptions.map((designOption) => ({
-                value: designOption.design_master,
-                label: designOption.design_master,
-              }))}
-            />
-          )}
+          <InputField
+            label="Product Design Name"
+            name="design_name"
+            value={formData.design_name}
+            onChange={handleChange}
+            type="select"
+            options={designOptions}
+          />
         </Col>
-
         <Col xs={12} md={2}>
-          {isBarcodeSelected ? (
-            <InputField
-              label="Purity"
-              name="purity"
-              value={formData.purity || ""}
-              onChange={handleChange}
-              type="select"
-              options={purityOptions} // Set options dynamically from the API
-            />
-
-          ) : (
-            <InputField
-              label="Purity"
-              name="purity"
-              value={formData.purity}
-              onChange={handleChange}
-              type="select"
-              options={filteredPurityOptions.map((Purity) => ({
-                value: Purity.Purity,
-                label: Purity.Purity,
-              }))}
-            />
-          )}
+          <InputField
+            label="Purity"
+            name="purity"
+            value={formData.purity || ""}
+            onChange={handleChange}
+            type="select"
+            options={purityOptions}
+          />
         </Col>
-
-        {/* <Col xs={12} md={2}>
-    <InputField
-      label="Sub Category"
-      name="sub_category"
-      value={formData.sub_category || ""}
-      onChange={handleChange}
-      readOnly={!isBarcodeSelected}
-    />
-  </Col> */}
         <Col xs={12} md={1}>
           <InputField
             label="Gross Wt"
@@ -344,7 +278,7 @@ const ProductDetails = ({
             name="qty"
             value={formData.qty}
             onChange={handleChange}
-            readOnly={!isQtyEditable} // Make it editable when isQtyEditable is true
+          // readOnly={!isQtyEditable} 
           />
         </Col>
         <Col xs={12} md={1}>
@@ -379,14 +313,39 @@ const ProductDetails = ({
             type="file"
             onChange={handleImageChange}
             accept="image/*"
+            ref={fileInputRef} // Attach ref to input field
           />
-          {/* {formData.imagePreview && (
-            <img
-              src={formData.imagePreview}
-              alt="Selected"
-              style={{ width: "100px", height: "100px", marginTop: "10px" }}
-            />
-          )} */}
+          {formData.imagePreview && (
+            <div style={{ position: "relative", display: "inline-block" }}>
+              <img
+                src={formData.imagePreview}
+                alt="Selected"
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  marginTop: "10px",
+                  borderRadius: "8px", // Optional: add rounded corners to the image
+                }}
+              />
+              <button
+                type="button"
+                onClick={clearImage}
+                style={{
+                  position: "absolute",
+                  top: "5px",
+                  right: "5px",
+                  background: "transparent",
+                  border: "none",
+                  color: "red",
+                  fontSize: "16px",
+                  cursor: "pointer",
+                  zIndex: 10,
+                }}
+              >
+                <FaTrash />
+              </button>
+            </div>
+          )}
         </Col>
 
         <Col xs={12} md={1}>

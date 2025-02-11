@@ -20,6 +20,11 @@ const ProductDetails = ({
   filteredDesignOptions,
   filteredPurityOptions,
   filteredMetalTypes,
+  categoryOptions,
+  subcategoryOptions,
+  designOptions,
+  purityOptions,
+  metaltypeOptions,
   uniqueProducts,
   isBarcodeSelected,
   isQtyEditable,
@@ -55,97 +60,53 @@ const ProductDetails = ({
           <InputField
             label="Metal Type"
             name="metal_type"
-            value={formData.metal_type}
-            onChange={(e) => handleMetalTypeChange(e.target.value)}
+            value={formData.metal_type || ""}
+            onChange={handleChange}
             type="select"
-            options={filteredMetalTypes.map((metalType) => ({
-              value: metalType.metal_type,
-              label: metalType.metal_type,
-            }))}
+            options={metaltypeOptions}
           />
         </Col>
-
         <Col xs={12} md={2}>
           <InputField
             label="Category"
             name="category"
             value={formData.category || ""}
+            type="select"
             onChange={handleChange}
-            readOnly
+            options={categoryOptions}
           />
         </Col>
-
         <Col xs={12} md={2}>
-          {isBarcodeSelected ? (
-            <InputField
-              label="Sub Category"
-              name="product_name"
-              value={formData.product_name}
-              onChange={handleChange}
-              type="text"
-            />
-          ) : (
-            <InputField
-              label="Sub Category"
-              name="product_name"
-              value={formData.product_name}
-              onChange={(e) => handleProductNameChange(e.target.value)}
-              type="select"
-              options={uniqueProducts.map((prod) => ({
-                value: prod.sub_category,
-                label: prod.sub_category,
-              }))}
-            />
-          )}
+          <InputField
+            label="Sub Category"
+            name="product_name"
+            value={formData.product_name || ""}
+            onChange={handleChange}
+            type="select"
+            options={subcategoryOptions}
+          />
         </Col>
-
         <Col xs={12} md={2}>
-          {isBarcodeSelected ? (
-            <InputField
-              label="Product Design Name"
-              name="design_name"
-              value={formData.design_name}
-              onChange={handleChange}
-              type="text"
-            />
-          ) : (
-            <InputField
-              label="Product Design Name"
-              name="design_name"
-              value={formData.design_name}
-              onChange={(e) => handleDesignNameChange(e.target.value)}
-              type="select"
-              options={filteredDesignOptions.map((designOption) => ({
-                value: designOption.design_master,
-                label: designOption.design_master,
-              }))}
-            />
-          )}
+          <InputField
+            label="Product Design Name"
+            name="design_name"
+            value={formData.design_name}
+            onChange={handleChange}
+            type="select"
+            options={designOptions}
+          />
         </Col>
-
         <Col xs={12} md={2}>
           <InputField
             label="Purity"
             name="purity"
-            value={formData.purity}
+            value={formData.purity || ""}
             onChange={handleChange}
             type="select"
-            options={filteredPurityOptions.map((Purity) => ({
-              value: Purity.Purity,
-              label: Purity.Purity,
-            }))}
+            options={purityOptions}
           />
         </Col>
 
-        {/* <Col xs={12} md={2}>
-    <InputField
-      label="Sub Category"
-      name="sub_category"
-      value={formData.sub_category || ""}
-      onChange={handleChange}
-      readOnly={!isBarcodeSelected}
-    />
-  </Col> */}
         <Col xs={12} md={1}>
           <InputField
             label="Gross Wt"

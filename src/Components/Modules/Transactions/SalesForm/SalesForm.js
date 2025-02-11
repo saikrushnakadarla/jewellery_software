@@ -73,10 +73,14 @@ const SalesForm = () => {
     uniqueProducts,
     metaltypeOptions,
     purityOptions,
+    categoryOptions,
     subcategoryOptions,
+    designOptions,
     isBarcodeSelected,
     handleImageChange,
     image,
+    fileInputRef,
+    clearImage,
   } = useProductHandlers();
 
 
@@ -278,7 +282,7 @@ const SalesForm = () => {
       ...repairDetails,
       { ...formData, imagePreview: formData.imagePreview }, // Ensure imagePreview is set
     ]);
-  
+
     // Reset fields
     setFormData((prevData) => ({
       ...prevData,
@@ -286,7 +290,7 @@ const SalesForm = () => {
       disscount_percentage: "",
       imagePreview: null, // Clear image preview
     }));
-  
+
     resetProductFields();
   };
 
@@ -346,7 +350,7 @@ const SalesForm = () => {
       tax_amt: "",
       total_price: "",
       qty: "",
-      imagePreview:null,
+      imagePreview: null,
     }));
   };
 
@@ -404,7 +408,7 @@ const SalesForm = () => {
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
     const discountAmt = parseFloat(item.disscount) || 0;
-    return sum + stonePrice + makingCharges + rateAmt-discountAmt;
+    return sum + stonePrice + makingCharges + rateAmt - discountAmt;
   }, 0);
   console.log("Total Price=", taxableAmount)
 
@@ -469,10 +473,10 @@ const SalesForm = () => {
   };
 
   const handleSave = async () => {
-  if (!formData.customer_id || !formData.account_name || !formData.mobile || !formData.email) {
-    alert("Please fill in all required customer details before saving.");
-    return;
-  }
+    if (!formData.customer_id || !formData.account_name || !formData.mobile || !formData.email) {
+      alert("Please fill in all required customer details before saving.");
+      return;
+    }
     const dataToSave = {
       repairDetails: repairDetails.map(item => ({
         ...item,
@@ -640,8 +644,10 @@ const SalesForm = () => {
               products={products}
               data={data}
               uniqueProducts={uniqueProducts}
+              categoryOptions={categoryOptions}
               subcategoryOptions={subcategoryOptions}
               purityOptions={purityOptions}
+              designOptions={designOptions}
               metaltypeOptions={metaltypeOptions}
               filteredMetalTypes={filteredMetalTypes}
               filteredPurityOptions={filteredPurityOptions}
@@ -652,6 +658,8 @@ const SalesForm = () => {
               isEditing={editIndex !== null}
               handleImageChange={handleImageChange}
               image={image}
+              fileInputRef={fileInputRef}
+              clearImage={clearImage}
             />
           </div>
 
