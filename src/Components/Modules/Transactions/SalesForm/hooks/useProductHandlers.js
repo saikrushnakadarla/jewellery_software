@@ -732,15 +732,28 @@ const useProductHandlers = () => {
 
   const [image, setImage] = useState(null);
   const fileInputRef = useRef(null);
+  // const handleImageChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setFormData((prevData) => ({
+  //         ...prevData,
+  //         imagePreview: reader.result, // Update image preview in formData
+  //       }));
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
+
+   // This function handles the file input change event for the gallery selection.
+  // Handles image file selection from the gallery (file system)
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData((prevData) => ({
-          ...prevData,
-          imagePreview: reader.result, // Update image preview in formData
-        }));
+        setFormData((prev) => ({ ...prev, imagePreview: reader.result }));
       };
       reader.readAsDataURL(file);
     }
