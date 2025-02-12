@@ -169,8 +169,17 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         }
     }, [formData.category]);
 
-    const handleChange = async (e) => {
+   const handleChange = async (e) => {
         const { name, value } = e.target;
+
+        if (name === "category") {
+            setFormData((prevData) => ({
+                ...prevData,
+                category: value,
+            }));
+            return; // No need to proceed further for category change
+        }
+
         if (name === "sub_category") {
             const selectedCategory = subCategories.find(
                 (category) => category.subcategory_id === parseInt(value)
@@ -206,13 +215,15 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 }));
             }
         } else {
-            // Handle generic field changes
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: value,
             }));
         }
     };
+
+    // Condition to check if "silver" or "gold" exists in category (case insensitive)
+    const isSilverOrGold = /silver|gold/i.test(formData.category);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -584,30 +595,36 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             ]}
                                         />
                                     </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Cut"
-                                            name="cut"
-                                            value={formData.cut}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Color"
-                                            name="color"
-                                            value={formData.color}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Clarity"
-                                            name="clarity"
-                                            value={formData.clarity}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
+                                   
+            {!isSilverOrGold && (
+                <>
+                    <Col xs={12} md={2}>
+                        <InputField
+                            label="Cut"
+                            name="cut"
+                            value={formData.cut}
+                            onChange={handleChange}
+                        />
+                    </Col>
+                    <Col xs={12} md={2}>
+                        <InputField
+                            label="Color"
+                            name="color"
+                            value={formData.color}
+                            onChange={handleChange}
+                        />
+                    </Col>
+                    <Col xs={12} md={2}>
+                        <InputField
+                            label="Clarity"
+                            name="clarity"
+                            value={formData.clarity}
+                            onChange={handleChange}
+                        />
+                    </Col>
+                </>
+            )}
+
                                     <Col xs={12} md={2}>
                                         <InputField
                                             label="PCode/BarCode"
@@ -659,7 +676,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             onChange={handleChange}
                                             options={[
                                                 { value: "MC / Gram", label: "MC / Gram" },
-                                                { value: "Fixed", label: "Fixed" },
+                                                { value: "MC/Piece", label: "MC/Piece" },
                                                 { value: "MC %", label: "MC %" },
                                             ]}
                                         />
