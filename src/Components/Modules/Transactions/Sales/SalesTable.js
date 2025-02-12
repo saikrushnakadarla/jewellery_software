@@ -78,11 +78,7 @@ const RepairsTable = () => {
         Cell: ({ row }) => {
           const paid_amt = Number(row.original.paid_amt) || 0;
           const receipts_amt = Number(row.original.receipts_amt) || 0;
-          const totalPaid = paid_amt + receipts_amt;
-      
-          console.log("Row Data:", row.original);
-          console.log("Calculated Total Paid:", totalPaid);
-      
+          const totalPaid = (paid_amt + receipts_amt).toFixed(2);      
           return totalPaid;
         },
       },
@@ -92,18 +88,16 @@ const RepairsTable = () => {
         Cell: ({ row }) => {
           const bal_amt = Number(row.original.bal_amt) || 0;
           const bal_after_receipts = Number(row.original.bal_after_receipts) || 0;
-          const receipts_amt = Number(row.original.receipts_amt) || 0;
-      
-          console.log("Row Data:", row.original);
-          console.log("Bal Amt:", bal_amt, "Bal After Receipts:", bal_after_receipts, "Receipts Amt:", receipts_amt);
-      
+          const receipts_amt = Number(row.original.receipts_amt) || 0;      
+          let finalBalance;
           if (bal_amt === receipts_amt) {
-            return bal_after_receipts || 0;
-          }
-      
-          return bal_after_receipts ? bal_after_receipts : bal_amt || 0;
+            finalBalance = bal_after_receipts || 0;
+          } else {
+            finalBalance = bal_after_receipts ? bal_after_receipts : bal_amt || 0;
+          }      
+          return finalBalance.toFixed(2);
         },
-      },
+      }, 
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -197,7 +191,7 @@ const RepairsTable = () => {
                 padding: '0.25rem 0.5rem', // Reduced padding
               }}
               onClick={() => handleAddReceipt(row.original)} // Pass row data to handle receipt creation
-              disabled={netBill === totalPaid || transaction_status === "ConvertedInvoice"} // Disable if transaction_status is ConvertedInvoice or netBill equals totalPaid
+              disabled={netBill === totalPaid} // Disable if transaction_status is ConvertedInvoice or netBill equals totalPaid
             >
               Add Receipt
             </Button>

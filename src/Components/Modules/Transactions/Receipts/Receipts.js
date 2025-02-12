@@ -118,7 +118,7 @@ const RepairForm = () => {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
         
         // Filter the data based on the 'transaction_status' column
-        const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
+        const filteredData = response.data.filter(item => item.transaction_status === 'Sales'|| item.transaction_status === "ConvertedInvoice");
         
         setRepairDetails(filteredData);
         console.log("filteredData=",filteredData)

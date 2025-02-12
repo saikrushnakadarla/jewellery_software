@@ -473,8 +473,8 @@ const SalesForm = () => {
   };
 
   const handleSave = async () => {
-    if (!formData.customer_id || !formData.account_name || !formData.mobile || !formData.email) {
-      alert("Please fill in all required customer details before saving.");
+    if ( !formData.account_name || !formData.mobile ) {
+      alert("Please select the Customer");
       return;
     }
     const dataToSave = {

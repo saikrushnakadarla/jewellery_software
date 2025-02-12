@@ -603,6 +603,34 @@ const URDPurchase = () => {
                   options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
               </Col>
+              
+              {/* <Col xs={12} md={2}>
+                <InputField
+                  label="HSN Code"
+                  name="hsn_code"
+                  type="text"
+                  value={productDetails.hsn_code}
+                  onChange={handleInputChange}
+                />
+              </Col> */}
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Gross"
+                  type="number"
+                  name="gross"
+                  value={productDetails.gross}
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField
+                  label="Dust"
+                  type="number"
+                  name="dust"
+                  value={productDetails.dust}
+                  onChange={handleInputChange}
+                />
+              </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Purity"
@@ -614,34 +642,6 @@ const URDPurchase = () => {
                     value: purity.name,
                     label: purity.name,
                   }))}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="HSN Code"
-                  name="hsn_code"
-                  type="text"
-                  value={productDetails.hsn_code}
-                  onChange={handleInputChange}
-
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Gross"
-                  type="number"
-                  name="gross"
-                  value={productDetails.gross}
-                  onChange={handleInputChange}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Dust"
-                  type="number"
-                  name="dust"
-                  value={productDetails.dust}
-                  onChange={handleInputChange}
                 />
               </Col>
               <Col xs={12} md={1}>
@@ -662,24 +662,7 @@ const URDPurchase = () => {
                   onChange={handleInputChange}
                 />
               </Col>
-              {/* <Col xs={12} md={1}>
-                  <InputField
-                    label="Touch %"
-                    type="number"
-                    name="touch_percent"
-                    value={productDetails.touch_percent}
-                    onChange={handleInputChange}
-                  />
-                </Col> */}
               <Col xs={12} md={2}>
-                {/* <InputField
-                    label="Rate"
-                    type="select"
-                    name="rate"
-                    value={productDetails.rate}
-                    onChange={handleInputChange}
-                    options={rateOptions} // Dynamic dropdown from API
-                  /> */}
                 <InputField
                   label="Rate"
                   name="rate"
@@ -725,18 +708,17 @@ const URDPurchase = () => {
                 <tr>
                   <th>S.No</th>
                   {/* <th>product ID</th> */}
-                  <th>Product Name</th>
-                  <th>Metal</th>
-                  <th>Purity</th>
-                  <th>HSN</th>
+                  <th>Product</th>
+                  <th>Metal</th>                  
+                  {/* <th>HSN</th> */}
                   <th>Gross</th>
                   <th>Dust</th>
-                  <th>Touch%</th>
+                  <th>Purity</th>
                   <th>ML%</th>
-                  <th>Net WT</th>
-                  <th>Remark</th>
+                  <th>Net WT</th>                  
                   <th>Rate</th>
                   <th>Total Value</th>
+                  <th>Remarks</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -746,17 +728,16 @@ const URDPurchase = () => {
                     <td>{index + 1}</td>
                     {/* <td>{item.product_id}</td> */}
                     <td>{item.product_name}</td>
-                    <td>{item.metal}</td>
-                    <td>{item.purity}</td>
-                    <td>{item.hsn_code}</td>
+                    <td>{item.metal}</td>                    
+                    {/* <td>{item.hsn_code}</td> */}
                     <td>{item.gross}</td>
                     <td>{item.dust}</td>
-                    <td>{item.touch_percent}</td>
+                    <td>{item.purity}</td>
                     <td>{item.ml_percent}</td>
-                    <td>{item.eqt_wt}</td>
-                    <td>{item.remarks}</td>
+                    <td>{item.eqt_wt}</td>                    
                     <td>{item.rate}</td>
                     <td>{item.total_amount}</td>
+                    <td>{item.remarks}</td>
                     <td>
                       <FaEdit
                         style={{ cursor: "pointer", marginLeft: "10px", color: "blue" }}

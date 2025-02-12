@@ -92,11 +92,16 @@ const OldSalesForm = ({ setOldSalesData }) => {
         }
       }
 
-      if (name === "purity" && value !== "Other") {
-        updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
+      if (name === "purity") {
+        if (value !== "Manual") {
+          updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
+        } else {
+          updatedDetails.purityPercentage = 0; // Directly set purityPercentage to 0
+        }
       } else if (name === "purityPercentage") {
         updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
       }
+      
 
       // Update calculations
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
@@ -120,7 +125,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
   };
 
   const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
-    const purityPercentageValue = purity === "Other"
+    const purityPercentageValue = purity === "Manual"
       ? parseFloat(purityPercentage) || 0
       : parsePurityToPercentage(purity) || 0;
 
@@ -263,7 +268,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
           normalizedPurity.includes("22") ? rates.rate_22crt :
             normalizedPurity.includes("18") ? rates.rate_18crt :
               normalizedPurity.includes("16") ? rates.rate_16crt :
-                oldDetails.purity === "Other" ? rates.rate_22crt :
+                oldDetails.purity === "Manual" ? rates.rate_22crt :
                   0;
 
     setOldDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
@@ -289,6 +294,17 @@ const OldSalesForm = ({ setOldSalesData }) => {
             }))}
           />
         </Col>
+        
+
+        {/* <Col xs={12} md={3}>
+          <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} onChange={handleInputChange} />
+        </Col> */}
+        <Col xs={12} md={3}>
+          <InputField label="Gross" name="gross" value={oldDetails.gross} onChange={handleInputChange} />
+        </Col>
+        <Col xs={12} md={3}>
+          <InputField label="Dust" name="dust" value={oldDetails.dust} onChange={handleInputChange} />
+        </Col>
         <Col xs={12} md={3}>
           <InputField
             label="Purity"
@@ -301,15 +317,15 @@ const OldSalesForm = ({ setOldSalesData }) => {
                 value: purity.name,
                 label: purity.name,
               })),
-              { value: "Other", label: "Other" },
+              { value: "Manual", label: "Manual" },
             ]}
           />
         </Col>
 
-        {oldDetails.purity === "Other" && (
+        {oldDetails.purity === "Manual" && (
           <Col xs={12} md={3}>
             <InputField
-              label="Custom Purity (%)"
+              label="Custom Purity %"
               type="number"
               name="purityPercentage"
               value={oldDetails.purityPercentage || ""}
@@ -317,29 +333,16 @@ const OldSalesForm = ({ setOldSalesData }) => {
             />
           </Col>
         )}
-
-        <Col xs={12} md={3}>
-          <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} onChange={handleInputChange} />
-        </Col>
-        <Col xs={12} md={3}>
-          <InputField label="Gross" name="gross" value={oldDetails.gross} onChange={handleInputChange} />
-        </Col>
-        <Col xs={12} md={3}>
-          <InputField label="Dust" name="dust" value={oldDetails.dust} onChange={handleInputChange} />
-        </Col>
-        <Col xs={12} md={3}>
-          <InputField
-            label="Net Weight"
-            name="net_wt"
-            value={isNaN(oldDetails.net_wt) || oldDetails.net_wt === "" ? "0.00" : Number(oldDetails.net_wt).toFixed(2)}
-            onChange={handleInputChange}
-          />
-        </Col>
         <Col xs={12} md={3}>
           <InputField label="ML %" name="ml_percent" value={oldDetails.ml_percent} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
+          <InputField
+            label="Net Wt"
+            name="net_wt"
+            value={isNaN(oldDetails.net_wt) || oldDetails.net_wt === "" ? "0.00" : Number(oldDetails.net_wt).toFixed(2)}
+            onChange={handleInputChange}
+          />
         </Col>
         <Col xs={12} md={3}>
           <InputField
@@ -351,12 +354,14 @@ const OldSalesForm = ({ setOldSalesData }) => {
         </Col>
         <Col xs={12} md={3}>
           <InputField
-            label="Total Amount"
+            label="Total Amt"
             name="total_amount"
             value={(Number(oldDetails.total_amount) || 0).toFixed(2)}
             readOnly
           />
-
+        </Col>                
+        <Col xs={12} md={3}>
+          <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={2}>
           <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)' }}>
@@ -369,16 +374,15 @@ const OldSalesForm = ({ setOldSalesData }) => {
         <thead>
           <tr>
             <th>Product</th>
-            <th>Metal</th>
-            <th>Purity</th>
+            <th>Metal</th>            
             <th>Gross</th>
             <th>Dust</th>
-            <th>HSN Code</th>
-            <th>ML Percent</th>
-            <th>Net Weight</th>
-            <th>Remarks</th>
+            <th>Purity</th>
+            <th>ML%</th>
+            <th>Net Wt</th>           
             <th>Rate</th>
-            <th>Total Amount</th>
+            <th>Total Amt</th>
+            <th>Remarks</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -386,16 +390,15 @@ const OldSalesForm = ({ setOldSalesData }) => {
           {oldTableData.map((data, index) => (
             <tr key={index}>
               <td>{data.product}</td>
-              <td>{data.metal}</td>
-              <td>{data.purity}</td>
+              <td>{data.metal}</td>              
               <td>{data.gross}</td>
               <td>{data.dust}</td>
-              <td>{data.hsn_code}</td>
+              <td>{data.purity}</td>
               <td>{data.ml_percent}</td>
-              <td>{data.net_wt}</td>
-              <td>{data.remarks}</td>
+              <td>{data.net_wt}</td>              
               <td>{data.rate}</td>
               <td>{data.total_amount}</td>
+              <td>{data.remarks}</td>
               <td>
                 {/* <Button variant="warning" size="sm" className="mr-2" onClick={() => handleEdit(data, index)}>
               Edit
@@ -420,7 +423,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
       </Table>
 
       <div className="d-flex justify-content-between px-2 mt-2">
-        <h5>Total Amount for Old:</h5>
+        <h5>Total Amount:</h5>
         <h5>₹ {calculateTotalSum()}</h5>
       </div>
 

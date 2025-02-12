@@ -163,7 +163,7 @@ const useProductHandlers = () => {
         new Set(result.result.map((prod) => prod.Purity))
       ).map((Purity) => ({ Purity: Purity }));
 
-      setData(result.result); // Set the full data
+      setData(result.result); 
       setUniqueProducts(uniqueProductNames); // Set unique product_Name options
       setMetalTypes(uniqueMetalTypes); // Set all unique metal types
       setFilteredMetalTypes(uniqueMetalTypes); // Initially, show all metal types
@@ -652,7 +652,7 @@ const useProductHandlers = () => {
         if (tag) {
           // setIsBarcodeSelected(true);  
           // If the tag is marked as "Sold"
-          if (tag.Status === "Sold") {
+          if (tag.Status === "Sold" || tag.Status === "Sale Returned") {
             alert("The product is already sold out!");
             setFormData((prevData) => ({
               ...prevData,

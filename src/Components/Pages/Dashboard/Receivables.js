@@ -11,7 +11,7 @@ function Receivables({ selectedCustomerMobile }) {
       try {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
         // Filter only the records where transaction_status is 'Sales'
-        const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
+        const filteredData = response.data.filter(item => item.transaction_status === 'Sales' || item.transaction_status === "ConvertedInvoice");
         setData(filteredData);
       } catch (error) {
         console.error('Error fetching repair details:', error);

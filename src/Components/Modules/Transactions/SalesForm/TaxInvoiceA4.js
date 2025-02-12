@@ -1,12 +1,9 @@
 import React from "react";
 
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
-import logo1 from '../../../Pages/Login/Logo/logo_dark.png'
+import logo1 from '../../../../Navbar/sadashri.png'
 import { toWords } from "number-to-words";
 
-
-
-// Define styles
 const styles = StyleSheet.create({
         page: {
                 padding: 5,
@@ -270,7 +267,7 @@ const TaxINVoiceReceipt = ({
                                 <View style={styles.row}>
                                         <View style={[styles.column, { marginTop: 20, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
                                                 <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
-                                                <Text style={{ marginBottom: 5 }}>Account Name:{formData.account_name || ""}</Text>
+                                                <Text style={{ marginBottom: 5 }}>{formData.account_name || ""},</Text>
                                                 <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
                                                 <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
                                                 <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text>
@@ -504,27 +501,28 @@ const TaxINVoiceReceipt = ({
 
                                                         <View style={{ paddingLeft: 10, marginTop: 20 }}>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>
-                                                                        Cash Recd: {cash_amount ?? "0.00"}
+                                                                        Cash Recd: {Number(cash_amount || 0).toFixed(2)}
                                                                 </Text>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>
-                                                                        Card Recd: {card_amt ?? "0.00"}
+                                                                        Card Recd: {Number(card_amt || 0).toFixed(2)}
                                                                 </Text>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>
-                                                                        Cheque Recd: {chq_amt ?? "0.00"}
+                                                                        Cheque Recd: {Number(chq_amt || 0).toFixed(2)}
                                                                 </Text>
                                                                 <Text style={[styles.bold]}>
-                                                                        NEFT Recd: {online_amt ?? "0.00"} #: Bank:
+                                                                        NEFT Recd: {Number(online_amt || 0).toFixed(2)} #: Bank:
                                                                 </Text>
                                                                 <Text style={[styles.bold]}>
-                                                                        Balance Amount:
+                                                                        Balance Amount:{" "}
                                                                         {(
-                                                                                netPayableAmount -
-                                                                                ((cash_amount ?? 0.00) + (chq_amt ?? 0.00) + (card_amt ?? 0.00) + (online_amt ?? 0.00))
+                                                                                Number(netPayableAmount || 0) -
+                                                                                (Number(cash_amount || 0) +
+                                                                                        Number(chq_amt || 0) +
+                                                                                        Number(card_amt || 0) +
+                                                                                        Number(online_amt || 0))
                                                                         ).toFixed(2)}
                                                                 </Text>
                                                         </View>
-
-
                                                         {/* {repairDetails.map((item, index) => ( */}
                                                         <View style={{ paddingRight: 10, marginTop: 5 }}>
 
