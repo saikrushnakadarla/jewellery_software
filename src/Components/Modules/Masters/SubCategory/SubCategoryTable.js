@@ -108,8 +108,6 @@ const SubCategoryTable = () => {
           throw new Error("Failed to fetch data");
         }
         const result = await response.json();
-  
-        // Log the result for debugging
         console.log("API Response:", result);
   
         // Ensure the data is an array and sort it by `created_at` in descending order
@@ -126,12 +124,12 @@ const SubCategoryTable = () => {
           throw new Error("Unexpected API response format");
         }
   
-        setData(sortedData); // Update state with sorted data
+        setData(sortedData); 
       } catch (error) {
         console.error("Error fetching data:", error);
         Swal.fire("Error", "Failed to load data from the server.", "error");
       } finally {
-        setLoading(false); // Stop loading indicator
+        setLoading(false); 
       }
     };
   

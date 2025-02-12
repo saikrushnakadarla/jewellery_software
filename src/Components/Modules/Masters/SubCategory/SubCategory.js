@@ -19,12 +19,10 @@ function SubCategory() {
     prefix: "",
   });
 
-  // State for dropdown options
   const [metalOptions, setMetalOptions] = useState([]);
   const [allCategoryOptions, setAllCategoryOptions] = useState([]);
   const [filteredCategoryOptions, setFilteredCategoryOptions] = useState([]);
 
-  // Fetch Metal Types
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
@@ -42,7 +40,6 @@ function SubCategory() {
     fetchMetalTypes();
   }, []);
 
-  // Fetch Categories (Products Table)
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -61,12 +58,12 @@ function SubCategory() {
     fetchCategories();
   }, []);
 
-  // Filter categories when metal type changes
   useEffect(() => {
     const filteredCategories = allCategoryOptions.filter(
       (category) => category.metal_type === formData.metal_type
     );
     setFilteredCategoryOptions(filteredCategories);
+    console.log("filteredCategories:", filteredCategories);
     setFormData((prevData) => ({
       ...prevData,
       category: "",
@@ -74,23 +71,53 @@ function SubCategory() {
     }));
   }, [formData.metal_type, allCategoryOptions]);
 
-  useEffect(() => {
-    if (subcategory_id) {
-      const fetchSubcategoryData = async () => {
-        try {
-          // Axios automatically parses JSON
-          const response = await axios.get(`${baseURL}/subcategory/${subcategory_id}`);
-          setFormData(response.data); // Use response.data directly
-          console.log("Sub Category=",response.data)
-        } catch (error) {
-          console.error('Error fetching subcategory:', error);
-        }
-      };
-      fetchSubcategoryData();
+useEffect(() => {
+  if (subcategory_id) {
+    const fetchSubcategoryData = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/subcategory/${subcategory_id}`);
+        const subcategoryData = response.data;
+
+        console.log("Sub Category Data =", subcategoryData);
+        console.log("Fetched Category =", subcategoryData.category);
+
+        setFormData((prevData) => ({
+          ...prevData,
+          ...subcategoryData,
+          category: subcategoryData.category?.toUpperCase() || "", // Convert to uppercase
+          category_id: subcategoryData.category_id || "", // Ensure category ID is set
+        }));
+      } catch (error) {
+        console.error("Error fetching subcategory:", error);
+      }
+    };
+    fetchSubcategoryData();
+  }
+}, [subcategory_id]);
+
+
+useEffect(() => {
+  if (formData.category) {
+    const matchedCategory = filteredCategoryOptions.find(
+      (option) => option.value === formData.category
+    );
+
+    console.log("matchedCategory:", matchedCategory);
+
+    if (!matchedCategory) {
+      console.log("Category not found in filtered options:", formData.category);
+      setFormData((prevData) => ({
+        ...prevData,
+        category: filteredCategoryOptions.length > 0 ? filteredCategoryOptions[0].value : "",
+        category_id: filteredCategoryOptions.length > 0 ? filteredCategoryOptions[0].id : "",
+      }));
     }
-  }, [subcategory_id]);
-  
-  // Handle input changes
+  }
+}, [filteredCategoryOptions, formData.category]);
+
+
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "metal_type") {
@@ -104,6 +131,7 @@ function SubCategory() {
       }));
     } else if (name === "category") {
       const selectedCategory = filteredCategoryOptions.find((option) => option.value === value);
+      console.log("filteredCategories", selectedCategory)
       setFormData((prevData) => ({
         ...prevData,
         category: selectedCategory?.value || "",
@@ -117,7 +145,6 @@ function SubCategory() {
     }
   };
 
-  // Handle form submission (Create or Update)
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -135,7 +162,6 @@ function SubCategory() {
     }
   };
 
-  // Handle back button
   const handleBack = () => {
     navigate("/subcategorytable");
   };
@@ -165,7 +191,9 @@ function SubCategory() {
                 label="Category:"
                 name="category"
                 type="select"
-                value={formData.category}
+                value={filteredCategoryOptions.some((opt) => opt.value === formData.category)
+                  ? formData.category
+                  : ""}
                 onChange={handleChange}
                 options={filteredCategoryOptions.map((option) => ({
                   value: option.value,
@@ -174,6 +202,7 @@ function SubCategory() {
                 required
               />
             </Col>
+
             <Col md={4}>
               <InputField
                 label="Sub Category:"

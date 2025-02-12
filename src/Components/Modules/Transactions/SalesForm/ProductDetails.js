@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Row, Button } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 import axios from 'axios';
@@ -38,69 +38,6 @@ const ProductDetails = ({
   console.log("Filtered Metal Types:", filteredMetalTypes);
   console.log("Unique Products:", uniqueProducts);
   console.log("subcategory Options:", subcategoryOptions);
-
-
-  const [showOptions, setShowOptions] = useState(false);
-  const [cameraOpen, setCameraOpen] = useState(false);
-  const [stream, setStream] = useState(null);
-
-  // Refs for the gallery file input, video element, and hidden canvas
-  const galleryInputRef = useRef(null);
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-
-  // Opens the camera using getUserMedia and displays the camera modal
-  const openCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
-      setCameraOpen(true);
-      setShowOptions(false); // Hide the options modal
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-      // Optionally notify the user if access fails.
-    }
-  };
-
-  // Captures a photo from the live video feed
-  const capturePhoto = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-
-    // Set canvas dimensions to match the video dimensions
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const context = canvas.getContext("2d");
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    // Convert the captured image to a data URL and update state using setFormData
-    const imageDataUrl = canvas.toDataURL("image/png");
-    FormData((prev) => ({ ...prev, imagePreview: imageDataUrl }));
-
-    closeCamera();
-  };
-
-  // Stops the video stream and closes the camera modal
-  const closeCamera = () => {
-    setCameraOpen(false);
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-    }
-  };
-
- // When "Choose from Gallery" is selected, trigger the hidden file input
- const handleGalleryClick = () => {
-  setShowOptions(false);
-  if (galleryInputRef.current) {
-    galleryInputRef.current.click();
-  }
-};
 
   return (
     <Col >
@@ -370,7 +307,7 @@ const ProductDetails = ({
           />
         </Col>
         <Col xs={12} md={2}>
-          {/* <InputField
+          <InputField
             label="Upload Image"
             name="image"
             type="file"
@@ -408,144 +345,7 @@ const ProductDetails = ({
                 <FaTrash />
               </button>
             </div>
-          )} */}
-    <div style={{ padding: "20px" }}>
-      {/* Button to open the image source selection modal */}
-      <button type="button" onClick={() => setShowOptions(true)}>
-        Upload Image
-      </button>
-
-      {/* Options modal for choosing between Camera and Gallery */}
-      {showOptions && (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            background: "#fff",
-            padding: "1rem",
-            zIndex: 1000,
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.26)",
-          }}
-        >
-          <h4>Select Image Source</h4>
-          <button
-            type="button"
-            onClick={openCamera}
-            style={{ margin: "0.5rem", padding: "0.5rem 1rem" }}
-          >
-            Take Photo
-          </button>
-          <button
-            type="button"
-            onClick={handleGalleryClick}
-            style={{ margin: "0.5rem", padding: "0.5rem 1rem" }}
-          >
-            Choose from Gallery
-          </button>
-          <div style={{ marginTop: "1rem" }}>
-            <button type="button" onClick={() => setShowOptions(false)}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Camera modal displaying live video and capture controls */}
-      {cameraOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            background: "#fff",
-            padding: "1rem",
-            zIndex: 1000,
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.26)",
-          }}
-        >
-          <h4>Camera</h4>
-          <video
-            ref={videoRef}
-            autoPlay
-            style={{ width: "300px", height: "auto", backgroundColor: "#000" }}
-          />
-          {/* Hidden canvas used for capturing the photo */}
-          <canvas ref={canvasRef} style={{ display: "none" }}></canvas>
-          <div style={{ marginTop: "0.5rem" }}>
-            <button
-              type="button"
-              onClick={capturePhoto}
-              style={{ margin: "0.5rem", padding: "0.5rem 1rem" }}
-            >
-              Capture Photo
-            </button>
-            <button
-              type="button"
-              onClick={closeCamera}
-              style={{ margin: "0.5rem", padding: "0.5rem 1rem" }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Hidden file input for selecting an image from the gallery */}
-      <input
-        type="file"
-        accept="image/*"
-        ref={galleryInputRef}
-        onChange={handleImageChange}
-        style={{ display: "none" }}
-      />
-
-      {/* Display image preview if available */}
-      {formData.imagePreview && (
-        <div
-          style={{
-            position: "relative",
-            display: "inline-block",
-            marginTop: "10px",
-          }}
-        >
-          <img
-            src={formData.imagePreview}
-            alt="Selected"
-            style={{
-              width: "100px",
-              height: "100px",
-              marginTop: "10px",
-              borderRadius: "8px",
-              objectFit: "cover",
-            }}
-          />
-          <button
-            type="button"
-            onClick={clearImage}
-            style={{
-              position: "absolute",
-              top: "5px",
-              right: "5px",
-              background: "transparent",
-              border: "none",
-              color: "red",
-              fontSize: "16px",
-              cursor: "pointer",
-              zIndex: 10,
-            }}
-          >
-            <FaTrash />
-          </button>
-        </div>
-      )}
-    </div>
+          )}
         </Col>
 
         <Col xs={12} md={1}>

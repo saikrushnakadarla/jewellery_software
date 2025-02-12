@@ -37,7 +37,7 @@ const RepairsTable = () => {
     total_amt: '',
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [editIndex, setEditIndex] = useState(null); 
+  const [editIndex, setEditIndex] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [repairDetails, setRepairDetails] = useState(null);
 
@@ -212,11 +212,12 @@ const RepairsTable = () => {
     if (selectedRepair) {
       const fetchedTotal = assignedRepairDetails
         .filter((repair) => repair.repair_id === selectedRepair.repair_id)
-        .reduce((total, repair) => total + (repair.amount || 0), 0);
+        .reduce((total, repair) => total + Number(repair.amount || 0), 0);
 
-      setTotalAmount(fetchedTotal + (parseFloat(mcForRepair) || 0)); // Add MC for Repair
+      setTotalAmount(fetchedTotal + Number(mcForRepair || 0)); // Add MC for Repair
     }
   }, [mcForRepair, selectedRepair, assignedRepairDetails]);
+
 
   const handleReceiveInputChange = (e) => {
     const { name, value } = e.target;
@@ -234,22 +235,23 @@ const RepairsTable = () => {
     if (!selectedRepair) return;
 
     const grossWtAfterRepair =
-      selectedRepair.gross_weight -
-      selectedRepair.estimated_dust +
+      Number(selectedRepair.gross_weight || 0) -
+      Number(selectedRepair.estimated_dust || 0) +
       assignedRepairDetails
         .filter((repair) => repair.repair_id === selectedRepair.repair_id)
-        .reduce((total, repair) => total + (repair.weight || 0), 0);
+        .reduce((total, repair) => total + Number(repair.weight || 0), 0);
 
     const totalAmt =
       assignedRepairDetails
         .filter((repair) => repair.repair_id === selectedRepair.repair_id)
         .reduce((total, repair) => total + Number(repair.amount || 0), 0) +
       Number(mcForRepair || 0); // Ensure numeric addition
+
     // Prepare the payload
     const payload = {
       repair_id: selectedRepair.repair_id,
       gross_wt_after_repair: grossWtAfterRepair,
-      mc_for_repair: mcForRepair,
+      mc_for_repair: Number(mcForRepair || 0), // Ensure mc_for_repair is a number
       total_amt: totalAmt,
     };
 
@@ -266,6 +268,7 @@ const RepairsTable = () => {
         console.error('Error updating repair:', error);
       });
   };
+
 
   const handleRepairEdit = (id) => {
     navigate(`/repairs/${id}`);
@@ -904,16 +907,19 @@ const RepairsTable = () => {
                       type="text"
                       name="gross_wt_after_repair"
                       value={
-                        selectedRepair ? // Check if selectedRepair is not null
-                          (selectedRepair.gross_weight - selectedRepair.estimated_dust) +
+                        selectedRepair
+                          ? Number(selectedRepair.gross_weight || 0) -
+                          Number(selectedRepair.estimated_dust || 0) +
                           assignedRepairDetails
                             .filter((repair) => repair.repair_id === selectedRepair.repair_id)
-                            .reduce((total, repair) => total + (repair.weight || 0), 0)
+                            .reduce((total, repair) => total + Number(repair.weight || 0), 0)
                           : ''
                       }
+                      readOnly
                     />
                   </Form.Group>
                 </Col>
+
                 <Col md={4}>
                   <Form.Group controlId="mc_for_repair">
                     <Form.Label><strong>MC for Repair</strong></Form.Label>
