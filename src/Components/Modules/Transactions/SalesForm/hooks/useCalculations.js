@@ -58,7 +58,7 @@ const useCalculations = (formData, setFormData) => {
         ...prev,
         making_charges: calculatedMakingCharges.toFixed(2),
       }));
-    } else if (formData.mc_on === "Fixed") {
+    } else if (formData.mc_on === "MC / Piece") {
       // If making_charges is manually entered, calculate mc_per_gram
       if (makingCharges && totalWeight > 0) {
         const calculatedMcPerGram = makingCharges / totalWeight;

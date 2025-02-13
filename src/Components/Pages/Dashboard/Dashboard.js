@@ -157,7 +157,7 @@ function Dashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 console.log("Selected Customer Mobile:", selectedMobile);
-                navigate("/urdpurchasetable", { state: { mobile: selectedMobile } });
+                navigate("/purchasetable", { state: { mobile: selectedMobile } });
               }}
             >
               Details
@@ -167,7 +167,7 @@ function Dashboard() {
               className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
-                navigate('/urd_purchase', { state: { mobile: selectedMobile } });
+                navigate('/purchase', { state: { mobile: selectedMobile } });
               }}
             >
               New

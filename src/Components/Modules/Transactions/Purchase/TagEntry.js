@@ -113,7 +113,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 ...prev,
                 Making_Charges: calculatedMakingCharges.toFixed(2), // Automatically set Making Charges
             }));
-        } else if (formData.Making_Charges_On === "Fixed") {
+        } else if (formData.Making_Charges_On === "MC / Piece") {
             // Calculate MC/Gram based on fixed Making Charges
             const calculatedMcPerGram = totalWeight ? makingCharges / totalWeight : 0;
             setFormData((prev) => ({
@@ -169,7 +169,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         }
     }, [formData.category]);
 
-   const handleChange = async (e) => {
+    const handleChange = async (e) => {
         const { name, value } = e.target;
 
         if (name === "category") {
@@ -595,35 +595,35 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             ]}
                                         />
                                     </Col>
-                                   
-            {!isSilverOrGold && (
-                <>
-                    <Col xs={12} md={2}>
-                        <InputField
-                            label="Cut"
-                            name="cut"
-                            value={formData.cut}
-                            onChange={handleChange}
-                        />
-                    </Col>
-                    <Col xs={12} md={2}>
-                        <InputField
-                            label="Color"
-                            name="color"
-                            value={formData.color}
-                            onChange={handleChange}
-                        />
-                    </Col>
-                    <Col xs={12} md={2}>
-                        <InputField
-                            label="Clarity"
-                            name="clarity"
-                            value={formData.clarity}
-                            onChange={handleChange}
-                        />
-                    </Col>
-                </>
-            )}
+
+                                    {!isSilverOrGold && (
+                                        <>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Cut"
+                                                    name="cut"
+                                                    value={formData.cut}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Color"
+                                                    name="color"
+                                                    value={formData.color}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Clarity"
+                                                    name="clarity"
+                                                    value={formData.clarity}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                        </>
+                                    )}
 
                                     <Col xs={12} md={2}>
                                         <InputField
@@ -676,7 +676,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             onChange={handleChange}
                                             options={[
                                                 { value: "MC / Gram", label: "MC / Gram" },
-                                                { value: "MC/Piece", label: "MC/Piece" },
+                                                { value: "MC / Piece", label: "MC / Piece" },
                                                 { value: "MC %", label: "MC %" },
                                             ]}
                                         />

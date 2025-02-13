@@ -219,10 +219,10 @@ const ProductDetails = ({
             onChange={handleChange}
             options={[
               { value: "MC / Gram", label: "MC / Gram" },
-              { value: "Fixed", label: "Fixed" },
+              { value: "MC / Piece", label: "MC / Piece" },
               { value: "MC %", label: "MC %" },
               ...(formData.mc_on &&
-                !["MC / Gram", "Fixed", "MC %"].includes(formData.mc_on)
+                !["MC / Gram", "MC / Piece", "MC %"].includes(formData.mc_on)
                 ? [{ value: formData.mc_on, label: formData.mc_on }]
                 : []),
             ]}
@@ -251,7 +251,7 @@ const ProductDetails = ({
             label="Total MC"
             name="making_charges"
             value={formData.making_charges || ""} // Display calculated Total MC
-            readOnly
+            onChange={handleChange}
           />
         </Col>
 

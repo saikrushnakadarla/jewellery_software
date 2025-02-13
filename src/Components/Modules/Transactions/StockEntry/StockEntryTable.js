@@ -111,7 +111,7 @@ const StockEntryTable = (selectedProduct) => {
         ...prev,
         Making_Charges: calculatedMakingCharges.toFixed(2), // Automatically set Making Charges
       }));
-    } else if (formData.Making_Charges_On === "Fixed") {
+    } else if (formData.Making_Charges_On === "MC / Piece") {
       // Calculate MC/Gram based on fixed Making Charges
       const calculatedMcPerGram = totalWeight ? makingCharges / totalWeight : 0;
       setFormData((prev) => ({
@@ -599,7 +599,7 @@ const StockEntryTable = (selectedProduct) => {
                     onChange={handleChange}
                     options={[
                       { value: "MC / Gram", label: "MC / Gram" },
-                      { value: "Fixed", label: "Fixed" },
+                      { value: "MC / Piece", label: "MC / Piece" },
                       { value: "MC %", label: "MC %" },
                     ]}
                   />

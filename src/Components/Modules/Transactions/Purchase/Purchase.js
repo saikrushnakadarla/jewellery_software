@@ -893,6 +893,47 @@ const URDPurchase = () => {
                 />
               </Col>
 
+
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Rbarcode"
+                  name="rbarcode"
+                  value={formData.rbarcode}
+                  onChange={(e) => handleChange("rbarcode", e.target.value)}
+                  readOnly
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="HSN Code"
+                  name="hsn_code"
+                  value={formData.hsn_code}
+                  onChange={handleChange}
+                  readOnly
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="PCs" type="text" value={formData.pcs}
+                  onChange={(e) => handleChange("pcs", e.target.value)} />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField label="Gross" type="number" value={formData.gross_weight}
+                  onChange={(e) => handleChange("gross_weight", e.target.value)} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Stone" type="number" value={formData.stone_weight}
+                  onChange={(e) => handleChange("stone_weight", e.target.value)} />
+              </Col>
+
+              <Col xs={12} md={1}>
+                <InputField
+                  label="Net"
+                  type="number"
+                  value={formData.net_weight}
+                  onChange={(e) => handleChange("net_weight", e.target.value)}
+                />
+              </Col>
+              
               {formData.category === "Diamond" ? (
                 <>
                   <Col xs={12} md={2}>
@@ -946,50 +987,9 @@ const URDPurchase = () => {
                   />
                 </Col>
               )}
-
               <Col xs={12} md={2}>
                 <InputField
-                  label="Rbarcode"
-                  name="rbarcode"
-                  value={formData.rbarcode}
-                  onChange={(e) => handleChange("rbarcode", e.target.value)}
-                  readOnly
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="HSN Code"
-                  name="hsn_code"
-                  value={formData.hsn_code}
-                  onChange={handleChange}
-                  readOnly
-                />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="PCs" type="text" value={formData.pcs}
-                  onChange={(e) => handleChange("pcs", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Gross" type="number" value={formData.gross_weight}
-                  onChange={(e) => handleChange("gross_weight", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Stone" type="number" value={formData.stone_weight}
-                  onChange={(e) => handleChange("stone_weight", e.target.value)} />
-              </Col>
-
-              <Col xs={12} md={1}>
-                <InputField
-                  label="Net"
-                  type="number"
-                  value={formData.net_weight}
-                  onChange={(e) => handleChange("net_weight", e.target.value)}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-
-                <InputField
-                  label="Total Pure Wt"
+                  label="Pure Wt"
                   type="number"
                   value={formData.pure_weight}
                   onChange={(e) => handleChange("pure_weight", e.target.value)}
@@ -998,6 +998,14 @@ const URDPurchase = () => {
               <Col xs={12} md={1}>
                 <InputField label="Wastage" type="number" value={formData.wastage}
                   onChange={(e) => handleChange("wastage", e.target.value)} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField
+                  label="Paid Wt"
+                  type="number"
+                  value={formData.paid_pure_weight}
+                  onChange={(e) => handleChange("paid_pure_weight", e.target.value)}
+                />
               </Col>
               <Col xs={12} md={2}>
                 <InputField
@@ -1024,21 +1032,10 @@ const URDPurchase = () => {
                   ]}
                 />
               </Col> */}
-              {/* <Col xs={12} md={2}>
+              <Col xs={12} md={2}>
                 <InputField label="Charges" type="number" value={formData.charges}
                   onChange={(e) => handleChange("charges", e.target.value)} />
-              </Col> */}
-
-              <Col xs={12} md={1}>
-                <InputField
-                  label="Paid Wt"
-                  type="number"
-                  value={formData.paid_pure_weight}
-                  onChange={(e) => handleChange("paid_pure_weight", e.target.value)}
-                />
-              </Col>
-
-              
+              </Col>         
               <Col xs={12} md={2}>
                 <InputField
                   label="Rate-Cut"
@@ -1049,7 +1046,7 @@ const URDPurchase = () => {
               </Col>
               <Col xs={12} md={2}>
                 <InputField
-                  label="Total Amount"
+                  label="Total Amt"
                   type="number"
                   value={formData.total_amount}
                   readOnly // Prevent editing by the user
@@ -1057,7 +1054,7 @@ const URDPurchase = () => {
               </Col>
               <Col xs={12} md={2}>
                 <InputField
-                  label="Paid Amount"
+                  label="Paid Amt"
                   type="number"
                   value={formData.paid_amount}
                   onChange={(e) => handleChange("paid_amount", e.target.value)}
@@ -1065,7 +1062,7 @@ const URDPurchase = () => {
               </Col>
               <Col xs={12} md={2}>
                 <InputField
-                  label="Balance Amount"
+                  label="Balance Amt"
                   type="number"
                   value={formData.balance_amount}
                   onChange={(e) => handleChange("balance_amount", e.target.value)}
@@ -1099,14 +1096,14 @@ const URDPurchase = () => {
                     {/* <th>Cut</th>
                     <th>Color</th>
                     <th>Clarity</th> */}
-                    <th>Pieces</th>
+                    <th>Pcs</th>
                     <th>Gross</th>
                     <th>Stone</th>
                     <th>Net</th>
                     {/* <th>HM Charges</th>
                     <th>Other Charges</th>
                     <th>Charges</th> */}
-                    <th>Metal</th>
+                    {/* <th>Metal</th> */}
                     <th>Purity</th>
                     <th>Total Wt</th>
                     <th>Paid wt</th>
@@ -1134,7 +1131,7 @@ const URDPurchase = () => {
                       {/* <td>{data.hm_charges}</td>
                       <td>{data.other_charges}</td>
                       <td>{data.charges}</td> */}
-                      <td>{data.metal_type}</td>
+                      {/* <td>{data.metal_type}</td> */}
                       <td>{data.purity}</td>
                       <td>{data.pure_weight}</td>
                       <td>{data.paid_pure_weight}</td>
