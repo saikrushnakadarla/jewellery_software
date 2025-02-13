@@ -77,7 +77,10 @@ const URDPurchase = () => {
     pcs: "",
     gross_weight: "",
     stone_weight: "",
+    wastage_on: "",
     wastage: "",
+    wastage_wt: "",
+    total_pure_wt: "",
     net_weight: "",
     hm_charges: "",
     other_charges: "",
@@ -128,6 +131,24 @@ const URDPurchase = () => {
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
+
+         // If "Paid Wt" is updated, set "Rate-Cut" to 0
+    // If "Paid Wt" is updated, reset "Rate-Cut" to 0
+    if (field === "paid_pure_weight") {
+      if (value) {
+        updatedFormData.rate = "0"; // ✅ Reset Rate-Cut to 0 when a value is entered
+      } else {
+        // ✅ Restore Rate-Cut to original value when Paid Wt is cleared
+        if (updatedFormData.metal_type?.toLowerCase() === "gold") {
+          updatedFormData.rate = rates.rate_22crt; // Adjust for gold based on 22K
+        } else if (updatedFormData.metal_type?.toLowerCase() === "silver") {
+          updatedFormData.rate = rates.silver_rate; // Adjust for silver
+        } else {
+          updatedFormData.rate = ""; // Default if no metal type is set
+        }
+      }
+    }
+
 
       // Restrict paid_amount to not exceed total_amount
       if (field === "paid_amount") {
@@ -199,6 +220,29 @@ const URDPurchase = () => {
         ).toFixed(2);
       }
 
+        // Calculate wastage weight based on selected wastage_on field
+    if (["wastage_on", "wastage", "gross_weight", "net_weight", "pure_weight"].includes(field)) {
+      const wastagePercentage = parseFloat(updatedFormData.wastage) || 0;
+      let baseWeight = 0;
+
+      if (updatedFormData.wastage_on === "Gross Wt") {
+        baseWeight = parseFloat(updatedFormData.gross_weight) || 0;
+      } else if (updatedFormData.wastage_on === "Net Wt") {
+        baseWeight = parseFloat(updatedFormData.net_weight) || 0;
+      } else if (updatedFormData.wastage_on === "Pure Wt") {
+        baseWeight = parseFloat(updatedFormData.pure_weight) || 0;
+      }
+
+      updatedFormData.wastage_wt = ((wastagePercentage * baseWeight) / 100).toFixed(2);
+    }
+
+
+    // ✅ Calculate Total Pure Weight (pure_weight + wastage_wt)
+    const pureWt = parseFloat(updatedFormData.pure_weight) || 0;
+    const wastageWeight = parseFloat(updatedFormData.wastage_wt) || 0;
+    updatedFormData.total_pure_wt = (pureWt + wastageWeight).toFixed(2);
+
+
       // Additional calculations for other fields
       if (
         updatedFormData.gross &&
@@ -232,7 +276,7 @@ const URDPurchase = () => {
       ).toFixed(2);
 
       // Calculate total amount
-      const pureWeight = parseFloat(updatedFormData.pure_weight) || 0;
+      const pureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
       const rate = parseFloat(updatedFormData.rate) || 0;
       updatedFormData.total_amount = (pureWeight * rate).toFixed(2);
 
@@ -248,7 +292,7 @@ const URDPurchase = () => {
       const rateCut = parseFloat(updatedFormData.rate) || 0;
       updatedFormData.balance_pure_weight =
         rateCut === 0
-          ? (parseFloat(updatedFormData.pure_weight || 0) - paid_pure_weight).toFixed(2)
+          ? (parseFloat(updatedFormData.total_pure_wt || 0) - paid_pure_weight).toFixed(2)
           : "0";
 
       return updatedFormData;
@@ -307,7 +351,10 @@ const URDPurchase = () => {
           pcs: "",
           gross_weight: "",
           stone_weight: "",
+          wastage_on: "",
           wastage: "",
+          wastage_wt: "",
+          total_pure_wt: "",
           net_weight: "",
           hm_charges: "",
           other_charges: "",
@@ -372,7 +419,10 @@ const URDPurchase = () => {
         pcs: "",
         gross_weight: "",
         stone_weight: "",
+        wastage_on: "",
         wastage: "",
+        wastage_wt: "",
+        total_pure_wt: "",
         net_weight: "",
         hm_charges: "",
         other_charges: "",
@@ -760,7 +810,7 @@ const URDPurchase = () => {
   return (
     <div className="main-container">
       <div className="purchase-form-container">
-        <Form>
+        <Form onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}>
           <div className="purchase-form">
             <div className="purchase-form-left">
               <Col className="urd-form1-section">
@@ -933,7 +983,7 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("net_weight", e.target.value)}
                 />
               </Col>
-              
+
               {formData.category === "Diamond" ? (
                 <>
                   <Col xs={12} md={2}>
@@ -995,9 +1045,32 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("pure_weight", e.target.value)}
                 />
               </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Wastage On"
+                  name="wastage_on"
+                  type="select"
+                  value={formData.wastage_on}
+                  onChange={(e) => handleChange("wastage_on", e.target.value)} // ✅ Ensure correct update
+                  options={[
+                    { value: "Gross Wt", label: "Gross Wt" },
+                    { value: "Net Wt", label: "Net Wt" },
+                    { value: "Pure Wt", label: "Pure Wt" },
+                  ]}
+                />
+              </Col>
+
               <Col xs={12} md={1}>
-                <InputField label="Wastage" type="number" value={formData.wastage}
+                <InputField label="Wastage%" type="number" value={formData.wastage}
                   onChange={(e) => handleChange("wastage", e.target.value)} />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField label="Wastage Wt" type="number" value={formData.wastage_wt}
+                  onChange={(e) => handleChange("wastage_wt", e.target.value)} />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField label="Total Pure Wt" type="number" value={formData.total_pure_wt}
+                  onChange={(e) => handleChange("total_pure_wt", e.target.value)} />
               </Col>
               <Col xs={12} md={1}>
                 <InputField
@@ -1035,7 +1108,7 @@ const URDPurchase = () => {
               <Col xs={12} md={2}>
                 <InputField label="Charges" type="number" value={formData.charges}
                   onChange={(e) => handleChange("charges", e.target.value)} />
-              </Col>         
+              </Col>
               <Col xs={12} md={2}>
                 <InputField
                   label="Rate-Cut"
