@@ -27,7 +27,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         // subcategory_id: "SBI001",
         product_Name: "",
         design_master: "",
-        Pricing: "",
+        Pricing: selectedProduct.Pricing,
         cut: "",
         clarity: "",
         color: "",
@@ -56,6 +56,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         Design_Master: selectedProduct.design_name,
         Weight_BW: "",
     });
+    const isByFixed = formData.Pricing === "By fixed";
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
@@ -175,115 +176,118 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         // Support both event object and direct (field, value) arguments.
         let field, value;
         if (fieldOrEvent && fieldOrEvent.target) {
-          // Called as an event handler: e.g. onChange={handleChange}
-          field = fieldOrEvent.target.name;
-          value = fieldOrEvent.target.value;
+            // Called as an event handler: e.g. onChange={handleChange}
+            field = fieldOrEvent.target.name;
+            value = fieldOrEvent.target.value;
         } else {
-          // Called directly: e.g. onChange={(e) => handleChange("deduct_st_Wt", e.target.value)}
-          field = fieldOrEvent;
-          value = valueArg;
+            // Called directly: e.g. onChange={(e) => handleChange("deduct_st_Wt", e.target.value)}
+            field = fieldOrEvent;
+            value = valueArg;
         }
-      
+
+        // At the top of your component:
+
+
         // Update state with the new field value.
         setFormData((prevData) => {
-          let updatedData = { ...prevData, [field]: value };
-      
-          // --- Calculate Stones Price ---
-          if (field === "Stones_Weight" || field === "stone_price_per_carat") {
-            const stoneWeight =
-              parseFloat(
-                field === "Stones_Weight" ? value : prevData.Stones_Weight
-              ) || 0;
-            const stonePricePerCarat =
-              parseFloat(
-                field === "stone_price_per_carat"
-                  ? value
-                  : prevData.stone_price_per_carat
-              ) || 0;
-            if (stoneWeight > 0 && stonePricePerCarat > 0) {
-              const calculatedStonePrice = (stoneWeight / 0.20) * stonePricePerCarat;
-              updatedData.Stones_Price = calculatedStonePrice.toFixed(2);
-            } else {
-              updatedData.Stones_Price = "";
+            let updatedData = { ...prevData, [field]: value };
+
+            // --- Calculate Stones Price ---
+            if (field === "Stones_Weight" || field === "stone_price_per_carat") {
+                const stoneWeight =
+                    parseFloat(
+                        field === "Stones_Weight" ? value : prevData.Stones_Weight
+                    ) || 0;
+                const stonePricePerCarat =
+                    parseFloat(
+                        field === "stone_price_per_carat"
+                            ? value
+                            : prevData.stone_price_per_carat
+                    ) || 0;
+                if (stoneWeight > 0 && stonePricePerCarat > 0) {
+                    const calculatedStonePrice = (stoneWeight / 0.20) * stonePricePerCarat;
+                    updatedData.Stones_Price = calculatedStonePrice.toFixed(2);
+                } else {
+                    updatedData.Stones_Price = "";
+                }
             }
-          }
-      
-          // --- Recalculate Weight BW ---
-          if (
-            field === "Gross_Weight" ||
-            field === "Stones_Weight" ||
-            field === "deduct_st_Wt"
-          ) {
-            const grossWt = parseFloat(updatedData.Gross_Weight) || 0;
-            const stonesWt = parseFloat(updatedData.Stones_Weight) || 0;
-            // Use deduct_st_Wt value if available; default to "yes" if not set.
-            const deductOption = updatedData.deduct_st_Wt
-              ? updatedData.deduct_st_Wt.toLowerCase()
-              : "yes";
-            if (deductOption === "yes") {
-              updatedData.Weight_BW = (grossWt - stonesWt).toFixed(2);
-            } else {
-              updatedData.Weight_BW = grossWt.toFixed(2);
+
+            // --- Recalculate Weight BW ---
+            if (
+                field === "Gross_Weight" ||
+                field === "Stones_Weight" ||
+                field === "deduct_st_Wt"
+            ) {
+                const grossWt = parseFloat(updatedData.Gross_Weight) || 0;
+                const stonesWt = parseFloat(updatedData.Stones_Weight) || 0;
+                // Use deduct_st_Wt value if available; default to "yes" if not set.
+                const deductOption = updatedData.deduct_st_Wt
+                    ? updatedData.deduct_st_Wt.toLowerCase()
+                    : "yes";
+                if (deductOption === "yes") {
+                    updatedData.Weight_BW = (grossWt - stonesWt).toFixed(2);
+                } else {
+                    updatedData.Weight_BW = grossWt.toFixed(2);
+                }
             }
-          }
-      
-          return updatedData;
+
+            return updatedData;
         });
-      
+
         // --- Handle Category Change ---
         if (field === "category") {
-          setFormData((prevData) => ({
-            ...prevData,
-            category: value,
-          }));
-          return;
+            setFormData((prevData) => ({
+                ...prevData,
+                category: value,
+            }));
+            return;
         }
-      
+
         // --- Handle Sub-Category Change and Fetch Prefix/PCode_BarCode ---
         if (field === "sub_category") {
-          const selectedCategory = subCategories.find(
-            (category) => category.subcategory_id === parseInt(value)
-          );
-      
-          const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-          if (newPrefix) {
-            try {
-              const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
-                params: { prefix: newPrefix },
-              });
-              const nextPCodeBarCode = response.data.nextPCodeBarCode;
-              setFormData((prevData) => ({
-                ...prevData,
-                sub_category: selectedCategory
-                  ? selectedCategory.sub_category_name
-                  : "",
-                subcategory_id: selectedCategory
-                  ? selectedCategory.subcategory_id
-                  : "",
-                item_prefix: newPrefix,
-                Prefix: newPrefix,
-                PCode_BarCode: nextPCodeBarCode,
-              }));
-            } catch (error) {
-              console.error("Error fetching PCode_BarCode:", error);
+            const selectedCategory = subCategories.find(
+                (category) => category.subcategory_id === parseInt(value)
+            );
+
+            const newPrefix = selectedCategory ? selectedCategory.prefix : "";
+            if (newPrefix) {
+                try {
+                    const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+                        params: { prefix: newPrefix },
+                    });
+                    const nextPCodeBarCode = response.data.nextPCodeBarCode;
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        sub_category: selectedCategory
+                            ? selectedCategory.sub_category_name
+                            : "",
+                        subcategory_id: selectedCategory
+                            ? selectedCategory.subcategory_id
+                            : "",
+                        item_prefix: newPrefix,
+                        Prefix: newPrefix,
+                        PCode_BarCode: nextPCodeBarCode,
+                    }));
+                } catch (error) {
+                    console.error("Error fetching PCode_BarCode:", error);
+                }
+            } else {
+                setFormData((prevData) => ({
+                    ...prevData,
+                    sub_category: selectedCategory
+                        ? selectedCategory.sub_category_name
+                        : "",
+                    subcategory_id: selectedCategory
+                        ? selectedCategory.subcategory_id
+                        : "",
+                    item_prefix: "",
+                    Prefix: "",
+                    PCode_BarCode: "",
+                }));
             }
-          } else {
-            setFormData((prevData) => ({
-              ...prevData,
-              sub_category: selectedCategory
-                ? selectedCategory.sub_category_name
-                : "",
-              subcategory_id: selectedCategory
-                ? selectedCategory.subcategory_id
-                : "",
-              item_prefix: "",
-              Prefix: "",
-              PCode_BarCode: "",
-            }));
-          }
         }
-      };
-      
+    };
+
 
 
     // Condition to check if "silver" or "gold" exists in category (case insensitive)
@@ -341,7 +345,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 subcategory_id: "",
                 product_Name: "",
                 design_master: "",
-                Pricing: "",
+                Pricing: selectedProduct.Pricing,
                 cut: "",
                 color: "",
                 clarity: "",
@@ -590,14 +594,16 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                             <div className="stock-entry-form">
                                 <h4 className="mb-4">Stock Entry</h4>
                                 <Row className="stock-form-section">
+                                    {/* Always visible fields */}
                                     <Col xs={12} md={2}>
                                         <InputField
                                             label="Category"
                                             name="category"
                                             value={formData.category}
-                                            onChange={(e) => handleChange(e)}
+                                            onChange={handleChange}
                                         />
                                     </Col>
+
                                     <Col xs={12} md={4} className="d-flex align-items-center">
                                         <div style={{ flex: 1 }}>
                                             <InputField
@@ -611,7 +617,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                     label: category.sub_category_name,
                                                 }))}
                                             />
-
                                         </div>
                                         <AiOutlinePlus
                                             size={20}
@@ -624,6 +629,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             }}
                                         />
                                     </Col>
+
                                     <Col xs={12} md={3}>
                                         <InputField
                                             label="Product Design Name"
@@ -631,24 +637,11 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             type="select"
                                             value={formData.design_master}
                                             onChange={handleChange}
-                                            // options={designOptions}
                                             options={designOptions.map(option => ({ value: option.value, label: option.label }))}
                                         />
                                     </Col>
+
                                     <Col xs={12} md={3}>
-                                        <InputField
-                                            label="Purity"
-                                            name="Purity"
-                                            type="select"
-                                            value={formData.Purity}
-                                            onChange={handleChange}
-                                            options={purityOptions.map((option) => ({
-                                                value: `${option.name} | ${option.purity}`, // Combined name and purity
-                                                label: `${option.name} | ${option.purity}`,
-                                            }))}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
                                         <InputField
                                             label="Pricing"
                                             name="Pricing"
@@ -662,198 +655,248 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                         />
                                     </Col>
 
-                                    {!isSilverOrGold && (
+                                    {/* Render different fields based on Pricing selection */}
+                                    {isByFixed ? (
+                                        // If Pricing is "By fixed", show only these fields:
                                         <>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Cut"
-                                                    name="cut"
-                                                    value={formData.cut}
+                                                    label="PCode/BarCode"
+                                                    name="PCode_BarCode"
+                                                    type="text"
+                                                    value={formData.PCode_BarCode}
                                                     onChange={handleChange}
                                                 />
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Color"
-                                                    name="color"
-                                                    value={formData.color}
+                                                    label="HUID No"
+                                                    name="HUID_No"
+                                                    value={formData.HUID_No}
                                                     onChange={handleChange}
                                                 />
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Clarity"
-                                                    name="clarity"
-                                                    value={formData.clarity}
+                                                    label="Stock Point"
+                                                    name="Stock_Point"
+                                                    type="select"
+                                                    value={formData.Stock_Point}
                                                     onChange={handleChange}
+                                                    options={[
+                                                        { value: "Floor1", label: "Floor1" },
+                                                        { value: "Floor2", label: "Floor2" },
+                                                        { value: "Strong room", label: "Strong room" },
+                                                    ]}
+                                                />
+                                            </Col>
+                                        </>
+                                    ) : (
+                                        // Otherwise (if Pricing is not "By fixed"), show all fields:
+                                        <>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Purity"
+                                                    name="Purity"
+                                                    type="select"
+                                                    value={formData.Purity}
+                                                    onChange={handleChange}
+                                                    options={purityOptions.map((option) => ({
+                                                        value: `${option.name} | ${option.purity}`,
+                                                        label: `${option.name} | ${option.purity}`,
+                                                    }))}
+                                                />
+                                            </Col>
+
+                                            {!isSilverOrGold && (
+                                                <>
+                                                    <Col xs={12} md={2}>
+                                                        <InputField
+                                                            label="Cut"
+                                                            name="cut"
+                                                            value={formData.cut}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </Col>
+                                                    <Col xs={12} md={2}>
+                                                        <InputField
+                                                            label="Color"
+                                                            name="color"
+                                                            value={formData.color}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </Col>
+                                                    <Col xs={12} md={2}>
+                                                        <InputField
+                                                            label="Clarity"
+                                                            name="clarity"
+                                                            value={formData.clarity}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </Col>
+                                                </>
+                                            )}
+
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="PCode/BarCode"
+                                                    name="PCode_BarCode"
+                                                    type="text"
+                                                    value={formData.PCode_BarCode}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Gross Wt"
+                                                    name="Gross_Weight"
+                                                    value={formData.Gross_Weight}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Stones Wt"
+                                                    name="Stones_Weight"
+                                                    value={formData.Stones_Weight}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={3}>
+                                                <InputField
+                                                    label="Deduct St Wt"
+                                                    name="deduct_st_Wt"
+                                                    type="select"
+                                                    value={formData.deduct_st_Wt || ""}
+                                                    onChange={(e) => handleChange("deduct_st_Wt", e.target.value)}
+                                                    options={[
+                                                        { value: "yes", label: "Yes" },
+                                                        { value: "no", label: "No" },
+                                                    ]}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Stone Price/Carat"
+                                                    name="stone_price_per_carat"
+                                                    value={formData.stone_price_per_carat}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Stones Price"
+                                                    name="Stones_Price"
+                                                    value={formData.Stones_Price}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Weight BW"
+                                                    name="Weight_BW"
+                                                    value={formData.Weight_BW}
+                                                    onChange={handleChange}
+                                                    readOnly
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="MC On"
+                                                    name="Making_Charges_On"
+                                                    type="select"
+                                                    value={formData.Making_Charges_On}
+                                                    onChange={handleChange}
+                                                    options={[
+                                                        { value: "MC / Gram", label: "MC / Gram" },
+                                                        { value: "MC / Piece", label: "MC / Piece" },
+                                                        { value: "MC %", label: "MC %" },
+                                                    ]}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label={formData.MC_Per_Gram_Label}
+                                                    name="MC_Per_Gram"
+                                                    value={formData.MC_Per_Gram}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            {isSilverCategory && (
+                                                <Col xs={12} md={2}>
+                                                    <InputField
+                                                        label="MC"
+                                                        name="Making_Charges"
+                                                        value={formData.Making_Charges}
+                                                        onChange={handleChange}
+                                                    />
+                                                </Col>
+                                            )}
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Wastage On"
+                                                    name="Wastage_On"
+                                                    type="select"
+                                                    value={formData.Wastage_On}
+                                                    onChange={handleChange}
+                                                    options={[
+                                                        { value: "Gross Weight", label: "Gross Weight" },
+                                                        { value: "Weight BW", label: "Weight BW" },
+                                                    ]}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Wastage %"
+                                                    name="Wastage_Percentage"
+                                                    value={formData.Wastage_Percentage}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="W.Wt"
+                                                    name="WastageWeight"
+                                                    value={formData.WastageWeight}
+                                                    onChange={handleChange}
+                                                    readOnly
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Total Weight"
+                                                    name="TotalWeight_AW"
+                                                    value={formData.TotalWeight_AW}
+                                                    onChange={handleChange}
+                                                    readOnly
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="HUID No"
+                                                    name="HUID_No"
+                                                    value={formData.HUID_No}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Stock Point"
+                                                    name="Stock_Point"
+                                                    type="select"
+                                                    value={formData.Stock_Point}
+                                                    onChange={handleChange}
+                                                    options={[
+                                                        { value: "Floor1", label: "Floor1" },
+                                                        { value: "Floor2", label: "Floor2" },
+                                                        { value: "Strong room", label: "Strong room" },
+                                                    ]}
                                                 />
                                             </Col>
                                         </>
                                     )}
-
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="PCode/BarCode"
-                                            name="PCode_BarCode"
-                                            type="text"
-                                            value={formData.PCode_BarCode}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Gross Wt"
-                                            name="Gross_Weight"
-                                            value={formData.Gross_Weight}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Stones Wt"
-                                            name="Stones_Weight"
-                                            value={formData.Stones_Weight}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Deduct St Wt"
-                                            name="deduct_st_Wt"
-                                            type="select"
-                                            value={formData.deduct_st_Wt || ""}
-                                            onChange={(e) => handleChange("deduct_st_Wt", e.target.value)}
-                                            options={[
-                                                { value: "yes", label: "Yes" },
-                                                { value: "no", label: "No" },
-                                            ]}
-                                        />
-                                    </Col>
-
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Stone Price/Carat"
-                                            name="stone_price_per_carat"
-                                            value={formData.stone_price_per_carat}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Stones Price"
-                                            name="Stones_Price"
-                                            value={formData.Stones_Price}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Weight BW"
-                                            name="Weight_BW"
-                                            value={formData.Weight_BW}
-                                            onChange={handleChange}
-                                            readOnly
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="MC On"
-                                            name="Making_Charges_On"
-                                            type="select"
-                                            value={formData.Making_Charges_On}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "MC / Gram", label: "MC / Gram" },
-                                                { value: "MC / Piece", label: "MC / Piece" },
-                                                { value: "MC %", label: "MC %" },
-                                            ]}
-                                        />
-                                    </Col>
-
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label={formData.MC_Per_Gram_Label}
-                                            name="MC_Per_Gram"
-                                            value={formData.MC_Per_Gram}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-
-                                    {/* Show MC field only if the category is Silver */}
-                                    {isSilverCategory && (
-                                        <Col xs={12} md={2}>
-                                            <InputField
-                                                label="MC"
-                                                name="Making_Charges"
-                                                value={formData.Making_Charges}
-                                                onChange={handleChange}
-                                            />
-                                        </Col>
-                                    )}
-
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Wastage On"
-                                            name="Wastage_On"
-                                            type="select"
-                                            value={formData.Wastage_On}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "Gross Weight", label: "Gross Weight" },
-                                                { value: "Weight BW", label: "Weight BW" },
-                                            ]}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Wastage %"
-                                            name="Wastage_Percentage"
-                                            value={formData.Wastage_Percentage}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="W.Wt"
-                                            name="WastageWeight"
-                                            value={formData.WastageWeight}
-                                            onChange={handleChange}
-                                            readOnly
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Total Weight"
-                                            name="TotalWeight_AW"
-                                            value={formData.TotalWeight_AW}
-                                            onChange={handleChange}
-                                            readOnly
-                                        />
-                                    </Col>
-
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="HUID No"
-                                            name="HUID_No"
-                                            value={formData.HUID_No}
-                                            onChange={handleChange}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Stock Point"
-                                            name="Stock_Point"
-                                            type="select"
-                                            value={formData.Stock_Point}
-                                            onChange={handleChange}
-                                            options={[
-                                                { value: "Floor1", label: "Floor1" },
-                                                { value: "Floor2", label: "Floor2" },
-                                                { value: "Strong room", label: "Strong room" },
-                                            ]}
-                                        />
-                                    </Col>
                                 </Row>
+
                             </div>
                             <div className="text-end mt-4">
                                 <Button
