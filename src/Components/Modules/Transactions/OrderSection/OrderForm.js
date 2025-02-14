@@ -172,6 +172,45 @@ const SalesForm = () => {
     }));
   };
 
+  const [discount, setDiscount] = useState();
+
+  
+  const handleDiscountChange = (e) => {
+    const discountValue = parseFloat(e.target.value) || 0; // Default to 0 if empty or NaN
+    setDiscount(discountValue);
+  
+    const storedOrderDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
+  
+    const updatedOrderDetails = storedOrderDetails.map((item) => {
+      const makingCharges = parseFloat(item.making_charges) || 0; // Default to 0 if NaN
+      const calculatedDiscount = (makingCharges * discountValue) / 100;
+  
+      // Ensure `total_price` is a valid number
+      const previousTotalPrice = parseFloat(item.total_price) || 0;
+  
+      // Store original total price if not already stored
+      const originalTotalPrice = item.original_total_price 
+        ? parseFloat(item.original_total_price) 
+        : previousTotalPrice;
+  
+      // Calculate the updated total price after applying the discount
+      const updatedTotalPrice = originalTotalPrice - calculatedDiscount;
+  
+      return { 
+        ...item, 
+        original_total_price: originalTotalPrice.toFixed(2), // Store original price
+        disscount: calculatedDiscount.toFixed(2), // Corrected spelling
+        total_price: updatedTotalPrice.toFixed(2) // Update total price
+      };
+    });
+  
+    // Update both state and localStorage
+    setOrderDetails(updatedOrderDetails);
+    localStorage.setItem('orderDetails', JSON.stringify(updatedOrderDetails));
+  
+    console.log("Updated Order Details:", updatedOrderDetails);
+  };
+  
   const handleAdd = () => {
     setOrderDetails((prevDetails) => {
       const updatedDetails = [
@@ -336,7 +375,8 @@ const SalesForm = () => {
     );
 
   // Calculate Net Payable Amount
-  const netPayableAmount = netAmount - (schemeAmount + oldItemsAmount);
+  const payableAmount = netAmount - (schemeAmount + oldItemsAmount);
+  const netPayableAmount = Math.round(payableAmount);
 
   const clearData = () => {
     setOldSalesData([]);
@@ -506,6 +546,8 @@ const SalesForm = () => {
                 schemeAmount={schemeAmount}
                 netPayableAmount={netPayableAmount}
                 oldSalesData={oldSalesData} schemeSalesData={schemeSalesData}
+                discount={discount}
+                handleDiscountChange={handleDiscountChange}
               />
             </div>
           </div>

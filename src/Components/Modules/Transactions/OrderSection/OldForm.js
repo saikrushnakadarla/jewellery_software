@@ -92,11 +92,16 @@ const OldSalesForm = ({ setOldSalesData }) => {
         }
       }
 
-      if (name === "purity" && value !== "Other") {
-        updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
+      if (name === "purity") {
+        if (value !== "Manual") {
+          updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
+        } else {
+          updatedDetails.purityPercentage = 0; // Directly set purityPercentage to 0
+        }
       } else if (name === "purityPercentage") {
         updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
       }
+      
 
       // Update calculations
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
@@ -108,8 +113,6 @@ const OldSalesForm = ({ setOldSalesData }) => {
 
   const parsePurityToPercentage = (purity) => {
     if (!purity) return null;
-
-    // Match formats like "22K", "24k", "22kt", "22KT", "22"
     const match = purity.match(/(\d+)(k|K|kt|KT)?/);
     if (match) {
       const caratValue = parseInt(match[1], 10); // Extract carat number
@@ -117,15 +120,12 @@ const OldSalesForm = ({ setOldSalesData }) => {
         return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
       }
     }
-
-    // Handle specific formats like "916HM" directly
     if (purity.toLowerCase() === "916hm") return 91.6;
-
-    return null; // Default if no match
+    return null; 
   };
 
   const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
-    const purityPercentageValue = purity === "Other"
+    const purityPercentageValue = purity === "Manual"
       ? parseFloat(purityPercentage) || 0
       : parsePurityToPercentage(purity) || 0;
 
@@ -143,16 +143,17 @@ const OldSalesForm = ({ setOldSalesData }) => {
     const totalAmount = netWeight * rateAmount;
     return Number(totalAmount.toFixed(2));
   };
+
   const handleEdit = (data, index) => {
     setOldDetails(data);  // Populate form fields with existing data
     setEditingRow(index); // Store index for updating
   };
 
-
   const handleAddButtonClick = () => {
     if (editingRow !== null) {
       // Update existing row
       setOldTableData((prevData) =>
+        
         prevData.map((data, index) =>
           index === editingRow ? oldDetails : data
         )
@@ -167,8 +168,6 @@ const OldSalesForm = ({ setOldSalesData }) => {
         return;
       }
     }
-
-    // Reset form fields
     setOldDetails({
       product: "",
       metal: "",
@@ -186,14 +185,12 @@ const OldSalesForm = ({ setOldSalesData }) => {
     });
   };
 
-
   const handleDelete = (index) => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       setOldTableData((prevData) => prevData.filter((_, i) => i !== index));
       alert("Old Item deleted successfully");
     }
   };
-
 
   const calculateTotalSum = () => {
     return oldTableData.reduce((sum, item) => sum + parseFloat(item.total_amount || 0), 0).toFixed(2);
@@ -256,25 +253,37 @@ const OldSalesForm = ({ setOldSalesData }) => {
     }
   }, [oldDetails.metal]);
 
-
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
 
   useEffect(() => {
     const normalizedMetal = oldDetails.metal.toLowerCase();
     const normalizedPurity = normalizePurity(oldDetails.purity);
 
-    const currentRate =
-      normalizedMetal === "silver" && normalizedPurity.includes("22") ? rates.rate_silver :
-        normalizedPurity.includes("24") ? rates.rate_24crt :
-          normalizedPurity.includes("22") ? rates.rate_22crt :
-            normalizedPurity.includes("18") ? rates.rate_18crt :
-              normalizedPurity.includes("16") ? rates.rate_16crt :
-                oldDetails.purity === "Other" ? rates.rate_22crt :
-                  0;
+    if (normalizedMetal === "silver" && normalizedPurity === "manual") {
+      setOldDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
+      return;
+    }
 
+    if (normalizedMetal === "gold" && normalizedPurity === "manual") {
+      setOldDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_22crt }));
+      return;
+    }
+
+    if (normalizedMetal === "silver") {
+      setOldDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
+      return;
+    }
+
+    const currentRate =
+      normalizedPurity.includes("24") ? rates.rate_24crt :
+      normalizedPurity.includes("22") ? rates.rate_22crt :
+      normalizedPurity.includes("18") ? rates.rate_18crt :
+      normalizedPurity.includes("16") ? rates.rate_16crt :
+      0;
+  
     setOldDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
   }, [oldDetails.purity, oldDetails.metal, rates]);
-
+  
   return (
     <>
       <Row>
@@ -295,6 +304,17 @@ const OldSalesForm = ({ setOldSalesData }) => {
             }))}
           />
         </Col>
+        
+
+        {/* <Col xs={12} md={3}>
+          <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} onChange={handleInputChange} />
+        </Col> */}
+        <Col xs={12} md={3}>
+          <InputField label="Gross" name="gross" value={oldDetails.gross} onChange={handleInputChange} />
+        </Col>
+        <Col xs={12} md={3}>
+          <InputField label="Dust" name="dust" value={oldDetails.dust} onChange={handleInputChange} />
+        </Col>
         <Col xs={12} md={3}>
           <InputField
             label="Purity"
@@ -307,15 +327,15 @@ const OldSalesForm = ({ setOldSalesData }) => {
                 value: purity.name,
                 label: purity.name,
               })),
-              { value: "Other", label: "Other" },
+              { value: "Manual", label: "Manual" },
             ]}
           />
         </Col>
 
-        {oldDetails.purity === "Other" && (
+        {oldDetails.purity === "Manual" && (
           <Col xs={12} md={3}>
             <InputField
-              label="Custom Purity (%)"
+              label="Custom Purity %"
               type="number"
               name="purityPercentage"
               value={oldDetails.purityPercentage || ""}
@@ -323,29 +343,16 @@ const OldSalesForm = ({ setOldSalesData }) => {
             />
           </Col>
         )}
-
-        <Col xs={12} md={3}>
-          <InputField label="HSN Code" name="hsn_code" value={oldDetails.hsn_code} onChange={handleInputChange} />
-        </Col>
-        <Col xs={12} md={3}>
-          <InputField label="Gross" name="gross" value={oldDetails.gross} onChange={handleInputChange} />
-        </Col>
-        <Col xs={12} md={3}>
-          <InputField label="Dust" name="dust" value={oldDetails.dust} onChange={handleInputChange} />
-        </Col>
-        <Col xs={12} md={3}>
-          <InputField
-            label="Net Weight"
-            name="net_wt"
-            value={isNaN(oldDetails.net_wt) || oldDetails.net_wt === "" ? "0.00" : Number(oldDetails.net_wt).toFixed(2)}
-            onChange={handleInputChange}
-          />
-        </Col>
         <Col xs={12} md={3}>
           <InputField label="ML %" name="ml_percent" value={oldDetails.ml_percent} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={3}>
-          <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
+          <InputField
+            label="Net Wt"
+            name="net_wt"
+            value={isNaN(oldDetails.net_wt) || oldDetails.net_wt === "" ? "0.00" : Number(oldDetails.net_wt).toFixed(2)}
+            onChange={handleInputChange}
+          />
         </Col>
         <Col xs={12} md={3}>
           <InputField
@@ -357,12 +364,14 @@ const OldSalesForm = ({ setOldSalesData }) => {
         </Col>
         <Col xs={12} md={3}>
           <InputField
-            label="Total Amount"
+            label="Total Amt"
             name="total_amount"
             value={(Number(oldDetails.total_amount) || 0).toFixed(2)}
             readOnly
           />
-
+        </Col>                
+        <Col xs={12} md={3}>
+          <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={2}>
           <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)' }}>
@@ -375,16 +384,15 @@ const OldSalesForm = ({ setOldSalesData }) => {
         <thead>
           <tr>
             <th>Product</th>
-            <th>Metal</th>
-            <th>Purity</th>
+            <th>Metal</th>            
             <th>Gross</th>
             <th>Dust</th>
-            <th>HSN Code</th>
-            <th>ML Percent</th>
-            <th>Net Weight</th>
-            <th>Remarks</th>
+            <th>Purity</th>
+            <th>ML%</th>
+            <th>Net Wt</th>           
             <th>Rate</th>
-            <th>Total Amount</th>
+            <th>Total Amt</th>
+            <th>Remarks</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -392,16 +400,15 @@ const OldSalesForm = ({ setOldSalesData }) => {
           {oldTableData.map((data, index) => (
             <tr key={index}>
               <td>{data.product}</td>
-              <td>{data.metal}</td>
-              <td>{data.purity}</td>
+              <td>{data.metal}</td>              
               <td>{data.gross}</td>
               <td>{data.dust}</td>
-              <td>{data.hsn_code}</td>
+              <td>{data.purity}</td>
               <td>{data.ml_percent}</td>
-              <td>{data.net_wt}</td>
-              <td>{data.remarks}</td>
+              <td>{data.net_wt}</td>              
               <td>{data.rate}</td>
               <td>{data.total_amount}</td>
+              <td>{data.remarks}</td>
               <td>
                 {/* <Button variant="warning" size="sm" className="mr-2" onClick={() => handleEdit(data, index)}>
               Edit
@@ -426,7 +433,7 @@ const OldSalesForm = ({ setOldSalesData }) => {
       </Table>
 
       <div className="d-flex justify-content-between px-2 mt-2">
-        <h5>Total Amount for Old:</h5>
+        <h5>Total Amount:</h5>
         <h5>₹ {calculateTotalSum()}</h5>
       </div>
 

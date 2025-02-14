@@ -255,24 +255,42 @@ const OldSalesForm = ({ setOldSalesData }) => {
     }
   }, [oldDetails.metal]);
 
-
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
 
   useEffect(() => {
     const normalizedMetal = oldDetails.metal.toLowerCase();
     const normalizedPurity = normalizePurity(oldDetails.purity);
-
+  
+    // If metal is silver and purity is Manual, set rate_silver
+    if (normalizedMetal === "silver" && normalizedPurity === "manual") {
+      setOldDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
+      return;
+    }
+  
+    // If metal is gold and purity is Manual, set rate_22crt
+    if (normalizedMetal === "gold" && normalizedPurity === "manual") {
+      setOldDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_22crt }));
+      return;
+    }
+  
+    // If metal is silver, always set rate_silver
+    if (normalizedMetal === "silver") {
+      setOldDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
+      return;
+    }
+  
+    // Normal purity-based rate assignment for gold
     const currentRate =
-      normalizedMetal === "silver" && normalizedPurity.includes("22") ? rates.rate_silver :
-        normalizedPurity.includes("24") ? rates.rate_24crt :
-          normalizedPurity.includes("22") ? rates.rate_22crt :
-            normalizedPurity.includes("18") ? rates.rate_18crt :
-              normalizedPurity.includes("16") ? rates.rate_16crt :
-                oldDetails.purity === "Manual" ? rates.rate_22crt :
-                  0;
-
+      normalizedPurity.includes("24") ? rates.rate_24crt :
+      normalizedPurity.includes("22") ? rates.rate_22crt :
+      normalizedPurity.includes("18") ? rates.rate_18crt :
+      normalizedPurity.includes("16") ? rates.rate_16crt :
+      0;
+  
     setOldDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
   }, [oldDetails.purity, oldDetails.metal, rates]);
+  
+  
 
   return (
     <>

@@ -229,20 +229,14 @@ const ProductDetails = ({
           />
         </Col>
         <Col xs={12} md={1}>
-          {/* <InputField
-            label={formData.metal_type?.toLowerCase() === "gold" ? "MC Percentage" : "MC/Gm"} // Dynamic label based on metal type
-            name="mc_per_gram"
-            value={formData.mc_per_gram || ""} // Ensure value is set properly
-            onChange={handleChange}
-          /> */}
           <InputField
             label={
               formData.mc_on === "MC %"
                 ? "MC %"
                 : "MC/Gm"
-            } // Dynamic label based on mc_on value
+            }
             name="mc_per_gram"
-            value={formData.mc_per_gram || ""} // Default value handling
+            value={formData.mc_per_gram || ""} 
             onChange={handleChange}
           />
         </Col>
@@ -250,7 +244,7 @@ const ProductDetails = ({
           <InputField
             label="Total MC"
             name="making_charges"
-            value={formData.making_charges || ""} // Display calculated Total MC
+            value={formData.making_charges || ""} 
             onChange={handleChange}
           />
         </Col>

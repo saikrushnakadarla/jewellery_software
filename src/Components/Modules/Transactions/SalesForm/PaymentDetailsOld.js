@@ -1,61 +1,93 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Row, Button } from 'react-bootstrap';
+import { Col, Row, Button, Table } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
-import { Table } from 'react-bootstrap';
-import { useLocation } from 'react-router-dom';
 
 const PaymentDetails = ({
   paymentDetails,
   setPaymentDetails,
   handleSave,
   handleBack,
-  repairDetails,
+  orderDetails,
   totalPrice,
   schemeSalesData,
   oldSalesData,
   taxableAmount,
-  discountAmt,
   totalAmount,
+  discountAmt,
   taxAmount,
   oldItemsAmount,
   schemeAmount,
   netPayableAmount,
-  netAmount,
-  salesNetAmount,
-  discount,
-  handleDiscountChange,
+  netAmount, // Assuming total price is passed as a prop
+  repairDetails, // Pass repairDetails as a prop
+  setRepairDetails // Pass setRepairDetails function to update the state
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
-  const location = useLocation();
-  const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
-  const netPayAmount = netPayableAmount - salesNetAmount
-  useEffect(() => {
-    // Set the default payment details from location.state if available
-    if (location.state?.cash_amount || location.state?.card_amt || location.state?.chq_amt || location.state?.online_amt) {
-      setPaymentDetails((prev) => ({
-        ...prev,
-        cash_amount: location.state.cash_amount || prev.cash_amount,
-        card_amt: location.state.card_amt || prev.card_amt,
-        chq_amt: location.state.chq_amt || prev.chq_amt,
-        online_amt: location.state.online_amt || prev.online_amt,
-      }));
-    }
-  }, [location.state, setPaymentDetails]);
+  const [discount, setDiscount] = useState(); // State for discount input field
 
+  // Calculate total entered amount
   useEffect(() => {
-    // Sum of all payment details
     const totalEnteredAmount =
       parseFloat(paymentDetails.cash_amount || 0) +
       parseFloat(paymentDetails.card_amt || 0) +
       parseFloat(paymentDetails.chq_amt || 0) +
       parseFloat(paymentDetails.online_amt || 0);
 
-    // Using a small tolerance to avoid floating point precision issues
     const tolerance = 0.01;
 
-    // Enable submit only if the total entered amount is approximately equal to totalPrice
     setIsSubmitEnabled(Math.abs(totalEnteredAmount - parseFloat(totalPrice || 0)) < tolerance);
   }, [paymentDetails, totalPrice]);
+
+  const handleDiscountChange = (e) => {
+    const value = e.target.value;
+  
+    if (value === '') {
+      setDiscount('');
+      localStorage.removeItem('discount'); // Clear discount only when user clears it
+  
+      const updatedRepairDetails = repairDetails.map((detail) => ({
+        ...detail,
+        disscount: '0.00',
+        total_price: parseFloat(detail.original_total_price).toFixed(2),
+      }));
+  
+      setRepairDetails(updatedRepairDetails);
+    } else {
+      setDiscount(value);
+      localStorage.setItem('discount', value); // Save discount in localStorage
+  
+      const updatedRepairDetails = repairDetails.map((detail) => {
+        const makingCharges = parseFloat(detail.making_charges) || 0;
+        const discountAmount = (parseFloat(value) / 100) * makingCharges;
+        const newTotalPrice = parseFloat(detail.original_total_price) - discountAmount;
+  
+        return {
+          ...detail,
+          disscount: discountAmount.toFixed(2),
+          total_price: newTotalPrice.toFixed(2),
+        };
+      });
+  
+      setRepairDetails(updatedRepairDetails);
+    }
+  };
+  
+
+  useEffect(() => {
+    const updatedRepairDetails = repairDetails.map((detail) => {
+      if (!detail.original_total_price) {
+        return {
+          ...detail,
+          original_total_price: detail.total_price, // Save original total price if not already saved
+        };
+      }
+      return detail;
+    });
+  
+    setRepairDetails(updatedRepairDetails);
+  }, [repairDetails]);
+  
+  
 
   return (
     <div>
@@ -63,7 +95,7 @@ const PaymentDetails = ({
         <Row>
           <h4 className="mb-3">Summary</h4>
           <Table bordered hover responsive>
-          <tr>
+            <tr>
               <td colSpan="16" className="text-right">Total Amount</td>
               <td colSpan="4">{totalAmount.toFixed(2)}</td>
             </tr>
@@ -95,7 +127,7 @@ const PaymentDetails = ({
             </tr>
             <tr>
               <td colSpan="16" className="text-right">Old Items Amount</td>
-              <td colSpan="4">{updatedOldItemsAmount.toFixed(2)}</td> {/* Display the updated amount */}
+              <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
             </tr>
             <tr>
               <td colSpan="16" className="text-right">Scheme Amount</td>
@@ -103,7 +135,7 @@ const PaymentDetails = ({
             </tr>
             <tr>
               <td colSpan="16" className="text-right">Net Payable Amount</td>
-              <td colSpan="4">{Math.round(netPayAmount).toFixed(2)}</td>
+              <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
             </tr>
           </Table>
         </Row>
@@ -156,13 +188,13 @@ const PaymentDetails = ({
             <Button
               onClick={handleSave}
               style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
-            // disabled={!isSubmitEnabled} 
             >
               Save
             </Button>
           </Col>
           <Col xs={12} md={2}>
             <Button
+              type="button"
               variant="secondary"
               onClick={handleBack}
               style={{ backgroundColor: 'gray', marginLeft: '-50px' }}
