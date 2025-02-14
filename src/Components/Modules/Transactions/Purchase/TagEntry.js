@@ -39,6 +39,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         PCode_BarCode: "",
         Gross_Weight: "",
         Stones_Weight: "",
+        deduct_st_Wt: "",
         stone_price_per_carat: "",
         Stones_Price: "",
         HUID_No: "",
@@ -170,72 +171,120 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         }
     }, [formData.category]);
 
-    const handleChange = async (e) => {
-        const { name, value } = e.target;
-    
+    const handleChange = async (fieldOrEvent, valueArg) => {
+        // Support both event object and direct (field, value) arguments.
+        let field, value;
+        if (fieldOrEvent && fieldOrEvent.target) {
+          // Called as an event handler: e.g. onChange={handleChange}
+          field = fieldOrEvent.target.name;
+          value = fieldOrEvent.target.value;
+        } else {
+          // Called directly: e.g. onChange={(e) => handleChange("deduct_st_Wt", e.target.value)}
+          field = fieldOrEvent;
+          value = valueArg;
+        }
+      
+        // Update state with the new field value.
         setFormData((prevData) => {
-            let updatedData = { ...prevData, [name]: value };
-    
-            if (name === "Stones_Weight" || name === "stone_price_per_carat") {
-                const stoneWeight = parseFloat(name === "Stones_Weight" ? value : prevData.Stones_Weight) || 0;
-                const stonePricePerCarat = parseFloat(name === "stone_price_per_carat" ? value : prevData.stone_price_per_carat) || 0;
-    
-                if (stoneWeight > 0 && stonePricePerCarat > 0) {
-                    const calculatedStonePrice = (stoneWeight / 0.20) * stonePricePerCarat;
-                    updatedData.Stones_Price = calculatedStonePrice.toFixed(2);
-                } else {
-                    updatedData.Stones_Price = "";
-                }
-            }
-    
-            return updatedData;
-        });
-    
-        if (name === "category") {
-            setFormData((prevData) => ({
-                ...prevData,
-                category: value,
-            }));
-            return;
-        }
-    
-        if (name === "sub_category") {
-            const selectedCategory = subCategories.find(
-                (category) => category.subcategory_id === parseInt(value)
-            );
-    
-            const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-            if (newPrefix) {
-                try {
-                    const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
-                        params: { prefix: newPrefix },
-                    });
-    
-                    const nextPCodeBarCode = response.data.nextPCodeBarCode;
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
-                        subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
-                        item_prefix: newPrefix,
-                        Prefix: newPrefix,
-                        PCode_BarCode: nextPCodeBarCode,
-                    }));
-                } catch (error) {
-                    console.error("Error fetching PCode_BarCode:", error);
-                }
+          let updatedData = { ...prevData, [field]: value };
+      
+          // --- Calculate Stones Price ---
+          if (field === "Stones_Weight" || field === "stone_price_per_carat") {
+            const stoneWeight =
+              parseFloat(
+                field === "Stones_Weight" ? value : prevData.Stones_Weight
+              ) || 0;
+            const stonePricePerCarat =
+              parseFloat(
+                field === "stone_price_per_carat"
+                  ? value
+                  : prevData.stone_price_per_carat
+              ) || 0;
+            if (stoneWeight > 0 && stonePricePerCarat > 0) {
+              const calculatedStonePrice = (stoneWeight / 0.20) * stonePricePerCarat;
+              updatedData.Stones_Price = calculatedStonePrice.toFixed(2);
             } else {
-                setFormData((prevData) => ({
-                    ...prevData,
-                    sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
-                    subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
-                    item_prefix: "",
-                    Prefix: "",
-                    PCode_BarCode: "",
-                }));
+              updatedData.Stones_Price = "";
             }
+          }
+      
+          // --- Recalculate Weight BW ---
+          if (
+            field === "Gross_Weight" ||
+            field === "Stones_Weight" ||
+            field === "deduct_st_Wt"
+          ) {
+            const grossWt = parseFloat(updatedData.Gross_Weight) || 0;
+            const stonesWt = parseFloat(updatedData.Stones_Weight) || 0;
+            // Use deduct_st_Wt value if available; default to "yes" if not set.
+            const deductOption = updatedData.deduct_st_Wt
+              ? updatedData.deduct_st_Wt.toLowerCase()
+              : "yes";
+            if (deductOption === "yes") {
+              updatedData.Weight_BW = (grossWt - stonesWt).toFixed(2);
+            } else {
+              updatedData.Weight_BW = grossWt.toFixed(2);
+            }
+          }
+      
+          return updatedData;
+        });
+      
+        // --- Handle Category Change ---
+        if (field === "category") {
+          setFormData((prevData) => ({
+            ...prevData,
+            category: value,
+          }));
+          return;
         }
-    };
-    
+      
+        // --- Handle Sub-Category Change and Fetch Prefix/PCode_BarCode ---
+        if (field === "sub_category") {
+          const selectedCategory = subCategories.find(
+            (category) => category.subcategory_id === parseInt(value)
+          );
+      
+          const newPrefix = selectedCategory ? selectedCategory.prefix : "";
+          if (newPrefix) {
+            try {
+              const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+                params: { prefix: newPrefix },
+              });
+              const nextPCodeBarCode = response.data.nextPCodeBarCode;
+              setFormData((prevData) => ({
+                ...prevData,
+                sub_category: selectedCategory
+                  ? selectedCategory.sub_category_name
+                  : "",
+                subcategory_id: selectedCategory
+                  ? selectedCategory.subcategory_id
+                  : "",
+                item_prefix: newPrefix,
+                Prefix: newPrefix,
+                PCode_BarCode: nextPCodeBarCode,
+              }));
+            } catch (error) {
+              console.error("Error fetching PCode_BarCode:", error);
+            }
+          } else {
+            setFormData((prevData) => ({
+              ...prevData,
+              sub_category: selectedCategory
+                ? selectedCategory.sub_category_name
+                : "",
+              subcategory_id: selectedCategory
+                ? selectedCategory.subcategory_id
+                : "",
+              item_prefix: "",
+              Prefix: "",
+              PCode_BarCode: "",
+            }));
+          }
+        }
+      };
+      
+
 
     // Condition to check if "silver" or "gold" exists in category (case insensitive)
     const isSilverOrGold = /silver|gold/i.test(formData.category);
@@ -304,6 +353,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 suffix: nextSuffix,
                 Gross_Weight: "",
                 Stones_Weight: "",
+                deduct_st_Wt: "",
                 stone_price_per_carat: "",
                 Stones_Price: "",
                 HUID_No: "",
@@ -666,6 +716,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             onChange={handleChange}
                                         />
                                     </Col>
+                                    <Col xs={12} md={2}>
+                                        <InputField
+                                            label="Deduct St Wt"
+                                            name="deduct_st_Wt"
+                                            type="select"
+                                            value={formData.deduct_st_Wt || ""}
+                                            onChange={(e) => handleChange("deduct_st_Wt", e.target.value)}
+                                            options={[
+                                                { value: "yes", label: "Yes" },
+                                                { value: "no", label: "No" },
+                                            ]}
+                                        />
+                                    </Col>
+
                                     <Col xs={12} md={2}>
                                         <InputField
                                             label="Stone Price/Carat"
