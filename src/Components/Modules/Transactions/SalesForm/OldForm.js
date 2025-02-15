@@ -4,7 +4,7 @@ import { Col, Row, Button, Table } from "react-bootstrap";
 import InputField from "./../../Masters/ItemMaster/Inputfield";
 import baseURL from "../../../../Url/NodeBaseURL";
 import { FaEdit, FaTrash } from "react-icons/fa";
-const OldSalesForm = ({ setOldSalesData }) => {
+const OldSalesForm = ({ setOldSalesData ,repairDetails}) => {
 
 
   const [metalOptions, setMetalOptions] = useState([]);
@@ -47,14 +47,26 @@ const OldSalesForm = ({ setOldSalesData }) => {
           label: item.metal_name,
           hsn_code: item.hsn_code,
         }));
+  
         setMetalOptions(metalTypes);
+  
+        // Set last metal_type from repairDetails
+        if (repairDetails?.length > 0) {
+          const lastMetalType = repairDetails[repairDetails.length - 1]?.metal_type;
+          if (lastMetalType) {
+            setOldDetails((prevDetails) => ({
+              ...prevDetails,
+              metal: lastMetalType,
+            }));
+          }
+        }
       } catch (error) {
         console.error("Error fetching metal types:", error);
       }
     };
-
+  
     fetchMetalTypes();
-  }, []);
+  }, [repairDetails]);
 
   useEffect(() => {
     if (oldDetails.metal === 'Gold') {

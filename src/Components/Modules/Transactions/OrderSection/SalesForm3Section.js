@@ -3,7 +3,7 @@ import { Col, Row, Button } from "react-bootstrap";
 import OldSalesForm from "./OldForm";
 import SchemeSalesForm from "./SchemesForm";
 
-const SalesFormSection = ({ setOldSalesData, setSchemeSalesData }) => {
+const SalesFormSection = ({ setOldSalesData, setSchemeSalesData, orderDetails }) => {
   const [activeForm, setActiveForm] = useState("old");
 
   return (
@@ -31,7 +31,7 @@ const SalesFormSection = ({ setOldSalesData, setSchemeSalesData }) => {
       </Row>
 
       {activeForm === "old" ? (
-        <OldSalesForm setOldSalesData={setOldSalesData} />
+        <OldSalesForm setOldSalesData={setOldSalesData} orderDetails={orderDetails}/>
       ) 
       : (
         <SchemeSalesForm setSchemeSalesData={setSchemeSalesData} />

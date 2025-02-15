@@ -22,6 +22,7 @@ const SalesFormSection = ({ setOldSalesData,
                 salesTaxAmount,
                 salesNetAmount,
                 selectedRows,
+                repairDetails,
        }) => {
   console.log("invoiceDetails=",invoiceDetails)
   const [activeForm, setActiveForm] = useState("old");
@@ -97,7 +98,7 @@ const SalesFormSection = ({ setOldSalesData,
 
       </Row>
 
-      {activeForm === "old" && <OldSalesForm setOldSalesData={setOldSalesData} />}
+      {activeForm === "old" && <OldSalesForm setOldSalesData={setOldSalesData} repairDetails={repairDetails}/>}
       {activeForm === "schemes" && (
         <SchemeSalesForm
           setSchemeSalesData={setSchemeSalesData}

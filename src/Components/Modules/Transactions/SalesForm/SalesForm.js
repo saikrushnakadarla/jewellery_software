@@ -742,6 +742,7 @@ const SalesForm = () => {
                 salesTaxableAmount={salesTaxableAmount}
                 salesTaxAmount={salesTaxAmount}
                 salesNetAmount={salesNetAmount}
+                repairDetails={repairDetails}
               />
 
             </div>

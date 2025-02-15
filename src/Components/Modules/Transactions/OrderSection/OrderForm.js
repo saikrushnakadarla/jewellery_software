@@ -526,6 +526,7 @@ const SalesForm = () => {
                 setSchemeSalesData={setSchemeSalesData}
                 schemeTableData={schemeTableData}
                 setSchemeTableData={setSchemeTableData}
+                orderDetails={orderDetails}
               />
             </div>
 
