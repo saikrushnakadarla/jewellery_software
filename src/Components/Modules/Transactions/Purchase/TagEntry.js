@@ -48,6 +48,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         Status: "Available",
         Source: "Purchase",
         Stock_Point: "",
+        pieace_cost: "",
         WastageWeight: "",
         TotalWeight_AW: "",
         MC_Per_Gram: "",
@@ -366,6 +367,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 Status: "Available",
                 Source: "Purchase",
                 Stock_Point: "",
+                pieace_cost: "",
                 WastageWeight: "",
                 TotalWeight_AW: "",
                 MC_Per_Gram: "",
@@ -895,6 +897,19 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             </Col>
                                         </>
                                     )}
+
+                                       {formData.Pricing === "By fixed" && (
+                                      <Col xs={12} md={2}>
+                                        <InputField
+                                          label="Piece Cost"
+                                          type="number"
+                                          value={formData.pieace_cost}
+                                          onChange={(e) => handleChange("pieace_cost", e.target.value)}
+                                       
+                                        />
+                                      </Col>
+                                    )}
+                                    
                                 </Row>
 
                             </div>

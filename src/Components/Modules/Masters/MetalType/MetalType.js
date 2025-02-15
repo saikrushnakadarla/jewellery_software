@@ -179,10 +179,10 @@ function MetalType() {
         Header: "Metal Name",
         accessor: "metal_name",
       },
-      {
-        Header: "HSN Code",
-        accessor: "hsn_code",
-      },
+      // {
+      //   Header: "HSN Code",
+      //   accessor: "hsn_code",
+      // },
       // {
       //   Header: "Item Type",
       //   accessor: "item_type",
@@ -243,14 +243,14 @@ function MetalType() {
               error={errors.metal_name}
             />
 
-            <InputField
+            {/* <InputField
               label="HSN Code"
               name="hsn_code"
               value={formData.hsn_code}
               onChange={handleChange}
               required={true}
               error={errors.hsn_code}
-            />
+            /> */}
 
 
             {/* <InputField
