@@ -304,6 +304,11 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
       alert("The product's PCS must be greater than zero to submit the form.");
       return;
     }
+       // Additionally, ensure that Piece Cost is provided and is a valid number.
+       if (!formData.pieace_cost || parseFloat(formData.pieace_cost) <= 0) {
+        alert("Please enter a Piece Cost.");
+        return;
+      }
     // grossWeight can be 0 or greater.
   } else {
     // For pricing other than 'By fixed', both PCS and Gross Weight must be > 0.
