@@ -297,10 +297,21 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (pcs <= 0 || grossWeight <= 0) {
-            alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
-            return;
-        }
+        // Validate based on the Pricing field selection:
+  if (formData.Pricing === "By fixed") {
+    // For 'By fixed' pricing, only check that PCS is greater than 0.
+    if (pcs <= 0) {
+      alert("The product's PCS must be greater than zero to submit the form.");
+      return;
+    }
+    // grossWeight can be 0 or greater.
+  } else {
+    // For pricing other than 'By fixed', both PCS and Gross Weight must be > 0.
+    if (pcs <= 0 || grossWeight <= 0) {
+      alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
+      return;
+    }
+  }
 
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
