@@ -609,6 +609,12 @@ const URDPurchase = () => {
   const handleSave = async (e) => {
     e.preventDefault();
 
+// Check if the customer's mobile number is provided
+if (!formData.mobile || formData.mobile.trim() === "") {
+  alert("Please select or enter customer's mobile number");
+  return;
+}
+
     console.log("Product ID before submission:", formData.product_id);
 
     try {
