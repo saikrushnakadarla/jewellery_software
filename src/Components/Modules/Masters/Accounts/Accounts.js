@@ -147,18 +147,11 @@ const RepairForm = () => {
   };
 
   const validateForm = () => {
-
-    const { bank_account_no, bank_name, ifsc_code, branch, mobile } = formData;
-  
-    if (!bank_account_no.trim() || !bank_name.trim() || !ifsc_code.trim() || !branch.trim()) {
-      alert("Please fill in all required fields: Bank Account No., Bank Name, IFSC Code, and Branch.");
+    if (!formData.account_name?.trim()) {
+      alert("Account Name is required.");
       return false;
     }
-    if (!formData.account_name.trim()) {
-      alert("Supplier Name is required.");
-      return false;
-    }
-    if (!formData.mobile.trim()) {
+    if (!formData.mobile?.trim()) {
       alert("Mobile number is required.");
       return false;
     }
@@ -166,62 +159,61 @@ const RepairForm = () => {
       alert("Mobile number must be exactly 10 digits.");
       return false;
     }
-    // if (formData.gst_in.trim() && formData.gst_in.length !== 15) {
-    //   alert("GSTIN must be exactly 15 characters.");
-    //   return false;
-    // }
-    // if (formData.ifsc_code.trim() && formData.ifsc_code.length !== 11) {
-    //   alert("IFSC Code must be exactly 11 characters.");
-    //   return false;
-    // }
+    if (formData.aadhar_card?.trim() && formData.aadhar_card.length !== 12) {
+      alert("Aadhar Card must be exactly 12 digits.");
+      return false;
+    }
+    if (formData.pan_card?.trim() && formData.pan_card.length !== 10) {
+      alert("PAN Card must be exactly 10 characters.");
+      return false;
+    }
+    if (formData.gst_in?.trim() && formData.gst_in.length !== 15) {
+      alert("GSTIN must be exactly 15 characters.");
+      return false;
+    }
+    if (formData.ifsc_code?.trim() && formData.ifsc_code.length !== 11) {
+      alert("IFSC Code must be exactly 11 characters.");
+      return false;
+    }
     return true;
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-     // Call validateForm() before submitting
-  if (!validateForm()) {
-    return;
-  }
-
+  
+    if (!validateForm()) {
+      return;
+    }
+  
+    const sanitizedFormData = {
+      account_name: formData.account_name || "",
+      mobile: formData.mobile || "",
+      aadhar_card: formData.aadhar_card || "",
+      pan_card: formData.pan_card || "",
+      gst_in: formData.gst_in || "",
+      ifsc_code: formData.ifsc_code || "",
+    };
+  
     try {
-      // Step 1: Check for duplicate mobile number only when creating a new account (POST request)
-      if (!id) {
-        const duplicateCheckResponse = await fetch(`${baseURL}/get/account-details`);
-        if (!duplicateCheckResponse.ok) {
-          throw new Error("Failed to fetch accounts data for duplicate check");
-        }
-        const accounts = await duplicateCheckResponse.json();
-
-        // Check if the mobile number already exists
-        const isDuplicate = accounts.some((account) => account.mobile === formData.mobile);
-        if (isDuplicate) {
-          alert("This mobile number already exists. Please use a different number.");
-          return;
-        }
-      }
-
-      // Step 2: Proceed with form submission (POST or PUT)
       const method = id ? "PUT" : "POST";
       const url = id
-        ? `${baseURL}/edit/account-details/${id}`  // Update the account if ID exists
-        : `${baseURL}/account-details`;           // Create a new account if no ID
-
+        ? `${baseURL}/edit/account-details/${id}`
+        : `${baseURL}/account-details`;
+  
       const response = await fetch(url, {
         method: method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(sanitizedFormData),
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Server error: ${errorText}`);
       }
-
-      const result = await response.json();
+  
       alert(id ? "Account updated successfully!" : "Account created successfully!");
       navigate("/accountstable");
     } catch (err) {
@@ -229,6 +221,7 @@ const RepairForm = () => {
       alert(`Error: ${err.message}`);
     }
   };
+  
 
 
   useEffect(() => {

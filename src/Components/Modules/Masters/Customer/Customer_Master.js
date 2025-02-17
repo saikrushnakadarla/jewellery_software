@@ -188,24 +188,25 @@ function Customer_Master() {
       alert("Mobile number must be exactly 10 digits.");
       return false;
     }
-    // if (formData.aadhar_card.length !== 12) {
-    //   alert("Aadhar Card must be exactly 12 digits.");
-    //   return false;
-    // }
-    // if (formData.pan_card.length !== 10) {
-    //   alert("PAN Card must be exactly 10 characters.");
-    //   return false;
-    // }
-    // if (formData.gst_in.length !== 15) {
-    //   alert("GSTIN must be exactly 15 characters.");
-    //   return false;
-    // }
-    // if (formData.ifsc_code.length !== 11) {
-    //   alert("IFSC Code must be exactly 11 characters.");
-    //   return false;
-    // }
+    if (formData.aadhar_card.trim() && formData.aadhar_card.length !== 12) {
+      alert("Aadhar Card must be exactly 12 digits.");
+      return false;
+    }
+    if (formData.pan_card.trim() && formData.pan_card.length !== 10) {
+      alert("PAN Card must be exactly 10 characters.");
+      return false;
+    }
+    if (formData.gst_in.trim() && formData.gst_in.length !== 15) {
+      alert("GSTIN must be exactly 15 characters.");
+      return false;
+    }
+    if (formData.ifsc_code.trim() && formData.ifsc_code.length !== 11) {
+      alert("IFSC Code must be exactly 11 characters.");
+      return false;
+    }
     return true;
   };
+  
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -295,7 +296,7 @@ function Customer_Master() {
         <form className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <Row>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Trade / Customer Name"
                 name="account_name"
@@ -304,13 +305,29 @@ function Customer_Master() {
                 required
               />
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Print Name"
                 name="print_name"
                 value={formData.print_name}
                 onChange={handleChange}
                 required
+              />
+            </Col>
+            <Col md={2}>
+              <InputField
+                label="Religion"
+                name="religion"
+                type="select"
+                value={formData.religion}
+                onChange={handleChange}
+                options={[
+                  { value: "Hinduism", label: "Hinduism" },
+                  { value: "Islam", label: "Islam" },
+                  { value: "Christianity", label: "Christianity" },
+                  { value: "Sikhism", label: "Sikhism" },
+                  { value: "Others", label: "Others" },
+                ]}
               />
             </Col>
             {/* <Col md={4}>
@@ -488,14 +505,7 @@ function Customer_Master() {
 
               />
             </Col>
-            <Col md={3}>
-              <InputField
-                label="Religion"
-                name="religion"
-                value={formData.religion}
-                onChange={handleChange}
-              />
-            </Col>
+            
           </Row>
 
           {/* Checkbox */}

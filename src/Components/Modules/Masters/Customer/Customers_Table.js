@@ -45,15 +45,15 @@ const RepairsTable = () => {
             <FaEye
               style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
               onClick={() => handleView(row.original)}
-            />            
+            />
             <FaEdit
               style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
               onClick={() => handleEdit(row.original.account_id)}
-            />            
+            />
             <FaTrash
               style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
               onClick={() => handleDelete(row.original.account_id)}
-            />            
+            />
           </div>
         ),
       },
@@ -172,7 +172,11 @@ const RepairsTable = () => {
                 <Col md={6}><strong>Print Name:</strong> {modalData.print_name}</Col>
               </Row>
               <Row>
+                <Col md={6}><strong>Religion:</strong> {modalData.religion}</Col>
                 <Col md={6}><strong>Account Group:</strong> {modalData.account_group}</Col>
+              </Row>
+              <Row>
+                <Col md={6}><strong>Address:</strong> {modalData.address1}</Col>
                 <Col md={6}><strong>Pincode:</strong> {modalData.pincode}</Col>
               </Row>
               <Row>

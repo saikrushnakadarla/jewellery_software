@@ -212,10 +212,10 @@ function DesignMaster() {
         Header: "Item Type",
         accessor: "item_type",
       },
-      {
-        Header: "Design Item",
-        accessor: "design_item",
-      },
+      // {
+      //   Header: "Design Item",
+      //   accessor: "design_item",
+      // },
       {
         Header: "Design Name",
         accessor: "design_name",
@@ -309,7 +309,7 @@ function DesignMaster() {
 
             />
 
-            <InputField
+            {/* <InputField
               label="Design Item"
               name="design_item"
               value={formData.design_item}
@@ -317,7 +317,7 @@ function DesignMaster() {
               // required={true}
               error={errors.design_item}
 
-            />
+            /> */}
 
             <InputField
               label="Design Name"
