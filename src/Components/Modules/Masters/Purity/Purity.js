@@ -64,8 +64,6 @@ function Purity() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-
     if (editMode) {
       // Edit functionality
       try {
@@ -215,7 +213,7 @@ function Purity() {
         <h3 style={{ textAlign: "center", marginBottom: "30px" }}>
           {editMode ? "Edit Purity" : "Add Purity"}
         </h3>
-        <form  ref={formRef} className="customer-master-form" onSubmit={handleSubmit}>
+        <form className="customer-master-form" onSubmit={handleSubmit} onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}>
           <div className="form-row">
             {/* <InputField
               label="Purity Percentage:"

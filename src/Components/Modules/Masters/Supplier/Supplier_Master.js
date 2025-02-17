@@ -160,6 +160,10 @@ function Supplier_Master() {
       alert("Mobile number must be exactly 10 digits.");
       return false;
     }
+    if (formData.pincode.trim() && formData.pincode.length !== 6) {
+      alert("PinCode must be exactly 6 digits.");
+      return false;
+    }
     if (formData.aadhar_card.trim() && formData.aadhar_card.length !== 12) {
       alert("Aadhar Card must be exactly 12 digits.");
       return false;

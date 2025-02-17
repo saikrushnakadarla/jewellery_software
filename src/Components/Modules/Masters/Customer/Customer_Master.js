@@ -67,22 +67,22 @@ function Customer_Master() {
           const response = await fetch(`${baseURL}/get/account-details/${id}`);
           if (response.ok) {
             const result = await response.json();
-              // Parse dates without timezone adjustment
-              const parseDate = (dateString) => {
-                if (!dateString) return '';
-                const date = new Date(dateString);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-              };
-    
-              setFormData({
-                ...result,
-                birthday: parseDate(result.birthday),
-                anniversary: parseDate(result.anniversary),
-              });
-            }
+            // Parse dates without timezone adjustment
+            const parseDate = (dateString) => {
+              if (!dateString) return '';
+              const date = new Date(dateString);
+              const year = date.getFullYear();
+              const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+              const day = String(date.getDate()).padStart(2, '0');
+              return `${year}-${month}-${day}`;
+            };
+
+            setFormData({
+              ...result,
+              birthday: parseDate(result.birthday),
+              anniversary: parseDate(result.anniversary),
+            });
+          }
         } catch (error) {
           console.error('Error fetching customer:', error);
         }
@@ -96,80 +96,80 @@ function Customer_Master() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
-  
+
     switch (name) {
       case "account_name":
       case "print_name":
         // Capitalize first letter
         updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
-        
+
         // Ensure it contains at least one letter
         if (/^\d+$/.test(updatedValue)) {
           return; // Prevent update if only numbers
         }
-  
+
         setFormData((prevData) => ({
           ...prevData,
           [name]: updatedValue,
           ...(name === "account_name" &&
             prevData.print_name === prevData.account_name && {
-              print_name: updatedValue,
-            }),
+            print_name: updatedValue,
+          }),
         }));
-        return; 
-  
+        return;
+
       case "print_name":
         // Capitalize first letter
         updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
         break;
-  
+
       case "mobile":
       case "phone":
         // Allow only numbers and limit to 10 digits
         updatedValue = value.replace(/\D/g, "").slice(0, 10);
         break;
-  
+
       case "aadhar_card":
         // Allow only numbers and limit to 12 digits
         updatedValue = value.replace(/\D/g, "").slice(0, 12);
         break;
-  
+
       case "pincode":
         // Allow only numbers and limit to 6 digits
         updatedValue = value.replace(/\D/g, "").slice(0, 6);
         break;
-  
+
       case "gst_in":
         // GSTIN must be 15 alphanumeric characters (uppercase)
         updatedValue = value.toUpperCase().slice(0, 15);
         break;
-  
+
       case "pan_card":
         // PAN must be 10 alphanumeric characters (uppercase)
         updatedValue = value.toUpperCase().slice(0, 10);
         break;
-  
+
       case "ifsc_code":
         // IFSC must be exactly 11 alphanumeric characters (uppercase)
         updatedValue = value.toUpperCase().slice(0, 11);
         break;
-  
-        case "bank_account_no":
-          // Allow only numbers and limit to 18 digits
-          updatedValue = value.replace(/\D/g, "").slice(0, 18);
-          break;
+
+      case "bank_account_no":
+        // Allow only numbers and limit to 18 digits
+        updatedValue = value.replace(/\D/g, "").slice(0, 18);
+        break;
 
       default:
         break;
     }
-  
+
     // Update state
     setFormData((prevData) => ({
       ...prevData,
       [name]: updatedValue,
     }));
   };
-  
+
 
   const handleCheckboxChange = () => {
     setTcsApplicable(!tcsApplicable);
@@ -186,6 +186,10 @@ function Customer_Master() {
     }
     if (formData.mobile.length !== 10) {
       alert("Mobile number must be exactly 10 digits.");
+      return false;
+    }
+    if (formData.pincode.trim() && formData.pincode.length !== 6) {
+      alert("PinCode must be exactly 6 digits.");
       return false;
     }
     if (formData.aadhar_card.trim() && formData.aadhar_card.length !== 12) {
@@ -206,15 +210,15 @@ function Customer_Master() {
     }
     return true;
   };
-  
-  
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!validateForm()) {
       return;
     }
-  
+
     try {
       // Check for duplicate mobile only when creating a new customer
       if (!id) {
@@ -224,19 +228,19 @@ function Customer_Master() {
         }
         const result = await response.json();
         const isDuplicateMobile = result.some((item) => item.mobile === formData.mobile);
-  
+
         if (isDuplicateMobile) {
           alert("This mobile number is already associated with another entry.");
           return;
         }
       }
-  
+
       // Proceed with saving the record (POST or PUT)
       const method = id ? "PUT" : "POST";
       const endpoint = id
         ? `${baseURL}/edit/account-details/${id}`
         : `${baseURL}/account-details`;
-  
+
       const saveResponse = await fetch(endpoint, {
         method,
         headers: {
@@ -244,7 +248,7 @@ function Customer_Master() {
         },
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
-  
+
       if (saveResponse.ok) {
         alert(`Customer ${id ? "updated" : "created"} successfully!`);
         navigate("/customerstable");
@@ -256,8 +260,8 @@ function Customer_Master() {
       alert("An error occurred while processing the request.");
     }
   };
-  
-  
+
+
 
 
   const handleBack = () => {
@@ -344,17 +348,14 @@ function Customer_Master() {
                 name="address1"
                 value={formData.address1}
                 onChange={handleChange}
-
               />
             </Col>
-
             <Col md={4}>
               <InputField
                 label="Address2"
                 name="address2"
                 value={formData.address2}
                 onChange={handleChange}
-
               />
             </Col>
             <Col md={4}>
@@ -363,7 +364,6 @@ function Customer_Master() {
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
-
               />
             </Col>
             <Col md={4}>
@@ -372,11 +372,8 @@ function Customer_Master() {
                 name="pincode"
                 value={formData.pincode}
                 onChange={handleChange}
-
               />
             </Col>
-           
-
             <Col md={3}>
               <InputField
                 label="State"
@@ -505,7 +502,7 @@ function Customer_Master() {
 
               />
             </Col>
-            
+
           </Row>
 
           {/* Checkbox */}
