@@ -38,24 +38,17 @@ function Purity() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    let updatedValue = value; // Declare updatedValue with a default value
-  
+    let updatedValue = value; 
     switch (name) {
-
       case "name":
-        // Convert entire string to uppercase
         updatedValue = value.toUpperCase();
         break;
-    
       case "metal":
-        // Capitalize the first letter
-        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
-        break;
-  
+        updatedValue = value.toUpperCase();
+        break;  
       default:
         break;
-    }
-  
+    }  
     setFormData({
       ...formData,
       [name]: updatedValue,

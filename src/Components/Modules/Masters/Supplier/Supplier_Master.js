@@ -74,67 +74,73 @@ function Supplier_Master() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let updatedValue = value;
-  
+
     switch (name) {
       case "account_name":
-        case "print_name":
-          // Capitalize first letter
-          updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
-    
-          // Ensure it contains at least one letter
-          if (!/[a-zA-Z]/.test(updatedValue)) {
-            return; // Prevent update if only numbers
-          }
-    
-          // If updating account_name, sync print_name when identical
-          if (name === "account_name") {
-            setFormData((prevData) => ({
-              ...prevData,
-              [name]: updatedValue,
-              print_name:
-                prevData.print_name === prevData.account_name
-                  ? updatedValue
-                  : prevData.print_name,
-            }));
-            return; // Return early after setting state
-          }
-          break;
-  
+      case "print_name":
+        // Capitalize first letter
+        updatedValue =  value.toUpperCase();
+
+        // Ensure it contains at least one letter
+        if (/^\d+$/.test(updatedValue)) {
+          return; // Prevent update if only numbers
+        }
+
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: updatedValue,
+          ...(name === "account_name" &&
+            prevData.print_name === prevData.account_name && {
+            print_name: updatedValue,
+          }),
+        }));
+        return;
+
+      case "print_name":
+        // Capitalize first letter
+        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
+        break;
+
       case "mobile":
       case "phone":
         // Allow only numbers and limit to 10 digits
         updatedValue = value.replace(/\D/g, "").slice(0, 10);
         break;
-  
+
       case "aadhar_card":
         // Allow only numbers and limit to 12 digits
         updatedValue = value.replace(/\D/g, "").slice(0, 12);
         break;
-  
+
       case "pincode":
         // Allow only numbers and limit to 6 digits
         updatedValue = value.replace(/\D/g, "").slice(0, 6);
         break;
-  
+
       case "gst_in":
         // GSTIN must be 15 alphanumeric characters (uppercase)
         updatedValue = value.toUpperCase().slice(0, 15);
         break;
-  
+
       case "pan_card":
         // PAN must be 10 alphanumeric characters (uppercase)
         updatedValue = value.toUpperCase().slice(0, 10);
         break;
-  
+
       case "ifsc_code":
         // IFSC must be exactly 11 alphanumeric characters (uppercase)
         updatedValue = value.toUpperCase().slice(0, 11);
         break;
-  
+
+      case "bank_account_no":
+        // Allow only numbers and limit to 18 digits
+        updatedValue = value.replace(/\D/g, "").slice(0, 18);
+        break;
+
       default:
         break;
     }
-  
+
     // Update state
     setFormData((prevData) => ({
       ...prevData,

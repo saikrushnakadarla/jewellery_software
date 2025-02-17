@@ -42,7 +42,7 @@ const SubCategoryTable = () => {
               // Confirm the deletion using SweetAlert2
               const result = await Swal.fire({
                 title: "Are you sure?",
-                text: "You will not be able to recover this subcategory!",
+                text: "Do you want to delete this subcategory!",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonText: "Yes, delete it!",

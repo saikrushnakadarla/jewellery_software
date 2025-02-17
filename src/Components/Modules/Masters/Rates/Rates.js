@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import './Rates.css';
 import InputField from '../../../Pages/InputField/InputField';
@@ -8,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Rates = () => {
     const [rates, setRates] = useState({
-        currentDate: '',
+        currentDate: new Date().toISOString().split('T')[0], // Set today's date by default
         gold16: '',
         gold18: '',
         gold22: '',
@@ -36,7 +34,7 @@ const Rates = () => {
                     const formattedDate = localDate.toISOString().split('T')[0];
 
                     setRates({
-                        currentDate: formattedDate,
+                        // currentDate: formattedDate,
                         gold16: result.rate_16crt,
                         gold18: result.rate_18crt,
                         gold22: result.rate_22crt,
@@ -85,16 +83,6 @@ const Rates = () => {
             setAllowEdit24(true);
         }
         
-        // if (name === 'gold16' || name === 'gold18' || name === 'gold24') {
-        //     if (!allowEdit) {
-        //         const confirmChange = window.confirm(
-        //             "You are modifying an auto-calculated value. Do you want to proceed?"
-        //         );
-        //         if (!confirmChange) return; // If "No", stop here
-        //         setAllowEdit(true); // Allow future modifications
-        //     }
-        // }
-
         if (name === 'gold22') {
             const calculatedRates = calculateRates(value);
             setRates((prevRates) => ({
@@ -116,7 +104,7 @@ const Rates = () => {
         const { currentDate, gold16, gold18, gold22, gold24, silverRate } = rates;
 
         const requestData = {
-            rate_date: currentDate,
+            rate_date: new Date().toISOString().split('T')[0],
             rate_time: new Date().toLocaleTimeString(),
             rate_16crt: gold16,
             rate_18crt: gold18,
@@ -148,7 +136,6 @@ const Rates = () => {
             console.error('Error:', error);
         }
     };
-
 
     return (
         <div className="main-container">
@@ -223,5 +210,3 @@ const Rates = () => {
     );
 };
 export default Rates;
-
-

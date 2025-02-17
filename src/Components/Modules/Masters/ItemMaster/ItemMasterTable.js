@@ -267,6 +267,14 @@ const [taxOptions, setTaxOptions] = useState([]);
         <Form onSubmit={handleUpdateSubmit} className="form-container">
           <h4 style={{ marginBottom: "15px" }}>Category Details</h4>
           <div className="form-row">
+          <InputField
+              label="Metal Type:"
+              name="Category"
+              type="select"
+              value={formData.Category}
+              onChange={handleChange}
+              options={metalOptions}
+            />
             <InputField
               label="Category:"
               name="product_name"
@@ -281,14 +289,7 @@ const [taxOptions, setTaxOptions] = useState([]);
               onChange={handleChange}
               readOnly
             />
-            <InputField
-              label="Metal Type:"
-              name="Category"
-              type="select"
-              value={formData.Category}
-              onChange={handleChange}
-              options={metalOptions}
-            />
+            
             {/* <InputField
               label="Design Master:"
               name="design_master"

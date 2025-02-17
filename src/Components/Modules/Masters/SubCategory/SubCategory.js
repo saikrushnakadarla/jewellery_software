@@ -13,7 +13,7 @@ function SubCategory() {
   const [formData, setFormData] = useState({
     category_id: "",
     metal_type_id: "",
-    metal_type: "Gold",
+    metal_type: "",
     category: "",
     sub_category_name: "",
     prefix: "",
@@ -23,6 +23,7 @@ function SubCategory() {
   const [allCategoryOptions, setAllCategoryOptions] = useState([]);
   const [filteredCategoryOptions, setFilteredCategoryOptions] = useState([]);
 
+  // Fetch metal types
   useEffect(() => {
     const fetchMetalTypes = async () => {
       try {
@@ -32,6 +33,10 @@ function SubCategory() {
           label: item.metal_name,
           id: item.metal_type_id,
         }));
+  
+        // Log the metal_type_id values to verify
+        console.log("Fetched Metal Types:", metalTypes);
+        
         setMetalOptions(metalTypes);
       } catch (error) {
         console.error("Error fetching metal types:", error);
@@ -39,7 +44,9 @@ function SubCategory() {
     };
     fetchMetalTypes();
   }, []);
+  
 
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -58,12 +65,12 @@ function SubCategory() {
     fetchCategories();
   }, []);
 
+  // Filter categories based on selected metal type
   useEffect(() => {
     const filteredCategories = allCategoryOptions.filter(
       (category) => category.metal_type === formData.metal_type
     );
     setFilteredCategoryOptions(filteredCategories);
-    console.log("filteredCategories:", filteredCategories);
     setFormData((prevData) => ({
       ...prevData,
       category: "",
@@ -71,57 +78,46 @@ function SubCategory() {
     }));
   }, [formData.metal_type, allCategoryOptions]);
 
-useEffect(() => {
-  if (subcategory_id) {
-    const fetchSubcategoryData = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/subcategory/${subcategory_id}`);
-        const subcategoryData = response.data;
+  // Fetch subcategory data when subcategory_id is provided
+  useEffect(() => {
+    if (subcategory_id) {
+      const fetchSubcategoryData = async () => {
+        try {
+          const response = await axios.get(`${baseURL}/subcategory/${subcategory_id}`);
+          const subcategoryData = response.data;
 
-        console.log("Sub Category Data =", subcategoryData);
-        console.log("Fetched Category =", subcategoryData.category);
-
-        setFormData((prevData) => ({
-          ...prevData,
-          ...subcategoryData,
-          category: subcategoryData.category?.toUpperCase() || "", // Convert to uppercase
-          category_id: subcategoryData.category_id || "", // Ensure category ID is set
-        }));
-      } catch (error) {
-        console.error("Error fetching subcategory:", error);
-      }
-    };
-    fetchSubcategoryData();
-  }
-}, [subcategory_id]);
-
-
-useEffect(() => {
-  if (formData.category) {
-    const matchedCategory = filteredCategoryOptions.find(
-      (option) => option.value === formData.category
-    );
-
-    console.log("matchedCategory:", matchedCategory);
-
-    if (!matchedCategory) {
-      console.log("Category not found in filtered options:", formData.category);
-      setFormData((prevData) => ({
-        ...prevData,
-        category: filteredCategoryOptions.length > 0 ? filteredCategoryOptions[0].value : "",
-        category_id: filteredCategoryOptions.length > 0 ? filteredCategoryOptions[0].id : "",
-      }));
+          setFormData((prevData) => ({
+            ...prevData,
+            ...subcategoryData,
+            category: subcategoryData.category?.toUpperCase() || "",
+            category_id: subcategoryData.category_id || "",
+          }));
+        } catch (error) {
+          console.error("Error fetching subcategory:", error);
+        }
+      };
+      fetchSubcategoryData();
     }
-  }
-}, [filteredCategoryOptions, formData.category]);
-
-
-
-
+  }, [subcategory_id]);
   const handleChange = (e) => {
     const { name, value } = e.target;
+  
+    let modifiedValue = value;
+    if (name === "sub_category_name" || name === "prefix") {
+      modifiedValue = value.toUpperCase();
+    }
+  
     if (name === "metal_type") {
-      const selectedMetal = metalOptions.find((option) => option.value === value);
+      // Log the selected value to check
+      console.log("Selected Metal Type:", modifiedValue);
+  
+      const selectedMetal = metalOptions.find(
+        (option) => option.value.toLowerCase() === modifiedValue.toLowerCase()
+      );
+  
+      // Log the selected metal to ensure it's found
+      console.log("Selected Metal:", selectedMetal);
+  
       setFormData((prevData) => ({
         ...prevData,
         metal_type: selectedMetal?.value || "",
@@ -130,8 +126,7 @@ useEffect(() => {
         category_id: "",
       }));
     } else if (name === "category") {
-      const selectedCategory = filteredCategoryOptions.find((option) => option.value === value);
-      console.log("filteredCategories", selectedCategory)
+      const selectedCategory = filteredCategoryOptions.find((option) => option.value === modifiedValue);
       setFormData((prevData) => ({
         ...prevData,
         category: selectedCategory?.value || "",
@@ -140,13 +135,20 @@ useEffect(() => {
     } else {
       setFormData((prevData) => ({
         ...prevData,
-        [name]: value,
+        [name]: modifiedValue,
       }));
     }
   };
+  
 
+  // Submit form data
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Log formData before submitting to check its structure
+    console.log("Form Data being submitted:", formData);
+    console.log("metal_type_id:", formData.metal_type_id);
+
     try {
       if (subcategory_id) {
         await axios.put(`${baseURL}/subcategory/${subcategory_id}`, formData);
@@ -191,9 +193,7 @@ useEffect(() => {
                 label="Category:"
                 name="category"
                 type="select"
-                value={filteredCategoryOptions.some((opt) => opt.value === formData.category)
-                  ? formData.category
-                  : ""}
+                value={formData.category}
                 onChange={handleChange}
                 options={filteredCategoryOptions.map((option) => ({
                   value: option.value,

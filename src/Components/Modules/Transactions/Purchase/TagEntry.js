@@ -352,8 +352,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             alert("Stock added successfully!");
 
             fetchData();
-
-            // Reset form data but preserve `Making_Charges_On` and `MC_Per_Gram_Label`
             setFormData((prevData) => ({
                 ...prevData,
                 product_id: selectedProduct.product_id,

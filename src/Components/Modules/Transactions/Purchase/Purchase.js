@@ -62,6 +62,7 @@ const URDPurchase = () => {
   // });
 
   const [formData, setFormData] = useState({
+    customer_id:"",
     mobile: "",
     account_name: "",
     gst_in: "",

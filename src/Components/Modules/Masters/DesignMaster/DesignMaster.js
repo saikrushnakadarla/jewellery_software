@@ -114,6 +114,28 @@ function DesignMaster() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0; // If no errors, form is valid
   };
+
+  const [metalOptions, setmetalOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchMetalTypes = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/metaltype`);
+        const metalTypes = response.data.map(item => ({
+          value: item.metal_name,
+          label: item.metal_name,
+          id: item.metal_type_id, // Add metal_type_id for reference
+          hsn_code: item.hsn_code,
+        }));
+        setmetalOptions(metalTypes);
+      } catch (error) {
+        console.error('Error fetching metal types:', error);
+      }
+    };
+
+    fetchMetalTypes();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -269,23 +291,16 @@ function DesignMaster() {
         <form className="customer-master-form" onSubmit={handleSubmit}>
           {/* Row 1 */}
           <div className="form-row">
-           <InputField
-              label="Metal"
-              name="metal"
-               type="select"
-              value={formData.metal}
-              onChange={handleChange}
-              required={true}
-
-              options={[
-                { value: 'Gold', label: 'Gold' },
-                { value: 'Silver', label: 'Silver' },
-                { value: 'Platinum', label: 'Platinum' },
-                { value: 'Diamond', label: 'Diamond' },
-              ]}
-              error={errors.metal}
-
-            />
+           
+            <InputField
+                  label="Metal Type"
+                  name="metal"
+                  type="select"
+                  value={formData.metal}
+                  onChange={handleChange}
+                  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+                  error={errors.metal}
+                />
             
             <InputField
               label="Short Id"

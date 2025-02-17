@@ -101,7 +101,7 @@ function Customer_Master() {
       case "account_name":
       case "print_name":
         // Capitalize first letter
-        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
+        updatedValue =  value.toUpperCase();
 
         // Ensure it contains at least one letter
         if (/^\d+$/.test(updatedValue)) {

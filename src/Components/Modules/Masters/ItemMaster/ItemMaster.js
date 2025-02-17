@@ -93,106 +93,94 @@ const FormWithTable = () => {
     ? {}
     : { backgroundColor: "#f5f5f5", color: "#888", cursor: "not-allowed" };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value,
-    }));
-
-    if (name === "design_master") {
-      const selectedOption = designOptions.find(option => option.value === value);
-      setFormData({
-        ...formData,
-        [name]: value,
-        design_id: selectedOption ? selectedOption.id : "" // Update design_id
-      });
-    } else if (name === "purity") {
-      const selectedOption = dropdownOptions.find(option => option.value === value);
-      setFormData({
-        ...formData,
-        [name]: value,
-        purity_id: selectedOption ? selectedOption.id : "" // Update purity_id
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-
-    if (name === "Category") {
-      const selectedOption = metalOptions.find(option => option.value === value);
-      setFormData({
-        ...formData,
-        [name]: value,
-        metal_type_id: selectedOption ? selectedOption.id : "" // Update metal_type_id
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-
-    // Update formData state
-    setFormData(prevState => {
-      const updatedData = { ...prevState, [name]: value };
-
-      // // If "Category" changes, update the "hsn_code" based on selected metal type
-      // if (name === 'Category') {
-      //   const selectedMetal = metalOptions.find(option => option.value === value);
-      //   updatedData.hsn_code = selectedMetal ? selectedMetal.hsn_code : '';
-      // }
-
-      return updatedData;
-    });
-
-    if (name === "Pricing") {
-      if (value === "By Weight") {
-        setIsSellingPriceDisabled(true);
-        setAreOtherFieldsDisabled(false);
-      } else if (value === "By Fixed") {
-        setIsSellingPriceDisabled(false);
-        setAreOtherFieldsDisabled(true);
-      } else {
-        setIsSellingPriceDisabled(false);
-        setAreOtherFieldsDisabled(false);
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+  
+      // Capitalize the first letter of 'hsn_code' specifically
+      let updatedValue = value;
+  
+      if (name === 'hsn_code' && value) {
+          updatedValue = value.charAt(0).toUpperCase() + value.slice(1); // Capitalize the first letter of hsn_code
       }
-    }
-
-    if (name === "tax_slab") {
-      // Fetch the TaxSlabID based on the selected TaxSlab name
-      const selectedTaxSlab = taxOptions.find((option) => option.value === value);
-      if (selectedTaxSlab) {
-        setFormData((prevState) => ({
+  
+      // Automatically convert the value to uppercase for product_name and other fields if needed
+      if (name === 'product_name') {
+          updatedValue = value.toUpperCase();
+      }
+  
+      setFormData(prevState => ({
           ...prevState,
-          [name]: value,
-          tax_slab_id: selectedTaxSlab.id, // Store the TaxSlabID
-        }));
-      }
-    } else {
-      setFormData((prevState) => ({
-        ...prevState,
-        [name]: value,
+          [name]: updatedValue, // Update the formData with the modified value
       }));
-    }
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
+  
+      // Handle logic for other fields
+      if (name === "design_master") {
+          const selectedOption = designOptions.find(option => option.value === updatedValue);
+          setFormData({
+              ...formData,
+              [name]: updatedValue,
+              design_id: selectedOption ? selectedOption.id : "" // Update design_id
+          });
+      } else if (name === "purity") {
+          const selectedOption = dropdownOptions.find(option => option.value === updatedValue);
+          setFormData({
+              ...formData,
+              [name]: updatedValue,
+              purity_id: selectedOption ? selectedOption.id : "" // Update purity_id
+          });
+      } else if (name === "Category") {
+          const selectedOption = metalOptions.find(option => option.value === updatedValue);
+          setFormData({
+              ...formData,
+              [name]: updatedValue,
+              metal_type_id: selectedOption ? selectedOption.id : "" // Update metal_type_id
+          });
+      }
+  
+      if (name === "Pricing") {
+          if (updatedValue === "By Weight") {
+              setIsSellingPriceDisabled(true);
+              setAreOtherFieldsDisabled(false);
+          } else if (updatedValue === "By Fixed") {
+              setIsSellingPriceDisabled(false);
+              setAreOtherFieldsDisabled(true);
+          } else {
+              setIsSellingPriceDisabled(false);
+              setAreOtherFieldsDisabled(false);
+          }
+      }
+  
+      if (name === "tax_slab") {
+          const selectedTaxSlab = taxOptions.find((option) => option.value === updatedValue);
+          if (selectedTaxSlab) {
+              setFormData((prevState) => ({
+                  ...prevState,
+                  [name]: updatedValue,
+                  tax_slab_id: selectedTaxSlab.id, // Store the TaxSlabID
+              }));
+          }
+      }
+  
       // Automatically update PCode_BarCode when item_prefix changes
-      ...(name === "item_prefix"
-        ? { PCode_BarCode: `${value}${prev.suffix || "001"}` }
-        : {}),
-    }));
-    // Prevent "RB" or "rb" (case insensitive) as input for "item_prefix"
-    if (name === "item_prefix" && value.toLowerCase() === "rb") {
-      alert("The value 'RB' is not allowed for Item Prefix.");
-      setFormData((prev) => ({ ...prev, item_prefix: "", PCode_BarCode: "" })); // Reset field value
-      return;
-    }
+      if (name === "item_prefix") {
+          setFormData((prev) => ({
+              ...prev,
+              [name]: updatedValue,
+              PCode_BarCode: `${updatedValue}${prev.suffix || "001"}`,
+          }));
+  
+          // Prevent "RB" or "rb" (case insensitive) as input for "item_prefix"
+          if (updatedValue.toLowerCase() === "rb") {
+              alert("The value 'RB' is not allowed for Item Prefix.");
+              setFormData((prev) => ({ ...prev, item_prefix: "", PCode_BarCode: "" })); // Reset field value
+              return;
+          }
+      }
   };
+  
+  
+
+
 
   const handleDeleteOpenTagEntry = (index) => {
     setOpenTagsEntries((prev) => prev.filter((_, i) => i !== index));
@@ -681,7 +669,7 @@ const FormWithTable = () => {
                   name="hsn_code"
                   value={formData.hsn_code}
                   onChange={handleChange}
-                  // readOnly
+                // readOnly
                 />
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
