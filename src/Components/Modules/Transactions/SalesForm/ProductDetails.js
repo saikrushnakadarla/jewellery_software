@@ -289,7 +289,7 @@ const ProductDetails = ({
             name="qty"
             value={formData.qty}
             onChange={handleChange}
-          // readOnly={!isQtyEditable} 
+          readOnly={!isQtyEditable} 
           />
         </Col>
         <Col xs={12} md={1}>

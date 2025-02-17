@@ -648,7 +648,7 @@ const useProductHandlers = () => {
           tax_percent: product.tax_slab,
           qty: 1, // Set qty to 1 for product
         }));
-        setIsQtyEditable(false); // Set qty as read-only
+        setIsQtyEditable(true); // Set qty as read-only
       } else {
         // Check if tag exists by code
         const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
@@ -693,7 +693,7 @@ const useProductHandlers = () => {
             tax_percent: productDetails?.tax_slab || "",
             qty: 1, // Allow qty to be editable for tag
           }));
-          setIsQtyEditable(true); // Allow editing of qty
+          setIsQtyEditable(false); // Allow editing of qty
         } else {
           // Reset form if no tag is found
           setFormData((prevData) => ({
