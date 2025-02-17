@@ -272,7 +272,7 @@ const [taxOptions, setTaxOptions] = useState([]);
               name="product_name"
               value={formData.product_name}
               onChange={handleChange}
-              readOnly
+              // readOnly
             />
             <InputField
               label="Rbarcode:"

@@ -112,12 +112,29 @@ const RepairForm = () => {
         setPurchases(response.data);
 
         // Extract account names for options
-        const accounts = response.data.map((purchase) => purchase.account_name);
-        setAccountOptions([...new Set(accounts)]); // Remove duplicates
+        // const accounts = response.data.map((purchase) => purchase.account_name);
+        // setAccountOptions([...new Set(accounts)]); // Remove duplicates
       })
       .catch((error) => {
         console.error("Error fetching purchases:", error);
       });
+  }, []);
+
+  useEffect(() => {
+    const fetchAccountNames = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/payment-account-names`);
+        const formattedOptions = response.data.map((item) => ({
+          value: item.account_name,
+          label: item.account_name,
+        }));
+        setAccountOptions(formattedOptions);
+      } catch (error) {
+        console.error("Error fetching account names:", error);
+      }
+    };
+
+    fetchAccountNames();
   }, []);
 
   useEffect(() => {

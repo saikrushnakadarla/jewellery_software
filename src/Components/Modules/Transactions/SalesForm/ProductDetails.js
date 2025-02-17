@@ -115,6 +115,23 @@ const ProductDetails = ({
             options={purityOptions}
           />
         </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Pricing"
+            name="pricing"
+            type="select"
+            value={formData.pricing || ""} // Default to "Gross Weight"
+            onChange={handleChange}
+            options={[
+              { value: "By Weight", label: "By Weight" },
+              { value: "By fixed", label: "By fixed" },
+              ...(formData.pricing &&
+                !["By Weight", "By fixed"].includes(formData.pricing)
+                ? [{ value: formData.pricing, label: formData.pricing }]
+                : []),
+            ]}
+          />
+        </Col>
         <Col xs={12} md={1}>
           <InputField
             label="Gross Wt"
