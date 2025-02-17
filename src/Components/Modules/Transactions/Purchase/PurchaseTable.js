@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Reusable DataTable component
 import { Button, Row, Col } from 'react-bootstrap';
 import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
@@ -18,7 +18,16 @@ const PurchaseTable = () => {
   const [openUpdateShow, setOpenUpdateShow] = useState(false); // State for the update modal
   const [selectedRow, setSelectedRow] = useState(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false); // State for update modal
- 
+    const location = useLocation();
+    const { mobile } = location.state || {};
+    const initialSearchValue = location.state?.mobile || '';
+  
+    useEffect(() => {
+      if (mobile) {
+        console.log("Selected Mobile from Dashboard:", mobile);
+      }
+    }, [mobile]);
+
   // Function to format date to DD/MM/YYYY
   const formatDate = (date) => {
     if (!date) return '';
@@ -233,7 +242,7 @@ const handleOpenModal = (data) => {
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={[...data].reverse()} />
+        <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue}/>
       </div>
       <Modal
         show={showModal}

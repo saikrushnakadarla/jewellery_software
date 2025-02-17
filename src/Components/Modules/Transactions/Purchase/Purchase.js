@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect} from "react";
 import "./Purchase.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
-import { useNavigate } from 'react-router-dom';
+import { renderMatches, useNavigate, useLocation } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -12,8 +12,12 @@ import { FaEdit, FaTrash } from 'react-icons/fa';
 
 const URDPurchase = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
+  const { state } = useLocation();
+  const { mobile } = location.state || {};
+  const initialSearchValue = location.state?.mobile || '';
   const [productIdAndRbarcode, setProductIdAndRbarcode] = useState({});
   // const [formData, setFormData] = useState(() => {
   //   const savedData = localStorage.getItem("purchaseFormData");
@@ -127,6 +131,40 @@ const URDPurchase = () => {
     };
     fetchCurrentRates();
   }, []);
+
+    useEffect(() => {
+      if (mobile) {
+        console.log("Selected Mobile from New Link:", mobile);
+  
+        // Find the customer with the matching mobile
+        const matchedCustomer = customers.find((cust) => cust.mobile === mobile);
+  
+        if (matchedCustomer) {
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            customer_id: matchedCustomer.account_id, // Set customer_id to match the dropdown
+            account_name: matchedCustomer.account_name,
+            mobile: matchedCustomer.mobile || "",
+            email: matchedCustomer.email || "",
+            address1: matchedCustomer.address1 || "",
+            address2: matchedCustomer.address2 || "",
+            city: matchedCustomer.city || "",
+            pincode: matchedCustomer.pincode || "",
+            state: matchedCustomer.state || "",
+            state_code: matchedCustomer.state_code || "",
+            aadhar_card: matchedCustomer.aadhar_card || "",
+            gst_in: matchedCustomer.gst_in || "",
+            pan_card: matchedCustomer.pan_card || "",
+          }));
+        } else {
+          // If no customer matches, just set the mobile
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            mobile: mobile,
+          }));
+        }
+      }
+    }, [mobile, customers]);
 
   // const handleChange = (field, value) => {
   //   setFormData((prevFormData) => {
