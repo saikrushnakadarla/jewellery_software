@@ -77,23 +77,41 @@ const useCalculations = (formData, setFormData) => {
   ]);
 
   // Calculate Rate Amount
+// useEffect(() => {
+//   const rate = parseFloat(formData.rate) || 0;
+//   const totalWeight = parseFloat(formData.total_weight_av) || 0;
+//   const qty = parseFloat(formData.qty) || 0;
+//   let rateAmt = 0;
+
+//   if (formData.pricing === "By fixed") {
+//     rateAmt = qty * rate;
+//   } else {
+//     rateAmt = rate * totalWeight;
+//   }
+
+//   setFormData(prev => ({
+//     ...prev,
+//     rate_amt: rateAmt.toFixed(2),
+//   }));
+// }, [formData.rate, formData.total_weight_av, formData.qty, formData.pricing]);
 useEffect(() => {
   const rate = parseFloat(formData.rate) || 0;
   const totalWeight = parseFloat(formData.total_weight_av) || 0;
   const qty = parseFloat(formData.qty) || 0;
+  const pieceCost = parseFloat(formData.pieace_cost) || 0;
   let rateAmt = 0;
 
   if (formData.pricing === "By fixed") {
-    rateAmt = qty * rate;
+    rateAmt = pieceCost * qty;
   } else {
     rateAmt = rate * totalWeight;
   }
 
-  setFormData(prev => ({
+  setFormData((prev) => ({
     ...prev,
     rate_amt: rateAmt.toFixed(2),
   }));
-}, [formData.rate, formData.total_weight_av, formData.qty, formData.pricing]);
+}, [formData.rate, formData.total_weight_av, formData.qty, formData.pricing, formData.pieace_cost]);
 
 
   // Calculate Tax Amount

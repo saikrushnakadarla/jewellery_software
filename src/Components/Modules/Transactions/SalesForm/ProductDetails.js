@@ -39,6 +39,8 @@ const ProductDetails = ({
   console.log("Unique Products:", uniqueProducts);
   console.log("subcategory Options:", subcategoryOptions);
 
+  const isByFixed = formData.pricing === "By fixed";
+
   return (
     <Col >
       <Row>
@@ -105,16 +107,7 @@ const ProductDetails = ({
             options={designOptions}
           />
         </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Purity"
-            name="purity"
-            value={formData.purity || ""}
-            onChange={handleChange}
-            type="select"
-            options={purityOptions}
-          />
-        </Col>
+
         <Col xs={12} md={2}>
           <InputField
             label="Pricing"
@@ -132,232 +125,345 @@ const ProductDetails = ({
             ]}
           />
         </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Gross Wt"
-            name="gross_weight"
-            value={formData.gross_weight || ""}
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Stone Wt"
-            name="stone_weight"
-            value={formData.stone_weight || ""}
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="St Price"
-            name="stone_price"
-            value={formData.stone_price || ""}
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Weight BW"
-            name="weight_bw"
-            value={formData.weight_bw || ""}
-            onChange={handleChange}
-            readOnly
-          />
-        </Col>
 
-        <Col xs={12} md={2}>
-          <InputField
-            label="Wastage On"
-            name="va_on"
-            type="select"
-            value={formData.va_on || ""} // Default to "Gross Weight"
-            onChange={handleChange}
-            options={[
-              { value: "Gross Weight", label: "Gross Weight" },
-              { value: "Weight BW", label: "Weight BW" },
-              ...(formData.va_on &&
-                !["Gross Weight", "Weight BW"].includes(formData.va_on)
-                ? [{ value: formData.va_on, label: formData.va_on }]
-                : []),
-            ]}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Wastage%"
-            name="va_percent"
-            value={formData.va_percent || "0"}
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="W.Wt"
-            name="wastage_weight"
-            value={formData.wastage_weight || "0.00"}
-            onChange={handleChange}
-            readOnly
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Total Weight AW"
-            name="total_weight_av"
-            value={formData.total_weight_av || ""}
-            onChange={handleChange}
-            readOnly
-          />
-        </Col>
-
-        <Col xs={12} md={1}>
-          <InputField
-            label="Rate"
-            name="rate"
-            value={formData.rate}
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Amount"
-            name="rate_amt"
-            value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
-            onChange={handleChange} // Trigger recalculation of Total MC
-            readOnly={false} // Ensure it's editable
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="MC On"
-            name="mc_on"
-            type="select"
-            value={formData.mc_on || ""} // Default to "MC / Gram"
-            onChange={handleChange}
-            options={[
-              { value: "MC / Gram", label: "MC / Gram" },
-              { value: "MC / Piece", label: "MC / Piece" },
-              { value: "MC %", label: "MC %" },
-              ...(formData.mc_on &&
-                !["MC / Gram", "MC / Piece", "MC %"].includes(formData.mc_on)
-                ? [{ value: formData.mc_on, label: formData.mc_on }]
-                : []),
-            ]}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label={
-              formData.mc_on === "MC %"
-                ? "MC %"
-                : "MC/Gm"
-            }
-            name="mc_per_gram"
-            value={formData.mc_per_gram || ""} 
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Total MC"
-            name="making_charges"
-            value={formData.making_charges || ""} 
-            onChange={handleChange}
-          />
-        </Col>
-
-        <Col xs={12} md={2}>
-          <InputField
-            label="Disscount %"
-            name="disscount_percentage"
-            value={formData.disscount_percentage || ""} // Display calculated Total MC
-            onChange={handleChange}
-          />
-        </Col>
-
-        <Col xs={12} md={2}>
-          <InputField
-            label="Total Disscount"
-            name="disscount"
-            value={formData.disscount || ""} // Display calculated Total MC
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Qty"
-            name="qty"
-            value={formData.qty}
-            onChange={handleChange}
-          readOnly={!isQtyEditable} 
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField label="Tax%"
-            name="tax_percent"
-            value={formData.tax_percent}
-            onChange={handleChange}
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Tax Amt"
-            name="tax_amt"
-            value={formData.tax_amt || "0.00"} // Default to "0.00" if undefined
-            onChange={handleChange} // Optional, since it's auto-calculated
-            readOnly
-          />
-        </Col>
-        <Col xs={12} md={1}>
-          <InputField
-            label="Total Price"
-            name="total_price"
-            value={formData.total_price || "0.00"} // Default to "0.00" if undefined
-            onChange={handleChange} // Optional, since it's auto-calculated
-            readOnly
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Upload Image"
-            name="image"
-            type="file"
-            onChange={handleImageChange}
-            accept="image/*"
-            ref={fileInputRef} // Attach ref to input field
-          />
-          {formData.imagePreview && (
-            <div style={{ position: "relative", display: "inline-block" }}>
-              <img
-                src={formData.imagePreview}
-                alt="Selected"
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  marginTop: "10px",
-                  borderRadius: "8px", // Optional: add rounded corners to the image
-                }}
+        {/* Render different fields based on Pricing selection */}
+        {isByFixed ? (
+          // If Pricing is "By fixed", show only these fields:
+          <>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Piece Cost"
+                name="pieace_cost"
+                value={formData.pieace_cost}
+                onChange={handleChange}
               />
-              <button
-                type="button"
-                onClick={clearImage}
-                style={{
-                  position: "absolute",
-                  top: "5px",
-                  right: "5px",
-                  background: "transparent",
-                  border: "none",
-                  color: "red",
-                  fontSize: "16px",
-                  cursor: "pointer",
-                  zIndex: 10,
-                }}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          )}
-        </Col>
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Amount"
+                name="rate_amt"
+                value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+                onChange={handleChange} // Trigger recalculation of Total MC
+                readOnly={false} // Ensure it's editable
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Qty"
+                name="qty"
+                value={formData.qty}
+                onChange={handleChange}
+                readOnly={!isQtyEditable}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField label="Tax%"
+                name="tax_percent"
+                value={formData.tax_percent}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Tax Amt"
+                name="tax_amt"
+                value={formData.tax_amt || "0.00"} // Default to "0.00" if undefined
+                onChange={handleChange} // Optional, since it's auto-calculated
+                readOnly
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Total Price"
+                name="total_price"
+                value={formData.total_price || "0.00"} // Default to "0.00" if undefined
+                onChange={handleChange} // Optional, since it's auto-calculated
+                readOnly
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Upload Image"
+                name="image"
+                type="file"
+                onChange={handleImageChange}
+                accept="image/*"
+                ref={fileInputRef} // Attach ref to input field
+              />
+              {formData.imagePreview && (
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <img
+                    src={formData.imagePreview}
+                    alt="Selected"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      marginTop: "10px",
+                      borderRadius: "8px", // Optional: add rounded corners to the image
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      right: "5px",
+                      background: "transparent",
+                      border: "none",
+                      color: "red",
+                      fontSize: "16px",
+                      cursor: "pointer",
+                      zIndex: 10,
+                    }}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              )}
+            </Col>
+          </>
+        ) : (
+          // Otherwise (if Pricing is not "By fixed"), show all fields:
+          <>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Purity"
+                name="purity"
+                value={formData.purity || ""}
+                onChange={handleChange}
+                type="select"
+                options={purityOptions}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Gross Wt"
+                name="gross_weight"
+                value={formData.gross_weight || ""}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Stone Wt"
+                name="stone_weight"
+                value={formData.stone_weight || ""}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="St Price"
+                name="stone_price"
+                value={formData.stone_price || ""}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Weight BW"
+                name="weight_bw"
+                value={formData.weight_bw || ""}
+                onChange={handleChange}
+                readOnly
+              />
+            </Col>
+
+            <Col xs={12} md={2}>
+              <InputField
+                label="Wastage On"
+                name="va_on"
+                type="select"
+                value={formData.va_on || ""} // Default to "Gross Weight"
+                onChange={handleChange}
+                options={[
+                  { value: "Gross Weight", label: "Gross Weight" },
+                  { value: "Weight BW", label: "Weight BW" },
+                  ...(formData.va_on &&
+                    !["Gross Weight", "Weight BW"].includes(formData.va_on)
+                    ? [{ value: formData.va_on, label: formData.va_on }]
+                    : []),
+                ]}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Wastage%"
+                name="va_percent"
+                value={formData.va_percent || "0"}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="W.Wt"
+                name="wastage_weight"
+                value={formData.wastage_weight || "0.00"}
+                onChange={handleChange}
+                readOnly
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Total Weight AW"
+                name="total_weight_av"
+                value={formData.total_weight_av || ""}
+                onChange={handleChange}
+                readOnly
+              />
+            </Col>
+
+            <Col xs={12} md={1}>
+              <InputField
+                label="Rate"
+                name="rate"
+                value={formData.rate}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Amount"
+                name="rate_amt"
+                value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+                onChange={handleChange} // Trigger recalculation of Total MC
+                readOnly={false} // Ensure it's editable
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="MC On"
+                name="mc_on"
+                type="select"
+                value={formData.mc_on || ""} // Default to "MC / Gram"
+                onChange={handleChange}
+                options={[
+                  { value: "MC / Gram", label: "MC / Gram" },
+                  { value: "MC / Piece", label: "MC / Piece" },
+                  { value: "MC %", label: "MC %" },
+                  ...(formData.mc_on &&
+                    !["MC / Gram", "MC / Piece", "MC %"].includes(formData.mc_on)
+                    ? [{ value: formData.mc_on, label: formData.mc_on }]
+                    : []),
+                ]}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label={
+                  formData.mc_on === "MC %"
+                    ? "MC %"
+                    : "MC/Gm"
+                }
+                name="mc_per_gram"
+                value={formData.mc_per_gram || ""}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Total MC"
+                name="making_charges"
+                value={formData.making_charges || ""}
+                onChange={handleChange}
+              />
+            </Col>
+
+            <Col xs={12} md={2}>
+              <InputField
+                label="Disscount %"
+                name="disscount_percentage"
+                value={formData.disscount_percentage || ""} // Display calculated Total MC
+                onChange={handleChange}
+              />
+            </Col>
+
+            <Col xs={12} md={2}>
+              <InputField
+                label="Total Disscount"
+                name="disscount"
+                value={formData.disscount || ""} // Display calculated Total MC
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Qty"
+                name="qty"
+                value={formData.qty}
+                onChange={handleChange}
+                readOnly={!isQtyEditable}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField label="Tax%"
+                name="tax_percent"
+                value={formData.tax_percent}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Tax Amt"
+                name="tax_amt"
+                value={formData.tax_amt || "0.00"} // Default to "0.00" if undefined
+                onChange={handleChange} // Optional, since it's auto-calculated
+                readOnly
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Total Price"
+                name="total_price"
+                value={formData.total_price || "0.00"} // Default to "0.00" if undefined
+                onChange={handleChange} // Optional, since it's auto-calculated
+                readOnly
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Upload Image"
+                name="image"
+                type="file"
+                onChange={handleImageChange}
+                accept="image/*"
+                ref={fileInputRef} // Attach ref to input field
+              />
+              {formData.imagePreview && (
+                <div style={{ position: "relative", display: "inline-block" }}>
+                  <img
+                    src={formData.imagePreview}
+                    alt="Selected"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      marginTop: "10px",
+                      borderRadius: "8px", // Optional: add rounded corners to the image
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      right: "5px",
+                      background: "transparent",
+                      border: "none",
+                      color: "red",
+                      fontSize: "16px",
+                      cursor: "pointer",
+                      zIndex: 10,
+                    }}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              )}
+            </Col>
+          </>
+        )}
 
         <Col xs={12} md={1}>
           <Button

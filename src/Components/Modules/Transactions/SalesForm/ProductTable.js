@@ -61,7 +61,9 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
               <td>{detail.making_charges}</td>
               <td>{detail.disscount_percentage}</td>
               <td>{detail.disscount}</td>
-              <td>{detail.rate}</td>
+              {/* <td>{detail.pieace_cost ?? detail.rate}</td> */}
+              <td>{detail.pieace_cost ? detail.pieace_cost : detail.rate}</td>
+
               <td>{detail.tax_percent}</td>
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>

@@ -311,31 +311,50 @@ const SalesForm = () => {
   
     console.log("Updated Repair Details:", updatedRepairDetails);
   };
-  const handleAdd = () => {
-    setRepairDetails([
-      ...repairDetails,
-      { ...formData, imagePreview: formData.imagePreview }, // Ensure imagePreview is set
-    ]);
+const handleAdd = () => {
+  setRepairDetails([
+    ...repairDetails,
+    {
+      ...formData,
+      pieace_cost: formData.pieace_cost
+        ? parseFloat(formData.pieace_cost).toFixed(2)
+        : "", // Ensure two decimal places
+        rate: formData.rate
+        ? parseFloat(formData.rate).toFixed(2)
+        : "", // Ensure two decimal places
+      imagePreview: formData.imagePreview, // Ensure image preview is set
+    },
+  ]);
 
-    // Reset fields
-    setFormData((prevData) => ({
-      ...prevData,
-      disscount: "",
-      disscount_percentage: "",
-      imagePreview: null, // Clear image preview
-    }));
+  // Reset fields
+  setFormData((prevData) => ({
+    ...prevData,
+    disscount: "",
+    disscount_percentage: "",
+    pieace_cost: "", // Reset this field
+    imagePreview: null, // Clear image preview
+  }));
 
-    resetProductFields();
-  };
+  resetProductFields();
+};
 
 
-  const handleEdit = (index) => {
-    setEditIndex(index);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      ...repairDetails[index], // Merge repair details into formData
-    }));
-  };
+const handleEdit = (index) => {
+  setEditIndex(index);
+
+  setFormData((prevFormData) => ({
+    ...prevFormData,
+    ...repairDetails[index], // Merge repair details into formData
+    pieace_cost: repairDetails[index].pieace_cost
+      ? parseFloat(repairDetails[index].pieace_cost).toFixed(2)
+      : "", // Ensure two decimal places
+    rate: repairDetails[index].rate
+      ? parseFloat(repairDetails[index].rate).toFixed(2)
+      : "", // Ensure two decimal places
+      
+  }));
+};
+
 
   const handleUpdate = () => {
     const updatedDetails = repairDetails.map((item, index) =>
