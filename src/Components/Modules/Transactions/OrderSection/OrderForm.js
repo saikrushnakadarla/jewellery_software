@@ -334,7 +334,7 @@ const SalesForm = () => {
   };
 
   const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/sales" } });
+    navigate("/customermaster", { state: { from: "/orders" } });
   };
 
   const taxableAmount = orderDetails.reduce((sum, item) => {
