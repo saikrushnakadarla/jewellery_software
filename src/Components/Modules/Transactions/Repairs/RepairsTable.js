@@ -696,29 +696,30 @@ const RepairsTable = () => {
                 </tr>
               </thead>
               <tbody>
-                {tempTableData.map((data, index) => (
-                  <tr key={index}>
-                    <td>{data.item_name}</td>
-                    <td>{data.purity}</td>
-                    <td>{data.qty}</td>
-                    <td>{data.weight}</td>
-                    <td>{data.rate_type}</td>
-                    <td>{data.rate}</td>
-                    <td>{data.amount}</td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <FaEdit
-                          style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
-                          onClick={() => handleEdit(index)}
-                        />
-                        <FaTrash
-                          style={{ cursor: 'pointer', marginLeft: '10px', color: 'red', }}
-                          onClick={() => handleDeleteTempData(index)}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {Array.isArray(tempTableData) &&
+                  tempTableData.filter(data => data).map((data, index) => (
+                    <tr key={index}>
+                      <td>{data?.item_name || 'N/A'}</td>
+                      <td>{data?.purity || 'N/A'}</td>
+                      <td>{data?.qty || 0}</td>
+                      <td>{data?.weight || 0}</td>
+                      <td>{data?.rate_type || 'N/A'}</td>
+                      <td>{data?.rate || 0}</td>
+                      <td>{data?.amount || 0}</td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <FaEdit
+                            style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue' }}
+                            onClick={() => handleEdit(index)}
+                          />
+                          <FaTrash
+                            style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
+                            onClick={() => handleDeleteTempData(index)}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </Table>
           </Modal.Body>

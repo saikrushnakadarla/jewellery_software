@@ -69,7 +69,7 @@ const SalesForm = () => {
           throw new Error('Failed to fetch customers');
         }
         const result = await response.json();
-        const filteredCustomers = result.filter(item => item.account_group === 'CUSTOMERS');
+        const filteredCustomers = result.filter(item => item.account_group === 'CUSTOMERS' || item.account_group === 'SUPPLIERS');
         setCustomers(filteredCustomers);
       } catch (error) {
         console.error('Error fetching customers:', error);

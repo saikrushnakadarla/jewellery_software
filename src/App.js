@@ -98,6 +98,7 @@ function App() {
         <Route path="/purchase" element={<Purchase />} />
         <Route path="/purchasetable" element={<PurchaseTable />} />
         <Route path="/receipts" element={<Receipts />} />
+        <Route path="/receipts/:id" element={<Receipts />} />
         <Route path="/receiptstable" element={<ReceiptsTable />} />
         <Route path="/purchaseReport" element={<PurchaseReport />} />
         <Route path="/salesReport" element={<SalesReport />} />

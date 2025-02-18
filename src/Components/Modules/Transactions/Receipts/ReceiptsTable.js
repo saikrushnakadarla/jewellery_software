@@ -58,7 +58,7 @@ const ReceiptsTable = () => {
           <FaEdit
             className="edit-icon"
             style={{ color: 'blue', cursor: 'pointer', marginRight: '10px' }}
-            onClick={() => handleEdit(row.original)}
+            onClick={() => handleEdit(row.original.id)}
           />
           <FaTrash
             className="delete-icon"
@@ -72,7 +72,6 @@ const ReceiptsTable = () => {
     [data]
   );
 
-  // Fetch payments data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -115,8 +114,10 @@ const ReceiptsTable = () => {
       alert('An error occurred while deleting the Receipt. Please try again.');
     }
   };
-  const handleEdit = (rowData) => {
-    navigate('/receipts', { state: { repairData: rowData } });
+
+  const handleEdit = (id) => {
+    // navigate('/receipts', { state: { repairData: rowData } });
+    navigate(`/receipts/${id}`);
   };
 
   const handleCreate = () => {

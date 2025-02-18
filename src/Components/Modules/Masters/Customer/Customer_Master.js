@@ -211,7 +211,6 @@ function Customer_Master() {
     return true;
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -251,7 +250,8 @@ function Customer_Master() {
 
       if (saveResponse.ok) {
         alert(`Customer ${id ? "updated" : "created"} successfully!`);
-        navigate("/customerstable");
+        const from = location.state?.from || "/customerstable";
+        navigate(from);
       } else {
         alert("Failed to save customer.");
       }
@@ -260,9 +260,6 @@ function Customer_Master() {
       alert("An error occurred while processing the request.");
     }
   };
-
-
-
 
   const handleBack = () => {
     const from = location.state?.from || "/customerstable";

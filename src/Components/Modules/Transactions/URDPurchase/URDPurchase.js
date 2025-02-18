@@ -130,7 +130,7 @@ const URDPurchase = () => {
 
         // Filter only suppliers
         const customers = result.filter(
-          (item) => item.account_group === 'CUSTOMERS'
+          (item) => item.account_group === 'CUSTOMERS' || item.account_group === 'SUPPLIERS'
         );
 
         setCustomers(customers);

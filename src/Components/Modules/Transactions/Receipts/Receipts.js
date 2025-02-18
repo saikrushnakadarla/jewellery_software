@@ -94,7 +94,6 @@ const RepairForm = () => {
     }
   }, [repairData, repairDetails]);
   
-
   useEffect(() => {
     const fetchAccountNames = async () => {
       try {
@@ -220,7 +219,6 @@ const RepairForm = () => {
     });
   };
   
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -382,6 +380,7 @@ const RepairForm = () => {
               name="total_amt"
               value={formData.total_amt}
               onChange={handleInputChange}
+              readOnly
             />
           </Col>
           <Col xs={12} md={2}>
