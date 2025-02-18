@@ -100,6 +100,7 @@ const URDPurchase = () => {
     paid_amount: "",
     balance_amount: "",
     balance_after_receipt: "0",
+    Pricing:'',
   });
 
   // const [tableData, setTableData] = useState([]);
@@ -711,7 +712,8 @@ if (!formData.mobile || formData.mobile.trim() === "") {
       setTableData([]);
       localStorage.removeItem("purchaseFormData");
       localStorage.removeItem("tableData");
-      window.location.reload();
+      // window.location.reload();
+      navigate("/purchasetable");
     } catch (error) {
       console.error("Error saving data:", error);
     }
@@ -743,6 +745,7 @@ if (!formData.mobile || formData.mobile.trim() === "") {
       console.log("Entry updated successfully");
       setFormData(selectedData); // Populate the form with selected row data
       setEditingIndex(index); // Track the index being edited
+
     } catch (error) {
       console.error("Error updating entry:", error);
       alert("Failed to update the entry. Please try again.");

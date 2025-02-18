@@ -7,6 +7,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
 import { pdf } from "@react-pdf/renderer";
 import PDFContent from "./ReceiptPdf";
+import { useParams } from "react-router-dom";
 
 const RepairForm = () => {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ const RepairForm = () => {
     cash_amt: "",
     remarks: "",
   });
+  const [data, setData] = useState(null);
+  const { id } = useParams();
   const { invoiceData } = location.state || {};
   useEffect(() => {
     if (invoiceData) {
@@ -212,23 +215,82 @@ const RepairForm = () => {
           //   updatedData.cash_amt = ""; 
           // }
 
+          
+
         }
       }
   
       return updatedData;
     });
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/payment/${id}`);
+        const result = await response.json();
+  
+        console.log("Fetched data:", result);
+  
+        if (result?.payment) {
+          // Convert date to dd-mm-yyyy format
+          let formattedDate = "";
+          if (result.payment.date) {
+            const dateObj = new Date(result.payment.date);
+            const day = String(dateObj.getDate()).padStart(2, "0");
+            const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+            const year = dateObj.getFullYear();
+            formattedDate = `${year}-${month}-${day}`;
+          }
+  
+          setFormData((prevData) => ({
+            ...prevData,
+            ...result.payment,
+            date: formattedDate, // Set formatted date
+          }));
+  
+          // Fetch related invoices immediately after setting account_name
+          if (result.payment.account_name) {
+            const filteredInvoices = repairDetails
+              ?.filter((item) => item.account_name === result.payment.account_name)
+              .map((item) => ({
+                value: item.invoice_number,
+                label: item.invoice_number,
+              }));
+  
+            setInvoiceNumberOptions(filteredInvoices);
+  
+            // If invoice_number exists, set it in formData
+            if (result.payment.invoice_number) {
+              setFormData((prevData) => ({
+                ...prevData,
+                invoice_number: result.payment.invoice_number,
+              }));
+            }
+          }
+        } else {
+          console.error("Payment not found");
+        }
+      } catch (error) {
+        console.error("Error fetching payment:", error);
+      }
+    };
+  
+    if (id) {
+      fetchData();
+    }
+  }, [id, repairDetails]);
+  
+  
   
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Determine the endpoint and HTTP method
-      const endpoint = repairData
-        ? `${baseURL}/edit/payments/${repairData.id}`
+      const endpoint = id
+        ? `${baseURL}/edit/payments/${id}`
         : `${baseURL}/post/payments`;
-      const method = repairData ? "PUT" : "POST";
+      const method = id ? "PUT" : "POST";
   
-      // Save data to the backend
       const response = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -237,24 +299,20 @@ const RepairForm = () => {
   
       if (!response.ok) throw new Error("Failed to save data");
   
-      alert("Receipt saved successfully!");
+      alert(`Receipt ${id ? "updated" : "saved"} successfully!`);
   
-      // Log formData before generating the PDF
       console.log("FormData being passed to PDF generation:", formData);
   
       // Generate PDF
       const pdfBlob = await pdf(
         <PDFContent formData={formData} repairDetails={repairDetails} />
-        
       ).toBlob();
   
-      // Create a download link and trigger the download
+      // Create download link and trigger download
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
       link.download = `receipt-${formData.id || "new"}.pdf`;
       link.click();
-  
-      // Clean up
       URL.revokeObjectURL(link.href);
   
       // Navigate to receipts table
@@ -263,6 +321,7 @@ const RepairForm = () => {
       alert(`Error: ${error.message}`);
     }
   };
+  
   
   useEffect(() => {
     if (invoiceData) {
@@ -310,7 +369,6 @@ const RepairForm = () => {
       <Container className="payments-form-container">
         <Row className="payments-form-section">
           <h4 className="mb-4">Receipts</h4>
-
           <Col xs={12} md={2}>
             <InputField
               label="Date"
@@ -319,6 +377,7 @@ const RepairForm = () => {
               value={formData.date}
               onChange={handleInputChange}
               max={new Date().toISOString().split("T")[0]}
+              disabled={!!id}
             />
           </Col>
           <Col xs={12} md={2}>
@@ -422,13 +481,13 @@ const RepairForm = () => {
             Cancel
           </Button>
           <Button
-            type="submit"
-            variant="primary"
-            style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
-            onClick={handleSubmit}
-          >
-            {repairData ? "Update" : "Save"}
-          </Button>
+        type="submit"
+        variant="primary"
+        style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+        onClick={handleSubmit}
+      >
+        {id ? "Update" : "Save"}
+      </Button>
         </div>
       </Container>
     </div>

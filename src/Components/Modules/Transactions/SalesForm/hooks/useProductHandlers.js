@@ -82,8 +82,8 @@ const useProductHandlers = () => {
 
   useEffect(() => {
     let currentRate = "";
-
-    if (formData.metal_type === "Gold" && formData.purity) {
+  
+    if (formData.metal_type?.toLowerCase() === "gold" && formData.purity) {
       // Check if the purity value includes specific numbers
       if (formData.purity.includes("24")) {
         currentRate = rates.rate_24crt;
@@ -94,15 +94,16 @@ const useProductHandlers = () => {
       } else if (formData.purity.includes("16")) {
         currentRate = rates.rate_16crt;
       }
-    } else if (formData.metal_type === "Silver" && formData.purity) {
+    } else if (formData.metal_type?.toLowerCase() === "silver" && formData.purity) {
       currentRate = rates.silver_rate;
     }
-
+  
     setFormData((prevData) => ({
       ...prevData,
       rate: currentRate,
     }));
   }, [formData.purity, formData.metal_type, rates]);
+  
 
   useEffect(() => {
     const fetchCurrentRates = async () => {

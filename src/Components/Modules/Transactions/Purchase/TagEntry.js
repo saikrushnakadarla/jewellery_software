@@ -11,6 +11,7 @@ import { Form, Row, Col } from 'react-bootstrap';
 import { Modal, Button } from "react-bootstrap";  // Add this import
 
 const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
+    console.log("Pricing=",selectedProduct.Pricing)
     const [productDetails, setProductDetails] = useState({
         pcs: selectedProduct?.pcs || 0,
         gross_weight: selectedProduct?.gross_weight || 0,
