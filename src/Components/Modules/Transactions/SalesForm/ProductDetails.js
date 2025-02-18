@@ -387,7 +387,7 @@ const ProductDetails = ({
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={12} md={1}>
+            {/* <Col xs={12} md={1}>
               <InputField
                 label="Qty"
                 name="qty"
@@ -395,7 +395,7 @@ const ProductDetails = ({
                 onChange={handleChange}
                 readOnly={!isQtyEditable}
               />
-            </Col>
+            </Col> */}
             <Col xs={12} md={1}>
               <InputField label="Tax%"
                 name="tax_percent"

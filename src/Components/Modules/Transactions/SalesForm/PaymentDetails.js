@@ -57,13 +57,35 @@ const PaymentDetails = ({
     setIsSubmitEnabled(Math.abs(totalEnteredAmount - parseFloat(totalPrice || 0)) < tolerance);
   }, [paymentDetails, totalPrice]);
 
+  const handlePaymentChange = (field, value) => {
+    // Convert value to float, default to 0 if empty or NaN
+    const newValue = parseFloat(value) || 0;
+
+    // Calculate the total amount including the new value
+    const totalAmount =
+      (field === "cash_amount" ? newValue : parseFloat(paymentDetails.cash_amount || 0)) +
+      (field === "card_amt" ? newValue : parseFloat(paymentDetails.card_amt || 0)) +
+      (field === "chq_amt" ? newValue : parseFloat(paymentDetails.chq_amt || 0)) +
+      (field === "online_amt" ? newValue : parseFloat(paymentDetails.online_amt || 0));
+
+    // Ensure the total does not exceed netPayAmount
+    if (totalAmount > netPayAmount) {
+      alert("Total payment amount cannot exceed Net Payable Amount.");
+      return;
+    }
+
+    // Update state if valid
+    setPaymentDetails({ ...paymentDetails, [field]: value });
+  };
+
+
   return (
     <div>
       <Col className="sales-form-section">
         <Row>
           <h4 className="mb-3">Summary</h4>
           <Table bordered hover responsive>
-          <tr>
+            <tr>
               <td colSpan="16" className="text-right">Total Amount</td>
               <td colSpan="4">{totalAmount.toFixed(2)}</td>
             </tr>
@@ -117,9 +139,7 @@ const PaymentDetails = ({
               label="Cash Amt"
               name="cash_amount"
               value={paymentDetails.cash_amount}
-              onChange={(e) =>
-                setPaymentDetails({ ...paymentDetails, cash_amount: e.target.value })
-              }
+              onChange={(e) => handlePaymentChange("cash_amount", e.target.value)}
             />
           </Col>
           <Col xs={12} md={4}>
@@ -127,9 +147,7 @@ const PaymentDetails = ({
               label="Card Amt"
               name="card_amt"
               value={paymentDetails.card_amt}
-              onChange={(e) =>
-                setPaymentDetails({ ...paymentDetails, card_amt: e.target.value })
-              }
+              onChange={(e) => handlePaymentChange("card_amt", e.target.value)}
             />
           </Col>
           <Col xs={12} md={4}>
@@ -137,9 +155,7 @@ const PaymentDetails = ({
               label="Cheque Amt"
               name="chq_amt"
               value={paymentDetails.chq_amt}
-              onChange={(e) =>
-                setPaymentDetails({ ...paymentDetails, chq_amt: e.target.value })
-              }
+              onChange={(e) => handlePaymentChange("chq_amt", e.target.value)}
             />
           </Col>
           <Col xs={12} md={4}>
@@ -147,9 +163,7 @@ const PaymentDetails = ({
               label="Online Amt"
               name="online_amt"
               value={paymentDetails.online_amt}
-              onChange={(e) =>
-                setPaymentDetails({ ...paymentDetails, online_amt: e.target.value })
-              }
+              onChange={(e) => handlePaymentChange("online_amt", e.target.value)}
             />
           </Col>
           <Col xs={12} md={3}>

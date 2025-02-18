@@ -528,7 +528,7 @@ const handleEdit = (index) => {
 
   const handleSave = async () => {
     if ( !formData.account_name || !formData.mobile ) {
-      alert("Please select the Customer");
+      alert("Please select the Customer or enter the Customer Mobile Number");
       return;
     }
     const dataToSave = {
