@@ -14,7 +14,7 @@ const ProductTable = ({
   handleCheckboxChange,
   handleSelectAllChange,
 }) => {
-  console.log("invoiceDetails=",invoiceDetails)
+  console.log("invoiceDetails=", invoiceDetails)
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;

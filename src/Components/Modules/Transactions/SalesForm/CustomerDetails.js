@@ -16,6 +16,8 @@ const CustomerDetails = ({
   const location = useLocation();
   const [balance, setBalance] = useState(0); // State to store balance
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState([]);
+  const [selectedMobile, setSelectedMobileState] = useState(""); // Added state to hold selected mobile
 
   useEffect(() => {
     if (location.state?.mobile) {
@@ -25,42 +27,58 @@ const CustomerDetails = ({
       );
       if (customer) {
         handleCustomerChange(customer.account_id); // Update formData
-        setSelectedMobile(location.state.mobile); // Pass the mobile number
+        setSelectedMobileState(location.state.mobile); // Pass the mobile number
         fetchBalance(location.state.mobile); // Fetch balance for the selected mobile
       }
     }
   }, [location.state?.mobile, customers]);
 
-  const fetchBalance = async (mobile) => {
+  useEffect(() => {
+    const fetchRepairs = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+        // Filter only the records where transaction_status is 'Sales'
+        const filteredData = response.data.filter(
+          (item) =>
+            item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice"
+        );
+        setData(filteredData);
+      } catch (error) {
+        console.error("Error fetching repair details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRepairs();
+  }, []);
+
+  // Function to fetch balance based on mobile
+  const fetchBalance = (mobile) => {
     setLoading(true);
-    try {
-      const response = await axios.get(`${baseURL}/get-unique-repair-details`);
-      const filteredData = response.data.filter(
-        (item) => item.transaction_status === "Sales" && item.mobile === mobile
-      );
+    const customerData = data.filter((item) => item.mobile === mobile);
 
-      // Calculate total balance
-      const totalBalance = filteredData.reduce((sum, item) => {
-        const { bal_amt, bal_after_receipts, receipts_amt } = item;
+    const totalBalance = customerData.reduce((sum, item) => {
+      const bal_amt = Number(item.bal_amt) || 0;
+      const bal_after_receipts = Number(item.bal_after_receipts) || 0;
+      const receipts_amt = Number(item.receipts_amt) || 0;
 
-        // If bal_amt equals receipts_amt, use bal_after_receipts
-        const balance =
-          bal_amt === receipts_amt
-            ? parseFloat(bal_after_receipts) || 0
-            : bal_after_receipts
-            ? parseFloat(bal_after_receipts) || 0
-            : parseFloat(bal_amt) || 0;
+      // If bal_amt equals receipts_amt, use bal_after_receipts
+      const balance = bal_amt === receipts_amt ? bal_after_receipts : bal_after_receipts || bal_amt;
 
-        return sum + balance;
-      }, 0);
+      return sum + balance;
+    }, 0);
 
-      setBalance(totalBalance);
-    } catch (error) {
-      console.error("Error fetching balance details:", error);
-    } finally {
-      setLoading(false);
-    }
+    setBalance(totalBalance.toFixed(2)); // Set the calculated balance
+    setLoading(false); // Set loading to false once balance is fetched
   };
+
+  // Trigger balance fetch when selectedMobile changes
+  useEffect(() => {
+    if (selectedMobile) {
+      fetchBalance(selectedMobile);
+    }
+  }, [selectedMobile]);
 
   return (
     <Col className="sales-form-section">

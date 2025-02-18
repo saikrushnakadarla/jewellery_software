@@ -71,14 +71,20 @@ const useProductHandlers = () => {
     product_image: null,
     imagePreview: null,
   });
-
   const [uniqueProducts, setUniqueProducts] = useState([]);
   const [metalTypes, setMetalTypes] = useState([]);
   const [purity, setPurity] = useState([]);
   const [filteredMetalTypes, setFilteredMetalTypes] = useState([]);
   const [filteredDesignOptions, setFilteredDesignOptions] = useState([]);
   const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
-
+  const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [subcategoryOptions, setSubcategoryOptions] = useState([]);
+  const [metaltypeOptions, setMetaltypeOptions] = useState([]);
+  const [purityOptions, setpurityOptions] = useState([]);
+  const [designOptions, setDesignOptions] = useState([]); 
+  const [image, setImage] = useState(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     let currentRate = "";
@@ -104,7 +110,6 @@ const useProductHandlers = () => {
     }));
   }, [formData.purity, formData.metal_type, rates]);
   
-
   useEffect(() => {
     const fetchCurrentRates = async () => {
       try {
@@ -187,21 +192,14 @@ const useProductHandlers = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Preserve the current barcode
-    const currentBarcode = formData.code;
-
-    // Update the specific field in formData
     const updatedFormData = { ...formData, [name]: value };
-
     setFormData(updatedFormData);
-
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
 
     if (name === "purity" || name === "metal_type") {
-      // Separate condition for gold
       if (formData.metal_type.toLowerCase() === "gold") {
         // Check for different purity values and set the rate accordingly for gold
         if (
@@ -234,7 +232,6 @@ const useProductHandlers = () => {
       }
     }
 
-    // Trigger recalculation for Total MC if relevant fields are updated
     if (
       formData.metal_type?.toLowerCase() === "gold" &&
       (name === "mc_per_gram" || name === "rate_amt")
@@ -253,7 +250,6 @@ const useProductHandlers = () => {
       }));
     }
 
-    // Handle discount calculation
     if (name === "disscount_percentage") {
       const discountPercentage = parseFloat(value) || 0;
       const makingCharges = parseFloat(formData.making_charges) || 0;
@@ -262,62 +258,26 @@ const useProductHandlers = () => {
       updatedFormData.disscount = discountAmount.toFixed(2);
     }
 
+    if (name === "pricing" && value === "By fixed") {
+      // Clear the specified fields if pricing is "By fixed"
+      updatedFormData.purity = "";
+      updatedFormData.gross_weight = "";
+      updatedFormData.stone_weight = "";
+      updatedFormData.weight_bw = "";
+      updatedFormData.stone_price = "";
+      updatedFormData.va_on = "Gross Weight"; // Reset to default if needed
+      updatedFormData.va_percent = "";
+      updatedFormData.wastage_weight = "";
+      updatedFormData.total_weight_av = "";
+      updatedFormData.mc_on = "MC %"; // Reset to default if needed
+      updatedFormData.mc_per_gram = "";
+      updatedFormData.making_charges = "";
+      updatedFormData.disscount_percentage = "";
+      updatedFormData.disscount = "";
+      updatedFormData.rate = "";
+    }
+
     setFormData(updatedFormData);
-
-    // Destructure relevant fields
-    // const { product_name, metal_type, design_name, purity } = {
-    //   ...formData,
-    //   [name]: value,
-    // };
-
-    // if (product_name && metal_type && design_name && purity) {
-    //   const matchingEntries = data.filter(
-    //     (prod) =>
-    //       prod.sub_category === product_name &&
-    //       prod.metal_type === metal_type &&
-    //       prod.design_master === design_name &&
-    //       prod.Purity === purity
-    //   );
-
-    //   if (matchingEntries.length > 0) {
-    //     if (matchingEntries.length > 1) {
-    //       setFormData((prevData) => ({
-    //         ...prevData,
-    //         barcodeOptions: matchingEntries.map((entry) => ({
-    //           value: entry.PCode_BarCode,
-    //           label: entry.PCode_BarCode,
-    //         })),
-    //       }));
-    //     } else if (matchingEntries.length === 1) {
-    //       const matchingEntry = matchingEntries[0];
-    //       const productId = matchingEntry.product_id;
-    //       const productDetails = products.find(
-    //         (prod) => String(prod.product_id) === String(productId)
-    //       );
-
-    //       setFormData((prevData) => ({
-    //         ...prevData,
-    //         code: matchingEntry.PCode_BarCode,
-    //         category: matchingEntry.category,
-    //         sub_category: matchingEntry.sub_category,
-    //         gross_weight: matchingEntry.Gross_Weight,
-    //         stone_weight: matchingEntry.Stones_Weight || "",
-    //         stone_price: matchingEntry.Stones_Price || "",
-    //         weight_bw: matchingEntry.Weight_BW || "",
-    //         va_on: matchingEntry.Wastage_On || "",
-    //         va_percent: matchingEntry.Wastage_Percentage || "",
-    //         wastage_weight: matchingEntry.WastageWeight || "",
-    //         total_weight_av: matchingEntry.TotalWeight_AW || "",
-    //         mc_on: matchingEntry.Making_Charges_On || "",
-    //         mc_per_gram: matchingEntry.MC_Per_Gram || "",
-    //         making_charges: matchingEntry.Making_Charges || "",
-    //         tax_percent: productDetails?.tax_slab || "",
-    //         qty: 1,
-    //         barcodeOptions: [],
-    //       }));
-    //     }
-    //   }
-    // }
   };
 
   const handleProductNameChange = (productName) => {
@@ -436,13 +396,6 @@ const useProductHandlers = () => {
     }
   };
 
-  const [isBarcodeSelected, setIsBarcodeSelected] = useState(false);
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  const [subcategoryOptions, setSubcategoryOptions] = useState([]);
-  const [metaltypeOptions, setMetaltypeOptions] = useState([]);
-  const [purityOptions, setpurityOptions] = useState([]);
-  const [designOptions, setDesignOptions] = useState([]);
-
   useEffect(() => {
     const fetchCategory = async () => {
       try {
@@ -477,11 +430,17 @@ const useProductHandlers = () => {
         }
         const result = await response.json();
         if (result && result.data) {
-          const formattedOptions = result.data.map((item) => ({
+          // If formData.metal_type is available, filter based on it, otherwise show all
+          const filteredData = formData.metal_type
+            ? result.data.filter((item) => item.metal_type === formData.metal_type)
+            : result.data;
+  
+          // Format the filtered options
+          const formattedOptions = filteredData.map((item) => ({
             label: item.sub_category_name, // Display value
             value: item.sub_category_name, // Unique ID for value
           }));
-
+  
           setSubcategoryOptions(formattedOptions);
         } else {
           console.error("Invalid API response format", result);
@@ -490,10 +449,11 @@ const useProductHandlers = () => {
         console.error("Error fetching data:", error);
       }
     };
-
+  
+    // Run the function initially and when formData.metal_type changes
     fetchSubCategory();
-  }, []);
-
+  }, [formData.metal_type]); 
+  
   useEffect(() => {
     const fetchMetalType = async () => {
       try {
@@ -545,34 +505,43 @@ const useProductHandlers = () => {
         const response = await fetch(`${baseURL}/purity`);
         const data = await response.json();
 
-        const filteredData = data.filter((product) => {
-          return product.metal?.toLowerCase() === formData.metal_type?.toLowerCase();
-        });
+        let filteredData = data;
+
+        // If metal_type is set, filter based on it; otherwise, show all
+        if (formData.metal_type) {
+          filteredData = data.filter((product) =>
+            product.metal?.toLowerCase() === formData.metal_type.toLowerCase()
+          );
+        }
+
         const purities = Array.from(
           new Set(filteredData.map((product) => `${product.name} | ${product.purity}`))
         );
+
         const purityOptions = purities.map((purity) => ({
           value: purity,
           label: purity,
         }));
 
         setpurityOptions(purityOptions);
-        const defaultPurity = purityOptions.find((option) =>
-          /22/i.test(option.value)
-        )?.value;
 
-        setFormData((prevData) => ({
-          ...prevData,
-          purity: defaultPurity || "",
-        }));
+        // Set default purity only if metal_type is available
+        if (formData.metal_type && purityOptions.length > 0) {
+          const defaultPurity = purityOptions.find((option) =>
+            /22/i.test(option.value)
+          )?.value;
+
+          setFormData((prevData) => ({
+            ...prevData,
+            purity: defaultPurity || "",
+          }));
+        }
       } catch (error) {
         console.error('Error fetching products:', error);
       }
     };
 
-    if (formData.metal_type) {
-      fetchPurity();
-    }
+    fetchPurity();
   }, [formData.metal_type]);
 
   const handleBarcodeChange = async (code) => {
@@ -742,8 +711,6 @@ const useProductHandlers = () => {
     }
   };
 
-  const [image, setImage] = useState(null);
-  const fileInputRef = useRef(null);
   // const handleImageChange = (e) => {
   //   const file = e.target.files[0];
   //   if (file) {
@@ -759,7 +726,7 @@ const useProductHandlers = () => {
   // };
 
    // This function handles the file input change event for the gallery selection.
-  // Handles image file selection from the gallery (file system)
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -782,8 +749,6 @@ const useProductHandlers = () => {
       fileInputRef.current.value = "";
     }
   };
-
-
 
   return {
     formData,

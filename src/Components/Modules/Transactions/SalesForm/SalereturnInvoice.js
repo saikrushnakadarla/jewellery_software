@@ -3,8 +3,6 @@ import { Col, Row } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 
 const InvoiceDetails = ({ setReturnData,returnData, invoiceDetails, filteredInvoices, setFilteredInvoices, uniqueInvoice,handleInvoiceChange }) => {
-
-
   return (
     <Col style={{width:'454%'}}>
       <Row>

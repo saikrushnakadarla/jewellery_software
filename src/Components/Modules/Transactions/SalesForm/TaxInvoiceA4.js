@@ -433,7 +433,8 @@ const TaxINVoiceReceipt = ({
                                                                         <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                         <Text style={[styles.tableCell, styles.tableCellRate]}>
-                                                                                {item.rate || "0.00"}
+                                                                                {/* {item.rate || "0.00"} */}
+                                                                                {item.pieace_cost ? item.pieace_cost : item.rate}
                                                                         </Text>
                                                                         <View style={[styles.divider1, { marginTop: -2 }]} />
 

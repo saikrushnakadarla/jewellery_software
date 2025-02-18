@@ -311,7 +311,7 @@ const RepairForm = () => {
       // Create download link and trigger download
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = `receipt-${formData.id || "new"}.pdf`;
+      link.download = `receipt-${formData.receipt_no || "new"}.pdf`;
       link.click();
       URL.revokeObjectURL(link.href);
   

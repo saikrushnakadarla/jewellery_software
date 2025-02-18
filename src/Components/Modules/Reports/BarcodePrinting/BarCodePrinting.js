@@ -26,7 +26,7 @@ const RepairForm = () => {
             id: index, // Unique ID for tracking selection
             opentag_id:item.opentag_id,
             pCode: item.PCode_BarCode,
-            nameValue: item.product_Name,
+            nameValue: item.sub_category,
             weight: item.Gross_Weight,
             date: item.added_at.split("T")[0], // Extract date part from ISO string
           }));

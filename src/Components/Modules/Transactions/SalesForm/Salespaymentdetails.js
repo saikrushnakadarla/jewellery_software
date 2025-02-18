@@ -6,82 +6,61 @@ import axios from "axios"; // Assuming you are using axios for API calls
 import baseURL from '../../../../Url/NodeBaseURL';
 
 const PaymentDetails = ({
-  paymentDetails,
-  setPaymentDetails,
-  handleSave,
-  handleBack,
-  repairDetails,
   invoiceDetails,
   selectedRows,
-  totalPrice,
-  resetForm,
+  setSelectedRows,
+  isAllSelected,
+  setIsAllSelected,
+  resetSaleReturnForm,
   salesTaxableAmount,
-                salesTaxAmount,
-                salesNetAmount,
+  salesTaxAmount,
+  salesNetAmount,
+  handleCheckout
 }) => {
 
+  // const handleCheckout = async () => {
+  //   if (!invoiceDetails.length || !selectedRows.length) {
+  //     alert("No invoices selected for sale return.");
+  //     return;
+  //   }
 
-  // Calculate taxable amount based on selected rows
-  // const taxableAmount = selectedRows.reduce((sum, rowIndex) => {
-  //   const detail = invoiceDetails[rowIndex];
-  //   const stonePrice = parseFloat(detail.stone_price) || 0;
-  //   const makingCharges = parseFloat(detail.making_charges) || 0;
-  //   const rateAmt = parseFloat(detail.rate_amt) || 0;
-  //   return sum + stonePrice + makingCharges + rateAmt;
-  // }, 0);
+  //   try {
+  //     const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
 
-  // const taxAmount = selectedRows.reduce((sum, rowIndex) => {
-  //   const detail = invoiceDetails[rowIndex];
-  //   return sum + parseFloat(detail.tax_amt || 0);
-  // }, 0);
+  //     const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
+  //       id: invoice.id,
+  //       status: "Sale Returned",
+  //     }));
 
-  // const netAmount = taxableAmount + taxAmount;
+  //     const openTagsUpdates = selectedInvoices.map((invoice) => ({
+  //       PCode_BarCode: invoice.code,
+  //       Status: "Sale Returned",
+  //     }));
+
+  //     const productUpdates = selectedInvoices.map((invoice) => ({
+  //       product_id: invoice.product_id,
+  //       qty: invoice.qty,
+  //       gross_weight: invoice.gross_weight,
+  //     }));
+
+  //     const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
+
+  //     await axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates });
+  //     await axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates });
+  //     await axios.post(`${baseURL}/updateProduct`, { updates: productUpdates });
+  //     await axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries });
+
+  //     alert("Sale Return added Successfully!");
+  //     // resetSaleReturnForm();
+  //     // setSelectedRows([]); 
+  //     // setIsAllSelected(false);
+  //   } catch (error) {
+  //     console.error("Error during checkout:", error);
+  //     alert("An error occurred during checkout. Please try again.");
+  //   }
+  // };
 
 
-
-  const handleCheckout = async () => {
-    try {
-      const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
-  
-      // Prepare data for updating `repair_details`
-      const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
-        id: invoice.id,
-        status: "Sale Returned",
-      }));
-  
-      // Prepare data for updating `open_tags_entry`
-      const openTagsUpdates = selectedInvoices.map((invoice) => ({
-        PCode_BarCode: invoice.code,
-        Status: "Sale Returned",
-      }));
-  
-      // Prepare data for updating `product` table
-      const productUpdates = selectedInvoices.map((invoice) => ({
-        product_id: invoice.product_id,
-        qty: invoice.qty,
-        gross_weight: invoice.gross_weight,
-      }));
-  
-      // Extract codes for adding 'Available' entries
-      const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
-  
-      // API Calls
-      await axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates });
-      await axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates });
-      await axios.post(`${baseURL}/updateProduct`, { updates: productUpdates });
-      await axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries });
-  
-      alert("Sale Return added Successfully!");
-      resetForm();
-  
-      // Refresh the window
-      // window.location.reload();
-    } catch (error) {
-      console.error("Error during checkout:", error);
-      alert("An error occurred during checkout. Please try again.");
-    }
-  };
-  
   return (
     <div>
       <Col >
@@ -138,7 +117,7 @@ const PaymentDetails = ({
             <Button
               onClick={handleCheckout}
               style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
-              // disabled={!isSubmitEnabled}
+            // disabled={!isSubmitEnabled}
             >
               Add
             </Button>
