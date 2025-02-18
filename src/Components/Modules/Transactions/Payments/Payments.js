@@ -361,7 +361,7 @@ const RepairForm = () => {
 
           <Col xs={12} md={2}>
             <InputField
-              label="Total Amt"
+              label="Out Standing Amt"
               type="number"
               name="total_amt"
               value={formData.total_amt}
