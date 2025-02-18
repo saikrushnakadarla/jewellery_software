@@ -399,6 +399,7 @@ const handleEdit = (index) => {
       disscount: "",
       rate: "",
       rate_amt: "",
+      pricing: "",
       tax_percent: "",
       tax_amt: "",
       total_price: "",
