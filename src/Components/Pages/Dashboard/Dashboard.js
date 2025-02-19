@@ -225,54 +225,6 @@ function Dashboard() {
           </div>
         </div>
         <div className="row-cards" style={{ marginTop: '15px' }}>
-        {/* <div className="metric-card">
-            <Sales selectedCustomerMobile={selectedMobile} />
-            <a style={{marginRight:'100px'}}
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log("Selected Customer Mobile:", selectedMobile);
-                navigate("/salestable", { state: { mobile: selectedMobile } });
-              }}
-            >
-              Details
-            </a>
-            <a 
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/sales", { state: { mobile: selectedMobile } });
-              }}
-            >
-              New
-            </a>
-          </div>
-          <div className="metric-card">
-            <Orders selectedCustomerMobile={selectedMobile} />
-            <a style={{marginRight:'100px'}}
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log("Selected Customer Mobile:", selectedMobile);
-                navigate("/orderstable", { state: { mobile: selectedMobile } });
-              }}
-            >
-              Details
-            </a>
-            <a 
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/orders', { state: { mobile: selectedMobile } });
-              }}
-            >
-              New
-            </a>
-          </div> */}
           <div className="metric-card">
           <Customers selectedCustomerMobile={selectedMobile} />
           </div>

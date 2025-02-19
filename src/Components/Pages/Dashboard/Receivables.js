@@ -48,7 +48,7 @@ function Receivables({ selectedCustomerMobile }) {
   return (
     <div>
       <h3>Receivables</h3>
-      <p style={{fontSize:'35px', color:'red', marginTop:'20px'}}>
+      <p style={{fontSize:'25px', color:'red', marginTop:'20px'}}>
         <strong>
         ₹ {totalBalance}
         </strong>

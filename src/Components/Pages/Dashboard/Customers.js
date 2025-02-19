@@ -44,7 +44,7 @@ function Customers() {
   return (
      <div>
      <h3>Customers</h3>
-     <p style={{fontSize:'35px', marginTop:'20px'}}>
+     <p style={{fontSize:'25px', marginTop:'20px'}}>
        <strong>
        {data.length}
        </strong>

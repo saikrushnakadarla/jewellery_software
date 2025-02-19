@@ -58,7 +58,7 @@ console.log("Total balance =", totalBalance);
   return (
     <div>
       <h3>Payables</h3>
-      <p style={{fontSize:'35px', color:'green', marginTop:'20px'}}>
+      <p style={{fontSize:'25px', color:'green', marginTop:'20px'}}>
         <strong>
         ₹ {totalBalance}
         </strong>
