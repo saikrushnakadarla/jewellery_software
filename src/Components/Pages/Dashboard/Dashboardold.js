@@ -1,174 +1,308 @@
-import React, { useState } from 'react';
+
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import Repairs from './Repairs';
 import Sales from './Sales';
 import Orders from './Orders';
+import Purchases from './Purchases';
 import URDPurchase from './URDPurchase';
 import Customers from './Customers';
+import Suppliers from './Suppliers'
 import CustomerDashboard from './CustomerDashboard';
+import Receivables from './Receivables';
+import Payables from './Payables';
+import AmountBilledToday from './AmountBilledToday';
+import { Bar, Pie, Line } from 'react-chartjs-2';
+import { AuthContext } from "../Login/Context";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  PointElement,
+  LineElement,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  PointElement,
+  LineElement
+);
 
 function Dashboard() {
+  const { authToken ,userId, userName} = useContext(AuthContext);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [selectedMobile, setSelectedMobile] = useState(null);
   const navigate = useNavigate();
 
+  const barData = {
+    labels: ['Sales', 'Repairs', 'Orders'],
+    datasets: [
+      {
+        label: 'Amount',
+        data: [3000, 2500, 2000],
+        backgroundColor: ['#cd853f', '#8b4513', '#ffa500'],
+      },
+    ],
+  };
+
+  const pieDataReceivablesPayables = {
+    labels: ['Receivables', 'Payables'],
+    datasets: [
+      {
+        data: [60, 40],
+        backgroundColor: ['#cd853f', '#8b4513'],
+      },
+    ],
+  };
+
+  const lineDataRevenue = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+    datasets: [
+      {
+        label: 'Revenue',
+        data: [10000, 15000, 12000, 20000],
+        borderColor: '#cd853f',
+        borderWidth: 2,
+        fill: false,
+      },
+    ],
+  };
+
+  const pieDataOrderStatus = {
+    labels: ['Completed', 'Pending', 'Cancelled'],
+    datasets: [
+      {
+        data: [50, 30, 20],
+        backgroundColor: ['#cd853f', '#8b4513', '#ffa500'],
+      },
+    ],
+  };
+
+
   return (
-    <div className="main-container">
-      <div className="dashboard_main-container">
-        <div className="dashboard_card-row"> 
-          <div className="dashboard_card bg-dash2">         
-            <Repairs selectedCustomerId={selectedCustomerId} />
-            <a 
-              href="#" 
-              className="details-link" 
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/repairstable');
-              }}
-            >
-              Details
-            </a>
-            <a style={{marginLeft:'300px'}}
-                href="#" 
-                className="new-link" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/repairs');
-                }}
-              >
-                New
-              </a>
-          </div>
-          <div className="dashboard_card bg-dash1">
-            <h2>Payables</h2>
-            <p>100000</p>
-          </div>
-          <div className="dashboard_card bg-dash3">
-            <h2>Receivables</h2>
-            <p>100000</p>
-          </div>
-        </div>
-        <div className="dashboard_card-row" style={{marginTop:'15px'}}> 
-          <div className="dashboard_card bg-dash2">         
-            <Sales selectedCustomerId={selectedCustomerId} />
-            <a 
-              href="#" 
-              className="details-link" 
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/salestable');
-              }}
-            >
-              Details
-            </a>
-            <a style={{marginLeft:'300px'}}
-                href="#" 
-                className="new-link" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/sales');
-                }}
-              >
-                New
-              </a>
-          </div>
-          <div className="dashboard_card bg-dash1">
-            <Orders selectedCustomerId={selectedCustomerId} />
-            <a 
-              href="#" 
-              className="details-link" 
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/orderstable');
-              }}
-            >
-              Details
-            </a>
-            <a style={{marginLeft:'300px'}}
-                href="#" 
-                className="new-link" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/orders');
-                }}
-              >
-                New
-              </a>
-          </div>
-          <div className="dashboard_card bg-dash3">
-            <URDPurchase selectedCustomerId={selectedCustomerId} />
-            <a 
-              href="#" 
-              className="details-link" 
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/urdpurchasetable');
-              }}
-            >
-              Details
-            </a>
-            <a style={{marginLeft:'300px'}}
-                href="#" 
-                className="new-link" 
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate('/urd_purchase');
-                }}
-              >
-                New
-              </a>
-          </div>
-        </div>
+    <div className="main-container" style={{backgroundColor:'#b7721834'}}>
+      <div className="dashboard-header">
+        <h2 style={{marginTop:"25px", marginLeft:"15px"}}>Dashboard</h2>
+        <CustomerDashboard onSelectCustomer={setSelectedMobile} />
       </div>
-      <div className="dashboard_main-container">
-        <CustomerDashboard onSelectCustomer={setSelectedCustomerId} />
-      </div>
-      <div className="dashboard-customers-row">
-        <div className="dashboard-customers-container">
-          <h2 className="dashboard-section-title">TOP CUSTOMERS</h2>
-          <div className="dashboard-table-wrapper">
-            <Customers />
+      <div className="dashboard-container">
+        <div className="row-cards" >
+        <div className="metric-card">
+            <Sales selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/salestable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a
+              
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/sales", { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+          <div className="metric-card">
+            <Orders selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/orderstable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate('/orders', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+        <div className="metric-card">
+            <Purchases selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/purchasetable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/purchase', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+        <div className="metric-card">
+            <URDPurchase selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/urdpurchasetable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/urd_purchase', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+         
+          <div className="metric-card" >
+            <Repairs selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/repairstable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a
+              
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/repairs', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
           </div>
         </div>
-        <div className="dashboard-customers-container">
-          <h2 className="dashboard-section-title">TOP SELLING PRODUCTS</h2>
-          <div className="dashboard-table-wrapper">
-            <table className="dashboard-responsive-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Price</th>
-                  <th>Category</th>
-                  <th>Units Sold</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Gold Necklace</td>
-                  <td>₹1,00,000</td>
-                  <td>Gold</td>
-                  <td>30</td>
-                  <td>Elegant design with pure gold</td>
-                </tr>
-                <tr>
-                  <td>Diamond Ring</td>
-                  <td>₹75,000</td>
-                  <td>Diamond</td>
-                  <td>25</td>
-                  <td>Exquisite ring with high-grade diamonds</td>
-                </tr>
-                <tr>
-                  <td>Silver Bracelet</td>
-                  <td>₹20,000</td>
-                  <td>Silver</td>
-                  <td>20</td>
-                  <td>Stylish bracelet suitable for all occasions</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="row-cards" style={{ marginTop: '15px' }}>
+        {/* <div className="metric-card">
+            <Sales selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/salestable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/sales", { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+          <div className="metric-card">
+            <Orders selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/orderstable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/orders', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div> */}
+          <div className="metric-card">
+          <Customers selectedCustomerMobile={selectedMobile} />
+          </div>
+          <div className="metric-card">
+          <Suppliers selectedCustomerMobile={selectedMobile} />
+          </div>
+          <div className="metric-card">
+          <Payables selectedCustomerMobile={selectedMobile} />
+          </div>
+          <div className="metric-card">
+            <Receivables selectedCustomerMobile={selectedMobile} />
+          </div>
+          <div className="metric-card">
+            <AmountBilledToday selectedCustomerMobile={selectedMobile} />
           </div>
         </div>
+        <div className="row-cards" style={{ marginTop: '15px',marginBottom:'15px' }}>
+        <div className="metric-card">
+            <Bar data={barData} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+          <div className="metric-card">
+            <Pie data={pieDataReceivablesPayables} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+          <div className="metric-card">
+            <Line data={lineDataRevenue} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+          <div className="metric-card">
+            <Pie data={pieDataOrderStatus} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div>
+          </div>
       </div>
     </div>
   );

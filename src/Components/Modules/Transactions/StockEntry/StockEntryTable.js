@@ -234,13 +234,14 @@ const StockEntryTable = (selectedProduct) => {
 
   const isGoldCategory = formData.category && formData.category.toLowerCase().includes("gold");
   const isSilverCategory = formData.category && formData.category.toLowerCase().includes("silver");
+
   useEffect(() => {
     if (isGoldCategory) {
       setFormData((prevData) => ({
         ...prevData,
         Making_Charges_On: "MC %",
         MC_Per_Gram_Label: "MC%",
-        Making_Charges: "", // Clear MC field if hidden
+        Making_Charges: "", // Reset field when hidden
       }));
     } else if (isSilverCategory) {
       setFormData((prevData) => ({
@@ -257,53 +258,185 @@ const StockEntryTable = (selectedProduct) => {
   }, [formData.category]);
 
   // Handle field changes
-  const handleChange = async (e) => {
-    const { name, value } = e.target;
-    if (name === "sub_category") {
-      // Handle sub_category field changes
-      const selectedCategory = subCategories.find(
-        (category) => category.subcategory_id === parseInt(value)
-      );
+  // const handleChange = async (e) => {
+  //   const { name, value } = e.target;
 
-      const newPrefix = selectedCategory ? selectedCategory.prefix : "";
 
-      if (newPrefix) {
-        try {
-          const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
-            params: { prefix: newPrefix },
-          });
+  //   if (name === "sub_category") {
+  //     // Handle sub_category field changes
+  //     const selectedCategory = subCategories.find(
+  //       (category) => category.subcategory_id === parseInt(value)
+  //     );
 
-          const nextPCodeBarCode = response.data.nextPCodeBarCode;
+  //     const newPrefix = selectedCategory ? selectedCategory.prefix : "";
 
-          setFormData((prevData) => ({
-            ...prevData,
-            sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
-            subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
-            item_prefix: newPrefix,
-            Prefix: newPrefix,
-            PCode_BarCode: nextPCodeBarCode,
-          }));
-        } catch (error) {
-          console.error("Error fetching PCode_BarCode:", error);
-        }
-      } else {
-        setFormData((prevData) => ({
-          ...prevData,
-          sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
-          subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
-          item_prefix: "",
-          Prefix: "",
-          PCode_BarCode: "",
-        }));
-      }
+  //     if (newPrefix) {
+  //       try {
+  //         const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+  //           params: { prefix: newPrefix },
+  //         });
+
+  //         const nextPCodeBarCode = response.data.nextPCodeBarCode;
+
+  //         setFormData((prevData) => ({
+  //           ...prevData,
+  //           sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
+  //           subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
+  //           item_prefix: newPrefix,
+  //           Prefix: newPrefix,
+  //           PCode_BarCode: nextPCodeBarCode,
+  //         }));
+  //       } catch (error) {
+  //         console.error("Error fetching PCode_BarCode:", error);
+  //       }
+  //     } else {
+  //       setFormData((prevData) => ({
+  //         ...prevData,
+  //         sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
+  //         subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
+  //         item_prefix: "",
+  //         Prefix: "",
+  //         PCode_BarCode: "",
+  //       }));
+  //     }
+  //   } else {
+  //     // Handle generic field changes
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       [name]: value,
+  //     }));
+  //   }
+  // };
+
+  const handleChange = async (fieldOrEvent, valueArg) => {
+       
+    let field, value;
+    if (fieldOrEvent && fieldOrEvent.target) {
+        
+        field = fieldOrEvent.target.name;
+        value = fieldOrEvent.target.value;
     } else {
-      // Handle generic field changes
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+        
+        field = fieldOrEvent;
+        value = valueArg;
     }
-  };
+    setFormData((prevData) => {
+        let updatedData = { ...prevData, [field]: value };
+
+        // Update MC field only if Making_Charges_On is "MC / Gram" or "MC / Piece"
+        if (field === "Making_Charges_On") {
+            if (value === "MC / Gram" || value === "MC / Piece") {
+                updatedData.Making_Charges = prevData.Making_Charges || "";
+            } else {
+                updatedData.Making_Charges = ""; // Hide field
+            }
+        }
+
+        // Update MC_Per_Gram_Label when Making_Charges_On changes
+        if (field === "Making_Charges_On") {
+            let newLabel = "MC/Gm"; // Default
+            if (value === "MC %") newLabel = "MC%";
+            else if (value === "MC / Gram") newLabel = "MC/Gm";
+            else if (value === "MC / Piece") newLabel = "MC/Gm";
+
+            updatedData.MC_Per_Gram_Label = newLabel;
+        }
+
+        // --- Calculate Stones Price ---
+        if (field === "Stones_Weight" || field === "stone_price_per_carat") {
+            const stoneWeight =
+                parseFloat(
+                    field === "Stones_Weight" ? value : prevData.Stones_Weight
+                ) || 0;
+            const stonePricePerCarat =
+                parseFloat(
+                    field === "stone_price_per_carat"
+                        ? value
+                        : prevData.stone_price_per_carat
+                ) || 0;
+            if (stoneWeight > 0 && stonePricePerCarat > 0) {
+                const calculatedStonePrice = (stoneWeight / 0.20) * stonePricePerCarat;
+                updatedData.Stones_Price = calculatedStonePrice.toFixed(2);
+            } else {
+                updatedData.Stones_Price = "";
+            }
+        }
+
+        // --- Recalculate Weight BW ---
+        if (
+            field === "Gross_Weight" ||
+            field === "Stones_Weight" ||
+            field === "deduct_st_Wt"
+        ) {
+            const grossWt = parseFloat(updatedData.Gross_Weight) || 0;
+            const stonesWt = parseFloat(updatedData.Stones_Weight) || 0;
+            // Use deduct_st_Wt value if available; default to "yes" if not set.
+            const deductOption = updatedData.deduct_st_Wt
+                ? updatedData.deduct_st_Wt.toLowerCase()
+                : "yes";
+            if (deductOption === "yes") {
+                updatedData.Weight_BW = (grossWt - stonesWt).toFixed(2);
+            } else {
+                updatedData.Weight_BW = grossWt.toFixed(2);
+            }
+        }
+
+        return updatedData;
+    });
+
+    // --- Handle Category Change ---
+    if (field === "category") {
+        setFormData((prevData) => ({
+            ...prevData,
+            category: value,
+        }));
+        return;
+    }
+
+    // --- Handle Sub-Category Change and Fetch Prefix/PCode_BarCode ---
+    if (field === "sub_category") {
+        const selectedCategory = subCategories.find(
+            (category) => category.subcategory_id === parseInt(value)
+        );
+
+        const newPrefix = selectedCategory ? selectedCategory.prefix : "";
+        if (newPrefix) {
+            try {
+                const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+                    params: { prefix: newPrefix },
+                });
+                const nextPCodeBarCode = response.data.nextPCodeBarCode;
+                setFormData((prevData) => ({
+                    ...prevData,
+                    sub_category: selectedCategory
+                        ? selectedCategory.sub_category_name
+                        : "",
+                    subcategory_id: selectedCategory
+                        ? selectedCategory.subcategory_id
+                        : "",
+                    item_prefix: newPrefix,
+                    Prefix: newPrefix,
+                    PCode_BarCode: nextPCodeBarCode,
+                }));
+            } catch (error) {
+                console.error("Error fetching PCode_BarCode:", error);
+            }
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                sub_category: selectedCategory
+                    ? selectedCategory.sub_category_name
+                    : "",
+                subcategory_id: selectedCategory
+                    ? selectedCategory.subcategory_id
+                    : "",
+                item_prefix: "",
+                Prefix: "",
+                PCode_BarCode: "",
+            }));
+        }
+    }
+};
 
   const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
     setFormData({
@@ -612,7 +745,7 @@ const StockEntryTable = (selectedProduct) => {
                     onChange={handleChange}
                   />
                 </div>
-                {isSilverCategory && (
+                {(formData.Making_Charges_On === "MC / Gram" || formData.Making_Charges_On === "MC / Piece") && (
                   <div className="col-md-2">
                     <InputField
                       label="MC"

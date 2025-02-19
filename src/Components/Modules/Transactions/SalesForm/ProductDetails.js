@@ -33,11 +33,6 @@ const ProductDetails = ({
   isQtyEditable
 }) => {
 
-  console.log("Filtered Design Options:", filteredDesignOptions);
-  console.log("Filtered Purity Options:", filteredPurityOptions);
-  console.log("Filtered Metal Types:", filteredMetalTypes);
-  console.log("Unique Products:", uniqueProducts);
-  console.log("subcategory Options:", subcategoryOptions);
 
   const isByFixed = formData.pricing === "By fixed";
 

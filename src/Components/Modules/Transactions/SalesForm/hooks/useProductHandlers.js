@@ -114,8 +114,6 @@ const useProductHandlers = () => {
     const fetchCurrentRates = async () => {
       try {
         const response = await axios.get(`${baseURL}/get/current-rates`);
-        console.log('API Response:', response.data);
-
         setRates({
           rate_24crt: response.data.rate_24crt || "",
           rate_22crt: response.data.rate_22crt || "",

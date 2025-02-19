@@ -68,6 +68,156 @@ const URDPurchase = () => {
     return null;
   };
 
+  useEffect(() => {
+    const fetchAndFilterPurity = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+        console.log("Fetched Purity Options:", response.data);
+
+        const allPurityOptions = response.data;
+
+        const filteredPurityOptions = allPurityOptions.filter(
+          (option) => option.metal.toLowerCase() === productDetails.metal.toLowerCase()
+        );
+
+        console.log("Filtered Purity Options:", filteredPurityOptions);
+
+        const defaultPurityOption = filteredPurityOptions.find(option =>
+          option.name.toLowerCase().replace(/\s/g, "").includes("22k")
+        );
+
+        console.log("Default Selected Purity:", defaultPurityOption);
+
+        setPurityOptions(filteredPurityOptions);
+
+        setProductDetails((prevDetails) => ({
+          ...prevDetails,
+          purity: defaultPurityOption?.name || "",
+          purityPercentage: defaultPurityOption?.purity_percentage || 0, // Store purity_percentage
+        }));
+      } catch (error) {
+        console.error("Error fetching purity options:", error);
+      }
+    };
+
+    if (productDetails.metal) {
+      fetchAndFilterPurity();
+    }
+  }, [productDetails.metal]);
+
+  const [metalOptions, setMetalOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchMetalTypes = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/metaltype`);
+        const metalTypes = response.data.map(item => ({
+          value: item.metal_name, // Metal name for dropdown
+          label: item.metal_name, // Display value
+          hsn_code: item.hsn_code, // Associated HSN Code
+        }));
+        setMetalOptions(metalTypes);
+      } catch (error) {
+        console.error('Error fetching metal types:', error);
+      }
+    };
+
+    fetchMetalTypes();
+  }, []);
+
+  useEffect(() => {
+    if (productDetails.metal === 'Gold') {
+      setProductDetails((prevState) => ({
+        ...prevState,
+        ml_percent: 1, // Set default value for Gold
+      }));
+    } else if (productDetails.metal === 'Silver') {
+      setProductDetails((prevState) => ({
+        ...prevState,
+        ml_percent: 3, // Set default value for Silver
+      }));
+    } else if (!productDetails.metal) {
+      setProductDetails((prevState) => ({
+        ...prevState,
+        ml_percent: '', // Clear ml_percent if metal is cleared
+      }));
+    }
+  }, [productDetails.metal]);
+
+  useEffect(() => {
+    const fetchLastURDPurchaseNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastURDPurchaseNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          urdpurchase_number: response.data.lastURDPurchaseNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastURDPurchaseNumber();
+  }, []);
+
+  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
+
+  useEffect(() => {
+    const fetchCurrentRates = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/current-rates`);
+        console.log('API Response:', response.data);
+
+        setRates({
+          rate_24crt: response.data.rate_24crt || "",
+          rate_22crt: response.data.rate_22crt || "",
+          rate_18crt: response.data.rate_18crt || "",
+          rate_16crt: response.data.rate_16crt || "",
+          rate_silver: response.data.silver_rate || "", // Add rate_silver from the response
+        });
+      } catch (error) {
+        console.error('Error fetching current rates:', error);
+      }
+    };
+
+    fetchCurrentRates();
+  }, []);
+
+  const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
+
+  useEffect(() => {
+    const normalizedMetal = productDetails.metal.toLowerCase();
+    const normalizedPurity = normalizePurity(productDetails.purity);
+
+    // If metal is silver and purity is Manual, set rate_silver
+    if (normalizedMetal === "silver" && normalizedPurity === "manual") {
+      setProductDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
+      return;
+    }
+
+    // If metal is gold and purity is Manual, set rate_22crt
+    if (normalizedMetal === "gold" && normalizedPurity === "manual") {
+      setProductDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_22crt }));
+      return;
+    }
+
+    // If metal is silver, always set rate_silver
+    if (normalizedMetal === "silver") {
+      setProductDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
+      return;
+    }
+
+    // Normal purity-based rate assignment for gold
+    const currentRate =
+      normalizedPurity.includes("24") ? rates.rate_24crt :
+        normalizedPurity.includes("22") ? rates.rate_22crt :
+          normalizedPurity.includes("18") ? rates.rate_18crt :
+            normalizedPurity.includes("16") ? rates.rate_16crt :
+              0;
+
+    setProductDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
+  }, [productDetails.purity, productDetails.metal, rates]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -85,14 +235,23 @@ const URDPurchase = () => {
         }
       }
 
-      if (name === "purity" && value !== "Other") {
-        updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
+      if (name === "purity") {
+        if (value !== "Manual") {
+          const selectedOption = purityOptions.find(option => option.name === value);
+          updatedDetails.purityPercentage = selectedOption ? selectedOption.purity_percentage : 0;
+        } else {
+          updatedDetails.purityPercentage = 0; // Directly set purityPercentage to 0
+        }
       } else if (name === "purityPercentage") {
         updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
       }
 
-      // Update calculations
-      updatedDetails.eqt_wt = calculateNetWeight(updatedDetails);
+      // Update calculations with the latest purityPercentage
+      updatedDetails.eqt_wt = calculateNetWeight({
+        ...updatedDetails,
+        purityPercentage: updatedDetails.purityPercentage,
+      });
+
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
 
       return updatedDetails;
@@ -100,9 +259,9 @@ const URDPurchase = () => {
   };
 
   const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
-    const purityPercentageValue = purity === "Other"
+    const purityPercentageValue = purity === "Manual"
       ? parseFloat(purityPercentage) || 0
-      : parsePurityToPercentage(purity) || 0;
+      : parseFloat(purityPercentage) || 0;  // Ensure the correct purityPercentage is used
 
     const grossWeight = parseFloat(gross) || 0;
     const dustWeight = parseFloat(dust) || 0;
@@ -111,6 +270,7 @@ const URDPurchase = () => {
     const netWeight = ((grossWeight - dustWeight) * (purityPercentageValue - mlPercentValue)) / 100;
     return parseFloat(netWeight.toFixed(2));
   };
+
   const calculateTotalAmount = ({ eqt_wt, rate }, currentRate) => {
     const netWeight = Number(eqt_wt) || 0;
     const rateAmount = Number(rate) || Number(currentRate) || 0;
@@ -316,170 +476,6 @@ const URDPurchase = () => {
     }
   };
 
-  // useEffect(() => {
-  //   const fetchAndFilterPurity = async () => {
-  //     try {
-  //       const response = await axios.get(`${baseURL}/purity`);
-  //       const allPurityOptions = response.data;
-
-  //       // Filter purity options based on selected metal
-  //       const filteredPurityOptions = allPurityOptions.filter(
-  //         (option) => option.metal === productDetails.metal
-  //       );
-
-  //       // Normalize and find default purity that includes "22" in any form
-  //       const defaultPurity =
-  //         filteredPurityOptions.find(option =>
-  //           option.name.toLowerCase().replace(/\s/g, "").includes("22k")
-  //         )?.name || "";
-
-  //       // Update state with filtered purities and set the default purity
-  //       setPurityOptions(filteredPurityOptions);
-  //       setProductDetails((prevDetails) => ({
-  //         ...prevDetails,
-  //         purity: defaultPurity, // Set default purity
-  //       }));
-  //     } catch (error) {
-  //       console.error("Error fetching purity options:", error);
-  //     }
-  //   };
-
-  //   // Fetch and filter purities when metal changes
-  //   if (productDetails.metal) {
-  //     fetchAndFilterPurity();
-  //   }
-  // }, [productDetails.metal]);
-
-  useEffect(() => {
-    const fetchAndFilterPurity = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        const allPurityOptions = response.data;
-  
-        // Normalize and filter purity options based on selected metal (case-insensitive)
-        const filteredPurityOptions = allPurityOptions.filter(
-          (option) => option.metal.toLowerCase() === productDetails.metal.toLowerCase()
-        );
-  
-        // Normalize and find default purity that includes "22" in any form
-        const defaultPurity =
-          filteredPurityOptions.find(option =>
-            option.name.toLowerCase().replace(/\s/g, "").includes("22k")
-          )?.name || "";
-  
-        // Update state with filtered purities and set the default purity
-        setPurityOptions(filteredPurityOptions);
-        setProductDetails((prevDetails) => ({
-          ...prevDetails,
-          purity: defaultPurity, // Set default purity
-        }));
-      } catch (error) {
-        console.error("Error fetching purity options:", error);
-      }
-    };
-  
-    // Fetch and filter purities when metal changes
-    if (productDetails.metal) {
-      fetchAndFilterPurity();
-    }
-  }, [productDetails.metal]);
-  const [metalOptions, setMetalOptions] = useState([]);
-
-  useEffect(() => {
-    const fetchMetalTypes = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/metaltype`);
-        const metalTypes = response.data.map(item => ({
-          value: item.metal_name, // Metal name for dropdown
-          label: item.metal_name, // Display value
-          hsn_code: item.hsn_code, // Associated HSN Code
-        }));
-        setMetalOptions(metalTypes);
-      } catch (error) {
-        console.error('Error fetching metal types:', error);
-      }
-    };
-
-    fetchMetalTypes();
-  }, []);
-
-  useEffect(() => {
-    if (productDetails.metal === 'Gold') {
-      setProductDetails((prevState) => ({
-        ...prevState,
-        ml_percent: 1, // Set default value for Gold
-      }));
-    } else if (productDetails.metal === 'Silver') {
-      setProductDetails((prevState) => ({
-        ...prevState,
-        ml_percent: 3, // Set default value for Silver
-      }));
-    } else if (!productDetails.metal) {
-      setProductDetails((prevState) => ({
-        ...prevState,
-        ml_percent: '', // Clear ml_percent if metal is cleared
-      }));
-    }
-  }, [productDetails.metal]);
-
-  useEffect(() => {
-    const fetchLastURDPurchaseNumber = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/lastURDPurchaseNumber`);
-        setFormData((prev) => ({
-          ...prev,
-          urdpurchase_number: response.data.lastURDPurchaseNumber,
-        }));
-      } catch (error) {
-        console.error("Error fetching estimate number:", error);
-      }
-    };
-
-    fetchLastURDPurchaseNumber();
-  }, []);
-
-  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
-
-  useEffect(() => {
-    const fetchCurrentRates = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get/current-rates`);
-        console.log('API Response:', response.data);
-
-        setRates({
-          rate_24crt: response.data.rate_24crt || "",
-          rate_22crt: response.data.rate_22crt || "",
-          rate_18crt: response.data.rate_18crt || "",
-          rate_16crt: response.data.rate_16crt || "",
-          rate_silver: response.data.silver_rate || "", // Add rate_silver from the response
-        });
-      } catch (error) {
-        console.error('Error fetching current rates:', error);
-      }
-    };
-
-    fetchCurrentRates();
-  }, []);
-
-  const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
-
-  useEffect(() => {
-    const normalizedMetal = productDetails.metal.toLowerCase();
-    const normalizedPurity = normalizePurity(productDetails.purity);
-
-    const currentRate =
-      normalizedMetal === "silver" && normalizedPurity.includes("22") ? rates.rate_silver :
-        normalizedPurity.includes("24") ? rates.rate_24crt :
-          normalizedPurity.includes("22") ? rates.rate_22crt :
-            normalizedPurity.includes("18") ? rates.rate_18crt :
-              normalizedPurity.includes("16") ? rates.rate_16crt :
-                productDetails.purity === "Other" ? rates.rate_22crt :
-                  0;
-
-    setProductDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
-  }, [productDetails.purity, productDetails.metal, rates]);
-
-
   return (
     <div className="main-container">
       <div className="urdpurchase-form-container">
@@ -637,7 +633,7 @@ const URDPurchase = () => {
                   options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
                 />
               </Col>
-              
+
               {/* <Col xs={12} md={2}>
                 <InputField
                   label="HSN Code"
@@ -672,12 +668,26 @@ const URDPurchase = () => {
                   name="purity"
                   value={productDetails.purity}
                   onChange={handleInputChange}
-                  options={purityOptions.map((purity) => ({
-                    value: purity.name,
-                    label: purity.name,
-                  }))}
+                  options={[
+                    ...purityOptions.map((purity) => ({
+                      value: purity.name,
+                      label: purity.name,
+                    })),
+                    { value: "Manual", label: "Manual" },
+                  ]}
                 />
               </Col>
+              {productDetails.purity === "Manual" && (
+                <Col xs={12} md={2}>
+                  <InputField
+                    label="Custom Purity %"
+                    type="number"
+                    name="purityPercentage"
+                    value={productDetails.purityPercentage || ""}
+                    onChange={handleInputChange}
+                  />
+                </Col>
+              )}
               <Col xs={12} md={1}>
                 <InputField
                   label="ML %"
@@ -743,13 +753,13 @@ const URDPurchase = () => {
                   <th>S.No</th>
                   {/* <th>product ID</th> */}
                   <th>Product</th>
-                  <th>Metal</th>                  
+                  <th>Metal</th>
                   {/* <th>HSN</th> */}
                   <th>Gross</th>
                   <th>Dust</th>
                   <th>Purity</th>
                   <th>ML%</th>
-                  <th>Net WT</th>                  
+                  <th>Net WT</th>
                   <th>Rate</th>
                   <th>Total Value</th>
                   <th>Remarks</th>
@@ -762,13 +772,13 @@ const URDPurchase = () => {
                     <td>{index + 1}</td>
                     {/* <td>{item.product_id}</td> */}
                     <td>{item.product_name}</td>
-                    <td>{item.metal}</td>                    
+                    <td>{item.metal}</td>
                     {/* <td>{item.hsn_code}</td> */}
                     <td>{item.gross}</td>
                     <td>{item.dust}</td>
                     <td>{item.purity}</td>
                     <td>{item.ml_percent}</td>
-                    <td>{item.eqt_wt}</td>                    
+                    <td>{item.eqt_wt}</td>
                     <td>{item.rate}</td>
                     <td>{item.total_amount}</td>
                     <td>{item.remarks}</td>

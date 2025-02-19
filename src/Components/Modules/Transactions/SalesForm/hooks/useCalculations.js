@@ -125,8 +125,6 @@ useEffect(() => {
   
     // Ensure discount is subtracted before tax calculation
     const taxableAmount = rateAmt + stonePrice + makingCharges;
-    console.log("taxableAmount =", taxableAmount);
-  
     const taxAmt = (taxableAmount * taxPercent) / 100;
   
     setFormData((prev) => ({

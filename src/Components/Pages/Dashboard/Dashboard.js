@@ -173,7 +173,40 @@ function Dashboard() {
               New
             </a>
           </div>
+        
+          <div className="metric-card">
+          <Customers selectedCustomerMobile={selectedMobile} />
+          </div>
+          <div className="metric-card">
+          <Suppliers selectedCustomerMobile={selectedMobile} />
+          </div>
+        </div>
+        <div className="row-cards" style={{ marginTop: '15px' }}>
         <div className="metric-card">
+            <Purchases selectedCustomerMobile={selectedMobile} />
+            <a style={{marginRight:'100px'}}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/purchasetable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a 
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/purchase', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+          <div className="metric-card">
             <URDPurchase selectedCustomerMobile={selectedMobile} />
             <a style={{marginRight:'100px'}}
               href="#"
@@ -223,23 +256,15 @@ function Dashboard() {
               New
             </a>
           </div>
-        </div>
-        <div className="row-cards" style={{ marginTop: '15px' }}>
-          <div className="metric-card">
-          <Customers selectedCustomerMobile={selectedMobile} />
-          </div>
-          <div className="metric-card">
-          <Suppliers selectedCustomerMobile={selectedMobile} />
-          </div>
-          <div className="metric-card">
-          <Payables selectedCustomerMobile={selectedMobile} />
-          </div>
+         
+          
           <div className="metric-card">
             <Receivables selectedCustomerMobile={selectedMobile} />
           </div>
           <div className="metric-card">
-            <AmountBilledToday selectedCustomerMobile={selectedMobile} />
+          <Payables selectedCustomerMobile={selectedMobile} />
           </div>
+
         </div>
         <div className="row-cards" style={{ marginTop: '15px',marginBottom:'15px' }}>
         <div className="metric-card">

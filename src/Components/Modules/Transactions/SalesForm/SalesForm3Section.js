@@ -28,7 +28,7 @@ const SalesFormSection = ({ setOldSalesData,
   resetSaleReturnForm,
   handleCheckout
 }) => {
-  console.log("invoiceDetails=", invoiceDetails)
+
   const [activeForm, setActiveForm] = useState("old");
   const navigate = useNavigate();
 

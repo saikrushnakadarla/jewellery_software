@@ -11,7 +11,7 @@ import { Form, Row, Col } from 'react-bootstrap';
 import { Modal, Button } from "react-bootstrap";  // Add this import
 
 const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
-    console.log("Pricing=",selectedProduct.Pricing)
+    console.log("Pricing=", selectedProduct.Pricing)
     const [productDetails, setProductDetails] = useState({
         pcs: selectedProduct?.pcs || 0,
         gross_weight: selectedProduct?.gross_weight || 0,
@@ -152,13 +152,14 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
 
     const isGoldCategory = formData.category && formData.category.toLowerCase().includes("gold");
     const isSilverCategory = formData.category && formData.category.toLowerCase().includes("silver");
+
     useEffect(() => {
         if (isGoldCategory) {
             setFormData((prevData) => ({
                 ...prevData,
                 Making_Charges_On: "MC %",
                 MC_Per_Gram_Label: "MC%",
-                Making_Charges: "", // Clear MC field if hidden
+                Making_Charges: "", // Reset field when hidden
             }));
         } else if (isSilverCategory) {
             setFormData((prevData) => ({
@@ -175,24 +176,38 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     }, [formData.category]);
 
     const handleChange = async (fieldOrEvent, valueArg) => {
-        // Support both event object and direct (field, value) arguments.
+       
         let field, value;
         if (fieldOrEvent && fieldOrEvent.target) {
-            // Called as an event handler: e.g. onChange={handleChange}
+            
             field = fieldOrEvent.target.name;
             value = fieldOrEvent.target.value;
         } else {
-            // Called directly: e.g. onChange={(e) => handleChange("deduct_st_Wt", e.target.value)}
+            
             field = fieldOrEvent;
             value = valueArg;
         }
-
-        // At the top of your component:
-
-
-        // Update state with the new field value.
         setFormData((prevData) => {
             let updatedData = { ...prevData, [field]: value };
+
+            // Update MC field only if Making_Charges_On is "MC / Gram" or "MC / Piece"
+            if (field === "Making_Charges_On") {
+                if (value === "MC / Gram" || value === "MC / Piece") {
+                    updatedData.Making_Charges = prevData.Making_Charges || "";
+                } else {
+                    updatedData.Making_Charges = ""; // Hide field
+                }
+            }
+
+            // Update MC_Per_Gram_Label when Making_Charges_On changes
+            if (field === "Making_Charges_On") {
+                let newLabel = "MC/Gm"; // Default
+                if (value === "MC %") newLabel = "MC%";
+                else if (value === "MC / Gram") newLabel = "MC/Gm";
+                else if (value === "MC / Piece") newLabel = "MC/Gm";
+
+                updatedData.MC_Per_Gram_Label = newLabel;
+            }
 
             // --- Calculate Stones Price ---
             if (field === "Stones_Weight" || field === "stone_price_per_carat") {
@@ -299,25 +314,25 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         e.preventDefault();
 
         // Validate based on the Pricing field selection:
-  if (formData.Pricing === "By fixed") {
-    // For 'By fixed' pricing, only check that PCS is greater than 0.
-    if (pcs <= 0) {
-      alert("The product's PCS must be greater than zero to submit the form.");
-      return;
-    }
-       // Additionally, ensure that Piece Cost is provided and is a valid number.
-       if (!formData.pieace_cost || parseFloat(formData.pieace_cost) <= 0) {
-        alert("Please enter a Piece Cost.");
-        return;
-      }
-    // grossWeight can be 0 or greater.
-  } else {
-    // For pricing other than 'By fixed', both PCS and Gross Weight must be > 0.
-    if (pcs <= 0 || grossWeight <= 0) {
-      alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
-      return;
-    }
-  }
+        if (formData.Pricing === "By fixed") {
+            // For 'By fixed' pricing, only check that PCS is greater than 0.
+            if (pcs <= 0) {
+                alert("The product's PCS must be greater than zero to submit the form.");
+                return;
+            }
+            // Additionally, ensure that Piece Cost is provided and is a valid number.
+            if (!formData.pieace_cost || parseFloat(formData.pieace_cost) <= 0) {
+                alert("Please enter a Piece Cost.");
+                return;
+            }
+            // grossWeight can be 0 or greater.
+        } else {
+            // For pricing other than 'By fixed', both PCS and Gross Weight must be > 0.
+            if (pcs <= 0 || grossWeight <= 0) {
+                alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
+                return;
+            }
+        }
 
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
@@ -422,7 +437,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         prefix: '',
         category: ''
     });
-    const [isSubCategoryAdded, setIsSubCategoryAdded] = useState(false);
 
     const handleModalChange = (e) => {
         const { name, value } = e.target;
@@ -832,6 +846,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                     ]}
                                                 />
                                             </Col>
+
                                             <Col xs={12} md={2}>
                                                 <InputField
                                                     label={formData.MC_Per_Gram_Label}
@@ -840,7 +855,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                     onChange={handleChange}
                                                 />
                                             </Col>
-                                            {isSilverCategory && (
+
+                                            {/* Show Making_Charges field only when Making_Charges_On is "MC / Gram" or "MC / Piece" */}
+                                            {(formData.Making_Charges_On === "MC / Gram" || formData.Making_Charges_On === "MC / Piece") && (
                                                 <Col xs={12} md={2}>
                                                     <InputField
                                                         label="MC"
@@ -850,6 +867,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                     />
                                                 </Col>
                                             )}
+
+
                                             <Col xs={12} md={2}>
                                                 <InputField
                                                     label="Wastage On"
@@ -914,18 +933,18 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                         </>
                                     )}
 
-                                       {formData.Pricing === "By fixed" && (
-                                      <Col xs={12} md={2}>
-                                        <InputField
-                                          label="Piece Cost"
-                                          type="number"
-                                          value={formData.pieace_cost}
-                                          onChange={(e) => handleChange("pieace_cost", e.target.value)}
-                                       
-                                        />
-                                      </Col>
+                                    {formData.Pricing === "By fixed" && (
+                                        <Col xs={12} md={2}>
+                                            <InputField
+                                                label="Piece Cost"
+                                                type="number"
+                                                value={formData.pieace_cost}
+                                                onChange={(e) => handleChange("pieace_cost", e.target.value)}
+
+                                            />
+                                        </Col>
                                     )}
-                                    
+
                                 </Row>
 
                             </div>

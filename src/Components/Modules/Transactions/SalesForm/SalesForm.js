@@ -471,11 +471,11 @@ const handleEdit = (index) => {
     const discountAmt = parseFloat(item.disscount) || 0;
     return sum + stonePrice + makingCharges + rateAmt - discountAmt;
   }, 0);
-  console.log("Total Price=", taxableAmount)
+ 
 
   const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
-  console.log("Net Amount=", netAmount)
+
 
   const totalAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
@@ -483,13 +483,13 @@ const handleEdit = (index) => {
     const rateAmt = parseFloat(item.rate_amt) || 0;
     return sum + stonePrice + makingCharges + rateAmt;
   }, 0);
-  console.log("Total Price=", totalAmount)
+
 
   const discountAmt = repairDetails.reduce((sum, item) => {
     const discountAmt = parseFloat(item.disscount) || 0;
     return sum + discountAmt;
   }, 0);
-  console.log("Total Price=", discountAmt)
+
 
   const oldItemsAmount = location.state?.old_exchange_amt
     ? parseFloat(location.state.old_exchange_amt)
@@ -599,8 +599,6 @@ const handleEdit = (index) => {
   }, 0);
 
   const salesNetAmount = salesTaxableAmount + salesTaxAmount;
-  console.log("salesTaxableAmount=", salesTaxableAmount)
-
 
   const clearData = () => {
     setOldSalesData([]);
