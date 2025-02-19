@@ -290,87 +290,171 @@ const RepairForm = () => {
     }
   };
 
+  // const handleInputChange = (e) => {
+  //   const { name, value } = e.target;
+
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+
+  //   // Trigger recalculation for Total MC when relevant fields are updated
+  //   if (
+  //     formData.metal_type?.toLowerCase() === "gold" &&
+  //     (name === "mc_per_gram" || name === "rate_amt")
+  //   ) {
+  //     const updatedMcPercentage = parseFloat(
+  //       name === "mc_per_gram" ? value : formData.mc_per_gram
+  //     ) || 0;
+  //     const updatedRateAmount = parseFloat(
+  //       name === "rate_amt" ? value : formData.rate_amt
+  //     ) || 0;
+
+  //     const calculatedTotalMC = (updatedMcPercentage / 100) * updatedRateAmount;
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       total_mc: calculatedTotalMC.toFixed(2),
+  //     }));
+  //   }
+
+  //   const { product_name, metal_type, design_name, purity } = {
+  //     ...formData,
+  //     [name]: value,
+  //   };
+
+  //   if (product_name && metal_type && design_name && purity) {
+  //     const matchingEntries = data.filter(
+  //       (prod) =>
+  //         prod.sub_category === product_name &&
+  //         prod.metal_type === metal_type &&
+  //         prod.design_master === design_name &&
+  //         prod.Purity === purity
+  //     );
+
+  //     if (matchingEntries.length > 0) {
+  //       if (matchingEntries.length > 1) {
+  //         setFormData((prevData) => ({
+  //           ...prevData,
+  //           barcodeOptions: matchingEntries.map((entry) => ({
+  //             value: entry.PCode_BarCode,
+  //             label: entry.PCode_BarCode,
+  //           })),
+  //         }));
+  //       } else if (matchingEntries.length === 1) {
+  //         const matchingEntry = matchingEntries[0];
+  //         const productId = matchingEntry.product_id;
+  //         const productDetails = products.find(
+  //           (prod) => String(prod.product_id) === String(productId)
+  //         );
+
+  //         setFormData((prevData) => ({
+  //           ...prevData,
+  //           code: matchingEntry.PCode_BarCode,
+  //           category: matchingEntry.category,
+  //           sub_category: matchingEntry.sub_category,
+  //           gross_weight: matchingEntry.Gross_Weight,
+  //           stones_weight: matchingEntry.Stones_Weight || "",
+  //           stones_price: matchingEntry.Stones_Price || "",
+  //           weight_bw: matchingEntry.Weight_BW || "",
+  //           wastage_on: matchingEntry.Wastage_On || "",
+  //           wastage_percent: matchingEntry.Wastage_Percentage || "",
+  //           wastage_weight: matchingEntry.WastageWeight || "",
+  //           total_weight: matchingEntry.TotalWeight_AW || "",
+  //           making_charges_on: matchingEntry.Making_Charges_On || "",
+  //           mc_per_gram: matchingEntry.MC_Per_Gram || "",
+  //           total_mc: matchingEntry.Making_Charges || "",
+  //           tax_percent: productDetails?.tax_slab || "",
+  //           qty: 1,
+  //           barcodeOptions: [],
+  //         }));
+  //       }
+  //     }
+  //   }
+  // };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-
-    // Trigger recalculation for Total MC when relevant fields are updated
-    if (
-      formData.metal_type?.toLowerCase() === "gold" &&
-      (name === "mc_per_gram" || name === "rate_amt")
-    ) {
-      const updatedMcPercentage = parseFloat(
-        name === "mc_per_gram" ? value : formData.mc_per_gram
-      ) || 0;
-      const updatedRateAmount = parseFloat(
-        name === "rate_amt" ? value : formData.rate_amt
-      ) || 0;
-
-      const calculatedTotalMC = (updatedMcPercentage / 100) * updatedRateAmount;
-      setFormData((prevData) => ({
+  
+    setFormData((prevData) => {
+      let updatedData = {
         ...prevData,
-        total_mc: calculatedTotalMC.toFixed(2),
-      }));
-    }
-
-    const { product_name, metal_type, design_name, purity } = {
-      ...formData,
-      [name]: value,
-    };
-
-    if (product_name && metal_type && design_name && purity) {
-      const matchingEntries = data.filter(
-        (prod) =>
-          prod.sub_category === product_name &&
-          prod.metal_type === metal_type &&
-          prod.design_master === design_name &&
-          prod.Purity === purity
-      );
-
-      if (matchingEntries.length > 0) {
-        if (matchingEntries.length > 1) {
-          setFormData((prevData) => ({
-            ...prevData,
-            barcodeOptions: matchingEntries.map((entry) => ({
+        [name]: value,
+      };
+  
+      // Reset `mc_per_gram` and `total_mc` when `making_charges_on` changes
+      if (name === "making_charges_on") {
+        updatedData.mc_per_gram = "";
+        updatedData.total_mc = "";
+      }
+  
+      // Trigger recalculation for Total MC when relevant fields are updated
+      if (
+        updatedData.metal_type?.toLowerCase() === "gold" &&
+        (name === "mc_per_gram" || name === "rate_amt")
+      ) {
+        const updatedMcPercentage = parseFloat(
+          name === "mc_per_gram" ? value : updatedData.mc_per_gram
+        ) || 0;
+        const updatedRateAmount = parseFloat(
+          name === "rate_amt" ? value : updatedData.rate_amt
+        ) || 0;
+  
+        const calculatedTotalMC = (updatedMcPercentage / 100) * updatedRateAmount;
+        updatedData.total_mc = calculatedTotalMC.toFixed(2);
+      }
+  
+      const { product_name, metal_type, design_name, purity } = updatedData;
+  
+      if (product_name && metal_type && design_name && purity) {
+        const matchingEntries = data.filter(
+          (prod) =>
+            prod.sub_category === product_name &&
+            prod.metal_type === metal_type &&
+            prod.design_master === design_name &&
+            prod.Purity === purity
+        );
+  
+        if (matchingEntries.length > 0) {
+          if (matchingEntries.length > 1) {
+            updatedData.barcodeOptions = matchingEntries.map((entry) => ({
               value: entry.PCode_BarCode,
               label: entry.PCode_BarCode,
-            })),
-          }));
-        } else if (matchingEntries.length === 1) {
-          const matchingEntry = matchingEntries[0];
-          const productId = matchingEntry.product_id;
-          const productDetails = products.find(
-            (prod) => String(prod.product_id) === String(productId)
-          );
-
-          setFormData((prevData) => ({
-            ...prevData,
-            code: matchingEntry.PCode_BarCode,
-            category: matchingEntry.category,
-            sub_category: matchingEntry.sub_category,
-            gross_weight: matchingEntry.Gross_Weight,
-            stones_weight: matchingEntry.Stones_Weight || "",
-            stones_price: matchingEntry.Stones_Price || "",
-            weight_bw: matchingEntry.Weight_BW || "",
-            wastage_on: matchingEntry.Wastage_On || "",
-            wastage_percent: matchingEntry.Wastage_Percentage || "",
-            wastage_weight: matchingEntry.WastageWeight || "",
-            total_weight: matchingEntry.TotalWeight_AW || "",
-            making_charges_on: matchingEntry.Making_Charges_On || "",
-            mc_per_gram: matchingEntry.MC_Per_Gram || "",
-            total_mc: matchingEntry.Making_Charges || "",
-            tax_percent: productDetails?.tax_slab || "",
-            qty: 1,
-            barcodeOptions: [],
-          }));
+            }));
+          } else if (matchingEntries.length === 1) {
+            const matchingEntry = matchingEntries[0];
+            const productId = matchingEntry.product_id;
+            const productDetails = products.find(
+              (prod) => String(prod.product_id) === String(productId)
+            );
+  
+            updatedData = {
+              ...updatedData,
+              code: matchingEntry.PCode_BarCode,
+              category: matchingEntry.category,
+              sub_category: matchingEntry.sub_category,
+              gross_weight: matchingEntry.Gross_Weight,
+              stones_weight: matchingEntry.Stones_Weight || "",
+              stones_price: matchingEntry.Stones_Price || "",
+              weight_bw: matchingEntry.Weight_BW || "",
+              wastage_on: matchingEntry.Wastage_On || "",
+              wastage_percent: matchingEntry.Wastage_Percentage || "",
+              wastage_weight: matchingEntry.WastageWeight || "",
+              total_weight: matchingEntry.TotalWeight_AW || "",
+              making_charges_on: matchingEntry.Making_Charges_On || "",
+              mc_per_gram: matchingEntry.MC_Per_Gram || "",
+              total_mc: matchingEntry.Making_Charges || "",
+              tax_percent: productDetails?.tax_slab || "",
+              qty: 1,
+              barcodeOptions: [],
+            };
+          }
         }
       }
-    }
+  
+      return updatedData;
+    });
   };
+  
 
   useEffect(() => {
     const fetchCategory = async () => {

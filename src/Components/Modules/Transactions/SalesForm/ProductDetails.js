@@ -336,7 +336,7 @@ const ProductDetails = ({
                 label="MC On"
                 name="mc_on"
                 type="select"
-                value={formData.mc_on || ""} // Default to "MC / Gram"
+                value={formData.mc_on || ""}
                 onChange={handleChange}
                 options={[
                   { value: "MC / Gram", label: "MC / Gram" },
@@ -349,26 +349,27 @@ const ProductDetails = ({
                 ]}
               />
             </Col>
+
             <Col xs={12} md={1}>
               <InputField
-                label={
-                  formData.mc_on === "MC %"
-                    ? "MC %"
-                    : "MC/Gm"
-                }
+                label={formData.mc_on === "MC %" ? "MC %" : "MC/Gm"}
                 name="mc_per_gram"
                 value={formData.mc_per_gram || ""}
                 onChange={handleChange}
+                disabled={formData.mc_on === "MC / Piece"} // Disable when MC / Piece is selected
               />
             </Col>
+
             <Col xs={12} md={1}>
               <InputField
                 label="Total MC"
                 name="making_charges"
                 value={formData.making_charges || ""}
                 onChange={handleChange}
+                disabled={formData.mc_on === "MC / Gram"} // Disable when MC / Gram is selected
               />
             </Col>
+
 
             <Col xs={12} md={2}>
               <InputField
