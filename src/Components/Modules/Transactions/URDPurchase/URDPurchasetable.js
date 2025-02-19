@@ -30,26 +30,26 @@ const RepairsTable = () => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
-   const [formData, setFormData] = useState({
-      customer_id: "",
-      account_name: "",
-      mobile: "",
-      email: "",
-      address1: "",
-      address2: "",
-      address3: "",
-      city: "",
-      state: "",
-      state_code: "",
-      aadhar_card: "",
-      gst_in: "",
-      pan_card: "",
-      // date: today,
-      urdpurchase_number: "",
-  
-  
-    });
- const [productDetails, setProductDetails] = useState({
+  const [formData, setFormData] = useState({
+    customer_id: "",
+    account_name: "",
+    mobile: "",
+    email: "",
+    address1: "",
+    address2: "",
+    address3: "",
+    city: "",
+    state: "",
+    state_code: "",
+    aadhar_card: "",
+    gst_in: "",
+    pan_card: "",
+    // date: today,
+    urdpurchase_number: "",
+
+
+  });
+  const [productDetails, setProductDetails] = useState({
     product_id: "",
     product_name: "",
     metal: "",
@@ -118,91 +118,69 @@ const RepairsTable = () => {
   //   setShowEditModal(true);
   // };
 
-    // Function to parse purity value to percentage
-    const parsePurityToPercentage = (purity) => {
-      if (!purity) return null;
-  
-      const match = purity.match(/(\d+)(k|K)/); // Match formats like "22K", "24k", etc.
-      if (match) {
-        const caratValue = parseInt(match[1], 10); // Extract carat number
+  // Function to parse purity value to percentage
+  const parsePurityToPercentage = (purity) => {
+    if (!purity) return null;
+    const match = purity.match(/(\d+)(k|K|kt|KT)?/);
+    if (match) {
+      const caratValue = parseInt(match[1], 10); // Extract carat number
+      if (caratValue) {
         return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
       }
-  
-      // Handle other formats like "916HM" directly if required
-      if (purity.toLowerCase() === "916hm") return 91.6;
-  
-      return null; // Default if no match
-    };
+    }
+    if (purity.toLowerCase() === "916hm") return 91.6;
+    return null;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData(prevState => {
-      const updatedData = { ...prevState, [name]: value };
+    setProductDetails((prevDetails) => {
+      const updatedDetails = { ...prevDetails, [name]: value };
 
-      if (name === "purity") {
-        // Update the rate based on the selected purity
-        const rate =
-          value === "24K" ? rates.rate_24crt :
-            value === "22K" ? rates.rate_22crt :
-              value === "18K" ? rates.rate_18crt :
-                value === "16K" ? rates.rate_16crt :
-                  "";
-
-        updatedDetails.rate = rate;
+      if (name === "metal") {
+        updatedDetails.purity = ""; // Reset purity when metal changes
+        updatedDetails.purityPercentage = ""; // Reset purity percentage
+        // Set rate based on metal type selection
+        if (value === "Silver") {
+          updatedDetails.rate = rates.rate_silver || "0.00"; // Set silver rate if metal is silver
+        } else {
+          updatedDetails.rate = ""; // Reset rate for other metals
+        }
       }
 
-      // Update HSN Code based on selected metal
-      if (name === 'metal') {
-        const selectedMetal = metalOptions.find(option => option.value === value);
-        updatedData.hsn_code = selectedMetal ? selectedMetal.hsn_code : '';
+      if (name === "purity" && value !== "Other") {
+        updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
+      } else if (name === "purityPercentage") {
+        updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
       }
 
-      return updatedData;
+      // Update calculations
+      updatedDetails.eqt_wt = calculateNetWeight(updatedDetails);
+      updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
+
+      return updatedDetails;
     });
+  };
 
-    // Update the product details
-    const updatedDetails = {
-      ...productDetails,
-      [name]: value,
-    };
+  const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
+    const purityPercentageValue = purity === "Other"
+      ? parseFloat(purityPercentage) || 0
+      : parsePurityToPercentage(purity) || 0;
 
-    // Calculate Net WT based on updated details
-    if (
-      updatedDetails.gross &&
-      updatedDetails.dust &&
-      updatedDetails.ml_percent &&
-      updatedDetails.purity
-    ) {
-      const purityValue = parsePurityToPercentage(updatedDetails.purity);
+    const grossWeight = parseFloat(gross) || 0;
+    const dustWeight = parseFloat(dust) || 0;
+    const mlPercentValue = parseFloat(ml_percent) || 0;
 
-      if (purityValue) {
-        const gross = parseFloat(updatedDetails.gross) || 0;
-        const dust = parseFloat(updatedDetails.dust) || 0;
-        const mlPercent = parseFloat(updatedDetails.ml_percent) || 0;
+    const netWeight = ((grossWeight - dustWeight) * (purityPercentageValue - mlPercentValue)) / 100;
+    return parseFloat(netWeight.toFixed(2));
+  };
+  const calculateTotalAmount = ({ eqt_wt, rate }, currentRate) => {
+    const netWeight = Number(eqt_wt) || 0;
+    const rateAmount = Number(rate) || Number(currentRate) || 0;
 
-        const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
-
-        updatedDetails.eqt_wt = netWeight.toFixed(2); // Display as a string with 2 decimal points
-      }
-    }
-
-    // Recalculate Amount when Net WT or Rate changes
-    if (updatedDetails.eqt_wt && updatedDetails.rate) {
-      const netWT = parseFloat(updatedDetails.eqt_wt) || 0;
-      const rate = parseFloat(updatedDetails.rate) || 0;
-
-      const totalAmount = netWT * rate; // Calculate Amount
-      updatedDetails.total_amount = totalAmount.toFixed(2); // Display as a string with 2 decimal points
-    }
-
-    setProductDetails(updatedDetails);
-
-    setProductDetails(updatedDetails);
-    setProductDetails((prevDetails) => ({
-      ...prevDetails,
-      [name]: value,
-    }));
+    const totalAmount = netWeight * rateAmount;
+    return Number(totalAmount.toFixed(2));
   };
 
 
@@ -218,7 +196,7 @@ const RepairsTable = () => {
           body: JSON.stringify(formData),
         }
       );
-  
+
       if (response.ok) {
         setShowEditModal(false);
         alert('Record updated successfully.');
@@ -231,27 +209,27 @@ const RepairsTable = () => {
     }
   };
   const [metalOptions, setMetalOptions] = useState([]);
- const [purityOptions, setPurityOptions] = useState([]);
+  const [purityOptions, setPurityOptions] = useState([]);
 
- const handleEdit = (row) => {
-  setFormData(row);
-  setProductDetails({
-    product_id: row.product_id,
-    product_name: row.product_name,
-    metal: row.metal,
-    purity: row.purity,
-    hsn_code: row.hsn_code,
-    gross: row.gross,
-    dust: row.dust,
-    touch_percent: row.touch_percent,
-    ml_percent: row.ml_percent,
-    eqt_wt: row.eqt_wt,
-    remarks: row.remarks,
-    rate: row.rate,
-    total_amount: row.total_amount,
-  });
-  setShowEditModal(true);
-};
+  const handleEdit = (row) => {
+    setFormData(row);
+    setProductDetails({
+      product_id: row.product_id,
+      product_name: row.product_name,
+      metal: row.metal,
+      purity: row.purity,
+      hsn_code: row.hsn_code,
+      gross: row.gross,
+      dust: row.dust,
+      touch_percent: row.touch_percent,
+      ml_percent: row.ml_percent,
+      eqt_wt: row.eqt_wt,
+      remarks: row.remarks,
+      rate: row.rate,
+      total_amount: row.total_amount,
+    });
+    setShowEditModal(true);
+  };
 
   const handleDelete = async (urdpurchase_number) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this record?");
@@ -289,8 +267,8 @@ const RepairsTable = () => {
     fetchPurity();
   }, []);
 
- 
-   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
+
+  // const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
 
   useEffect(() => {
     const fetchMetalTypes = async () => {
@@ -347,7 +325,97 @@ const RepairsTable = () => {
 
   const [rateOptions, setRateOptions] = useState([]);
 
- 
+
+  useEffect(() => {
+    const fetchAndFilterPurity = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+        const allPurityOptions = response.data;
+
+        // Filter purity options based on selected metal
+        const filteredPurityOptions = allPurityOptions.filter(
+          (option) => option.metal === productDetails.metal
+        );
+
+        // Normalize and find default purity that includes "22" in any form
+        const defaultPurity =
+          filteredPurityOptions.find(option =>
+            option.name.toLowerCase().replace(/\s/g, "").includes("22k")
+          )?.name || "";
+
+        // Update state with filtered purities and set the default purity
+        setPurityOptions(filteredPurityOptions);
+        setProductDetails((prevDetails) => ({
+          ...prevDetails,
+          purity: defaultPurity, // Set default purity
+        }));
+      } catch (error) {
+        console.error("Error fetching purity options:", error);
+      }
+    };
+
+    // Fetch and filter purities when metal changes
+    if (productDetails.metal) {
+      fetchAndFilterPurity();
+    }
+  }, [productDetails.metal]);
+
+  // const [metalOptions, setMetalOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchMetalTypes = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/metaltype`);
+        const metalTypes = response.data.map(item => ({
+          value: item.metal_name, // Metal name for dropdown
+          label: item.metal_name, // Display value
+          hsn_code: item.hsn_code, // Associated HSN Code
+        }));
+        setMetalOptions(metalTypes);
+      } catch (error) {
+        console.error('Error fetching metal types:', error);
+      }
+    };
+
+    fetchMetalTypes();
+  }, []);
+
+  useEffect(() => {
+    if (productDetails.metal === 'Gold') {
+      setProductDetails((prevState) => ({
+        ...prevState,
+        ml_percent: 1, // Set default value for Gold
+      }));
+    } else if (productDetails.metal === 'Silver') {
+      setProductDetails((prevState) => ({
+        ...prevState,
+        ml_percent: 3, // Set default value for Silver
+      }));
+    } else if (!productDetails.metal) {
+      setProductDetails((prevState) => ({
+        ...prevState,
+        ml_percent: '', // Clear ml_percent if metal is cleared
+      }));
+    }
+  }, [productDetails.metal]);
+
+  useEffect(() => {
+    const fetchLastURDPurchaseNumber = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/lastURDPurchaseNumber`);
+        setFormData((prev) => ({
+          ...prev,
+          urdpurchase_number: response.data.lastURDPurchaseNumber,
+        }));
+      } catch (error) {
+        console.error("Error fetching estimate number:", error);
+      }
+    };
+
+    fetchLastURDPurchaseNumber();
+  }, []);
+
+  const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -355,30 +423,39 @@ const RepairsTable = () => {
         const response = await axios.get(`${baseURL}/get/current-rates`);
         console.log('API Response:', response.data);
 
-        // Log the 24crt rate separately
-        console.log('24crt Rate:', response.data.rate_24crt);
-
-        // Dynamically set the rates based on response
         setRates({
           rate_24crt: response.data.rate_24crt || "",
           rate_22crt: response.data.rate_22crt || "",
           rate_18crt: response.data.rate_18crt || "",
           rate_16crt: response.data.rate_16crt || "",
+          rate_silver: response.data.silver_rate || "", // Add rate_silver from the response
         });
       } catch (error) {
         console.error('Error fetching current rates:', error);
       }
     };
+
     fetchCurrentRates();
   }, []);
 
+  const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
 
-  const currentRate =
-    productDetails.purity === "24K" ? rates.rate_24crt :
-      productDetails.purity === "22K" ? rates.rate_22crt :
-        productDetails.purity === "18K" ? rates.rate_18crt :
-          productDetails.purity === "16K" ? rates.rate_16crt :
-            "";
+  useEffect(() => {
+    const normalizedMetal = productDetails.metal.toLowerCase();
+    const normalizedPurity = normalizePurity(productDetails.purity);
+
+    const currentRate =
+      normalizedMetal === "silver" && normalizedPurity.includes("22") ? rates.rate_silver :
+        normalizedPurity.includes("24") ? rates.rate_24crt :
+          normalizedPurity.includes("22") ? rates.rate_22crt :
+            normalizedPurity.includes("18") ? rates.rate_18crt :
+              normalizedPurity.includes("16") ? rates.rate_16crt :
+                productDetails.purity === "Other" ? rates.rate_22crt :
+                  0;
+
+    setProductDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
+  }, [productDetails.purity, productDetails.metal, rates]);
+
 
 
 
@@ -407,16 +484,16 @@ const RepairsTable = () => {
               }}
               onClick={() => handleEdit(row.original)}
             />
-              
+
             <FaTrash
-               style={{
+              style={{
                 cursor: 'pointer',
                 marginLeft: '10px',
                 color: 'red',
               }}
               onClick={() => handleDelete(row.original.urdpurchase_number)}
             />
-              
+
           </>
         ),
       },
@@ -424,7 +501,7 @@ const RepairsTable = () => {
     []
   );
 
-  
+
 
   return (
     <div className="main-container">
@@ -445,131 +522,131 @@ const RepairsTable = () => {
         <DataTable columns={columns} data={data} initialSearchValue={initialSearchValue} />
 
         {/* Edit Modal */}
-        <Modal 
-  show={showEditModal} 
-  onHide={() => setShowEditModal(false)} 
-  dialogClassName="custom-modal-width"
->
-  <Modal.Header closeButton>
-    <Modal.Title>Edit Record</Modal.Title>
-  </Modal.Header>
-  <Modal.Body style={{ backgroundColor: "rgba(163, 110, 41, 0.08)" }}>
-    <Row>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Product"
-          name="product_name"
-          value={productDetails.product_name}
-          onChange={handleInputChange}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Metal"
-          name="metal"
-          type="select"
-          value={formData.metal}
-          onChange={handleInputChange}
-          options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Purity"
-          type="select"
-          name="purity"
-          value={productDetails.purity}
-          onChange={handleInputChange}
-          options={purityOptions.map((purity) => ({
-            value: purity.name,
-            label: purity.name,
-          }))}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="HSN Code"
-          name="hsn_code"
-          type="text"
-          value={formData.hsn_code}
-          onChange={handleInputChange}
-          readOnly // Make it read-only
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Gross"
-          type="number"
-          name="gross"
-          value={productDetails.gross}
-          onChange={handleInputChange}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Dust"
-          type="number"
-          name="dust"
-          value={productDetails.dust}
-          onChange={handleInputChange}
-        />
-      </Col>
-      <Col xs={12} md={1}>
-        <InputField
-          label="ML %"
-          type="number"
-          name="ml_percent"
-          value={productDetails.ml_percent}
-          onChange={handleInputChange}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Net WT"
-          type="number"
-          name="eqt_wt"
-          value={productDetails.eqt_wt}
-          onChange={handleInputChange}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Rate"
-          name="rate"
-          value={productDetails.rate || currentRate}
-          onChange={handleInputChange}
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Amount"
-          type="number"
-          name="total_amount"
-          value={productDetails.total_amount}
-          onChange={handleInputChange}
-          readOnly
-        />
-      </Col>
-      <Col xs={12} md={2}>
-        <InputField
-          label="Remarks"
-          type="text"
-          name="remarks"
-          value={productDetails.remarks}
-          onChange={handleInputChange}
-        />
-      </Col>
-    </Row>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-      Cancel
-    </Button>
-    <Button variant="primary" onClick={handleSaveEdit}>
-      Save Changes
-    </Button>
-  </Modal.Footer>
-</Modal>
+        <Modal
+          show={showEditModal}
+          onHide={() => setShowEditModal(false)}
+          dialogClassName="custom-modal-width"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Record</Modal.Title>
+          </Modal.Header>
+          <Modal.Body style={{ backgroundColor: "rgba(163, 110, 41, 0.08)" }}>
+            <Row>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Product"
+                  name="product_name"
+                  value={productDetails.product_name}
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Metal"
+                  name="metal"
+                  type="select"
+                  value={formData.metal}
+                  onChange={handleInputChange}
+                  options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Purity"
+                  type="select"
+                  name="purity"
+                  value={productDetails.purity}
+                  onChange={handleInputChange}
+                  options={purityOptions.map((purity) => ({
+                    value: purity.name,
+                    label: purity.name,
+                  }))}
+                />
+              </Col>
+              {/* <Col xs={12} md={2}>
+                <InputField
+                  label="HSN Code"
+                  name="hsn_code"
+                  type="text"
+                  value={formData.hsn_code}
+                  onChange={handleInputChange}
+                  readOnly // Make it read-only
+                />
+              </Col> */}
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Gross"
+                  type="number"
+                  name="gross"
+                  value={productDetails.gross}
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Dust"
+                  type="number"
+                  name="dust"
+                  value={productDetails.dust}
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField
+                  label="ML %"
+                  type="number"
+                  name="ml_percent"
+                  value={productDetails.ml_percent}
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Net WT"
+                  type="number"
+                  name="eqt_wt"
+                  value={productDetails.eqt_wt}
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Rate"
+                  name="rate"
+                  value={productDetails.rate}
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Amount"
+                  type="number"
+                  name="total_amount"
+                  value={productDetails.total_amount}
+                  onChange={handleInputChange}
+                  readOnly
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Remarks"
+                  type="text"
+                  name="remarks"
+                  value={productDetails.remarks}
+                  onChange={handleInputChange}
+                />
+              </Col>
+            </Row>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={handleSaveEdit}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
 
 
       </div>

@@ -562,6 +562,22 @@ const URDPurchase = () => {
         rateCut === 0
           ? (parseFloat(updatedFormData.total_pure_wt) - paid_pure_weight).toFixed(2)
           : "0";
+
+            // Helper function to extract purity percentage from the selected purity option
+    const extractPurityPercentage = (purityValue) => {
+      if (!purityValue) return 0;
+      const matchedPurity = purityOptions.find((option) =>
+        purityValue.includes(option.name)
+      );
+      return matchedPurity ? parseFloat(matchedPurity.purity_percentage) || 0 : 0;
+    };
+
+    // Calculate Pure Weight when net_weight or purity changes
+    if (field === "net_weight" || field === "purity") {
+      const netWeight = parseFloat(updatedFormData.net_weight) || 0;
+      const purityPercentage = extractPurityPercentage(updatedFormData.purity);
+      updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
+    }
   
       return updatedFormData;
     });
@@ -983,38 +999,37 @@ if (!formData.mobile || formData.mobile.trim() === "") {
       if (!formData.category) {
         setFormData((prev) => ({
           ...prev,
-          purity: "", // Clear purity
-          rate: "",   // Clear rate
+          purity: "",
+          rate: "",
         }));
         setPurityOptions([]);
         return;
       }
-
+  
       if (!formData.metal_type) {
         setPurityOptions([]);
         return;
       }
-
+  
       try {
         const response = await axios.get(`${baseURL}/purity`);
-
-        // Filter purity options based on selected metal type
+  
         const filteredPurity = response.data.filter(
           (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
         );
-
+  
         setPurityOptions(filteredPurity);
         console.log("Purity Options:", filteredPurity);
-
+  
         let defaultOption = null;
-
+  
         if (formData.metal_type.toLowerCase() === "gold") {
           defaultOption = filteredPurity.find((option) =>
             ["22k", "22 kt", "22"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
-
+  
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -1023,23 +1038,22 @@ if (!formData.mobile || formData.mobile.trim() === "") {
             }));
           }
         }
-
+  
         if (formData.metal_type.toLowerCase() === "silver") {
           const silver22K = filteredPurity.find((option) =>
             ["22k", "22 kt", "22"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
-
+  
           const silver24K = filteredPurity.find((option) =>
             ["24k", "24 kt", "24"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
-
-          // Set default priority: 24K > 22K
+  
           defaultOption = silver24K || silver22K;
-
+  
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -1052,7 +1066,7 @@ if (!formData.mobile || formData.mobile.trim() === "") {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     if (formData.category) {
       fetchPurity();
     } else {
@@ -1064,7 +1078,7 @@ if (!formData.mobile || formData.mobile.trim() === "") {
       setPurityOptions([]);
     }
   }, [formData.metal_type, formData.category]);
-
+  
 
   const handleOpenModal = (data) => {
     setSelectedProduct(data);

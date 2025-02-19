@@ -199,6 +199,19 @@ const useProductHandlers = () => {
       [name]: value,
     }));
 
+    if (name === "mc_on") {
+      if (value !== formData.mc_on) {
+        // Reset values only when changing from the tag's initial value
+        if (!formData.isTagSelected) {
+          updatedFormData.mc_per_gram = "0";
+          updatedFormData.making_charges = "0";
+        } else {
+          updatedFormData.mc_per_gram = formData.mc_per_gram; // Keep previous value
+          updatedFormData.making_charges = formData.making_charges; // Keep previous value
+        }
+      }
+    }
+
     if (name === "purity" || name === "metal_type") {
       if (formData.metal_type.toLowerCase() === "gold") {
         // Check for different purity values and set the rate accordingly for gold
@@ -280,6 +293,8 @@ const useProductHandlers = () => {
     setFormData(updatedFormData);
   };
 
+ 
+  
   const handleProductNameChange = (productName) => {
     const productEntries = data.filter((prod) => prod.sub_category === productName);
 
