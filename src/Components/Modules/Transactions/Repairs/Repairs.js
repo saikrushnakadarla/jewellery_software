@@ -356,6 +356,7 @@ const RepairForm = () => {
                             label: customer.mobile, // Display mobile as the label
                           })),
                         ]}
+                        autoFocus
                       />
                     </div>
                     <AiOutlinePlus

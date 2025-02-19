@@ -13,6 +13,7 @@ const InputField = ({
   options = [],
   required = false,
   max,
+  autoFocus
 }) => {
   // Custom styles for react-select
   const customStyles = {
@@ -64,6 +65,7 @@ const InputField = ({
           styles={customStyles}
           menuPortalTarget={document.body}
           isClearable
+          autoFocus={autoFocus}
         />
         
         ) : (
@@ -77,6 +79,7 @@ const InputField = ({
             onChange={onChange}
             required={required}
             max={max}
+            autoFocus={autoFocus}
           />
         )}
       </div>
