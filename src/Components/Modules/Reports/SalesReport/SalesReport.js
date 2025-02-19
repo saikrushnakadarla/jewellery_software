@@ -27,7 +27,11 @@ const RepairsTable = () => {
         Cell: ({ value }) => formatDate(value), // Format date value
       },
       {
-        Header: 'Invoice Number',
+        Header: 'Mobile Number',
+        accessor: 'mobile',
+      },
+      {
+        Header: 'Invoice No.',
         accessor: 'invoice_number',
       },
       {
@@ -37,12 +41,48 @@ const RepairsTable = () => {
       {
         Header: 'Total Amt',
         accessor: 'net_amount',
-        Cell: ({ value }) => value || '-', // Handle cases with missing values
+        Cell: ({ value }) => value || 0
       },
       {
-        Header: 'Paid Amount',
-        accessor: 'paid_amount',
-        Cell: ({ row }) => row.original.net_amount || '-', // Use `net_amount` for now
+        Header: 'Old Amt',
+        accessor: 'old_exchange_amt',
+        Cell: ({ value }) => value || 0
+      },
+      {
+        Header: 'Scheme Amt',
+        accessor: 'scheme_amt',
+        Cell: ({ value }) => value || 0
+      },
+      {
+        Header: 'Net Amt',
+        accessor: 'net_bill_amount',
+        Cell: ({ value }) => value || 0
+      },
+      {
+        Header: 'Paid Amt',
+        accessor: 'paid_amt',
+        Cell: ({ row }) => {
+          const paid_amt = Number(row.original.paid_amt) || 0;
+          const receipts_amt = Number(row.original.receipts_amt) || 0;
+          const totalPaid = (paid_amt + receipts_amt).toFixed(2);      
+          return totalPaid;
+        },
+      },
+      {
+        Header: 'Bal Amt',
+        accessor: 'bal_amt',
+        Cell: ({ row }) => {
+          const bal_amt = Number(row.original.bal_amt) || 0;
+          const bal_after_receipts = Number(row.original.bal_after_receipts) || 0;
+          const receipts_amt = Number(row.original.receipts_amt) || 0;      
+          let finalBalance;
+          if (bal_amt === receipts_amt) {
+            finalBalance = bal_after_receipts || 0;
+          } else {
+            finalBalance = bal_after_receipts ? bal_after_receipts : bal_amt || 0;
+          }      
+          return finalBalance.toFixed(2);
+        },
       },
       {
         Header: 'Actions',
@@ -82,10 +122,10 @@ const RepairsTable = () => {
     const fetchRepairs = async () => {
       try {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
-        
+
         // Filter the data based on the 'transaction_status' column
         const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
-        
+
         setData(filteredData); // Set the filtered data
         setLoading(false);
       } catch (error) {
@@ -93,10 +133,10 @@ const RepairsTable = () => {
         setLoading(false);
       }
     };
-  
+
     fetchRepairs();
   }, []);
-  
+
   const handleEdit = (id) => {
     navigate(`/repairs/edit/${id}`);
   };
@@ -144,7 +184,7 @@ const RepairsTable = () => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <DataTable columns={columns} data={[...data].reverse()}/>
+          <DataTable columns={columns} data={[...data].reverse()} />
         )}
       </div>
 
@@ -191,50 +231,50 @@ const RepairsTable = () => {
               </Table>
 
               <h5>Products</h5>
-              <Table bordered>
-                <thead>
-                <tr>
-              <th>Code</th>
-              <th>Product Name</th>
-              <th>Metal</th>
-              <th>Metal Type</th>
-              <th>Purity</th>
-              <th>Gross Weight</th>
-              <th>Stone Weight</th>
-              <th>Wastage Weight</th>
-              <th>Total Weight</th>
-              <th>Making Charges</th>
-              <th>Rate</th>
-              <th>Tax Amount</th>
-              <th>Total Price</th>
-            </tr>
-                </thead>
-                <tbody>
-                  {repairDetails.repeatedData.map((product, index) => (
-                    <tr key={index}>
-                       <td>{product.code}</td>
-                <td>{product.product_name}</td>
-                <td>{product.metal || 'N/A'}</td>
-                <td>{product.metal_type}</td>
-                <td>{product.purity}</td>
-                <td>{product.gross_weight}</td>
-                <td>{product.stone_weight}</td>
-                <td>{product.wastage_weight}</td>
-                <td>{product.total_weight_av}</td>
-                <td>{product.making_charges}</td>
-                <td>{product.rate}</td>
-                <td>{product.tax_amt}</td>
-                <td>{product.total_price}</td>
+              <div className="table-responsive">
+                <Table bordered>
+                  <thead style={{whiteSpace:'nowrap'}}>
+                    <tr>
+                      <th>BarCode</th>
+                      <th>Product Name</th>
+                      <th>Metal</th>
+                      <th>Purity</th>
+                      <th>Gross Wt</th>
+                      <th>Stone Wt</th>
+                      <th>W.Wt</th>
+                      <th>Total Wt</th>
+                      <th>MC</th>
+                      <th>Rate</th>
+                      <th>Tax Amt</th>
+                      <th>Total Price</th>
                     </tr>
-                  ))}
-                  <tr style={{ fontWeight: 'bold' }}>
-                    <td colSpan="12" className="text-end">
-                      Total Amount
-                    </td>
-                    <td>{repairDetails.uniqueData.net_amount}</td>
-                  </tr>
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody style={{whiteSpace:'nowrap'}}>
+                    {repairDetails.repeatedData.map((product, index) => (
+                      <tr key={index}>
+                        <td>{product.code}</td>
+                        <td>{product.product_name}</td>
+                        <td>{product.metal_type}</td>
+                        <td>{product.purity}</td>
+                        <td>{product.gross_weight}</td>
+                        <td>{product.stone_weight}</td>
+                        <td>{product.wastage_weight}</td>
+                        <td>{product.total_weight_av}</td>
+                        <td>{product.making_charges}</td>
+                        <td>{product.rate}</td>
+                        <td>{product.tax_amt}</td>
+                        <td>{product.total_price}</td>
+                      </tr>
+                    ))}
+                    <tr style={{ fontWeight: 'bold' }}>
+                      <td colSpan="11" className="text-end">
+                        Total Amount
+                      </td>
+                      <td>{repairDetails.uniqueData.net_amount}</td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </div>
             </>
           )}
         </Modal.Body>

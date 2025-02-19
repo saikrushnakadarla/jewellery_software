@@ -87,7 +87,10 @@ const handleOpenModal = (data) => {
 
   const columns = React.useMemo(
     () => [
-      { Header: 'Sr.No', accessor: 'id' },
+      {
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+      },
       { Header: 'Name', accessor: 'account_name' },
       { Header: 'Mobile', accessor: 'mobile' },
       { Header: 'Invoice', accessor: 'invoice' },

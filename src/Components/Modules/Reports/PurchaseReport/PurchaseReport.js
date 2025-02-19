@@ -22,6 +22,7 @@ const PurchaseTable = () => {
   // Define columns for the DataTable
   const columns = React.useMemo(
     () => [
+      { Header: 'Sr. No.', Cell: ({ row }) => row.index + 1},
       { Header: 'Name', accessor: 'account_name' },
       // { Header: 'Customer Id', accessor: 'customer_id' },
       { Header: 'Mobile', accessor: 'mobile' },

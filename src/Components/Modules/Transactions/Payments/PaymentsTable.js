@@ -14,6 +14,10 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+      },
+      {
         Header: 'Date',
         accessor: 'date', // Key from the data
         Cell: ({ value }) => new Date(value).toLocaleDateString('en-IN'), // Format date

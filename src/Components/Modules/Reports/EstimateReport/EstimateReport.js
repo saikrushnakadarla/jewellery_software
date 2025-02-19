@@ -187,32 +187,31 @@ const RepairsTable = () => {
               </Table>
 
               <h5>Products</h5>
+              <div className="table-responsive">
               <Table bordered>
-              <thead>
+              <thead style={{whiteSpace:'nowrap'}}>
               <tr>
-                <th>RbarCode/BarCode</th>
+                <th>BarCode</th>
                 <th>Product Name</th>
-                <th>Metal Type</th>
-                <th>Design Name</th>
+                <th>Metal</th>
                 <th>Purity</th>
-                <th>Gross Weight</th>
-                <th>Stone Weight</th>
-                <th>Wastage Weight</th>
-                <th>Total Weight</th>
-                <th>Making Charges</th>
+                <th>Gross Wt</th>
+                <th>Stone Wt</th>
+                <th>W.Wt</th>
+                <th>Total Wt</th>
+                <th>MC</th>
                 <th>Rate</th>
-                <th>Tax Amount</th>
+                <th>Tax Amt</th>
                 <th>Total Price</th>
               </tr>
                 </thead>
-                <tbody>
+                <tbody style={{whiteSpace:'nowrap'}}>
                 {repairDetails.repeatedData.map((product, index) => (
 
                 <tr key={index}>
                   <td>{product.code}</td>
                   <td>{product.product_name}</td>
                   <td>{product.metal_type}</td>
-                  <td>{product.design_master}</td>
                   <td>{product.purity}</td>
                   <td>{product.gross_weight}</td>
                   <td>{product.stones_weight}</td>  
@@ -226,12 +225,13 @@ const RepairsTable = () => {
 
                 ))}
                <tr style={{fontWeight:'bold'}}>
-                  <td colSpan="12" className="text-end">Total Amount</td>
+                  <td colSpan="11" className="text-end">Total Amount</td>
                   <td>{repairDetails.uniqueData.total_amount}</td>
                 </tr> 
                 </tbody>
                 
               </Table>
+              </div>
             </>
           )}
         </Modal.Body>

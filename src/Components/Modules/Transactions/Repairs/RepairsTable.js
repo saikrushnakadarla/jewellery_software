@@ -297,6 +297,18 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+      },
+      {
+        Header: 'Date',
+        accessor: 'date',
+        Cell: ({ value }) => {
+          const date = new Date(value);
+          return date.toLocaleDateString('en-GB');
+        },
+      },
+      {
         Header: 'Repair No',
         accessor: 'repair_no',
       },
@@ -325,17 +337,8 @@ const RepairsTable = () => {
         accessor: 'purity',
       },
       {
-        Header: 'Date',
-        accessor: 'date',
-        Cell: ({ value }) => {
-          const date = new Date(value);
-          return date.toLocaleDateString('en-GB');
-        },
-      },
-      {
         Header: 'Total',
-        accessor: 'total_amt',
-        Cell: ({ value }) => (value !== null ? value : 0), // Display 0 if value is null
+        accessor: row => row.total_amt ? row.total_amt : '0.00',
       },
       {
         Header: 'Status',

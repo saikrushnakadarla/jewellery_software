@@ -33,6 +33,18 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+      },
+      {
+        Header: 'Date',
+        accessor: 'date',
+        Cell: ({ value }) => {
+          const date = new Date(value);
+          return date.toLocaleDateString('en-GB'); // 'en-GB' formats as dd/mm/yyyy
+        },
+      },
+      {
         Header: 'Repair No',
         accessor: 'repair_no',
       },
@@ -43,10 +55,6 @@ const RepairsTable = () => {
       {
         Header: 'Mobile',
         accessor: 'mobile',
-      },
-      {
-        Header: 'Email',
-        accessor: 'email',
       },
       {
         Header: 'Entry Type',
@@ -64,18 +72,12 @@ const RepairsTable = () => {
         Header: 'Purity',
         accessor: 'purity',
       },
-      {
-        Header: 'Date',
-        accessor: 'date',
-        Cell: ({ value }) => {
-          const date = new Date(value);
-          return date.toLocaleDateString('en-GB'); // 'en-GB' formats as dd/mm/yyyy
-        },
-      },
+      
       {
         Header: 'Total',
-        accessor: 'total',
+        accessor: row => row.total_amt ? row.total_amt : '0.00',
       },
+      
       {
         Header: 'Status',
         accessor: 'status',
