@@ -238,18 +238,18 @@ const OldSalesForm = ({ setOldSalesData ,repairDetails}) => {
       try {
         const response = await axios.get(`${baseURL}/purity`);
         const allPurityOptions = response.data;
-
-        // Filter purity options based on selected metal
+  
+        // Normalize and filter purity options based on selected metal (case-insensitive)
         const filteredPurityOptions = allPurityOptions.filter(
-          (option) => option.metal === oldDetails.metal
+          (option) => option.metal.toLowerCase() === oldDetails.metal.toLowerCase()
         );
-
+  
         // Normalize and find default purity that includes "22" in any form
         const defaultPurity =
           filteredPurityOptions.find(option =>
             option.name.toLowerCase().replace(/\s/g, "").includes("22k")
           )?.name || "";
-
+  
         // Update state with filtered purities and set the default purity
         setPurityOptions(filteredPurityOptions);
         setOldDetails((prevDetails) => ({
@@ -260,12 +260,13 @@ const OldSalesForm = ({ setOldSalesData ,repairDetails}) => {
         console.error("Error fetching purity options:", error);
       }
     };
-
+  
     // Fetch and filter purities when metal changes
     if (oldDetails.metal) {
       fetchAndFilterPurity();
     }
   }, [oldDetails.metal]);
+  
 
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
 

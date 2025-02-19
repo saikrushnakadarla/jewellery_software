@@ -445,19 +445,25 @@ const URDPurchase = () => {
       }
   
       // Helper: Parse purity (e.g., "22K", "916HM") to a percentage
-      const parsePurityToPercentage = (purity) => {
-        if (!purity) return null;
-        const match = purity.match(/(\d+)(k|K|kt|KT)?/);
-        if (match) {
-          const caratValue = parseInt(match[1], 10);
-          if (caratValue) {
-            return (caratValue / 24) * 100;
-          }
-        }
-        if (purity.toLowerCase() === "916hm") return 91.6;
-        return null;
+      // const parsePurityToPercentage = (purity) => {
+      //   if (!purity) return null;
+      //   const match = purity.match(/(\d+)(k|K|kt|KT)?/);
+      //   if (match) {
+      //     const caratValue = parseInt(match[1], 10);
+      //     if (caratValue) {
+      //       return (caratValue / 24) * 100;
+      //     }
+      //   }
+      //   if (purity.toLowerCase() === "916hm") return 91.6;
+      //   return null;
+      // };
+      const extractPurityPercentage = (purityValue) => {
+        if (!purityValue) return 0;
+        const matchedPurity = purityOptions.find((option) =>
+          purityValue.includes(option.name)
+        );
+        return matchedPurity ? parseFloat(matchedPurity.purity_percentage) || 0 : 0;
       };
-  
       // Update rate for gold based on purity or metal_type changes (only for "By Weight")
       if ((field === "purity" || field === "metal_type") && !isFixedPricing) {
         if (updatedFormData.metal_type?.toLowerCase() === "gold") {
@@ -484,11 +490,11 @@ const URDPurchase = () => {
       }
   
       // Calculate pure weight from net_weight and purity
-      if (field === "net_weight" || field === "purity") {
-        const netWeight = parseFloat(updatedFormData.net_weight) || 0;
-        const purityPercentage = parsePurityToPercentage(updatedFormData.purity) || 0;
-        updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
-      }
+      // if (field === "net_weight" || field === "purity") {
+      //   const netWeight = parseFloat(updatedFormData.net_weight) || 0;
+      //   const purityPercentage = parsePurityToPercentage(updatedFormData.purity) || 0;
+      //   updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
+      // }
   
       // Calculate wastage weight based on the selected wastage field
       if (["wastage_on", "wastage", "gross_weight", "net_weight", "pure_weight"].includes(field)) {
@@ -516,7 +522,7 @@ const URDPurchase = () => {
         updatedFormData.ml_percent &&
         updatedFormData.purity
       ) {
-        const purityValue = parsePurityToPercentage(updatedFormData.purity);
+        const purityValue = extractPurityPercentage(updatedFormData.purity);
         if (purityValue) {
           const gross = parseFloat(updatedFormData.gross) || 0;
           const dust = parseFloat(updatedFormData.dust) || 0;
@@ -533,7 +539,7 @@ const URDPurchase = () => {
   
       // Re-calculate pure weight using the new net_weight
       const netWeight = parseFloat(updatedFormData.net_weight) || 0;
-      const purityPercentage = parsePurityToPercentage(updatedFormData.purity) || 0;
+      const purityPercentage = extractPurityPercentage(updatedFormData.purity) || 0;
       updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
   
       // ***** Calculate Total Amount based on Pricing *****
@@ -564,13 +570,7 @@ const URDPurchase = () => {
           : "0";
 
             // Helper function to extract purity percentage from the selected purity option
-    const extractPurityPercentage = (purityValue) => {
-      if (!purityValue) return 0;
-      const matchedPurity = purityOptions.find((option) =>
-        purityValue.includes(option.name)
-      );
-      return matchedPurity ? parseFloat(matchedPurity.purity_percentage) || 0 : 0;
-    };
+  
 
     // Calculate Pure Weight when net_weight or purity changes
     if (field === "net_weight" || field === "purity") {

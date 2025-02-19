@@ -316,23 +316,57 @@ const URDPurchase = () => {
     }
   };
 
+  // useEffect(() => {
+  //   const fetchAndFilterPurity = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/purity`);
+  //       const allPurityOptions = response.data;
+
+  //       // Filter purity options based on selected metal
+  //       const filteredPurityOptions = allPurityOptions.filter(
+  //         (option) => option.metal === productDetails.metal
+  //       );
+
+  //       // Normalize and find default purity that includes "22" in any form
+  //       const defaultPurity =
+  //         filteredPurityOptions.find(option =>
+  //           option.name.toLowerCase().replace(/\s/g, "").includes("22k")
+  //         )?.name || "";
+
+  //       // Update state with filtered purities and set the default purity
+  //       setPurityOptions(filteredPurityOptions);
+  //       setProductDetails((prevDetails) => ({
+  //         ...prevDetails,
+  //         purity: defaultPurity, // Set default purity
+  //       }));
+  //     } catch (error) {
+  //       console.error("Error fetching purity options:", error);
+  //     }
+  //   };
+
+  //   // Fetch and filter purities when metal changes
+  //   if (productDetails.metal) {
+  //     fetchAndFilterPurity();
+  //   }
+  // }, [productDetails.metal]);
+
   useEffect(() => {
     const fetchAndFilterPurity = async () => {
       try {
         const response = await axios.get(`${baseURL}/purity`);
         const allPurityOptions = response.data;
-
-        // Filter purity options based on selected metal
+  
+        // Normalize and filter purity options based on selected metal (case-insensitive)
         const filteredPurityOptions = allPurityOptions.filter(
-          (option) => option.metal === productDetails.metal
+          (option) => option.metal.toLowerCase() === productDetails.metal.toLowerCase()
         );
-
+  
         // Normalize and find default purity that includes "22" in any form
         const defaultPurity =
           filteredPurityOptions.find(option =>
             option.name.toLowerCase().replace(/\s/g, "").includes("22k")
           )?.name || "";
-
+  
         // Update state with filtered purities and set the default purity
         setPurityOptions(filteredPurityOptions);
         setProductDetails((prevDetails) => ({
@@ -343,13 +377,12 @@ const URDPurchase = () => {
         console.error("Error fetching purity options:", error);
       }
     };
-
+  
     // Fetch and filter purities when metal changes
     if (productDetails.metal) {
       fetchAndFilterPurity();
     }
   }, [productDetails.metal]);
-
   const [metalOptions, setMetalOptions] = useState([]);
 
   useEffect(() => {
