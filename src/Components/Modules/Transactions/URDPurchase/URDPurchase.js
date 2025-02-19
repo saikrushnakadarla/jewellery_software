@@ -126,12 +126,12 @@ const URDPurchase = () => {
   }, []);
 
   useEffect(() => {
-    if (productDetails.metal === 'Gold') {
+    if (productDetails.metal?.toLowerCase() === 'gold') {
       setProductDetails((prevState) => ({
         ...prevState,
         ml_percent: 1, // Set default value for Gold
       }));
-    } else if (productDetails.metal === 'Silver') {
+    } else if (productDetails.metal?.toLowerCase() === 'silver') {
       setProductDetails((prevState) => ({
         ...prevState,
         ml_percent: 3, // Set default value for Silver
@@ -143,6 +143,7 @@ const URDPurchase = () => {
       }));
     }
   }, [productDetails.metal]);
+  
 
   useEffect(() => {
     const fetchLastURDPurchaseNumber = async () => {

@@ -62,7 +62,7 @@ const RepairsTable = () => {
             marginLeft: '10px',
             color: 'blue',
           }}
-            onClick={() => handleEdit(row.original)}
+            onClick={() => handleEdit(row.original.id)}
           />
           <FaTrash
              style={{
@@ -123,8 +123,10 @@ const RepairsTable = () => {
       alert('An error occurred while deleting the payment. Please try again.');
     }
   };
-  const handleEdit = (rowData) => {
-    navigate('/payments', { state: { repairData: rowData } });
+
+  const handleEdit = (id) => {
+    // navigate('/receipts', { state: { repairData: rowData } });
+    navigate(`/payments/${id}`);
   };
 
   const handleCreate = () => {

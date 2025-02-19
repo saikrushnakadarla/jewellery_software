@@ -106,6 +106,7 @@ function App() {
         <Route path="/repairsReport" element={<RepairsReport />} />
         <Route path="/urdPurchaseReport" element={<URDPurchaseReport />} />
         <Route path="/payments" element={<Payments />} />
+        <Route path="/payments/:id" element={<Payments />} />
         <Route path="/paymentstable" element={<PaymentsTable />} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/accounts/:id" element={<Accounts />} />

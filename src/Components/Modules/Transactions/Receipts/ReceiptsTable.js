@@ -94,7 +94,7 @@ const ReceiptsTable = () => {
     if (!window.confirm('Are you sure you want to delete this Receipt?')) return;
   
     try {
-      const response = await fetch(`${baseURL}/delete/payments/${id}`, {
+      const response = await fetch(`${baseURL}/delete/receipt/${id}`, {
         method: 'DELETE',
       });
   

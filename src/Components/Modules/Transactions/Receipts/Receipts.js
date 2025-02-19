@@ -26,7 +26,6 @@ const RepairForm = () => {
     cash_amt: "",
     remarks: "",
   });
-  const [data, setData] = useState(null);
   const { id } = useParams();
   const { invoiceData } = location.state || {};
   useEffect(() => {
@@ -229,9 +228,7 @@ const RepairForm = () => {
       try {
         const response = await fetch(`${baseURL}/get/payment/${id}`);
         const result = await response.json();
-  
         console.log("Fetched data:", result);
-  
         if (result?.payment) {
           // Convert date to dd-mm-yyyy format
           let formattedDate = "";
@@ -281,13 +278,11 @@ const RepairForm = () => {
     }
   }, [id, repairDetails]);
   
-  
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const endpoint = id
-        ? `${baseURL}/edit/payments/${id}`
+        ? `${baseURL}/edit/receipt/${id}`
         : `${baseURL}/post/payments`;
       const method = id ? "PUT" : "POST";
   
@@ -321,7 +316,6 @@ const RepairForm = () => {
       alert(`Error: ${error.message}`);
     }
   };
-  
   
   useEffect(() => {
     if (invoiceData) {

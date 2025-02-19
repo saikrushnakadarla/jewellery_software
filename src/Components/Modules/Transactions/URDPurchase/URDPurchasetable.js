@@ -12,10 +12,10 @@ const RepairsTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
-  // const [formData, setFormData] = useState({}); // State for editing form data
   const location = useLocation();
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
+  const [purityOptions, setPurityOptions] = useState([]);
 
   useEffect(() => {
     if (mobile) {
@@ -113,254 +113,44 @@ const RepairsTable = () => {
     fetchUrdPurchases();
   }, []);
 
-  // const handleEdit = (row) => {
-  //   setFormData(row);
-  //   setShowEditModal(true);
-  // };
-
-  // Function to parse purity value to percentage
-  const parsePurityToPercentage = (purity) => {
-    if (!purity) return null;
-    const match = purity.match(/(\d+)(k|K|kt|KT)?/);
-    if (match) {
-      const caratValue = parseInt(match[1], 10); // Extract carat number
-      if (caratValue) {
-        return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
-      }
-    }
-    if (purity.toLowerCase() === "916hm") return 91.6;
-    return null;
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-
-    setProductDetails((prevDetails) => {
-      const updatedDetails = { ...prevDetails, [name]: value };
-
-      if (name === "metal") {
-        updatedDetails.purity = ""; // Reset purity when metal changes
-        updatedDetails.purityPercentage = ""; // Reset purity percentage
-        // Set rate based on metal type selection
-        if (value === "Silver") {
-          updatedDetails.rate = rates.rate_silver || "0.00"; // Set silver rate if metal is silver
-        } else {
-          updatedDetails.rate = ""; // Reset rate for other metals
-        }
-      }
-
-      if (name === "purity" && value !== "Other") {
-        updatedDetails.purityPercentage = parsePurityToPercentage(value); // Convert purity name to percentage
-      } else if (name === "purityPercentage") {
-        updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
-      }
-
-      // Update calculations
-      updatedDetails.eqt_wt = calculateNetWeight(updatedDetails);
-      updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
-
-      return updatedDetails;
-    });
-  };
-
-  const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
-    const purityPercentageValue = purity === "Other"
-      ? parseFloat(purityPercentage) || 0
-      : parsePurityToPercentage(purity) || 0;
-
-    const grossWeight = parseFloat(gross) || 0;
-    const dustWeight = parseFloat(dust) || 0;
-    const mlPercentValue = parseFloat(ml_percent) || 0;
-
-    const netWeight = ((grossWeight - dustWeight) * (purityPercentageValue - mlPercentValue)) / 100;
-    return parseFloat(netWeight.toFixed(2));
-  };
-  const calculateTotalAmount = ({ eqt_wt, rate }, currentRate) => {
-    const netWeight = Number(eqt_wt) || 0;
-    const rateAmount = Number(rate) || Number(currentRate) || 0;
-
-    const totalAmount = netWeight * rateAmount;
-    return Number(totalAmount.toFixed(2));
-  };
-
-
-  const handleSaveEdit = async () => {
-    try {
-      const response = await fetch(
-        `${baseURL}/api/urd-purchase/${formData.urdpurchase_number}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      if (response.ok) {
-        setShowEditModal(false);
-        alert('Record updated successfully.');
-        fetchUrdPurchases(); // Refresh the table data
-      } else {
-        console.error('Failed to update:', await response.json());
-      }
-    } catch (error) {
-      console.error('Error updating record:', error);
-    }
-  };
-  const [metalOptions, setMetalOptions] = useState([]);
-  const [purityOptions, setPurityOptions] = useState([]);
-
-  const handleEdit = (row) => {
-    setFormData(row);
-    setProductDetails({
-      product_id: row.product_id,
-      product_name: row.product_name,
-      metal: row.metal,
-      purity: row.purity,
-      hsn_code: row.hsn_code,
-      gross: row.gross,
-      dust: row.dust,
-      touch_percent: row.touch_percent,
-      ml_percent: row.ml_percent,
-      eqt_wt: row.eqt_wt,
-      remarks: row.remarks,
-      rate: row.rate,
-      total_amount: row.total_amount,
-    });
-    setShowEditModal(true);
-  };
-
-  const handleDelete = async (urdpurchase_number) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this record?");
-    if (!confirmDelete) return;
-
-    try {
-      const response = await fetch(`${baseURL}/delete/${urdpurchase_number}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        setData((prevData) => prevData.filter((item) => item.urdpurchase_number !== urdpurchase_number));
-        alert("Record deleted successfully.");
-      } else {
-        console.error('Failed to delete:', await response.json());
-      }
-    } catch (error) {
-      console.error('Error deleting purchase:', error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchPurity = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        setPurityOptions(response.data); // Populate purity options dynamically
-      } catch (error) {
-        console.error("Error fetching purity options:", error);
-      }
-    };
-
-    fetchPurity();
-  }, []);
-
-
-  // const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
-
-  useEffect(() => {
-    const fetchMetalTypes = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/metaltype`);
-        const metalTypes = response.data.map(item => ({
-          value: item.metal_name, // Metal name for dropdown
-          label: item.metal_name, // Display value
-          hsn_code: item.hsn_code, // Associated HSN Code
-        }));
-        setMetalOptions(metalTypes);
-      } catch (error) {
-        console.error('Error fetching metal types:', error);
-      }
-    };
-
-    fetchMetalTypes();
-  }, []);
-
-  useEffect(() => {
-    if (productDetails.metal === 'Gold') {
-      setProductDetails((prevState) => ({
-        ...prevState,
-        ml_percent: 1, // Set default value for Gold
-      }));
-    } else if (productDetails.metal === 'Silver') {
-      setProductDetails((prevState) => ({
-        ...prevState,
-        ml_percent: 3, // Set default value for Silver
-      }));
-    } else if (!productDetails.metal) {
-      setProductDetails((prevState) => ({
-        ...prevState,
-        ml_percent: '', // Clear ml_percent if metal is cleared
-      }));
-    }
-  }, [productDetails.metal]);
-
-  useEffect(() => {
-    const fetchLastURDPurchaseNumber = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/lastURDPurchaseNumber`);
-        setFormData((prev) => ({
-          ...prev,
-          urdpurchase_number: response.data.lastURDPurchaseNumber,
-        }));
-      } catch (error) {
-        console.error("Error fetching estimate number:", error);
-      }
-    };
-
-    fetchLastURDPurchaseNumber();
-  }, []);
-
-  const [rateOptions, setRateOptions] = useState([]);
-
-
   useEffect(() => {
     const fetchAndFilterPurity = async () => {
       try {
         const response = await axios.get(`${baseURL}/purity`);
+        console.log("Fetched Purity Options:", response.data);
+
         const allPurityOptions = response.data;
 
-        // Filter purity options based on selected metal
         const filteredPurityOptions = allPurityOptions.filter(
-          (option) => option.metal === productDetails.metal
+          (option) => option.metal.toLowerCase() === productDetails.metal.toLowerCase()
         );
 
-        // Normalize and find default purity that includes "22" in any form
-        const defaultPurity =
-          filteredPurityOptions.find(option =>
-            option.name.toLowerCase().replace(/\s/g, "").includes("22k")
-          )?.name || "";
+        console.log("Filtered Purity Options:", filteredPurityOptions);
 
-        // Update state with filtered purities and set the default purity
+        const defaultPurityOption = filteredPurityOptions.find(option =>
+          option.name.toLowerCase().replace(/\s/g, "").includes("22k")
+        );
+
+        console.log("Default Selected Purity:", defaultPurityOption);
+
         setPurityOptions(filteredPurityOptions);
+
         setProductDetails((prevDetails) => ({
           ...prevDetails,
-          purity: defaultPurity, // Set default purity
+          purity: defaultPurityOption?.name || "",
+          purityPercentage: defaultPurityOption?.purity_percentage || 0, // Store purity_percentage
         }));
       } catch (error) {
         console.error("Error fetching purity options:", error);
       }
     };
 
-    // Fetch and filter purities when metal changes
     if (productDetails.metal) {
       fetchAndFilterPurity();
     }
   }, [productDetails.metal]);
 
-  // const [metalOptions, setMetalOptions] = useState([]);
+  const [metalOptions, setMetalOptions] = useState([]);
 
   useEffect(() => {
     const fetchMetalTypes = async () => {
@@ -381,12 +171,12 @@ const RepairsTable = () => {
   }, []);
 
   useEffect(() => {
-    if (productDetails.metal === 'Gold') {
+    if (productDetails.metal?.toLowerCase() === 'gold') {
       setProductDetails((prevState) => ({
         ...prevState,
         ml_percent: 1, // Set default value for Gold
       }));
-    } else if (productDetails.metal === 'Silver') {
+    } else if (productDetails.metal?.toLowerCase() === 'silver') {
       setProductDetails((prevState) => ({
         ...prevState,
         ml_percent: 3, // Set default value for Silver
@@ -398,6 +188,7 @@ const RepairsTable = () => {
       }));
     }
   }, [productDetails.metal]);
+
 
   useEffect(() => {
     const fetchLastURDPurchaseNumber = async () => {
@@ -444,21 +235,163 @@ const RepairsTable = () => {
     const normalizedMetal = productDetails.metal.toLowerCase();
     const normalizedPurity = normalizePurity(productDetails.purity);
 
+    // If metal is silver and purity is Manual, set rate_silver
+    if (normalizedMetal === "silver" && normalizedPurity === "manual") {
+      setProductDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
+      return;
+    }
+
+    // If metal is gold and purity is Manual, set rate_22crt
+    if (normalizedMetal === "gold" && normalizedPurity === "manual") {
+      setProductDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_22crt }));
+      return;
+    }
+
+    // If metal is silver, always set rate_silver
+    if (normalizedMetal === "silver") {
+      setProductDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
+      return;
+    }
+
+    // Normal purity-based rate assignment for gold
     const currentRate =
-      normalizedMetal === "silver" && normalizedPurity.includes("22") ? rates.rate_silver :
-        normalizedPurity.includes("24") ? rates.rate_24crt :
-          normalizedPurity.includes("22") ? rates.rate_22crt :
-            normalizedPurity.includes("18") ? rates.rate_18crt :
-              normalizedPurity.includes("16") ? rates.rate_16crt :
-                productDetails.purity === "Other" ? rates.rate_22crt :
-                  0;
+      normalizedPurity.includes("24") ? rates.rate_24crt :
+        normalizedPurity.includes("22") ? rates.rate_22crt :
+          normalizedPurity.includes("18") ? rates.rate_18crt :
+            normalizedPurity.includes("16") ? rates.rate_16crt :
+              0;
 
     setProductDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
   }, [productDetails.purity, productDetails.metal, rates]);
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
 
+    setProductDetails((prevDetails) => {
+      const updatedDetails = { ...prevDetails, [name]: value };
 
+      if (name === "metal") {
+        updatedDetails.purity = ""; // Reset purity when metal changes
+        updatedDetails.purityPercentage = ""; // Reset purity percentage
+        // Set rate based on metal type selection
+        if (value === "Silver") {
+          updatedDetails.rate = rates.rate_silver || "0.00"; // Set silver rate if metal is silver
+        } else {
+          updatedDetails.rate = ""; // Reset rate for other metals
+        }
+      }
 
+      if (name === "purity") {
+        if (value !== "Manual") {
+          const selectedOption = purityOptions.find(option => option.name === value);
+          updatedDetails.purityPercentage = selectedOption ? selectedOption.purity_percentage : 0;
+        } else {
+          updatedDetails.purityPercentage = 0; // Directly set purityPercentage to 0
+        }
+      } else if (name === "purityPercentage") {
+        updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
+      }
+
+      // Update calculations with the latest purityPercentage
+      updatedDetails.eqt_wt = calculateNetWeight({
+        ...updatedDetails,
+        purityPercentage: updatedDetails.purityPercentage,
+      });
+
+      updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
+
+      return updatedDetails;
+    });
+  };
+
+  const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
+    const purityPercentageValue = purity === "Manual"
+      ? parseFloat(purityPercentage) || 0
+      : parseFloat(purityPercentage) || 0;  // Ensure the correct purityPercentage is used
+
+    const grossWeight = parseFloat(gross) || 0;
+    const dustWeight = parseFloat(dust) || 0;
+    const mlPercentValue = parseFloat(ml_percent) || 0;
+
+    const netWeight = ((grossWeight - dustWeight) * (purityPercentageValue - mlPercentValue)) / 100;
+    return parseFloat(netWeight.toFixed(2));
+  };
+
+  const calculateTotalAmount = ({ eqt_wt, rate }, currentRate) => {
+    const netWeight = Number(eqt_wt) || 0;
+    const rateAmount = Number(rate) || Number(currentRate) || 0;
+
+    const totalAmount = netWeight * rateAmount;
+    return Number(totalAmount.toFixed(2));
+  };
+
+  const handleEdit = (row) => {
+    setFormData(row);
+    setProductDetails({
+      product_id: row.product_id,
+      product_name: row.product_name,
+      metal: row.metal,
+      purity: row.purity,
+      hsn_code: row.hsn_code,
+      gross: row.gross,
+      dust: row.dust,
+      touch_percent: row.touch_percent,
+      ml_percent: row.ml_percent,
+      eqt_wt: row.eqt_wt,
+      remarks: row.remarks,
+      rate: row.rate,
+      total_amount: row.total_amount,
+    });
+    setShowEditModal(true);
+  };
+
+  const handleDelete = async (urdpurchase_number) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this record?");
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`${baseURL}/delete/${urdpurchase_number}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        setData((prevData) => prevData.filter((item) => item.urdpurchase_number !== urdpurchase_number));
+        alert("Record deleted successfully.");
+      } else {
+        console.error('Failed to delete:', await response.json());
+      }
+    } catch (error) {
+      console.error('Error deleting purchase:', error);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const response = await fetch(
+        `${baseURL}/api/urd-purchase/${formData.urdpurchase_number}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (response.ok) {
+        setShowEditModal(false);
+        alert('Record updated successfully.');
+        fetchUrdPurchases(); // Refresh the table data
+      } else {
+        console.error('Failed to update:', await response.json());
+      }
+    } catch (error) {
+      console.error('Error updating record:', error);
+    }
+  };
 
   const columns = React.useMemo(
     () => [
@@ -500,8 +433,6 @@ const RepairsTable = () => {
     ],
     []
   );
-
-
 
   return (
     <div className="main-container">

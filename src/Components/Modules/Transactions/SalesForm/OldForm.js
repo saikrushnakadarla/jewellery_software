@@ -67,20 +67,20 @@ const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
   }, [repairDetails]);
 
   useEffect(() => {
-    if (oldDetails.metal === 'Gold') {
+    if (oldDetails.metal?.toLowerCase() === 'gold') {
       setOldDetails((prevState) => ({
         ...prevState,
-        ml_percent: 1,
+        ml_percent: 1, // Set default value for Gold
       }));
-    } else if (oldDetails.metal === 'Silver') {
+    } else if (oldDetails.metal?.toLowerCase() === 'silver') {
       setOldDetails((prevState) => ({
         ...prevState,
-        ml_percent: 3,
+        ml_percent: 3, // Set default value for Silver
       }));
     } else if (!oldDetails.metal) {
       setOldDetails((prevState) => ({
         ...prevState,
-        ml_percent: '',
+        ml_percent: '', // Clear ml_percent if metal is cleared
       }));
     }
   }, [oldDetails.metal]);

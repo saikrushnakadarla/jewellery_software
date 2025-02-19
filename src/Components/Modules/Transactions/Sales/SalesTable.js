@@ -493,26 +493,26 @@ const RepairsTable = () => {
               </Table>
 
               <h5>Products</h5>
+              <div className="table-responsive">
               <Table bordered>
-                <thead>
+                <thead style={{whiteSpace:'nowrap'}}>
                   <tr>
                     <th>Bar Code</th>
                     <th>Product Name</th>
-                    <th>Metal Type</th>
+                    <th>Metal</th>
                     <th>Purity</th>
-                    <th>Gross Weight</th>
-                    <th>Stone Weight</th>
-                    <th>Wastage Weight</th>
-                    <th>Total Weight</th>
-                    <th>Making Charges</th>
+                    <th>Gross Wt</th>
+                    <th>Stone Wt</th>
+                    <th>W.Wt</th>
+                    <th>Total Wt</th>
+                    <th>MC</th>
                     <th>Rate</th>
-                    <th>Tax Amount</th>
+                    <th>Tax Amt</th>
                     <th>Status</th>
-                    <th>Total Price</th>
-                    
+                    <th>Total Price</th>  
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style={{whiteSpace:'nowrap'}}>
                   {repairDetails.repeatedData.map((product, index) => (
                     <tr key={index}>
                       <td>{product.code}</td>
@@ -539,6 +539,7 @@ const RepairsTable = () => {
                   </tr>
                 </tbody>
               </Table>
+              </div>
             </>
           )}
         </Modal.Body>

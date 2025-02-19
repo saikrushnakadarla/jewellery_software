@@ -6,14 +6,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
 import { pdf } from "@react-pdf/renderer";
-
+import { useParams } from "react-router-dom";
 import PDFContent from "./ReceiptPdf";
 
 const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const repairData = location.state?.repairData;
-
   const [formData, setFormData] = useState({
     transaction_type: "Payment",
     date: "",
@@ -27,7 +26,7 @@ const RepairForm = () => {
     cash_amt: "",
     remarks: "",
   });
-
+  const { id } = useParams();
   const [accountOptions, setAccountOptions] = useState([]);
 
   const [purchases, setPurchases] = useState([]);
@@ -70,7 +69,7 @@ const RepairForm = () => {
         const balAfterReceipts = Number(selectedInvoice.balance_after_receipt) || 0;
         const balAmt = Number(selectedInvoice.balance_amount) || 0;
         const totalAmt = balAfterReceipts || balAmt || 0;
-        console.log("totalAmt=",totalAmt)
+        console.log("totalAmt=", totalAmt)
         setFormData((prevData) => ({
           ...prevData,
           total_amt: totalAmt,
@@ -164,14 +163,14 @@ const RepairForm = () => {
       const selectedInvoice = purchases.find(
         (purchase) => purchase.invoice === formData.invoice_number
       );
-  
+
       if (selectedInvoice) {
         const paidAmt = Number(selectedInvoice.paid_amt) || 0;
         const paidAmount = Number(selectedInvoice.paid_amount) || 0;
         const totalAmount = Number(selectedInvoice.total_amount) || 0;
         const balanceAfterReceipt = Number(selectedInvoice.balance_after_receipt) || 0;
         const balanceAmount = Number(selectedInvoice.balance_amount) || 0;
-  
+
         setFormData((prevData) => ({
           ...prevData,
           total_amt:
@@ -190,7 +189,7 @@ const RepairForm = () => {
       }));
     }
   }, [formData.invoice_number, purchases]);
-  
+
   useEffect(() => {
     // Set default date to today
     const today = new Date().toISOString().split("T")[0];
@@ -245,13 +244,69 @@ const RepairForm = () => {
     });
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/payment/${id}`);
+        const result = await response.json();
+        console.log("Fetched data:", result);
+        if (result?.payment) {
+          // Convert date to dd-mm-yyyy format
+          let formattedDate = "";
+          if (result.payment.date) {
+            const dateObj = new Date(result.payment.date);
+            const day = String(dateObj.getDate()).padStart(2, "0");
+            const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+            const year = dateObj.getFullYear();
+            formattedDate = `${year}-${month}-${day}`;
+          }
+
+          setFormData((prevData) => ({
+            ...prevData,
+            ...result.payment,
+            date: formattedDate, // Set formatted date
+          }));
+
+          // Fetch related invoices immediately after setting account_name
+          if (result.payment.account_name) {
+            const filteredInvoices = purchases
+              ?.filter((item) => item.account_name === result.payment.account_name)
+              .map((item) => ({
+                value: item.invoice,
+                label: item.invoice,
+              }));
+
+            setInvoiceOptions(filteredInvoices);
+
+            // If invoice_number exists, set it in formData
+            if (result.payment.invoice_number) {
+              setFormData((prevData) => ({
+                ...prevData,
+                invoice_number: result.payment.invoice_number,
+              }));
+            }
+          }
+        } else {
+          console.error("Payment not found");
+        }
+      } catch (error) {
+        console.error("Error fetching payment:", error);
+      }
+    };
+
+    if (id) {
+      fetchData();
+    }
+  }, [id, purchases]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const endpoint = repairData
-        ? `${baseURL}/edit/payments/${repairData.id}`
+      
+      const endpoint = id
+        ? `${baseURL}/edit/payments/${id}`
         : `${baseURL}/post/payments`;
-      const method = repairData ? "PUT" : "POST";
+      const method = id ? "PUT" : "POST";
 
       // Save payment details to the server
       const response = await fetch(endpoint, {
@@ -262,17 +317,17 @@ const RepairForm = () => {
 
       if (!response.ok) throw new Error("Failed to save data");
 
-      // Notify user about successful save
-      window.alert("Payment saved successfully!");
+
+      alert(`Payment ${id ? "updated" : "saved"} successfully!`);
 
       // Generate the PDF
-      const pdfDoc = <PDFContent formData={formData} />;
+      const pdfDoc = <PDFContent formData={formData} purchases={purchases}/>;
       const pdfBlob = await pdf(pdfDoc).toBlob();
 
       // Create a download link and trigger it
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = `payment-receipt-${formData.id || "new"}.pdf`;
+      link.download = `Payment-receipt-${formData.receipt_no || "new"}.pdf`;
       link.click();
 
       // Clean up the download link
@@ -290,6 +345,7 @@ const RepairForm = () => {
     navigate(from);
   };
 
+
   return (
     <div className="main-container">
       <Container className="payments-form-container">
@@ -304,6 +360,7 @@ const RepairForm = () => {
               value={formData.date}
               onChange={handleInputChange}
               max={new Date().toISOString().split("T")[0]}
+              disabled={!!id}
             />
           </Col>
           <Col xs={12} md={2}>
@@ -414,7 +471,7 @@ const RepairForm = () => {
             style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
             onClick={handleSubmit}
           >
-            {repairData ? "Update" : "Save"}
+            {id ? "Update" : "Save"}
           </Button>
         </div>
       </Container>

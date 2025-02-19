@@ -10,16 +10,16 @@ const RepairsTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store table data
   const [loading, setLoading] = useState(true); // Loading state
-    const [repairDetails, setRepairDetails] = useState(null);
-    const [showModal, setShowModal] = useState(false);
+  const [repairDetails, setRepairDetails] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get(`${baseURL}/get-unique-estimates`);
-        
+
         // Filter the data based on the 'transaction_status' column
         const filteredData = response.data
-        
+
         setData(filteredData); // Set the filtered data
         setLoading(false);
       } catch (error) {
@@ -27,18 +27,18 @@ const RepairsTable = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
 
   const formatDate = (date) => {
     if (!date) return ''; // Return an empty string if no date is provided
-  
+
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, '0');  // Pad single digit days with 0
     const month = String(d.getMonth() + 1).padStart(2, '0'); // Pad months with 0
     const year = d.getFullYear();
-    
+
     return `${day}/${month}/${year}`;
   };
 
@@ -133,25 +133,25 @@ const RepairsTable = () => {
     []
   );
 
-    const handleViewDetails = async (estimate_number) => {
-      try {
-        const response = await axios.get(`${baseURL}/get-estimates/${estimate_number}`);
-        setRepairDetails(response.data);
-        setShowModal(true); // Show the modal with repair details
-      } catch (error) {
-        console.error('Error fetching repair details:', error);
-      }
-    };
-  
-    // Close the modal
-    const handleCloseModal = () => {
-      setShowModal(false);
-      setRepairDetails(null); // Clear repair details on modal close
-    };
+  const handleViewDetails = async (estimate_number) => {
+    try {
+      const response = await axios.get(`${baseURL}/get-estimates/${estimate_number}`);
+      setRepairDetails(response.data);
+      setShowModal(true); // Show the modal with repair details
+    } catch (error) {
+      console.error('Error fetching repair details:', error);
+    }
+  };
 
-    const handleCreate = () => {
-      navigate('/estimates'); // Navigate to the /suppliers page
-    };
+  // Close the modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setRepairDetails(null); // Clear repair details on modal close
+  };
+
+  const handleCreate = () => {
+    navigate('/estimates'); // Navigate to the /suppliers page
+  };
 
   return (
     <div className="main-container">
@@ -159,7 +159,7 @@ const RepairsTable = () => {
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Estimates</h3>
-            <Button  className='create_but' onClick={handleCreate} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+            <Button className='create_but' onClick={handleCreate} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
               + Create
             </Button>
           </Col>
@@ -171,76 +171,77 @@ const RepairsTable = () => {
         )}
       </div>
 
-      <Modal show={showModal} onHide={handleCloseModal} size="xl" className='m-auto'>
+      <Modal show={showModal} onHide={handleCloseModal} size="xl" className="m-auto">
         <Modal.Header closeButton>
           <Modal.Title>Estimate Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {repairDetails && (
-            <>             
+            <>
               <Table bordered>
                 <tbody>
-                <tr>
-                  <td>Date</td>
-                  <td>{formatDate(repairDetails.uniqueData.date)}</td>
-                </tr>
+                  <tr>
+                    <td>Date</td>
+                    <td>{formatDate(repairDetails.uniqueData.date)}</td>
+                  </tr>
                   <tr>
                     <td>Invoice Number</td>
                     <td>{repairDetails.uniqueData.estimate_number}</td>
-                  </tr>    
+                  </tr>
                   <tr>
                     <td>Total Amount</td>
                     <td>{repairDetails.uniqueData.total_amount}</td>
-                  </tr>               
+                  </tr>
                 </tbody>
               </Table>
 
               <h5>Products</h5>
-              <Table bordered>
-              <thead>
-              <tr>
-                <th>RbarCode/BarCode</th>
-                <th>Product Name</th>
-                <th>Metal Type</th>
-                <th>Design Name</th>
-                <th>Purity</th>
-                <th>Gross Weight</th>
-                <th>Stone Weight</th>
-                <th>Wastage Weight</th>
-                <th>Total Weight</th>
-                <th>Making Charges</th>
-                <th>Rate</th>
-                <th>Tax Amount</th>
-                <th>Total Price</th>
-              </tr>
-                </thead>
-                <tbody>
-                {repairDetails.repeatedData.map((product, index) => (
 
-                <tr key={index}>
-                  <td>{product.code}</td>
-                  <td>{product.product_name}</td>
-                  <td>{product.metal_type}</td>
-                  <td>{product.design_master}</td>
-                  <td>{product.purity}</td>
-                  <td>{product.gross_weight}</td>
-                  <td>{product.stones_weight}</td>  
-                  <td>{product.wastage_weight}</td>
-                  <td>{product.total_weight}</td>
-                  <td>{product.total_mc}</td>
-                  <td>{product.rate}</td>
-                  <td>{product.tax_vat_amount}</td>
-                  <td>{product.total_rs}</td>                
-                </tr>
-
-                ))}
-               <tr style={{fontWeight:'bold'}}>
-                  <td colSpan="12" className="text-end">Total Amount</td>
-                  <td>{repairDetails.uniqueData.total_amount}</td>
-                </tr> 
-                </tbody>
-                
-              </Table>
+              {/* Make table scrollable when columns are too many */}
+              <div className="table-responsive">
+                <Table bordered>
+                  <thead style={{whiteSpace:'nowrap'}}>
+                    <tr>
+                      <th>BarCode</th>
+                      <th>Product Name</th>
+                      <th>Metal Type</th>
+                      <th>Purity</th>
+                      <th>Gross Wt</th>
+                      <th>Stone Wt</th>
+                      <th>W.Wt</th>
+                      <th>Total Wt</th>
+                      <th>MC</th>
+                      <th>Rate</th>
+                      <th>Tax Amt</th>
+                      <th>Total Price</th>
+                    </tr>
+                  </thead>
+                  <tbody style={{whiteSpace:'nowrap'}}>
+                    {repairDetails.repeatedData.map((product, index) => (
+                      <tr key={index}>
+                        <td>{product.code}</td>
+                        <td>{product.product_name}</td>
+                        <td>{product.metal_type}</td>
+                        <td>{product.purity}</td>
+                        <td>{product.gross_weight}</td>
+                        <td>{product.stones_weight}</td>
+                        <td>{product.wastage_weight}</td>
+                        <td>{product.total_weight}</td>
+                        <td>{product.total_mc}</td>
+                        <td>{product.rate}</td>
+                        <td>{product.tax_vat_amount}</td>
+                        <td>{product.total_rs}</td>
+                      </tr>
+                    ))}
+                    <tr style={{ fontWeight: "bold" }}>
+                      <td colSpan="11" className="text-end">
+                        Total Amount
+                      </td>
+                      <td>{repairDetails.uniqueData.total_amount}</td>
+                    </tr>
+                  </tbody>
+                </Table>
+              </div>
             </>
           )}
         </Modal.Body>
@@ -250,6 +251,7 @@ const RepairsTable = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
     </div>
   );
 };

@@ -667,7 +667,7 @@ const RepairsTable = () => {
               <h5>Products</h5>
               <div className="table-responsive">
                 <Table bordered>
-                  <thead>
+                  <thead style={{whiteSpace:'nowrap'}}>
                     <tr>
                       <th>Bar Code</th>
                       <th>Product Name</th>
@@ -677,15 +677,15 @@ const RepairsTable = () => {
                       <th>Stone Wt</th>
                       <th>W.Wt</th>
                       <th>Total Wt</th>
-                      <th>Making Charges</th>
+                      <th>MC</th>
                       <th>Rate</th>
-                      <th>Tax Amount</th>
+                      <th>Tax Amt</th>
                       <th>Total Price</th>
                       <th>Assigning</th>
                       <th>Worker Name</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody style={{whiteSpace:'nowrap'}}>
                     {orderDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>{product.code}</td>
