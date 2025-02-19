@@ -130,6 +130,7 @@ useEffect(() => {
                 value={formData.user_name}
                 onChange={handleChange}
                 required
+                autoFocus
               />
             </Col>
 

@@ -535,45 +535,54 @@ const handleEdit = (index) => {
 
   const handleCheckout = async () => {
     if (!invoiceDetails.length || !selectedRows.length) {
-      alert("No invoices selected for sale return.");
-      return;
+        alert("No invoices selected for sale return.");
+        return;
     }
 
     try {
-      const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
+        const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
 
-      const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
-        id: invoice.id,
-        status: "Sale Returned",
-      }));
+        const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
+            id: invoice.id,
+            status: "Sale Returned",
+        }));
 
-      const openTagsUpdates = selectedInvoices.map((invoice) => ({
-        PCode_BarCode: invoice.code,
-        Status: "Sale Returned",
-      }));
+        const openTagsUpdates = selectedInvoices.map((invoice) => ({
+            PCode_BarCode: invoice.code,
+            Status: "Sale Returned",
+        }));
 
-      const productUpdates = selectedInvoices.map((invoice) => ({
-        product_id: invoice.product_id,
-        qty: invoice.qty,
-        gross_weight: invoice.gross_weight,
-      }));
+        const productUpdates = selectedInvoices.map((invoice) => ({
+            product_id: invoice.product_id,
+            qty: invoice.qty,
+            gross_weight: invoice.gross_weight,
+        }));
 
-      const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
+        const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
 
-      await axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates });
-      await axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates });
-      await axios.post(`${baseURL}/updateProduct`, { updates: productUpdates });
-      await axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries });
+        // Execute all API calls in parallel
+        const responses = await Promise.allSettled([
+            axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates }),
+            axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates }),
+            axios.post(`${baseURL}/updateProduct`, { updates: productUpdates }),
+            axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries }),
+        ]);
 
-      alert("Sale Return added Successfully!");
-      // resetSaleReturnForm();
-      // setSelectedRows([]); 
-      // setIsAllSelected(false);
+        // Check if any API failed
+        const failedRequests = responses.filter(res => res.status === "rejected");
+        if (failedRequests.length > 0) {
+            console.error("Some API calls failed:", failedRequests);
+            alert("Some updates failed. Please check console for details.");
+        } else {
+            alert("Sale Return added Successfully!");
+        }
+        
     } catch (error) {
-      console.error("Error during checkout:", error);
-      alert("An error occurred during checkout. Please try again.");
+        console.error("Error during checkout:", error);
+        alert("An error occurred during checkout. Please try again.");
     }
-  };
+};
+
 
   // Calculate taxable amount based on selected rows
   const salesTaxableAmount = selectedRows.reduce((sum, rowIndex) => {

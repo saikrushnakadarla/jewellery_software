@@ -17,7 +17,7 @@ function CompanyInfo() {
     state: "",
     state_code: "",
     country: "",
-    email:"",
+    email: "",
     mobile: "",
     phone: "",
     website: "",
@@ -74,12 +74,12 @@ function CompanyInfo() {
 
 
   const handleChange = (e) => {
-    
+
 
     const { name, value } = e.target;
     let updatedValue = value;
     switch (name) {
-    case "mobile":
+      case "mobile":
       case "phone":
         // Allow only numbers and limit to 10 digits
         updatedValue = value.replace(/\D/g, "").slice(0, 10);
@@ -103,6 +103,10 @@ function CompanyInfo() {
       case "ifsc_code":
         // IFSC must be exactly 11 alphanumeric characters (uppercase)
         updatedValue = value.toUpperCase().slice(0, 11);
+        break;
+      case "company_name":
+        // Capitalize the first letter of company name
+        updatedValue = value.charAt(0).toUpperCase() + value.slice(1);
         break;
 
       default:
@@ -150,10 +154,10 @@ function CompanyInfo() {
       alert("IFSC Code must be exactly 11 characters.");
       return false;
     }
-  
+
     return true;
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -205,7 +209,7 @@ function CompanyInfo() {
     const isConfirmed = window.confirm(`Are you sure you want to delete the record with ID ${id}?`);
 
     if (!isConfirmed) {
-      return; 
+      return;
     }
 
     try {
@@ -226,7 +230,7 @@ function CompanyInfo() {
       state: "",
       state_code: "",
       country: "",
-      email:"",
+      email: "",
       mobile: "",
       phone: "",
       website: "",
@@ -268,7 +272,7 @@ function CompanyInfo() {
         Header: "Action",
         Cell: ({ row }) => (
           <div>
-            <FaEdit 
+            <FaEdit
               style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue', }}
               onClick={() => handleEdit(row.original)}
             />
@@ -292,7 +296,7 @@ function CompanyInfo() {
         <form ref={formRef} className="customer-master-form" onSubmit={handleSubmit}>
           <Row>
             <Col md={3}>
-              <InputField label="Company Name" name="company_name" value={formData.company_name} onChange={handleChange} required/>
+              <InputField label="Company Name" name="company_name" value={formData.company_name} onChange={handleChange} required autoFocus />
             </Col>
             <Col md={3}>
               <InputField label="Address" name="address" value={formData.address} onChange={handleChange} />
@@ -312,7 +316,7 @@ function CompanyInfo() {
                 name="state"
                 type="select"
                 value={formData.state}
-                onChange={handleStateChange} 
+                onChange={handleStateChange}
                 options={states.map((state) => ({
                   value: state.state_name,
                   label: state.state_name,
@@ -322,7 +326,7 @@ function CompanyInfo() {
             </Col>
             <Col md={2}>
               <InputField label="State Code" name="state_code" value={formData.state_code} onChange={handleChange} readOnly />
-            </Col>      
+            </Col>
             <Col md={2}>
               <InputField label="Country" name="country" value={formData.country} onChange={handleChange} />
             </Col>

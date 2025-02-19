@@ -304,6 +304,7 @@ function Customer_Master() {
                 value={formData.account_name}
                 onChange={handleChange}
                 required
+                autoFocus
               />
             </Col>
             <Col md={3}>

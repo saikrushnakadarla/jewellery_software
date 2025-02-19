@@ -609,6 +609,7 @@ const FormWithTable = () => {
                   value={formData.Category}
                   onChange={handleChange}
                   options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
+                  autoFocus
                 />
                 <InputField
                   label="Category:"

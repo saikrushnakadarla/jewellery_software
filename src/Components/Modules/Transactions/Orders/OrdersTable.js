@@ -96,30 +96,30 @@ const RepairsTable = () => {
           return finalBalance.toFixed(2);
         },
       }, 
-      {
-        Header: 'Status',
-        accessor: 'status',
-        Cell: ({ row }) => (
-          <select
-            value={row.original.order_status}
-            onChange={(e) => handleStatusChange(row.original.order_number, e.target.value)}
-            style={{
-              padding: '5px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-            }}
-          >
-            <option value="Pending">Pending</option>
-            <option value="In Transit">In Transit</option>
-            <option value="Delivered">Delivered</option>
-          </select>
-        ),
-      },
-      {
-        Header: 'Order Status',
-        accessor: 'order_status',
-        Cell: ({ row }) => row.original.order_status || '-',
-      },
+      // {
+      //   Header: 'Status',
+      //   accessor: 'status',
+      //   Cell: ({ row }) => (
+      //     <select
+      //       value={row.original.order_status}
+      //       onChange={(e) => handleStatusChange(row.original.order_number, e.target.value)}
+      //       style={{
+      //         padding: '5px',
+      //         border: '1px solid #ccc',
+      //         borderRadius: '4px',
+      //       }}
+      //     >
+      //       <option value="Pending">Pending</option>
+      //       <option value="In Transit">In Transit</option>
+      //       <option value="Delivered">Delivered</option>
+      //     </select>
+      //   ),
+      // },
+      // {
+      //   Header: 'Order Status',
+      //   accessor: 'order_status',
+      //   Cell: ({ row }) => row.original.order_status || '-',
+      // },
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -301,33 +301,35 @@ const RepairsTable = () => {
  };
 
 
-  const handleStatusChange = async (orderNumber, newStatus) => {
-    try {
-      // Make the PUT request to update the status in the backend
-      const response = await axios.put(`${baseURL}/update-order-status`, {
-        order_number: orderNumber,
-        order_status: newStatus,
-      });
+ const handleStatusChange = async (orderNumber, newStatus) => {
+  try {
+    console.log("Sending Request with:", { order_number: orderNumber, order_status: newStatus }); // Debugging
 
-      if (response.status === 200) {
-        // Update the local state with the new status
-        setData((prevData) =>
-          prevData.map((item) =>
-            item.order_number === orderNumber
-              ? { ...item, order_status: newStatus }
-              : item
-          )
-        );
+    // Make the PUT request to update the status in the backend
+    const response = await axios.put(`${baseURL}/update-order-status`, {
+      order_number: orderNumber,
+      order_status: newStatus,
+    });
 
-        Swal.fire('Success', 'Order status updated successfully.', 'success');
-      } else {
-        Swal.fire('Error', 'Failed to update the order status.', 'error');
-      }
-    } catch (error) {
-      console.error('Error updating order status:', error);
-      Swal.fire('Error', 'An error occurred while updating the order status.', 'error');
+    if (response.status === 200) {
+      // Update the local state with the new status
+      setData((prevData) =>
+        prevData.map((item) =>
+          item.order_number === orderNumber ? { ...item, order_status: newStatus } : item
+        )
+      );
+
+      Swal.fire("Success", "Order status updated successfully.", "success");
+    } else {
+      Swal.fire("Error", "Failed to update the order status.", "error");
     }
-  };
+  } catch (error) {
+    console.error("Error updating order status:", error.response?.data || error.message);
+
+    Swal.fire("Error", "An error occurred while updating the order status.", "error");
+  }
+};
+
   
   const fetchRepairs = async () => {
     try {

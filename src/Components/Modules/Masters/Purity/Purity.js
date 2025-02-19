@@ -223,6 +223,7 @@ function Purity() {
               onChange={handleChange}
               required={true}
               error={errors.name}
+              autoFocus
             />
             <InputField
               label="Metal"

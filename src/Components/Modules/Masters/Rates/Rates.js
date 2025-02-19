@@ -178,6 +178,7 @@ const Rates = () => {
                             type="text"
                             value={rates.gold22}
                             onChange={handleInputChange}
+                            autoFocus
                         />
                         <InputField
                             label="24 Crt"

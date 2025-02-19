@@ -51,6 +51,7 @@ const ProductDetails = ({
             value={formData.code}
             onChange={(e) => handleBarcodeChange(e.target.value)}
             type="select"
+            // autoFocus
             options={
               formData.barcodeOptions?.length > 0
                 ? formData.barcodeOptions
@@ -67,6 +68,7 @@ const ProductDetails = ({
             }
           />
         </Col>
+
         <Col xs={12} md={2}>
           <InputField
             label="Metal Type"

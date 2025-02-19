@@ -300,6 +300,7 @@ function DesignMaster() {
                   onChange={handleChange}
                   options={metalOptions.map(option => ({ value: option.value, label: option.label }))}
                   error={errors.metal}
+                  autoFocus
                 />
             
             <InputField

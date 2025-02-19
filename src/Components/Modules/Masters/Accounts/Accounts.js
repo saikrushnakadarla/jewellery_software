@@ -287,6 +287,7 @@ const RepairForm = () => {
                 value={formData.account_name}
                 onChange={handleChange}
                 required
+                autoFocus
               />
             </Col>
             <Col xs={12} md={4}>

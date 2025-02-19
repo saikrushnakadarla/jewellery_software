@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./Repairs.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
@@ -14,17 +14,17 @@ import { AuthContext } from "../../../Pages/Login/Context";
 const RepairForm = () => {
   const today = new Date(); // Define today as a Date object
   const formattedToday = today.toISOString().split("T")[0]; // Format today's date as YYYY-MM-DD
-  
+
   const defaultDeliveryDate = new Date(); // Create a new Date object for the default delivery date
   defaultDeliveryDate.setDate(today.getDate() + 3); // Add 3 days to today's date
-  
+
   const formattedDate = defaultDeliveryDate.toISOString().split("T")[0];
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
   const { authToken, userId, userName } = useContext(AuthContext);
   console.log(userId, userName)
-  console.log("ID=",id)
+  console.log("ID=", id)
   const { state } = useLocation();
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
@@ -51,12 +51,12 @@ const RepairForm = () => {
     tag_no: "",
     description: "",
     purity: "",
-    category:"",
-    sub_category:"",
-    gross_weight:"",
-    pcs:"",
-    estimated_dust:"",
-    estimated_amt:"",
+    category: "",
+    sub_category: "",
+    gross_weight: "",
+    pcs: "",
+    estimated_dust: "",
+    estimated_amt: "",
     extra_weight: "",
     stone_value: "",
     making_charge: "",
@@ -227,7 +227,7 @@ const RepairForm = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result);
+        setImage(reader.result); // Convert image to base64 and update state
       };
       reader.readAsDataURL(file);
     }
@@ -242,15 +242,20 @@ const RepairForm = () => {
     return `${year}-${month}-${day}`;
   };
 
-
   useEffect(() => {
     const fetchRepairById = async () => {
       if (id) {
         try {
           const response = await axios.get(`${baseURL}/get/repairs/${id}`);
           const fetchedData = response.data;
+          console.log("Fetched Data:", fetchedData);
 
-          // Format the date and delivery_date fields
+          // Check if image exists
+          if (fetchedData.image) {
+            setImage(fetchedData.image); // Set existing image
+          }
+
+          // Format the date fields
           const formattedData = {
             ...fetchedData,
             date: parseDate(fetchedData.date),
@@ -259,7 +264,7 @@ const RepairForm = () => {
 
           setFormData((prevData) => ({
             ...prevData,
-            ...formattedData, // Merge formatted data into the form data
+            ...formattedData, // Merge formatted data into the form state
           }));
         } catch (error) {
           console.error("Error fetching repair data:", error);
@@ -271,23 +276,23 @@ const RepairForm = () => {
     fetchRepairById();
   }, [id]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const updatedFormData = {
       ...formData,
-      image,
+      image, // Include the image in the request payload
     };
 
     try {
       if (id) {
-        // Update existing repair record
+        // Update existing repair entry
         const response = await axios.put(`${baseURL}/update/repairs/${id}`, updatedFormData);
         if (response.status === 200) {
           alert("Repair entry updated successfully!");
         }
       } else {
-        // Create a new repair record
+        // Create a new repair entry
         const response = await axios.post(`${baseURL}/add/repairs`, updatedFormData);
         if (response.status === 201) {
           alert("Repair entry added successfully!");
@@ -299,6 +304,7 @@ const RepairForm = () => {
       alert("Failed to submit the repair entry");
     }
   };
+
 
   const handleAddCustomer = () => {
     navigate("/customermaster", { state: { from: "/repairs" } });
@@ -453,7 +459,7 @@ const RepairForm = () => {
           </div>
           <Row className="form-section pt-4">
             <Col xs={12} md={2}>
-              <InputField label="Staff:" name="staff" value={formData.staff} onChange={handleChange} readOnly/>
+              <InputField label="Staff:" name="staff" value={formData.staff} onChange={handleChange} readOnly />
             </Col>
             <Col xs={12} md={2}>
               <InputField label="Delivery Date:" type="date" name="delivery_date" value={formData.delivery_date} onChange={handleChange} />
@@ -467,7 +473,7 @@ const RepairForm = () => {
               <Col className="form-section">
                 <h4>Repair Item Details</h4>
                 <Row>
-                <Col xs={12} md={3}>
+                  <Col xs={12} md={3}>
                     <InputField label="Category" name="category" value={formData.category} onChange={handleChange} />
                   </Col>
                   <Col xs={12} md={2}>
@@ -477,18 +483,18 @@ const RepairForm = () => {
                     <InputField label="Item name" name="item" value={formData.item} onChange={handleChange} />
                   </Col>
                   <Col xs={12} md={2}>
-        <InputField
-          label="Metal Type"
-          name="metal_type"
-          type="select"
-          value={formData.metal_type}
-          onChange={handleChange}
-          options={metalTypes.map((metal) => ({
-            value: metal.metal_name,
-            label: metal.metal_name
-          }))}
-        />
-      </Col>
+                    <InputField
+                      label="Metal Type"
+                      name="metal_type"
+                      type="select"
+                      value={formData.metal_type}
+                      onChange={handleChange}
+                      options={metalTypes.map((metal) => ({
+                        value: metal.metal_name,
+                        label: metal.metal_name
+                      }))}
+                    />
+                  </Col>
                   {/* <Col xs={12} md={2}>
                     <InputField label="Tag No:" name="tag_no" value={formData.tag_no} onChange={handleChange} />
                   </Col> */}
@@ -496,18 +502,18 @@ const RepairForm = () => {
                     <InputField label="Description:" name="description" value={formData.description} onChange={handleChange} />
                   </Col>
                   <Col xs={12} md={2}>
-        <InputField
-          label="Purity"
-          name="purity"
-          type="select"
-          value={formData.purity}
-          onChange={handleChange}
-          options={filteredPurity.map((item) => ({
-            value: item.name,
-            label: item.name
-          }))}
-        />
-      </Col>
+                    <InputField
+                      label="Purity"
+                      name="purity"
+                      type="select"
+                      value={formData.purity}
+                      onChange={handleChange}
+                      options={filteredPurity.map((item) => ({
+                        value: item.name,
+                        label: item.name
+                      }))}
+                    />
+                  </Col>
                   <Col xs={12} md={2}>
                     <InputField label="Gross Weight" name="gross_weight" value={formData.gross_weight} onChange={handleChange} />
                   </Col>

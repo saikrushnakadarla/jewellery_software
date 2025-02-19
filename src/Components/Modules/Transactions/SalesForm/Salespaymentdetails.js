@@ -18,47 +18,55 @@ const PaymentDetails = ({
   handleCheckout
 }) => {
 
-  // const handleCheckout = async () => {
-  //   if (!invoiceDetails.length || !selectedRows.length) {
-  //     alert("No invoices selected for sale return.");
-  //     return;
-  //   }
+//   const handleCheckout = async () => {
+//     if (!invoiceDetails.length || !selectedRows.length) {
+//         alert("No invoices selected for sale return.");
+//         return;
+//     }
 
-  //   try {
-  //     const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
+//     try {
+//         const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
 
-  //     const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
-  //       id: invoice.id,
-  //       status: "Sale Returned",
-  //     }));
+//         const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
+//             id: invoice.id,
+//             status: "Sale Returned",
+//         }));
 
-  //     const openTagsUpdates = selectedInvoices.map((invoice) => ({
-  //       PCode_BarCode: invoice.code,
-  //       Status: "Sale Returned",
-  //     }));
+//         const openTagsUpdates = selectedInvoices.map((invoice) => ({
+//             PCode_BarCode: invoice.code,
+//             Status: "Sale Returned",
+//         }));
 
-  //     const productUpdates = selectedInvoices.map((invoice) => ({
-  //       product_id: invoice.product_id,
-  //       qty: invoice.qty,
-  //       gross_weight: invoice.gross_weight,
-  //     }));
+//         const productUpdates = selectedInvoices.map((invoice) => ({
+//             product_id: invoice.product_id,
+//             qty: invoice.qty,
+//             gross_weight: invoice.gross_weight,
+//         }));
 
-  //     const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
+//         const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
 
-  //     await axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates });
-  //     await axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates });
-  //     await axios.post(`${baseURL}/updateProduct`, { updates: productUpdates });
-  //     await axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries });
+//         // Execute all API calls in parallel
+//         const responses = await Promise.allSettled([
+//             axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates }),
+//             axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates }),
+//             axios.post(`${baseURL}/updateProduct`, { updates: productUpdates }),
+//             axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries }),
+//         ]);
 
-  //     alert("Sale Return added Successfully!");
-  //     // resetSaleReturnForm();
-  //     // setSelectedRows([]); 
-  //     // setIsAllSelected(false);
-  //   } catch (error) {
-  //     console.error("Error during checkout:", error);
-  //     alert("An error occurred during checkout. Please try again.");
-  //   }
-  // };
+//         // Check if any API failed
+//         const failedRequests = responses.filter(res => res.status === "rejected");
+//         if (failedRequests.length > 0) {
+//             console.error("Some API calls failed:", failedRequests);
+//             alert("Some updates failed. Please check console for details.");
+//         } else {
+//             alert("Sale Return added Successfully!");
+//         }
+        
+//     } catch (error) {
+//         console.error("Error during checkout:", error);
+//         alert("An error occurred during checkout. Please try again.");
+//     }
+// };
 
 
   return (
@@ -73,20 +81,19 @@ const PaymentDetails = ({
                   <td colSpan="20" className="text-right">
                     Taxable Amount
                   </td>
-                  <td colSpan="4">{salesTaxableAmount}</td>
+                  <td colSpan="4">{parseFloat(salesTaxableAmount).toFixed(2)}</td>
                 </tr>
                 <tr>
                   <td colSpan="20" className="text-right">
                     Tax Amount
                   </td>
-                  <td colSpan="4">{salesTaxAmount}</td>
+                  <td colSpan="4">{parseFloat(salesTaxAmount).toFixed(2)}</td>
                 </tr>
                 <tr>
-                  <td colSpan="20" className="text-right">
-                    Net Amount
-                  </td>
-                  <td colSpan="4">{salesNetAmount}</td>
+                  <td colSpan="20" className="text-right">Net Amount</td>
+                  <td colSpan="4">{parseFloat(salesNetAmount).toFixed(2)}</td>
                 </tr>
+
               </>
             ) : (
               <>
@@ -113,24 +120,13 @@ const PaymentDetails = ({
           </Table>
         </Row>
         <Row>
-          <Col xs={12} md={3}>
+          {/* <Col xs={12} md={3}>
             <Button
               onClick={handleCheckout}
               style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
             // disabled={!isSubmitEnabled}
             >
               Add
-            </Button>
-          </Col>
-          {/* <Col xs={12} md={2}>
-            <Button
-              type="button"
-              className="cus-back-btn"
-              variant="secondary"
-              onClick={handleBack}
-              style={{ backgroundColor: "gray", marginLeft: "-120px" }}
-            >
-              Cancel
             </Button>
           </Col> */}
         </Row>

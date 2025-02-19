@@ -13,6 +13,7 @@ const InputField = ({
   options = [],
   required = false,
   max,
+  autoFocus ,
 }) => {
   // Custom styles for react-select
   const customStyles = {
@@ -55,6 +56,7 @@ const InputField = ({
             options={options}
             placeholder={placeholder || "Select"}
             isDisabled={readOnly}
+            autoFocus={autoFocus}
             value={value ? options.find((opt) => opt.value === value) : null}
             onChange={(selectedOption) =>
               onChange({
@@ -74,6 +76,7 @@ const InputField = ({
             onChange={onChange}
             required={required}
             disabled={readOnly}
+            autoFocus={autoFocus}
           />
         ) : (
           <input
@@ -86,6 +89,7 @@ const InputField = ({
             onChange={onChange}
             required={required}
             max={max}
+            autoFocus={autoFocus}
           />
         )}
       </div>

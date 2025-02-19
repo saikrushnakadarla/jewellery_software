@@ -186,6 +186,7 @@ function SubCategory() {
                   label: option.label,
                 }))}
                 required
+                autoFocus
               />
             </Col>
             <Col md={4}>

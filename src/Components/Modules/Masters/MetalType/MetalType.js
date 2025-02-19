@@ -231,6 +231,7 @@ function MetalType() {
               onChange={handleChange}
               required={true}
               error={errors.metal_name}
+              autoFocus
             />
 
             {/* <InputField
