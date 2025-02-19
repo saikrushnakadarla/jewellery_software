@@ -633,6 +633,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                     value: category.subcategory_id,
                                                     label: category.sub_category_name,
                                                 }))}
+                                                autoFocus
                                             />
                                         </div>
                                         <AiOutlinePlus

@@ -1025,6 +1025,7 @@ const RepairForm = () => {
                     })),
                   ]
               }
+              autoFocus
             />
           </Col>
 

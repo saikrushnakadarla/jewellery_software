@@ -1121,6 +1121,7 @@ if (!formData.mobile || formData.mobile.trim() === "") {
                             label: customer.mobile, // Display mobile as the label
                           })),
                         ]}
+                        autoFocus
                       />
                     </div>
                     <AiOutlinePlus
@@ -1560,13 +1561,13 @@ if (!formData.mobile || formData.mobile.trim() === "") {
             </div>
           </div>
           <div className="form-buttons">
-            <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSave}>Save</Button>
-            <Button
+          <Button
               variant="secondary"
               onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
             >
               cancel
             </Button>
+            <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSave}>Save</Button>           
           </div>
         </Form>
       </div>

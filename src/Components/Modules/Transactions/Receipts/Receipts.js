@@ -400,6 +400,7 @@ const RepairForm = () => {
                 { value: "Cheque", label: "Cheque" },
                 { value: "Online", label: "Online" },
               ]}
+              autoFocus
             />
           </Col>
           <Col xs={12} md={3}>
