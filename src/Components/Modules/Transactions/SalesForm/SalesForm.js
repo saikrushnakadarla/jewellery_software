@@ -198,8 +198,6 @@ const SalesForm = () => {
     fetchRepairs();
   }, []);
 
-
-
   useEffect(() => {
     const fetchInvoiceDetails = async () => {
       if (!returnData.invoice_number) {
@@ -221,7 +219,6 @@ const SalesForm = () => {
 
     fetchInvoiceDetails();
   }, [returnData.invoice_number]);
-
 
   const handleCustomerChange = (customerId) => {
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
@@ -272,91 +269,107 @@ const SalesForm = () => {
   };
 
   const [editIndex, setEditIndex] = useState(null);
-
   const [discount, setDiscount] = useState();
 
-  
+
   const handleDiscountChange = (e) => {
     const discountValue = parseFloat(e.target.value) || 0; // Default to 0 if empty or NaN
     setDiscount(discountValue);
-  
+
     const storedRepairDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
-  
+
     const updatedRepairDetails = storedRepairDetails.map((item) => {
       const makingCharges = parseFloat(item.making_charges) || 0; // Default to 0 if NaN
       const calculatedDiscount = (makingCharges * discountValue) / 100;
-  
+
       // Ensure `total_price` is a valid number
       const previousTotalPrice = parseFloat(item.total_price) || 0;
-  
+
       // Store original total price if not already stored
-      const originalTotalPrice = item.original_total_price 
-        ? parseFloat(item.original_total_price) 
+      const originalTotalPrice = item.original_total_price
+        ? parseFloat(item.original_total_price)
         : previousTotalPrice;
-  
+
       // Calculate the updated total price after applying the discount
       const updatedTotalPrice = originalTotalPrice - calculatedDiscount;
-  
-      return { 
-        ...item, 
+
+      return {
+        ...item,
         original_total_price: originalTotalPrice.toFixed(2), // Store original price
         disscount: calculatedDiscount.toFixed(2), // Corrected spelling
-        disscount_percentage:discountValue,
+        disscount_percentage: discountValue,
         total_price: updatedTotalPrice.toFixed(2) // Update total price
       };
     });
-  
+
     // Update both state and localStorage
     setRepairDetails(updatedRepairDetails);
     localStorage.setItem('repairDetails', JSON.stringify(updatedRepairDetails));
-  
+
     console.log("Updated Repair Details:", updatedRepairDetails);
   };
 
-const handleAdd = () => {
-  setRepairDetails([
-    ...repairDetails,
-    {
-      ...formData,
-      pieace_cost:
-        formData.pieace_cost && parseFloat(formData.pieace_cost) > 0
-          ? parseFloat(formData.pieace_cost).toFixed(2)
-          : null, // Set to null if not greater than 0
-      rate:
-        formData.rate && parseFloat(formData.rate) > 0
-          ? parseFloat(formData.rate).toFixed(2)
-          : "",
-      imagePreview: formData.imagePreview,
-    },
-  ]);
+  const handleAdd = () => {
+    const storedRepairDetails = JSON.parse(localStorage.getItem("repairDetails")) || [];
 
-  setFormData((prevData) => ({
-    ...prevData,
-    disscount: "",
-    disscount_percentage: "",
-    pieace_cost: "",
-    imagePreview: null,
-  }));
+    // Check if the code already exists
+    const isDuplicate = storedRepairDetails.some(
+      (item) => item.code === formData.code
+    );
 
-  resetProductFields();
-};
+    if (isDuplicate) {
+      alert("The product is already selected.");
+      return;
+    }
 
-const handleEdit = (index) => {
-  setEditIndex(index);
+    // Add new repair detail
+    const updatedRepairDetails = [
+      ...repairDetails,
+      {
+        ...formData,
+        pieace_cost:
+          formData.pieace_cost && parseFloat(formData.pieace_cost) > 0
+            ? parseFloat(formData.pieace_cost).toFixed(2)
+            : null, // Set to null if not greater than 0
+        rate:
+          formData.rate && parseFloat(formData.rate) > 0
+            ? parseFloat(formData.rate).toFixed(2)
+            : "",
+        imagePreview: formData.imagePreview,
+      },
+    ];
 
-  setFormData((prevFormData) => ({
-    ...prevFormData,
-    ...repairDetails[index],
-    pieace_cost: repairDetails[index].pieace_cost && parseFloat(repairDetails[index].pieace_cost) > 0
-      ? parseFloat(repairDetails[index].pieace_cost).toFixed(2)
-      : "",
-    rate: repairDetails[index].rate && parseFloat(repairDetails[index].rate) > 0
-      ? parseFloat(repairDetails[index].rate).toFixed(2)
-      : "",
-      
-  }));
-};
+    setRepairDetails(updatedRepairDetails);
 
+    setFormData((prevData) => ({
+      ...prevData,
+      disscount: "",
+      disscount_percentage: "",
+      pieace_cost: "",
+      imagePreview: null,
+    }));
+
+    resetProductFields();
+
+    // Save updated data to localStorage
+    localStorage.setItem("repairDetails", JSON.stringify(updatedRepairDetails));
+  };
+
+  const handleEdit = (index) => {
+    setEditIndex(index);
+
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      ...repairDetails[index],
+      pieace_cost: repairDetails[index].pieace_cost && parseFloat(repairDetails[index].pieace_cost) > 0
+        ? parseFloat(repairDetails[index].pieace_cost).toFixed(2)
+        : "",
+      rate: repairDetails[index].rate && parseFloat(repairDetails[index].rate) > 0
+        ? parseFloat(repairDetails[index].rate).toFixed(2)
+        : "",
+
+    }));
+  };
 
   const handleUpdate = () => {
     const updatedDetails = repairDetails.map((item, index) =>
@@ -472,7 +485,7 @@ const handleEdit = (index) => {
     const discountAmt = parseFloat(item.disscount) || 0;
     return sum + stonePrice + makingCharges + rateAmt - discountAmt;
   }, 0);
- 
+
 
   const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
@@ -510,7 +523,7 @@ const handleEdit = (index) => {
   const payableAmount = netAmount - (schemeAmount + oldItemsAmount);
   const netPayableAmount = Math.round(payableAmount);
 
-  
+
   const [selectedRows, setSelectedRows] = useState([]);
   const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
 
@@ -536,53 +549,53 @@ const handleEdit = (index) => {
 
   const handleCheckout = async () => {
     if (!invoiceDetails.length || !selectedRows.length) {
-        // alert("No invoices selected for sale return.");
-        return;
+      // alert("No invoices selected for sale return.");
+      return;
     }
 
     try {
-        const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
+      const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
 
-        const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
-            id: invoice.id,
-            status: "Sale Returned",
-        }));
+      const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
+        id: invoice.id,
+        status: "Sale Returned",
+      }));
 
-        const openTagsUpdates = selectedInvoices.map((invoice) => ({
-            PCode_BarCode: invoice.code,
-            Status: "Sale Returned",
-        }));
+      const openTagsUpdates = selectedInvoices.map((invoice) => ({
+        PCode_BarCode: invoice.code,
+        Status: "Sale Returned",
+      }));
 
-        const productUpdates = selectedInvoices.map((invoice) => ({
-            product_id: invoice.product_id,
-            qty: invoice.qty,
-            gross_weight: invoice.gross_weight,
-        }));
+      const productUpdates = selectedInvoices.map((invoice) => ({
+        product_id: invoice.product_id,
+        qty: invoice.qty,
+        gross_weight: invoice.gross_weight,
+      }));
 
-        const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
+      const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
 
-        // Execute all API calls in parallel
-        const responses = await Promise.allSettled([
-            axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates }),
-            axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates }),
-            axios.post(`${baseURL}/updateProduct`, { updates: productUpdates }),
-            axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries }),
-        ]);
+      // Execute all API calls in parallel
+      const responses = await Promise.allSettled([
+        axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates }),
+        axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates }),
+        axios.post(`${baseURL}/updateProduct`, { updates: productUpdates }),
+        axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries }),
+      ]);
 
-        // Check if any API failed
-        const failedRequests = responses.filter(res => res.status === "rejected");
-        if (failedRequests.length > 0) {
-            console.error("Some API calls failed:", failedRequests);
-            alert("Some updates failed. Please check console for details.");
-        } else {
-            alert("Sale Return added Successfully!");
-        }
-        
+      // Check if any API failed
+      const failedRequests = responses.filter(res => res.status === "rejected");
+      if (failedRequests.length > 0) {
+        console.error("Some API calls failed:", failedRequests);
+        alert("Some updates failed. Please check console for details.");
+      } else {
+        alert("Sale Return added Successfully!");
+      }
+
     } catch (error) {
-        console.error("Error during checkout:", error);
-        alert("An error occurred during checkout. Please try again.");
+      console.error("Error during checkout:", error);
+      alert("An error occurred during checkout. Please try again.");
     }
-};
+  };
 
 
   // Calculate taxable amount based on selected rows
@@ -626,7 +639,7 @@ const handleEdit = (index) => {
   };
 
   const handleSave = async () => {
-    if ( !formData.account_name || !formData.mobile ) {
+    if (!formData.account_name || !formData.mobile) {
       alert("Please select the Customer or enter the Customer Mobile Number");
       return;
     }
