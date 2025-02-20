@@ -41,25 +41,47 @@ const ProductDetails = ({
       <Row>
         <Col xs={12} md={2}>
           <InputField
+            label="Category"
+            name="category"
+            value={formData.category || ""}
+            type="select"
+            onChange={handleChange}
+            options={categoryOptions}
+          />
+        </Col>
+
+        <Col xs={12} md={2}>
+          <InputField
             label="BarCode/Rbarcode"
             name="code"
             value={formData.code}
             onChange={(e) => handleBarcodeChange(e.target.value)}
             type="select"
-            // autoFocus
             options={
               formData.barcodeOptions?.length > 0
                 ? formData.barcodeOptions
-                : [
-                  ...products.map((product) => ({
+                : products
+                  .filter((product) =>
+                    formData.category
+                      ? product.product_name === formData.category
+                      : true
+                  )
+                  .map((product) => ({
                     value: product.rbarcode,
                     label: product.rbarcode,
-                  })),
-                  ...data.map((tag) => ({
-                    value: tag.PCode_BarCode,
-                    label: tag.PCode_BarCode,
-                  })),
-                ]
+                  }))
+                  .concat(
+                    data
+                      .filter((tag) =>
+                        formData.category
+                          ? tag.category === formData.category
+                          : true
+                      )
+                      .map((tag) => ({
+                        value: tag.PCode_BarCode,
+                        label: tag.PCode_BarCode,
+                      }))
+                  )
             }
           />
         </Col>
@@ -74,7 +96,7 @@ const ProductDetails = ({
             options={metaltypeOptions}
           />
         </Col>
-        <Col xs={12} md={2}>
+        {/* <Col xs={12} md={2}>
           <InputField
             label="Category"
             name="category"
@@ -83,7 +105,7 @@ const ProductDetails = ({
             onChange={handleChange}
             options={categoryOptions}
           />
-        </Col>
+        </Col> */}
         <Col xs={12} md={2}>
           <InputField
             label="Sub Category"

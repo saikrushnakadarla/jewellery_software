@@ -33,50 +33,12 @@ const ProductDetails = ({
   isQtyEditable
 }) => {
 
-  console.log("Filtered Design Options:", filteredDesignOptions);
-  console.log("Filtered Purity Options:", filteredPurityOptions);
-  console.log("Filtered Metal Types:", filteredMetalTypes);
-  console.log("Unique Products:", uniqueProducts);
-  console.log("subcategory Options:", subcategoryOptions);
 
   const isByFixed = formData.pricing === "By fixed";
 
   return (
     <Col >
       <Row>
-        <Col xs={12} md={2}>
-          <InputField
-            label="BarCode/Rbarcode"
-            name="code"
-            value={formData.code}
-            onChange={(e) => handleBarcodeChange(e.target.value)}
-            type="select"
-            options={
-              formData.barcodeOptions?.length > 0
-                ? formData.barcodeOptions
-                : [
-                  ...products.map((product) => ({
-                    value: product.rbarcode,
-                    label: product.rbarcode,
-                  })),
-                  ...data.map((tag) => ({
-                    value: tag.PCode_BarCode,
-                    label: tag.PCode_BarCode,
-                  })),
-                ]
-            }
-          />
-        </Col>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Metal Type"
-            name="metal_type"
-            value={formData.metal_type || ""}
-            onChange={handleChange}
-            type="select"
-            options={metaltypeOptions}
-          />
-        </Col>
         <Col xs={12} md={2}>
           <InputField
             label="Category"
@@ -87,6 +49,63 @@ const ProductDetails = ({
             options={categoryOptions}
           />
         </Col>
+
+        <Col xs={12} md={2}>
+          <InputField
+            label="BarCode/Rbarcode"
+            name="code"
+            value={formData.code}
+            onChange={(e) => handleBarcodeChange(e.target.value)}
+            type="select"
+            options={
+              formData.barcodeOptions?.length > 0
+                ? formData.barcodeOptions
+                : products
+                  .filter((product) =>
+                    formData.category
+                      ? product.product_name === formData.category
+                      : true
+                  )
+                  .map((product) => ({
+                    value: product.rbarcode,
+                    label: product.rbarcode,
+                  }))
+                  .concat(
+                    data
+                      .filter((tag) =>
+                        formData.category
+                          ? tag.category === formData.category
+                          : true
+                      )
+                      .map((tag) => ({
+                        value: tag.PCode_BarCode,
+                        label: tag.PCode_BarCode,
+                      }))
+                  )
+            }
+          />
+        </Col>
+
+        <Col xs={12} md={2}>
+          <InputField
+            label="Metal Type"
+            name="metal_type"
+            value={formData.metal_type || ""}
+            onChange={handleChange}
+            type="select"
+            options={metaltypeOptions}
+          />
+        </Col>
+        {/* <Col xs={12} md={2}>
+          <InputField
+            label="Category"
+            name="category"
+            value={formData.category || ""}
+            type="select"
+            onChange={handleChange}
+            options={categoryOptions}
+          />
+        </Col> */}
         <Col xs={12} md={2}>
           <InputField
             label="Sub Category"
@@ -336,7 +355,7 @@ const ProductDetails = ({
                 label="MC On"
                 name="mc_on"
                 type="select"
-                value={formData.mc_on || ""} // Default to "MC / Gram"
+                value={formData.mc_on || ""}
                 onChange={handleChange}
                 options={[
                   { value: "MC / Gram", label: "MC / Gram" },
@@ -349,26 +368,27 @@ const ProductDetails = ({
                 ]}
               />
             </Col>
+
             <Col xs={12} md={1}>
               <InputField
-                label={
-                  formData.mc_on === "MC %"
-                    ? "MC %"
-                    : "MC/Gm"
-                }
+                label={formData.mc_on === "MC %" ? "MC %" : "MC/Gm"}
                 name="mc_per_gram"
                 value={formData.mc_per_gram || ""}
                 onChange={handleChange}
+                disabled={formData.mc_on === "MC / Piece"} // Disable when MC / Piece is selected
               />
             </Col>
+
             <Col xs={12} md={1}>
               <InputField
                 label="Total MC"
                 name="making_charges"
                 value={formData.making_charges || ""}
                 onChange={handleChange}
+                disabled={formData.mc_on === "MC / Gram"} // Disable when MC / Gram is selected
               />
             </Col>
+
 
             <Col xs={12} md={2}>
               <InputField

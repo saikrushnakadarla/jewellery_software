@@ -140,34 +140,8 @@ const useProductHandlers = () => {
         throw new Error("Failed to fetch tags");
       }
       const result = await response.json();
-
-      // Remove duplicate product_Name entries
-      // const uniqueProductNames = Array.from(
-      //   new Map(result.result.map((prod) => [prod.sub_category, prod])).values()
-      // );
-
-      // // Extract unique metal types
-      // const uniqueMetalTypes = Array.from(
-      //   new Set(result.result.map((prod) => prod.metal_type))
-      // ).map((metalType) => ({ metal_type: metalType }));
-
-      // // Extract unique design names
-      // const uniqueDesigns = Array.from(
-      //   new Set(result.result.map((prod) => prod.design_master))
-      // ).map((designMaster) => ({ design_master: designMaster }));
-
-      // const uniquePurity = Array.from(
-      //   new Set(result.result.map((prod) => prod.Purity))
-      // ).map((Purity) => ({ Purity: Purity }));
-
-      setData(result.result); // Set the full data
-      // setUniqueProducts(uniqueProductNames); // Set unique product_Name options
-      // setMetalTypes(uniqueMetalTypes); // Set all unique metal types
-      // setFilteredMetalTypes(uniqueMetalTypes); // Initially, show all metal types
-      // setDesignOptions(uniqueDesigns); // Set all unique designs
-      // setFilteredDesignOptions(uniqueDesigns); // Initially, show all designs
-      // setPurity(uniquePurity); // Set all unique metal types
-      // setFilteredPurityOptions(uniquePurity); // Initially, show all metal types
+      setData(result.result); 
+      
     } catch (error) {
       console.error("Error fetching tags:", error);
     }
@@ -484,11 +458,17 @@ const useProductHandlers = () => {
         }
         const result = await response.json();
         if (result && result.data) {
-          const formattedOptions = result.data.map((item) => ({
+          // If formData.metal_type is available, filter based on it, otherwise show all
+          const filteredData = formData.category
+            ? result.data.filter((item) => item.category === formData.category)
+            : result.data;
+  
+          // Format the filtered options
+          const formattedOptions = filteredData.map((item) => ({
             label: item.sub_category_name, // Display value
             value: item.sub_category_name, // Unique ID for value
           }));
-
+  
           setSubcategoryOptions(formattedOptions);
         } else {
           console.error("Invalid API response format", result);
@@ -497,10 +477,11 @@ const useProductHandlers = () => {
         console.error("Error fetching data:", error);
       }
     };
-
+  
+    // Run the function initially and when formData.metal_type changes
     fetchSubCategory();
-  }, []);
-
+  }, [formData.category]); 
+  
   useEffect(() => {
     const fetchMetalType = async () => {
       try {
@@ -552,36 +533,44 @@ const useProductHandlers = () => {
         const response = await fetch(`${baseURL}/purity`);
         const data = await response.json();
 
-        const filteredData = data.filter((product) => {
-          return product.metal?.toLowerCase() === formData.metal_type?.toLowerCase();
-        });
+        let filteredData = data;
+
+        // If metal_type is set, filter based on it; otherwise, show all
+        if (formData.metal_type) {
+          filteredData = data.filter((product) =>
+            product.metal?.toLowerCase() === formData.metal_type.toLowerCase()
+          );
+        }
+
         const purities = Array.from(
           new Set(filteredData.map((product) => `${product.name} | ${product.purity}`))
         );
+
         const purityOptions = purities.map((purity) => ({
           value: purity,
           label: purity,
         }));
 
         setpurityOptions(purityOptions);
-        const defaultPurity = purityOptions.find((option) =>
-          /22/i.test(option.value)
-        )?.value;
 
-        setFormData((prevData) => ({
-          ...prevData,
-          purity: defaultPurity || "",
-        }));
+        // Set default purity only if metal_type is available
+        if (formData.metal_type && purityOptions.length > 0) {
+          const defaultPurity = purityOptions.find((option) =>
+            /22/i.test(option.value)
+          )?.value;
+
+          setFormData((prevData) => ({
+            ...prevData,
+            purity: defaultPurity || "",
+          }));
+        }
       } catch (error) {
         console.error('Error fetching products:', error);
       }
     };
 
-    if (formData.metal_type) {
-      fetchPurity();
-    }
+    fetchPurity();
   }, [formData.metal_type]);
-
 
   const handleBarcodeChange = async (code) => {
     try {
@@ -741,7 +730,6 @@ const useProductHandlers = () => {
       console.error("Error handling code change:", error);
     }
   };
-
 
   const [image, setImage] = useState(null);
   const handleImageChange = (e) => {

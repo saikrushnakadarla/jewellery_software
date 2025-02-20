@@ -149,34 +149,8 @@ const useProductHandlers = () => {
         throw new Error("Failed to fetch tags");
       }
       const result = await response.json();
-
-      // Remove duplicate product_Name entries
-      const uniqueProductNames = Array.from(
-        new Map(result.result.map((prod) => [prod.sub_category, prod])).values()
-      );
-
-      // Extract unique metal types
-      const uniqueMetalTypes = Array.from(
-        new Set(result.result.map((prod) => prod.metal_type))
-      ).map((metalType) => ({ metal_type: metalType }));
-
-      // Extract unique design names
-      const uniqueDesigns = Array.from(
-        new Set(result.result.map((prod) => prod.design_master))
-      ).map((designMaster) => ({ design_master: designMaster }));
-
-      const uniquePurity = Array.from(
-        new Set(result.result.map((prod) => prod.Purity))
-      ).map((Purity) => ({ Purity: Purity }));
-
       setData(result.result); 
-      setUniqueProducts(uniqueProductNames); // Set unique product_Name options
-      setMetalTypes(uniqueMetalTypes); // Set all unique metal types
-      setFilteredMetalTypes(uniqueMetalTypes); // Initially, show all metal types
-      setDesignOptions(uniqueDesigns); // Set all unique designs
-      setFilteredDesignOptions(uniqueDesigns); // Initially, show all designs
-      setPurity(uniquePurity); // Set all unique metal types
-      setFilteredPurityOptions(uniquePurity); // Initially, show all metal types
+      
     } catch (error) {
       console.error("Error fetching tags:", error);
     }
@@ -291,8 +265,6 @@ const useProductHandlers = () => {
     setFormData(updatedFormData);
   };
 
- 
-  
   const handleProductNameChange = (productName) => {
     const productEntries = data.filter((prod) => prod.sub_category === productName);
 
@@ -444,8 +416,8 @@ const useProductHandlers = () => {
         const result = await response.json();
         if (result && result.data) {
           // If formData.metal_type is available, filter based on it, otherwise show all
-          const filteredData = formData.metal_type
-            ? result.data.filter((item) => item.metal_type === formData.metal_type)
+          const filteredData = formData.category
+            ? result.data.filter((item) => item.category === formData.category)
             : result.data;
   
           // Format the filtered options
@@ -465,7 +437,7 @@ const useProductHandlers = () => {
   
     // Run the function initially and when formData.metal_type changes
     fetchSubCategory();
-  }, [formData.metal_type]); 
+  }, [formData.category]); 
   
   useEffect(() => {
     const fetchMetalType = async () => {

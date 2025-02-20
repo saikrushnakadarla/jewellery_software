@@ -301,6 +301,7 @@ const SalesForm = () => {
         ...item, 
         original_total_price: originalTotalPrice.toFixed(2), // Store original price
         disscount: calculatedDiscount.toFixed(2), // Corrected spelling
+        disscount_percentage:discountValue,
         total_price: updatedTotalPrice.toFixed(2) // Update total price
       };
     });
@@ -535,7 +536,7 @@ const handleEdit = (index) => {
 
   const handleCheckout = async () => {
     if (!invoiceDetails.length || !selectedRows.length) {
-        alert("No invoices selected for sale return.");
+        // alert("No invoices selected for sale return.");
         return;
     }
 

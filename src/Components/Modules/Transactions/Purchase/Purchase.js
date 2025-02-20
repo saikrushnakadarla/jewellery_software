@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import "./Purchase.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
@@ -62,7 +62,7 @@ const URDPurchase = () => {
   // });
 
   const [formData, setFormData] = useState({
-    customer_id:"",
+    customer_id: "",
     mobile: "",
     account_name: "",
     gst_in: "",
@@ -100,7 +100,7 @@ const URDPurchase = () => {
     paid_amount: "",
     balance_amount: "",
     balance_after_receipt: "0",
-    Pricing:'',
+    Pricing: '',
   });
 
   // const [tableData, setTableData] = useState([]);
@@ -134,39 +134,39 @@ const URDPurchase = () => {
     fetchCurrentRates();
   }, []);
 
-    useEffect(() => {
-      if (mobile) {
-        console.log("Selected Mobile from New Link:", mobile);
-  
-        // Find the customer with the matching mobile
-        const matchedCustomer = customers.find((cust) => cust.mobile === mobile);
-  
-        if (matchedCustomer) {
-          setFormData((prevFormData) => ({
-            ...prevFormData,
-            customer_id: matchedCustomer.account_id, // Set customer_id to match the dropdown
-            account_name: matchedCustomer.account_name,
-            mobile: matchedCustomer.mobile || "",
-            email: matchedCustomer.email || "",
-            address1: matchedCustomer.address1 || "",
-            address2: matchedCustomer.address2 || "",
-            city: matchedCustomer.city || "",
-            pincode: matchedCustomer.pincode || "",
-            state: matchedCustomer.state || "",
-            state_code: matchedCustomer.state_code || "",
-            aadhar_card: matchedCustomer.aadhar_card || "",
-            gst_in: matchedCustomer.gst_in || "",
-            pan_card: matchedCustomer.pan_card || "",
-          }));
-        } else {
-          // If no customer matches, just set the mobile
-          setFormData((prevFormData) => ({
-            ...prevFormData,
-            mobile: mobile,
-          }));
-        }
+  useEffect(() => {
+    if (mobile) {
+      console.log("Selected Mobile from New Link:", mobile);
+
+      // Find the customer with the matching mobile
+      const matchedCustomer = customers.find((cust) => cust.mobile === mobile);
+
+      if (matchedCustomer) {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          customer_id: matchedCustomer.account_id, // Set customer_id to match the dropdown
+          account_name: matchedCustomer.account_name,
+          mobile: matchedCustomer.mobile || "",
+          email: matchedCustomer.email || "",
+          address1: matchedCustomer.address1 || "",
+          address2: matchedCustomer.address2 || "",
+          city: matchedCustomer.city || "",
+          pincode: matchedCustomer.pincode || "",
+          state: matchedCustomer.state || "",
+          state_code: matchedCustomer.state_code || "",
+          aadhar_card: matchedCustomer.aadhar_card || "",
+          gst_in: matchedCustomer.gst_in || "",
+          pan_card: matchedCustomer.pan_card || "",
+        }));
+      } else {
+        // If no customer matches, just set the mobile
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          mobile: mobile,
+        }));
       }
-    }, [mobile, customers]);
+    }
+  }, [mobile, customers]);
 
   // const handleChange = (field, value) => {
   //   setFormData((prevFormData) => {
@@ -174,7 +174,7 @@ const URDPurchase = () => {
 
 
   //      // Check if "By fixed" is selected
-   
+
   //      const isFixedPricing = updatedFormData.Pricing === "By fixed";
 
   //      // Reset fields when "By fixed" is selected
@@ -192,11 +192,11 @@ const URDPurchase = () => {
   //        updatedFormData.balance_pure_weight = "";
   //        updatedFormData.hm_charges = "";
   //        updatedFormData.charges = "";
-   
+
   //        // Ensure Piece Rate does not fetch from category when "By fixed" is selected
   //        updatedFormData.rate = ""; 
   //      }
-   
+
   //      // Fetch rate based on category only when "By Weight" is selected
   //      if (!isFixedPricing && field === "category") {
   //        const selectedCategory = categories.find((cat) => cat.value === value);
@@ -204,12 +204,12 @@ const URDPurchase = () => {
   //          updatedFormData.rate = selectedCategory.rate || ""; // Fetch rate based on category
   //        }
   //      }
-   
+
   //      // If "By fixed" is selected, ensure rate remains manually entered
   //      if (isFixedPricing && field === "rate") {
   //        updatedFormData.rate = value; // Allow manual entry only
   //      }
-   
+
 
 
   //     // If "Paid Wt" is updated, set "Rate-Cut" to 0
@@ -382,9 +382,9 @@ const URDPurchase = () => {
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
-  
+
       const isFixedPricing = updatedFormData.Pricing === "By fixed";
-  
+
       // Reset fields when "By fixed" is selected
       if (field === "Pricing" && value === "By fixed") {
         updatedFormData.gross_weight = "";
@@ -400,11 +400,11 @@ const URDPurchase = () => {
         updatedFormData.balance_pure_weight = "";
         updatedFormData.hm_charges = "";
         updatedFormData.charges = "";
-        
+
         // For fixed pricing, clear any auto-fetched rate
         updatedFormData.rate = "";
       }
-  
+
       // When Pricing is "By Weight", fetch rate from the selected category
       if (!isFixedPricing && field === "category") {
         const selectedCategory = categories.find((cat) => cat.value === value);
@@ -412,12 +412,12 @@ const URDPurchase = () => {
           updatedFormData.rate = selectedCategory.rate || "";
         }
       }
-  
+
       // For "By fixed", allow manual entry for the Piece Rate (stored in rate)
       if (isFixedPricing && field === "rate") {
         updatedFormData.rate = value;
       }
-  
+
       // When paid_pure_weight is updated, update the rate accordingly
       if (field === "paid_pure_weight") {
         if (value) {
@@ -433,7 +433,7 @@ const URDPurchase = () => {
           }
         }
       }
-  
+
       // Restrict paid_amount so it does not exceed total_amount
       if (field === "paid_amount") {
         const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
@@ -443,7 +443,7 @@ const URDPurchase = () => {
           return prevFormData;
         }
       }
-  
+
       // Helper: Parse purity (e.g., "22K", "916HM") to a percentage
       // const parsePurityToPercentage = (purity) => {
       //   if (!purity) return null;
@@ -481,21 +481,21 @@ const URDPurchase = () => {
           }
         }
       }
-  
+
       // For silver, set rate automatically (again, only for "By Weight")
       if (field === "metal_type" && !isFixedPricing) {
         if (updatedFormData.metal_type?.toLowerCase() === "silver") {
           updatedFormData.rate = rates.silver_rate;
         }
       }
-  
+
       // Calculate pure weight from net_weight and purity
       // if (field === "net_weight" || field === "purity") {
       //   const netWeight = parseFloat(updatedFormData.net_weight) || 0;
       //   const purityPercentage = parsePurityToPercentage(updatedFormData.purity) || 0;
       //   updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
       // }
-  
+
       // Calculate wastage weight based on the selected wastage field
       if (["wastage_on", "wastage", "gross_weight", "net_weight", "pure_weight"].includes(field)) {
         const wastagePercentage = parseFloat(updatedFormData.wastage) || 0;
@@ -509,12 +509,12 @@ const URDPurchase = () => {
         }
         updatedFormData.wastage_wt = ((wastagePercentage * baseWeight) / 100).toFixed(2);
       }
-  
+
       // Calculate Total Pure Weight
       const pureWt = parseFloat(updatedFormData.pure_weight) || 0;
       const wastageWeight = parseFloat(updatedFormData.wastage_wt) || 0;
       updatedFormData.total_pure_wt = (pureWt + wastageWeight).toFixed(2);
-  
+
       // Additional calculation if gross, dust, ml_percent, and purity are provided
       if (
         updatedFormData.gross &&
@@ -531,17 +531,17 @@ const URDPurchase = () => {
           updatedFormData.eqt_wt = netWeight.toFixed(2);
         }
       }
-  
+
       // Update net weight from gross and stone weight
       const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
       const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
       updatedFormData.net_weight = (grossWeight - stoneWeight).toFixed(2);
-  
+
       // Re-calculate pure weight using the new net_weight
       const netWeight = parseFloat(updatedFormData.net_weight) || 0;
       const purityPercentage = extractPurityPercentage(updatedFormData.purity) || 0;
       updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
-  
+
       // ***** Calculate Total Amount based on Pricing *****
       if (isFixedPricing) {
         // For "By fixed": Total Amt = pcs * Piece Rate (rate)
@@ -554,13 +554,13 @@ const URDPurchase = () => {
         const rate = parseFloat(updatedFormData.rate) || 0;
         updatedFormData.total_amount = (pureWeight * rate).toFixed(2);
       }
-  
+
       // Calculate balance amount based on total_amount and paid_amount
       const paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
       updatedFormData.balance_amount = (
         parseFloat(updatedFormData.total_amount) - paidAmount
       ).toFixed(2);
-  
+
       // Calculate balance pure weight based on paid_pure_weight and rate (or set to "0")
       const paid_pure_weight = parseFloat(updatedFormData.paid_pure_weight) || 0;
       const rateCut = parseFloat(updatedFormData.rate) || 0;
@@ -569,20 +569,20 @@ const URDPurchase = () => {
           ? (parseFloat(updatedFormData.total_pure_wt) - paid_pure_weight).toFixed(2)
           : "0";
 
-            // Helper function to extract purity percentage from the selected purity option
-  
+      // Helper function to extract purity percentage from the selected purity option
 
-    // Calculate Pure Weight when net_weight or purity changes
-    if (field === "net_weight" || field === "purity") {
-      const netWeight = parseFloat(updatedFormData.net_weight) || 0;
-      const purityPercentage = extractPurityPercentage(updatedFormData.purity);
-      updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
-    }
-  
+
+      // Calculate Pure Weight when net_weight or purity changes
+      if (field === "net_weight" || field === "purity") {
+        const netWeight = parseFloat(updatedFormData.net_weight) || 0;
+        const purityPercentage = extractPurityPercentage(updatedFormData.purity);
+        updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
+      }
+
       return updatedFormData;
     });
   };
-  
+
 
   useEffect(() => {
     localStorage.setItem("tableData", JSON.stringify(tableData));
@@ -665,11 +665,11 @@ const URDPurchase = () => {
   const handleSave = async (e) => {
     e.preventDefault();
 
-// Check if the customer's mobile number is provided
-if (!formData.mobile || formData.mobile.trim() === "") {
-  alert("Please select or enter customer's mobile number");
-  return;
-}
+    // Check if the customer's mobile number is provided
+    if (!formData.mobile || formData.mobile.trim() === "") {
+      alert("Please select or enter customer's mobile number");
+      return;
+    }
 
     console.log("Product ID before submission:", formData.product_id);
 
@@ -1005,31 +1005,31 @@ if (!formData.mobile || formData.mobile.trim() === "") {
         setPurityOptions([]);
         return;
       }
-  
+
       if (!formData.metal_type) {
         setPurityOptions([]);
         return;
       }
-  
+
       try {
         const response = await axios.get(`${baseURL}/purity`);
-  
+
         const filteredPurity = response.data.filter(
           (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
         );
-  
+
         setPurityOptions(filteredPurity);
         console.log("Purity Options:", filteredPurity);
-  
+
         let defaultOption = null;
-  
+
         if (formData.metal_type.toLowerCase() === "gold") {
           defaultOption = filteredPurity.find((option) =>
             ["22k", "22 kt", "22"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
-  
+
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -1038,22 +1038,22 @@ if (!formData.mobile || formData.mobile.trim() === "") {
             }));
           }
         }
-  
+
         if (formData.metal_type.toLowerCase() === "silver") {
           const silver22K = filteredPurity.find((option) =>
             ["22k", "22 kt", "22"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
-  
+
           const silver24K = filteredPurity.find((option) =>
             ["24k", "24 kt", "24"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
-  
+
           defaultOption = silver24K || silver22K;
-  
+
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -1066,7 +1066,7 @@ if (!formData.mobile || formData.mobile.trim() === "") {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     if (formData.category) {
       fetchPurity();
     } else {
@@ -1078,7 +1078,7 @@ if (!formData.mobile || formData.mobile.trim() === "") {
       setPurityOptions([]);
     }
   }, [formData.metal_type, formData.category]);
-  
+
 
   const handleOpenModal = (data) => {
     setSelectedProduct(data);
@@ -1401,9 +1401,9 @@ if (!formData.mobile || formData.mobile.trim() === "") {
                     <InputField label="HM Charges" type="number" value={formData.hm_charges}
                       onChange={(e) => handleChange("hm_charges", e.target.value)} />
                   </Col>
-                  </>
+                </>
               )}
-                  {/* <Col xs={12} md={2}>
+              {/* <Col xs={12} md={2}>
                 <InputField
                   label="Other Charges:"
                   type="select"
@@ -1415,27 +1415,27 @@ if (!formData.mobile || formData.mobile.trim() === "") {
                   ]}
                 />
               </Col> */}
-                  <Col xs={12} md={2}>
-                    <InputField label="Charges" type="number" value={formData.charges}
-                      onChange={(e) => handleChange("charges", e.target.value)} />
-                  </Col>
-                  <Col xs={12} md={2}>
-  <InputField
-    label={formData.Pricing === "By fixed" ? "Piece Rate" : "Rate-Cut"}
-    type="number"
-    value={formData.rate} 
-    onChange={(e) => handleChange("rate", e.target.value)}
-  />
-</Col>
+              <Col xs={12} md={2}>
+                <InputField label="Charges" type="number" value={formData.charges}
+                  onChange={(e) => handleChange("charges", e.target.value)} />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label={formData.Pricing === "By fixed" ? "Piece Rate" : "Rate-Cut"}
+                  type="number"
+                  value={formData.rate}
+                  onChange={(e) => handleChange("rate", e.target.value)}
+                />
+              </Col>
 
 
 
 
-             
+
               {/* ✅ Rename "Total Amt" to "Piece Rate" when "By fixed" is selected & enable manual input */}
               <Col xs={12} md={2}>
                 <InputField
-                  label= "Total Amt"
+                  label="Total Amt"
                   type="number"
                   value={formData.total_amount}
                   onChange={(e) => handleChange("total_amount", e.target.value)}
@@ -1561,13 +1561,13 @@ if (!formData.mobile || formData.mobile.trim() === "") {
             </div>
           </div>
           <div className="form-buttons">
-          <Button
+            <Button
               variant="secondary"
               onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}
             >
               cancel
             </Button>
-            <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSave}>Save</Button>           
+            <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSave}>Save</Button>
           </div>
         </Form>
       </div>
