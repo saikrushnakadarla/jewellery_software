@@ -3,7 +3,6 @@ import "./Estimate.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button, Table } from "react-bootstrap";
 import axios from "axios";
-import DataTable from "../../../Pages/InputField/TableLayout";
 import baseURL from "../../../../Url/NodeBaseURL";
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +21,7 @@ const RepairForm = () => {
     product_id: "",
     product_name: "",
     metal_type: "",
-    design_master: "",
+    design_name: "",
     purity: "",
     category: "",
     sub_category: "",
@@ -30,16 +29,16 @@ const RepairForm = () => {
     stones_weight: "",
     stones_price: "",
     weight_bw: "",
-    wastage_on: "",
+    wastage_on: "Gross Weight",
     wastage_percent: "",
     wastage_weight: "",
     total_weight: "",
-    making_charges_on: "",
+    making_charges_on: "MC %",
     mc_per_gram: "",
     total_mc: "",
     rate: "",
     rate_amt: "",
-    tax_percent: "",
+    tax_percent: "03% GST",
     tax_vat_amount: "",
     total_rs: "",
     total_amount: "0.00",
@@ -97,7 +96,6 @@ const RepairForm = () => {
     }));
   }, [formData.purity, formData.metal_type, rates]);
 
-  // Fetch rates on mount
   useEffect(() => {
     const fetchCurrentRates = async () => {
       try {
@@ -177,216 +175,52 @@ const RepairForm = () => {
     fetchTags();
   }, []);
 
-  const handleProductNameChange = (productName) => {
-    const productEntries = data.filter((prod) => prod.sub_category === productName);
-
-    if (productEntries.length > 0) {
-      const uniqueMetalTypes = Array.from(
-        new Set(productEntries.map((prod) => prod.metal_type))
-      ).map((metalType) => ({ metal_type: metalType }));
-
-      setFormData((prevData) => ({
-        ...prevData,
-        product_name: productName,
-        metal_type: "",
-        design_name: "",
-      }));
-
-      setFilteredMetalTypes(uniqueMetalTypes); // Update metal types based on selected product
-      setFilteredDesignOptions([]); // Clear design options initially
-    } else {
-      // Reset fields if no matching product entries found
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        category: "",
-        sub_category: "",
-        gross_weight: "",
-        stones_weight: "",
-        stones_price: "",
-        weight_bw: "",
-        wastage_on: "",
-        wastage_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        making_charges_on: "",
-        mc_per_gram: "",
-        total_mc: "",
-        rate: "",
-        rate_amt: "",
-        tax_percent: "",
-        tax_amt: "",
-        total_price: "",
-        qty: "", // Rese
-      }));
-
-      setFilteredMetalTypes(metalTypes);
-      setFilteredDesignOptions(designOptions);
-    }
-  };
-
-  const handleMetalTypeChange = (metalType) => {
-    const productEntries = data.filter(
-      (prod) => prod.sub_category === formData.product_name && prod.metal_type === metalType
-    );
-
-    if (productEntries.length > 0) {
-      const uniqueDesignOptions = Array.from(
-        new Set(productEntries.map((prod) => prod.design_master))
-      ).map((designMaster) => ({ design_master: designMaster }));
-
-      setFormData((prevData) => ({
-        ...prevData,
-        metal_type: metalType,
-        design_name: "",
-      }));
-
-      setFilteredDesignOptions(uniqueDesignOptions); // Update design options based on metal type
-    } else {
-      // Reset if no matching entries found
-      setFormData((prevData) => ({
-        ...prevData,
-        metal_type: "",
-        design_name: "",
-      }));
-
-      setFilteredDesignOptions([]);
-    }
-  };
-
-  const handleDesignNameChange = (designName) => {
-    const productEntries = data.filter(
-      (prod) =>
-        prod.sub_category === formData.product_name &&
-        prod.metal_type === formData.metal_type &&
-        prod.design_master === designName
-    );
-
-    if (productEntries.length > 0) {
-      const uniquePurityOptions = Array.from(
-        new Set(productEntries.map((prod) => prod.Purity))
-      ).map((Purity) => ({ Purity }));
-
-      setFormData((prevData) => ({
-        ...prevData,
-        design_name: designName,
-        purity: "",
-      }));
-
-      setFilteredPurityOptions(uniquePurityOptions); // Update purity options based on design
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        design_name: "",
-        purity: "",
-
-      }));
-
-      setFilteredPurityOptions([]);
-    }
-  };
-
-  // const handleInputChange = (e) => {
-  //   const { name, value } = e.target;
-
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: value,
-  //   }));
-
-  //   // Trigger recalculation for Total MC when relevant fields are updated
-  //   if (
-  //     formData.metal_type?.toLowerCase() === "gold" &&
-  //     (name === "mc_per_gram" || name === "rate_amt")
-  //   ) {
-  //     const updatedMcPercentage = parseFloat(
-  //       name === "mc_per_gram" ? value : formData.mc_per_gram
-  //     ) || 0;
-  //     const updatedRateAmount = parseFloat(
-  //       name === "rate_amt" ? value : formData.rate_amt
-  //     ) || 0;
-
-  //     const calculatedTotalMC = (updatedMcPercentage / 100) * updatedRateAmount;
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       total_mc: calculatedTotalMC.toFixed(2),
-  //     }));
-  //   }
-
-  //   const { product_name, metal_type, design_name, purity } = {
-  //     ...formData,
-  //     [name]: value,
-  //   };
-
-  //   if (product_name && metal_type && design_name && purity) {
-  //     const matchingEntries = data.filter(
-  //       (prod) =>
-  //         prod.sub_category === product_name &&
-  //         prod.metal_type === metal_type &&
-  //         prod.design_master === design_name &&
-  //         prod.Purity === purity
-  //     );
-
-  //     if (matchingEntries.length > 0) {
-  //       if (matchingEntries.length > 1) {
-  //         setFormData((prevData) => ({
-  //           ...prevData,
-  //           barcodeOptions: matchingEntries.map((entry) => ({
-  //             value: entry.PCode_BarCode,
-  //             label: entry.PCode_BarCode,
-  //           })),
-  //         }));
-  //       } else if (matchingEntries.length === 1) {
-  //         const matchingEntry = matchingEntries[0];
-  //         const productId = matchingEntry.product_id;
-  //         const productDetails = products.find(
-  //           (prod) => String(prod.product_id) === String(productId)
-  //         );
-
-  //         setFormData((prevData) => ({
-  //           ...prevData,
-  //           code: matchingEntry.PCode_BarCode,
-  //           category: matchingEntry.category,
-  //           sub_category: matchingEntry.sub_category,
-  //           gross_weight: matchingEntry.Gross_Weight,
-  //           stones_weight: matchingEntry.Stones_Weight || "",
-  //           stones_price: matchingEntry.Stones_Price || "",
-  //           weight_bw: matchingEntry.Weight_BW || "",
-  //           wastage_on: matchingEntry.Wastage_On || "",
-  //           wastage_percent: matchingEntry.Wastage_Percentage || "",
-  //           wastage_weight: matchingEntry.WastageWeight || "",
-  //           total_weight: matchingEntry.TotalWeight_AW || "",
-  //           making_charges_on: matchingEntry.Making_Charges_On || "",
-  //           mc_per_gram: matchingEntry.MC_Per_Gram || "",
-  //           total_mc: matchingEntry.Making_Charges || "",
-  //           tax_percent: productDetails?.tax_slab || "",
-  //           qty: 1,
-  //           barcodeOptions: [],
-  //         }));
-  //       }
-  //     }
-  //   }
-  // };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     setFormData((prevData) => {
       let updatedData = {
         ...prevData,
         [name]: value,
       };
-  
+
+      if (name === "category" && value === "") {
+        updatedData = {
+          ...updatedData, // Keep other existing values
+          code: "",
+          product_id: "",
+          product_name: "",
+          metal_type: "",
+          design_name: "",
+          purity: "",
+          category: "",
+          sub_category: "",
+          gross_weight: "",
+          stones_weight: "",
+          stones_price: "",
+          weight_bw: "",
+          wastage_on: "Gross Weight",
+          wastage_percent: "",
+          wastage_weight: "",
+          total_weight: "",
+          making_charges_on: "MC %",
+          mc_per_gram: "",
+          total_mc: "",
+          rate: "",
+          rate_amt: "",
+          tax_percent: "03% GST",
+          tax_vat_amount: "",
+          total_rs: "",
+          total_amount: "0.00",
+        };
+      }
+
       // Reset `mc_per_gram` and `total_mc` when `making_charges_on` changes
       if (name === "making_charges_on") {
         updatedData.mc_per_gram = "";
         updatedData.total_mc = "";
       }
-  
+
       // Trigger recalculation for Total MC when relevant fields are updated
       if (
         updatedData.metal_type?.toLowerCase() === "gold" &&
@@ -398,13 +232,13 @@ const RepairForm = () => {
         const updatedRateAmount = parseFloat(
           name === "rate_amt" ? value : updatedData.rate_amt
         ) || 0;
-  
+
         const calculatedTotalMC = (updatedMcPercentage / 100) * updatedRateAmount;
         updatedData.total_mc = calculatedTotalMC.toFixed(2);
       }
-  
+
       const { product_name, metal_type, design_name, purity } = updatedData;
-  
+
       if (product_name && metal_type && design_name && purity) {
         const matchingEntries = data.filter(
           (prod) =>
@@ -413,7 +247,7 @@ const RepairForm = () => {
             prod.design_master === design_name &&
             prod.Purity === purity
         );
-  
+
         if (matchingEntries.length > 0) {
           if (matchingEntries.length > 1) {
             updatedData.barcodeOptions = matchingEntries.map((entry) => ({
@@ -426,7 +260,7 @@ const RepairForm = () => {
             const productDetails = products.find(
               (prod) => String(prod.product_id) === String(productId)
             );
-  
+
             updatedData = {
               ...updatedData,
               code: matchingEntry.PCode_BarCode,
@@ -450,11 +284,10 @@ const RepairForm = () => {
           }
         }
       }
-  
+
       return updatedData;
     });
   };
-  
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -491,8 +324,8 @@ const RepairForm = () => {
         const result = await response.json();
         if (result && result.data) {
           // If formData.metal_type is available, filter based on it, otherwise show all
-          const filteredData = formData.metal_type
-            ? result.data.filter((item) => item.metal_type === formData.metal_type)
+          const filteredData = formData.category
+            ? result.data.filter((item) => item.category === formData.category)
             : result.data;
 
           // Format the filtered options
@@ -512,27 +345,80 @@ const RepairForm = () => {
 
     // Run the function initially and when formData.metal_type changes
     fetchSubCategory();
-  }, [formData.metal_type]);
+  }, [formData.category]);
+
+  const [allMetalTypes, setAllMetalTypes] = useState([]);
 
   useEffect(() => {
     const fetchMetalType = async () => {
       try {
         const response = await fetch(`${baseURL}/metaltype`);
         const data = await response.json();
-        const categories = Array.from(
-          new Set(data.map((product) => product.metal_name))
-        );
-        setMetaltypeOptions(categories.map((category) => ({
+
+        // Extract all metal types
+        const allMetalTypes = Array.from(new Set(data.map((product) => product.metal_name)));
+
+        // Store all metal types
+        setAllMetalTypes(allMetalTypes);
+
+        // Initially, show all metal types
+        setMetaltypeOptions(allMetalTypes.map((category) => ({
           value: category,
           label: category,
         })));
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching metal types:', error);
       }
     };
 
     fetchMetalType();
   }, []);
+
+  useEffect(() => {
+    if (!formData.category) {
+      // Show all metal types if no category is selected
+      setMetaltypeOptions(allMetalTypes.map((category) => ({
+        value: category,
+        label: category,
+      })));
+      return;
+    }
+
+    const fetchFilteredMetalTypes = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/products`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const result = await response.json();
+
+        // Find selected category object
+        const selectedProduct = result.find((item) => item.product_name === formData.category);
+
+        if (selectedProduct) {
+          const filteredMetals = allMetalTypes.filter(
+            (metal) => metal === selectedProduct.Category
+          );
+
+          const options = filteredMetals.map((category) => ({
+            value: category,
+            label: category,
+          }));
+
+          setMetaltypeOptions(options);
+
+          // Auto-select the first option only when a category is selected
+          if (formData.category && options.length > 0) {
+            setFormData((prev) => ({ ...prev, metal_type: options[0].value }));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching filtered metal types:", error);
+      }
+    };
+
+    fetchFilteredMetalTypes();
+  }, [formData.category, allMetalTypes]);
 
   useEffect(() => {
     const fetchDesignName = async () => {
@@ -604,8 +490,6 @@ const RepairForm = () => {
     fetchPurity();
   }, [formData.metal_type]);
 
-
-
   const handleBarcodeChange = async (code) => {
     try {
       if (!code) {
@@ -634,7 +518,7 @@ const RepairForm = () => {
           total_mc: "",
           rate: "",
           rate_amt: "",
-          tax_percent: "",
+          tax_percent: "03% GST",
           tax_amt: "",
           total_price: "",
           qty: "", // Reset qty
@@ -681,17 +565,6 @@ const RepairForm = () => {
         // Check if tag exists by code
         const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
         if (tag) {
-          // setIsBarcodeSelected(true);  
-          // If the tag is marked as "Sold"
-          // if (tag.Status === "Sold") {
-          //   alert("The product is already sold out!");
-          //   setFormData((prevData) => ({
-          //     ...prevData,
-          //   }));
-          //   setIsQtyEditable(true); // Allow editing of qty
-          //   return;
-          // }
-
           const productId = tag.product_id;
           const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
 
@@ -746,7 +619,7 @@ const RepairForm = () => {
             total_mc: "",
             rate: "",
             rate_amt: "",
-            tax_percent: "",
+            tax_percent: "03% GST",
             tax_amt: "",
             total_price: "",
             qty: "", // Reset qty
@@ -856,7 +729,7 @@ const RepairForm = () => {
 
     setFormData((prev) => ({
       ...prev,
-      weight_bw: weightBW.toFixed(2),
+      weight_bw: weightBW.toFixed(3),
     }));
   }, [formData.gross_weight, formData.stones_weight]);
 
@@ -878,8 +751,8 @@ const RepairForm = () => {
 
     setFormData((prev) => ({
       ...prev,
-      wastage_weight: wastageWeight.toFixed(2),
-      total_weight: totalWeight.toFixed(2),
+      wastage_weight: wastageWeight.toFixed(3),
+      total_weight: totalWeight.toFixed(3),
     }));
   }, [formData.wastage_on, formData.wastage_percent, formData.gross_weight, formData.weight_bw]);
 
@@ -975,6 +848,30 @@ const RepairForm = () => {
     fetchLastEstimateNumber();
   }, []);
 
+  const handleBack = () => {
+    navigate("/estimatetable");
+  };
+
+  
+  const barcodeOptions = formData.barcodeOptions?.length > 0
+    ? formData.barcodeOptions
+    : [
+      ...products
+        .filter((product) => formData.category ? product.product_name === formData.category : true)
+        .map((product) => ({
+          value: product.rbarcode,
+          label: product.rbarcode,
+        })),
+      ...data
+        .filter((tag) => formData.category ? tag.category === formData.category : true)
+        .map((tag) => ({
+          value: tag.PCode_BarCode,
+          label: tag.PCode_BarCode,
+        })),
+    ];
+
+    const defaultBarcode = formData.category && barcodeOptions.length > 0 ? barcodeOptions[0].value : "";
+
 
   return (
     <div className="main-container">
@@ -1006,28 +903,25 @@ const RepairForm = () => {
 
           <Col xs={12} md={2}>
             <InputField
-              label="BarCode/Rbarcode"
-              name="code"
-              value={formData.code}
-              onChange={(e) => handleBarcodeChange(e.target.value)}
+              label="Category"
+              name="category"
+              value={formData.category || ""}
               type="select"
-              options={
-                formData.barcodeOptions?.length > 0
-                  ? formData.barcodeOptions
-                  : [
-                    ...products.map((product) => ({
-                      value: product.rbarcode,
-                      label: product.rbarcode,
-                    })),
-                    ...data.map((tag) => ({
-                      value: tag.PCode_BarCode,
-                      label: tag.PCode_BarCode,
-                    })),
-                  ]
-              }
-              autoFocus
+              onChange={handleInputChange}
+              options={categoryOptions}
             />
           </Col>
+
+          <Col xs={12} md={2}>
+          <InputField
+            label="BarCode/Rbarcode"
+            name="code"
+            value={formData.code || defaultBarcode} // Default barcode when formData.code is empty
+            onChange={(e) => handleBarcodeChange(e.target.value)}
+            type="select"
+            options={barcodeOptions}
+          />
+        </Col>
 
           <Col xs={12} md={2}>
             <InputField
@@ -1039,16 +933,7 @@ const RepairForm = () => {
               options={metaltypeOptions}
             />
           </Col>
-          <Col xs={12} md={2}>
-            <InputField
-              label="Category"
-              name="category"
-              value={formData.category || ""}
-              type="select"
-              onChange={handleInputChange}
-              options={categoryOptions}
-            />
-          </Col>
+         
           <Col xs={12} md={2}>
             <InputField
               label="Sub Category"
@@ -1201,7 +1086,6 @@ const RepairForm = () => {
           </Col>
 
         </Row>
-
         <Row className="estimate-form-section2">
           <Table striped bordered hover className="mt-3">
             <thead>
@@ -1266,8 +1150,9 @@ const RepairForm = () => {
           </Table>
 
           <Col xs={12} md={12} className="d-flex justify-content-end">
+            <Button className="cus-back-btn" variant="secondary" onClick={handleBack}>cancel</Button>
             <Button
-              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29", }}
+              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29", marginLeft: '15px' }}
               onClick={handlePrint}
             >
               Print

@@ -9,7 +9,7 @@ const useCalculations = (formData, setFormData) => {
 
     setFormData(prev => ({
       ...prev,
-      weight_bw: weightBW.toFixed(2),
+      weight_bw: weightBW.toFixed(3),
     }));
   }, [formData.gross_weight, formData.stone_weight]);
 
@@ -32,8 +32,8 @@ const useCalculations = (formData, setFormData) => {
 
     setFormData(prev => ({
       ...prev,
-      wastage_weight: wastageWeight.toFixed(2),
-      total_weight_av: totalWeight.toFixed(2),
+      wastage_weight: wastageWeight.toFixed(3),
+      total_weight_av: totalWeight.toFixed(3),
     }));
   }, [formData.va_on, formData.va_percent, formData.gross_weight, formData.weight_bw]);
 
@@ -124,7 +124,7 @@ useEffect(() => {
     const discountAmt = parseFloat(formData.disscount) || 0;
   
     // Ensure discount is subtracted before tax calculation
-    const taxableAmount = rateAmt + stonePrice + makingCharges;
+    const taxableAmount = rateAmt + stonePrice + makingCharges-discountAmt;
     const taxAmt = (taxableAmount * taxPercent) / 100;
   
     setFormData((prev) => ({
@@ -146,7 +146,7 @@ useEffect(() => {
     let totalPrice = rateAmt + taxAmt + stonePrice + makingCharges;
 
     // Subtract discount amount
-    totalPrice -= discount;
+    // totalPrice -= discount;
 
     setFormData(prev => ({
       ...prev,

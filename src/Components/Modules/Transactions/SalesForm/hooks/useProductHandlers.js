@@ -164,12 +164,52 @@ const useProductHandlers = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    const updatedFormData = { ...formData, [name]: value };
+    let updatedFormData = { ...formData, [name]: value };
     setFormData(updatedFormData);
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+
+    if (name === "category" && value === "") {
+      updatedFormData = {
+        ...updatedFormData, // Keep other existing values
+        code: "",
+        product_id: "",
+        metal: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        pricing: "",
+        category: "",
+        sub_category: "",
+        gross_weight: "",
+        stone_weight: "",
+        weight_bw: "",
+        stone_price: "",
+        va_on: "Gross Weight",
+        va_percent: "",
+        wastage_weight: "",
+        total_weight_av: "",
+        mc_on: "MC %",
+        disscount_percentage: "",
+        disscount: "",
+        mc_per_gram: "",
+        making_charges: "",
+        rate: "",
+        pieace_cost: "",
+        rate_amt: "",
+        tax_percent: "03% GST",
+        tax_amt: "",
+        total_price: "",
+        transaction_status: "Sales",
+        qty: "1",
+        opentag_id: "",
+        product_image: null,
+        imagePreview: null,
+      };
+    }
 
     if (name === "mc_on") {
       if (value !== formData.mc_on) {
@@ -438,27 +478,80 @@ const useProductHandlers = () => {
     // Run the function initially and when formData.metal_type changes
     fetchSubCategory();
   }, [formData.category]); 
+
+  const [allMetalTypes, setAllMetalTypes] = useState([]); 
   
   useEffect(() => {
     const fetchMetalType = async () => {
       try {
         const response = await fetch(`${baseURL}/metaltype`);
         const data = await response.json();
-        const categories = Array.from(
-          new Set(data.map((product) => product.metal_name))
-        );
-        setMetaltypeOptions(categories.map((category) => ({
+        
+        // Extract all metal types
+        const allMetalTypes = Array.from(new Set(data.map((product) => product.metal_name)));
+  
+        // Store all metal types
+        setAllMetalTypes(allMetalTypes);
+  
+        // Initially, show all metal types
+        setMetaltypeOptions(allMetalTypes.map((category) => ({
           value: category,
           label: category,
         })));
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching metal types:', error);
       }
     };
-
+  
     fetchMetalType();
   }, []);
-
+  
+  useEffect(() => {
+    if (!formData.category) {
+      // Show all metal types if no category is selected
+      setMetaltypeOptions(allMetalTypes.map((category) => ({
+        value: category,
+        label: category,
+      })));
+      return;
+    }
+  
+    const fetchFilteredMetalTypes = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/products`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch products");
+        }
+        const result = await response.json();
+  
+        // Find selected category object
+        const selectedProduct = result.find((item) => item.product_name === formData.category);
+  
+        if (selectedProduct) {
+          const filteredMetals = allMetalTypes.filter(
+            (metal) => metal === selectedProduct.Category
+          );
+  
+          const options = filteredMetals.map((category) => ({
+            value: category,
+            label: category,
+          }));
+  
+          setMetaltypeOptions(options);
+  
+          // Auto-select the first option only when a category is selected
+          if (formData.category && options.length > 0) {
+            setFormData((prev) => ({ ...prev, metal_type: options[0].value }));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching filtered metal types:", error);
+      }
+    };
+  
+    fetchFilteredMetalTypes();
+  }, [formData.category, allMetalTypes]);
+  
   useEffect(() => {
     const fetchDesignName = async () => {
       try {

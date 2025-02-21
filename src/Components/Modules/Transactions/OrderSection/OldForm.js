@@ -87,43 +87,35 @@ const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, [name]: value };
-
+  
       if (name === "metal") {
         updatedDetails.purity = ""; // Reset purity when metal changes
         updatedDetails.purityPercentage = ""; // Reset purity percentage
-        // Set rate based on metal type selection
         if (value === "Silver") {
-          updatedDetails.rate = rates.rate_silver || "0.00"; // Set silver rate if metal is silver
+          updatedDetails.rate = rates.rate_silver || "0.00";
         } else {
-          updatedDetails.rate = ""; // Reset rate for other metals
+          updatedDetails.rate = "";
         }
       }
-
+  
       if (name === "purity") {
         if (value !== "Manual") {
           const selectedOption = purityOptions.find(option => option.name === value);
           updatedDetails.purityPercentage = selectedOption ? selectedOption.purity_percentage : 0;
         } else {
-          updatedDetails.purityPercentage = 0; // Directly set purityPercentage to 0
+          updatedDetails.purityPercentage = 0;
         }
       } else if (name === "purityPercentage") {
-        updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
+        updatedDetails.purityPercentage = parseFloat(value);
       }
-
-      // Update calculations with the latest purityPercentage
-      updatedDetails.net_wt = calculateNetWeight({
-        ...updatedDetails,
-        purityPercentage: updatedDetails.purityPercentage,
-      });
-
-      updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
-
+  
       return updatedDetails;
     });
   };
+  
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -184,55 +176,56 @@ const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
 
   useEffect(() => {
-    const normalizedMetal = oldDetails.metal.toLowerCase();
-    const normalizedPurity = normalizePurity(oldDetails.purity);
-
-    // If metal is silver and purity is Manual, set rate_silver
-    if (normalizedMetal === "silver" && normalizedPurity === "manual") {
-      setOldDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
-      return;
-    }
-
-    // If metal is gold and purity is Manual, set rate_22crt
-    if (normalizedMetal === "gold" && normalizedPurity === "manual") {
-      setOldDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_22crt }));
-      return;
-    }
-
-    // If metal is silver, always set rate_silver
+    const normalizedMetal = oldDetails.metal?.toLowerCase() || "";
+    const normalizedPurity = normalizePurity(oldDetails.purity || "");
+  
+    let updatedRate = 0;
+  
     if (normalizedMetal === "silver") {
-      setOldDetails((prevDetails) => ({ ...prevDetails, rate: rates.rate_silver }));
-      return;
-    }
-
-    // Normal purity-based rate assignment for gold
-    const currentRate =
-      normalizedPurity.includes("24") ? rates.rate_24crt :
+      updatedRate = rates.rate_silver || 0;
+    } else if (normalizedMetal === "gold" && normalizedPurity === "manual") {
+      updatedRate = rates.rate_22crt || 0;
+    } else {
+      updatedRate =
+        normalizedPurity.includes("24") ? rates.rate_24crt :
         normalizedPurity.includes("22") ? rates.rate_22crt :
-          normalizedPurity.includes("18") ? rates.rate_18crt :
-            normalizedPurity.includes("16") ? rates.rate_16crt :
-              0;
-
-    setOldDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
+        normalizedPurity.includes("18") ? rates.rate_18crt :
+        normalizedPurity.includes("16") ? rates.rate_16crt :
+        rates.rate_22crt; // Default to rate_22crt if no match
+    }
+    
+  
+    setOldDetails((prevDetails) => {
+      const updatedDetails = { ...prevDetails, rate: updatedRate };
+  
+      // Immediately update net weight and total amount after setting rate
+      updatedDetails.net_wt = calculateNetWeight({
+        ...updatedDetails,
+        purityPercentage: updatedDetails.purityPercentage,
+      });
+  
+      updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
+  
+      return updatedDetails;
+    });
+  
   }, [oldDetails.purity, oldDetails.metal, rates]);
+  
 
   const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
-    const purityPercentageValue = purity === "Manual"
-      ? parseFloat(purityPercentage) || 0
-      : parseFloat(purityPercentage) || 0;  // Ensure the correct purityPercentage is used
-
+    const purityPercentageValue = parseFloat(purityPercentage) || 0;
     const grossWeight = parseFloat(gross) || 0;
     const dustWeight = parseFloat(dust) || 0;
     const mlPercentValue = parseFloat(ml_percent) || 0;
-
+  
     const netWeight = ((grossWeight - dustWeight) * (purityPercentageValue - mlPercentValue)) / 100;
     return parseFloat(netWeight.toFixed(2));
   };
-
-  const calculateTotalAmount = ({ net_wt, rate }, currentRate) => {
+  
+  const calculateTotalAmount = ({ net_wt, rate }) => {
     const netWeight = Number(net_wt) || 0;
-    const rateAmount = Number(rate) || Number(currentRate) || 0;
-
+    const rateAmount = Number(rate) || 0;
+  
     const totalAmount = netWeight * rateAmount;
     return Number(totalAmount.toFixed(2));
   };
@@ -438,10 +431,13 @@ const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
           ))}
         </tbody>
       </Table>
+
       <div className="d-flex justify-content-between px-2 mt-2">
         <h5>Total Amount:</h5>
         <h5>₹ {calculateTotalSum()}</h5>
       </div>
+
+
     </>
   );
 };

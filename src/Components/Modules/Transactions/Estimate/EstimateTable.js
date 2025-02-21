@@ -72,51 +72,6 @@ const RepairsTable = () => {
         Header: 'Total Amount',
         accessor: 'total_amount',
       },
-
-      // {
-      //   Header: 'Gross Weight',
-      //   accessor: 'gross_weight',
-      // },
-      // {
-      //   Header: 'Stone Weight',
-      //   accessor: 'stones_weight',
-      // },
-      // {
-      //   Header: 'Stone Price',
-      //   accessor: 'stones_price',
-      // },
-      // {
-      //   Header: 'Wastage Percent',
-      //   accessor: 'wastage_percent',
-      // },
-      // {
-      //   Header: 'Wastage Weight',
-      //   accessor: 'wastage_weight',
-      // },
-      // {
-      //   Header: 'Net Weight',
-      //   accessor: 'total_weight',
-      // },
-      // {
-      //   Header: 'MC Per Gram',
-      //   accessor: 'mc_per_gram',
-      // },
-      // {
-      //   Header: 'Total MC',
-      //   accessor: 'total_mc',
-      // },
-      // {
-      //   Header: 'Tax Percent',
-      //   accessor: 'tax_percent',
-      // },
-      // {
-      //   Header: 'Tax VAT Amount',
-      //   accessor: 'tax_vat_amount',
-      // },
-      // {
-      //   Header: 'Total Rs',
-      //   accessor: 'total_rs',
-      // },
       {
         Header: 'Actions',
         accessor: 'actions',

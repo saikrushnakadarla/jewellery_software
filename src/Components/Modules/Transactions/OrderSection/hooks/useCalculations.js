@@ -9,7 +9,7 @@ const useCalculations = (formData, setFormData) => {
 
     setFormData(prev => ({
       ...prev,
-      weight_bw: weightBW.toFixed(2),
+      weight_bw: weightBW.toFixed(3),
     }));
   }, [formData.gross_weight, formData.stone_weight]);
 
@@ -32,8 +32,8 @@ const useCalculations = (formData, setFormData) => {
 
     setFormData(prev => ({
       ...prev,
-      wastage_weight: wastageWeight.toFixed(2),
-      total_weight_av: totalWeight.toFixed(2),
+      wastage_weight: wastageWeight.toFixed(3),
+      total_weight_av: totalWeight.toFixed(3),
     }));
   }, [formData.va_on, formData.va_percent, formData.gross_weight, formData.weight_bw]);
 

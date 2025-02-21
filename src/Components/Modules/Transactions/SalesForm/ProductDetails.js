@@ -36,6 +36,25 @@ const ProductDetails = ({
 
   const isByFixed = formData.pricing === "By fixed";
 
+  const barcodeOptions = formData.barcodeOptions?.length > 0
+    ? formData.barcodeOptions
+    : [
+      ...products
+        .filter((product) => formData.category ? product.product_name === formData.category : true)
+        .map((product) => ({
+          value: product.rbarcode,
+          label: product.rbarcode,
+        })),
+      ...data
+        .filter((tag) => formData.category ? tag.category === formData.category : true)
+        .map((tag) => ({
+          value: tag.PCode_BarCode,
+          label: tag.PCode_BarCode,
+        })),
+    ];
+
+    const defaultBarcode = formData.category && barcodeOptions.length > 0 ? barcodeOptions[0].value : "";
+
   return (
     <Col >
       <Row>
@@ -54,35 +73,10 @@ const ProductDetails = ({
           <InputField
             label="BarCode/Rbarcode"
             name="code"
-            value={formData.code}
+            value={formData.code || defaultBarcode} // Default barcode when formData.code is empty
             onChange={(e) => handleBarcodeChange(e.target.value)}
             type="select"
-            options={
-              formData.barcodeOptions?.length > 0
-                ? formData.barcodeOptions
-                : products
-                  .filter((product) =>
-                    formData.category
-                      ? product.product_name === formData.category
-                      : true
-                  )
-                  .map((product) => ({
-                    value: product.rbarcode,
-                    label: product.rbarcode,
-                  }))
-                  .concat(
-                    data
-                      .filter((tag) =>
-                        formData.category
-                          ? tag.category === formData.category
-                          : true
-                      )
-                      .map((tag) => ({
-                        value: tag.PCode_BarCode,
-                        label: tag.PCode_BarCode,
-                      }))
-                  )
-            }
+            options={barcodeOptions}
           />
         </Col>
 

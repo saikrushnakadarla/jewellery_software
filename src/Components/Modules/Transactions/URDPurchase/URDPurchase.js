@@ -55,19 +55,6 @@ const URDPurchase = () => {
   const [editingRow, setEditingRow] = useState(null);
   const [purityOptions, setPurityOptions] = useState([]);
 
-  const parsePurityToPercentage = (purity) => {
-    if (!purity) return null;
-    const match = purity.match(/(\d+)(k|K|kt|KT)?/);
-    if (match) {
-      const caratValue = parseInt(match[1], 10); // Extract carat number
-      if (caratValue) {
-        return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
-      }
-    }
-    if (purity.toLowerCase() === "916hm") return 91.6;
-    return null;
-  };
-
   useEffect(() => {
     const fetchAndFilterPurity = async () => {
       try {
@@ -211,31 +198,45 @@ const URDPurchase = () => {
     // Normal purity-based rate assignment for gold
     const currentRate =
       normalizedPurity.includes("24") ? rates.rate_24crt :
-        normalizedPurity.includes("22") ? rates.rate_22crt :
-          normalizedPurity.includes("18") ? rates.rate_18crt :
-            normalizedPurity.includes("16") ? rates.rate_16crt :
-              0;
+      normalizedPurity.includes("22") ? rates.rate_22crt :
+      normalizedPurity.includes("18") ? rates.rate_18crt :
+      normalizedPurity.includes("16") ? rates.rate_16crt :
+      rates.rate_22crt;
+
 
     setProductDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
   }, [productDetails.purity, productDetails.metal, rates]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     setProductDetails((prevDetails) => {
-      const updatedDetails = { ...prevDetails, [name]: value };
-
+      let updatedDetails = { ...prevDetails, [name]: value };
+  
       if (name === "metal") {
-        updatedDetails.purity = ""; // Reset purity when metal changes
-        updatedDetails.purityPercentage = ""; // Reset purity percentage
-        // Set rate based on metal type selection
-        if (value === "Silver") {
-          updatedDetails.rate = rates.rate_silver || "0.00"; // Set silver rate if metal is silver
+        if (!value) {
+          // If metal is cleared, reset all dependent fields
+          updatedDetails = {
+            ...updatedDetails,
+            purity: "",
+            purityPercentage: "",
+            rate: 0,
+            gross: 0,
+            dust: 0,
+            touch_percent: 0,
+            ml_percent: 0,
+            eqt_wt: 0,
+            remarks: "",
+            total_amount: 0,
+          };
         } else {
-          updatedDetails.rate = ""; // Reset rate for other metals
+          // If metal is selected, reset purity and set rate for silver
+          updatedDetails.purity = "";
+          updatedDetails.purityPercentage = "";
+          updatedDetails.rate = value === "Silver" ? rates.rate_silver || "0.00" : "";
         }
       }
-
+  
       if (name === "purity") {
         if (value !== "Manual") {
           const selectedOption = purityOptions.find(option => option.name === value);
@@ -243,22 +244,33 @@ const URDPurchase = () => {
         } else {
           updatedDetails.purityPercentage = 0; // Directly set purityPercentage to 0
         }
-      } else if (name === "purityPercentage") {
-        updatedDetails.purityPercentage = parseFloat(value); // Handle custom purity percentage
+  
+        // **Get the correct rate based on purity**
+        const normalizedPurity = normalizePurity(value);
+        updatedDetails.rate =
+          normalizedPurity.includes("24") ? rates.rate_24crt :
+          normalizedPurity.includes("22") ? rates.rate_22crt :
+          normalizedPurity.includes("18") ? rates.rate_18crt :
+          normalizedPurity.includes("16") ? rates.rate_16crt :
+          rates.rate_22crt; // Default to rate_22crt if no match
       }
-
-      // Update calculations with the latest purityPercentage
+  
+      if (name === "purityPercentage") {
+        updatedDetails.purityPercentage = parseFloat(value) || 0;
+      }
+  
+      // **Ensure net weight is calculated with the latest purity and rate**
       updatedDetails.eqt_wt = calculateNetWeight({
         ...updatedDetails,
         purityPercentage: updatedDetails.purityPercentage,
       });
-
+  
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
-
+  
       return updatedDetails;
     });
   };
-
+  
   const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
     const purityPercentageValue = purity === "Manual"
       ? parseFloat(purityPercentage) || 0
@@ -269,7 +281,7 @@ const URDPurchase = () => {
     const mlPercentValue = parseFloat(ml_percent) || 0;
 
     const netWeight = ((grossWeight - dustWeight) * (purityPercentageValue - mlPercentValue)) / 100;
-    return parseFloat(netWeight.toFixed(2));
+    return parseFloat(netWeight.toFixed(3));
   };
 
   const calculateTotalAmount = ({ eqt_wt, rate }, currentRate) => {
