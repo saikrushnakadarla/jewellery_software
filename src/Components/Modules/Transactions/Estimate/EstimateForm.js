@@ -45,6 +45,7 @@ const RepairForm = () => {
     hm_charges: "60.00",
     total_rs: "",
     total_amount: "0.00",
+    pricing:"By Weight"
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -458,6 +459,7 @@ const RepairForm = () => {
           hm_charges: "60.00",
           total_price: "",
           qty: "", // Reset qty
+          pricing:"By Weight"
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
@@ -495,8 +497,9 @@ const RepairForm = () => {
           total_mc: "",
           tax_percent: product.tax_slab,
           qty: 1, // Set qty to 1 for product
+          pricing:"By Weight"
         }));
-        setIsQtyEditable(false); // Set qty as read-only
+        setIsQtyEditable(true); // Set qty as read-only
       } else {
         // Check if tag exists by code
         const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
@@ -528,8 +531,9 @@ const RepairForm = () => {
             total_mc: tag.Making_Charges || "",
             tax_percent: productDetails?.tax_slab || "",
             qty: 1, // Allow qty to be editable for tag
+            pricing:tag.Pricing || ""
           }));
-          setIsQtyEditable(true); // Allow editing of qty
+          setIsQtyEditable(false); // Allow editing of qty
         } else {
           // Reset form if no tag is found
           setFormData((prevData) => ({
@@ -560,6 +564,7 @@ const RepairForm = () => {
             hm_charges: "60.00",
             total_price: "",
             qty: "", // Reset qty
+            pricing:"By Weight"
           }));
           setIsQtyEditable(true); // Default to editable
         }
@@ -824,6 +829,8 @@ const RepairForm = () => {
     }
   }, [formData.category, defaultBarcode]); 
 
+  const isByFixed = formData.pricing === "By fixed";
+
 
   return (
     <div className="main-container">
@@ -924,6 +931,48 @@ const RepairForm = () => {
               ]}
             />
           </Col>
+          {isByFixed ? (
+          // If Pricing is "By fixed", show only these fields:
+          <>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Piece Cost"
+                name="pieace_cost"
+                value={formData.pieace_cost}
+                onChange={handleInputChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Amount"
+                name="rate_amt"
+                value={formData.rate_amt || "0.00"} 
+                onChange={handleInputChange} 
+                readOnly={false} 
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Qty"
+                name="qty"
+                value={formData.qty}
+                onChange={handleInputChange}
+                readOnly={!isQtyEditable}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+            <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
+          </Col>
+          <Col xs={12} md={1}>
+            <InputField label="Tax Amt" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField label="Total Price" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
+          </Col>
+          </>
+        ) : (
+          // Otherwise (if Pricing is not "By fixed"), show all fields:
+          <>
           <Col xs={12} md={2}>
             <InputField
               label="Purity"
@@ -976,13 +1025,6 @@ const RepairForm = () => {
             <InputField label="Rate" name="rate" value={formData.rate} onChange={handleInputChange} />
           </Col>
           <Col xs={12} md={1}>
-            {/* <InputField
-              label="Amount"
-              name="rate_amt"
-              value={formData.rate_amt || "0.00"}
-              onChange={handleInputChange}
-              readOnly
-            /> */}
             <InputField
               label="Amount"
               name="rate_amt"
@@ -1009,9 +1051,7 @@ const RepairForm = () => {
               ]}
             />
           </Col>
-
           <Col xs={12} md={1}>
-
             <InputField
               label={
                 formData.making_charges_on === "MC %"
@@ -1024,7 +1064,6 @@ const RepairForm = () => {
             />
           </Col>
           <Col xs={12} md={1}>
-
             <InputField
               label="Total MC"
               name="total_mc"
@@ -1041,7 +1080,6 @@ const RepairForm = () => {
               onChange={handleInputChange}
             />
           </Col>
-
           <Col xs={12} md={2}>
             <InputField
               label="Total Disscount"
@@ -1068,6 +1106,8 @@ const RepairForm = () => {
           <Col xs={12} md={2}>
             <InputField label="Total Price" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
           </Col>
+          </>
+        )}
           <Col xs={12} md={2}>
             <Button
               style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}

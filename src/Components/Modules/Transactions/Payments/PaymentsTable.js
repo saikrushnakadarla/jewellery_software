@@ -40,16 +40,16 @@ const RepairsTable = () => {
         Cell: ({ value }) => (value ? value : 'N/A'), // Display 'N/A' if null
       },
       {
-        Header: 'Total Amt',
-        accessor: 'total_amt',
+        Header: 'Total Wt / Amt',
+        accessor: row => ` ${row.total_wt} / ${row.total_amt}`
       },
       {
-        Header: 'Discount Amt',
-        accessor: 'discount_amt',
+        Header: 'Paid Wt / Amt',
+        accessor: row => ` ${row.paid_wt} / ${row.discount_amt}`
       },
       {
-        Header: 'Cash Amt',
-        accessor: 'cash_amt',
+        Header: 'Bal Wt / Amt',
+        accessor: row => ` ${row.bal_wt} / ${row.cash_amt}`
       },
       {
         Header: 'Remarks',

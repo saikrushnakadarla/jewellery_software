@@ -21,7 +21,7 @@ const RepairForm = () => {
     receipt_no: "",
     account_name: "",
     invoice_number: "",
-    total_weight: "",
+    total_wt: "",
     paid_wt: "",
     bal_wt: "",
     rate:"",
@@ -71,7 +71,7 @@ const RepairForm = () => {
         setFormData((prevData) => ({
           ...prevData,
           total_amt: totalAmt,
-          total_weight: balanceWeight,
+          total_wt: balanceWeight,
           rate:rate,
         }));
       }
@@ -183,7 +183,7 @@ const RepairForm = () => {
               : balanceAfterReceipt > 0
                 ? balanceAfterReceipt
                 : balanceAmount,
-          total_weight: balanceWeight,
+          total_wt: balanceWeight,
           rate:rate,
         }));
       }
@@ -245,8 +245,8 @@ const RepairForm = () => {
         updatedData.prevPaidAmt = updatedData.discount_amt;
       }
 
-      if (name === "total_weight" || name === "paid_wt") {
-        const totalWt = Number(updatedData.total_weight) || 0;
+      if (name === "total_wt" || name === "paid_wt") {
+        const totalWt = Number(updatedData.total_wt) || 0;
         const paidWt = Number(updatedData.paid_wt) || 0;
         if (paidWt > totalWt) {
           alert("Balance Weight cannot be greater than total weight.");
@@ -436,8 +436,8 @@ const RepairForm = () => {
             <InputField
               label="Out Standing Wt"
               type="number"
-              name="total_weight"
-              value={formData.total_weight}
+              name="total_wt"
+              value={formData.total_wt}
               onChange={handleInputChange}
               readOnly
             />

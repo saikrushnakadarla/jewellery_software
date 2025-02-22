@@ -170,7 +170,6 @@ const URDPurchase = () => {
   }, [mobile, customers]);
   const [lastUpdatedField, setLastUpdatedField] = useState(null);
 
-
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
@@ -678,7 +677,7 @@ const URDPurchase = () => {
               product_id: matchingProduct.product_id, // Update product_id
               rbarcode: matchingProduct.rbarcode,    // Update rbarcode
               metal_type: matchingProduct.Category,
-              hsn_code: matchingProduct.hsn_code
+              hsn_code: matchingProduct.hsn_code,
             }));
           } else {
             // Reset product_id and rbarcode if no match
@@ -708,80 +707,75 @@ const URDPurchase = () => {
     }
   }, [formData.category]);
 
-  useEffect(() => {
-    const fetchPurity = async () => {
-      if (!formData.category) {
-        setFormData((prev) => ({
-          ...prev,
-          purity: "",
-          rate: "",
-        }));
-        setPurityOptions([]);
-        return;
-      }
-  
-      if (!formData.metal_type) {
-        setPurityOptions([]);
-        return;
-      }
-  
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        const filteredPurity = response.data.filter(
-          (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
+useEffect(() => {
+  const fetchPurity = async () => {
+    if (!formData.category) {
+      setFormData((prev) => ({
+        ...prev,
+        purity: "",
+        rate: "",
+      }));
+      setPurityOptions([]);
+      return;
+    }
+
+    if (!formData.metal_type) {
+      setPurityOptions([]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${baseURL}/purity`);
+      const filteredPurity = response.data.filter(
+        (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
+      );
+
+      setPurityOptions(filteredPurity);
+      console.log("Purity Options:", filteredPurity);
+
+      let defaultOption = null;
+
+      if (formData.metal_type.toLowerCase() === "gold") {
+        defaultOption = filteredPurity.find((option) =>
+          option.name.toLowerCase().includes("22") // Check if "22" is included
         );
-  
-        setPurityOptions(filteredPurity);
-        console.log("Purity Options:", filteredPurity);
-  
-        let defaultOption = null;
-  
-        if (formData.metal_type.toLowerCase() === "gold") {
-          defaultOption = filteredPurity.find((option) =>
-            ["22k", "22 kt", "22"].some((match) =>
-              option.name.toLowerCase().includes(match)
-            )
-          );
-  
-          if (defaultOption) {
-            setFormData((prev) => ({
-              ...prev,
-              purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
-              rate: rates.rate_22crt,
-            }));
-          }
+
+        if (defaultOption) {
+          setFormData((prev) => ({
+            ...prev,
+            purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
+            rate: rates.rate_22crt,
+          }));
         }
-  
-        if (formData.metal_type.toLowerCase() === "silver") {
-          const silver22K = filteredPurity.find((option) =>
-            ["22k", "22 kt", "22"].some((match) =>
-              option.name.toLowerCase().includes(match)
-            )
-          );
-  
-          const silver24K = filteredPurity.find((option) =>
-            ["24k", "24 kt", "24"].some((match) =>
-              option.name.toLowerCase().includes(match)
-            )
-          );
-  
-          defaultOption = silver24K || silver22K;
-  
-          if (defaultOption) {
-            setFormData((prev) => ({
-              ...prev,
-              purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
-              rate: rates.silver_rate,
-            }));
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
       }
-    };
-  
-    fetchPurity();
-  }, [formData.metal_type, formData.category]);
+
+      if (formData.metal_type.toLowerCase() === "silver") {
+        const silver22 = filteredPurity.find((option) =>
+          option.name.toLowerCase().includes("22")
+        );
+
+        const silver24 = filteredPurity.find((option) =>
+          option.name.toLowerCase().includes("24")
+        );
+
+        defaultOption = silver24 || silver22;
+
+        if (defaultOption) {
+          setFormData((prev) => ({
+            ...prev,
+            purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
+            rate: rates.silver_rate,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  fetchPurity();
+}, [formData.metal_type, formData.category]);
+
   
   const extractPurityPercentage = (purityValue) => {
     if (!purityValue || purityOptions.length === 0) return 0;
@@ -844,11 +838,6 @@ const URDPurchase = () => {
     formData.paid_amount 
   ]);
   
-  
-  
-  
-
-
   const handleOpenModal = (data) => {
     setSelectedProduct(data);
     setShowModal(true);
@@ -989,7 +978,6 @@ const URDPurchase = () => {
                   ]}
                 />
               </Col>
-
               <Col xs={12} md={3} className="d-flex align-items-center">
                 <div style={{ flex: 1 }}>
                   <InputField
@@ -1017,8 +1005,6 @@ const URDPurchase = () => {
                   }}
                 />
               </Col>
-
-
               <Col xs={12} md={2}>
                 <InputField
                   label="Rbarcode"
@@ -1061,7 +1047,6 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("net_weight", e.target.value)}
                     />
                   </Col>
-
                   {formData.category === "Diamond" ? (
                     <>
                       <Col xs={12} md={2}>
@@ -1188,18 +1173,6 @@ const URDPurchase = () => {
                   </Col>
                 </>
               )}
-              {/* <Col xs={12} md={2}>
-                <InputField
-                  label="Other Charges:"
-                  type="select"
-                  value={formData.other_charges}
-                  onChange={(e) => handleChange("other_charges", e.target.value)}
-                  options={[
-                    { value: "Cargo", label: "Cargo" },
-                    { value: "Transport", label: "Transport" },
-                  ]}
-                />
-              </Col> */}
               <Col xs={12} md={2}>
                 <InputField label="Charges" type="number" value={formData.charges}
                   onChange={(e) => handleChange("charges", e.target.value)} />
@@ -1212,12 +1185,6 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("rate", e.target.value)}
                 />
               </Col>
-
-
-
-
-
-              {/* ✅ Rename "Total Amt" to "Piece Rate" when "By fixed" is selected & enable manual input */}
               <Col xs={12} md={2}>
                 <InputField
                   label="Total Amt"
@@ -1227,9 +1194,6 @@ const URDPurchase = () => {
                   readOnly={formData.Pricing !== "By fixed"} // Piece Rate is writable only when "By fixed" is selected
                 />
               </Col>
-
-
-
               <Col xs={12} md={2}>
                 <InputField
                   label="Paid Amt"
@@ -1246,16 +1210,6 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("balance_amount", e.target.value)}
                 />
               </Col>
-
-
-              {/* <Col xs={12} md={1}>
-                <InputField label="Actions" type="number" value={formData.total_amount}
-                  onChange={(e) => handleChange("total_amount", e.target.value)} />
-              </Col>
-              <Col xs={12} md={1}>
-                <InputField label="Pure Bal" type="number" value={formData.total_amount}
-                  onChange={(e) => handleChange("total_amount", e.target.value)} />
-              </Col> */}
               <Col xs={12} md={1}>
                 <Button onClick={handleAdd} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
                   {editingIndex !== null ? "Update" : "Add"}
