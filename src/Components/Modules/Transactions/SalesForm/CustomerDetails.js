@@ -90,7 +90,7 @@ const CustomerDetails = ({
               name="mobile"
               type="select"
               value={formData.customer_id || ""}
-              autoFocus
+
               onChange={(e) => {
                 handleCustomerChange(e.target.value);
                 const selectedCustomer = customers.find(

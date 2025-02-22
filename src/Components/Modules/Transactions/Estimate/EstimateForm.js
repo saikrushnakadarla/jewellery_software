@@ -36,10 +36,13 @@ const RepairForm = () => {
     making_charges_on: "MC %",
     mc_per_gram: "",
     total_mc: "",
+    disscount_percentage: "",
+    disscount: "",
     rate: "",
     rate_amt: "",
     tax_percent: "03% GST",
     tax_vat_amount: "",
+    hm_charges: "60.00",
     total_rs: "",
     total_amount: "0.00",
   };
@@ -136,35 +139,8 @@ const RepairForm = () => {
         throw new Error("Failed to fetch tags");
       }
       const result = await response.json();
-
-      // Remove duplicate sub_category entries
-      const uniqueProductNames = Array.from(
-        new Map(result.result.map((prod) => [prod.sub_category, prod])).values()
-      );
-
-      // Extract unique metal types
-      const uniqueMetalTypes = Array.from(
-        new Set(result.result.map((prod) => prod.metal_type))
-      ).map((metalType) => ({ metal_type: metalType }));
-
-      // Extract unique design names
-      const uniqueDesigns = Array.from(
-        new Set(result.result.map((prod) => prod.design_master))
-      ).map((designMaster) => ({ design_master: designMaster }));
-
-      const uniquePurity = Array.from(
-        new Set(result.result.map((prod) => prod.Purity))
-      ).map((Purity) => ({ Purity: Purity }));
-
       setData(result.result); // Set the full data
-      setUniqueProducts(uniqueProductNames); // Set unique sub_category options
-      console.log("Product Name=", uniqueProductNames)
-      setMetalTypes(uniqueMetalTypes); // Set all unique metal types
-      setFilteredMetalTypes(uniqueMetalTypes); // Initially, show all metal types
-      setDesignOptions(uniqueDesigns); // Set all unique designs
-      setFilteredDesignOptions(uniqueDesigns); // Initially, show all designs
-      setPurity(uniquePurity); // Set all unique metal types
-      setFilteredPurityOptions(uniquePurity); // Initially, show all metal types
+
     } catch (error) {
       console.error("Error fetching tags:", error);
     }
@@ -215,6 +191,14 @@ const RepairForm = () => {
         };
       }
 
+      if (name === "disscount_percentage") {
+        const discountPercentage = parseFloat(value) || 0;
+        const makingCharges = parseFloat(formData.total_mc) || 0;
+        const discountAmount = (discountPercentage / 100) * makingCharges;
+
+        updatedData.disscount = discountAmount.toFixed(2);
+      }
+
       // Reset `mc_per_gram` and `total_mc` when `making_charges_on` changes
       if (name === "making_charges_on") {
         updatedData.mc_per_gram = "";
@@ -236,55 +220,6 @@ const RepairForm = () => {
         const calculatedTotalMC = (updatedMcPercentage / 100) * updatedRateAmount;
         updatedData.total_mc = calculatedTotalMC.toFixed(2);
       }
-
-      const { product_name, metal_type, design_name, purity } = updatedData;
-
-      if (product_name && metal_type && design_name && purity) {
-        const matchingEntries = data.filter(
-          (prod) =>
-            prod.sub_category === product_name &&
-            prod.metal_type === metal_type &&
-            prod.design_master === design_name &&
-            prod.Purity === purity
-        );
-
-        if (matchingEntries.length > 0) {
-          if (matchingEntries.length > 1) {
-            updatedData.barcodeOptions = matchingEntries.map((entry) => ({
-              value: entry.PCode_BarCode,
-              label: entry.PCode_BarCode,
-            }));
-          } else if (matchingEntries.length === 1) {
-            const matchingEntry = matchingEntries[0];
-            const productId = matchingEntry.product_id;
-            const productDetails = products.find(
-              (prod) => String(prod.product_id) === String(productId)
-            );
-
-            updatedData = {
-              ...updatedData,
-              code: matchingEntry.PCode_BarCode,
-              category: matchingEntry.category,
-              sub_category: matchingEntry.sub_category,
-              gross_weight: matchingEntry.Gross_Weight,
-              stones_weight: matchingEntry.Stones_Weight || "",
-              stones_price: matchingEntry.Stones_Price || "",
-              weight_bw: matchingEntry.Weight_BW || "",
-              wastage_on: matchingEntry.Wastage_On || "",
-              wastage_percent: matchingEntry.Wastage_Percentage || "",
-              wastage_weight: matchingEntry.WastageWeight || "",
-              total_weight: matchingEntry.TotalWeight_AW || "",
-              making_charges_on: matchingEntry.Making_Charges_On || "",
-              mc_per_gram: matchingEntry.MC_Per_Gram || "",
-              total_mc: matchingEntry.Making_Charges || "",
-              tax_percent: productDetails?.tax_slab || "",
-              qty: 1,
-              barcodeOptions: [],
-            };
-          }
-        }
-      }
-
       return updatedData;
     });
   };
@@ -519,7 +454,8 @@ const RepairForm = () => {
           rate: "",
           rate_amt: "",
           tax_percent: "03% GST",
-          tax_amt: "",
+          tax_vat_amount: "",
+          hm_charges: "60.00",
           total_price: "",
           qty: "", // Reset qty
         }));
@@ -620,7 +556,8 @@ const RepairForm = () => {
             rate: "",
             rate_amt: "",
             tax_percent: "03% GST",
-            tax_amt: "",
+            tax_vat_amount: "",
+            hm_charges: "60.00",
             total_price: "",
             qty: "", // Reset qty
           }));
@@ -672,17 +609,16 @@ const RepairForm = () => {
         0
       ).toFixed(2);
 
-      // Save to the database
       await Promise.all(
-        entries.map((entry) =>
-          axios.post(`${baseURL}/add/estimate`, {
+        entries.map((entry) => {
+          const requestData = {
             ...entry,
             total_amount: totalAmount,
-          })
-        )
+          };
+          return axios.post(`${baseURL}/add/estimate`, requestData);
+        })
       );
 
-      // Generate PDF
       const pdfDoc = pdf(
         <PDFContent
           entries={entries}
@@ -694,17 +630,18 @@ const RepairForm = () => {
       );
 
       const blob = await pdfDoc.toBlob();
-      saveAs(blob, `estimate_${Date.now()}.pdf`);
+      saveAs(blob, `estimate_${formData.estimate_number}.pdf`);
 
       alert("Estimates saved successfully!");
       setEntries([]);
       setFormData(initialFormData);
-      navigate("/estimatetable"); // Redirect to another page if needed
+      navigate("/estimatetable");
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to save or generate PDF. Please try again.");
     }
   };
+
 
   useEffect(() => {
     const fetchLastEstimateNumber = async () => {
@@ -797,40 +734,43 @@ const RepairForm = () => {
   useEffect(() => {
     const rate = parseFloat(formData.rate) || 0;
     const totalWeight = parseFloat(formData.total_weight) || 0;
+    const qty = parseFloat(formData.qty) || 0;
+    const pieceCost = parseFloat(formData.pieace_cost) || 0;
+    let rateAmt = 0;
 
-    const rateAmt = rate * totalWeight;
+    if (formData.pricing === "By fixed") {
+      rateAmt = pieceCost * qty;
+    } else {
+      rateAmt = rate * totalWeight;
+    }
 
     setFormData((prev) => ({
       ...prev,
       rate_amt: rateAmt.toFixed(2),
     }));
-  }, [formData.rate, formData.total_weight]);
+  }, [formData.rate, formData.total_weight, formData.qty, formData.pricing, formData.pieace_cost]);
 
   useEffect(() => {
     const taxPercent = parseFloat(formData.tax_percent) || 0;
     const rateAmt = parseFloat(formData.rate_amt) || 0;
+    const stonesPrice = parseFloat(formData.stones_price) || 0;
+    const totalMC = parseFloat(formData.total_mc) || 0;
+    const discountAmt = parseFloat(formData.disscount) || 0;
+    const hmCharges = parseFloat(formData.hm_charges) || 0;
 
-    const taxAmt = (rateAmt * taxPercent) / 100;
+    // Ensure discount is subtracted before tax calculation
+    const taxableAmount = rateAmt + stonesPrice + totalMC + hmCharges - discountAmt;
+    const taxAmt = (taxableAmount * taxPercent) / 100;
+
+    // Calculate Total Price
+    const totalPrice = taxableAmount + taxAmt;
 
     setFormData((prev) => ({
       ...prev,
       tax_vat_amount: taxAmt.toFixed(2),
+      total_rs: totalPrice.toFixed(2),
     }));
-  }, [formData.tax_percent, formData.rate_amt]);
-
-  useEffect(() => {
-    const rateAmt = parseFloat(formData.rate_amt) || 0;
-    const taxAmt = parseFloat(formData.tax_vat_amount) || 0;
-    const stonesPrice = parseFloat(formData.stones_price) || 0;
-    const totalMC = parseFloat(formData.total_mc) || 0;
-
-    const totalRs = rateAmt + taxAmt + stonesPrice + totalMC;
-
-    setFormData((prev) => ({
-      ...prev,
-      total_rs: totalRs.toFixed(2),
-    }));
-  }, [formData.rate_amt, formData.tax_vat_amount, formData.stones_price, formData.total_mc]);
+  }, [formData.tax_percent, formData.rate_amt, formData.stones_price, formData.total_mc, formData.disscount]);
 
   useEffect(() => {
     const fetchLastEstimateNumber = async () => {
@@ -852,25 +792,37 @@ const RepairForm = () => {
     navigate("/estimatetable");
   };
 
-  
-  const barcodeOptions = formData.barcodeOptions?.length > 0
-    ? formData.barcodeOptions
-    : [
-      ...products
-        .filter((product) => formData.category ? product.product_name === formData.category : true)
-        .map((product) => ({
-          value: product.rbarcode,
-          label: product.rbarcode,
-        })),
-      ...data
-        .filter((tag) => formData.category ? tag.category === formData.category : true)
-        .map((tag) => ({
-          value: tag.PCode_BarCode,
-          label: tag.PCode_BarCode,
-        })),
-    ];
+  const defaultBarcode = formData.category
+    ? products.find((product) => product.product_name === formData.category)?.rbarcode || ""
+    : "";
 
-    const defaultBarcode = formData.category && barcodeOptions.length > 0 ? barcodeOptions[0].value : "";
+  // Generate options list for barcode selection
+  const barcodeOptions = [
+    ...products
+      .filter((product) => (formData.category ? product.product_name === formData.category : true))
+      .map((product) => ({
+        value: product.rbarcode,
+        label: product.rbarcode,
+      })),
+    ...data
+      .filter((tag) => (formData.category ? tag.category === formData.category : true))
+      .map((tag) => ({
+        value: tag.PCode_BarCode,
+        label: tag.PCode_BarCode,
+      })),
+  ];
+
+  // Ensure default barcode is included in options
+  if (defaultBarcode && !barcodeOptions.some((option) => option.value === defaultBarcode)) {
+    barcodeOptions.unshift({ value: defaultBarcode, label: defaultBarcode });
+  }
+
+  // Set default barcode only if formData.code is empty
+  useEffect(() => {
+    if (!formData.code && defaultBarcode) {
+      handleBarcodeChange(defaultBarcode);
+    }
+  }, [formData.category, defaultBarcode]); 
 
 
   return (
@@ -913,15 +865,15 @@ const RepairForm = () => {
           </Col>
 
           <Col xs={12} md={2}>
-          <InputField
-            label="BarCode/Rbarcode"
-            name="code"
-            value={formData.code || defaultBarcode} // Default barcode when formData.code is empty
-            onChange={(e) => handleBarcodeChange(e.target.value)}
-            type="select"
-            options={barcodeOptions}
-          />
-        </Col>
+            <InputField
+              label="BarCode/Rbarcode"
+              name="code"
+              value={formData.code} // Maintains user selection
+              onChange={(e) => handleBarcodeChange(e.target.value)}
+              type="select"
+              options={barcodeOptions} // Provide valid options list
+            />
+          </Col>
 
           <Col xs={12} md={2}>
             <InputField
@@ -933,12 +885,12 @@ const RepairForm = () => {
               options={metaltypeOptions}
             />
           </Col>
-         
+
           <Col xs={12} md={2}>
             <InputField
               label="Sub Category"
-              name="product_name"
-              value={formData.product_name || ""}
+              name="sub_category"
+              value={formData.sub_category || ""}
               onChange={handleInputChange}
               type="select"
               options={subcategoryOptions}
@@ -957,6 +909,23 @@ const RepairForm = () => {
 
           <Col xs={12} md={2}>
             <InputField
+              label="Pricing"
+              name="pricing"
+              type="select"
+              value={formData.pricing || ""} // Default to "Gross Weight"
+              onChange={handleInputChange}
+              options={[
+                { value: "By Weight", label: "By Weight" },
+                { value: "By fixed", label: "By fixed" },
+                ...(formData.pricing &&
+                  !["By Weight", "By fixed"].includes(formData.pricing)
+                  ? [{ value: formData.pricing, label: formData.pricing }]
+                  : []),
+              ]}
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
               label="Purity"
               name="purity"
               value={formData.purity || ""}
@@ -965,7 +934,6 @@ const RepairForm = () => {
               options={purityOptions}
             />
           </Col>
-
           <Col xs={12} md={1}>
             <InputField label="Gross Wt" name="gross_weight" value={formData.gross_weight} onChange={handleInputChange} />
           </Col>
@@ -995,7 +963,6 @@ const RepairForm = () => {
               ]}
             />
           </Col>
-
           <Col xs={12} md={2}>
             <InputField label="Wastage %" name="wastage_percent" value={formData.wastage_percent} onChange={handleInputChange} />
           </Col>
@@ -1066,6 +1033,31 @@ const RepairForm = () => {
             // readOnly // Make this field read-only, since it’s auto-calculated
             />
           </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="Disscount %"
+              name="disscount_percentage"
+              value={formData.disscount_percentage || ""} // Display calculated Total MC
+              onChange={handleInputChange}
+            />
+          </Col>
+
+          <Col xs={12} md={2}>
+            <InputField
+              label="Total Disscount"
+              name="disscount"
+              value={formData.disscount || ""} // Display calculated Total MC
+              onChange={handleInputChange}
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="HM Charges"
+              name="hm_charges"
+              value={formData.hm_charges || "0.00"} // Default to "0.00" if undefined
+              onChange={handleInputChange} // Optional, since it's auto-calculated
+            />
+          </Col>
 
           <Col xs={12} md={1}>
             <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
@@ -1091,7 +1083,9 @@ const RepairForm = () => {
             <thead>
               <tr>
                 <th>S No</th>
-                <th>Product Name</th>
+                <th>Code</th>
+                <th>Category</th>
+                <th>Sub Category</th>
                 <th>Gross Weight</th>
                 <th>Stones Weight</th>
                 <th>Total Weight</th>
@@ -1105,7 +1099,9 @@ const RepairForm = () => {
                 entries.map((entry, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
-                    <td>{entry.product_name}</td>
+                    <td>{entry.code}</td>
+                    <td>{entry.category}</td>
+                    <td>{entry.sub_category}</td>
                     <td>{entry.gross_weight}</td>
                     <td>{entry.stones_weight}</td>
                     <td>{entry.total_weight}</td>
@@ -1137,7 +1133,7 @@ const RepairForm = () => {
               {/* Total Row */}
               {entries.length > 0 && (
                 <tr style={{ fontWeight: 'bold' }}>
-                  <td colSpan="6" className="text-end" >
+                  <td colSpan="8" className="text-end" >
                     Total Amount
                   </td>
                   <td className="font-weight-bold">

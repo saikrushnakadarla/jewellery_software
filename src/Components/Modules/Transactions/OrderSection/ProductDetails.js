@@ -36,24 +36,37 @@ const ProductDetails = ({
 
   const isByFixed = formData.pricing === "By fixed";
 
-  const barcodeOptions = formData.barcodeOptions?.length > 0
-    ? formData.barcodeOptions
-    : [
-      ...products
-        .filter((product) => formData.category ? product.product_name === formData.category : true)
-        .map((product) => ({
-          value: product.rbarcode,
-          label: product.rbarcode,
-        })),
-      ...data
-        .filter((tag) => formData.category ? tag.category === formData.category : true)
-        .map((tag) => ({
-          value: tag.PCode_BarCode,
-          label: tag.PCode_BarCode,
-        })),
-    ];
+  const defaultBarcode = formData.category
+    ? products.find((product) => product.product_name === formData.category)?.rbarcode || ""
+    : "";
 
-    const defaultBarcode = formData.category && barcodeOptions.length > 0 ? barcodeOptions[0].value : "";
+  // Generate options list for barcode selection
+  const barcodeOptions = [
+    ...products
+      .filter((product) => (formData.category ? product.product_name === formData.category : true))
+      .map((product) => ({
+        value: product.rbarcode,
+        label: product.rbarcode,
+      })),
+    ...data
+      .filter((tag) => (formData.category ? tag.category === formData.category : true))
+      .map((tag) => ({
+        value: tag.PCode_BarCode,
+        label: tag.PCode_BarCode,
+      })),
+  ];
+
+  // Ensure default barcode is included in options
+  if (defaultBarcode && !barcodeOptions.some((option) => option.value === defaultBarcode)) {
+    barcodeOptions.unshift({ value: defaultBarcode, label: defaultBarcode });
+  }
+
+  // Set default barcode only if formData.code is empty
+  useEffect(() => {
+    if (!formData.code && defaultBarcode) {
+      handleBarcodeChange(defaultBarcode);
+    }
+  }, [formData.category, defaultBarcode]); 
 
   return (
     <Col >
@@ -68,8 +81,6 @@ const ProductDetails = ({
             options={categoryOptions}
           />
         </Col>
-
-       
         <Col xs={12} md={2}>
           <InputField
             label="BarCode/Rbarcode"
@@ -78,9 +89,9 @@ const ProductDetails = ({
             onChange={(e) => handleBarcodeChange(e.target.value)}
             type="select"
             options={barcodeOptions}
+            autoFocus
           />
         </Col>
-
         <Col xs={12} md={2}>
           <InputField
             label="Metal Type"
@@ -91,16 +102,6 @@ const ProductDetails = ({
             options={metaltypeOptions}
           />
         </Col>
-        {/* <Col xs={12} md={2}>
-          <InputField
-            label="Category"
-            name="category"
-            value={formData.category || ""}
-            type="select"
-            onChange={handleChange}
-            options={categoryOptions}
-          />
-        </Col> */}
         <Col xs={12} md={2}>
           <InputField
             label="Sub Category"
@@ -384,8 +385,7 @@ const ProductDetails = ({
               />
             </Col>
 
-
-            <Col xs={12} md={2}>
+            {/* <Col xs={12} md={2}>
               <InputField
                 label="Disscount %"
                 name="disscount_percentage"
@@ -401,7 +401,7 @@ const ProductDetails = ({
                 value={formData.disscount || ""} // Display calculated Total MC
                 onChange={handleChange}
               />
-            </Col>
+            </Col> */}
             {/* <Col xs={12} md={1}>
               <InputField
                 label="Qty"
@@ -411,6 +411,14 @@ const ProductDetails = ({
                 readOnly={!isQtyEditable}
               />
             </Col> */}
+            <Col xs={12} md={2}>
+              <InputField
+                label="HM Charges"
+                name="hm_charges"
+                value={formData.hm_charges || "0.00"} // Default to "0.00" if undefined
+                onChange={handleChange} // Optional, since it's auto-calculated
+              />
+            </Col>
             <Col xs={12} md={1}>
               <InputField label="Tax%"
                 name="tax_percent"
@@ -427,7 +435,7 @@ const ProductDetails = ({
                 readOnly
               />
             </Col>
-            <Col xs={12} md={1}>
+            <Col xs={12} md={2}>
               <InputField
                 label="Total Price"
                 name="total_price"

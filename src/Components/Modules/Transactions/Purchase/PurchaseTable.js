@@ -100,28 +100,47 @@ const handleOpenModal = (data) => {
       { Header: 'Gross Wt', accessor: 'gross_weight' },
       { Header: 'Purity', accessor: 'purity' },
       { Header: 'Pure Wt', accessor: 'pure_weight' },
-      { Header: 'Tot Amt / Wt', accessor: 'total_amount' },
+      { Header: 'Rate', accessor: 'rate' },
+      { 
+        Header: 'Tot Wt / Amt', 
+        accessor: row => ` ${row.total_pure_wt} / ${row.total_amount}`
+      }, 
+      // { 
+      //   Header: 'Paid Wt / Amt', 
+      //   accessor: row => ` ${row.paid_pure_weight} / ${row.paid_amount}`
+      // }, 
+      // { 
+      //   Header: 'Bal Wt / Amt', 
+      //   accessor: row => ` ${row.balance_pure_weight} / ${row.balance_amount}`
+      // }, 
+      
       {
-        Header: 'Paid Amt / Wt',
+        Header: 'Paid Wt / Amt',
         accessor: 'paid_amount',
         Cell: ({ row }) => {
           const paid_amount = Number(row.original.paid_amount) || 0;
           const paid_amt = Number(row.original.paid_amt) || 0;
-          return paid_amount + paid_amt;
+          const paid_pure_weight = Number(row.original.paid_pure_weight) || 0;
+      
+          return `${paid_pure_weight} / ${paid_amount + paid_amt}`;
         },
       },
+      
       {
-        Header: 'Bal Amt / Wt',
+        Header: 'Bal Wt / Amt',
         accessor: 'balance_amount',
         Cell: ({ row }) => {
           const balance_amount = Number(row.original.balance_amount) || 0;
           const balance_after_receipt = Number(row.original.balance_after_receipt) || 0;
           const paid_amt = Number(row.original.paid_amt) || 0;
+          const balance_pure_weight = Number(row.original.balance_pure_weight) || 0;
       
-          return balance_amount === paid_amt ? balance_after_receipt : balance_after_receipt || balance_amount || '-';
+          const final_balance_amount =
+            balance_amount === paid_amt ? balance_after_receipt : balance_after_receipt || balance_amount || '-';
+      
+          return `${balance_pure_weight} / ${final_balance_amount} `;
         },
       },
-      
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -172,11 +191,11 @@ const handleOpenModal = (data) => {
               style={{
                 backgroundColor: '#28a745',
                 borderColor: '#28a745',
-                fontSize: '0.875rem', // Smaller font size
-                padding: '0.25rem 0.5rem', // Reduced padding
+                fontSize: '0.875rem', 
+                padding: '0.25rem 0.5rem', 
               }}
               onClick={() => handleAddReceipt(row.original)}
-              disabled={totalAmount === totalPaid} // Disable button if totalAmount equals totalPaid
+              // disabled={totalAmount === totalPaid} 
             >
               Add Payment
             </Button>

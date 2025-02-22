@@ -183,114 +183,114 @@ const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) 
 
   return (
 
-  <Document>
-    <Page size={[226, 500]} style={styles.page}>
-      {/* Heading */}
-      <Text style={styles.heading}>Estimation</Text>
+    <Document>
+      <Page size={[226, 500]} style={styles.page}>
+        {/* Heading */}
+        <Text style={styles.heading}>Estimation</Text>
 
-      {/* Details */}
-      {entries.length > 0 && (
+        {/* Details */}
+        {entries.length > 0 && (
+          <View>
+            <View style={styles.row}>
+              <Text style={styles.leftText}>Est No: {entries[0].estimate_number}</Text>
+              <Text style={styles.rightText}>S.E: {sellerName}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.leftText}>Rate: {entries[0].rate}</Text>
+              {/* <Text style={styles.rightText}>Date: {entries[0].date}</Text> */}
+              <Text style={styles.rightText}>Date: {formattedDate}</Text>
+            </View>
+          </View>
+        )}
+
         <View>
-          <View style={styles.row}>
-            <Text style={styles.leftText}>Est No: {entries[0].estimate_number}</Text>
-            <Text style={styles.rightText}>S.E: {sellerName}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.leftText}>Rate: {entries[0].rate}</Text>
-            {/* <Text style={styles.rightText}>Date: {entries[0].date}</Text> */}
-            <Text style={styles.rightText}>Date: {formattedDate}</Text>
-          </View>
+          <Text style={styles.timeText}>{currentTime}</Text>
         </View>
-      )}
 
-      <View>
-      <Text style={styles.timeText}>{currentTime}</Text>
-      </View>
+        {/* Table Header */}
+        <View style={styles.tableHeader}>
+          <Text style={[styles.tableCell, styles.snBoldHeader]}>S.N</Text>
+          <Text style={[styles.tableCell, styles.itemBoldHeader]}>Item</Text>
+          <Text style={[styles.tableCell, styles.stAmtBoldHeader]}>st.Amt</Text>
+        </View>
+        <View style={styles.tableHeader1}>
+          <Text style={[styles.tableCell, styles.snHeader]}></Text>
+          <Text style={[styles.tableCell, styles.grBoldHeader]}>Gr.wt</Text>
+          <Text style={[styles.tableCell, styles.ntBoldHeader]}>Nt.wt</Text>
+          <Text style={[styles.tableCell, styles.vaBoldHeader]}>VA</Text>
+          <Text style={[styles.tableCell, styles.mcBoldHeader]}>MC</Text>
+          <Text style={[styles.tableCell, styles.stAmtBoldHeader]}>Amt</Text>
+        </View>
+        <View>
+          {entries.map((entry, index) => (
+            <View key={index}>
+              <View style={styles.row}>
+                <Text style={[styles.tableCell, styles.snHeader]}>{index + 1}</Text>
+                <Text style={[styles.tableCell, styles.itemHeader]}>{entry.product_name}</Text>
+                <Text style={[styles.tableCell, styles.stAmtHeader]}>{entry.stones_price}</Text>
+              </View>
+              <View style={styles.tableHeader2}>
+                <Text style={[styles.tableCell, styles.snHeader]}></Text>
+                <Text style={[styles.tableCell, styles.grHeader]}>{entry.gross_weight}</Text>
+                <Text style={[styles.tableCell, styles.ntHeader]}>{entry.total_weight}</Text>
+                <Text style={[styles.tableCell, styles.vaHeader]}>{entry.wastage_percent}</Text>
+                <Text style={[styles.tableCell, styles.mcHeader]}>{entry.total_mc}</Text>
+                <Text style={[styles.tableCell, styles.stAmtHeader]}>{entry.rate_amt}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
 
-      {/* Table Header */}
-      <View style={styles.tableHeader}>
-        <Text style={[styles.tableCell, styles.snBoldHeader]}>S.N</Text>
-        <Text style={[styles.tableCell, styles.itemBoldHeader]}>Item</Text>
-        <Text style={[styles.tableCell, styles.stAmtBoldHeader]}>st.Amt</Text>
-      </View>
-      <View style={styles.tableHeader1}>
-        <Text style={[styles.tableCell, styles.snHeader]}></Text>
-        <Text style={[styles.tableCell, styles.grBoldHeader]}>Gr.wt</Text>
-        <Text style={[styles.tableCell, styles.ntBoldHeader]}>Nt.wt</Text>
-        <Text style={[styles.tableCell, styles.vaBoldHeader]}>VA</Text>
-        <Text style={[styles.tableCell, styles.mcBoldHeader]}>MC</Text>
-        <Text style={[styles.tableCell, styles.stAmtBoldHeader]}>Amt</Text>
-      </View>
-      <View>
-      {entries.map((entry, index) => (
-  <View key={index}>
-    <View style={styles.row}>
-      <Text style={[styles.tableCell, styles.snHeader]}>{index + 1}</Text>
-      <Text style={[styles.tableCell, styles.itemHeader]}>{entry.product_name}</Text>
-      <Text style={[styles.tableCell, styles.stAmtHeader]}>{entry.stones_price}</Text>
-    </View>
-    <View style={styles.tableHeader2}>
-      <Text style={[styles.tableCell, styles.snHeader]}></Text>
-      <Text style={[styles.tableCell, styles.grHeader]}>{entry.gross_weight}</Text>
-      <Text style={[styles.tableCell, styles.ntHeader]}>{entry.total_weight}</Text>
-      <Text style={[styles.tableCell, styles.vaHeader]}>{entry.wastage_percent}</Text>
-      <Text style={[styles.tableCell, styles.mcHeader]}>{entry.total_mc}</Text>
-      <Text style={[styles.tableCell, styles.stAmtHeader]}>{entry.rate_amt}</Text>
-    </View>
-  </View>
-))}
-</View>
+        {(() => {
+          const totalGrossWeight = entries.reduce((sum, entry) => sum + parseFloat(entry.gross_weight || 0), 0);
+          const totalNetWeight = entries.reduce((sum, entry) => sum + parseFloat(entry.total_weight || 0), 0);
+          const totalAmount = entries.reduce((sum, entry) => sum + parseFloat(entry.rate_amt || 0), 0);
+          const totalMakingCharge = entries.reduce((sum, entry) => sum + parseFloat(entry.total_mc || 0), 0);
+          const totalStoneAmount = entries.reduce((sum, entry) => sum + parseFloat(entry.stones_price || 0), 0);
+          const hmCharges = entries.reduce((sum, entry) => sum + parseFloat(entry.hm_charges || 0), 0);
+          const discountAmount = entries.reduce((sum, entry) => sum + parseFloat(entry.disscount || 0), 0);
 
-{(() => {
-  const totalGrossWeight = entries.reduce((sum, entry) => sum + parseFloat(entry.gross_weight || 0), 0);
-  const totalNetWeight = entries.reduce((sum, entry) => sum + parseFloat(entry.total_weight || 0), 0);
-  const totalAmount = entries.reduce((sum, entry) => sum + parseFloat(entry.rate_amt || 0), 0);
-  const totalMakingCharge = entries.reduce((sum, entry) => sum + parseFloat(entry.total_mc || 0), 0);
+          const taxPercent = parseFloat(entries[0]?.tax_percent || 0);
+          const taxableAmount = totalAmount + totalMakingCharge + totalStoneAmount + hmCharges - discountAmount
+          const gstAmount = taxableAmount * (taxPercent / 100);
+          const cgst = gstAmount / 2;
+          const sgst = gstAmount / 2;
+          const finalAmount = taxableAmount + gstAmount;
 
-  const taxPercent = parseFloat(entries[0]?.tax_percent || 0);
-  const gstAmount = totalAmount * (taxPercent / 100);
-  const cgst = gstAmount / 2;
-  const sgst = gstAmount / 2;
-  const finalAmount = totalAmount + gstAmount + totalMakingCharge;
-
-  return (
-    <>
-      <View style={{ borderTopWidth: 1, borderTopColor: "#000", borderBottomWidth: 1, borderBottomColor: "#000", paddingVertical: 5 }}>
-        <View style={styles.footerRow}>
-          <Text style={[styles.tableCell, styles.snBoldHeader]}></Text>
-          <Text style={[styles.tableCell, styles.grBoldHeader]}>{totalGrossWeight.toFixed(2)}</Text>
-          <Text style={[styles.tableCell, styles.ntBoldHeader]}>{totalNetWeight.toFixed(2)}</Text>
-          <Text style={[styles.tableCell, styles.totalAmtHeader]}>{totalAmount.toFixed(2)}</Text>
-        </View>
-      </View>
-      <View>
-        <View style={styles.rowContainer}>
-          <Text style={styles.leftAlignedText}>Round off:</Text>
-          <Text style={styles.rightAlignedText}>-0.31</Text>
-        </View>
-        <View style={styles.rowContainer}>
-          <Text style={styles.leftAlignedText}>GST Value:</Text>
-          <Text style={styles.rightAlignedText}>  {totalAmount.toFixed(2)}</Text> 
-        </View>
-        <View style={styles.rowContainer}>
-          <Text style={styles.leftAlignedText}>CGST@{(taxPercent / 2).toFixed(2)}%:</Text>
-          <Text style={styles.rightAlignedText}>  {cgst.toFixed(2)}</Text>
-        </View>
-        <View style={styles.rowContainer}>
-          <Text style={styles.leftAlignedText}>SGST@{(taxPercent / 2).toFixed(2)}%:</Text>
-          <Text style={styles.rightAlignedText}>  {sgst.toFixed(2)}</Text>
-        </View>
-        <View style={styles.rowContainer}>
-          <Text style={styles.leftAlignedText}>Final Amt:</Text>
-          <Text style={styles.rightAlignedText}>  {finalAmount.toFixed(2)}</Text>
-        </View>
-      </View>
-    </>
+          return (
+            <>
+              <View style={{ borderTopWidth: 1, borderTopColor: "#000", borderBottomWidth: 1, borderBottomColor: "#000", paddingVertical: 5 }}>
+                <View style={styles.footerRow}>
+                  <Text style={[styles.tableCell, styles.snBoldHeader]}></Text>
+                  <Text style={[styles.tableCell, styles.grBoldHeader]}>{totalGrossWeight.toFixed(3)}</Text>
+                  <Text style={[styles.tableCell, styles.ntBoldHeader]}>{totalNetWeight.toFixed(3)}</Text>
+                  <Text style={[styles.tableCell, styles.totalAmtHeader]}>{taxableAmount.toFixed(2)}</Text>
+                </View>
+              </View>
+              <View>
+                <View style={styles.rowContainer}>
+                  <Text style={styles.leftAlignedText}>GST Value:</Text>
+                  <Text style={styles.rightAlignedText}>  {taxableAmount.toFixed(2)}</Text>
+                </View>
+                <View style={styles.rowContainer}>
+                  <Text style={styles.leftAlignedText}>CGST@{(taxPercent / 2).toFixed(2)}%:</Text>
+                  <Text style={styles.rightAlignedText}>  {cgst.toFixed(2)}</Text>
+                </View>
+                <View style={styles.rowContainer}>
+                  <Text style={styles.leftAlignedText}>SGST@{(taxPercent / 2).toFixed(2)}%:</Text>
+                  <Text style={styles.rightAlignedText}>  {sgst.toFixed(2)}</Text>
+                </View>
+                <View style={styles.rowContainer}>
+                  <Text style={styles.leftAlignedText}>Final Amt:</Text>
+                  <Text style={styles.rightAlignedText}>  {finalAmount.toFixed(2)}</Text>
+                </View>
+              </View>
+            </>
+          );
+        })()}
+      </Page>
+    </Document>
   );
-})()}
-    </Page>
-  </Document>
-);
 };
 
 export default PDFContent;

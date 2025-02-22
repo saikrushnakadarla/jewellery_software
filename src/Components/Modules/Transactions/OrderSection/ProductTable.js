@@ -18,10 +18,10 @@ const ProductTable = ({ orderDetails, onDelete, onEdit }) => {
     <Table className='dataTable_headerCell2' bordered hover responsive>
     <thead style={{ position: "sticky", top: 0, background: "white", zIndex: 2 }}>
         <tr>
-          <th>Date</th>
-          <th>Invoice Number</th>
+          {/* <th>Date</th> */}
+          {/* <th>Invoice Number</th> */}
           <th>Product Name</th>
-          <th>Metal Type</th>
+          <th>Metal</th>
           <th>Design Name</th>
           <th>Purity</th>
           <th>Gr Wt</th>
@@ -31,16 +31,17 @@ const ProductTable = ({ orderDetails, onDelete, onEdit }) => {
           {/* <th>Wastage On</th> */}
           <th>VA%</th>
           {/* <th>Wastage Weight</th> */}
-          <th>Total Wt AW</th>
-          <th>MC On</th>
-          <th>MC Per Gram</th>
+          <th>Total Wt</th>
+          <th>Rate</th>
+          {/* <th>MC On</th>
+          <th>MC Per Gram</th> */}
           <th>MC</th>
           {/* <th>Discount %</th> */}
           <th>Discount</th>
-          <th>Rate</th>
+          
           {/* <th>Rate Amount</th> */}
           {/* <th>Tax %</th> */}
-          <th>Tax Amount</th>
+          <th>Tax Amt</th>
           <th>Total Price</th>
           <th>image</th>
           <th>Actions</th> {/* Add Action column for delete */}
@@ -50,8 +51,8 @@ const ProductTable = ({ orderDetails, onDelete, onEdit }) => {
         {orderDetails.length > 0 ? (
           orderDetails.map((detail, index) => (
             <tr key={index}>
-              <td>{detail.date}</td>
-              <td>{detail.order_number}</td>
+              {/* <td>{detail.date}</td> */}
+              {/* <td>{detail.order_number}</td> */}
               <td>{detail.product_name}</td>
               <td>{detail.metal_type}</td>
               <td>{detail.design_name}</td>
@@ -64,12 +65,13 @@ const ProductTable = ({ orderDetails, onDelete, onEdit }) => {
               <td>{detail.va_percent}</td>
               {/* <td>{detail.wastage_weight}</td> */}
               <td>{detail.total_weight_av}</td>
-              <td>{detail.mc_on}</td>
-              <td>{detail.mc_per_gram}</td>
+              <td>{detail.rate}</td>
+              {/* <td>{detail.mc_on}</td>
+              <td>{detail.mc_per_gram}</td> */}
               <td>{detail.making_charges}</td>
               {/* <td>{detail.disscount_percentage}</td> */}
               <td>{detail.disscount}</td>
-              <td>{detail.rate}</td>
+              
               {/* <td>{detail.rate_amt}</td> */}
               {/* <td>{detail.tax_percent}</td> */}
               <td>{detail.tax_amt}</td>

@@ -21,22 +21,23 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
         <tr>
           <th>Code</th>
           <th>Product Name</th>
-          <th>Metal Type</th>
+          <th>Metal</th>
           <th>Design Name</th>
           <th>Purity</th>
           <th>Gr Wt</th>
           <th>St Wt</th>
           <th>St Pr</th>
           <th>VA%</th>
-          <th>Total Wt AW</th>
-          <th>MC On</th>
-          <th>MC Per Gram</th>
-          <th>MC</th>
-          <th>Discount %</th>
-          <th>Discount</th>
+          <th>Total Wt</th>
           <th>Rate</th>
+          {/* <th>MC On</th>
+          <th>MC Per Gram</th> */}
+          <th>MC</th>
+          {/* <th>Discount %</th> */}
+          <th>Discount</th>
+          
           <th>Tax %</th>
-          <th>Tax Amount</th>
+          <th>Tax Amt</th>
           <th>Total Price</th>
           <th>Image</th>
           <th>Action</th>
@@ -56,14 +57,13 @@ const ProductTable = ({ repairDetails, onDelete,onEdit }) => {
               <td>{detail.stone_price}</td>
               <td>{detail.va_percent}</td>
               <td>{detail.total_weight_av}</td>
-              <td>{detail.mc_on}</td>
-              <td>{detail.mc_per_gram}</td>
+              <td>{detail.pieace_cost ? detail.pieace_cost : detail.rate}</td>
+              {/* <td>{detail.mc_on}</td>
+              <td>{detail.mc_per_gram}</td> */}
               <td>{detail.making_charges}</td>
-              <td>{detail.disscount_percentage}</td>
+              {/* <td>{detail.disscount_percentage}</td> */}
               <td>{detail.disscount}</td>
               {/* <td>{detail.pieace_cost ?? detail.rate}</td> */}
-              <td>{detail.pieace_cost ? detail.pieace_cost : detail.rate}</td>
-
               <td>{detail.tax_percent}</td>
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>

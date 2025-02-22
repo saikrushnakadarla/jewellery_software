@@ -64,6 +64,7 @@ const useProductHandlers = () => {
     rate_amt: "",
     tax_percent: "03% GST",
     tax_amt: "",
+    hm_charges:"60.00",
     total_price: "",
     transaction_status: "Sales",
     qty: "1",
@@ -202,6 +203,7 @@ const useProductHandlers = () => {
         rate_amt: "",
         tax_percent: "03% GST",
         tax_amt: "",
+        hm_charges:"60.00",
         total_price: "",
         transaction_status: "Sales",
         qty: "1",
@@ -351,6 +353,7 @@ const useProductHandlers = () => {
         rate_amt: "",
         tax_percent: "",
         tax_amt: "",
+        hm_charges:"60.00",
         total_price: "",
         qty: "", // Rese
       }));
@@ -656,6 +659,7 @@ const useProductHandlers = () => {
           rate_amt: "",
           tax_percent: "",
           tax_amt: "",
+          hm_charges:"60.00",
           total_price: "",
           qty: "", // Reset qty
         }));
@@ -778,6 +782,7 @@ const useProductHandlers = () => {
             rate_amt: "",
             tax_percent: "",
             tax_amt: "",
+            hm_charges:"60.00",
             total_price: "",
             qty: "", // Reset qty
           }));

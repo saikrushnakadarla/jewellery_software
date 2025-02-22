@@ -21,6 +21,10 @@ const RepairForm = () => {
     receipt_no: "",
     account_name: "",
     invoice_number: "",
+    total_weight: "",
+    paid_wt: "",
+    bal_wt: "",
+    rate:"",
     total_amt: "",
     discount_amt: "",
     cash_amt: "",
@@ -57,22 +61,18 @@ const RepairForm = () => {
         (item) => item.invoice_number === invoiceData.invoice
       );
 
-      // if (selectedInvoice) {
-      //   const totalAmt = selectedInvoice.balance_after_receipt || selectedInvoice.balance_amount || "";
-      //   setFormData((prevData) => ({
-      //     ...prevData,
-      //     total_amt: totalAmt,
-      //   }));
-      // }
-
       if (selectedInvoice) {
         const balAfterReceipts = Number(selectedInvoice.balance_after_receipt) || 0;
         const balAmt = Number(selectedInvoice.balance_amount) || 0;
+        const balanceWeight = Number(selectedInvoice.balance_pure_weight) || 0;
+        const rate = Number(selectedInvoice.rate) || 0;
         const totalAmt = balAfterReceipts || balAmt || 0;
         console.log("totalAmt=", totalAmt)
         setFormData((prevData) => ({
           ...prevData,
           total_amt: totalAmt,
+          total_weight: balanceWeight,
+          rate:rate,
         }));
       }
     }
@@ -166,10 +166,14 @@ const RepairForm = () => {
 
       if (selectedInvoice) {
         const paidAmt = Number(selectedInvoice.paid_amt) || 0;
-        const paidAmount = Number(selectedInvoice.paid_amount) || 0;
-        const totalAmount = Number(selectedInvoice.total_amount) || 0;
         const balanceAfterReceipt = Number(selectedInvoice.balance_after_receipt) || 0;
+        const totalAmount = Number(selectedInvoice.total_amount) || 0;
+        const paidAmount = Number(selectedInvoice.paid_amount) || 0;
         const balanceAmount = Number(selectedInvoice.balance_amount) || 0;
+        const totalWeight = Number(selectedInvoice.total_pure_weight) || 0;
+        const paidWeight = Number(selectedInvoice.paid_pure_weight) || 0;
+        const balanceWeight = Number(selectedInvoice.balance_pure_weight) || 0;
+        const rate = Number(selectedInvoice.rate) || 0;
 
         setFormData((prevData) => ({
           ...prevData,
@@ -179,6 +183,8 @@ const RepairForm = () => {
               : balanceAfterReceipt > 0
                 ? balanceAfterReceipt
                 : balanceAmount,
+          total_weight: balanceWeight,
+          rate:rate,
         }));
       }
     } else {
@@ -230,16 +236,26 @@ const RepairForm = () => {
       if (name === "total_amt" || name === "discount_amt") {
         const totalAmt = Number(updatedData.total_amt) || 0;
         const discountAmt = Number(updatedData.discount_amt) || 0;
-
-        // Ensure discount amount is not greater than total amount
         if (discountAmt > totalAmt) {
-          alert("Discount amount cannot be greater than total amount.");
-          updatedData.discount_amt = "";
+          alert("Paid amount cannot be greater than total amount.");
+          updatedData.discount_amt = updatedData.prevPaidAmt || "";
         } else {
           updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
         }
+        updatedData.prevPaidAmt = updatedData.discount_amt;
       }
 
+      if (name === "total_weight" || name === "paid_wt") {
+        const totalWt = Number(updatedData.total_weight) || 0;
+        const paidWt = Number(updatedData.paid_wt) || 0;
+        if (paidWt > totalWt) {
+          alert("Balance Weight cannot be greater than total weight.");
+          updatedData.paid_wt = updatedData.prevPaidWt || "";
+        } else {
+          updatedData.bal_wt = (totalWt - paidWt).toFixed(3);
+        }
+        updatedData.prevPaidWt = updatedData.paid_wt;
+      }
       return updatedData;
     });
   };
@@ -302,7 +318,7 @@ const RepairForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      
+
       const endpoint = id
         ? `${baseURL}/edit/payments/${id}`
         : `${baseURL}/post/payments`;
@@ -321,7 +337,7 @@ const RepairForm = () => {
       alert(`Payment ${id ? "updated" : "saved"} successfully!`);
 
       // Generate the PDF
-      const pdfDoc = <PDFContent formData={formData} purchases={purchases}/>;
+      const pdfDoc = <PDFContent formData={formData} purchases={purchases} />;
       const pdfBlob = await pdf(pdfDoc).toBlob();
 
       // Create a download link and trigger it
@@ -386,7 +402,7 @@ const RepairForm = () => {
               autoFocus
             />
           </Col>
-          <Col xs={12} md={3}>
+          <Col xs={12} md={2}>
             <InputField
               label="Reference Number"
               name="cheque_number"
@@ -395,7 +411,7 @@ const RepairForm = () => {
             />
           </Col>
 
-          <Col xs={12} md={3}>
+          <Col xs={12} md={2}>
             <InputField
               label="Account Name"
               type="select"
@@ -405,7 +421,7 @@ const RepairForm = () => {
               options={accountOptions} // Dynamically populated
             />
           </Col>
-          <Col xs={12} md={3}>
+          <Col xs={12} md={2}>
             <InputField
               label="Invoice"
               type="select"
@@ -413,6 +429,45 @@ const RepairForm = () => {
               value={formData.invoice_number}
               onChange={handleInputChange}
               options={invoiceOptions} // Dynamically populated with invoiceData
+            />
+          </Col>
+
+          <Col xs={12} md={2}>
+            <InputField
+              label="Out Standing Wt"
+              type="number"
+              name="total_weight"
+              value={formData.total_weight}
+              onChange={handleInputChange}
+              readOnly
+            />
+          </Col>
+
+          <Col xs={12} md={2}>
+            <InputField
+              label="Paid Wt"
+              type="number"
+              name="paid_wt"
+              value={formData.paid_wt}
+              onChange={handleInputChange}
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="Bal Wt"
+              type="number"
+              name="bal_wt"
+              value={formData.bal_wt}
+              readOnly
+            />
+          </Col>
+          <Col xs={12} md={2}>
+            <InputField
+              label="Rate"
+              type="number"
+              name="rate"
+              value={formData.rate}
+              onChange={handleInputChange}
             />
           </Col>
 

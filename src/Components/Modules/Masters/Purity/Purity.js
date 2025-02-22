@@ -157,10 +157,10 @@ function Purity() {
         Header: "Purity %",
         accessor: "purity_percentage",
       },
-      {
-        Header: "Purity",
-        accessor: "purity",
-      },
+      // {
+      //   Header: "Purity",
+      //   accessor: "purity",
+      // },
       {
         Header: "URD Purity",
         accessor: "urd_purity",
@@ -288,6 +288,7 @@ function Purity() {
               label="Cut Issue"
               name="cut_issue"
               value={formData.cut_issue}
+              onChange={handleChange}
               error={errors.cut_issue}
             />
             <InputField

@@ -417,6 +417,7 @@ const SalesForm = () => {
       pricing: "",
       tax_percent: "",
       tax_amt: "",
+      hm_charges:"60.00",
       total_price: "",
       qty: "",
       imagePreview: null,
@@ -478,32 +479,22 @@ const SalesForm = () => {
     navigate("/customermaster", { state: { from: "/sales" } });
   };
 
-  const taxableAmount = repairDetails.reduce((sum, item) => {
-    const stonePrice = parseFloat(item.stone_price) || 0;
-    const makingCharges = parseFloat(item.making_charges) || 0;
-    const rateAmt = parseFloat(item.rate_amt) || 0;
-    const discountAmt = parseFloat(item.disscount) || 0;
-    return sum + stonePrice + makingCharges + rateAmt - discountAmt;
-  }, 0);
-
-
-  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
-  const netAmount = taxableAmount + taxAmount;
-
-
   const totalAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
-    return sum + stonePrice + makingCharges + rateAmt;
+    const hmCharges = parseFloat(item.hm_charges) || 0;
+    return sum + stonePrice + makingCharges + rateAmt + hmCharges;
   }, 0);
-
 
   const discountAmt = repairDetails.reduce((sum, item) => {
     const discountAmt = parseFloat(item.disscount) || 0;
     return sum + discountAmt;
   }, 0);
 
+  const taxableAmount = totalAmount - discountAmt;
+  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
+  const netAmount = taxableAmount + taxAmount;
 
   const oldItemsAmount = location.state?.old_exchange_amt
     ? parseFloat(location.state.old_exchange_amt)
@@ -692,10 +683,12 @@ const SalesForm = () => {
           card_amt={paymentDetails.card_amt || 0}
           chq_amt={paymentDetails.chq_amt || 0}
           online_amt={paymentDetails.online_amt || 0}
+          taxableAmount={taxableAmount}
           taxAmount={taxAmount}
           discountAmt={discountAmt}
           oldItemsAmount={oldItemsAmount}
           schemeAmount={schemeAmount}
+          netAmount={netAmount}
           netPayableAmount={netPayableAmount}
         />
       );

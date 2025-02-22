@@ -41,7 +41,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         PCode_BarCode: "",
         Gross_Weight: "",
         Stones_Weight: "",
-        deduct_st_Wt: "",
+        deduct_st_Wt: "Yes",
         stone_price_per_carat: "",
         Stones_Price: "",
         HUID_No: "",
@@ -59,20 +59,19 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         Design_Master: selectedProduct.design_name,
         Weight_BW: "",
 
-          // Newly added fields
-    pur_Gross_Weight: "",
-    pur_Stones_Weight: "",
-    pur_deduct_st_Wt: "",
-    pur_stone_price_per_carat: "",
-    pur_Stones_Price: "",
-    pur_Weight_BW: "",
-    pur_Making_Charges_On: "",
-    pur_MC_Per_Gram: "",
-    pur_Making_Charges: "",
-    pur_Wastage_On: "Gross Weight",
-    pur_Wastage_Percentage: "",
-    pur_WastageWeight: "",
-    pur_TotalWeight_AW: ""
+        pur_Gross_Weight: "",
+        pur_Stones_Weight: "",
+        pur_deduct_st_Wt: "Yes",
+        pur_stone_price_per_carat: "",
+        pur_Stones_Price: "",
+        pur_Weight_BW: "",
+        pur_Making_Charges_On: "",
+        pur_MC_Per_Gram: "",
+        pur_Making_Charges: "",
+        pur_Wastage_On: "Gross Weight",
+        pur_Wastage_Percentage: "",
+        pur_WastageWeight: "",
+        pur_TotalWeight_AW: ""
     });
     const isByFixed = formData.Pricing === "By fixed";
     const [showModal, setShowModal] = useState(false);
@@ -88,24 +87,33 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         }
     }, [selectedProduct]);
 
-    useEffect(() => {
-        const grossWeight = parseFloat(formData.Gross_Weight) || 0;
-        const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
-        const weightBW = grossWeight - stonesWeight;
+    // useEffect(() => {
+    //     const grossWeight = parseFloat(formData.Gross_Weight) || 0;
+    //     const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
+    //     const weightBW = grossWeight - stonesWeight;
+    //     const purGrossWeight = parseFloat(formData.pur_Gross_Weight) || 0;
+    //     const purStonesWeight = parseFloat(formData.pur_Stones_Weight) || 0;
+    //     const purWeightBW = purGrossWeight - purStonesWeight;
 
-        setFormData((prev) => ({
-            ...prev,
-            Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
-        }));
-    }, [formData.Gross_Weight, formData.Stones_Weight]);
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
+    //         pur_Weight_BW:purWeightBW.toFixed(2), // Ensures two decimal places
+    //     }));
+    // }, [formData.Gross_Weight, formData.Stones_Weight, formData.pur_Gross_Weight, formData.pur_Stones_Weight]);
 
     useEffect(() => {
         const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
         const grossWeight = parseFloat(formData.Gross_Weight) || 0;
         const weightBW = parseFloat(formData.Weight_BW) || 0;
+        const purWastagePercentage = parseFloat(formData.pur_Wastage_Percentage) || 0;
+        const purGrossWeight = parseFloat(formData.pur_Gross_Weight) || 0;
+        const purWeightBW = parseFloat(formData.pur_Weight_BW) || 0;
 
         let wastageWeight = 0;
         let totalWeight = 0;
+        let purWastageWeight = 0;
+        let purTotalWeight = 0;
 
         if (formData.Wastage_On === "Gross Weight") {
             wastageWeight = (grossWeight * wastagePercentage) / 100;
@@ -115,17 +123,32 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             totalWeight = weightBW + wastageWeight;
         }
 
+        if (formData.pur_Wastage_On === "Gross Weight") {
+            purWastageWeight = (purGrossWeight * purWastagePercentage) / 100;
+            purTotalWeight = purWeightBW + purWastageWeight;
+        } else if (formData.pur_Wastage_On === "Weight BW") {
+            purWastageWeight = (purWeightBW * purWastagePercentage) / 100;
+            purTotalWeight = purWeightBW + purWastageWeight;
+        }
+
         setFormData((prev) => ({
             ...prev,
             WastageWeight: wastageWeight.toFixed(2),
             TotalWeight_AW: totalWeight.toFixed(2),
+            pur_WastageWeight: purWastageWeight.toFixed(2),
+            pur_TotalWeight_AW: purTotalWeight.toFixed(2),
         }));
-    }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW]);
+    }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW,
+        formData.pur_Wastage_On, formData.pur_Wastage_Percentage, formData.pur_Gross_Weight, formData.pur_Weight_BW
+    ]);
 
     const handleMakingChargesCalculation = () => {
         const totalWeight = parseFloat(formData.TotalWeight_AW) || 0;
         const mcPerGram = parseFloat(formData.MC_Per_Gram) || 0;
         const makingCharges = parseFloat(formData.Making_Charges) || 0;
+        const purTotalWeight = parseFloat(formData.pur_TotalWeight_AW) || 0;
+        const purMcPerGram = parseFloat(formData.pur_MC_Per_Gram) || 0;
+        const purMakingCharges = parseFloat(formData.pur_Making_Charges) || 0;
 
         if (formData.Making_Charges_On === "MC / Gram") {
             // Calculate Making Charges based on MC/Gram
@@ -142,6 +165,22 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 MC_Per_Gram: calculatedMcPerGram.toFixed(2), // Automatically set MC/Gram
             }));
         }
+
+        if (formData.pur_Making_Charges_On === "MC / Gram") {
+            // Calculate Making Charges based on MC/Gram
+            const calculatedMakingCharges = purTotalWeight * purMcPerGram;
+            setFormData((prev) => ({
+                ...prev,
+                pur_Making_Charges: calculatedMakingCharges.toFixed(2), // Automatically set Making Charges
+            }));
+        } else if (formData.pur_Making_Charges_On === "MC / Piece") {
+            // Calculate MC/Gram based on fixed Making Charges
+            const calculatedMcPerGram = purTotalWeight ? purMakingCharges / purTotalWeight : 0;
+            setFormData((prev) => ({
+                ...prev,
+                pur_MC_Per_Gram: calculatedMcPerGram.toFixed(2), // Automatically set MC/Gram
+            }));
+        }
     };
 
     useEffect(() => {
@@ -151,6 +190,10 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         formData.MC_Per_Gram,
         formData.Making_Charges,
         formData.TotalWeight_AW,
+        formData.pur_Making_Charges_On,
+        formData.pur_MC_Per_Gram,
+        formData.pur_Making_Charges,
+        formData.pur_TotalWeight_AW,
     ]);
 
     useEffect(() => {
@@ -191,6 +234,28 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         }
     }, [formData.category]);
 
+    useEffect(() => {
+        if (isGoldCategory) {
+            setFormData((prevData) => ({
+                ...prevData,
+                pur_Making_Charges_On: "MC %",
+                pur_MC_Per_Gram_Label: "MC%",
+                pur_Making_Charges: "", // Reset field when hidden
+            }));
+        } else if (isSilverCategory) {
+            setFormData((prevData) => ({
+                ...prevData,
+                pur_Making_Charges_On: "MC / Gram",
+                pur_MC_Per_Gram_Label: "MC/Gm",
+            }));
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                pur_MC_Per_Gram_Label: "MC/Gm",
+            }));
+        }
+    }, [formData.category]);
+
     const handleChange = async (fieldOrEvent, valueArg) => {
 
         let field, value;
@@ -215,6 +280,14 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 }
             }
 
+            if (field === "pur_Making_Charges_On") {
+                if (value === "MC / Gram" || value === "MC / Piece") {
+                    updatedData.pur_Making_Charges = prevData.pur_Making_Charges || "";
+                } else {
+                    updatedData.pur_Making_Charges = ""; // Hide field
+                }
+            }
+
             // Update MC_Per_Gram_Label when Making_Charges_On changes
             if (field === "Making_Charges_On") {
                 let newLabel = "MC/Gm"; // Default
@@ -223,6 +296,15 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 else if (value === "MC / Piece") newLabel = "MC/Gm";
 
                 updatedData.MC_Per_Gram_Label = newLabel;
+            }
+
+            if (field === "pur_Making_Charges_On") {
+                let newLabel = "MC/Gm"; // Default
+                if (value === "MC %") newLabel = "MC%";
+                else if (value === "MC / Gram") newLabel = "MC/Gm";
+                else if (value === "MC / Piece") newLabel = "MC/Gm";
+
+                updatedData.pur_MC_Per_Gram_Label = newLabel;
             }
 
             // --- Calculate Stones Price ---
@@ -245,6 +327,25 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 }
             }
 
+            if (field === "pur_Stones_Weight" || field === "pur_stone_price_per_carat") {
+                const stoneWeight =
+                    parseFloat(
+                        field === "pur_Stones_Weight" ? value : prevData.pur_Stones_Weight
+                    ) || 0;
+                const stonePricePerCarat =
+                    parseFloat(
+                        field === "pur_stone_price_per_carat"
+                            ? value
+                            : prevData.pur_stone_price_per_carat
+                    ) || 0;
+                if (stoneWeight > 0 && stonePricePerCarat > 0) {
+                    const calculatedStonePrice = (stoneWeight / 0.20) * stonePricePerCarat;
+                    updatedData.pur_Stones_Price = calculatedStonePrice.toFixed(2);
+                } else {
+                    updatedData.pur_Stones_Price = "";
+                }
+            }
+
             // --- Recalculate Weight BW ---
             if (
                 field === "Gross_Weight" ||
@@ -256,13 +357,34 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 // Use deduct_st_Wt value if available; default to "yes" if not set.
                 const deductOption = updatedData.deduct_st_Wt
                     ? updatedData.deduct_st_Wt.toLowerCase()
-                    : "yes";
+                    : "";
                 if (deductOption === "yes") {
                     updatedData.Weight_BW = (grossWt - stonesWt).toFixed(2);
                 } else {
                     updatedData.Weight_BW = grossWt.toFixed(2);
                 }
             }
+
+            if (
+                field === "pur_Gross_Weight" ||
+                field === "pur_Stones_Weight" ||
+                field === "pur_deduct_st_Wt"
+            ) {
+                const grossWt = parseFloat(updatedData.pur_Gross_Weight) || 0;
+                const stonesWt = parseFloat(updatedData.pur_Stones_Weight) || 0;
+            
+                // Check if the option is explicitly set to "yes"; otherwise, do NOT deduct.
+                const deductOption = updatedData.pur_deduct_st_Wt
+                    ? updatedData.pur_deduct_st_Wt.toLowerCase()
+                    : "";
+            
+                if (deductOption === "yes") {
+                    updatedData.pur_Weight_BW = (grossWt - stonesWt).toFixed(2);
+                } else {
+                    updatedData.pur_Weight_BW = grossWt.toFixed(2); // No deduction if empty or not "yes"
+                }
+            }
+            
 
             return updatedData;
         });
@@ -419,6 +541,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 MC_Per_Gram: "",
                 Making_Charges_On: prevData.Making_Charges_On, // Preserve value
                 MC_Per_Gram_Label: prevData.MC_Per_Gram_Label, // Preserve value
+                pur_MC_Per_Gram_Label: prevData.pur_MC_Per_Gram_Label, // Preserve value
                 Making_Charges: "",
                 Design_Master: selectedProduct.design_name,
                 Weight_BW: "",
@@ -782,8 +905,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                                 value={formData.pur_deduct_st_Wt || ""}
                                                                 onChange={(e) => handleChange("pur_deduct_st_Wt", e.target.value)}
                                                                 options={[
-                                                                    { value: "yes", label: "Yes" },
-                                                                    { value: "no", label: "No" },
+                                                                    { value: "Yes", label: "Yes" },
+                                                                    { value: "No", label: "No" },
                                                                 ]}
                                                             />
                                                         </Col>
@@ -823,7 +946,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
 
                                                         <Col xs={12} md={4}>
                                                             <InputField
-                                                                label={formData.MC_Per_Gram_Label}
+                                                                label={formData.pur_MC_Per_Gram_Label}
                                                                 name="pur_MC_Per_Gram"
                                                                 value={formData.pur_MC_Per_Gram}
                                                                 onChange={handleChange}
@@ -831,7 +954,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                         </Col>
 
                                                         {/* Show Making_Charges field only when Making_Charges_On is "MC / Gram" or "MC / Piece" */}
-                                                        {(formData.Making_Charges_On === "MC / Gram" || formData.Making_Charges_On === "MC / Piece") && (
+                                                        {(formData.pur_Making_Charges_On === "MC / Gram" || formData.pur_Making_Charges_On === "MC / Piece") && (
                                                             <Col xs={12} md={4}>
                                                                 <InputField
                                                                     label="MC"
@@ -868,9 +991,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                     </Row>
                                                 </Col>
                                             </div>
-                                           <div className="purchase-form-right">
-                                                         <Col className="tag-urd-form2-section">
-                                                           <h4 className="mb-4">Sales</h4>
+                                            <div className="purchase-form-right">
+                                                <Col className="tag-urd-form2-section">
+                                                    <h4 className="mb-4">Sales</h4>
                                                     {/* New Row for Weight Fields */}
                                                     <Row className="mt-3">
                                                         <Col xs={12} md={4}>
@@ -887,8 +1010,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                                 value={formData.deduct_st_Wt || ""}
                                                                 onChange={(e) => handleChange("deduct_st_Wt", e.target.value)}
                                                                 options={[
-                                                                    { value: "yes", label: "Yes" },
-                                                                    { value: "no", label: "No" },
+                                                                    { value: "Yes", label: "Yes" },
+                                                                    { value: "No", label: "No" },
                                                                 ]}
                                                             />
                                                         </Col>

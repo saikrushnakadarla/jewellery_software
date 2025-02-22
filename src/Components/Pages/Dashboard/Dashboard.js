@@ -101,6 +101,30 @@ function Dashboard() {
       <div className="dashboard-container">
         <div className="row-cards" >
           <div className="metric-card">
+            <Estimate selectedCustomerMobile={selectedMobile} />
+            <a style={{ marginRight: '100px' }}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/estimatetable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/estimates', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+          <div className="metric-card">
             <Sales selectedCustomerMobile={selectedMobile} />
             <a style={{ marginRight: '100px' }}
               href="#"
@@ -120,6 +144,63 @@ function Dashboard() {
               onClick={(e) => {
                 e.preventDefault();
                 navigate("/sales", { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+          <div className="metric-card">
+            <Purchases selectedCustomerMobile={selectedMobile} />
+            <a style={{ marginRight: '100px' }}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/purchasetable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/purchase', { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a>
+          </div>
+          <div className="metric-card">
+            <Customers selectedCustomerMobile={selectedMobile} />
+          </div>
+          <div className="metric-card">
+            <Suppliers selectedCustomerMobile={selectedMobile} />
+          </div>
+        </div>
+        <div className="row-cards" style={{ marginTop: '15px' }}>
+          <div className="metric-card" >
+            <Repairs selectedCustomerMobile={selectedMobile} />
+            <a style={{ marginRight: '100px' }}
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Selected Customer Mobile:", selectedMobile);
+                navigate("/repairstable", { state: { mobile: selectedMobile } });
+              }}
+            >
+              Details
+            </a>
+            <a
+
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/repairs', { state: { mobile: selectedMobile } });
               }}
             >
               New
@@ -151,62 +232,6 @@ function Dashboard() {
             </a>
           </div>
           <div className="metric-card">
-            <Estimate selectedCustomerMobile={selectedMobile} />
-            <a style={{ marginRight: '100px' }}
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log("Selected Customer Mobile:", selectedMobile);
-                navigate("/estimatetable", { state: { mobile: selectedMobile } });
-              }}
-            >
-              Details
-            </a>
-            <a
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/estimates', { state: { mobile: selectedMobile } });
-              }}
-            >
-              New
-            </a>
-          </div>
-          <div className="metric-card">
-            <Customers selectedCustomerMobile={selectedMobile} />
-          </div>
-          <div className="metric-card">
-            <Suppliers selectedCustomerMobile={selectedMobile} />
-          </div>
-        </div>
-        <div className="row-cards" style={{ marginTop: '15px' }}>
-          <div className="metric-card">
-            <Purchases selectedCustomerMobile={selectedMobile} />
-            <a style={{ marginRight: '100px' }}
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log("Selected Customer Mobile:", selectedMobile);
-                navigate("/purchasetable", { state: { mobile: selectedMobile } });
-              }}
-            >
-              Details
-            </a>
-            <a
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/purchase', { state: { mobile: selectedMobile } });
-              }}
-            >
-              New
-            </a>
-          </div>
-          <div className="metric-card">
             <URDPurchase selectedCustomerMobile={selectedMobile} />
             <a style={{ marginRight: '100px' }}
               href="#"
@@ -230,41 +255,12 @@ function Dashboard() {
               New
             </a>
           </div>
-
-          <div className="metric-card" >
-            <Repairs selectedCustomerMobile={selectedMobile} />
-            <a style={{ marginRight: '100px' }}
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log("Selected Customer Mobile:", selectedMobile);
-                navigate("/repairstable", { state: { mobile: selectedMobile } });
-              }}
-            >
-              Details
-            </a>
-            <a
-
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate('/repairs', { state: { mobile: selectedMobile } });
-              }}
-            >
-              New
-            </a>
-          </div>
-
-
           <div className="metric-card">
             <Receivables selectedCustomerMobile={selectedMobile} />
           </div>
           <div className="metric-card">
             <Payables selectedCustomerMobile={selectedMobile} />
           </div>
-
         </div>
         <div className="row-cards" style={{ marginTop: '15px', marginBottom: '15px' }}>
           <div className="metric-card">

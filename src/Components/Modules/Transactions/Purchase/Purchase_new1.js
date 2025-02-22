@@ -168,14 +168,13 @@ const URDPurchase = () => {
       }
     }
   }, [mobile, customers]);
-  const [lastUpdatedField, setLastUpdatedField] = useState(null);
-
 
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
 
       const isFixedPricing = updatedFormData.Pricing === "By fixed";
+
       // Reset fields when "By fixed" is selected
       if (field === "Pricing" && value === "By fixed") {
         updatedFormData.gross_weight = "";
@@ -207,6 +206,43 @@ const URDPurchase = () => {
         updatedFormData.rate = value;
       }
 
+      if (field === "paid_pure_weight") {
+        if (value) {
+          updatedFormData.rate = "0";
+          updatedFormData.paid_amount = "0";
+          updatedFormData.balance_amount = "0";
+        } else {
+          // Clear balance_pure_weight when paid_pure_weight is cleared
+          updatedFormData.balance_pure_weight = "0";
+
+          // Restore rate based on metal_type if paid_pure_weight is cleared
+          if (updatedFormData.metal_type?.toLowerCase() === "gold") {
+            updatedFormData.rate = rates.rate_22crt;
+          } else if (updatedFormData.metal_type?.toLowerCase() === "silver") {
+            updatedFormData.rate = rates.silver_rate;
+          } else {
+            updatedFormData.rate = "";
+          }
+        }
+      }
+
+
+      if (field === "paid_amount") {
+        updatedFormData.paid_pure_weight = "0";
+        updatedFormData.balance_pure_weight = "0";
+      }
+
+
+      // Restrict paid_amount so it does not exceed total_amount
+      if (field === "paid_amount") {
+        const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
+        const paidAmount = parseFloat(value) || 0;
+        if (paidAmount > totalAmount) {
+          alert("Paid amount cannot exceed the total amount.");
+          return prevFormData;
+        }
+      }
+
       // Update rate for gold based on purity or metal_type changes (only for "By Weight")
       if ((field === "purity" || field === "metal_type") && !isFixedPricing) {
         if (updatedFormData.metal_type?.toLowerCase() === "gold") {
@@ -223,7 +259,7 @@ const URDPurchase = () => {
           } else if (normalizedValue.includes("16")) {
             updatedFormData.rate = rates.rate_16crt;
           } else {
-            updatedFormData.rate = rates.rate_22crt;
+            updatedFormData.rate = "";
           }
         }
       }
@@ -235,20 +271,61 @@ const URDPurchase = () => {
         }
       }
 
+
       // Update net weight from gross and stone weight
       const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
       const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
       updatedFormData.net_weight = (grossWeight - stoneWeight).toFixed(3);
 
-      // Restrict paid_amount so it does not exceed total_amount
-      if (field === "paid_amount") {
-        const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
-        const paidAmount = parseFloat(value) || 0;
-        if (paidAmount > totalAmount) {
-          alert("Paid amount cannot exceed the total amount.");
-          return prevFormData;
+
+      const extractPurityPercentage = (purityValue) => {
+        if (!purityValue || purityOptions.length === 0) return 0;
+
+        if (purityValue.toLowerCase() === "manual") {
+          return parseFloat(updatedFormData.purityPercentage) || 0; // Use custom purity input
         }
+
+        const matchedPurity = purityOptions.find((option) =>
+          purityValue.includes(option.name)
+        );
+
+        return matchedPurity ? parseFloat(matchedPurity.purity_percentage) || 0 : 0;
+      };
+
+      if (field === "net_weight" || field === "purity" || field === "purityPercentage") {
+        const netWeight = parseFloat(updatedFormData.net_weight) || 0;
+        const purityPercentage = extractPurityPercentage(updatedFormData.purity);
+        updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
       }
+
+      // Calculate wastage weight based on the selected wastage field
+      if (["wastage_on", "wastage", "gross_weight", "net_weight", "pure_weight"].includes(field)) {
+        const wastagePercentage = parseFloat(updatedFormData.wastage) || 0;
+        let baseWeight = 0;
+        if (updatedFormData.wastage_on === "Gross Wt") {
+          baseWeight = parseFloat(updatedFormData.gross_weight) || 0;
+        } else if (updatedFormData.wastage_on === "Net Wt") {
+          baseWeight = parseFloat(updatedFormData.net_weight) || 0;
+        } else if (updatedFormData.wastage_on === "Pure Wt") {
+          baseWeight = parseFloat(updatedFormData.pure_weight) || 0;
+        }
+        updatedFormData.wastage_wt = ((wastagePercentage * baseWeight) / 100).toFixed(3);
+      }
+
+
+
+
+
+      // Re-calculate pure weight using the new net_weight
+
+      const netWeight = parseFloat(updatedFormData.net_weight) || 0;
+      const purityPercentage = extractPurityPercentage(updatedFormData.purity) || 0;
+      updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(3);
+      const wastageWeight = parseFloat(updatedFormData.wastage_wt) || 0;
+
+      // Ensure that `total_pure_wt` is properly calculated using the updated pure_weight
+      updatedFormData.total_pure_wt = (parseFloat(updatedFormData.pure_weight) + wastageWeight).toFixed(3);
+
 
       // ***** Calculate Total Amount based on Pricing *****
       if (isFixedPricing) {
@@ -262,36 +339,41 @@ const URDPurchase = () => {
         const rate = parseFloat(updatedFormData.rate) || 0;
         updatedFormData.total_amount = (pureWeight * rate).toFixed(2);
       }
-      if (field === "paid_amount") {
-        setLastUpdatedField("paid_amount");
-        const rate = parseFloat(updatedFormData.rate) || 0;
-        if (rate) {
-          updatedFormData.paid_pure_weight = (value / rate).toFixed(3);
-        } else {
-          updatedFormData.paid_pure_weight = "0";
-        }
-      } else if (field === "paid_pure_weight") {
-        setLastUpdatedField("paid_pure_weight");
-        const rate = parseFloat(updatedFormData.rate) || 0;
-        if (rate) {
-          updatedFormData.paid_amount = (value * rate).toFixed(2);
-        } else {
-          updatedFormData.paid_amount = "0";
-        }
-      }
-  
-      // Update balance calculations
-      const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
+
+      // Calculate balance amount based on total_amount and paid_amount
       const paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
-      const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
-      const paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || 0;
-  
-      updatedFormData.balance_pure_weight = (totalPureWeight - paidPureWeight).toFixed(3);
-      updatedFormData.balance_amount = (totalAmount - paidAmount).toFixed(2);
-  
+      updatedFormData.balance_amount = (
+        parseFloat(updatedFormData.total_amount) - paidAmount
+      ).toFixed(2);
+
+      // Calculate balance pure weight based on paid_pure_weight and rate (or set to "0")
+      const paid_pure_weight = parseFloat(updatedFormData.paid_pure_weight) || 0;
+
+      if (paid_pure_weight) {
+        updatedFormData.balance_pure_weight = (
+          parseFloat(updatedFormData.total_pure_wt) - paid_pure_weight
+        ).toFixed(3);
+      }
+
+
+      // const rateCut = parseFloat(updatedFormData.rate) || 0;
+      // updatedFormData.balance_pure_weight =
+      //   rateCut === 0
+      //     ? (parseFloat(updatedFormData.total_pure_wt) - paid_pure_weight).toFixed(3)
+      //     : "0";
+
+      // Helper function to extract purity percentage from the selected purity option
+
+
+      // Calculate Pure Weight when net_weight or purity changes
+
+
       return updatedFormData;
     });
   };
+
+
+
 
   useEffect(() => {
     localStorage.setItem("tableData", JSON.stringify(tableData));
@@ -516,6 +598,7 @@ const URDPurchase = () => {
     }
   };
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -719,30 +802,31 @@ const URDPurchase = () => {
         setPurityOptions([]);
         return;
       }
-  
+
       if (!formData.metal_type) {
         setPurityOptions([]);
         return;
       }
-  
+
       try {
         const response = await axios.get(`${baseURL}/purity`);
+
         const filteredPurity = response.data.filter(
           (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
         );
-  
+
         setPurityOptions(filteredPurity);
         console.log("Purity Options:", filteredPurity);
-  
+
         let defaultOption = null;
-  
+
         if (formData.metal_type.toLowerCase() === "gold") {
           defaultOption = filteredPurity.find((option) =>
             ["22k", "22 kt", "22"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
-  
+
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -751,22 +835,22 @@ const URDPurchase = () => {
             }));
           }
         }
-  
+
         if (formData.metal_type.toLowerCase() === "silver") {
           const silver22K = filteredPurity.find((option) =>
             ["22k", "22 kt", "22"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
-  
+
           const silver24K = filteredPurity.find((option) =>
             ["24k", "24 kt", "24"].some((match) =>
               option.name.toLowerCase().includes(match)
             )
           );
-  
+
           defaultOption = silver24K || silver22K;
-  
+
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -779,74 +863,18 @@ const URDPurchase = () => {
         console.error("Error fetching data:", error);
       }
     };
-  
-    fetchPurity();
+
+    if (formData.category) {
+      fetchPurity();
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        purity: "",
+        rate: "",
+      }));
+      setPurityOptions([]);
+    }
   }, [formData.metal_type, formData.category]);
-  
-  const extractPurityPercentage = (purityValue) => {
-    if (!purityValue || purityOptions.length === 0) return 0;
-  
-    if (purityValue.toLowerCase() === "manual") {
-      return parseFloat(formData.purityPercentage) || 0; // Use custom purity input
-    }
-  
-    const matchedPurity = purityOptions.find((option) =>
-      purityValue.includes(option.name)
-    );
-  
-    return matchedPurity ? parseFloat(matchedPurity.purity_percentage) || 0 : 0;
-  };
-  
-  useEffect(() => {
-    const updatedFormData = { ...formData };
-    const netWeight = parseFloat(updatedFormData.net_weight) || 0;
-    const purityPercentage = extractPurityPercentage(updatedFormData.purity);
-    updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
-
-    const wastagePercentage = parseFloat(updatedFormData.wastage) || 0;
-    let baseWeight = 0;
-    if (updatedFormData.wastage_on === "Gross Wt") {
-      baseWeight = parseFloat(updatedFormData.gross_weight) || 0;
-    } else if (updatedFormData.wastage_on === "Net Wt") {
-      baseWeight = parseFloat(updatedFormData.net_weight) || 0;
-    } else if (updatedFormData.wastage_on === "Pure Wt") {
-      baseWeight = parseFloat(updatedFormData.pure_weight) || 0;
-    }
-    updatedFormData.wastage_wt = ((wastagePercentage * baseWeight) / 100).toFixed(3);
-
-    const wastageWeight = parseFloat(updatedFormData.wastage_wt) || 0;
-    updatedFormData.total_pure_wt = (parseFloat(updatedFormData.pure_weight) + wastageWeight).toFixed(3);
-  
-    const rate = parseFloat(updatedFormData.rate) || 0;
-    const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
-    let paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || 0;
-    let paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
-    
-    if (lastUpdatedField === "paid_amount" && rate) {
-      paidPureWeight = (paidAmount / rate).toFixed(3);
-    } else if (lastUpdatedField === "paid_pure_weight" && rate) {
-      paidAmount = (paidPureWeight * rate).toFixed(2);
-    }
-
-    updatedFormData.paid_pure_weight = paidPureWeight;
-    updatedFormData.paid_amount = paidAmount;
-
-    updatedFormData.balance_pure_weight = (parseFloat(updatedFormData.total_pure_wt) - paidPureWeight).toFixed(3);
-    updatedFormData.balance_amount = (totalAmount - paidAmount).toFixed(2);
-
-    setFormData(updatedFormData);
-  }, [
-    formData.purity,
-    formData.purityPercentage,
-    formData.net_weight,
-    formData.rate,
-    formData.total_amount,
-    formData.paid_amount 
-  ]);
-  
-  
-  
-  
 
 
   const handleOpenModal = (data) => {

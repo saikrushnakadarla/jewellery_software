@@ -76,61 +76,48 @@ const useCalculations = (formData, setFormData) => {
     formData.rate_amt,
   ]);
 
-
-
   // Calculate Rate Amount
   useEffect(() => {
     const rate = parseFloat(formData.rate) || 0;
     const totalWeight = parseFloat(formData.total_weight_av) || 0;
-    const rateAmt = rate * totalWeight;
+    const qty = parseFloat(formData.qty) || 0;
+    const pieceCost = parseFloat(formData.pieace_cost) || 0;
+    let rateAmt = 0;
 
-    setFormData(prev => ({
+    if (formData.pricing === "By fixed") {
+      rateAmt = pieceCost * qty;
+    } else {
+      rateAmt = rate * totalWeight;
+    }
+
+    setFormData((prev) => ({
       ...prev,
       rate_amt: rateAmt.toFixed(2),
     }));
-  }, [formData.rate, formData.total_weight_av]);
+  }, [formData.rate, formData.total_weight_av, formData.qty, formData.pricing, formData.pieace_cost]);
 
-  // Calculate Tax Amount
-
+  // Calculate Tax Amount and Total Price
   useEffect(() => {
     const taxPercent = parseFloat(formData.tax_percent) || 0;
     const rateAmt = parseFloat(formData.rate_amt) || 0;
     const stonePrice = parseFloat(formData.stone_price) || 0;
     const makingCharges = parseFloat(formData.making_charges) || 0;
     const discountAmt = parseFloat(formData.disscount) || 0;
-  
+    const hmCharges = parseFloat(formData.hm_charges) || 0;
+
     // Ensure discount is subtracted before tax calculation
-    const taxableAmount = rateAmt + stonePrice + makingCharges;
-    console.log("taxableAmount =", taxableAmount);
-  
+    const taxableAmount = rateAmt + stonePrice + makingCharges + hmCharges - discountAmt;
     const taxAmt = (taxableAmount * taxPercent) / 100;
-  
+
+    // Calculate Total Price
+    const totalPrice = taxableAmount + taxAmt;
+
     setFormData((prev) => ({
       ...prev,
       tax_amt: taxAmt.toFixed(2),
-    }));
-  }, [formData.tax_percent, formData.rate_amt, formData.stone_price, formData.making_charges, formData.disscount]);
-  
-
-  // Calculate Total Price (with discount deduction)
-  useEffect(() => {
-    const rateAmt = parseFloat(formData.rate_amt) || 0;
-    const taxAmt = parseFloat(formData.tax_amt) || 0;
-    const stonePrice = parseFloat(formData.stone_price) || 0;
-    const makingCharges = parseFloat(formData.making_charges) || 0;
-    const discount = parseFloat(formData.disscount) || 0; // Fetch discount value
-
-    // Calculate total price before discount
-    let totalPrice = rateAmt + taxAmt + stonePrice + makingCharges;
-
-    // Subtract discount amount
-    totalPrice -= discount;
-
-    setFormData(prev => ({
-      ...prev,
       total_price: totalPrice.toFixed(2),
     }));
-  }, [formData.rate_amt, formData.tax_amt, formData.stone_price, formData.making_charges, formData.disscount]);
+  }, [formData.tax_percent, formData.rate_amt, formData.stone_price, formData.making_charges, formData.disscount, formData.hm_charges]);
 
 };
 

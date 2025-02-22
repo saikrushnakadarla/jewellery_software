@@ -214,9 +214,11 @@ const TaxINVoiceReceipt = ({
         card_amt,
         chq_amt,
         online_amt,
+        taxableAmount,
         taxAmount,
         oldItemsAmount,
         schemeAmount,
+        netAmount,
         netPayableAmount,
 }) => {
         // Log customer details to verify they are dynamically fetched
@@ -255,10 +257,8 @@ const TaxINVoiceReceipt = ({
                 }
         );
 
-        const netBillValue = totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount;
-
         // Convert the value into words
-        const netBillValueInWords = toWords(netBillValue).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase()); // Capitalize words
+        const netBillValueInWords = toWords(netPayableAmount).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase()); // Capitalize words
 
         return (
                 <Document>
@@ -526,13 +526,18 @@ const TaxINVoiceReceipt = ({
                                                         </View>
                                                         {/* {repairDetails.map((item, index) => ( */}
                                                         <View style={{ paddingRight: 10, marginTop: 5 }}>
+                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                        <Text>(-) Discount:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{discountAmt.toFixed(2)}</Text>
+                                                                </View>
 
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>GST Value:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice).toFixed(2)}
+                                                                                {taxableAmount.toFixed(2)}
                                                                         </Text>
                                                                 </View>
+
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>CGST @1.50%:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
@@ -550,14 +555,11 @@ const TaxINVoiceReceipt = ({
                                                                         <Text style={[styles.bold]}>Net Bill Value: </Text>
                                                                         <Text style={{ textAlign: "right" }}>
                                                                                 {/* {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)} */}
-                                                                                {netBillValue.toFixed(2)}
+                                                                                {netAmount.toFixed(2)}
                                                                         </Text>
 
                                                                 </View>
-                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text>(-) Discount:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>{discountAmt.toFixed(2)}</Text>
-                                                                </View>
+
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>(-) OLD:</Text>
                                                                         <Text style={{ textAlign: "right" }}>{oldItemsAmount.toFixed(2)}</Text>
@@ -569,9 +571,10 @@ const TaxINVoiceReceipt = ({
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text style={[styles.bold]}>Net Amount:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {Math.round(netPayableAmount.toFixed(2))}
+                                                                                {Math.round(netPayableAmount).toFixed(2)}
                                                                         </Text>
                                                                 </View>
+
 
                                                         </View>
 

@@ -12,7 +12,8 @@ const RepairsTable = () => {
   const [loading, setLoading] = useState(true); // Loading state
   const [repairDetails, setRepairDetails] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  useEffect(() => {
+
+
     const fetchData = async () => {
       try {
         const response = await axios.get(`${baseURL}/get-unique-estimates`);
@@ -27,7 +28,7 @@ const RepairsTable = () => {
         setLoading(false);
       }
     };
-
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -43,50 +44,73 @@ const RepairsTable = () => {
   };
 
 
-  // Define columns for the table
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: 'Sr. No.',
-        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
-      },
 
-      {
-        Header: 'Date',
-        accessor: 'date',
-        Cell: ({ value }) => {
-          const date = new Date(value);
-          return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
-        },
+const columns = React.useMemo(
+  () => [
+    {
+      Header: 'Sr. No.',
+      Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+    },
+    {
+      Header: 'Date',
+      accessor: 'date',
+      Cell: ({ value }) => {
+        const date = new Date(value);
+        return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
       },
-      {
-        Header: 'Estimate Number',
-        accessor: 'estimate_number',
-      },
+    },
+    {
+      Header: 'Estimate Number',
+      accessor: 'estimate_number',
+    },
+    {
+      Header: 'Product Name',
+      accessor: 'sub_category',
+    },
+    {
+      Header: 'Total Amount',
+      accessor: 'total_amount',
+    },
+    {
+      Header: 'Actions',
+      accessor: 'actions',
+      Cell: ({ row }) => (
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <FaEye
+            style={{ cursor: 'pointer', color: 'green' }}
+            onClick={() => handleViewDetails(row.original.estimate_number)} // Pass estimate_number
+          />
+          <FaTrash
+            style={{ cursor: 'pointer', color: 'red' }}
+            onClick={() => handleDelete(row.original.estimate_number)} // Pass estimate_number
+          />
+        </div>
+      ),
+    },
+  ],
+  []
+);
 
-      {
-        Header: 'Product Name',
-        accessor: 'product_name',
-      },
-      {
-        Header: 'Total Amount',
-        accessor: 'total_amount',
-      },
-      {
-        Header: 'Actions',
-        accessor: 'actions',
-        Cell: ({ row }) => (
-          <div>
-            <FaEye
-              style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
-              onClick={() => handleViewDetails(row.original.estimate_number)} // Pass estimate_number
-            />
-          </div>
-        ),
-      },
-    ],
-    []
-  );
+// Delete function
+const handleDelete = async (estimateNumber) => {
+  if (window.confirm('Are you sure you want to delete this estimate?')) {
+    try {
+      const response = await fetch(`${baseURL}/delete/estimate/${estimateNumber}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete estimate');
+      }
+      fetchData();
+      alert('Estimate deleted successfully');
+    } catch (error) {
+      console.error('Error deleting estimate:', error.message);
+      alert('Error deleting estimate');
+    }
+  }
+};
+
 
   const handleViewDetails = async (estimate_number) => {
     try {
@@ -175,7 +199,7 @@ const RepairsTable = () => {
                     {repairDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>{product.code}</td>
-                        <td>{product.product_name}</td>
+                        <td>{product.sub_category}</td>
                         <td>{product.metal_type}</td>
                         <td>{product.purity}</td>
                         <td>{product.gross_weight}</td>
