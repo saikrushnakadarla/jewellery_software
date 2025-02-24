@@ -1,8 +1,8 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
 import logo1 from '../../../../Navbar/sadashri.png'
 import { toWords } from "number-to-words";
+import QRCode from "qrcode";
 
 const styles = StyleSheet.create({
         page: {
@@ -203,6 +203,15 @@ const styles = StyleSheet.create({
                 height: 28,
                 // marginTop:'10'
         },
+        qrCodeContainer: {
+                alignItems: "center",
+                marginTop: 10,
+                marginBottom: 10,
+        },
+        qrCode: {
+                width: 100,
+                height: 100,
+        },
 });
 
 
@@ -221,15 +230,23 @@ const TaxINVoiceReceipt = ({
         netAmount,
         netPayableAmount,
 }) => {
-        // Log customer details to verify they are dynamically fetched
-        console.log("Customer Details:");
-        console.log("Account Name:", formData.account_name);
-        console.log("City:", formData.city);
-        console.log("Mobile:", formData.mobile);
-        console.log("PAN No:", formData.pan_card);
-        console.log("GSTIN:", formData.gst_in);
-        console.log("Invoice Number:", formData.invoice_number);
-        console.log("Date:", formData.date);
+        const [qrCodeUrl, setQrCodeUrl] = useState("");
+
+        useEffect(() => {
+                const generateQRCode = async () => {
+                        try {
+                                const qrCodeDataUrl = await QRCode.toDataURL(repairDetails[0]?.invoice_number || "", {
+                                        width: 100,
+                                        margin: 2,
+                                });
+                                setQrCodeUrl(qrCodeDataUrl);
+                        } catch (err) {
+                                console.error("Error generating QR code:", err);
+                        }
+                };
+
+                generateQRCode();
+        }, [repairDetails]);
 
         // Calculate total values
         const totalValues = repairDetails.reduce(
@@ -596,7 +613,13 @@ const TaxINVoiceReceipt = ({
                                                         <View style={{ alignItems: "flex-end", paddingRight: 10 }}>
                                                                 <Text style={[styles.bold]}>For SADASHRI VENTURES PRIVATE LIMITED</Text>
                                                         </View>
+
                                                 </View>
+
+                                                <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                                                        {qrCodeUrl && <Image style={styles.qrCode} src={qrCodeUrl} />}
+                                                </View>
+
 
 
 
@@ -604,7 +627,7 @@ const TaxINVoiceReceipt = ({
 
                                 </View>
 
-                                <View></View>
+
                         </Page>
                 </Document>
         );

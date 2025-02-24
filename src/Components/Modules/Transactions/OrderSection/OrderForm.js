@@ -79,6 +79,14 @@ const SalesForm = () => {
     isBarcodeSelected,
     handleImageChange,
     image,
+    fileInputRef,
+    clearImage,
+    captureImage,
+    setShowWebcam,
+    showWebcam,
+    webcamRef,
+    setShowOptions,
+    showOptions,
   } = useProductHandlers();
 
   useCalculations(formData, setFormData);
@@ -177,6 +185,10 @@ const SalesForm = () => {
   
   const handleDiscountChange = (e) => {
     const discountValue = parseFloat(e.target.value) || 0; // Default to 0 if empty or NaN
+    if (discountValue > 15) {
+      alert("Discount cannot be greater than 15%");
+      return; // Prevent further execution
+    }
     setDiscount(discountValue);
   
     const storedOrderDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
@@ -287,6 +299,7 @@ const SalesForm = () => {
       total_price: "",
       qty: "",
       imagePreview:null,
+      remarks: "",
     }));
   };
 
@@ -504,6 +517,14 @@ const SalesForm = () => {
               handleImageUpload={handleImageUpload}
               handleImageChange={handleImageChange}
               image={image}
+              fileInputRef={fileInputRef}
+              clearImage={clearImage}
+              captureImage={captureImage}
+              setShowWebcam={setShowWebcam}
+              showWebcam={showWebcam}
+              webcamRef={webcamRef}
+              setShowOptions={setShowOptions}
+              showOptions={showOptions}
             />
           </div>
 

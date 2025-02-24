@@ -8,11 +8,13 @@ import axios from "axios";
 
 const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustomer, handleAddCategory }) => {
     const [formData, setFormData] = useState(selectedProduct || {});
+    console.log("Purity=",selectedProduct.purity)
     const [loading, setLoading] = useState(true);
     const [customers, setCustomers] = useState([]);
     const [categories, setCategories] = useState([]);
     const [purityOptions, setPurityOptions] = useState([]);
     const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
+    const [lastUpdatedField, setLastUpdatedField] = useState(null);
 
     const handleSave = async (e) => {
         e.preventDefault();
@@ -60,136 +62,119 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
         setFormData((prevFormData) => {
             const updatedFormData = { ...prevFormData, [field]: value };
 
-            // Restrict paid_amount to not exceed total_amount
+            const isFixedPricing = updatedFormData.Pricing === "By fixed";
+            // Reset fields when "By fixed" is selected
+            if (field === "Pricing" && value === "By fixed") {
+                updatedFormData.gross_weight = "";
+                updatedFormData.stone_weight = "";
+                updatedFormData.net_weight = "";
+                updatedFormData.purity = "";
+                updatedFormData.pure_weight = "";
+                updatedFormData.wastage_on = "";
+                updatedFormData.wastage = "";
+                updatedFormData.wastage_wt = "";
+                updatedFormData.total_pure_wt = "";
+                updatedFormData.paid_pure_weight = "";
+                updatedFormData.balance_pure_weight = "";
+                updatedFormData.hm_charges = "";
+                updatedFormData.charges = "";
+                updatedFormData.rate = "";
+            }
+
+            // When Pricing is "By Weight", fetch rate from the selected category
+            if (!isFixedPricing && field === "category") {
+                const selectedCategory = categories.find((cat) => cat.value === value);
+                if (selectedCategory) {
+                    updatedFormData.rate = selectedCategory.rate || "";
+                }
+            }
+
+            // For "By fixed", allow manual entry for the Piece Rate (stored in rate)
+            if (isFixedPricing && field === "rate") {
+                updatedFormData.rate = value;
+            }
+
+            // Update rate for gold based on purity or metal_type changes (only for "By Weight")
+            if ((field === "purity" || field === "metal_type") && !isFixedPricing) {
+                if (updatedFormData.metal_type?.toLowerCase() === "gold") {
+                    const normalizedValue = value.toLowerCase().replace(/\s+/g, "");
+
+                    if (normalizedValue === "manual") {
+                        updatedFormData.rate = rates.rate_22crt; // Set rate to 22K if purity is "Manual"
+                    } else if (normalizedValue.includes("22")) {
+                        updatedFormData.rate = rates.rate_22crt;
+                    } else if (normalizedValue.includes("24")) {
+                        updatedFormData.rate = rates.rate_24crt;
+                    } else if (normalizedValue.includes("18")) {
+                        updatedFormData.rate = rates.rate_18crt;
+                    } else if (normalizedValue.includes("16")) {
+                        updatedFormData.rate = rates.rate_16crt;
+                    } else {
+                        updatedFormData.rate = rates.rate_22crt;
+                    }
+                }
+            }
+
+            // For silver, set rate automatically (again, only for "By Weight")
+            if (field === "metal_type" && !isFixedPricing) {
+                if (updatedFormData.metal_type?.toLowerCase() === "silver") {
+                    updatedFormData.rate = rates.silver_rate;
+                }
+            }
+
+            // Update net weight from gross and stone weight
+            const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
+            const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
+            updatedFormData.net_weight = (grossWeight - stoneWeight).toFixed(3);
+
+            // Restrict paid_amount so it does not exceed total_amount
             if (field === "paid_amount") {
                 const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
                 const paidAmount = parseFloat(value) || 0;
-
                 if (paidAmount > totalAmount) {
                     alert("Paid amount cannot exceed the total amount.");
-                    return prevFormData; // Prevent update
-                }
-            }
-            // Parse purity value to percentage
-            const parsePurityToPercentage = (purity) => {
-                if (!purity) return null;
-
-                // Match formats like "22K", "24k", "22kt", "22KT", "22"
-                const match = purity.match(/(\d+)(k|K|kt|KT)?/);
-                if (match) {
-                    const caratValue = parseInt(match[1], 10); // Extract carat number
-                    if (caratValue) {
-                        return (caratValue / 24) * 100; // Convert carat to percentage (e.g., 22K = 91.6)
-                    }
-                }
-
-                // Handle specific formats like "916HM" directly
-                if (purity.toLowerCase() === "916hm") return 91.6;
-
-                return null; // Default if no match
-            };
-
-
-            if (field === "purity" || field === "metal_type") {
-                // Separate condition for gold
-                if (formData.metal_type.toLowerCase() === "gold") {
-                    // Check for different purity values and set the rate accordingly for gold
-                    if (
-                        value.toLowerCase().includes("22") || // Check for 22 KT, 22K, 22k, etc.
-                        value.toLowerCase().includes("22kt") ||
-                        value.toLowerCase().includes("22k")
-                    ) {
-                        updatedFormData.rate = rates.rate_22crt;
-                    } else if (
-                        value.toLowerCase().includes("24") || // Check for 24 KT, 24K, etc.
-                        value.toLowerCase().includes("24kt") ||
-                        value.toLowerCase().includes("24k")
-                    ) {
-                        updatedFormData.rate = rates.rate_24crt;
-                    } else if (
-                        value.toLowerCase().includes("18") || // Check for 18 KT, 18K, etc.
-                        value.toLowerCase().includes("18kt") ||
-                        value.toLowerCase().includes("18k")
-                    ) {
-                        updatedFormData.rate = rates.rate_18crt;
-                    } else if (
-                        value.toLowerCase().includes("16") || // Check for 16 KT, 16K, etc.
-                        value.toLowerCase().includes("16kt") ||
-                        value.toLowerCase().includes("16k")
-                    ) {
-                        updatedFormData.rate = rates.rate_16crt;
-                    } else {
-                        updatedFormData.rate = "";
-                    }
+                    return prevFormData;
                 }
             }
 
-            if (field === "metal_type") {
-                // Additional condition to ensure silver rate is fetched without purity
-                if (formData.metal_type.toLowerCase() === "silver") {
-                    updatedFormData.rate = rates.silver_rate; // Set rate based on silver
+            // ***** Calculate Total Amount based on Pricing *****
+            if (isFixedPricing) {
+                // For "By fixed": Total Amt = pcs * Piece Rate (rate)
+                const pcs = parseFloat(updatedFormData.pcs) || 0;
+                const pieceRate = parseFloat(updatedFormData.rate) || 0;
+                updatedFormData.total_amount = (pcs * pieceRate).toFixed(2);
+            } else {
+                // For "By Weight": Total Amt = Total Pure Weight * rate
+                const pureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
+                const rate = parseFloat(updatedFormData.rate) || 0;
+                updatedFormData.total_amount = (pureWeight * rate).toFixed(2);
+            }
+            if (field === "paid_amount") {
+                setLastUpdatedField("paid_amount");
+                const rate = parseFloat(updatedFormData.rate) || 0;
+                if (rate) {
+                    updatedFormData.paid_pure_weight = (value / rate).toFixed(3);
+                } else {
+                    updatedFormData.paid_pure_weight = "0";
+                }
+            } else if (field === "paid_pure_weight") {
+                setLastUpdatedField("paid_pure_weight");
+                const rate = parseFloat(updatedFormData.rate) || 0;
+                if (rate) {
+                    updatedFormData.paid_amount = (value * rate).toFixed(2);
+                } else {
+                    updatedFormData.paid_amount = "0";
                 }
             }
-            if (field === "net_weight" || field === "purity") {
-                const netWeight = parseFloat(updatedFormData.net_weight) || 0;
-                const purityPercentage = parsePurityToPercentage(
-                    updatedFormData.purity
-                ) || 0;
 
-                updatedFormData.pure_weight = (
-                    (netWeight * purityPercentage) / 100
-                ).toFixed(2);
-            }
-            // Additional calculations for other fields
-            if (
-                updatedFormData.gross &&
-                updatedFormData.dust &&
-                updatedFormData.ml_percent &&
-                updatedFormData.purity
-            ) {
-                const purityValue = parsePurityToPercentage(updatedFormData.purity);
-
-                if (purityValue) {
-                    const gross = parseFloat(updatedFormData.gross) || 0;
-                    const dust = parseFloat(updatedFormData.dust) || 0;
-                    const mlPercent = parseFloat(updatedFormData.ml_percent) || 0;
-
-                    const netWeight = ((gross - dust) * (purityValue - mlPercent)) / 100;
-                    updatedFormData.eqt_wt = netWeight.toFixed(2);
-                }
-            }
-            // Update net weight and pure weight
-            const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
-            const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
-            updatedFormData.net_weight = grossWeight - stoneWeight;
-
-            const netWeight = parseFloat(updatedFormData.net_weight) || 0;
-            const purityPercentage = parsePurityToPercentage(
-                updatedFormData.purity
-            ) || 0;
-            updatedFormData.pure_weight = (
-                (netWeight * purityPercentage) / 100
-            ).toFixed(2);
-
-            // Calculate total amount
-            const pureWeight = parseFloat(updatedFormData.pure_weight) || 0;
-            const rate = parseFloat(updatedFormData.rate) || 0;
-            updatedFormData.total_amount = (pureWeight * rate).toFixed(2);
-
-            // Calculate balance amount
+            // Update balance calculations
+            const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
             const paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
-            updatedFormData.balance_amount = (
-                parseFloat(updatedFormData.total_amount || 0) - paidAmount
-            ).toFixed(2);
+            const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
+            const paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || 0;
 
-            const paid_pure_weight = parseFloat(updatedFormData.paid_pure_weight) || 0;
-
-            // Set Balance Pure Wt to zero if rate_cut is empty or not equal to zero
-            const rateCut = parseFloat(updatedFormData.rate) || 0;
-            updatedFormData.balance_pure_weight =
-                rateCut === 0
-                    ? (parseFloat(updatedFormData.pure_weight || 0) - paid_pure_weight).toFixed(2)
-                    : "0";
+            updatedFormData.balance_pure_weight = (totalPureWeight - paidPureWeight).toFixed(3);
+            updatedFormData.balance_amount = (totalAmount - paidAmount).toFixed(2);
 
             return updatedFormData;
         });
@@ -331,7 +316,7 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
                             product_id: matchingProduct.product_id, // Update product_id
                             rbarcode: matchingProduct.rbarcode,    // Update rbarcode
                             metal_type: matchingProduct.Category,
-                            hsn_code: matchingProduct.hsn_code
+                            hsn_code: matchingProduct.hsn_code,
                         }));
                     } else {
                         // Reset product_id and rbarcode if no match
@@ -361,33 +346,13 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
         }
     }, [formData.category]);
 
-
-    useEffect(() => {
-        const fetchCurrentRates = async () => {
-            try {
-                const response = await axios.get(`${baseURL}/get/current-rates`);
-                setRates({
-                    rate_24crt: response.data.rate_24crt || "",
-                    rate_22crt: response.data.rate_22crt || "",
-                    rate_18crt: response.data.rate_18crt || "",
-                    rate_16crt: response.data.rate_16crt || "",
-                    silver_rate: response.data.silver_rate || "",
-                });
-            } catch (error) {
-                console.error('Error fetching current rates:', error);
-            }
-        };
-        fetchCurrentRates();
-    }, []);
-
-
     useEffect(() => {
         const fetchPurity = async () => {
             if (!formData.category) {
                 setFormData((prev) => ({
                     ...prev,
-                    purity: "", // Clear purity
-                    rate: "",   // Clear rate
+                    purity: "",
+                    rate: "",
                 }));
                 setPurityOptions([]);
                 return;
@@ -400,8 +365,6 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
 
             try {
                 const response = await axios.get(`${baseURL}/purity`);
-
-                // Filter purity options based on selected metal type
                 const filteredPurity = response.data.filter(
                     (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
                 );
@@ -413,41 +376,34 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
 
                 if (formData.metal_type.toLowerCase() === "gold") {
                     defaultOption = filteredPurity.find((option) =>
-                        ["22k", "22 kt", "22"].some((match) =>
-                            option.name.toLowerCase().includes(match)
-                        )
+                        option.name.toLowerCase().includes("22") // Check if "22" is included
                     );
 
                     if (defaultOption) {
                         setFormData((prev) => ({
                             ...prev,
-                            purity: `${defaultOption.name} | ${defaultOption.purity}`,
-                            rate: rates.rate_22crt, // Set the correct rate
+                            purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
+                            rate: rates.rate_22crt,
                         }));
                     }
                 }
 
                 if (formData.metal_type.toLowerCase() === "silver") {
-                    const silver22K = filteredPurity.find((option) =>
-                        ["22k", "22 kt", "22"].some((match) =>
-                            option.name.toLowerCase().includes(match)
-                        )
+                    const silver22 = filteredPurity.find((option) =>
+                        option.name.toLowerCase().includes("22")
                     );
 
-                    const silver24K = filteredPurity.find((option) =>
-                        ["24k", "24 kt", "24"].some((match) =>
-                            option.name.toLowerCase().includes(match)
-                        )
+                    const silver24 = filteredPurity.find((option) =>
+                        option.name.toLowerCase().includes("24")
                     );
 
-                    // Set default priority: 24K > 22K
-                    defaultOption = silver24K || silver22K;
+                    defaultOption = silver24 || silver22;
 
                     if (defaultOption) {
                         setFormData((prev) => ({
                             ...prev,
-                            purity: `${defaultOption.name} | ${defaultOption.purity}`,
-                            rate: rates.silver_rate, // Set the correct rate
+                            purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
+                            rate: rates.silver_rate,
                         }));
                     }
                 }
@@ -456,17 +412,69 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
             }
         };
 
-        if (formData.category) {
-            fetchPurity();
-        } else {
-            setFormData((prev) => ({
-                ...prev,
-                purity: "",
-                rate: "",
-            }));
-            setPurityOptions([]);
+        fetchPurity();
+    }, [formData.metal_type, formData.category]);
+
+    const extractPurityPercentage = (purityValue) => {
+        if (!purityValue || purityOptions.length === 0) return 0;
+
+        if (purityValue.toLowerCase() === "manual") {
+            return parseFloat(formData.purityPercentage) || 0; // Use custom purity input
         }
-    }, [formData.metal_type, formData.category, rates]); // Add rates dependency to ensure it's updated when rates change
+
+        const matchedPurity = purityOptions.find((option) =>
+            purityValue.includes(option.name)
+        );
+
+        return matchedPurity ? parseFloat(matchedPurity.purity_percentage) || 0 : 0;
+    };
+
+    useEffect(() => {
+        const updatedFormData = { ...formData };
+        const netWeight = parseFloat(updatedFormData.net_weight) || 0;
+        const purityPercentage = extractPurityPercentage(updatedFormData.purity);
+        updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(2);
+
+        const wastagePercentage = parseFloat(updatedFormData.wastage) || 0;
+        let baseWeight = 0;
+        if (updatedFormData.wastage_on === "Gross Wt") {
+            baseWeight = parseFloat(updatedFormData.gross_weight) || 0;
+        } else if (updatedFormData.wastage_on === "Net Wt") {
+            baseWeight = parseFloat(updatedFormData.net_weight) || 0;
+        } else if (updatedFormData.wastage_on === "Pure Wt") {
+            baseWeight = parseFloat(updatedFormData.pure_weight) || 0;
+        }
+        updatedFormData.wastage_wt = ((wastagePercentage * baseWeight) / 100).toFixed(3);
+
+        const wastageWeight = parseFloat(updatedFormData.wastage_wt) || 0;
+        updatedFormData.total_pure_wt = (parseFloat(updatedFormData.pure_weight) + wastageWeight).toFixed(3);
+
+        const rate = parseFloat(updatedFormData.rate) || 0;
+        const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
+        let paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || 0;
+        let paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
+
+        if (lastUpdatedField === "paid_amount" && rate) {
+            paidPureWeight = (paidAmount / rate).toFixed(3);
+        } else if (lastUpdatedField === "paid_pure_weight" && rate) {
+            paidAmount = (paidPureWeight * rate).toFixed(2);
+        }
+
+        updatedFormData.paid_pure_weight = paidPureWeight;
+        updatedFormData.paid_amount = paidAmount;
+
+        updatedFormData.balance_pure_weight = (parseFloat(updatedFormData.total_pure_wt) - paidPureWeight).toFixed(3);
+        updatedFormData.balance_amount = (totalAmount - paidAmount).toFixed(2);
+
+        setFormData(updatedFormData);
+    }, [
+        formData.purity,
+        formData.purityPercentage,
+        formData.net_weight,
+        formData.rate,
+        formData.total_amount,
+        formData.paid_amount
+    ]);
 
 
 
@@ -568,6 +576,19 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
                     </div>
                     <div className="urd-form-section">
                         <Row>
+                            <Col xs={12} md={2}>
+                                <InputField
+                                    label="Pricing"
+                                    name="Pricing"
+                                    type="select"
+                                    value={formData.Pricing || ""} // Ensure it never becomes undefined
+                                    onChange={(e) => handleChange("Pricing", e.target.value)} // Correctly updates the field
+                                    options={[
+                                        { value: "By Weight", label: "By Weight" },
+                                        { value: "By fixed", label: "By fixed" },
+                                    ]}
+                                />
+                            </Col>
                             <Col xs={12} md={3} className="d-flex align-items-center">
                                 <div style={{ flex: 1 }}>
                                     <InputField
@@ -595,51 +616,6 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
                                     }}
                                 />
                             </Col>
-                            {formData.category === "Diamond" ? (
-                                <>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Cut"
-                                            name="cut"
-                                            type="text"
-                                            value={formData.cut || ""}
-                                            onChange={(e) => handleChange("cut", e.target.value)}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Color"
-                                            name="color"
-                                            type="text"
-                                            value={formData.color || ""}
-                                            onChange={(e) => handleChange("color", e.target.value)}
-                                        />
-                                    </Col>
-                                    <Col xs={12} md={2}>
-                                        <InputField
-                                            label="Clarity"
-                                            name="clarity"
-                                            type="text"
-                                            value={formData.clarity || ""}
-                                            onChange={(e) => handleChange("clarity", e.target.value)}
-                                        />
-                                    </Col>
-                                </>
-                            ) : (
-                                <Col xs={12} md={2}>
-                                    <InputField
-                                        label="Purity"
-                                        type="select"
-                                        name="purity"
-                                        value={formData.purity}
-                                        onChange={(e) => handleChange("purity", e.target.value)}
-                                        options={purityOptions.map((option) => ({
-                                            value: `${option.name} | ${option.purity}`, // Combined name and purity
-                                            label: `${option.name} | ${option.purity}`,
-                                        }))}
-                                    />
-                                </Col>
-                            )}
                             <Col xs={12} md={2}>
                                 <InputField
                                     label="Rbarcode"
@@ -662,70 +638,159 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
                                 <InputField label="PCs" type="text" value={formData.pcs}
                                     onChange={(e) => handleChange("pcs", e.target.value)} />
                             </Col>
-                            <Col xs={12} md={1}>
-                                <InputField label="Gross" type="number" value={formData.gross_weight}
-                                    onChange={(e) => handleChange("gross_weight", e.target.value)} />
-                            </Col>
-                            <Col xs={12} md={1}>
-                                <InputField label="Stone" type="number" value={formData.stone_weight}
-                                    onChange={(e) => handleChange("stone_weight", e.target.value)} />
-                            </Col>
-                            <Col xs={12} md={1}>
-                                <InputField
-                                    label="Net"
-                                    type="number"
-                                    value={formData.net_weight}
-                                    onChange={(e) => handleChange("net_weight", e.target.value)}
-                                />
-                            </Col>
-                            <Col xs={12} md={2}>
-                                <InputField label="HM Charges" type="number" value={formData.hm_charges}
-                                    onChange={(e) => handleChange("hm_charges", e.target.value)} />
-                            </Col>
+                            {/* Conditionally Hidden Fields */}
+                            {formData.Pricing !== "By fixed" && (
+                                <>
+                                    <Col xs={12} md={2}>
+                                        <InputField label="Gross" type="number" value={formData.gross_weight}
+                                            onChange={(e) => handleChange("gross_weight", e.target.value)} />
+                                    </Col>
+                                    <Col xs={12} md={1}>
+                                        <InputField label="Stone" type="number" value={formData.stone_weight}
+                                            onChange={(e) => handleChange("stone_weight", e.target.value)} />
+                                    </Col>
 
-                            <Col xs={12} md={2}>
-                                <InputField
-                                    label="Other Charges:"
-                                    type="select"
-                                    value={formData.other_charges}
-                                    onChange={(e) => handleChange("other_charges", e.target.value)}
-                                    options={[
-                                        { value: "Cargo", label: "Cargo" },
-                                        { value: "Transport", label: "Transport" },
-                                    ]}
-                                />
-                            </Col>
+                                    <Col xs={12} md={1}>
+                                        <InputField
+                                            label="Net"
+                                            type="number"
+                                            value={formData.net_weight}
+                                            onChange={(e) => handleChange("net_weight", e.target.value)}
+                                        />
+                                    </Col>
+                                    {formData.category === "Diamond" ? (
+                                        <>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Cut"
+                                                    name="cut"
+                                                    type="text"
+                                                    value={formData.cut || ""}
+                                                    onChange={(e) => handleChange("cut", e.target.value)}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Color"
+                                                    name="color"
+                                                    type="text"
+                                                    value={formData.color || ""}
+                                                    onChange={(e) => handleChange("color", e.target.value)}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Clarity"
+                                                    name="clarity"
+                                                    type="text"
+                                                    value={formData.clarity || ""}
+                                                    onChange={(e) => handleChange("clarity", e.target.value)}
+                                                />
+                                            </Col>
+                                        </>
+                                    ) : (
+                                        <Col xs={12} md={2}>
+                                            <InputField
+                                                label="Purity"
+                                                type="select"
+                                                name="purity"
+                                                value={formData.purity}
+                                                onChange={(e) => handleChange("purity", e.target.value)}
+                                                options={[
+                                                    ...purityOptions.map((option) => ({
+                                                        value: `${option.name} | ${option.purity_percentage}`, // Combined name and purity
+                                                        label: `${option.name} | ${option.purity_percentage}`,
+                                                    })),
+                                                    { value: "Manual", label: "Manual" }, // Added inside the array
+                                                ]}
+                                            />
+                                        </Col>
+
+                                    )}
+                                    {formData.purity === "Manual" && (
+                                        <Col xs={12} md={2}>
+                                            <InputField
+                                                label="Custom Purity %"
+                                                type="number"
+                                                name="purityPercentage"
+                                                value={formData.purityPercentage || ""}
+
+                                                onChange={(e) => handleChange("purityPercentage", e.target.value)}
+                                            />
+                                        </Col>
+                                    )}
+                                    <Col xs={12} md={2}>
+                                        <InputField
+                                            label="Pure Wt"
+                                            type="number"
+                                            value={formData.pure_weight}
+                                            onChange={(e) => handleChange("pure_weight", e.target.value)}
+                                        />
+                                    </Col>
+                                    <Col xs={12} md={2}>
+                                        <InputField
+                                            label="Wastage On"
+                                            name="wastage_on"
+                                            type="select"
+                                            value={formData.wastage_on}
+                                            onChange={(e) => handleChange("wastage_on", e.target.value)} // ✅ Ensure correct update
+                                            options={[
+                                                { value: "Gross Wt", label: "Gross Wt" },
+                                                { value: "Net Wt", label: "Net Wt" },
+                                                { value: "Pure Wt", label: "Pure Wt" },
+                                            ]}
+                                        />
+                                    </Col>
+
+                                    <Col xs={12} md={2}>
+                                        <InputField label="Wastage%" type="number" value={formData.wastage}
+                                            onChange={(e) => handleChange("wastage", e.target.value)} />
+                                    </Col>
+                                    <Col xs={12} md={2}>
+                                        <InputField label="Wastage Wt" type="number" value={formData.wastage_wt}
+                                            onChange={(e) => handleChange("wastage_wt", e.target.value)} />
+                                    </Col>
+                                    <Col xs={12} md={2}>
+                                        <InputField label="Total Pure Wt" type="number" value={formData.total_pure_wt}
+                                            onChange={(e) => handleChange("total_pure_wt", e.target.value)} />
+                                    </Col>
+                                    <Col xs={12} md={2}>
+                                        <InputField
+                                            label="Paid Wt"
+                                            type="number"
+                                            value={formData.paid_pure_weight}
+                                            onChange={(e) => {
+                                                const newValue = parseFloat(e.target.value) || 0;
+                                                if (newValue > formData.total_pure_wt) {
+                                                    alert("Paid Wt cannot be greater than Total Pure Wt!");
+                                                } else {
+                                                    handleChange("paid_pure_weight", newValue);
+                                                }
+                                            }}
+                                        />
+                                    </Col>
+
+                                    <Col xs={12} md={2}>
+                                        <InputField
+                                            label="Balance Wt"
+                                            type="number"
+                                            value={formData.balance_pure_weight}
+                                            onChange={(e) => handleChange("balance_pure_weight", e.target.value)}
+                                        />
+                                    </Col>
+                                    <Col xs={12} md={2}>
+                                        <InputField label="HM Charges" type="number" value={formData.hm_charges}
+                                            onChange={(e) => handleChange("hm_charges", e.target.value)} />
+                                    </Col>
+                                </>
+                            )}
                             <Col xs={12} md={2}>
                                 <InputField label="Charges" type="number" value={formData.charges}
                                     onChange={(e) => handleChange("charges", e.target.value)} />
                             </Col>
                             <Col xs={12} md={2}>
                                 <InputField
-                                    label="Total Pure Wt"
-                                    type="number"
-                                    value={formData.pure_weight}
-                                    onChange={(e) => handleChange("pure_weight", e.target.value)}
-                                />
-                            </Col>
-                            <Col xs={12} md={1}>
-                                <InputField
-                                    label="Paid Wt"
-                                    type="number"
-                                    value={formData.paid_pure_weight}
-                                    onChange={(e) => handleChange("paid_pure_weight", e.target.value)}
-                                />
-                            </Col>
-                            <Col xs={12} md={2}>
-                                <InputField
-                                    label="Balance Wt"
-                                    type="number"
-                                    value={formData.balance_pure_weight}
-                                    onChange={(e) => handleChange("balance_pure_weight", e.target.value)}
-                                />
-                            </Col>
-                            <Col xs={12} md={2}>
-                                <InputField
-                                    label="Rate-Cut"
+                                    label={formData.Pricing === "By fixed" ? "Piece Rate" : "Rate-Cut"}
                                     type="number"
                                     value={formData.rate}
                                     onChange={(e) => handleChange("rate", e.target.value)}
@@ -733,15 +798,16 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
                             </Col>
                             <Col xs={12} md={2}>
                                 <InputField
-                                    label="Total Amount"
+                                    label="Total Amt"
                                     type="number"
                                     value={formData.total_amount}
-                                    readOnly // Prevent editing by the user
+                                    onChange={(e) => handleChange("total_amount", e.target.value)}
+                                    readOnly={formData.Pricing !== "By fixed"} // Piece Rate is writable only when "By fixed" is selected
                                 />
                             </Col>
                             <Col xs={12} md={2}>
                                 <InputField
-                                    label="Paid Amount"
+                                    label="Paid Amt"
                                     type="number"
                                     value={formData.paid_amount}
                                     onChange={(e) => handleChange("paid_amount", e.target.value)}
@@ -749,15 +815,17 @@ const UpdatePurchaseForm = ({ selectedProduct, handleCloseModal, handleAddCustom
                             </Col>
                             <Col xs={12} md={2}>
                                 <InputField
-                                    label="Balance Amount"
+                                    label="Balance Amt"
                                     type="number"
                                     value={formData.balance_amount}
                                     onChange={(e) => handleChange("balance_amount", e.target.value)}
                                 />
                             </Col>
+
                         </Row>
                         <Row>
                         </Row>
+
                     </div>
                     {/* Buttons */}
                     <div className="d-flex justify-content-end">

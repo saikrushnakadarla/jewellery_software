@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import baseURL from './../../../../../Url/NodeBaseURL';
 import { useLocation } from "react-router-dom";
+import Webcam from "react-webcam";
 
 const useProductHandlers = () => {
   const [products, setProducts] = useState([]);
@@ -71,6 +72,7 @@ const useProductHandlers = () => {
     opentag_id: "",
     product_image: null,
     imagePreview: null,
+    remarks:"",
   });
   const [uniqueProducts, setUniqueProducts] = useState([]);
   const [metalTypes, setMetalTypes] = useState([]);
@@ -85,6 +87,9 @@ const useProductHandlers = () => {
   const [purityOptions, setpurityOptions] = useState([]);
   const [designOptions, setDesignOptions] = useState([]); 
   const [image, setImage] = useState(null);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showWebcam, setShowWebcam] = useState(false);
+  const webcamRef = useRef(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -210,6 +215,7 @@ const useProductHandlers = () => {
         opentag_id: "",
         product_image: null,
         imagePreview: null,
+        remarks:"",
       };
     }
 
@@ -356,6 +362,7 @@ const useProductHandlers = () => {
         hm_charges:"60.00",
         total_price: "",
         qty: "", // Rese
+        remarks:"",
       }));
 
       setFilteredMetalTypes(metalTypes);
@@ -662,6 +669,7 @@ const useProductHandlers = () => {
           hm_charges:"60.00",
           total_price: "",
           qty: "", // Reset qty
+          remarks:"",
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
@@ -785,6 +793,7 @@ const useProductHandlers = () => {
             hm_charges:"60.00",
             total_price: "",
             qty: "", // Reset qty
+            remarks:"",
           }));
           setIsQtyEditable(true); // Default to editable
         }
@@ -810,7 +819,7 @@ const useProductHandlers = () => {
 
    // This function handles the file input change event for the gallery selection.
 
-  const handleImageChange = (e) => {
+   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -818,20 +827,26 @@ const useProductHandlers = () => {
         setFormData((prev) => ({ ...prev, imagePreview: reader.result }));
       };
       reader.readAsDataURL(file);
+      setShowOptions(false); // Hide options after selection
     }
   };
 
   const clearImage = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      imagePreview: null,
-    }));
-
-    // Reset the file input
+    setFormData({ imagePreview: null });
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
+
+  const captureImage = () => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      setFormData((prev) => ({ ...prev, imagePreview: imageSrc }));
+      setShowWebcam(false);
+      setShowOptions(false); // Hide options after capturing
+    }
+  };
+
 
   return {
     formData,
@@ -843,6 +858,12 @@ const useProductHandlers = () => {
     handleImageChange,
     fileInputRef,
     clearImage,
+    captureImage,
+    setShowWebcam,
+    showWebcam,
+    webcamRef,
+    setShowOptions,
+    showOptions,
     image,
     handleBarcodeChange,
     handleProductNameChange,

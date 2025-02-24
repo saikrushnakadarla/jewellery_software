@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import "./Repairs.css";
 import InputField from "../../../Pages/InputField/InputField";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Dropdown } from "react-bootstrap";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from "axios";
@@ -10,6 +10,8 @@ import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import PDFContent from "./RepairInvoice";
 import { AuthContext } from "../../../Pages/Login/Context";
+import { FaTrash } from "react-icons/fa";
+import Webcam from "react-webcam";
 
 const RepairForm = () => {
   const today = new Date(); // Define today as a Date object
@@ -70,6 +72,10 @@ const RepairForm = () => {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filteredPurity, setFilteredPurity] = useState([]);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const webcamRef = useRef(null);
+  const fileInputRef = useRef(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -231,6 +237,16 @@ const RepairForm = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const captureImage = () => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    setImage(imageSrc);
+    setIsCameraOpen(false);
+  };
+
+  const clearImage = () => {
+    setImage(null);
   };
 
   const parseDate = (dateString) => {
@@ -533,21 +549,79 @@ const RepairForm = () => {
             </div>
             <div className="repair-form-right">
               <Col className="form-section">
-                <h4>Upload Image</h4>
+                {/* <h4>Upload Image</h4> */}
                 <Row>
                   <Col xs={12} md={4}>
                     <div className="image-upload-container">
-                      <label htmlFor="image-upload" className="upload-button">Upload</label>
+                      {/* Dropdown Button for Upload Options */}
+                      <Dropdown>
+                        <Dropdown.Toggle id="dropdown-basic-button">Upload Image</Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                          <Dropdown.Item onClick={() => fileInputRef.current.click()}>
+                            Select Image
+                          </Dropdown.Item>
+                          <Dropdown.Item onClick={() => setIsCameraOpen(true)}>
+                            Capture Image
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown>
+
+                      {/* Hidden file input */}
                       <input
                         type="file"
-                        id="image-upload"
                         accept="image/*"
+                        ref={fileInputRef}
                         onChange={handleImageChange}
                         style={{ display: "none" }}
                       />
+
+                      {/* Webcam Modal */}
+                      {isCameraOpen && (
+                        <div className="webcam-container mt-2">
+                          <Webcam
+                            audio={false}
+                            ref={webcamRef}
+                            screenshotFormat="image/jpeg"
+                            className="img-thumbnail"
+                          />
+                          <div className="d-flex gap-2 mt-2">
+                            <Button onClick={captureImage} variant="primary">
+                              Capture
+                            </Button>
+                            <Button onClick={() => setIsCameraOpen(false)} variant="danger">
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Image Preview with Delete Icon */}
                       {image && (
-                        <div className="image-preview">
-                          <img src={image} alt="Uploaded" className="img-thumbnail" />
+                        <div style={{ position: "relative", display: "inline-block", marginTop: "10px" }}>
+                          <img src={image} alt="Selected"
+                            style={{
+                              width: "100px",
+                              height: "100px",
+                              borderRadius: "8px",
+                            }} />
+                          <button
+                            type="button"
+                            onClick={clearImage}
+                            style={{
+                              position: "absolute",
+                              top: "5px",
+                              right: "5px",
+                              background: "transparent",
+                              border: "none",
+                              color: "red",
+                              fontSize: "16px",
+                              cursor: "pointer",
+                              zIndex: 10,
+                            }}
+                          >
+                            <FaTrash />
+                          </button>
                         </div>
                       )}
                     </div>

@@ -145,7 +145,7 @@ const PaymentDetails = ({
               type="button"
               variant="secondary"
               onClick={handleBack}
-              style={{ backgroundColor: 'gray', marginLeft: '-50px' }}
+              style={{ backgroundColor: 'gray', marginLeft: '-40px' }}
             >
               Cancel
             </Button>

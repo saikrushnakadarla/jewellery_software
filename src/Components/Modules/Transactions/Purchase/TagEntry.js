@@ -58,7 +58,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         Making_Charges: "",
         Design_Master: selectedProduct.design_name,
         Weight_BW: "",
-
         pur_Gross_Weight: "",
         pur_Stones_Weight: "",
         pur_deduct_st_Wt: "Yes",
@@ -133,13 +132,13 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
 
         setFormData((prev) => ({
             ...prev,
-            WastageWeight: wastageWeight.toFixed(2),
-            TotalWeight_AW: totalWeight.toFixed(2),
-            pur_WastageWeight: purWastageWeight.toFixed(2),
-            pur_TotalWeight_AW: purTotalWeight.toFixed(2),
+            WastageWeight: wastageWeight.toFixed(3),
+            TotalWeight_AW: totalWeight.toFixed(3),
+            pur_WastageWeight: purWastageWeight.toFixed(3),
+            pur_TotalWeight_AW: purTotalWeight.toFixed(3),
         }));
     }, [formData.Wastage_On, formData.Wastage_Percentage, formData.Gross_Weight, formData.Weight_BW,
-        formData.pur_Wastage_On, formData.pur_Wastage_Percentage, formData.pur_Gross_Weight, formData.pur_Weight_BW
+    formData.pur_Wastage_On, formData.pur_Wastage_Percentage, formData.pur_Gross_Weight, formData.pur_Weight_BW
     ]);
 
     const handleMakingChargesCalculation = () => {
@@ -372,19 +371,19 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             ) {
                 const grossWt = parseFloat(updatedData.pur_Gross_Weight) || 0;
                 const stonesWt = parseFloat(updatedData.pur_Stones_Weight) || 0;
-            
+
                 // Check if the option is explicitly set to "yes"; otherwise, do NOT deduct.
                 const deductOption = updatedData.pur_deduct_st_Wt
                     ? updatedData.pur_deduct_st_Wt.toLowerCase()
                     : "";
-            
+
                 if (deductOption === "yes") {
                     updatedData.pur_Weight_BW = (grossWt - stonesWt).toFixed(2);
                 } else {
                     updatedData.pur_Weight_BW = grossWt.toFixed(2); // No deduction if empty or not "yes"
                 }
             }
-            
+
 
             return updatedData;
         });
@@ -527,7 +526,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 Gross_Weight: "",
                 Stones_Weight: "",
                 deduct_st_Wt: "",
-                stone_price_per_carat: "",
+                stone_price_per_carat: "Yes",
                 Stones_Price: "",
                 HUID_No: "",
                 Wastage_On: "Gross Weight",
@@ -545,6 +544,19 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 Making_Charges: "",
                 Design_Master: selectedProduct.design_name,
                 Weight_BW: "",
+                pur_Gross_Weight: "",
+                pur_Stones_Weight: "",
+                pur_deduct_st_Wt: "Yes",
+                pur_stone_price_per_carat: "",
+                pur_Stones_Price: "",
+                pur_Weight_BW: "",
+                pur_Making_Charges_On: "",
+                pur_MC_Per_Gram: "",
+                pur_Making_Charges: "",
+                pur_Wastage_On: "Gross Weight",
+                pur_Wastage_Percentage: "",
+                pur_WastageWeight: "",
+                pur_TotalWeight_AW: ""
             }));
         } catch (error) {
             console.error(error);

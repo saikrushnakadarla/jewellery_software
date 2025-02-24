@@ -1,5 +1,6 @@
-import React from "react";
-import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
+import React, { useEffect, useState } from "react";
+import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
+import QRCode from "qrcode";
 
 // Helper function to format the date in dd-mm-yyyy format
 const formatDate = (date) => {
@@ -24,7 +25,6 @@ const formatTime = (date) => {
 
   return `${hours}:${minutes}:${seconds} ${period}`;
 };
-
 
 // Styles optimized for thermal receipt printers
 const styles = StyleSheet.create({
@@ -115,7 +115,6 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontFamily: "Helvetica-Bold",
   },
-
   snBoldHeader: {
     width: "8%",
     fontFamily: "Helvetica-Bold",
@@ -161,7 +160,7 @@ const styles = StyleSheet.create({
   },
   rowContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end", // Aligns all content to the right
+    justifyContent: "flex-end",
     marginBottom: 3,
   },
   leftAlignedText: {
@@ -174,21 +173,44 @@ const styles = StyleSheet.create({
     textAlign: "right",
     fontFamily: "Helvetica-Bold",
   },
+  qrCodeContainer: {
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  qrCode: {
+    width: 100,
+    height: 100,
+  },
 });
 
 const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) => {
-  const currentDate = new Date(); // Current date
-  const formattedDate = formatDate(currentDate); // Format current date as dd-mm-yyyy
-  const currentTime = formatTime(currentDate); // Get current time in HH:mm:ss format
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const currentDate = new Date();
+  const formattedDate = formatDate(currentDate);
+  const currentTime = formatTime(currentDate);
+
+  useEffect(() => {
+    const generateQRCode = async () => {
+      try {
+        const qrCodeDataUrl = await QRCode.toDataURL(entries[0]?.estimate_number || "", {
+          width: 100,
+          margin: 2,
+        });
+        setQrCodeUrl(qrCodeDataUrl);
+      } catch (err) {
+        console.error("Error generating QR code:", err);
+      }
+    };
+
+    generateQRCode();
+  }, [entries]);
 
   return (
-
     <Document>
       <Page size={[226, 500]} style={styles.page}>
-        {/* Heading */}
         <Text style={styles.heading}>Estimation</Text>
 
-        {/* Details */}
         {entries.length > 0 && (
           <View>
             <View style={styles.row}>
@@ -197,7 +219,6 @@ const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) 
             </View>
             <View style={styles.row}>
               <Text style={styles.leftText}>Rate: {entries[0].rate}</Text>
-              {/* <Text style={styles.rightText}>Date: {entries[0].date}</Text> */}
               <Text style={styles.rightText}>Date: {formattedDate}</Text>
             </View>
           </View>
@@ -207,7 +228,6 @@ const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) 
           <Text style={styles.timeText}>{currentTime}</Text>
         </View>
 
-        {/* Table Header */}
         <View style={styles.tableHeader}>
           <Text style={[styles.tableCell, styles.snBoldHeader]}>S.N</Text>
           <Text style={[styles.tableCell, styles.itemBoldHeader]}>Item</Text>
@@ -251,7 +271,7 @@ const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) 
           const discountAmount = entries.reduce((sum, entry) => sum + parseFloat(entry.disscount || 0), 0);
 
           const taxPercent = parseFloat(entries[0]?.tax_percent || 0);
-          const taxableAmount = totalAmount + totalMakingCharge + totalStoneAmount + hmCharges - discountAmount
+          const taxableAmount = totalAmount + totalMakingCharge + totalStoneAmount + hmCharges - discountAmount;
           const gstAmount = taxableAmount * (taxPercent / 100);
           const cgst = gstAmount / 2;
           const sgst = gstAmount / 2;
@@ -285,6 +305,11 @@ const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) 
                   <Text style={styles.rightAlignedText}>  {finalAmount.toFixed(2)}</Text>
                 </View>
               </View>
+
+              {/* QR Code */}
+              <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                {qrCodeUrl && <Image style={styles.qrCode} src={qrCodeUrl} />}
+              </View>
             </>
           );
         })()}
@@ -294,5 +319,3 @@ const PDFContent = ({ entries, totalAmount, date, estimateNumber, sellerName }) 
 };
 
 export default PDFContent;
-
-

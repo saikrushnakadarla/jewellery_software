@@ -49,8 +49,22 @@
 }
 
 .cus-back-btn {
-  width: 100%;
+  width: 7%;
 }
+
+#dropdown-basic-button {
+  background-color: #a36e29 !important;
+  border-color: #a36e29 !important;
+  color: white !important;
+}
+#dropdown-basic-button:hover,
+#dropdown-basic-button:focus,
+#dropdown-basic-button:active {
+  background-color: #8b5c1e !important; 
+  border-color: #8b5c1e !important;
+}
+
+
 
 @media (max-width: 768px) {
   .sales-form,

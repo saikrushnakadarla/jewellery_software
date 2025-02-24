@@ -78,7 +78,7 @@ const RepairsTable = () => {
         Cell: ({ row }) => {
           const paid_amt = Number(row.original.paid_amt) || 0;
           const receipts_amt = Number(row.original.receipts_amt) || 0;
-          const totalPaid = (paid_amt + receipts_amt).toFixed(2);      
+          const totalPaid = (paid_amt + receipts_amt).toFixed(2);
           return totalPaid;
         },
       },
@@ -88,16 +88,32 @@ const RepairsTable = () => {
         Cell: ({ row }) => {
           const bal_amt = Number(row.original.bal_amt) || 0;
           const bal_after_receipts = Number(row.original.bal_after_receipts) || 0;
-          const receipts_amt = Number(row.original.receipts_amt) || 0;      
+          const receipts_amt = Number(row.original.receipts_amt) || 0;
           let finalBalance;
           if (bal_amt === receipts_amt) {
             finalBalance = bal_after_receipts || 0;
           } else {
             finalBalance = bal_after_receipts ? bal_after_receipts : bal_amt || 0;
-          }      
+          }
           return finalBalance.toFixed(2);
         },
-      }, 
+      },
+      {
+        Header: 'Status',
+        accessor: 'status',
+        Cell: ({ row }) => {
+          const { net_bill_amount, paid_amt, receipts_amt } = row.original;
+      
+          const totalPaid = Number(paid_amt) + Number(receipts_amt);
+          const netBill = Number(net_bill_amount);
+      
+          return (
+            <span style={{  color: netBill === totalPaid ? 'green' : 'red' }}>
+              {netBill === totalPaid ? 'Delivered' : 'Not Delivered'}
+            </span>
+          );
+        },
+      },
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -177,11 +193,11 @@ const RepairsTable = () => {
         accessor: 'receipts',
         Cell: ({ row }) => {
           const { net_bill_amount, paid_amt, receipts_amt, transaction_status } = row.original;
-      
+
           // Ensure numerical calculations are performed correctly
           const totalPaid = Number(paid_amt) + Number(receipts_amt);
           const netBill = Number(net_bill_amount);
-      
+
           return (
             <Button
               style={{
@@ -205,8 +221,6 @@ const RepairsTable = () => {
   const handleEdit = async (
     invoice_number,
     mobile,
-    scheme_amt,
-    old_exchange_amt,
     cash_amount,
     card_amt,
     chq_amt,
@@ -222,66 +236,68 @@ const RepairsTable = () => {
       confirmButtonText: 'Yes, go ahead!',
       cancelButtonText: 'No, cancel',
     });
-  
+
     if (result.isConfirmed) {
       try {
         // Fetch repair details
         const repairResponse = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
         const repairDetails = repairResponse.data;
-  
+
         if (!repairDetails || !repairDetails.repeatedData) {
           console.error('No repeatedData found in response:', repairDetails);
           Swal.fire('Error', 'No repair details found for the provided invoice number.', 'error');
           return;
         }
-  
+
         // Filter repeatedData to include only items with specific transaction statuses
         const filteredRepairData = repairDetails.repeatedData.filter(
           (item) => item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice"
         );
-  
+
         if (filteredRepairData.length === 0) {
           Swal.fire('No data', 'No records found with the required transaction status.', 'info');
           return;
         }
-  
+
         // Check if order_number exists; otherwise, use invoice_number
         const order_number = filteredRepairData[0]?.order_number || invoice_number;
-  
+
         // Fetch old items details using order_number if available; otherwise, use invoice_number
         const oldItemsResponse = await axios.get(`${baseURL}/get/olditems/${order_number}`);
         const oldItemsDetails = oldItemsResponse.data;
-  
+
         // Retrieve existing data from localStorage
         const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
         const existingOldItems = JSON.parse(localStorage.getItem('oldTableData')) || [];
-  
+
         // Get today's date in yyyy-mm-dd format
         const today = new Date().toISOString().split('T')[0];
-  
+
         // Update repair and old items details with today's date
         const formattedRepairDetails = filteredRepairData.map((item) => ({
           ...item,
           date: today,
           invoice_number,
         }));
-  
+
         const formattedOldItems = oldItemsDetails.map((item) => ({
           ...item,
           date: today,
           invoice_number,
         }));
-  
+
         // Combine and store updated details
         const updatedRepairDetails = [...existingDetails, ...formattedRepairDetails];
         const updatedOldItems = [...existingOldItems, ...formattedOldItems];
-  
+
         localStorage.setItem('repairDetails', JSON.stringify(updatedRepairDetails));
         localStorage.setItem('oldTableData', JSON.stringify(updatedOldItems));
-  
-        console.log('Updated repair details added to localStorage:', updatedRepairDetails);
-        console.log('Updated old items details added to localStorage:', updatedOldItems);
-  
+        // **Set discount percentage in localStorage**
+        if (updatedRepairDetails.length > 0 && updatedRepairDetails[0].disscount_percentage) {
+          localStorage.setItem('discount', updatedRepairDetails[0].disscount_percentage);
+         
+        }
+
         // Navigate to the sales page
         navigate('/sales', {
           state: {
@@ -294,7 +310,7 @@ const RepairsTable = () => {
             repairDetails: updatedRepairDetails, // Ensure the repair details are passed
           },
         });
-  
+
         // Call handleDelete without confirmation
         await handleDelete(invoice_number, true, true);
       } catch (error) {
@@ -305,10 +321,6 @@ const RepairsTable = () => {
       Swal.fire('Cancelled', 'Edit operation was cancelled.', 'info');
     }
   };
-  
-  
-  
-
 
   const handleDelete = async (invoiceNumber, skipConfirmation = false, skipMessage = false) => {
     if (skipConfirmation) {
@@ -494,51 +506,51 @@ const RepairsTable = () => {
 
               <h5>Products</h5>
               <div className="table-responsive">
-              <Table bordered>
-                <thead style={{whiteSpace:'nowrap'}}>
-                  <tr>
-                    <th>Bar Code</th>
-                    <th>Product Name</th>
-                    <th>Metal</th>
-                    <th>Purity</th>
-                    <th>Gross Wt</th>
-                    <th>Stone Wt</th>
-                    <th>W.Wt</th>
-                    <th>Total Wt</th>
-                    <th>MC</th>
-                    <th>Rate</th>
-                    <th>Tax Amt</th>
-                    <th>Status</th>
-                    <th>Total Price</th>  
-                  </tr>
-                </thead>
-                <tbody style={{whiteSpace:'nowrap'}}>
-                  {repairDetails.repeatedData.map((product, index) => (
-                    <tr key={index}>
-                      <td>{product.code}</td>
-                      <td>{product.product_name}</td>
-                      <td>{product.metal_type}</td>
-                      <td>{product.purity}</td>
-                      <td>{product.gross_weight}</td>
-                      <td>{product.stone_weight}</td>
-                      <td>{product.wastage_weight}</td>
-                      <td>{product.total_weight_av}</td>
-                      <td>{product.making_charges}</td>
-                      <td>{product.rate}</td>
-                      <td>{product.tax_amt}</td>
-                      <td>{product.transaction_status}</td>
-                      <td>{product.total_price}</td>
-                      
+                <Table bordered>
+                  <thead style={{ whiteSpace: 'nowrap' }}>
+                    <tr>
+                      <th>Bar Code</th>
+                      <th>Product Name</th>
+                      <th>Metal</th>
+                      <th>Purity</th>
+                      <th>Gross Wt</th>
+                      <th>Stone Wt</th>
+                      <th>W.Wt</th>
+                      <th>Total Wt</th>
+                      <th>MC</th>
+                      <th>Rate</th>
+                      <th>Tax Amt</th>
+                      <th>Status</th>
+                      <th>Total Price</th>
                     </tr>
-                  ))}
-                  <tr style={{ fontWeight: 'bold' }}>
-                    <td colSpan="12" className="text-end">
-                      Total Amount
-                    </td>
-                    <td>{repairDetails.uniqueData.net_amount}</td>
-                  </tr>
-                </tbody>
-              </Table>
+                  </thead>
+                  <tbody style={{ whiteSpace: 'nowrap' }}>
+                    {repairDetails.repeatedData.map((product, index) => (
+                      <tr key={index}>
+                        <td>{product.code}</td>
+                        <td>{product.product_name}</td>
+                        <td>{product.metal_type}</td>
+                        <td>{product.purity}</td>
+                        <td>{product.gross_weight}</td>
+                        <td>{product.stone_weight}</td>
+                        <td>{product.wastage_weight}</td>
+                        <td>{product.total_weight_av}</td>
+                        <td>{product.making_charges}</td>
+                        <td>{product.rate}</td>
+                        <td>{product.tax_amt}</td>
+                        <td>{product.transaction_status}</td>
+                        <td>{product.total_price}</td>
+
+                      </tr>
+                    ))}
+                    <tr style={{ fontWeight: 'bold' }}>
+                      <td colSpan="12" className="text-end">
+                        Total Amount
+                      </td>
+                      <td>{repairDetails.uniqueData.net_amount}</td>
+                    </tr>
+                  </tbody>
+                </Table>
               </div>
             </>
           )}

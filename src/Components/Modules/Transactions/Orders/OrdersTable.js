@@ -444,8 +444,6 @@ const RepairsTable = () => {
   const handleEdit = async (
     order_number,
     mobile,
-    scheme_amt,
-    old_exchange_amt,
     cash_amount,
     card_amt,
     chq_amt,

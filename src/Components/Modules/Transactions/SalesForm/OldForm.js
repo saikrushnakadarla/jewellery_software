@@ -85,36 +85,9 @@ const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
     }
   }, [oldDetails.metal]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+
   
-    setOldDetails((prevDetails) => {
-      const updatedDetails = { ...prevDetails, [name]: value };
   
-      if (name === "metal") {
-        updatedDetails.purity = ""; // Reset purity when metal changes
-        updatedDetails.purityPercentage = ""; // Reset purity percentage
-        if (value === "Silver") {
-          updatedDetails.rate = rates.rate_silver || "0.00";
-        } else {
-          updatedDetails.rate = "";
-        }
-      }
-  
-      if (name === "purity") {
-        if (value !== "Manual") {
-          const selectedOption = purityOptions.find(option => option.name === value);
-          updatedDetails.purityPercentage = selectedOption ? selectedOption.purity_percentage : 0;
-        } else {
-          updatedDetails.purityPercentage = 0;
-        }
-      } else if (name === "purityPercentage") {
-        updatedDetails.purityPercentage = parseFloat(value);
-      }
-  
-      return updatedDetails;
-    });
-  };
   
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -135,42 +108,45 @@ const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
     fetchCurrentRates();
   }, []);
 
-  useEffect(() => {
-    const fetchAndFilterPurity = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/purity`);
-        console.log("Fetched Purity Options:", response.data);
+useEffect(() => {
+  const fetchAndFilterPurity = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/purity`);
+      const allPurityOptions = response.data;
 
-        const allPurityOptions = response.data;
+      const filteredPurityOptions = allPurityOptions.filter(
+        (option) => option.metal.toLowerCase() === oldDetails.metal.toLowerCase()
+      );
 
-        const filteredPurityOptions = allPurityOptions.filter(
-          (option) => option.metal.toLowerCase() === oldDetails.metal.toLowerCase()
-        );
+      const defaultPurityOption = filteredPurityOptions.find((option) =>
+        option.name.toLowerCase().replace(/\s/g, "").includes("22k")
+      );
 
-        console.log("Filtered Purity Options:", filteredPurityOptions);
+      setPurityOptions(filteredPurityOptions);
 
-        const defaultPurityOption = filteredPurityOptions.find(option =>
-          option.name.toLowerCase().replace(/\s/g, "").includes("22k")
-        );
-
-        console.log("Default Selected Purity:", defaultPurityOption);
-
-        setPurityOptions(filteredPurityOptions);
-
-        setOldDetails((prevDetails) => ({
+      setOldDetails((prevDetails) => {
+        const updatedDetails = {
           ...prevDetails,
           purity: defaultPurityOption?.name || "",
-          purityPercentage: defaultPurityOption?.purity_percentage || 0, // Store purity_percentage
-        }));
-      } catch (error) {
-        console.error("Error fetching purity options:", error);
-      }
-    };
+          purityPercentage: defaultPurityOption?.purity_percentage || 0,
+        };
 
-    if (oldDetails.metal) {
-      fetchAndFilterPurity();
+        // **Ensure calculations happen immediately after purity change**
+        updatedDetails.net_wt = calculateNetWeight(updatedDetails);
+        updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
+
+        return updatedDetails;
+      });
+    } catch (error) {
+      console.error("Error fetching purity options:", error);
     }
-  }, [oldDetails.metal]);
+  };
+
+  if (oldDetails.metal) {
+    fetchAndFilterPurity();
+  }
+}, [oldDetails.metal]);
+
 
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
 
@@ -211,22 +187,59 @@ const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
   }, [oldDetails.purity, oldDetails.metal, rates]);
   
 
-  const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
+  const calculateNetWeight = ({ gross, dust, purityPercentage, ml_percent }) => {
     const purityPercentageValue = parseFloat(purityPercentage) || 0;
     const grossWeight = parseFloat(gross) || 0;
     const dustWeight = parseFloat(dust) || 0;
     const mlPercentValue = parseFloat(ml_percent) || 0;
   
     const netWeight = ((grossWeight - dustWeight) * (purityPercentageValue - mlPercentValue)) / 100;
-    return parseFloat(netWeight.toFixed(2));
+    return parseFloat(netWeight.toFixed(3)); // Set to three decimal places
   };
   
+
   const calculateTotalAmount = ({ net_wt, rate }) => {
     const netWeight = Number(net_wt) || 0;
     const rateAmount = Number(rate) || 0;
   
     const totalAmount = netWeight * rateAmount;
     return Number(totalAmount.toFixed(2));
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+  
+    setOldDetails((prevDetails) => {
+      const updatedDetails = { ...prevDetails, [name]: value };
+  
+      if (name === "metal") {
+        updatedDetails.purity = "";
+        updatedDetails.purityPercentage = "";
+  
+        if (value === "Silver") {
+          updatedDetails.rate = rates.rate_silver || "0.00";
+        } else {
+          updatedDetails.rate = "";
+        }
+      }
+  
+      if (name === "purity") {
+        if (value !== "Manual") {
+          const selectedOption = purityOptions.find((option) => option.name === value);
+          updatedDetails.purityPercentage = selectedOption ? selectedOption.purity_percentage : 0;
+        } else {
+          updatedDetails.purityPercentage = 0;
+        }
+      } else if (name === "purityPercentage") {
+        updatedDetails.purityPercentage = parseFloat(value) || 0;
+      }
+  
+      // **Update net weight and total amount immediately**
+      updatedDetails.net_wt = calculateNetWeight(updatedDetails);
+      updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
+  
+      return updatedDetails;
+    });
   };
 
   const handleEdit = (data, index) => {
@@ -349,7 +362,7 @@ const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
           <InputField
             label="Net Wt"
             name="net_wt"
-            value={isNaN(oldDetails.net_wt) || oldDetails.net_wt === "" ? "0.00" : Number(oldDetails.net_wt).toFixed(2)}
+            value={isNaN(oldDetails.net_wt) || oldDetails.net_wt === "" ? "0.00" : Number(oldDetails.net_wt).toFixed(3)}
             onChange={handleInputChange}
           />
         </Col>

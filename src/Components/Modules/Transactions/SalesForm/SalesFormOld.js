@@ -44,16 +44,16 @@ const SalesForm = () => {
   const [repairDetails, setRepairDetails] = useState(
     JSON.parse(localStorage.getItem('repairDetails')) || []
   );
-  // const [paymentDetails, setPaymentDetails] = useState(
-  //   JSON.parse(localStorage.getItem('paymentDetails')) || {
-  //     cash_amount: 0,
-  //     card_amt: 0,
-  //     chq: "",
-  //     chq_amt: 0,
-  //     online: "",
-  //     online_amt: 0,
-  //   }
-  // );
+  const [paymentDetails, setPaymentDetails] = useState(
+    JSON.parse(localStorage.getItem('paymentDetails')) || {
+      cash_amount: 0,
+      card_amt: 0,
+      chq: "",
+      chq_amt: 0,
+      online: "",
+      online_amt: 0,
+    }
+  );
 
   const {
     formData,
@@ -81,12 +81,6 @@ const SalesForm = () => {
     image,
     fileInputRef,
     clearImage,
-    captureImage,
-    setShowWebcam,
-    showWebcam,
-    webcamRef,
-    setShowOptions,
-    showOptions,
   } = useProductHandlers();
 
 
@@ -132,9 +126,9 @@ const SalesForm = () => {
     localStorage.setItem('repairDetails', JSON.stringify(repairDetails));
   }, [repairDetails]);
 
-  // useEffect(() => {
-  //   localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
-  // }, [paymentDetails]);
+  useEffect(() => {
+    localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
+  }, [paymentDetails]);
 
   const [selectedMobile, setSelectedMobile] = useState("");
   const [uniqueInvoice, setUniqueInvoice] = useState([]);
@@ -275,48 +269,45 @@ const SalesForm = () => {
   };
 
   const [editIndex, setEditIndex] = useState(null);
-  const [discount, setDiscount] = useState(() => {
-    return parseFloat(localStorage.getItem("discount")) || 0; // Load discount from localStorage
-  });
+  const [discount, setDiscount] = useState();
 
-  useEffect(() => {
-    localStorage.setItem("discount", discount); // Save to localStorage when discount changes
-  }, [discount]);
 
   const handleDiscountChange = (e) => {
     const discountValue = parseFloat(e.target.value) || 0; // Default to 0 if empty or NaN
-    if (discountValue > 15) {
-      alert("Discount cannot be greater than 15%");
-      return; // Prevent further execution
-    }
     setDiscount(discountValue);
 
-    const storedRepairDetails = JSON.parse(localStorage.getItem("repairDetails")) || [];
+    const storedRepairDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
 
     const updatedRepairDetails = storedRepairDetails.map((item) => {
-      const makingCharges = parseFloat(item.making_charges) || 0;
+      const makingCharges = parseFloat(item.making_charges) || 0; // Default to 0 if NaN
       const calculatedDiscount = (makingCharges * discountValue) / 100;
 
+      // Ensure `total_price` is a valid number
       const previousTotalPrice = parseFloat(item.total_price) || 0;
+
+      // Store original total price if not already stored
       const originalTotalPrice = item.original_total_price
         ? parseFloat(item.original_total_price)
         : previousTotalPrice;
 
+      // Calculate the updated total price after applying the discount
       const updatedTotalPrice = originalTotalPrice - calculatedDiscount;
 
       return {
         ...item,
-        original_total_price: originalTotalPrice.toFixed(2),
-        disscount: calculatedDiscount.toFixed(2),
+        original_total_price: originalTotalPrice.toFixed(2), // Store original price
+        disscount: calculatedDiscount.toFixed(2), // Corrected spelling
         disscount_percentage: discountValue,
-        total_price: updatedTotalPrice.toFixed(2),
+        total_price: updatedTotalPrice.toFixed(2) // Update total price
       };
     });
 
+    // Update both state and localStorage
     setRepairDetails(updatedRepairDetails);
-    localStorage.setItem("repairDetails", JSON.stringify(updatedRepairDetails));
-  };
+    localStorage.setItem('repairDetails', JSON.stringify(updatedRepairDetails));
 
+    console.log("Updated Repair Details:", updatedRepairDetails);
+  };
 
   const handleAdd = () => {
     const storedRepairDetails = JSON.parse(localStorage.getItem("repairDetails")) || [];
@@ -426,11 +417,10 @@ const SalesForm = () => {
       pricing: "",
       tax_percent: "",
       tax_amt: "",
-      hm_charges: "60.00",
+      hm_charges:"60.00",
       total_price: "",
       qty: "",
       imagePreview: null,
-      remarks: "",
     }));
   };
 
@@ -614,29 +604,6 @@ const SalesForm = () => {
   }, 0);
 
   const salesNetAmount = salesTaxableAmount + salesTaxAmount;
-  const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
-  const netPayAmount = netPayableAmount - salesNetAmount
-
-  const [paymentDetails, setPaymentDetails] = useState({
-    cash_amount: "", // Fix to two decimal places
-    card_amt: "",
-    chq_amt: "",
-    online_amt: "",
-  });
-
-
-  // Save payment details to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
-  }, [paymentDetails]);
-
-  useEffect(() => {
-    // Retrieve payment details from localStorage on component mount
-    const storedPaymentDetails = localStorage.getItem('paymentDetails');
-    if (storedPaymentDetails) {
-      setPaymentDetails(JSON.parse(storedPaymentDetails));
-    }
-  }, []);
 
   const clearData = () => {
     setOldSalesData([]);
@@ -652,14 +619,13 @@ const SalesForm = () => {
     });
     setOldTableData([]); // Clear the oldTableData state
     setSchemeTableData([])
-    setDiscount(0);
     localStorage.removeItem('oldSalesData');
     localStorage.removeItem('schemeSalesData');
     localStorage.removeItem('repairDetails');
     localStorage.removeItem('paymentDetails');
     localStorage.removeItem('oldTableData'); // Explicitly remove oldTableData from local storage
     localStorage.removeItem('schemeTableData'); // Explicitly remove oldTableData from local storage
-    localStorage.removeItem("discount");
+
     console.log("Data cleared successfully");
   };
 
@@ -686,10 +652,12 @@ const SalesForm = () => {
         pan_card: formData.pan_card,
         terms: formData.terms,
         cash_amount: paymentDetails.cash_amount || 0,
+        card_amount: paymentDetails.card || 0,
         card_amt: paymentDetails.card_amt || 0,
+        chq: paymentDetails.chq || "",
         chq_amt: paymentDetails.chq_amt || 0,
+        online: paymentDetails.online || "",
         online_amt: paymentDetails.online_amt || 0,
-
       })),
       oldItems: oldSalesData,
       memberSchemes: schemeSalesData,
@@ -805,12 +773,6 @@ const SalesForm = () => {
               image={image}
               fileInputRef={fileInputRef}
               clearImage={clearImage}
-              captureImage={captureImage}
-              setShowWebcam={setShowWebcam}
-              showWebcam={showWebcam}
-              webcamRef={webcamRef}
-              setShowOptions={webcamRef}
-              showOptions={webcamRef}
             />
           </div>
 
@@ -846,7 +808,6 @@ const SalesForm = () => {
                 salesTaxableAmount={salesTaxableAmount}
                 salesTaxAmount={salesTaxAmount}
                 salesNetAmount={salesNetAmount}
-
                 repairDetails={repairDetails}
                 resetSaleReturnForm={resetSaleReturnForm}
                 handleCheckout={handleCheckout}
@@ -870,8 +831,6 @@ const SalesForm = () => {
                 schemeAmount={schemeAmount}
                 netPayableAmount={netPayableAmount}
                 salesNetAmount={salesNetAmount}
-                updatedOldItemsAmount={updatedOldItemsAmount}
-                netPayAmount={netPayAmount}
                 oldSalesData={oldSalesData} schemeSalesData={schemeSalesData}
                 discount={discount}
                 handleDiscountChange={handleDiscountChange}

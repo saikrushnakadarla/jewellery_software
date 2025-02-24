@@ -1,5 +1,6 @@
-import React from "react";
-import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
+import React, { useEffect, useState } from "react";
+import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
+import QRCode from "qrcode";
 
 const styles = StyleSheet.create({
   page: {
@@ -76,16 +77,36 @@ const styles = StyleSheet.create({
     paddingBottom: 3,
 
   },
+  qrCodeContainer: {
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  qrCode: {
+    width: 100,
+    height: 100,
+  },
 });
 
 const PDFContent = ({ formData }) => {
   const currentTime = new Date().toLocaleTimeString();
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
 
-  // Safely handle formData properties
-  const invoiceNumbers = Array.isArray(formData.invoice_number) ? formData.invoice_number : [];
-  const totalAmounts = Array.isArray(formData.total_amt) ? formData.total_amt : [];
-  const discountAmounts = Array.isArray(formData.discount_amt) ? formData.discount_amt : [];
-  const balanceAmounts = Array.isArray(formData.balanceAmt) ? formData.balanceAmt : [];
+  useEffect(() => {
+    const generateQRCode = async () => {
+      try {
+        const qrCodeDataUrl = await QRCode.toDataURL(formData[0]?.receipt_no || "", {
+          width: 100,
+          margin: 2,
+        });
+        setQrCodeUrl(qrCodeDataUrl);
+      } catch (err) {
+        console.error("Error generating QR code:", err);
+      }
+    };
+
+    generateQRCode();
+  }, [formData]);
 
   return (
     <Document>
@@ -114,25 +135,28 @@ const PDFContent = ({ formData }) => {
           <Text style={[styles.tableCell, styles.paidAmt]}>Bal Amt</Text>
         </View>
 
-         {/* Table Rows */}
-      {[1].map((item, index) => (
-        <View style={styles.tableRow} key={index}>
-          <Text style={[styles.tableCell, styles.sno]}>{item}</Text>
-          <Text style={[styles.tableCell, styles.inv]}>{formData.invoice_number}</Text>
+        {/* Table Rows */}
+        {[1].map((item, index) => (
+          <View style={styles.tableRow} key={index}>
+            <Text style={[styles.tableCell, styles.sno]}>{item}</Text>
+            <Text style={[styles.tableCell, styles.inv]}>{formData.invoice_number}</Text>
+            <Text style={[styles.tableCell, styles.totalAmt]}>{formData.total_amt}</Text>
+            <Text style={[styles.tableCell, styles.balanceAmt]}>{formData.discount_amt}</Text>
+            <Text style={[styles.tableCell, styles.paidAmt]}>{formData.cash_amt}</Text>
+          </View>
+        ))}
+
+        {/* Footer Row */}
+        <View style={styles.footerRow}>
+          <Text style={[styles.tableCell, styles.sno]}></Text>
+          <Text style={[styles.tableCell, styles.inv]}>Total</Text>
           <Text style={[styles.tableCell, styles.totalAmt]}>{formData.total_amt}</Text>
           <Text style={[styles.tableCell, styles.balanceAmt]}>{formData.discount_amt}</Text>
           <Text style={[styles.tableCell, styles.paidAmt]}>{formData.cash_amt}</Text>
         </View>
-      ))}
-
-      {/* Footer Row */}
-      <View style={styles.footerRow}>
-        <Text style={[styles.tableCell, styles.sno]}></Text>
-        <Text style={[styles.tableCell, styles.inv]}>Total</Text>
-        <Text style={[styles.tableCell, styles.totalAmt]}>{formData.total_amt}</Text>
-        <Text style={[styles.tableCell, styles.balanceAmt]}>{formData.discount_amt}</Text>
-        <Text style={[styles.tableCell, styles.paidAmt]}>{formData.cash_amt}</Text>
-      </View>
+        <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+          {qrCodeUrl && <Image style={styles.qrCode} src={qrCodeUrl} />}
+        </View>
       </Page>
     </Document>
   );

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Col, Row, Button } from 'react-bootstrap';
+import { Col, Row, Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import InputField from './../../../Pages/InputField/InputField';
 import axios from 'axios';
 import baseURL from "../../../../Url/NodeBaseURL";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash, FaCamera, FaUpload } from "react-icons/fa";
+import Webcam from "react-webcam";
 
 const ProductDetails = ({
   handleAdd,
@@ -15,6 +16,12 @@ const ProductDetails = ({
   handleImageChange,
   fileInputRef,
   clearImage,
+  captureImage,
+  setShowWebcam,
+  showWebcam,
+  webcamRef,
+  setShowOptions,
+  showOptions,
   handleBarcodeChange,
   handleProductNameChange,
   handleMetalTypeChange,
@@ -198,6 +205,14 @@ const ProductDetails = ({
             </Col>
             <Col xs={12} md={2}>
               <InputField
+                label="Remarks"
+                name="remarks"
+                value={formData.remarks}
+                onChange={handleChange}
+              />
+            </Col>
+            {/* <Col xs={12} md={2}>
+              <InputField
                 label="Upload Image"
                 name="image"
                 type="file"
@@ -215,6 +230,88 @@ const ProductDetails = ({
                       height: "100px",
                       marginTop: "10px",
                       borderRadius: "8px", // Optional: add rounded corners to the image
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      right: "5px",
+                      background: "transparent",
+                      border: "none",
+                      color: "red",
+                      fontSize: "16px",
+                      cursor: "pointer",
+                      zIndex: 10,
+                    }}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              )}
+            </Col> */}
+            <Col xs={12} md={2}>
+              <DropdownButton
+                id="dropdown-basic-button"
+                title="Choose / Capture Image"
+                variant="primary"
+                size="sm"
+                onClick={() => setShowOptions(!showOptions)}
+              >
+                {showOptions && (
+                  <>
+                    <Dropdown.Item
+                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                    >
+                      <FaUpload /> Choose Image
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => setShowWebcam(true)}>
+                      <FaCamera /> Capture Image
+                    </Dropdown.Item>
+                  </>
+                )}
+              </DropdownButton>
+
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+              />
+
+              {/* Webcam Section */}
+              {showWebcam && (
+                <div>
+                  <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    width={150}
+                    height={150}
+                  />
+                  <Button variant="success" size="sm" onClick={captureImage} style={{ marginRight: "5px" }}>
+                    Capture
+                  </Button>
+                  <Button variant="secondary" size="sm" onClick={() => setShowWebcam(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              )}
+              {/* Image Preview */}
+              {formData.imagePreview && (
+                <div style={{ position: "relative", display: "inline-block", marginTop: "10px" }}>
+                  <img
+                    src={formData.imagePreview}
+                    alt="Selected"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      borderRadius: "8px",
                     }}
                   />
                   <button
@@ -446,6 +543,14 @@ const ProductDetails = ({
             </Col>
             <Col xs={12} md={2}>
               <InputField
+                label="Remarks"
+                name="remarks"
+                value={formData.remarks}
+                onChange={handleChange}
+              />
+            </Col>
+            {/* <Col xs={12} md={2}>
+              <InputField
                 label="Upload Image"
                 name="image"
                 type="file"
@@ -463,6 +568,88 @@ const ProductDetails = ({
                       height: "100px",
                       marginTop: "10px",
                       borderRadius: "8px", // Optional: add rounded corners to the image
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      right: "5px",
+                      background: "transparent",
+                      border: "none",
+                      color: "red",
+                      fontSize: "16px",
+                      cursor: "pointer",
+                      zIndex: 10,
+                    }}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              )}
+            </Col> */}
+            <Col xs={12} md={2}>
+              <DropdownButton
+                id="dropdown-basic-button"
+                title="Choose / Capture Image"
+                variant="primary"
+                size="sm"
+                onClick={() => setShowOptions(!showOptions)}
+              >
+                {showOptions && (
+                  <>
+                    <Dropdown.Item
+                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                    >
+                      <FaUpload /> Choose Image
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => setShowWebcam(true)}>
+                      <FaCamera /> Capture Image
+                    </Dropdown.Item>
+                  </>
+                )}
+              </DropdownButton>
+
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+              />
+
+              {/* Webcam Section */}
+              {showWebcam && (
+                <div>
+                  <Webcam
+                    audio={false}
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    width={150}
+                    height={150}
+                  />
+                  <Button variant="success" size="sm" onClick={captureImage} style={{ marginRight: "5px" }}>
+                    Capture
+                  </Button>
+                  <Button variant="secondary" size="sm" onClick={() => setShowWebcam(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              )}
+              {/* Image Preview */}
+              {formData.imagePreview && (
+                <div style={{ position: "relative", display: "inline-block", marginTop: "10px" }}>
+                  <img
+                    src={formData.imagePreview}
+                    alt="Selected"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      borderRadius: "8px",
                     }}
                   />
                   <button

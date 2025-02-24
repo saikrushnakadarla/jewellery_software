@@ -9,9 +9,11 @@ import { useNavigate } from 'react-router-dom';
 import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import PDFContent from "./EstimateReceipt";
+import { useLocation } from "react-router-dom";
 
 const RepairForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const today = new Date().toISOString().split("T")[0];
   const initialFormData = {
     date: today,
@@ -45,7 +47,7 @@ const RepairForm = () => {
     hm_charges: "60.00",
     total_rs: "",
     total_amount: "0.00",
-    pricing:"By Weight"
+    pricing: "By Weight"
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -459,7 +461,7 @@ const RepairForm = () => {
           hm_charges: "60.00",
           total_price: "",
           qty: "", // Reset qty
-          pricing:"By Weight"
+          pricing: "By Weight"
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
@@ -497,7 +499,7 @@ const RepairForm = () => {
           total_mc: "",
           tax_percent: product.tax_slab,
           qty: 1, // Set qty to 1 for product
-          pricing:"By Weight"
+          pricing: "By Weight"
         }));
         setIsQtyEditable(true); // Set qty as read-only
       } else {
@@ -531,7 +533,7 @@ const RepairForm = () => {
             total_mc: tag.Making_Charges || "",
             tax_percent: productDetails?.tax_slab || "",
             qty: 1, // Allow qty to be editable for tag
-            pricing:tag.Pricing || ""
+            pricing: tag.Pricing || ""
           }));
           setIsQtyEditable(false); // Allow editing of qty
         } else {
@@ -564,7 +566,7 @@ const RepairForm = () => {
             hm_charges: "60.00",
             total_price: "",
             qty: "", // Reset qty
-            pricing:"By Weight"
+            pricing: "By Weight"
           }));
           setIsQtyEditable(true); // Default to editable
         }
@@ -575,26 +577,30 @@ const RepairForm = () => {
   };
 
   const handleAdd = () => {
+    let updatedEntries;
     if (isEditing) {
-      // Update the entry being edited
-      const updatedEntries = entries.map((entry, index) =>
+      updatedEntries = entries.map((entry, index) =>
         index === editIndex ? formData : entry
       );
-      setEntries(updatedEntries);
       setIsEditing(false);
       setEditIndex(null);
     } else {
-      // Add new entry
-      setEntries([...entries, formData]);
+      updatedEntries = [...entries, formData];
     }
-
-    // Reset the form data
+    setEntries(updatedEntries);
+    localStorage.setItem("estimateDetails", JSON.stringify(updatedEntries));
     setFormData((prev) => ({
       ...initialFormData,
       date: today,
       estimate_number: prev.estimate_number,
     }));
   };
+
+  useEffect(() => {
+    const storedEntries = JSON.parse(localStorage.getItem("estimateDetails")) || [];
+    setEntries(storedEntries);
+  }, []);
+
 
   const handleEdit = (index) => {
     setFormData(entries[index]);
@@ -603,31 +609,99 @@ const RepairForm = () => {
   };
 
   const handleDelete = (index) => {
-    const updatedEntries = entries.filter((_, i) => i !== index);
-    setEntries(updatedEntries);
+    if (window.confirm("Are you sure you want to delete this entry?")) {
+      const updatedEntries = entries.filter((_, i) => i !== index);
+      setEntries(updatedEntries);
+      localStorage.setItem("estimateDetails", JSON.stringify(updatedEntries));
+      alert("Entry deleted successfully!");
+    }
   };
+
+  const [discount, setDiscount] = useState(() => {
+    return parseFloat(localStorage.getItem("estimateDiscount")) || 0; // Load discount from localStorage
+  });
+
+  useEffect(() => {
+    localStorage.setItem("estimateDiscount", discount); // Save to localStorage when discount changes
+  }, [discount]);
+
+  const handleDiscountChange = (e) => {
+    const discountValue = parseFloat(e.target.value) || 0; // Default to 0 if empty or NaN
+  
+    if (discountValue > 15) {
+      alert("Discount cannot be greater than 15%");
+      return; // Prevent further execution
+    }
+  
+    setDiscount(discountValue);
+  
+    const storedEstimateDetails = JSON.parse(localStorage.getItem("estimateDetails")) || [];
+  
+    const updatedEstimateDetails = storedEstimateDetails.map((item) => {
+      const makingCharges = parseFloat(item.total_mc) || 0;
+      const calculatedDiscount = (makingCharges * discountValue) / 100;
+  
+      // Preserve original_total_rs when applying discount for the first time
+      const originalTotalPrice = item.original_total_rs
+        ? parseFloat(item.original_total_rs) // Ensure we're using the correct stored original value
+        : parseFloat(item.total_rs) || 0;
+  
+      // If discount is cleared (0%), reset total_rs to original_total_rs
+      const updatedTotalPrice = discountValue === 0 ? originalTotalPrice : originalTotalPrice - calculatedDiscount;
+  
+      return {
+        ...item,
+        original_total_rs: originalTotalPrice.toFixed(2), // Ensure original value is stored
+        disscount: calculatedDiscount.toFixed(2),
+        disscount_percentage: discountValue,
+        total_rs: updatedTotalPrice.toFixed(2),
+      };
+    });
+  
+    setEntries(updatedEstimateDetails);
+    localStorage.setItem("estimateDetails", JSON.stringify(updatedEstimateDetails));
+  };
+  
+
 
   const handlePrint = async () => {
     try {
-      const totalAmount = entries.reduce(
-        (sum, entry) => sum + parseFloat(entry.total_rs || 0),
-        0
-      ).toFixed(2);
+      // Calculate total values
+      const totalAmount = entries.reduce((sum, item) => {
+        const stonePrice = parseFloat(item.stones_price) || 0;
+        const makingCharges = parseFloat(item.total_mc) || 0;
+        const rateAmt = parseFloat(item.rate_amt) || 0;
+        const hmCharges = parseFloat(item.hm_charges) || 0;
+        return sum + stonePrice + makingCharges + rateAmt + hmCharges;
+      }, 0);
 
+      const discountAmt = entries.reduce((sum, item) => sum + (parseFloat(item.disscount) || 0), 0);
+      const taxableAmount = totalAmount - discountAmt;
+      const taxAmount = entries.reduce((sum, item) => sum + (parseFloat(item.tax_vat_amount) || 0), 0);
+      const netAmount = taxableAmount + taxAmount;
+
+      // Save to database
       await Promise.all(
         entries.map((entry) => {
           const requestData = {
             ...entry,
-            total_amount: totalAmount,
+            total_amount: totalAmount.toFixed(2),
+            taxable_amount: taxableAmount.toFixed(2),
+            tax_amount: taxAmount.toFixed(2),
+            net_amount: netAmount.toFixed(2),
           };
           return axios.post(`${baseURL}/add/estimate`, requestData);
         })
       );
 
+      // Generate PDF
       const pdfDoc = pdf(
         <PDFContent
           entries={entries}
-          totalAmount={totalAmount}
+          totalAmount={totalAmount.toFixed(2)}
+          taxableAmount={taxableAmount.toFixed(2)}
+          taxAmount={taxAmount.toFixed(2)}
+          netAmount={netAmount.toFixed(2)}
           date={today}
           estimateNumber="02" // Replace with dynamic estimate number
           sellerName="Sadashri Jewels"
@@ -638,14 +712,20 @@ const RepairForm = () => {
       saveAs(blob, `estimate_${formData.estimate_number}.pdf`);
 
       alert("Estimates saved successfully!");
+
+      // Clear localStorage and reset state
+      localStorage.removeItem("estimateDetails"); // <-- Remove from localStorage
+      localStorage.removeItem("estimateDiscount"); // <-- Remove from localStorage
       setEntries([]);
       setFormData(initialFormData);
+
       navigate("/estimatetable");
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to save or generate PDF. Please try again.");
     }
   };
+
 
 
   useEffect(() => {
@@ -764,6 +844,7 @@ const RepairForm = () => {
     const hmCharges = parseFloat(formData.hm_charges) || 0;
 
     // Ensure discount is subtracted before tax calculation
+    const totalAmount = rateAmt + stonesPrice + totalMC + hmCharges;
     const taxableAmount = rateAmt + stonesPrice + totalMC + hmCharges - discountAmt;
     const taxAmt = (taxableAmount * taxPercent) / 100;
 
@@ -827,9 +908,39 @@ const RepairForm = () => {
     if (!formData.code && defaultBarcode) {
       handleBarcodeChange(defaultBarcode);
     }
-  }, [formData.category, defaultBarcode]); 
+  }, [formData.category, defaultBarcode]);
 
   const isByFixed = formData.pricing === "By fixed";
+
+  const totalAmount = entries.reduce((sum, item) => {
+    const stonePrice = parseFloat(item.stones_price) || 0;
+    const makingCharges = parseFloat(item.total_mc) || 0;
+    const rateAmt = parseFloat(item.rate_amt) || 0;
+    const hmCharges = parseFloat(item.hm_charges) || 0;
+    return sum + stonePrice + makingCharges + rateAmt + hmCharges;
+  }, 0);
+
+  const discountAmt = entries.reduce((sum, item) => {
+    const discountAmt = parseFloat(item.disscount) || 0;
+    return sum + discountAmt;
+  }, 0);
+
+  const taxableAmount = totalAmount - discountAmt;
+  const taxAmount = entries.reduce((sum, item) => sum + parseFloat(item.tax_vat_amount || 0), 0);
+  const netAmount = taxableAmount + taxAmount;
+
+
+  // Update formData.estimate_number from location.state
+  useEffect(() => {
+    if (location.state?.estimate_number && formData.estimate_number !== location.state.estimate_number) {
+      console.log("Received Estimate Number from navigation:", location.state.estimate_number);
+      setFormData((prev) => ({
+        ...prev,
+        estimate_number: location.state.estimate_number,
+      }));
+    }
+  }, [location.state, formData.estimate_number, setFormData]);
+
 
 
   return (
@@ -837,8 +948,6 @@ const RepairForm = () => {
       <Container className="estimate-form-container">
         <Row className="estimate-form-section">
           <h2>Estimate</h2>
-
-          {/* First Row with Date and Estimate Number */}
           <Row className="d-flex justify-content-end align-items-center mb-3" style={{ marginLeft: '9px', marginTop: '-60px' }}>
             <Col xs={12} md={2}>
               <InputField
@@ -846,6 +955,7 @@ const RepairForm = () => {
                 name="date"
                 value={formData.date}
                 type="date"
+                max={new Date().toISOString().split("T")[0]}
                 onChange={handleInputChange}
               />
             </Col>
@@ -903,6 +1013,7 @@ const RepairForm = () => {
               options={subcategoryOptions}
             />
           </Col>
+
           <Col xs={12} md={2}>
             <InputField
               label="Product Design Name"
@@ -932,183 +1043,181 @@ const RepairForm = () => {
             />
           </Col>
           {isByFixed ? (
-          // If Pricing is "By fixed", show only these fields:
-          <>
-            <Col xs={12} md={1}>
-              <InputField
-                label="Piece Cost"
-                name="pieace_cost"
-                value={formData.pieace_cost}
-                onChange={handleInputChange}
-              />
-            </Col>
-            <Col xs={12} md={1}>
-              <InputField
-                label="Amount"
-                name="rate_amt"
-                value={formData.rate_amt || "0.00"} 
-                onChange={handleInputChange} 
-                readOnly={false} 
-              />
-            </Col>
-            <Col xs={12} md={1}>
-              <InputField
-                label="Qty"
-                name="qty"
-                value={formData.qty}
-                onChange={handleInputChange}
-                readOnly={!isQtyEditable}
-              />
-            </Col>
-            <Col xs={12} md={1}>
-            <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
-          </Col>
+            <>
+              <Col xs={12} md={1}>
+                <InputField
+                  label="Piece Cost"
+                  name="pieace_cost"
+                  value={formData.pieace_cost}
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField
+                  label="Amount"
+                  name="rate_amt"
+                  value={formData.rate_amt || "0.00"}
+                  onChange={handleInputChange}
+                  readOnly={false}
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField
+                  label="Qty"
+                  name="qty"
+                  value={formData.qty}
+                  onChange={handleInputChange}
+                  readOnly={!isQtyEditable}
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Tax Amt" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField label="Total Price" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
+              </Col>
+            </>
+          ) : (
+            // Otherwise (if Pricing is not "By fixed"), show all fields:
+            <>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Purity"
+                  name="purity"
+                  value={formData.purity || ""}
+                  onChange={handleInputChange}
+                  type="select"
+                  options={purityOptions}
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Gross Wt" name="gross_weight" value={formData.gross_weight} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Stones Wt" name="stones_weight" value={formData.stones_weight} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="St Price" name="stones_price" value={formData.stones_price} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Wt BW:" name="weight_bw" value={formData.weight_bw} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Wastage On"
+                  name="wastage_on"
+                  type="select"
+                  value={formData.wastage_on || ""} // Default to "Gross Weight"
+                  onChange={handleInputChange}
+                  options={[
+                    { value: "Gross Weight", label: "Gross Weight" },
+                    { value: "Weight BW", label: "Weight BW" },
+                    ...(formData.wastage_on &&
+                      !["Gross Weight", "Weight BW"].includes(formData.wastage_on)
+                      ? [{ value: formData.wastage_on, label: formData.wastage_on }]
+                      : []),
+                  ]}
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Wastage %" name="wastage_percent" value={formData.wastage_percent} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="W.Wt" name="wastage_weight" value={formData.wastage_weight} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField label="Total Weight AW" name="total_weight" value={formData.total_weight} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Rate" name="rate" value={formData.rate} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField
+                  label="Amount"
+                  name="rate_amt"
+                  value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+                  onChange={handleInputChange} // Trigger recalculation of Total MC
+                  readOnly // Ensure it's editable
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="MC On"
+                  name="making_charges_on"
+                  type="select"
+                  value={formData.making_charges_on || ""} // Default to "MC / Gram"
+                  onChange={handleInputChange}
+                  options={[
+                    { value: "MC / Gram", label: "MC / Gram" },
+                    { value: "MC / Piece", label: "MC / Piece" },
+                    { value: "MC %", label: "MC %" },
+                    ...(formData.making_charges_on &&
+                      !["MC / Gram", "MC / Piece", "MC %"].includes(formData.making_charges_on)
+                      ? [{ value: formData.making_charges_on, label: formData.making_charges_on }]
+                      : []),
+                  ]}
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField
+                  label={
+                    formData.making_charges_on === "MC %"
+                      ? "MC %"
+                      : "MC/Gm"
+                  }
+                  name="mc_per_gram"
+                  value={formData.mc_per_gram || ""} // Default value handling
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField
+                  label="Total MC"
+                  name="total_mc"
+                  value={formData.total_mc || ""} // Display calculated Total MC
+                  onChange={handleInputChange}
+                // readOnly // Make this field read-only, since it’s auto-calculated
+                />
+              </Col>
+              {/* <Col xs={12} md={2}>
+                <InputField
+                  label="Disscount %"
+                  name="disscount_percentage"
+                  value={formData.disscount_percentage || ""} // Display calculated Total MC
+                  onChange={handleInputChange}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Total Disscount"
+                  name="disscount"
+                  value={formData.disscount || ""} // Display calculated Total MC
+                  onChange={handleInputChange}
+                />
+              </Col> */}
+              <Col xs={12} md={1}>
+                <InputField
+                  label="HMCharge"
+                  name="hm_charges"
+                  value={formData.hm_charges || "0.00"} // Default to "0.00" if undefined
+                  onChange={handleInputChange} // Optional, since it's auto-calculated
+                />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={1}>
+                <InputField label="Tax Amt" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField label="Total Price" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
+              </Col>
+            </>
+          )}
           <Col xs={12} md={1}>
-            <InputField label="Tax Amt" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Total Price" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
-          </Col>
-          </>
-        ) : (
-          // Otherwise (if Pricing is not "By fixed"), show all fields:
-          <>
-          <Col xs={12} md={2}>
-            <InputField
-              label="Purity"
-              name="purity"
-              value={formData.purity || ""}
-              onChange={handleInputChange}
-              type="select"
-              options={purityOptions}
-            />
-          </Col>
-          <Col xs={12} md={1}>
-            <InputField label="Gross Wt" name="gross_weight" value={formData.gross_weight} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={1}>
-            <InputField label="Stones Wt" name="stones_weight" value={formData.stones_weight} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={1}>
-            <InputField label="St Price" name="stones_price" value={formData.stones_price} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Weight BW:" name="weight_bw" value={formData.weight_bw} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField
-              label="Wastage On"
-              name="wastage_on"
-              type="select"
-              value={formData.wastage_on || ""} // Default to "Gross Weight"
-              onChange={handleInputChange}
-              options={[
-                { value: "Gross Weight", label: "Gross Weight" },
-                { value: "Weight BW", label: "Weight BW" },
-                ...(formData.wastage_on &&
-                  !["Gross Weight", "Weight BW"].includes(formData.wastage_on)
-                  ? [{ value: formData.wastage_on, label: formData.wastage_on }]
-                  : []),
-              ]}
-            />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Wastage %" name="wastage_percent" value={formData.wastage_percent} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={1}>
-            <InputField label="W.Wt" name="wastage_weight" value={formData.wastage_weight} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Total Weight AW" name="total_weight" value={formData.total_weight} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={1}>
-            <InputField label="Rate" name="rate" value={formData.rate} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={1}>
-            <InputField
-              label="Amount"
-              name="rate_amt"
-              value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
-              onChange={handleInputChange} // Trigger recalculation of Total MC
-              readOnly // Ensure it's editable
-            />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField
-              label="MC On"
-              name="making_charges_on"
-              type="select"
-              value={formData.making_charges_on || ""} // Default to "MC / Gram"
-              onChange={handleInputChange}
-              options={[
-                { value: "MC / Gram", label: "MC / Gram" },
-                { value: "MC / Piece", label: "MC / Piece" },
-                { value: "MC %", label: "MC %" },
-                ...(formData.making_charges_on &&
-                  !["MC / Gram", "MC / Piece", "MC %"].includes(formData.making_charges_on)
-                  ? [{ value: formData.making_charges_on, label: formData.making_charges_on }]
-                  : []),
-              ]}
-            />
-          </Col>
-          <Col xs={12} md={1}>
-            <InputField
-              label={
-                formData.making_charges_on === "MC %"
-                  ? "MC %"
-                  : "MC/Gm"
-              }
-              name="mc_per_gram"
-              value={formData.mc_per_gram || ""} // Default value handling
-              onChange={handleInputChange}
-            />
-          </Col>
-          <Col xs={12} md={1}>
-            <InputField
-              label="Total MC"
-              name="total_mc"
-              value={formData.total_mc || ""} // Display calculated Total MC
-              onChange={handleInputChange}
-            // readOnly // Make this field read-only, since it’s auto-calculated
-            />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField
-              label="Disscount %"
-              name="disscount_percentage"
-              value={formData.disscount_percentage || ""} // Display calculated Total MC
-              onChange={handleInputChange}
-            />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField
-              label="Total Disscount"
-              name="disscount"
-              value={formData.disscount || ""} // Display calculated Total MC
-              onChange={handleInputChange}
-            />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField
-              label="HM Charges"
-              name="hm_charges"
-              value={formData.hm_charges || "0.00"} // Default to "0.00" if undefined
-              onChange={handleInputChange} // Optional, since it's auto-calculated
-            />
-          </Col>
-
-          <Col xs={12} md={1}>
-            <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={1}>
-            <InputField label="Tax Amt" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
-          </Col>
-          <Col xs={12} md={2}>
-            <InputField label="Total Price" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
-          </Col>
-          </>
-        )}
-          <Col xs={12} md={2}>
             <Button
               style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
               onClick={handleAdd}
@@ -1119,7 +1228,7 @@ const RepairForm = () => {
 
         </Row>
         <Row className="estimate-form-section2">
-          <Table striped bordered hover className="mt-3">
+          <Table bordered hover responsive>
             <thead>
               <tr>
                 <th>S No</th>
@@ -1164,27 +1273,58 @@ const RepairForm = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center">
+                  <td colSpan="10" className="text-center">
                     No entries added yet.
                   </td>
                 </tr>
               )}
-
-              {/* Total Row */}
-              {entries.length > 0 && (
-                <tr style={{ fontWeight: 'bold' }}>
-                  <td colSpan="8" className="text-end" >
-                    Total Amount
-                  </td>
-                  <td className="font-weight-bold">
-                    {entries.reduce((sum, entry) => sum + parseFloat(entry.total_rs || 0), 0).toFixed(2)}
-                  </td>
-                  <td></td>
-                </tr>
-              )}
             </tbody>
           </Table>
-
+        </Row>
+        <Row className="estimate-form-section2">
+          <Table bordered hover responsive>
+            <>
+              <tr>
+                <td colSpan="20" className="text-right">
+                  Total Amount
+                </td>
+                <td colSpan="4">{totalAmount.toFixed(2)}</td>
+              </tr>
+              
+              <tr>
+                <td colSpan="16" className="text-right">Discount Amount</td>
+                <td colSpan="4">  @
+                  <input
+                    type="number"
+                    value={discount}
+                    onChange={handleDiscountChange}
+                    style={{ width: '80px', padding: '5px' }}
+                  />
+                </td>
+                <td colSpan="4">
+                  {discountAmt.toFixed(2)}
+                </td>
+              </tr>
+              <tr>
+                <td colSpan="20" className="text-right">
+                  Taxable Amount
+                </td>
+                <td colSpan="4">{taxableAmount.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colSpan="20" className="text-right">
+                  Tax Amount
+                </td>
+                <td colSpan="4">{taxAmount.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colSpan="20" className="text-right">
+                  Net Amount
+                </td>
+                <td colSpan="4">{netAmount.toFixed(2)}</td>
+              </tr>
+            </>
+          </Table>
           <Col xs={12} md={12} className="d-flex justify-content-end">
             <Button className="cus-back-btn" variant="secondary" onClick={handleBack}>cancel</Button>
             <Button

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useRef } from 'react';
 import axios from 'axios';
 import baseURL from './../../../../../Url/NodeBaseURL';
 import { useLocation } from "react-router-dom";
@@ -68,6 +68,7 @@ const useProductHandlers = () => {
     product_image: null,
     order_status: 'In Progress',
     imagePreview: null,
+    remarks:"",
   });
 
   const [uniqueProducts, setUniqueProducts] = useState([]);
@@ -76,6 +77,10 @@ const useProductHandlers = () => {
   const [filteredMetalTypes, setFilteredMetalTypes] = useState([]);
   const [filteredDesignOptions, setFilteredDesignOptions] = useState([]);
   const [filteredPurityOptions, setFilteredPurityOptions] = useState([]);
+    const [showOptions, setShowOptions] = useState(false);
+    const [showWebcam, setShowWebcam] = useState(false);
+    const webcamRef = useRef(null);
+    const fileInputRef = useRef(null);
 
 
   useEffect(() => {
@@ -205,6 +210,7 @@ const useProductHandlers = () => {
         opentag_id: "",
         product_image: null,
         imagePreview: null,
+        remarks:"",
       };
     }
 
@@ -389,6 +395,7 @@ const useProductHandlers = () => {
         hm_charges:"60.00",
         total_price: "",
         qty: "", // Rese
+        remarks:"",
       }));
 
       setFilteredMetalTypes(metalTypes);
@@ -700,6 +707,7 @@ const useProductHandlers = () => {
           hm_charges:"60.00",
           total_price: "",
           qty: "", // Reset qty
+          remarks:"",
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
@@ -817,6 +825,7 @@ const useProductHandlers = () => {
             hm_charges:"60.00",
             total_price: "",
             qty: "", // Reset qty
+            remarks:"",
           }));
           setIsQtyEditable(true); // Default to editable
         }
@@ -832,12 +841,26 @@ const useProductHandlers = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData((prevData) => ({
-          ...prevData,
-          imagePreview: reader.result, // Update image preview in formData
-        }));
+        setFormData((prev) => ({ ...prev, imagePreview: reader.result }));
       };
       reader.readAsDataURL(file);
+      setShowOptions(false); // Hide options after selection
+    }
+  };
+
+  const clearImage = () => {
+    setFormData({ imagePreview: null });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const captureImage = () => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      setFormData((prev) => ({ ...prev, imagePreview: imageSrc }));
+      setShowWebcam(false);
+      setShowOptions(false); // Hide options after capturing
     }
   };
 
@@ -851,6 +874,14 @@ const useProductHandlers = () => {
     isQtyEditable,
     handleChange,
     handleImageChange,
+    fileInputRef,
+    clearImage,
+    captureImage,
+    setShowWebcam,
+    showWebcam,
+    webcamRef,
+    setShowOptions,
+    showOptions,
     image,
     handleBarcodeChange,
     handleProductNameChange,

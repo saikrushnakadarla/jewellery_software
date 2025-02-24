@@ -5,6 +5,7 @@ import DataTable from '../../../Pages/InputField/TableLayout'; // Import the Dat
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -14,20 +15,20 @@ const RepairsTable = () => {
   const [showModal, setShowModal] = useState(false);
 
 
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/get-unique-estimates`);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/get-unique-estimates`);
 
-        // Filter the data based on the 'transaction_status' column
-        const filteredData = response.data
+      // Filter the data based on the 'transaction_status' column
+      const filteredData = response.data
 
-        setData(filteredData); // Set the filtered data
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching repair details:', error);
-        setLoading(false);
-      }
-    };
+      setData(filteredData); // Set the filtered data
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching estimate details:', error);
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     fetchData();
   }, []);
@@ -44,88 +45,181 @@ const RepairsTable = () => {
   };
 
 
-
-const columns = React.useMemo(
-  () => [
-    {
-      Header: 'Sr. No.',
-      Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
-    },
-    {
-      Header: 'Date',
-      accessor: 'date',
-      Cell: ({ value }) => {
-        const date = new Date(value);
-        return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: 'Sr. No.',
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
-    },
-    {
-      Header: 'Estimate Number',
-      accessor: 'estimate_number',
-    },
-    {
-      Header: 'Product Name',
-      accessor: 'sub_category',
-    },
-    {
-      Header: 'Total Amount',
-      accessor: 'total_amount',
-    },
-    {
-      Header: 'Actions',
-      accessor: 'actions',
-      Cell: ({ row }) => (
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <FaEye
-            style={{ cursor: 'pointer', color: 'green' }}
-            onClick={() => handleViewDetails(row.original.estimate_number)} // Pass estimate_number
-          />
-          <FaTrash
-            style={{ cursor: 'pointer', color: 'red' }}
-            onClick={() => handleDelete(row.original.estimate_number)} // Pass estimate_number
-          />
-        </div>
-      ),
-    },
-  ],
-  []
-);
+      {
+        Header: 'Date',
+        accessor: 'date',
+        Cell: ({ value }) => {
+          const date = new Date(value);
+          return date.toLocaleDateString('en-GB'); // en-GB for dd/mm/yyyy format
+        },
+      },
+      {
+        Header: 'Estimate Number',
+        accessor: 'estimate_number',
+      },
+      {
+        Header: 'Product Name',
+        accessor: 'sub_category',
+      },
+      {
+        Header: 'Total Amount',
+        accessor: 'net_amount',
+      },
+      {
+        Header: 'Actions',
+        accessor: 'actions',
+        Cell: ({ row }) => (
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <FaEye
+              style={{ cursor: 'pointer', color: 'green' }}
+              onClick={() => handleViewDetails(row.original.estimate_number)} // Pass estimate_number
+            />
+            <FaEdit
+              style={{
+                cursor: 'pointer',
+                marginLeft: '10px',
+                color: 'blue',
+              }}
+              onClick={() => handleEdit(row.original.estimate_number,
+                row.original.mobile,
+              )}
+            />
+            <FaTrash
+              style={{ cursor: 'pointer', color: 'red' }}
+              onClick={() => handleDelete(row.original.estimate_number)} // Pass estimate_number
+            />
+          </div>
+        ),
+      },
+    ],
+    []
+  );
 
-// Delete function
-const handleDelete = async (estimateNumber) => {
-  if (window.confirm('Are you sure you want to delete this estimate?')) {
-    try {
-      const response = await fetch(`${baseURL}/delete/estimate/${estimateNumber}`, {
-        method: 'DELETE',
-      });
+  const handleEdit = async (
+    estimate_number,
+    mobile,
+  ) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to edit this record?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, go ahead!',
+      cancelButtonText: 'No, cancel',
+    });
 
-      if (!response.ok) {
-        throw new Error('Failed to delete estimate');
+    if (result.isConfirmed) {
+      try {
+        // Fetch estimate details
+        const response = await axios.get(`${baseURL}/get-estimates/${estimate_number}`);
+        const details = response.data;
+
+        // Verify if the API returned data
+        if (!details || !details.repeatedData) {
+          console.error('No repeatedData found in response:', details);
+          Swal.fire('Error', 'No estimate details found for the provided estimate number.', 'error');
+          return;
+        }
+
+        // Retrieve existing estimate details from localStorage or set to an empty array if not available
+        const existingDetails = JSON.parse(localStorage.getItem('estimateDetails')) || [];
+
+
+        // Get today's date in yyyy-mm-dd format
+        const today = new Date().toISOString().split('T')[0];
+
+        // Update repeatedData with today's date
+        const formattedDetails = details.repeatedData.map((item) => ({
+          ...item,
+          date: today,
+          estimate_number, // Ensure the estimate_number is explicitly included
+        }));
+        // Combine existing details with the new ones
+        const updatedDetails = [...existingDetails, ...formattedDetails];
+
+        // Save updated details back to localStorage
+        localStorage.setItem('estimateDetails', JSON.stringify(updatedDetails));
+
+        console.log('Updated estimate details added to localStorage:', updatedDetails);
+
+        if (updatedDetails.length > 0 && updatedDetails[0].disscount_percentage) {
+          localStorage.setItem('estimateDiscount', updatedDetails[0].disscount_percentage);
+         
+        }
+
+        // Navigate to the sales page with state
+        navigate('/estimates', {
+          state: {
+            estimate_number,
+            mobile,
+            entries: details,
+          },
+        });
+
+        // Call handleDelete without confirmation
+        // await handleDelete(estimate_number, true, true);
+      } catch (error) {
+        console.error('Error fetching estimate details:', error);
+        Swal.fire('Error', 'Unable to fetch estimate details. Please try again.', 'error');
       }
-      fetchData();
-      alert('Estimate deleted successfully');
-    } catch (error) {
-      console.error('Error deleting estimate:', error.message);
-      alert('Error deleting estimate');
+    } else {
+      Swal.fire('Cancelled', 'Edit operation was cancelled.', 'info');
     }
-  }
-};
+  };
+
+  const handleDelete = async (estimateNumber) => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: `Do you really want to delete order ${estimateNumber}`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`${baseURL}/delete/estimate/${estimateNumber}`, {
+            method: 'DELETE',
+          });
+  
+          if (!response.ok) {
+            throw new Error('Failed to delete estimate');
+          }
+          fetchData();
+          Swal.fire('Deleted!','The estimate has been deleted.', 'success');
+        } catch (error) {
+          console.error('Error deleting estimate:', error.message);
+          Swal.fire('Error!','Failed to delete the estimate.','error');
+        }
+      }
+    });
+  };
+  
 
 
   const handleViewDetails = async (estimate_number) => {
     try {
       const response = await axios.get(`${baseURL}/get-estimates/${estimate_number}`);
       setRepairDetails(response.data);
-      setShowModal(true); // Show the modal with repair details
+      setShowModal(true); // Show the modal with estimate details
     } catch (error) {
-      console.error('Error fetching repair details:', error);
+      console.error('Error fetching estimate details:', error);
     }
   };
 
   // Close the modal
   const handleCloseModal = () => {
     setShowModal(false);
-    setRepairDetails(null); // Clear repair details on modal close
+    setRepairDetails(null); // Clear estimate details on modal close
   };
 
   const handleCreate = () => {
@@ -179,7 +273,7 @@ const handleDelete = async (estimateNumber) => {
               {/* Make table scrollable when columns are too many */}
               <div className="table-responsive">
                 <Table bordered>
-                  <thead style={{whiteSpace:'nowrap'}}>
+                  <thead style={{ whiteSpace: 'nowrap' }}>
                     <tr>
                       <th>BarCode</th>
                       <th>Product Name</th>
@@ -195,7 +289,7 @@ const handleDelete = async (estimateNumber) => {
                       <th>Total Price</th>
                     </tr>
                   </thead>
-                  <tbody style={{whiteSpace:'nowrap'}}>
+                  <tbody style={{ whiteSpace: 'nowrap' }}>
                     {repairDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>{product.code}</td>
