@@ -61,6 +61,7 @@ import UserMasterTable from "./Components/Modules/Masters/UserMaster/UserMasterT
 import SubCategory from "./Components/Modules/Masters/SubCategory/SubCategory";
 import SubCategoryTable from "./Components/Modules/Masters/SubCategory/SubCategoryTable";
 import { AuthProvider } from "./Components/Pages/Login/Context";
+import EstimateSales from './Components/Modules/Transactions/Sales/EstimateSales';
 function App() {
   const location = useLocation();
 
@@ -140,6 +141,9 @@ function App() {
         <Route path="/subcategory" element={<SubCategory />} />
         <Route path="/subcategorytable" element={<SubCategoryTable />} />
         <Route path="/subcategory/:id" element={<SubCategory />} />
+
+
+        <Route path="/estimateSales" element={<EstimateSales />} />
       </Routes>
       </AuthProvider>
     </>

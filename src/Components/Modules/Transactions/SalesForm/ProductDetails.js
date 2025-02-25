@@ -39,7 +39,10 @@ const ProductDetails = ({
   purityOptions,
   metaltypeOptions,
   isBarcodeSelected,
-  isQtyEditable
+  isQtyEditable,
+  estimate,
+  selectedEstimate,
+  handleEstimateChange
 }) => {
 
 
@@ -49,7 +52,6 @@ const ProductDetails = ({
     ? products.find((product) => product.product_name === formData.category)?.rbarcode || ""
     : "";
 
-  // Generate options list for barcode selection
   const barcodeOptions = [
     ...products
       .filter((product) => (formData.category ? product.product_name === formData.category : true))
@@ -65,17 +67,18 @@ const ProductDetails = ({
       })),
   ];
 
-  // Ensure default barcode is included in options
   if (defaultBarcode && !barcodeOptions.some((option) => option.value === defaultBarcode)) {
     barcodeOptions.unshift({ value: defaultBarcode, label: defaultBarcode });
   }
 
-  // Set default barcode only if formData.code is empty
   useEffect(() => {
     if (!formData.code && defaultBarcode) {
       handleBarcodeChange(defaultBarcode);
     }
   }, [formData.category, defaultBarcode]);
+
+
+
 
   return (
     <Col >
@@ -687,6 +690,21 @@ const ProductDetails = ({
           >
             {isEditing ? "Update" : "Add"}
           </Button>
+        </Col>
+        <Col xs={12} md={4}></Col>
+        <Col xs={12} md={3}>
+          <InputField
+            label="Estimate Number"
+            type="select"
+            value={selectedEstimate}
+            onChange={handleEstimateChange}
+            options={[
+              ...estimate.map((item) => ({
+                value: item.estimate_number,
+                label: item.estimate_number
+              }))
+            ]}
+          />
         </Col>
       </Row>
     </Col>

@@ -317,6 +317,93 @@ const SalesForm = () => {
     localStorage.setItem("repairDetails", JSON.stringify(updatedRepairDetails));
   };
 
+  const [estimate, setEstimate] = useState([]);
+  const [selectedEstimate, setSelectedEstimate] = useState("");
+  const [estimateDetails, setEstimateDetails] = useState(null);
+  const [stock, setStock] = useState(null);
+  useEffect(() => {
+    const fetchEstimate = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-unique-estimates`);
+        setEstimate(response.data);
+      } catch (error) {
+        console.error('Error fetching estimate details:', error);
+      }
+    };
+    fetchEstimate();
+  }, []);
+
+  useEffect(() => {
+    fetch(`${baseURL}/get/opening-tags-entry`) // Correct URL
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch stock entries");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Fetched Stock Data:", data); // Log the entire response to see its structure
+        setStock(data.result); // Use data.result since the backend sends { result: [...] }
+        console.log("Updated Stock State:", data.result); // Log the updated state value
+      })
+      .catch((error) => {
+        console.error("Error fetching stock entries:", error);
+      });
+  }, []);
+
+  const fetchEstimateDetails = async (estimate_number) => {
+    if (!estimate_number) return;
+
+    try {
+      const response = await axios.get(`${baseURL}/get-estimates/${estimate_number}`);
+
+      // First, update the state with the full estimate details
+      setEstimateDetails(response.data);
+
+      if (!stock) {
+        console.warn("Stock data not yet available!");
+        return;
+      }
+
+      // Filter only matching repeatedData items
+      const filteredData = response.data.repeatedData.filter(item =>
+        stock.some(stockItem => stockItem.PCode_BarCode === item.code && stockItem.Status === "Available")
+      );
+
+      if (filteredData.length > 0) {
+        // Store filtered data in localStorage
+        localStorage.setItem("repairDetails", JSON.stringify(filteredData));
+
+        // Update state with filtered data
+        setRepairDetails(filteredData);
+
+        // Immediately retrieve and log stored data
+        const storedData = JSON.parse(localStorage.getItem("repairDetails"));
+        console.log("Stored repairDetails:", storedData);
+      } else {
+        // Clear localStorage if no matching data
+        localStorage.removeItem("repairDetails");
+        setRepairDetails([]); // Clear state
+        console.log("No matching data found. LocalStorage cleared.");
+      }
+    } catch (error) {
+      console.error('Error fetching selected estimate details:', error);
+    }
+  };
+
+  const handleEstimateChange = (e) => {
+    const selectedValue = e.target.value;
+    setSelectedEstimate(selectedValue);
+
+    if (selectedValue) {
+      fetchEstimateDetails(selectedValue);
+    } else {
+      setEstimateDetails(null);
+      localStorage.removeItem("repairDetails");
+      setRepairDetails([]);
+    }
+  };
+
 
   const handleAdd = () => {
     const storedRepairDetails = JSON.parse(localStorage.getItem("repairDetails")) || [];
@@ -811,6 +898,9 @@ const SalesForm = () => {
               webcamRef={webcamRef}
               setShowOptions={webcamRef}
               showOptions={webcamRef}
+              estimate={estimate}
+              selectedEstimate={selectedEstimate}
+              handleEstimateChange={handleEstimateChange}
             />
           </div>
 

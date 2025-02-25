@@ -204,8 +204,6 @@ const RepairsTable = () => {
     });
   };
   
-
-
   const handleViewDetails = async (estimate_number) => {
     try {
       const response = await axios.get(`${baseURL}/get-estimates/${estimate_number}`);
@@ -297,13 +295,13 @@ const RepairsTable = () => {
                         <td>{product.metal_type}</td>
                         <td>{product.purity}</td>
                         <td>{product.gross_weight}</td>
-                        <td>{product.stones_weight}</td>
+                        <td>{product.stone_weight}</td>
                         <td>{product.wastage_weight}</td>
-                        <td>{product.total_weight}</td>
-                        <td>{product.total_mc}</td>
+                        <td>{product.total_weight_av}</td>
+                        <td>{product.making_charges}</td>
                         <td>{product.rate}</td>
-                        <td>{product.tax_vat_amount}</td>
-                        <td>{product.total_rs}</td>
+                        <td>{product.tax_amt}</td>
+                        <td>{product.total_price}</td>
                       </tr>
                     ))}
                     <tr style={{ fontWeight: "bold" }}>

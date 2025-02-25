@@ -28,24 +28,24 @@ const RepairForm = () => {
     category: "",
     sub_category: "",
     gross_weight: "",
-    stones_weight: "",
-    stones_price: "",
+    stone_weight: "",
+    stone_price: "",
     weight_bw: "",
-    wastage_on: "Gross Weight",
-    wastage_percent: "",
+    va_on: "Gross Weight",
+    va_percent: "",
     wastage_weight: "",
-    total_weight: "",
-    making_charges_on: "MC %",
+    total_weight_av: "",
+    mc_on: "MC %",
     mc_per_gram: "",
-    total_mc: "",
+    making_charges: "",
     disscount_percentage: "",
     disscount: "",
     rate: "",
     rate_amt: "",
     tax_percent: "03% GST",
-    tax_vat_amount: "",
+    tax_amt: "",
     hm_charges: "60.00",
-    total_rs: "",
+    total_price: "",
     total_amount: "0.00",
     pricing: "By Weight"
   };
@@ -175,37 +175,37 @@ const RepairForm = () => {
           category: "",
           sub_category: "",
           gross_weight: "",
-          stones_weight: "",
-          stones_price: "",
+          stone_weight: "",
+          stone_price: "",
           weight_bw: "",
-          wastage_on: "Gross Weight",
-          wastage_percent: "",
+          va_on: "Gross Weight",
+          va_percent: "",
           wastage_weight: "",
-          total_weight: "",
-          making_charges_on: "MC %",
+          total_weight_av: "",
+          mc_on: "MC %",
           mc_per_gram: "",
-          total_mc: "",
+          making_charges: "",
           rate: "",
           rate_amt: "",
           tax_percent: "03% GST",
-          tax_vat_amount: "",
-          total_rs: "",
+          tax_amt: "",
+          total_price: "",
           total_amount: "0.00",
         };
       }
 
       if (name === "disscount_percentage") {
         const discountPercentage = parseFloat(value) || 0;
-        const makingCharges = parseFloat(formData.total_mc) || 0;
+        const makingCharges = parseFloat(formData.making_charges) || 0;
         const discountAmount = (discountPercentage / 100) * makingCharges;
 
         updatedData.disscount = discountAmount.toFixed(2);
       }
 
-      // Reset `mc_per_gram` and `total_mc` when `making_charges_on` changes
-      if (name === "making_charges_on") {
+      // Reset `mc_per_gram` and `making_charges` when `mc_on` changes
+      if (name === "mc_on") {
         updatedData.mc_per_gram = "";
-        updatedData.total_mc = "";
+        updatedData.making_charges = "";
       }
 
       // Trigger recalculation for Total MC when relevant fields are updated
@@ -221,7 +221,7 @@ const RepairForm = () => {
         ) || 0;
 
         const calculatedTotalMC = (updatedMcPercentage / 100) * updatedRateAmount;
-        updatedData.total_mc = calculatedTotalMC.toFixed(2);
+        updatedData.making_charges = calculatedTotalMC.toFixed(2);
       }
       return updatedData;
     });
@@ -444,20 +444,20 @@ const RepairForm = () => {
           category: "",
           sub_category: "",
           gross_weight: "",
-          stones_weight: "",
-          stones_price: "",
+          stone_weight: "",
+          stone_price: "",
           weight_bw: "",
-          wastage_on: "Gross Weight",
-          wastage_percent: "",
+          va_on: "Gross Weight",
+          va_percent: "",
           wastage_weight: "",
           total_weight_aw: "",
-          making_charges_on: "MC %",
+          mc_on: "MC %",
           mc_per_gram: "",
-          total_mc: "",
+          making_charges: "",
           rate: "",
           rate_amt: "",
           tax_percent: "03% GST",
-          tax_vat_amount: "",
+          tax_amt: "",
           hm_charges: "60.00",
           total_price: "",
           qty: "", // Reset qty
@@ -487,16 +487,16 @@ const RepairForm = () => {
           category: product.product_name,
           sub_category: "",
           gross_weight: "",
-          stones_weight: "",
-          stones_price: "",
+          stone_weight: "",
+          stone_price: "",
           weight_bw: "",
-          wastage_on: "Gross Weight",
-          wastage_percent: "",
+          va_on: "Gross Weight",
+          va_percent: "",
           wastage_weight: "",
           total_weight_aw: "",
-          making_charges_on: "MC %",
+          mc_on: "MC %",
           mc_per_gram: "",
-          total_mc: "",
+          making_charges: "",
           tax_percent: product.tax_slab,
           qty: 1, // Set qty to 1 for product
           pricing: "By Weight"
@@ -521,16 +521,16 @@ const RepairForm = () => {
             category: tag.category || "",
             sub_category: tag.sub_category || "",
             gross_weight: tag.Gross_Weight || "",
-            stones_weight: tag.Stones_Weight || "",
-            stones_price: tag.Stones_Price || "",
+            stone_weight: tag.Stones_Weight || "",
+            stone_price: tag.Stones_Price || "",
             weight_bw: tag.Weight_BW || "",
-            wastage_on: tag.Wastage_On || "",
-            wastage_percent: tag.Wastage_Percentage || "",
+            va_on: tag.Wastage_On || "",
+            va_percent: tag.Wastage_Percentage || "",
             wastage_weight: tag.WastageWeight || "",
             total_weight_aw: tag.TotalWeight_AW || "",
-            making_charges_on: tag.Making_Charges_On || "",
+            mc_on: tag.Making_Charges_On || "",
             mc_per_gram: tag.MC_Per_Gram || "",
-            total_mc: tag.Making_Charges || "",
+            making_charges: tag.Making_Charges || "",
             tax_percent: productDetails?.tax_slab || "",
             qty: 1, // Allow qty to be editable for tag
             pricing: tag.Pricing || ""
@@ -549,20 +549,20 @@ const RepairForm = () => {
             category: "",
             sub_category: "",
             gross_weight: "",
-            stones_weight: "",
-            stones_price: "",
+            stone_weight: "",
+            stone_price: "",
             weight_bw: "",
-            wastage_on: "Gross Weight",
-            wastage_percent: "",
+            va_on: "Gross Weight",
+            va_percent: "",
             wastage_weight: "",
             total_weight_aw: "",
-            making_charges_on: "MC %",
+            mc_on: "MC %",
             mc_per_gram: "",
-            total_mc: "",
+            making_charges: "",
             rate: "",
             rate_amt: "",
             tax_percent: "03% GST",
-            tax_vat_amount: "",
+            tax_amt: "",
             hm_charges: "60.00",
             total_price: "",
             qty: "", // Reset qty
@@ -638,23 +638,23 @@ const RepairForm = () => {
     const storedEstimateDetails = JSON.parse(localStorage.getItem("estimateDetails")) || [];
   
     const updatedEstimateDetails = storedEstimateDetails.map((item) => {
-      const makingCharges = parseFloat(item.total_mc) || 0;
+      const makingCharges = parseFloat(item.making_charges) || 0;
       const calculatedDiscount = (makingCharges * discountValue) / 100;
   
-      // Preserve original_total_rs when applying discount for the first time
-      const originalTotalPrice = item.original_total_rs
-        ? parseFloat(item.original_total_rs) // Ensure we're using the correct stored original value
-        : parseFloat(item.total_rs) || 0;
+      // Preserve original_total_price when applying discount for the first time
+      const originalTotalPrice = item.original_total_price
+        ? parseFloat(item.original_total_price) // Ensure we're using the correct stored original value
+        : parseFloat(item.total_price) || 0;
   
-      // If discount is cleared (0%), reset total_rs to original_total_rs
+      // If discount is cleared (0%), reset total_price to original_total_price
       const updatedTotalPrice = discountValue === 0 ? originalTotalPrice : originalTotalPrice - calculatedDiscount;
   
       return {
         ...item,
-        original_total_rs: originalTotalPrice.toFixed(2), // Ensure original value is stored
+        original_total_price: originalTotalPrice.toFixed(2), // Ensure original value is stored
         disscount: calculatedDiscount.toFixed(2),
         disscount_percentage: discountValue,
-        total_rs: updatedTotalPrice.toFixed(2),
+        total_price: updatedTotalPrice.toFixed(2),
       };
     });
   
@@ -668,8 +668,8 @@ const RepairForm = () => {
     try {
       // Calculate total values
       const totalAmount = entries.reduce((sum, item) => {
-        const stonePrice = parseFloat(item.stones_price) || 0;
-        const makingCharges = parseFloat(item.total_mc) || 0;
+        const stonePrice = parseFloat(item.stone_price) || 0;
+        const makingCharges = parseFloat(item.making_charges) || 0;
         const rateAmt = parseFloat(item.rate_amt) || 0;
         const hmCharges = parseFloat(item.hm_charges) || 0;
         return sum + stonePrice + makingCharges + rateAmt + hmCharges;
@@ -677,7 +677,7 @@ const RepairForm = () => {
 
       const discountAmt = entries.reduce((sum, item) => sum + (parseFloat(item.disscount) || 0), 0);
       const taxableAmount = totalAmount - discountAmt;
-      const taxAmount = entries.reduce((sum, item) => sum + (parseFloat(item.tax_vat_amount) || 0), 0);
+      const taxAmount = entries.reduce((sum, item) => sum + (parseFloat(item.tax_amt) || 0), 0);
       const netAmount = taxableAmount + taxAmount;
 
       // Save to database
@@ -746,27 +746,27 @@ const RepairForm = () => {
 
   useEffect(() => {
     const grossWeight = parseFloat(formData.gross_weight) || 0;
-    const stonesWeight = parseFloat(formData.stones_weight) || 0;
+    const stonesWeight = parseFloat(formData.stone_weight) || 0;
     const weightBW = grossWeight - stonesWeight;
 
     setFormData((prev) => ({
       ...prev,
       weight_bw: weightBW.toFixed(3),
     }));
-  }, [formData.gross_weight, formData.stones_weight]);
+  }, [formData.gross_weight, formData.stone_weight]);
 
   useEffect(() => {
-    const wastagePercentage = parseFloat(formData.wastage_percent) || 0;
+    const wastagePercentage = parseFloat(formData.va_percent) || 0;
     const grossWeight = parseFloat(formData.gross_weight) || 0;
     const weightBW = parseFloat(formData.weight_bw) || 0;
 
     let wastageWeight = 0;
     let totalWeight = 0;
 
-    if (formData.wastage_on === "Gross Weight") {
+    if (formData.va_on === "Gross Weight") {
       wastageWeight = (grossWeight * wastagePercentage) / 100;
       totalWeight = weightBW + wastageWeight;
-    } else if (formData.wastage_on === "Weight BW") {
+    } else if (formData.va_on === "Weight BW") {
       wastageWeight = (weightBW * wastagePercentage) / 100;
       totalWeight = weightBW + wastageWeight;
     }
@@ -774,32 +774,32 @@ const RepairForm = () => {
     setFormData((prev) => ({
       ...prev,
       wastage_weight: wastageWeight.toFixed(3),
-      total_weight: totalWeight.toFixed(3),
+      total_weight_av: totalWeight.toFixed(3),
     }));
-  }, [formData.wastage_on, formData.wastage_percent, formData.gross_weight, formData.weight_bw]);
+  }, [formData.va_on, formData.va_percent, formData.gross_weight, formData.weight_bw]);
 
   useEffect(() => {
-    const totalWeight = parseFloat(formData.total_weight) || 0;
+    const totalWeight = parseFloat(formData.total_weight_av) || 0;
     const mcPerGram = parseFloat(formData.mc_per_gram) || 0;
-    const makingCharges = parseFloat(formData.total_mc) || 0;
+    const makingCharges = parseFloat(formData.making_charges) || 0;
     const rateAmount = parseFloat(formData.rate_amt) || 0;
 
-    if (formData.making_charges_on === "MC / Gram") {
-      // Calculate total_mc as mcPerGram * totalWeight
+    if (formData.mc_on === "MC / Gram") {
+      // Calculate making_charges as mcPerGram * totalWeight
       const calculatedMakingCharges = mcPerGram * totalWeight;
       setFormData((prev) => ({
         ...prev,
-        total_mc: calculatedMakingCharges.toFixed(2),
+        making_charges: calculatedMakingCharges.toFixed(2),
       }));
-    } else if (formData.making_charges_on === "MC %") {
-      // Calculate total_mc as (mcPerGram * rateAmount) / 100
+    } else if (formData.mc_on === "MC %") {
+      // Calculate making_charges as (mcPerGram * rateAmount) / 100
       const calculatedMakingCharges = (mcPerGram * rateAmount) / 100;
       setFormData((prev) => ({
         ...prev,
-        total_mc: calculatedMakingCharges.toFixed(2),
+        making_charges: calculatedMakingCharges.toFixed(2),
       }));
-    } else if (formData.making_charges_on === "MC / Piece") {
-      // If total_mc is manually entered, calculate mc_per_gram
+    } else if (formData.mc_on === "MC / Piece") {
+      // If making_charges is manually entered, calculate mc_per_gram
       if (makingCharges && totalWeight > 0) {
         const calculatedMcPerGram = makingCharges / totalWeight;
         setFormData((prev) => ({
@@ -809,16 +809,16 @@ const RepairForm = () => {
       }
     }
   }, [
-    formData.making_charges_on,
+    formData.mc_on,
     formData.mc_per_gram,
-    formData.total_mc,
-    formData.total_weight,
+    formData.making_charges,
+    formData.total_weight_av,
     formData.rate_amt,
   ]);
 
   useEffect(() => {
     const rate = parseFloat(formData.rate) || 0;
-    const totalWeight = parseFloat(formData.total_weight) || 0;
+    const totalWeight = parseFloat(formData.total_weight_av) || 0;
     const qty = parseFloat(formData.qty) || 0;
     const pieceCost = parseFloat(formData.pieace_cost) || 0;
     let rateAmt = 0;
@@ -833,13 +833,13 @@ const RepairForm = () => {
       ...prev,
       rate_amt: rateAmt.toFixed(2),
     }));
-  }, [formData.rate, formData.total_weight, formData.qty, formData.pricing, formData.pieace_cost]);
+  }, [formData.rate, formData.total_weight_av, formData.qty, formData.pricing, formData.pieace_cost]);
 
   useEffect(() => {
     const taxPercent = parseFloat(formData.tax_percent) || 0;
     const rateAmt = parseFloat(formData.rate_amt) || 0;
-    const stonesPrice = parseFloat(formData.stones_price) || 0;
-    const totalMC = parseFloat(formData.total_mc) || 0;
+    const stonesPrice = parseFloat(formData.stone_price) || 0;
+    const totalMC = parseFloat(formData.making_charges) || 0;
     const discountAmt = parseFloat(formData.disscount) || 0;
     const hmCharges = parseFloat(formData.hm_charges) || 0;
 
@@ -853,10 +853,10 @@ const RepairForm = () => {
 
     setFormData((prev) => ({
       ...prev,
-      tax_vat_amount: taxAmt.toFixed(2),
-      total_rs: totalPrice.toFixed(2),
+      tax_amt: taxAmt.toFixed(2),
+      total_price: totalPrice.toFixed(2),
     }));
-  }, [formData.tax_percent, formData.rate_amt, formData.stones_price, formData.total_mc, formData.disscount]);
+  }, [formData.tax_percent, formData.rate_amt, formData.stone_price, formData.making_charges, formData.disscount]);
 
   useEffect(() => {
     const fetchLastEstimateNumber = async () => {
@@ -913,8 +913,8 @@ const RepairForm = () => {
   const isByFixed = formData.pricing === "By fixed";
 
   const totalAmount = entries.reduce((sum, item) => {
-    const stonePrice = parseFloat(item.stones_price) || 0;
-    const makingCharges = parseFloat(item.total_mc) || 0;
+    const stonePrice = parseFloat(item.stone_price) || 0;
+    const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
     const hmCharges = parseFloat(item.hm_charges) || 0;
     return sum + stonePrice + makingCharges + rateAmt + hmCharges;
@@ -926,7 +926,7 @@ const RepairForm = () => {
   }, 0);
 
   const taxableAmount = totalAmount - discountAmt;
-  const taxAmount = entries.reduce((sum, item) => sum + parseFloat(item.tax_vat_amount || 0), 0);
+  const taxAmount = entries.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
   const netAmount = taxableAmount + taxAmount;
 
 
@@ -1074,10 +1074,10 @@ const RepairForm = () => {
                 <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={1}>
-                <InputField label="Tax Amt" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
+                <InputField label="Tax Amt" name="tax_amt" value={formData.tax_amt} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={2}>
-                <InputField label="Total Price" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
+                <InputField label="Total Price" name="total_price" value={formData.total_price} onChange={handleInputChange} />
               </Col>
             </>
           ) : (
@@ -1097,10 +1097,10 @@ const RepairForm = () => {
                 <InputField label="Gross Wt" name="gross_weight" value={formData.gross_weight} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={1}>
-                <InputField label="Stones Wt" name="stones_weight" value={formData.stones_weight} onChange={handleInputChange} />
+                <InputField label="Stones Wt" name="stone_weight" value={formData.stone_weight} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={1}>
-                <InputField label="St Price" name="stones_price" value={formData.stones_price} onChange={handleInputChange} />
+                <InputField label="St Price" name="stone_price" value={formData.stone_price} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={1}>
                 <InputField label="Wt BW:" name="weight_bw" value={formData.weight_bw} onChange={handleInputChange} />
@@ -1108,28 +1108,28 @@ const RepairForm = () => {
               <Col xs={12} md={2}>
                 <InputField
                   label="Wastage On"
-                  name="wastage_on"
+                  name="va_on"
                   type="select"
-                  value={formData.wastage_on || ""} // Default to "Gross Weight"
+                  value={formData.va_on || ""} // Default to "Gross Weight"
                   onChange={handleInputChange}
                   options={[
                     { value: "Gross Weight", label: "Gross Weight" },
                     { value: "Weight BW", label: "Weight BW" },
-                    ...(formData.wastage_on &&
-                      !["Gross Weight", "Weight BW"].includes(formData.wastage_on)
-                      ? [{ value: formData.wastage_on, label: formData.wastage_on }]
+                    ...(formData.va_on &&
+                      !["Gross Weight", "Weight BW"].includes(formData.va_on)
+                      ? [{ value: formData.va_on, label: formData.va_on }]
                       : []),
                   ]}
                 />
               </Col>
               <Col xs={12} md={1}>
-                <InputField label="Wastage %" name="wastage_percent" value={formData.wastage_percent} onChange={handleInputChange} />
+                <InputField label="Wastage %" name="va_percent" value={formData.va_percent} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={1}>
                 <InputField label="W.Wt" name="wastage_weight" value={formData.wastage_weight} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={2}>
-                <InputField label="Total Weight AW" name="total_weight" value={formData.total_weight} onChange={handleInputChange} />
+                <InputField label="Total Weight AW" name="total_weight_av" value={formData.total_weight_av} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={1}>
                 <InputField label="Rate" name="rate" value={formData.rate} onChange={handleInputChange} />
@@ -1146,17 +1146,17 @@ const RepairForm = () => {
               <Col xs={12} md={2}>
                 <InputField
                   label="MC On"
-                  name="making_charges_on"
+                  name="mc_on"
                   type="select"
-                  value={formData.making_charges_on || ""} // Default to "MC / Gram"
+                  value={formData.mc_on || ""} // Default to "MC / Gram"
                   onChange={handleInputChange}
                   options={[
                     { value: "MC / Gram", label: "MC / Gram" },
                     { value: "MC / Piece", label: "MC / Piece" },
                     { value: "MC %", label: "MC %" },
-                    ...(formData.making_charges_on &&
-                      !["MC / Gram", "MC / Piece", "MC %"].includes(formData.making_charges_on)
-                      ? [{ value: formData.making_charges_on, label: formData.making_charges_on }]
+                    ...(formData.mc_on &&
+                      !["MC / Gram", "MC / Piece", "MC %"].includes(formData.mc_on)
+                      ? [{ value: formData.mc_on, label: formData.mc_on }]
                       : []),
                   ]}
                 />
@@ -1164,7 +1164,7 @@ const RepairForm = () => {
               <Col xs={12} md={1}>
                 <InputField
                   label={
-                    formData.making_charges_on === "MC %"
+                    formData.mc_on === "MC %"
                       ? "MC %"
                       : "MC/Gm"
                   }
@@ -1176,8 +1176,8 @@ const RepairForm = () => {
               <Col xs={12} md={1}>
                 <InputField
                   label="Total MC"
-                  name="total_mc"
-                  value={formData.total_mc || ""} // Display calculated Total MC
+                  name="making_charges"
+                  value={formData.making_charges || ""} // Display calculated Total MC
                   onChange={handleInputChange}
                 // readOnly // Make this field read-only, since it’s auto-calculated
                 />
@@ -1210,10 +1210,10 @@ const RepairForm = () => {
                 <InputField label="Tax %" name="tax_percent" value={formData.tax_percent} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={1}>
-                <InputField label="Tax Amt" name="tax_vat_amount" value={formData.tax_vat_amount} onChange={handleInputChange} />
+                <InputField label="Tax Amt" name="tax_amt" value={formData.tax_amt} onChange={handleInputChange} />
               </Col>
               <Col xs={12} md={2}>
-                <InputField label="Total Price" name="total_rs" value={formData.total_rs} onChange={handleInputChange} />
+                <InputField label="Total Price" name="total_price" value={formData.total_price} onChange={handleInputChange} />
               </Col>
             </>
           )}
@@ -1252,10 +1252,10 @@ const RepairForm = () => {
                     <td>{entry.category}</td>
                     <td>{entry.sub_category}</td>
                     <td>{entry.gross_weight}</td>
-                    <td>{entry.stones_weight}</td>
-                    <td>{entry.total_weight}</td>
+                    <td>{entry.stone_weight}</td>
+                    <td>{entry.total_weight_av}</td>
                     <td>{entry.rate}</td>
-                    <td>{entry.total_rs}</td>
+                    <td>{entry.total_price}</td>
                     <td>
                       <div className="d-flex align-items-center">
                         <FaEdit
@@ -1322,6 +1322,12 @@ const RepairForm = () => {
                   Net Amount
                 </td>
                 <td colSpan="4">{netAmount.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td colSpan="20" className="text-right">
+                  Net Payable Amount
+                </td>
+                <td colSpan="4">{Math.round(netAmount).toFixed(2)}</td>
               </tr>
             </>
           </Table>
