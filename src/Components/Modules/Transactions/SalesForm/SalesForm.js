@@ -353,30 +353,37 @@ const SalesForm = () => {
 
   const fetchEstimateDetails = async (estimate_number) => {
     if (!estimate_number) return;
-
+  
     try {
       const response = await axios.get(`${baseURL}/get-estimates/${estimate_number}`);
-
+  
       // First, update the state with the full estimate details
       setEstimateDetails(response.data);
-
+  
       if (!stock) {
         console.warn("Stock data not yet available!");
         return;
       }
-
+  
       // Filter only matching repeatedData items
-      const filteredData = response.data.repeatedData.filter(item =>
-        stock.some(stockItem => stockItem.PCode_BarCode === item.code && stockItem.Status === "Available")
-      );
-
+      const filteredData = response.data.repeatedData
+        .filter(item =>
+          stock.some(stockItem => stockItem.PCode_BarCode === item.code && stockItem.Status === "Available")
+        )
+        .map(item => ({
+          ...item,
+          invoice_number: formData.invoice_number, // Add invoice_number from formData
+          transaction_status: "Sales", // Add transaction_status as "Sales"
+          date:formData.date,
+        }));
+  
       if (filteredData.length > 0) {
         // Store filtered data in localStorage
         localStorage.setItem("repairDetails", JSON.stringify(filteredData));
-
+  
         // Update state with filtered data
         setRepairDetails(filteredData);
-
+  
         // Immediately retrieve and log stored data
         const storedData = JSON.parse(localStorage.getItem("repairDetails"));
         console.log("Stored repairDetails:", storedData);
@@ -390,6 +397,7 @@ const SalesForm = () => {
       console.error('Error fetching selected estimate details:', error);
     }
   };
+  
 
   const handleEstimateChange = (e) => {
     const selectedValue = e.target.value;

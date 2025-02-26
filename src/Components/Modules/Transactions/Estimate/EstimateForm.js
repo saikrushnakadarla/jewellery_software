@@ -47,7 +47,8 @@ const RepairForm = () => {
     hm_charges: "60.00",
     total_price: "",
     total_amount: "0.00",
-    pricing: "By Weight"
+    pricing: "By Weight",
+    opentag_id: "",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -191,6 +192,8 @@ const RepairForm = () => {
           tax_amt: "",
           total_price: "",
           total_amount: "0.00",
+          opentag_id: "",
+          qty:1,
         };
       }
 

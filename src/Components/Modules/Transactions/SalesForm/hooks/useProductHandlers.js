@@ -73,6 +73,7 @@ const useProductHandlers = () => {
     product_image: null,
     imagePreview: null,
     remarks:"",
+
   });
   const [uniqueProducts, setUniqueProducts] = useState([]);
   const [metalTypes, setMetalTypes] = useState([]);
