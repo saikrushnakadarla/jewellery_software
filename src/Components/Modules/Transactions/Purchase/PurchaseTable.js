@@ -183,33 +183,35 @@ const PurchaseTable = () => {
           </div>
         ),
       },
-
       {
-        Header: 'Payments',
-        accessor: 'payment',
+        Header: "Payments",
+        accessor: "payment",
         Cell: ({ row }) => {
-          const { total_amount, paid_amount, paid_amt } = row.original;
-
+          const { total_amount, paid_amount, paid_amt, total_pure_wt, paid_pure_weight, paid_wt } = row.original;
+      
           // Ensure all values are treated as numbers
           const totalPaid = (Number(paid_amount) || 0) + (Number(paid_amt) || 0);
           const totalAmount = Number(total_amount) || 0;
-
+          const totalPaidWt = (Number(paid_pure_weight) || 0) + (Number(paid_wt) || 0);
+          const totalWt = Number(total_pure_wt) || 0;
+      
           return (
             <Button
               style={{
-                backgroundColor: '#28a745',
-                borderColor: '#28a745',
-                fontSize: '0.875rem',
-                padding: '0.25rem 0.5rem',
+                backgroundColor: "#28a745",
+                borderColor: "#28a745",
+                fontSize: "0.875rem",
+                padding: "0.25rem 0.5rem",
               }}
               onClick={() => handleAddReceipt(row.original)}
-            // disabled={totalAmount === totalPaid} 
+              disabled={totalWt === totalPaidWt} // Disable if both amounts or weights are fully paid
             >
               Add Payment
             </Button>
           );
         },
       }
+      
 
     ],
     [loading]

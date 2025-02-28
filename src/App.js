@@ -62,6 +62,7 @@ import SubCategory from "./Components/Modules/Masters/SubCategory/SubCategory";
 import SubCategoryTable from "./Components/Modules/Masters/SubCategory/SubCategoryTable";
 import { AuthProvider } from "./Components/Pages/Login/Context";
 import EstimateSales from './Components/Modules/Transactions/Sales/EstimateSales';
+import QRScanner from "./Components/QRScanner ";
 function App() {
   const location = useLocation();
 
@@ -144,6 +145,9 @@ function App() {
 
 
         <Route path="/estimateSales" element={<EstimateSales />} />
+
+
+        <Route path="/qrcode" element={<QRScanner />} />
       </Routes>
       </AuthProvider>
     </>
