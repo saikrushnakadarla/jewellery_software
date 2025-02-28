@@ -13,20 +13,20 @@ const PurchaseTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store fetched table data
   const [loading, setLoading] = useState(false); // Loading state for delete actions
- const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openUpdateShow, setOpenUpdateShow] = useState(false); // State for the update modal
   const [selectedRow, setSelectedRow] = useState(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false); // State for update modal
-    const location = useLocation();
-    const { mobile } = location.state || {};
-    const initialSearchValue = location.state?.mobile || '';
-  
-    useEffect(() => {
-      if (mobile) {
-        console.log("Selected Mobile from Dashboard:", mobile);
-      }
-    }, [mobile]);
+  const location = useLocation();
+  const { mobile } = location.state || {};
+  const initialSearchValue = location.state?.mobile || '';
+
+  useEffect(() => {
+    if (mobile) {
+      console.log("Selected Mobile from Dashboard:", mobile);
+    }
+  }, [mobile]);
 
   // Function to format date to DD/MM/YYYY
   const formatDate = (date) => {
@@ -38,41 +38,41 @@ const PurchaseTable = () => {
     return `${day}/${month}/${year}`;
   };
 
-// Function to handle delete request
-const handleDelete = async (id) => {
-  const confirmDelete = window.confirm('Are you sure you want to delete this purchase?');
-  if (!confirmDelete) return;
+  // Function to handle delete request
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this purchase?');
+    if (!confirmDelete) return;
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const response = await fetch(`${baseURL}/delete-purchases/${id}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    try {
+      const response = await fetch(`${baseURL}/delete-purchases/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-    if (response.ok) {
-      alert(result.message || 'Purchase deleted successfully');
-      // Remove the deleted item from the state
-      setData((prevData) => prevData.filter((item) => item.id !== id));
-    } else {
-      console.error('Error deleting purchase:', result.message);
-      alert(result.message || 'Failed to delete purchase');
+      if (response.ok) {
+        alert(result.message || 'Purchase deleted successfully');
+        // Remove the deleted item from the state
+        setData((prevData) => prevData.filter((item) => item.id !== id));
+      } else {
+        console.error('Error deleting purchase:', result.message);
+        alert(result.message || 'Failed to delete purchase');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Something went wrong while deleting the purchase');
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Something went wrong while deleting the purchase');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
-const handleOpenModal = (data) => {
-  setSelectedProduct(data);
-  setShowModal(true);
-};
+  const handleOpenModal = (data) => {
+    setSelectedProduct(data);
+    setShowModal(true);
+  };
 
   // Separate function to open the update modal
   const handleOpenUpdateModal = (data) => {
@@ -101,10 +101,10 @@ const handleOpenModal = (data) => {
       { Header: 'Purity', accessor: 'purity' },
       { Header: 'Pure Wt', accessor: 'pure_weight' },
       { Header: 'Rate', accessor: 'rate' },
-      { 
-        Header: 'Tot Wt / Amt', 
+      {
+        Header: 'Tot Wt / Amt',
         accessor: row => ` ${row.total_pure_wt} / ${row.total_amount}`
-      }, 
+      },
       // { 
       //   Header: 'Paid Wt / Amt', 
       //   accessor: row => ` ${row.paid_pure_weight} / ${row.paid_amount}`
@@ -113,7 +113,7 @@ const handleOpenModal = (data) => {
       //   Header: 'Bal Wt / Amt', 
       //   accessor: row => ` ${row.balance_pure_weight} / ${row.balance_amount}`
       // }, 
-      
+
       {
         Header: 'Paid Wt / Amt',
         accessor: 'paid_amount',
@@ -121,11 +121,13 @@ const handleOpenModal = (data) => {
           const paid_amount = Number(row.original.paid_amount) || 0;
           const paid_amt = Number(row.original.paid_amt) || 0;
           const paid_pure_weight = Number(row.original.paid_pure_weight) || 0;
-      
-          return `${paid_pure_weight} / ${paid_amount + paid_amt}`;
+          const paid_wt = Number(row.original.paid_wt) || 0;
+
+          const final_paid_wt = (paid_pure_weight + paid_wt).toFixed(3);
+          return `${final_paid_wt} / ${paid_amount + paid_amt}`;
         },
       },
-      
+
       {
         Header: 'Bal Wt / Amt',
         accessor: 'balance_amount',
@@ -134,13 +136,19 @@ const handleOpenModal = (data) => {
           const balance_after_receipt = Number(row.original.balance_after_receipt) || 0;
           const paid_amt = Number(row.original.paid_amt) || 0;
           const balance_pure_weight = Number(row.original.balance_pure_weight) || 0;
-      
+          const balWt_after_payment = Number(row.original.balWt_after_payment) || 0;
+          const paid_wt = Number(row.original.paid_wt) || 0;
+
           const final_balance_amount =
             balance_amount === paid_amt ? balance_after_receipt : balance_after_receipt || balance_amount || '-';
-      
-          return `${balance_pure_weight} / ${final_balance_amount} `;
+
+          const final_balance_wt =
+            (balance_pure_weight === paid_wt ? balWt_after_payment : balWt_after_payment || balance_pure_weight || 0).toFixed(3);
+
+          return `${final_balance_wt} / ${final_balance_amount}`;
         },
       },
+
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -149,7 +157,7 @@ const handleOpenModal = (data) => {
             <button
               type="button"
               className="btn btn-primary"
-              
+
               style={{
                 backgroundColor: '#a36e29',
                 borderColor: '#a36e29',
@@ -175,38 +183,38 @@ const handleOpenModal = (data) => {
           </div>
         ),
       },
-      
+
       {
         Header: 'Payments',
         accessor: 'payment',
         Cell: ({ row }) => {
           const { total_amount, paid_amount, paid_amt } = row.original;
-          
+
           // Ensure all values are treated as numbers
           const totalPaid = (Number(paid_amount) || 0) + (Number(paid_amt) || 0);
           const totalAmount = Number(total_amount) || 0;
-      
+
           return (
             <Button
               style={{
                 backgroundColor: '#28a745',
                 borderColor: '#28a745',
-                fontSize: '0.875rem', 
-                padding: '0.25rem 0.5rem', 
+                fontSize: '0.875rem',
+                padding: '0.25rem 0.5rem',
               }}
               onClick={() => handleAddReceipt(row.original)}
-              // disabled={totalAmount === totalPaid} 
+            // disabled={totalAmount === totalPaid} 
             >
               Add Payment
             </Button>
           );
         },
       }
-      
+
     ],
     [loading]
   );
-  
+
 
   const handleAddReceipt = (invoiceData) => {
     console.log("Invoice Data:", invoiceData);
@@ -221,7 +229,7 @@ const handleOpenModal = (data) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-  
+
         if (Array.isArray(result)) {
           setData(result); // Update state if the result is an array
         } else {
@@ -233,16 +241,16 @@ const handleOpenModal = (data) => {
         alert('Failed to fetch data. Please try again later.');
       }
     };
-  
+
     fetchData();
   }, []);
-  
+
 
   // Handle navigation to the Create Purchase page
   const handleCreate = () => {
     navigate('/purchase'); // Update with your correct route
   };
-  
+
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedProduct(null);
@@ -264,7 +272,7 @@ const handleOpenModal = (data) => {
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue}/>
+        <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
       </div>
       <Modal
         show={showModal}
@@ -287,12 +295,12 @@ const handleOpenModal = (data) => {
         </Modal.Body>
 
       </Modal>
-     {/* Separate modal for update */}
-     <Modal show={showUpdateModal} onHide={handleCloseUpdateModal} size="lg" backdrop="static" keyboard={false} dialogClassName="custom-tagentrymodal-width">
+      {/* Separate modal for update */}
+      <Modal show={showUpdateModal} onHide={handleCloseUpdateModal} size="lg" backdrop="static" keyboard={false} dialogClassName="custom-tagentrymodal-width">
         <Modal.Header closeButton>
           <Modal.Title>Update Purchase</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{marginTop:'-90px'}}>
+        <Modal.Body style={{ marginTop: '-90px' }}>
           {selectedProduct && (
             <UpdatePurchaseForm selectedProduct={selectedProduct} handleCloseModal={handleCloseUpdateModal} />
           )}

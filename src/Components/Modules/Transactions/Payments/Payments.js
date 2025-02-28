@@ -24,7 +24,7 @@ const RepairForm = () => {
     total_wt: "",
     paid_wt: "",
     bal_wt: "",
-    rate:"",
+    rate: "",
     total_amt: "",
     discount_amt: "",
     cash_amt: "",
@@ -32,10 +32,8 @@ const RepairForm = () => {
   });
   const { id } = useParams();
   const [accountOptions, setAccountOptions] = useState([]);
-
   const [purchases, setPurchases] = useState([]);
   const [invoiceOptions, setInvoiceOptions] = useState([]);
-
   const { invoiceData } = location.state || {};
 
   useEffect(() => {
@@ -65,14 +63,16 @@ const RepairForm = () => {
         const balAfterReceipts = Number(selectedInvoice.balance_after_receipt) || 0;
         const balAmt = Number(selectedInvoice.balance_amount) || 0;
         const balanceWeight = Number(selectedInvoice.balance_pure_weight) || 0;
+        const balanceWeightAfterPayment = Number(selectedInvoice.balWt_after_payment) || 0;
         const rate = Number(selectedInvoice.rate) || 0;
         const totalAmt = balAfterReceipts || balAmt || 0;
+        const totalWt = balanceWeightAfterPayment || balanceWeight || 0;
         console.log("totalAmt=", totalAmt)
         setFormData((prevData) => ({
           ...prevData,
           total_amt: totalAmt,
-          total_wt: balanceWeight,
-          rate:rate,
+          total_wt: totalWt,
+          rate: rate,
         }));
       }
     }
@@ -163,7 +163,7 @@ const RepairForm = () => {
       const selectedInvoice = purchases.find(
         (purchase) => purchase.invoice === formData.invoice_number
       );
-
+  
       if (selectedInvoice) {
         const paidAmt = Number(selectedInvoice.paid_amt) || 0;
         const balanceAfterReceipt = Number(selectedInvoice.balance_after_receipt) || 0;
@@ -171,30 +171,46 @@ const RepairForm = () => {
         const paidAmount = Number(selectedInvoice.paid_amount) || 0;
         const balanceAmount = Number(selectedInvoice.balance_amount) || 0;
         const totalWeight = Number(selectedInvoice.total_pure_weight) || 0;
-        const paidWeight = Number(selectedInvoice.paid_pure_weight) || 0;
+        const paidPureWeight = Number(selectedInvoice.paid_pure_weight) || 0;
         const balanceWeight = Number(selectedInvoice.balance_pure_weight) || 0;
+        const paidWt = Number(selectedInvoice.paid_wt) || 0;
+        const balanceWeightAfterPayment = Number(selectedInvoice.balWt_after_payment) || 0;
         const rate = Number(selectedInvoice.rate) || 0;
-
+  
+        let totalAmt =
+          paidAmt + paidAmount === totalAmount
+            ? balanceAfterReceipt
+            : balanceAfterReceipt > 0
+              ? balanceAfterReceipt
+              : balanceAmount;
+  
+        if (!totalAmt) {
+          totalAmt = (formData.total_wt * formData.rate).toFixed(2); // Default calculation
+        }
+  
+        let totalWt =
+          paidWt + paidPureWeight === totalWeight
+            ? balanceWeightAfterPayment
+            : balanceWeightAfterPayment > 0
+              ? balanceWeightAfterPayment
+              : balanceWeight;
+  
         setFormData((prevData) => ({
           ...prevData,
-          total_amt:
-            paidAmt + paidAmount === totalAmount
-              ? balanceAfterReceipt
-              : balanceAfterReceipt > 0
-                ? balanceAfterReceipt
-                : balanceAmount,
-          total_wt: balanceWeight,
-          rate:rate,
+          total_amt: totalAmt,
+          total_wt: totalWt.toFixed(3), // Ensure 3 decimal places
         }));
       }
     } else {
-      // Clear total_amt when invoice_number is cleared
+      // Clear total_amt and total_wt when invoice_number is cleared
       setFormData((prevData) => ({
         ...prevData,
         total_amt: "",
+        total_wt: "",
       }));
     }
-  }, [formData.invoice_number, purchases]);
+  }, [formData.invoice_number, purchases, formData.total_wt, formData.rate]);
+  
 
   useEffect(() => {
     // Set default date to today
@@ -226,28 +242,36 @@ const RepairForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
+  
     setFormData((prevData) => {
       const updatedData = {
         ...prevData,
-        [name]: value,
+        [name]: value, // Ensure the field is updated first
       };
-
-      if (name === "total_amt" || name === "discount_amt") {
-        const totalAmt = Number(updatedData.total_amt) || 0;
-        const discountAmt = Number(updatedData.discount_amt) || 0;
+  
+      // Ensure numerical values are properly converted
+      const totalAmt = Number(updatedData.total_amt) || 0;
+      const discountAmt = value === "" ? "" : Number(updatedData.discount_amt) || 0;
+      const totalWt = Number(updatedData.total_wt) || 0;
+      const paidWt = Number(updatedData.paid_wt) || 0;
+      const rate = Number(updatedData.rate) || 0;
+  
+      // Ensure discount_amt is valid
+      if (name === "discount_amt") {
         if (discountAmt > totalAmt) {
           alert("Paid amount cannot be greater than total amount.");
           updatedData.discount_amt = updatedData.prevPaidAmt || "";
         } else {
-          updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
+          updatedData.cash_amt = discountAmt !== "" ? (totalAmt - discountAmt).toFixed(2) : ""; // Update only if discount_amt exists, otherwise clear it
+  
+          // Calculate paid_wt as discount_amt * rate and update it
+          updatedData.paid_wt = discountAmt !== "" ? (discountAmt/rate).toFixed(3) : "";
         }
         updatedData.prevPaidAmt = updatedData.discount_amt;
       }
-
+  
+      // Ensure paid_wt is valid
       if (name === "total_wt" || name === "paid_wt") {
-        const totalWt = Number(updatedData.total_wt) || 0;
-        const paidWt = Number(updatedData.paid_wt) || 0;
         if (paidWt > totalWt) {
           alert("Balance Weight cannot be greater than total weight.");
           updatedData.paid_wt = updatedData.prevPaidWt || "";
@@ -256,9 +280,16 @@ const RepairForm = () => {
         }
         updatedData.prevPaidWt = updatedData.paid_wt;
       }
+  
+      // Ensure total_amt updates dynamically if rate or total_wt change
+      if (name === "rate" || name === "total_wt") {
+        updatedData.total_amt = (updatedData.total_wt * rate).toFixed(2);
+      }
+  
       return updatedData;
     });
   };
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -360,7 +391,6 @@ const RepairForm = () => {
     const from = location.state?.from || "/paymentstable"; // Default to /receiptstable if no from location provided
     navigate(from);
   };
-
 
   return (
     <div className="main-container">
