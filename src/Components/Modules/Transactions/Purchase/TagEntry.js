@@ -10,6 +10,8 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import "./TagEntry.css";
 import { Form, Row, Col } from 'react-bootstrap';
 import { Modal, Button } from "react-bootstrap";  // Add this import
+import { jsPDF } from "jspdf";
+import QRCode from "qrcode";
 
 const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     console.log("Pricing=", selectedProduct.Pricing)
@@ -488,22 +490,16 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 item_prefix: "", // Adjust as needed
             };
 
+            const updatedData = {
+                ...formData,
+            };
+
             // Save form data
             await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
                 headers: { 'Content-Type': 'application/json' },
             });
-
-            // Uncomment if the additional API is needed
-            // await axios.post(`${baseURL}/add-entry`, {
-            //     id: formData.id,
-            //     product_id: formData.product_id,
-            //     pcs: updatedPcs,
-            //     gross_weight: updatedGrossWeight,
-            //     added_at: new Date().toISOString(),
-            // });
-
             alert("Stock added successfully!");
-
+            generateAndDownloadPDF(updatedData);
             fetchData();
             setFormData((prevData) => ({
                 ...prevData,
@@ -561,6 +557,26 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         } catch (error) {
             console.error(error);
             alert("An error occurred. Please try again.");
+        }
+    };
+
+    const generateAndDownloadPDF = async (data) => {
+        const doc = new jsPDF();
+        const qrContent = `PCode: ${data.PCode_BarCode}, Name: ${data.sub_category}, Weight: ${data.Gross_Weight}`;
+    
+        try {
+            const qrImageData = await QRCode.toDataURL(qrContent);
+    
+            doc.text("Product QR Code", 10, 10);
+            doc.addImage(qrImageData, "PNG", 10, 20, 40, 40);
+    
+            doc.text(`PCode: ${data.PCode_BarCode}`, 60, 30);
+            doc.text(`Name: ${data.sub_category}`, 60, 40);
+            doc.text(`Weight: ${data.Gross_Weight}`, 60, 50);
+    
+            doc.save(`QR_Code_${data.PCode_BarCode}.pdf`);
+        } catch (error) {
+            console.error("Error generating QR Code PDF:", error);
         }
     };
 
