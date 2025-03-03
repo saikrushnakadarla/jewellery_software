@@ -96,14 +96,15 @@ const URDPurchase = () => {
     paid_pure_weight: "",
     balance_pure_weight: "0",
     rate: "",
+    tax_slab: "03% GST",
     total_amount: "",
     paid_amount: "",
     balance_amount: "",
     balance_after_receipt: "0",
-    balWt_after_payment:"0",
+    balWt_after_payment: "0",
     Pricing: 'By Weight',
     purityPercentage: "",
-    remarks:"",
+    remarks: "",
   });
 
   // const [tableData, setTableData] = useState([]);
@@ -135,6 +136,27 @@ const URDPurchase = () => {
       }
     };
     fetchCurrentRates();
+  }, []);
+
+  const [taxOptions, setTaxOptions] = useState([]);
+  useEffect(() => {
+    const fetchProductIds = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/taxslabs`);
+        const Data = response.data; // Ensure the response structure matches this
+        const options = Data.map((tax) => ({
+          value: tax.TaxSlabName,
+          label: tax.TaxSlabName,
+          id: tax.TaxSlabID, // Ensure you have the TaxSlabID
+        }));
+        setTaxOptions(options);
+        console.log("Names=", options)
+      } catch (error) {
+        console.error("Error fetching product IDs:", error);
+      }
+    };
+
+    fetchProductIds();
   }, []);
 
   useEffect(() => {
@@ -175,6 +197,11 @@ const URDPurchase = () => {
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
+
+        // Ensure manual input works correctly
+    if (!/silver|gold/i.test(updatedFormData.category)) {
+      return updatedFormData;
+    }
 
       const isFixedPricing = updatedFormData.Pricing === "By fixed";
       // Reset fields when "By fixed" is selected
@@ -380,8 +407,8 @@ const URDPurchase = () => {
           paid_amount: "",
           balance_amount: "",
           balance_after_receipt: "0",
-          balWt_after_payment:"0",
-          remarks:"",
+          balWt_after_payment: "0",
+          remarks: "",
         });
       } else {
         console.error("Failed to add entry to the database:", response.statusText);
@@ -390,6 +417,8 @@ const URDPurchase = () => {
       console.error("Error while adding entry to the database:", error);
     }
   };
+
+  const isSilverOrGold = /silver|gold/i.test(formData.category);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -453,7 +482,7 @@ const URDPurchase = () => {
         rate: "",
         total_amount: "",
         product_id: "",
-        remarks:"",
+        remarks: "",
       });
       setTableData([]);
       localStorage.removeItem("purchaseFormData");
@@ -729,90 +758,90 @@ const URDPurchase = () => {
     }
   }, [formData.category]);
 
-useEffect(() => {
-  const fetchPurity = async () => {
-    if (!formData.category) {
-      setFormData((prev) => ({
-        ...prev,
-        purity: "",
-        rate: "",
-      }));
-      setPurityOptions([]);
-      return;
-    }
-
-    if (!formData.metal_type) {
-      setPurityOptions([]);
-      return;
-    }
-
-    try {
-      const response = await axios.get(`${baseURL}/purity`);
-      const filteredPurity = response.data.filter(
-        (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
-      );
-
-      setPurityOptions(filteredPurity);
-      console.log("Purity Options:", filteredPurity);
-
-      let defaultOption = null;
-
-      if (formData.metal_type.toLowerCase() === "gold") {
-        defaultOption = filteredPurity.find((option) =>
-          option.name.toLowerCase().includes("22") // Check if "22" is included
-        );
-
-        if (defaultOption) {
-          setFormData((prev) => ({
-            ...prev,
-            purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
-            rate: rates.rate_22crt,
-          }));
-        }
+  useEffect(() => {
+    const fetchPurity = async () => {
+      if (!formData.category) {
+        setFormData((prev) => ({
+          ...prev,
+          purity: "",
+          rate: "",
+        }));
+        setPurityOptions([]);
+        return;
       }
 
-      if (formData.metal_type.toLowerCase() === "silver") {
-        const silver22 = filteredPurity.find((option) =>
-          option.name.toLowerCase().includes("22")
-        );
-
-        const silver24 = filteredPurity.find((option) =>
-          option.name.toLowerCase().includes("24")
-        );
-
-        defaultOption = silver24 || silver22;
-
-        if (defaultOption) {
-          setFormData((prev) => ({
-            ...prev,
-            purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
-            rate: rates.silver_rate,
-          }));
-        }
+      if (!formData.metal_type) {
+        setPurityOptions([]);
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
 
-  fetchPurity();
-}, [formData.metal_type, formData.category]);
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+        const filteredPurity = response.data.filter(
+          (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
+        );
 
-  
+        setPurityOptions(filteredPurity);
+        console.log("Purity Options:", filteredPurity);
+
+        let defaultOption = null;
+
+        if (formData.metal_type.toLowerCase() === "gold") {
+          defaultOption = filteredPurity.find((option) =>
+            option.name.toLowerCase().includes("22") // Check if "22" is included
+          );
+
+          if (defaultOption) {
+            setFormData((prev) => ({
+              ...prev,
+              purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
+              rate: rates.rate_22crt,
+            }));
+          }
+        }
+
+        if (formData.metal_type.toLowerCase() === "silver") {
+          const silver22 = filteredPurity.find((option) =>
+            option.name.toLowerCase().includes("22")
+          );
+
+          const silver24 = filteredPurity.find((option) =>
+            option.name.toLowerCase().includes("24")
+          );
+
+          defaultOption = silver24 || silver22;
+
+          if (defaultOption) {
+            setFormData((prev) => ({
+              ...prev,
+              purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
+              rate: rates.silver_rate,
+            }));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchPurity();
+  }, [formData.metal_type, formData.category]);
+
+
   const extractPurityPercentage = (purityValue) => {
     if (!purityValue || purityOptions.length === 0) return 0;
-  
+
     if (purityValue.toLowerCase() === "manual") {
       return parseFloat(formData.purityPercentage) || 0; // Use custom purity input
     }
-  
+
     const matchedPurity = purityOptions.find((option) =>
       purityValue.includes(option.name)
     );
-  
+
     return matchedPurity ? parseFloat(matchedPurity.purity_percentage) || 0 : 0;
   };
-  
+
   useEffect(() => {
     const updatedFormData = { ...formData };
     const netWeight = parseFloat(updatedFormData.net_weight) || 0;
@@ -832,12 +861,12 @@ useEffect(() => {
 
     const wastageWeight = parseFloat(updatedFormData.wastage_wt) || 0;
     updatedFormData.total_pure_wt = (parseFloat(updatedFormData.pure_weight) + wastageWeight).toFixed(3);
-  
+
     const rate = parseFloat(updatedFormData.rate) || 0;
     const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
     let paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || 0;
     let paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
-    
+
     if (lastUpdatedField === "paid_amount" && rate) {
       paidPureWeight = (paidAmount / rate).toFixed(3);
     } else if (lastUpdatedField === "paid_pure_weight" && rate) {
@@ -857,9 +886,9 @@ useEffect(() => {
     formData.net_weight,
     formData.rate,
     formData.total_amount,
-    formData.paid_amount 
+    formData.paid_amount
   ]);
-  
+
   const handleOpenModal = (data) => {
     setSelectedProduct(data);
     setShowModal(true);
@@ -1069,55 +1098,53 @@ useEffect(() => {
                       onChange={(e) => handleChange("net_weight", e.target.value)}
                     />
                   </Col>
-                  {formData.category === "Diamond" ? (
+                  {!isSilverOrGold && (
                     <>
-                      <Col xs={12} md={2}>
+
+                      <Col xs={12} md={1}>
                         <InputField
                           label="Cut"
                           name="cut"
-                          type="text"
-                          value={formData.cut || ""}
+                          value={formData.cut}
                           onChange={(e) => handleChange("cut", e.target.value)}
                         />
                       </Col>
-                      <Col xs={12} md={2}>
+                      <Col xs={12} md={1}>
                         <InputField
                           label="Color"
                           name="color"
-                          type="text"
-                          value={formData.color || ""}
+                          value={formData.color}
                           onChange={(e) => handleChange("color", e.target.value)}
                         />
                       </Col>
-                      <Col xs={12} md={2}>
+                      <Col xs={12} md={1}>
                         <InputField
                           label="Clarity"
                           name="clarity"
-                          type="text"
-                          value={formData.clarity || ""}
+                          value={formData.clarity}
                           onChange={(e) => handleChange("clarity", e.target.value)}
                         />
                       </Col>
                     </>
-                  ) : (
-                    <Col xs={12} md={2}>
-                      <InputField
-                        label="Purity"
-                        type="select"
-                        name="purity"
-                        value={formData.purity}
-                        onChange={(e) => handleChange("purity", e.target.value)}
-                        options={[
-                          ...purityOptions.map((option) => ({
-                            value: `${option.name} | ${option.purity_percentage}`, // Combined name and purity
-                            label: `${option.name} | ${option.purity_percentage}`,
-                          })),
-                          { value: "Manual", label: "Manual" }, // Added inside the array
-                        ]}
-                      />
-                    </Col>
-
                   )}
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Purity"
+                      type="select"
+                      name="purity"
+                      value={formData.purity}
+                      onChange={(e) => handleChange("purity", e.target.value)}
+                      options={[
+                        ...purityOptions.map((option) => ({
+                          value: `${option.name} | ${option.purity_percentage}`, // Combined name and purity
+                          label: `${option.name} | ${option.purity_percentage}`,
+                        })),
+                        { value: "Manual", label: "Manual" }, // Added inside the array
+                      ]}
+                    />
+                  </Col>
+
+
                   {formData.purity === "Manual" && (
                     <Col xs={12} md={2}>
                       <InputField
@@ -1205,6 +1232,16 @@ useEffect(() => {
                   type="number"
                   value={formData.rate}
                   onChange={(e) => handleChange("rate", e.target.value)}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+              <InputField
+                  label="GST:"
+                  name="tax_slab"
+                  type="select"
+                  value={formData.tax_slab}
+                  onChange={handleChange}
+                  options={taxOptions}
                 />
               </Col>
               {/* <Col xs={12} md={2}>
