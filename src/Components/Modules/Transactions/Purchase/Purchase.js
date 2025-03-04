@@ -206,6 +206,19 @@ const URDPurchase = () => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
 
+       // Recalculate Net Weight on every change, including category selection
+    const grossWt = parseFloat(updatedFormData.gross_weight) || 0;
+    const stoneWt = parseFloat(updatedFormData.stone_weight) || 0;
+    updatedFormData.net_weight = (grossWt - stoneWt).toFixed(3);
+
+    // If category is changed, update rate (if applicable)
+    if (field === "category") {
+      const selectedCategory = categories.find((cat) => cat.value === value);
+      if (selectedCategory) {
+        updatedFormData.rate = selectedCategory.rate || "";
+      }
+    }
+
         // Calculate Amount: amount = carat_wt * price
     const caratWt = parseFloat(updatedFormData.carat_wt) || 0;
     const price = parseFloat(updatedFormData.price) || 0;
@@ -239,9 +252,28 @@ const URDPurchase = () => {
       }
 
       // Ensure manual input works correctly
-      if (!/silver|gold/i.test(updatedFormData.category)) {
-        return updatedFormData;
-      }
+      // if (!/silver|gold/i.test(updatedFormData.category)) {
+      //   return updatedFormData;
+      // }
+
+      // Ensure Pure Wt is calculated for gold, silver, and diamond
+if (!/silver|gold|diamond/i.test(updatedFormData.category)) {
+  return updatedFormData;
+}
+
+const wastagePercentage = parseFloat(updatedFormData.wastage) || 0;
+const netWeight = parseFloat(updatedFormData.pure_weight) || 0;
+
+updatedFormData.wastage_wt = ((wastagePercentage / 100) * netWeight).toFixed(3);
+
+const purity = parseFloat(updatedFormData.wastage_wt) || 0;
+const netWt = parseFloat(updatedFormData.pure_weight) || 0;
+
+// Ensure purity is a valid percentage before calculating
+if (purity > 0) {
+  updatedFormData.total_pure_wt = (purity + netWt).toFixed(3);
+}
+
 
       const isFixedPricing = updatedFormData.Pricing === "By fixed";
       // Reset fields when "By fixed" is selected
