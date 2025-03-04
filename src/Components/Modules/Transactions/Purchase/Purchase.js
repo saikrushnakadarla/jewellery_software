@@ -77,6 +77,9 @@ const URDPurchase = () => {
     cut: "",
     color: "",
     clarity: "",
+    carat_wt: "",
+    price: "",
+    amount: "",
     hsn_code: "",
     rbarcode: "",
     pcs: "",
@@ -202,6 +205,13 @@ const URDPurchase = () => {
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
+
+        // Calculate Amount: amount = carat_wt * price
+    const caratWt = parseFloat(updatedFormData.carat_wt) || 0;
+    const price = parseFloat(updatedFormData.price) || 0;
+
+    updatedFormData.amount = (caratWt * price).toFixed(2); // Update the amount field
+
 
       if (field === "Making_Charges_On") {
         setMcOnType(value); // Track MC On selection
@@ -415,6 +425,9 @@ const URDPurchase = () => {
           cut: "",
           color: "",
           clarity: "",
+          carat_wt: "",
+          price: "",
+          amount: "",
           hsn_code: "",
           rbarcode: "",
           pcs: "",
@@ -1153,6 +1166,30 @@ const URDPurchase = () => {
                           name="clarity"
                           value={formData.clarity}
                           onChange={(e) => handleChange("clarity", e.target.value)}
+                        />
+                      </Col>
+                      <Col xs={12} md={1}>
+                        <InputField
+                          label="Carat Wt"
+                          name="carat_wt"
+                          value={formData.carat_wt}
+                          onChange={(e) => handleChange("carat_wt", e.target.value)}
+                        />
+                      </Col>
+                      <Col xs={12} md={1}>
+                        <InputField
+                          label="Price"
+                          name="price"
+                          value={formData.price}
+                          onChange={(e) => handleChange("price", e.target.value)}
+                        />
+                      </Col>
+                      <Col xs={12} md={1}>
+                        <InputField
+                          label="Amount"
+                          name="amount"
+                          value={formData.amount}
+                          onChange={(e) => handleChange("amount", e.target.value)}
                         />
                       </Col>
                     </>
