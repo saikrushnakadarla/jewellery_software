@@ -90,6 +90,9 @@ const URDPurchase = () => {
     hm_charges: "",
     other_charges: "",
     charges: "",
+    Making_Charges_On: "",
+    Making_Charges_Value: "",
+    total_mc: "",
     product_id: "",
     metal_type: "",
     pure_weight: "",
@@ -194,14 +197,41 @@ const URDPurchase = () => {
   }, [mobile, customers]);
   const [lastUpdatedField, setLastUpdatedField] = useState(null);
 
+  const [mcOnType, setMcOnType] = useState("");
+
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
       const updatedFormData = { ...prevFormData, [field]: value };
 
-        // Ensure manual input works correctly
-    if (!/silver|gold/i.test(updatedFormData.category)) {
-      return updatedFormData;
-    }
+      if (field === "Making_Charges_On") {
+        setMcOnType(value); // Track MC On selection
+        updatedFormData.Making_Charges_Value = ""; // Reset Making Charges Value
+        updatedFormData.total_mc = ""; // Reset Total MC
+      }
+
+      const totalPureWt = parseFloat(updatedFormData.total_pure_wt) || 0;
+      const makingChargesValue = parseFloat(updatedFormData.Making_Charges_Value) || 0;
+      const totalMC = parseFloat(updatedFormData.total_mc) || 0;
+
+      // Calculation based on Making_Charges_On selection
+      if (updatedFormData.Making_Charges_On === "MC / Gram") {
+        updatedFormData.total_mc = (makingChargesValue * totalPureWt).toFixed(2);
+      } else if (updatedFormData.Making_Charges_On === "MC / Piece") {
+        if (totalPureWt > 0) {
+          updatedFormData.Making_Charges_Value = (totalMC / totalPureWt).toFixed(2);
+        } else {
+          updatedFormData.Making_Charges_Value = "0";
+        }
+      }
+
+      if (field === "Making_Charges_On") {
+        setMcOnType(value); // Track MC On selection
+      }
+
+      // Ensure manual input works correctly
+      if (!/silver|gold/i.test(updatedFormData.category)) {
+        return updatedFormData;
+      }
 
       const isFixedPricing = updatedFormData.Pricing === "By fixed";
       // Reset fields when "By fixed" is selected
@@ -263,8 +293,8 @@ const URDPurchase = () => {
         }
       }
 
-       // When paid_pure_weight is updated, update the rate accordingly
-       if (field === "paid_pure_weight") {
+      // When paid_pure_weight is updated, update the rate accordingly
+      if (field === "paid_pure_weight") {
         if (value) {
           updatedFormData.rate = "0"; // Reset rate when a value is entered
         } else {
@@ -314,7 +344,7 @@ const URDPurchase = () => {
         } else {
           updatedFormData.paid_pure_weight = "0";
         }
-      } 
+      }
       // else if (field === "paid_pure_weight") {
       //   setLastUpdatedField("paid_pure_weight");
       //   const rate = parseFloat(updatedFormData.rate) || 0;
@@ -324,16 +354,16 @@ const URDPurchase = () => {
       //     updatedFormData.paid_amount = "0";
       //   }
       // }
-  
+
       // Update balance calculations
       const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
       const paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
       const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
       const paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || 0;
-  
+
       updatedFormData.balance_pure_weight = (totalPureWeight - paidPureWeight).toFixed(3);
       updatedFormData.balance_amount = (totalAmount - paidAmount).toFixed(2);
-  
+
       return updatedFormData;
     });
   };
@@ -1226,6 +1256,54 @@ const URDPurchase = () => {
                 <InputField label="Charges" type="number" value={formData.charges}
                   onChange={(e) => handleChange("charges", e.target.value)} />
               </Col>
+
+              <Col xs={12} md={2}>
+                <InputField
+                  label="MC On"
+                  name="Making_Charges_On"
+                  type="select"
+                  value={formData.Making_Charges_On}
+                  onChange={(e) => handleChange("Making_Charges_On", e.target.value)}
+                  options={[
+                    { value: "MC / Gram", label: "MC / Gram" },
+                    { value: "MC / Piece", label: "MC / Piece" },
+                    { value: "MC %", label: "MC %" },
+                  ]}
+                />
+              </Col>
+
+              {mcOnType && (
+                <Col xs={12} md={2}>
+                  <InputField
+                    label={mcOnType} // Change label dynamically
+                    name="Making_Charges_Value"
+                    type="number"
+                    value={formData.Making_Charges_Value}
+                    onChange={(e) => handleChange("Making_Charges_Value", e.target.value)}
+                  />
+                </Col>
+              )}
+
+              {/* <Col xs={12} md={1}>
+                <InputField
+                  label="Total MC"
+                  name="total_mc"
+                  value={formData.total_mc || ""}
+                  onChange={handleChange}
+                />
+              </Col> */}
+              <Col xs={12} md={1}>
+                <InputField
+                  label="Total MC"
+                  name="total_mc"
+                  type="number"
+                  value={formData.total_mc || ""}
+                  onChange={(e) => handleChange("total_mc", e.target.value)}
+                  disabled={formData.Making_Charges_On === "MC / Gram"} // Disable only for "MC / Gram"
+                />
+              </Col>
+
+
               <Col xs={12} md={2}>
                 <InputField
                   label={formData.Pricing === "By fixed" ? "Piece Rate" : "Rate-Cut"}
@@ -1235,7 +1313,7 @@ const URDPurchase = () => {
                 />
               </Col>
               <Col xs={12} md={2}>
-              <InputField
+                <InputField
                   label="GST:"
                   name="tax_slab"
                   type="select"
