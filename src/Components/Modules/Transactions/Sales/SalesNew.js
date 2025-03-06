@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./SalesForm.css";
 import InputField from "../../Masters/ItemMaster/Inputfield";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Modal  } from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
+import Webcam from "react-webcam";
 
 const RepairForm = () => {
   const [products, setProducts] = useState([]);
@@ -89,6 +90,13 @@ const RepairForm = () => {
     } catch (error) {
       console.error("Error fetching tags:", error);
     }
+  };
+
+  const [showScanner, setShowScanner] = useState(false);
+  
+  const handleScan = (barcode) => {
+    handleBarcodeChange(barcode); 
+    setShowScanner(false); 
   };
 
   useEffect(() => {
@@ -598,6 +606,11 @@ const RepairForm = () => {
           <div className="sales-form-section">
             <Col>
               <Row>
+              <Col xs={12} md={1}>
+        <Button variant="primary" onClick={() => setShowScanner(true)}>
+          Scan 
+        </Button>
+      </Col>
                 <Col xs={12} md={2}>
                   <InputField
                     label="BarCode/Rbarcode"
@@ -671,6 +684,24 @@ const RepairForm = () => {
                     options={purityOptions}
                   />
                 </Col>
+                  {/* Modal for Barcode Scanner */}
+      <Modal show={showScanner} onHide={() => setShowScanner(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Scan Barcode</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Webcam
+            audio={false}
+            screenshotFormat="image/png"
+            width="100%"
+            height="auto"
+            videoConstraints={{ facingMode: "environment" }}
+          />
+          <Button variant="success" onClick={() => handleScan("1234567890")}>
+            Simulate Scan (Replace with Scanner Logic)
+          </Button>
+        </Modal.Body>
+      </Modal>
               </Row>
             </Col>
           </div>
