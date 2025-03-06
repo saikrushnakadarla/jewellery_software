@@ -9,6 +9,7 @@ import { AiOutlinePlus } from "react-icons/ai";
 import TagEntry from "./TagEntry";
 import { Modal } from "react-bootstrap";
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import StoneDetailsModal from './StoneDetailsModal';
 
 const URDPurchase = () => {
   const navigate = useNavigate();
@@ -75,6 +76,30 @@ const URDPurchase = () => {
     other_charges: "",
     purityPercentage: "",
   });
+
+  useEffect(() => {
+    // Function to calculate total stone weight
+    const calculateTotalWeight = () => {
+      const storedStoneDetails = JSON.parse(localStorage.getItem("stoneDetails")) || [];
+      const total = storedStoneDetails.reduce((sum, item) => sum + (item.weight || 0), 0);
+
+      // Update formData state with total stone weight
+      setFormData((prevData) => ({
+        ...prevData,
+        stone_weight: total.toFixed(2), // Ensure it's in a fixed decimal format
+      }));
+    };
+
+    // Calculate total weight on component mount
+    calculateTotalWeight();
+
+    // Listen for localStorage changes
+    const handleStorageChange = () => calculateTotalWeight();
+    window.addEventListener("storage", handleStorageChange);
+
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
   const [purityOptions, setPurityOptions] = useState([]);
@@ -1089,6 +1114,32 @@ const URDPurchase = () => {
     }));
   }, []);
 
+  // State for "Stone Details" Modal
+  const [showStoneModal, setShowStoneModal] = useState(false);
+  const [totalWeight, setTotalWeight] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+
+
+  const handleStoneDetails = () => {
+    console.log("Stone Details button clicked!");
+    // Add your logic here (e.g., open a modal, navigate to another page, etc.)
+  };
+  // Open Stone Details Modal
+  const handleShowStoneModal = () => {
+    setShowStoneModal(true);
+  };
+
+  // Close Stone Details Modal
+  const handleCloseStoneModal = () => {
+    setShowStoneModal(false);
+  };
+
+  // Update stone details from modal
+  const handleUpdateStoneDetails = (updatedWeight, updatedPrice) => {
+    setTotalWeight(updatedWeight);
+    setTotalPrice(updatedPrice);
+  };
+
   return (
     <div className="main-container">
       <div className="purchase-form-container">
@@ -1270,6 +1321,19 @@ const URDPurchase = () => {
                   <Col xs={12} md={1}>
                     <InputField label="Stone Wt" type="number" value={formData.stone_weight}
                       onChange={(e) => handleChange("stone_weight", e.target.value)} />
+                  </Col>
+                  <Col xs={12} md="auto">
+                    <Button variant="primary" 
+                    onClick={handleShowStoneModal}
+                    style={{
+                      backgroundColor: '#a36e29',
+                      borderColor: '#a36e29',
+                      fontSize: '1rem', // Smaller font size
+                      padding: '0.45rem 1.0rem', // Reduced padding
+                    }}
+                    >
+                      Stone Details
+                    </Button>
                   </Col>
                   <Col xs={12} md={2}>
                     <InputField
@@ -1666,6 +1730,12 @@ const URDPurchase = () => {
           </div>
         </Form>
       </div>
+
+      <StoneDetailsModal
+        showModal={showStoneModal}
+        handleCloseModal={handleCloseStoneModal}
+        handleUpdateStoneDetails={handleUpdateStoneDetails}
+      />
 
       <Modal
         show={showModal}

@@ -294,14 +294,14 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
 
             </div>
 
-            <div className="modal-footer">
+            {/* <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
                 Close
               </button>
               <button type="button" className="btn btn-primary" onClick={handleSaveChanges}>
                 Save Changes
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
