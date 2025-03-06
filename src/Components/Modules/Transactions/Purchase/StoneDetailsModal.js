@@ -49,6 +49,7 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
     ],
     []
   );
+
   const handleAddOrUpdate = () => {
     if (!validateForm()) {
       return;
@@ -104,8 +105,6 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
     setAmount("");
   };
   
-  
-  
   const validateForm = () => {
     if (!subproductname.trim()) {
       alert("Sub Product Name is required.");
@@ -126,8 +125,6 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
     return true;
   };
   
-
-
   const handleEdit = (rowData) => {
     setIsEditing(true);
     setEditId(rowData.id);
@@ -139,16 +136,33 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
   };
 
   const handleDelete = (id) => {
-    const rowToDelete = data.find((item) => item.id === id);
-
+    // Get the current stone details from localStorage
+    let storedData = JSON.parse(localStorage.getItem("stoneDetails")) || [];
+  
+    // Find the row to delete
+    const rowToDelete = storedData.find((item) => item.id === id);
+  
     if (rowToDelete) {
       // Update total weight and total price after deletion
       setTotalWeight((prevTotalWeight) => prevTotalWeight - rowToDelete.weight);
       setTotalPrice((prevTotalPrice) => prevTotalPrice - rowToDelete.amount);
     }
-
-    setData((prevData) => prevData.filter((item) => item.id !== id));
+  
+    // Filter out only the deleted row
+    const updatedData = storedData.filter((item) => item.id !== id);
+  
+    // Update state
+    setData(updatedData);
+  
+    // Update localStorage with the new array
+    localStorage.setItem("stoneDetails", JSON.stringify(updatedData));
+  
+    // Trigger storage event manually
+    window.dispatchEvent(new Event("storage"));
   };
+  
+  
+  
 
   const handleSaveChanges = async () => {
     if (data.length === 0) {
