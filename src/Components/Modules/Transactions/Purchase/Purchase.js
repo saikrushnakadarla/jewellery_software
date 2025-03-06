@@ -240,7 +240,7 @@ const URDPurchase = () => {
         updatedFormData.hsn_code = "";
         updatedFormData.pcs = "";
         updatedFormData.gross_weight = "";
-        updatedFormData.stone_weight = "";
+        // updatedFormData.stone_weight = "";
         updatedFormData.deduct_st_Wt = "No";
         updatedFormData.stone_price = "";
         updatedFormData.wastage_on = "Pure Wt";
