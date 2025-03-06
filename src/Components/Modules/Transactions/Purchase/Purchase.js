@@ -27,54 +27,53 @@ const URDPurchase = () => {
     terms: "Cash",
     invoice: "",
     bill_no: "",
-    rate_cut: "",
     date: new Date().toISOString().split("T")[0],
     bill_date: new Date().toISOString().split("T")[0],
     due_date: "",
+    Pricing: 'By Weight',
+    product_id: "",
     category: "",
-    cut: "",
-    color: "",
-    clarity: "",
-    carat_wt: "",
-    price: "",
-    amount: "",
-    hsn_code: "",
+    metal_type: "",
     rbarcode: "",
+    hsn_code: "",
     pcs: "",
     gross_weight: "",
     stone_weight: "",
     deduct_st_Wt: "No",
-    stone_price: "",
+    net_weight: "",
+    purity: "",
+    pure_weight: "",
     wastage_on: "Pure Wt",
     wastage: "0",
     wastage_wt: "0.000",
-    total_pure_wt: "",
-    net_weight: "",
-    hm_charges: "",
-    other_charges: "",
-    charges: "",
-    Making_Charges_On: "",
+    Making_Charges_On: "MC / Gram",
     Making_Charges_Value: "",
     total_mc: "",
-    product_id: "",
-    metal_type: "",
-    pure_weight: "",
+    total_pure_wt: "",
     paid_pure_weight: "",
     balance_pure_weight: "0",
     rate: "",
+    total_amount: "",
     tax_slab: "",
     tax_amt: "",
-    total_amount: "",
+    net_amt: "",
+    rate_cut: "",
+    rate_cut_wt: "",
     paid_amount: "",
     balance_amount: "",
+    hm_charges: "",
+    charges: "",
+    remarks: "",
+    cut: "",
+    color: "",
+    clarity: "",
+    carat_wt: "",
+    stone_price: "",
+    final_stone_amount: "",
     balance_after_receipt: "0",
     balWt_after_payment: "0",
-    Pricing: 'By Weight',
+    other_charges: "",
     purityPercentage: "",
-    remarks: "",
-    rate_cut_wt: "",
-    net_amt: "",
-    diamond_wt: "",
   });
 
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
@@ -164,7 +163,7 @@ const URDPurchase = () => {
   }, [mobile, customers]);
   const [lastUpdatedField, setLastUpdatedField] = useState(null);
 
-  const [mcOnType, setMcOnType] = useState("");
+  const [mcOnType, setMcOnType] = useState("MC / Gram");
 
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
@@ -227,7 +226,7 @@ const URDPurchase = () => {
         updatedFormData.hm_charges = "";
         updatedFormData.other_charges = "";
         updatedFormData.charges = "";
-        updatedFormData.Making_Charges_On = "";
+        updatedFormData.Making_Charges_On = "MC / Gram";
         updatedFormData.Making_Charges_Value = "";
         updatedFormData.total_mc = "";
         updatedFormData.product_id = "";
@@ -276,7 +275,8 @@ const URDPurchase = () => {
       }
 
       if ((field === "purity" || field === "metal_type") && !isFixedPricing) {
-        if (updatedFormData.metal_type?.toLowerCase() === "gold") {
+        if (updatedFormData.metal_type?.toLowerCase() === "gold" || updatedFormData.metal_type?.toLowerCase() === "diamond") {
+
           const normalizedValue = value.toLowerCase().replace(/\s+/g, "");
 
           if (normalizedValue === "manual") {
@@ -314,7 +314,8 @@ const URDPurchase = () => {
           updatedFormData.rate_cut = "0";
         } else {
           // Restore rate based on metal_type if paid_pure_weight is cleared
-          if (updatedFormData.metal_type?.toLowerCase() === "gold") {
+          if (updatedFormData.metal_type?.toLowerCase() === "gold" || updatedFormData.metal_type?.toLowerCase() === "diamond") {
+
             updatedFormData.rate = rates.rate_22crt;
             updatedFormData.rate_cut = rates.rate_22crt;
           } else if (updatedFormData.metal_type?.toLowerCase() === "silver") {
@@ -330,7 +331,7 @@ const URDPurchase = () => {
         const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
         const paidAmount = parseFloat(value) || 0;
         if (paidAmount > totalAmount) {
-          alert("Paid amount cannot exceed the total amount.");
+          alert("Paid final_stone_amount cannot exceed the total final_stone_amount.");
           return prevFormData;
         }
       }
@@ -391,51 +392,50 @@ const URDPurchase = () => {
         // Reset formData only when needed (optional for editing scenarios)
         setFormData({
           ...formData, // Retain fields as necessary
+          Pricing: 'By Weight',
+          product_id: "",
           category: "",
-          cut: "",
-          color: "",
-          clarity: "",
-          carat_wt: "",
-          price: "",
-          amount: "",
-          hsn_code: "",
+          metal_type: "",
           rbarcode: "",
+          hsn_code: "",
           pcs: "",
           gross_weight: "",
           stone_weight: "",
           deduct_st_Wt: "No",
-          deduct_st_Wt: "",
-          stone_price: "",
+          net_weight: "",
+          purity: "",
+          pure_weight: "",
           wastage_on: "Pure Wt",
           wastage: "0",
           wastage_wt: "0.000",
-          total_pure_wt: "",
-          net_weight: "",
-          hm_charges: "",
-          other_charges: "",
-          charges: "",
-          Making_Charges_On: "",
+          Making_Charges_On: "MC / Gram",
           Making_Charges_Value: "",
           total_mc: "",
-          product_id: "",
-          metal_type: "",
-          pure_weight: "",
+          total_pure_wt: "",
           paid_pure_weight: "",
           balance_pure_weight: "0",
           rate: "",
+          total_amount: "",
           tax_slab: "",
           tax_amt: "",
-          total_amount: "",
+          net_amt: "",
+          rate_cut: "",
+          rate_cut_wt: "",
           paid_amount: "",
           balance_amount: "",
+          hm_charges: "",
+          charges: "",
+          remarks: "",
+          cut: "",
+          color: "",
+          clarity: "",
+          carat_wt: "",
+          stone_price: "",
+          final_stone_amount: "",
           balance_after_receipt: "0",
           balWt_after_payment: "0",
-          Pricing: 'By Weight',
+          other_charges: "",
           purityPercentage: "",
-          remarks: "",
-          rate_cut_wt: "",
-          net_amt: "",
-          diamond_wt: "",
         });
       } else {
         console.error("Failed to add entry to the database:", response.statusText);
@@ -485,48 +485,53 @@ const URDPurchase = () => {
         terms: "Cash",
         invoice: "",
         bill_no: "",
-        rate_cut: "",
         date: new Date().toISOString().split("T")[0],
         bill_date: new Date().toISOString().split("T")[0],
         due_date: "",
+        Pricing: 'By Weight',
+        product_id: "",
         category: "",
-        hsn_code: "",
+        metal_type: "",
         rbarcode: "",
+        hsn_code: "",
         pcs: "",
         gross_weight: "",
         stone_weight: "",
         deduct_st_Wt: "No",
-        stone_price: "",
+        net_weight: "",
+        purity: "",
+        pure_weight: "",
         wastage_on: "Pure Wt",
         wastage: "0",
         wastage_wt: "0.000",
-        total_pure_wt: "",
-        net_weight: "",
-        hm_charges: "",
-        other_charges: "",
-        charges: "",
-        Making_Charges_On: "",
+        Making_Charges_On: "MC / Gram",
         Making_Charges_Value: "",
         total_mc: "",
-        product_id: "",
-        metal_type: "",
-        pure_weight: "",
+        total_pure_wt: "",
         paid_pure_weight: "",
         balance_pure_weight: "0",
         rate: "",
+        total_amount: "",
         tax_slab: "",
         tax_amt: "",
-        total_amount: "",
+        net_amt: "",
+        rate_cut: "",
+        rate_cut_wt: "",
         paid_amount: "",
         balance_amount: "",
+        hm_charges: "",
+        charges: "",
+        remarks: "",
+        cut: "",
+        color: "",
+        clarity: "",
+        carat_wt: "",
+        stone_price: "",
+        final_stone_amount: "",
         balance_after_receipt: "0",
         balWt_after_payment: "0",
-        Pricing: 'By Weight',
+        other_charges: "",
         purityPercentage: "",
-        remarks: "",
-        rate_cut_wt: "",
-        net_amt: "",
-        diamond_wt: "",
       });
       setTableData([]);
       localStorage.removeItem("purchaseFormData");
@@ -795,46 +800,50 @@ const URDPurchase = () => {
       // Reset if category or purity is not selected
       setFormData((prevFormData) => ({
         ...prevFormData,
-        product_id: '',
-        rbarcode: '',
-        hsn_code: '',
-        purity: '',
-        rate: '',
-        rate_cut: '',
+        Pricing: 'By Weight',
+        product_id: "",
+        category: "",
+        metal_type: "",
+        rbarcode: "",
+        hsn_code: "",
+        pcs: "",
         gross_weight: "",
         stone_weight: "",
         deduct_st_Wt: "No",
-        stone_price: "",
+        net_weight: "",
+        purity: "",
+        pure_weight: "",
         wastage_on: "Pure Wt",
         wastage: "0",
         wastage_wt: "0.000",
-        total_pure_wt: "",
-        net_weight: "",
-        hm_charges: "",
-        other_charges: "",
-        charges: "",
-        Making_Charges_On: "",
+        Making_Charges_On: "MC / Gram",
         Making_Charges_Value: "",
         total_mc: "",
-        product_id: "",
-        metal_type: "",
-        pure_weight: "",
+        total_pure_wt: "",
         paid_pure_weight: "",
         balance_pure_weight: "0",
         rate: "",
+        total_amount: "",
         tax_slab: "",
         tax_amt: "",
-        total_amount: "",
+        net_amt: "",
+        rate_cut: "",
+        rate_cut_wt: "",
         paid_amount: "",
         balance_amount: "",
+        hm_charges: "",
+        charges: "",
+        remarks: "",
+        cut: "",
+        color: "",
+        clarity: "",
+        carat_wt: "",
+        stone_price: "",
+        final_stone_amount: "",
         balance_after_receipt: "0",
         balWt_after_payment: "0",
-        Pricing: 'By Weight',
+        other_charges: "",
         purityPercentage: "",
-        remarks: "",
-        rate_cut_wt: "",
-        net_amt: "",
-        diamond_wt: "",
       }));
     }
   }, [formData.category]);
@@ -859,8 +868,14 @@ const URDPurchase = () => {
 
       try {
         const response = await axios.get(`${baseURL}/purity`);
-        const filteredPurity = response.data.filter(
-          (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
+
+        // Show gold purities if metal is gold or diamond
+        const isGoldOrDiamond = formData.metal_type.toLowerCase() === "gold" || formData.metal_type.toLowerCase() === "diamond";
+
+        const filteredPurity = response.data.filter((item) =>
+          isGoldOrDiamond
+            ? item.metal.toLowerCase() === "gold" // Show gold purities for both gold and diamond
+            : item.metal.toLowerCase() === formData.metal_type.toLowerCase()
         );
 
         setPurityOptions(filteredPurity);
@@ -868,7 +883,7 @@ const URDPurchase = () => {
 
         let defaultOption = null;
 
-        if (formData.metal_type.toLowerCase() === "gold") {
+        if (isGoldOrDiamond) {
           defaultOption = filteredPurity.find((option) =>
             option.name.toLowerCase().includes("22") // Check if "22" is included
           );
@@ -935,7 +950,6 @@ const URDPurchase = () => {
     const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
     const stonePrice = parseFloat(updatedFormData.stone_price) || 0;
     const DiamondWt = parseFloat(updatedFormData.diamond_wt) || 0; // Get Diamond Weight
-    const price = parseFloat(updatedFormData.price) || 0;
     const makingChargesValue = parseFloat(updatedFormData.Making_Charges_Value) || 0;
     const totalMC = parseFloat(updatedFormData.total_mc) || 0;
     const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
@@ -943,6 +957,8 @@ const URDPurchase = () => {
     const taxSlab = parseFloat(updatedFormData.tax_slab) || 0;
     const rateCut = parseFloat(updatedFormData.rate_cut) || 0;
     const rateCuttedWt = parseFloat(updatedFormData.rate_cut_wt) || 0;
+    const hmCharges = parseFloat(updatedFormData.hm_charges) || 0;
+    const otherCharges = parseFloat(updatedFormData.charges) || 0;
     let paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || 0;
     let paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
 
@@ -974,8 +990,8 @@ const URDPurchase = () => {
     // Carat Weight Calculation
     updatedFormData.carat_wt = (stoneWeight * 5).toFixed(3);
 
-    // Calculate Amount: amount = carat_wt * price
-    updatedFormData.amount = (parseFloat(updatedFormData.carat_wt) * stonePrice).toFixed(2);
+    // Calculate Amount: final_stone_amount = carat_wt * stonePrice
+    updatedFormData.final_stone_amount = (parseFloat(updatedFormData.carat_wt) * stonePrice).toFixed(2);
 
 
     // Making Charges Calculation
@@ -983,12 +999,15 @@ const URDPurchase = () => {
       updatedFormData.total_mc = (makingChargesValue * updatedFormData.total_pure_wt).toFixed(2);
     } else if (updatedFormData.Making_Charges_On === "MC / Piece" && updatedFormData.total_pure_wt > 0) {
       updatedFormData.Making_Charges_Value = (totalMC / updatedFormData.total_pure_wt).toFixed(2);
+    } else if (updatedFormData.Making_Charges_On === "MC %") {
+      updatedFormData.total_mc = ((makingChargesValue * updatedFormData.total_amount) / 100).toFixed(2);
     }
 
+
     // Tax Amount Calculation
-    updatedFormData.tax_amt = (((stonePrice + totalAmount + totalMC) * taxSlab) / 100).toFixed(2);
+    updatedFormData.tax_amt = (((parseFloat(updatedFormData.final_stone_amount) + totalAmount + totalMC) * taxSlab) / 100).toFixed(2);
     // Net Amount Calculation
-    updatedFormData.net_amt = (stonePrice + totalAmount + totalMC + parseFloat(updatedFormData.tax_amt)).toFixed(2);
+    updatedFormData.net_amt = (parseFloat(updatedFormData.final_stone_amount) + totalAmount + totalMC + parseFloat(updatedFormData.tax_amt) + hmCharges + otherCharges).toFixed(2);
 
 
     // Pricing Calculation
@@ -1045,12 +1064,12 @@ const URDPurchase = () => {
     formData.rate_cut,
     formData.diamond_wt,
     formData.carat_wt,
-    formData.price,
     formData.rate_cut_wt,
     formData.tax_amt,
+    formData.hm_charges,
+    formData.charges,
     formData.net_amt
   ]);
-
 
   const handleOpenModal = (data) => {
     setSelectedProduct(data);
@@ -1361,7 +1380,7 @@ const URDPurchase = () => {
                       />
                     </Col>
                   )}
-                  <Col xs={12} md={2}>
+                  <Col xs={12} md={1}>
                     <InputField
                       label="Total MC"
                       name="total_mc"
@@ -1400,7 +1419,7 @@ const URDPurchase = () => {
                   </Col>
                 </>
               )}
-              <Col xs={12} md={1}>
+              <Col xs={12} md={2}>
                 <InputField
                   label={formData.Pricing === "By fixed" ? "Piece Rate" : "Rate"}
                   type="number"
@@ -1408,7 +1427,7 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("rate", e.target.value)}
                 />
               </Col>
-              <Col xs={12} md={1}>
+              <Col xs={12} md={2}>
                 <InputField
                   label="Total Amt"
                   type="number"
@@ -1427,7 +1446,7 @@ const URDPurchase = () => {
                   options={taxOptions}
                 />
               </Col>
-              <Col xs={12} md={1}>
+              <Col xs={12} md={2}>
                 <InputField
                   label="Tax Amt"
                   name="tax_amt"
@@ -1443,7 +1462,7 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("net_amt", e.target.value)}
                 />
               </Col>
-              <Col xs={12} md={1}>
+              <Col xs={12} md={2}>
                 <InputField
                   label="Rate Cut"
                   type="number"
@@ -1541,9 +1560,9 @@ const URDPurchase = () => {
               <Col xs={12} md={2}>
                 <InputField
                   label="Final Stone Value"
-                  name="amount"
-                  value={formData.amount}
-                  onChange={(e) => handleChange("amount", e.target.value)}
+                  name="final_stone_amount"
+                  value={formData.final_stone_amount}
+                  onChange={(e) => handleChange("final_stone_amount", e.target.value)}
                 />
               </Col>
               <Col xs={12} md={1}>
