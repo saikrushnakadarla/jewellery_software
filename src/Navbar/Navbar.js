@@ -123,18 +123,18 @@ function Navbar() {
             <div className="navbar-dropdown-content">
               {userRole === 'admin' && (
                 <Link to="/usertable" onClick={handleItemClick} className={isActive('/usertable')}>
-                  User_Master
+                  User Master
                 </Link>
               )}
-              <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable') || isActive('/customermaster')}>Customer_Master</Link>
-              <Link to="/suppliertable" onClick={handleItemClick} className={isActive('/suppliertable') || isActive('/suppliermaster')}>Supplier_Master</Link>
+              <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable') || isActive('/customermaster')}>Customer Master</Link>
+              <Link to="/suppliertable" onClick={handleItemClick} className={isActive('/suppliertable') || isActive('/suppliermaster')}>Supplier Master</Link>
               <Link to="/itemmastertable" onClick={handleItemClick} className={isActive('/itemmastertable') || isActive('/itemmaster')}>Category Master</Link>
               <Link to="/subcategorytable" onClick={handleItemClick} className={isActive('/subcategorytable') || isActive('/subcategory')}>Sub Category Master</Link>
               <Link to="/purity" onClick={handleItemClick} className={isActive('/purity')}>Purity</Link>
               <Link to="/metaltype" onClick={handleItemClick} className={isActive('/metaltype')}>Metal Type</Link>
               <Link to="/designmaster" onClick={handleItemClick} className={isActive('/designmaster')}>Design Master</Link>
               <Link to="/accountstable" onClick={handleItemClick} className={isActive('/accountstable') || isActive('/accounts')}>Accounts</Link>
-              <Link to="/workerstable" onClick={handleItemClick} className={isActive('/workerstable') || isActive('/workermaster')}>Worker_Master</Link>
+              <Link to="/workerstable" onClick={handleItemClick} className={isActive('/workerstable') || isActive('/workermaster')}>Worker Master</Link>
               <Link to="/rates" onClick={handleItemClick} className={isActive('/rates')}>Rates</Link>
               <Link to="/company_info" onClick={handleItemClick} className={isActive('/company_info')}>Company Info</Link>
 
@@ -205,7 +205,7 @@ function Navbar() {
         </div>
 
         {/* Utility/Settings Dropdown */}
-        <div
+        {/* <div
           className="navbar-dropdown"
           onMouseEnter={() => toggleDropdown('utility')}
           onMouseLeave={() => toggleDropdown('utility')}
@@ -222,7 +222,7 @@ function Navbar() {
               <Link to="/invoice" onClick={handleItemClick} className={isActive('/invoice')}>Invoice</Link>
             </div>
           )}
-        </div>
+        </div> */}
 
         <div>
           <span>

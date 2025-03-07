@@ -11,9 +11,8 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
   const [c_weight, setC_weight] = useState("");
   const [ratepergram, setRatePerGram] = useState("");
   const [amount, setAmount] = useState("");
-  const [totalweight, setTotalWeight] = useState(0); // Initial total weight as 0
-  const [totalprice, setTotalPrice] = useState(0); // Initial total price as 0
-
+  const [totalweight, setTotalWeight] = useState(0);
+  const [totalprice, setTotalPrice] = useState(0);
   const [data, setData] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -54,7 +53,7 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
     if (!validateForm()) {
       return;
     }
-  
+
     const payload = {
       id: isEditing ? editId : data.length + 1,
       subproductname,
@@ -63,48 +62,42 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
       amount: parseFloat(amount),
       c_weight: parseFloat(c_weight),
     };
-  
+
     let updatedData = [];
-  
+
     if (isEditing) {
       updatedData = data.map((item) => {
         if (item.id === editId) {
           const weightDifference = payload.weight - item.weight;
           const amountDifference = payload.amount - item.amount;
-  
+
           setTotalWeight((prevTotalWeight) => prevTotalWeight + weightDifference);
           setTotalPrice((prevTotalPrice) => prevTotalPrice + amountDifference);
-  
+
           return { ...item, ...payload };
         }
         return item;
       });
-  
+
       setIsEditing(false);
       setEditId(null);
     } else {
       updatedData = [...data, payload];
-  
+
       setTotalWeight((prevTotalWeight) => prevTotalWeight + payload.weight);
       setTotalPrice((prevTotalPrice) => prevTotalPrice + payload.amount);
     }
-  
+
     setData(updatedData);
-  
-    // Save to Local Storage
     localStorage.setItem("stoneDetails", JSON.stringify(updatedData));
-  
-    // Trigger storage event manually
     window.dispatchEvent(new Event("storage"));
-  
-    // Clear input fields after saving
     setSubProductName("");
     setC_weight("");
     setWeight("");
     setRatePerGram("");
     setAmount("");
   };
-  
+
   const validateForm = () => {
     if (!subproductname.trim()) {
       alert("Sub Product Name is required.");
@@ -124,7 +117,7 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
     }
     return true;
   };
-  
+
   const handleEdit = (rowData) => {
     setIsEditing(true);
     setEditId(rowData.id);
@@ -136,40 +129,25 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
   };
 
   const handleDelete = (id) => {
-    // Get the current stone details from localStorage
     let storedData = JSON.parse(localStorage.getItem("stoneDetails")) || [];
-  
-    // Find the row to delete
     const rowToDelete = storedData.find((item) => item.id === id);
-  
+
     if (rowToDelete) {
-      // Update total weight and total price after deletion
       setTotalWeight((prevTotalWeight) => prevTotalWeight - rowToDelete.weight);
       setTotalPrice((prevTotalPrice) => prevTotalPrice - rowToDelete.amount);
     }
-  
-    // Filter out only the deleted row
     const updatedData = storedData.filter((item) => item.id !== id);
-  
-    // Update state
     setData(updatedData);
-  
-    // Update localStorage with the new array
     localStorage.setItem("stoneDetails", JSON.stringify(updatedData));
-  
-    // Trigger storage event manually
     window.dispatchEvent(new Event("storage"));
   };
-  
-  
-  
 
   const handleSaveChanges = async () => {
     if (data.length === 0) {
       alert("No data to save. Please add stone details before saving.");
       return;
     }
-  
+
     try {
       for (const row of data) {
         // Validate each row before sending it to the server
@@ -189,7 +167,7 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
           alert(`Row with Amount must be greater than 0.`);
           return;
         }
-  
+
         const payload = {
           subproductname: row.subproductname,
           weight: row.weight,
@@ -198,17 +176,17 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
           totalweight: totalweight, // Send the total weight
           totalprice: totalprice,  // Send the total price
         };
-  
+
         await axios.post(`${baseURL}/post/addProductstonedetails`, payload);
       }
-      
+
       alert("Data saved successfully!");
       handleUpdateStoneDetails(totalweight, totalprice);
       // Clear table data and reset totals
       setData([]);
       setTotalWeight(0);
       setTotalPrice(0);
-  
+
       // Close the modal
       handleCloseModal();
     } catch (error) {
@@ -216,43 +194,26 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
       alert("Failed to save data. Please try again.");
     }
   };
-  
-  
-  
-  
-
-//   const handleWeightChange = (e) => {
-//     const newWeight = e.target.value;
-//     setWeight(newWeight);
-//     calculateAmount(newWeight, ratepergram);
-//   };
 
   const handleWeightChange = (e) => {
     const newWeight = e.target.value;
     setWeight(newWeight);
-  
-    // Calculate Carat Wt based on Stone Wt
     const calculatedCWeight = (parseFloat(newWeight || 0) / 0.2).toFixed(2);
     setC_weight(calculatedCWeight);
-  
-    calculateAmount(newWeight, ratepergram);
-  };
-
-  const handleC_weightChange = (e) => {
-    const newC_weight = e.target.value;
-    setC_weight(newC_weight);
+    if (ratepergram) {
+      const calculatedAmount = (parseFloat(calculatedCWeight) * parseFloat(ratepergram)).toFixed(2);
+      setAmount(calculatedAmount);
+    }
   };
 
 
   const handleRatePerGramChange = (e) => {
     const newRate = e.target.value;
     setRatePerGram(newRate);
-    calculateAmount(c_weight, newRate);
-  };
-
-  const calculateAmount = (weightValue, rateValue) => {
-    const calculatedAmount = (parseFloat(weightValue || 0) * parseFloat(rateValue || 0)).toFixed(2);
-    setAmount(calculatedAmount);
+    if (c_weight) {
+      const calculatedAmount = (parseFloat(c_weight) * parseFloat(newRate)).toFixed(2);
+      setAmount(calculatedAmount);
+    }
   };
 
   if (!showModal) return null;
@@ -275,7 +236,7 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
                   <InputField label="Stone Wt:" value={weight} onChange={handleWeightChange} />
                 </div>
                 <div className="col-md-4">
-                  <InputField label="Carat Wt:" value={c_weight} onChange={handleC_weightChange} />
+                  <InputField label="Carat Wt:" value={c_weight} readOnly />
                 </div>
                 <div className="col-md-4">
                   <InputField label="Stone Price:" value={ratepergram} onChange={handleRatePerGramChange} />
