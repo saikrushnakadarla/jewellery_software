@@ -207,7 +207,7 @@ const RepairsTable = () => {
 
  const fetchOrderDetails = async (orderNumber) => {
    try {
-     const response = await axios.get(`http://localhost:5000/invoice/${orderNumber}`);
+     const response = await axios.get(`${baseURL}/invoice/${orderNumber}`);
      if (response.data.success) {
        // Assign values based on the API response or some other source
        setFormData(response.data.formData);

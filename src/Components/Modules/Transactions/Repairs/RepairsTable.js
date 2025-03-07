@@ -464,7 +464,7 @@ const RepairsTable = () => {
     try {
       console.log(`Fetching repair details for ID: ${id}`);
 
-      const response = await fetch(`http://localhost:5000/assigned-repairdetails/${id}`);
+      const response = await fetch(`${baseURL}/assigned-repairdetails/${id}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
