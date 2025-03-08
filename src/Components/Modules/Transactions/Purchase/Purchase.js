@@ -335,31 +335,6 @@ const URDPurchase = () => {
         }
       }
 
-      if (field === "paid_pure_weight") {
-        if (value) {
-          // Reset rate_cut when paid_pure_weight is entered
-          updatedFormData.rate_cut = "0";
-        } else {
-          // Restore rate based on metal_type if paid_pure_weight is cleared
-          if (updatedFormData.metal_type?.toLowerCase() === "gold" || updatedFormData.metal_type?.toLowerCase() === "diamond") {
-            updatedFormData.rate = rates.rate_22crt;
-            updatedFormData.rate_cut = rates.rate_22crt;
-          } else if (updatedFormData.metal_type?.toLowerCase() === "silver") {
-            updatedFormData.rate = rates.silver_rate;
-            updatedFormData.rate_cut = rates.silver_rate;
-          } else {
-            updatedFormData.rate_cut = "";
-          }
-        }
-
-        // Ensure paid_pure_weight is a valid number
-        const paidPureWeight = parseFloat(value) || "";
-        const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || "";
-
-        // Calculate balance_pure_weight
-        updatedFormData.balance_pure_weight = (totalPureWeight - paidPureWeight).toFixed(3);
-      }
-
       if (field === "paid_amount") {
         const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
         const paidAmount = parseFloat(value) || 0;
@@ -370,13 +345,45 @@ const URDPurchase = () => {
       }
 
       if (field === "paid_pure_weight") {
-        const totalWeight = parseFloat(updatedFormData.total_pure_wt) || "";
-        const paidWeight = parseFloat(value) || "";
-        if (paidWeight > totalWeight) {
+        const paidPureWeight = parseFloat(value) || 0;
+        const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
+      
+        // Validation: Prevent entering a value greater than total weight
+        if (paidPureWeight > totalPureWeight) {
           alert("Paid Weight cannot exceed the total Weight.");
-          return prevFormData;
+          return prevFormData; // Return previous state without updating
         }
+      
+        // Reset rate_cut when paid_pure_weight is entered
+        let newRateCut = "0";
+        let newRate = updatedFormData.rate;
+      
+        // Restore rate based on metal_type if paid_pure_weight is cleared
+        if (!value) {
+          if (updatedFormData.metal_type?.toLowerCase() === "gold" || updatedFormData.metal_type?.toLowerCase() === "diamond") {
+            newRate = rates.rate_22crt;
+            newRateCut = rates.rate_22crt;
+          } else if (updatedFormData.metal_type?.toLowerCase() === "silver") {
+            newRate = rates.silver_rate;
+            newRateCut = rates.silver_rate;
+          } else {
+            newRateCut = "";
+          }
+        }
+      
+        // Calculate balance_pure_weight
+        const balancePureWeight = (totalPureWeight - paidPureWeight).toFixed(3);
+      
+        // Update state in one step
+        return {
+          ...updatedFormData,
+          paid_pure_weight: value,
+          rate: newRate,
+          rate_cut: newRateCut,
+          balance_pure_weight: balancePureWeight
+        };
       }
+      
 
       if (field === "rate_cut_wt") {
         const totalWeight = parseFloat(updatedFormData.total_pure_wt) || "";
@@ -783,8 +790,6 @@ const URDPurchase = () => {
     console.log("Updated FormData:", formData);
   }, [formData]);
 
-
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -1093,14 +1098,8 @@ const URDPurchase = () => {
     // Paid Amount & Paid Pure Weight Adjustment
     if (lastUpdatedField === "paid_amount" && rateCut) {
       paidPureWeight = (paidAmount / rateCut).toFixed(3);
-    } else if (lastUpdatedField === "paid_pure_weight" && rateCut) {
-      paidAmount = (paidPureWeight * rateCut).toFixed(2);
-
-      // Use updatedFormData.total_pure_wt instead of totalPureWeight
-      updatedFormData.balance_pure_weight = (parseFloat(updatedFormData.total_pure_wt) - parseFloat(updatedFormData.paid_pure_weight)).toFixed(3);
-    }
-
-
+    } 
+    
     updatedFormData.paid_pure_weight = paidPureWeight;
     updatedFormData.paid_amount = paidAmount;
 
@@ -1118,7 +1117,6 @@ const URDPurchase = () => {
     } else {
       updatedFormData.paid_pure_weight = "";
     }
-
 
     // Balance Calculations
     updatedFormData.balance_pure_weight = (parseFloat(updatedFormData.total_pure_wt) - updatedFormData.paid_pure_weight).toFixed(3);
