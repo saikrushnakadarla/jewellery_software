@@ -534,7 +534,6 @@ const URDPurchase = () => {
         account_name: "",
         gst_in: "",
         terms: "Cash",
-        invoice: "",
         bill_no: "",
         date: new Date().toISOString().split("T")[0],
         bill_date: new Date().toISOString().split("T")[0],
@@ -765,17 +764,26 @@ const URDPurchase = () => {
     const fetchLastInvoice = async () => {
       try {
         const response = await axios.get(`${baseURL}/lastInvoice`);
+        console.log("API Response:", response.data); // Log API response
+
         setFormData((prev) => ({
           ...prev,
           invoice: response.data.lastInvoiceNumber,
         }));
       } catch (error) {
-        console.error("Error fetching estimate number:", error);
+        console.error("Error fetching invoice number:", error);
       }
     };
 
     fetchLastInvoice();
   }, []);
+
+  // Log formData when it updates
+  useEffect(() => {
+    console.log("Updated FormData:", formData);
+  }, [formData]);
+
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -964,7 +972,11 @@ const URDPurchase = () => {
             option.name.toLowerCase().includes("24")
           );
 
-          defaultOption = silver24 || silver22;
+          const silver925 = filteredPurity.find((option) =>
+            option.name.toLowerCase().includes("92.5")
+          );
+
+          defaultOption = silver925 || silver24 || silver22;
           mcType = "MC / Gram"; // Silver => MC / Gram
 
           if (defaultOption) {
@@ -1052,7 +1064,7 @@ const URDPurchase = () => {
 
     // Total Pure Weight
     updatedFormData.total_pure_wt = (parseFloat(updatedFormData.pure_weight) + parseFloat(updatedFormData.wastage_wt)).toFixed(3);
-    
+
     // Carat Weight Calculation
     updatedFormData.carat_wt = (stoneWeight * 5).toFixed(3);
     // Making Charges Calculation
@@ -1262,10 +1274,11 @@ const URDPurchase = () => {
                   <Col xs={12} md={4}>
                     <InputField
                       label="Invoice"
-                      value={formData.invoice}
-                      onChange={(e) => handleChange("invoice", e.target.value)} // Corrected key
+                      value={formData.invoice || ""}  // Prevents undefined issue
+                      onChange={(e) => handleChange("invoice", e.target.value)}
                     />
                   </Col>
+
                   {/* <Col xs={12} md={3} >
                     <InputField label="Bill No" value={formData.bill_no}
                       onChange={(e) => handleChange("bill_no", e.target.value)} />
@@ -1682,56 +1695,32 @@ const URDPurchase = () => {
               <Table striped bordered hover className="mt-4">
                 <thead>
                   <tr>
-                    {/* <th>product_id</th> */}
-                    {/* <th>Rbarcode</th> */}
                     <th>Category</th>
-                    {/* <th>Cut</th>
-                    <th>Color</th>
-                    <th>Clarity</th> */}
                     <th>Pcs</th>
                     <th>Gross</th>
                     <th>Stone</th>
                     <th>Net</th>
-                    {/* <th>HM Charges</th>
-                    <th>Other Charges</th>
-                    <th>Charges</th> */}
-                    {/* <th>Metal</th> */}
                     <th>Purity</th>
                     <th>Total Wt</th>
                     <th>Paid wt</th>
                     <th>Bal wt</th>
-                    <th>Rate</th>
-                    <th>Total Amt</th>
                     <th>Paid Amt</th>
-                    <th>Balance Amt</th>
                     <th>Actions</th> {/* New Action column */}
                   </tr>
                 </thead>
                 <tbody>
                   {tableData.map((data, index) => (
                     <tr key={index}>
-                      {/* <td>{data.product_id}</td> */}
-                      {/* <td>{data.rbarcode}</td> */}
                       <td>{data.category}</td>
-                      {/* <td>{data.cut}</td>
-                      <td>{data.color}</td>
-                      <td>{data.clarity}</td> */}
                       <td>{data.pcs}</td>
                       <td>{data.gross_weight}</td>
                       <td>{data.stone_weight}</td>
                       <td>{data.net_weight}</td>
-                      {/* <td>{data.hm_charges}</td>
-                      <td>{data.other_charges}</td>
-                      <td>{data.charges}</td> */}
-                      {/* <td>{data.metal_type}</td> */}
                       <td>{data.purity}</td>
                       <td>{data.pure_weight}</td>
                       <td>{data.paid_pure_weight}</td>
                       <td>{data.balance_pure_weight}</td>
-                      <td>{data.rate}</td>
-                      <td>{data.total_amount}</td>
                       <td>{data.paid_amount}</td>
-                      <td>{data.balance_amount}</td>
                       <td style={{ display: 'flex', alignItems: 'center' }}>
                         <button
                           type="button"
