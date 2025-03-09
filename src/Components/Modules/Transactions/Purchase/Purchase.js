@@ -47,7 +47,7 @@ const URDPurchase = () => {
     wastage_on: "Pure Wt",
     wastage: "",
     wastage_wt: "0.000",
-    Making_Charges_On: "",
+    Making_Charges_On: "MC %",
     Making_Charges_Value: "",
     total_mc: "",
     total_pure_wt: "",
@@ -190,12 +190,19 @@ const URDPurchase = () => {
   }, [mobile, customers]);
   const [lastUpdatedField, setLastUpdatedField] = useState(null);
 
-  const [mcOnType, setMcOnType] = useState("");
+  const [mcOnType, setMcOnType] = useState("MC %");
 
   const handleChange = (field, value) => {
     setFormData((prevFormData) => {
-      const updatedFormData = { ...prevFormData, [field]: value };
+      let updatedFormData = { ...prevFormData, [field]: value };
       const isFixedPricing = updatedFormData.Pricing === "By fixed";
+
+      if (field === "rate_cut_wt") {
+        setLastUpdatedField("rate_cut_wt");
+      }
+      if (field === "paid_pure_weight") {
+        setLastUpdatedField("paid_pure_weight");
+      }
 
       if (field === "category") {
         const selectedCategory = categories.find(
@@ -217,32 +224,12 @@ const URDPurchase = () => {
         }
       }
 
-      if (field === "Pricing" && value === "By fixed") {
-        updatedFormData.gross_weight = "";
-        updatedFormData.stone_weight = "";
-        updatedFormData.deduct_st_Wt = "No";
-        updatedFormData.stone_price = "";
-        updatedFormData.net_weight = "";
-        updatedFormData.purity = "";
-        updatedFormData.pure_weight = "";
-        updatedFormData.wastage_on = "";
-        updatedFormData.wastage = "";
-        updatedFormData.wastage_wt = "";
-        updatedFormData.total_pure_wt = "";
-        updatedFormData.paid_pure_weight = "";
-        updatedFormData.balance_pure_weight = "";
-        updatedFormData.hm_charges = "";
-        updatedFormData.charges = "";
-        updatedFormData.rate = "";
-        updatedFormData.rate_cut = "";
-      }
-
       if (field === "category" && value === "") {
         updatedFormData.rbarcode = "";
         updatedFormData.hsn_code = "";
         updatedFormData.pcs = "";
         updatedFormData.gross_weight = "";
-        // updatedFormData.stone_weight = "";
+        updatedFormData.stone_weight = "";
         updatedFormData.deduct_st_Wt = "No";
         updatedFormData.stone_price = "";
         updatedFormData.wastage_on = "Pure Wt";
@@ -253,7 +240,7 @@ const URDPurchase = () => {
         updatedFormData.hm_charges = "";
         updatedFormData.other_charges = "";
         updatedFormData.charges = "";
-        updatedFormData.Making_Charges_On = "";
+        updatedFormData.Making_Charges_On = "MC %";
         updatedFormData.Making_Charges_Value = "";
         updatedFormData.total_mc = "";
         updatedFormData.product_id = "";
@@ -278,27 +265,10 @@ const URDPurchase = () => {
         updatedFormData.diamond_wt = "";
       }
 
-      if (isFixedPricing && field === "rate") {
-        updatedFormData.rate = value;
-        updatedFormData.rate_cut = value;
-      }
-
-      if (!isFixedPricing && field === "category") {
-        const selectedCategory = categories.find((cat) => cat.value === value);
-        if (selectedCategory) {
-          updatedFormData.rate = selectedCategory.rate || "";
-          updatedFormData.rate_cut = selectedCategory.rate_cut || "";
-        }
-      }
-
       if (field === "Making_Charges_On") {
         setMcOnType(value); // Track MC On selection
         updatedFormData.Making_Charges_Value = ""; // Reset Making Charges Value
         updatedFormData.total_mc = ""; // Reset Total MC
-      }
-
-      if (field === "Making_Charges_On") {
-        setMcOnType(value); // Track MC On selection
       }
 
       if ((field === "purity" || field === "metal_type") && !isFixedPricing) {
@@ -328,13 +298,6 @@ const URDPurchase = () => {
         }
       }
 
-      if (field === "metal_type" && !isFixedPricing) {
-        if (updatedFormData.metal_type?.toLowerCase() === "silver") {
-          updatedFormData.rate = rates.silver_rate;
-          updatedFormData.rate_cut = rates.silver_rate;
-        }
-      }
-
       if (field === "paid_amount") {
         const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
         const paidAmount = parseFloat(value) || 0;
@@ -344,46 +307,6 @@ const URDPurchase = () => {
         }
       }
 
-      if (field === "paid_pure_weight") {
-        const paidPureWeight = parseFloat(value) || 0;
-        const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
-      
-        // Validation: Prevent entering a value greater than total weight
-        if (paidPureWeight > totalPureWeight) {
-          alert("Paid Weight cannot exceed the total Weight.");
-          return prevFormData; // Return previous state without updating
-        }
-      
-        // Reset rate_cut when paid_pure_weight is entered
-        let newRateCut = "0";
-        let newRate = updatedFormData.rate;
-      
-        // Restore rate based on metal_type if paid_pure_weight is cleared
-        if (!value) {
-          if (updatedFormData.metal_type?.toLowerCase() === "gold" || updatedFormData.metal_type?.toLowerCase() === "diamond") {
-            newRate = rates.rate_22crt;
-            newRateCut = rates.rate_22crt;
-          } else if (updatedFormData.metal_type?.toLowerCase() === "silver") {
-            newRate = rates.silver_rate;
-            newRateCut = rates.silver_rate;
-          } else {
-            newRateCut = "";
-          }
-        }
-      
-        // Calculate balance_pure_weight
-        const balancePureWeight = (totalPureWeight - paidPureWeight).toFixed(3);
-      
-        // Update state in one step
-        return {
-          ...updatedFormData,
-          paid_pure_weight: value,
-          rate: newRate,
-          rate_cut: newRateCut,
-          balance_pure_weight: balancePureWeight
-        };
-      }
-      
 
       if (field === "rate_cut_wt") {
         const totalWeight = parseFloat(updatedFormData.total_pure_wt) || "";
@@ -391,16 +314,6 @@ const URDPurchase = () => {
         if (paidWeight > totalWeight) {
           alert("Paid Weight cannot exceed the total Weight.");
           return prevFormData;
-        }
-      }
-
-      if (field === "paid_amount") {
-        setLastUpdatedField("paid_amount");
-        const rate = parseFloat(updatedFormData.rate) || 0;
-        if (rate) {
-          updatedFormData.paid_pure_weight = (value / rate).toFixed(3);
-        } else {
-          updatedFormData.paid_pure_weight = "";
         }
       }
       return updatedFormData;
@@ -466,7 +379,7 @@ const URDPurchase = () => {
           wastage_on: "Pure Wt",
           wastage: "",
           wastage_wt: "0.000",
-          Making_Charges_On: "",
+          Making_Charges_On: "MC %",
           Making_Charges_Value: "",
           total_mc: "",
           total_pure_wt: "",
@@ -561,7 +474,7 @@ const URDPurchase = () => {
         wastage_on: "Pure Wt",
         wastage: "",
         wastage_wt: "0.000",
-        Making_Charges_On: " ",
+        Making_Charges_On: "MC %",
         Making_Charges_Value: "",
         total_mc: "",
         total_pure_wt: "",
@@ -785,11 +698,6 @@ const URDPurchase = () => {
     fetchLastInvoice();
   }, []);
 
-  // Log formData when it updates
-  useEffect(() => {
-    console.log("Updated FormData:", formData);
-  }, [formData]);
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -880,7 +788,7 @@ const URDPurchase = () => {
         wastage_on: "Pure Wt",
         wastage: "",
         wastage_wt: "0.000",
-        Making_Charges_On: "",
+        Making_Charges_On: "MC %",
         Making_Charges_Value: "",
         total_mc: "",
         total_pure_wt: "",
@@ -911,7 +819,7 @@ const URDPurchase = () => {
       }));
     }
   }, [formData.category]);
-
+  
   useEffect(() => {
     const fetchPurity = async () => {
       if (!formData.category) {
@@ -920,43 +828,44 @@ const URDPurchase = () => {
           purity: "",
           rate: "",
           rate_cut: "",
-          Making_Charges_On: "", // Reset Making Charges
+          Making_Charges_On: "MC %", // Reset Making Charges
         }));
         setPurityOptions([]);
-        setMcOnType(""); // Reset mcOnType
+        setMcOnType("MC %"); // Reset mcOnType
         return;
       }
-
+  
       if (!formData.metal_type) {
         setPurityOptions([]);
         return;
       }
-
+  
       try {
         const response = await axios.get(`${baseURL}/purity`);
-
-        // Show gold purities if metal is gold or diamond
+  
+        // Determine if metal is gold or diamond
         const isGoldOrDiamond = formData.metal_type.toLowerCase() === "gold" || formData.metal_type.toLowerCase() === "diamond";
-
+  
+        // Filter purities based on metal type
         const filteredPurity = response.data.filter((item) =>
           isGoldOrDiamond
             ? item.metal.toLowerCase() === "gold" // Show gold purities for both gold and diamond
             : item.metal.toLowerCase() === formData.metal_type.toLowerCase()
         );
-
+  
         setPurityOptions(filteredPurity);
         console.log("Purity Options:", filteredPurity);
-
+  
         let defaultOption = null;
         let mcType = "";
-
+  
         if (isGoldOrDiamond) {
           defaultOption = filteredPurity.find((option) =>
-            option.name.toLowerCase().includes("22") // Check if "22" is included
+            option.name.toLowerCase().includes("22") // Prefer 22k gold if available
           );
-
+  
           mcType = "MC %"; // Gold/Diamond => MC %
-
+  
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -967,23 +876,23 @@ const URDPurchase = () => {
             }));
           }
         }
-
+  
         if (formData.metal_type.toLowerCase() === "silver") {
           const silver22 = filteredPurity.find((option) =>
             option.name.toLowerCase().includes("22")
           );
-
+  
           const silver24 = filteredPurity.find((option) =>
             option.name.toLowerCase().includes("24")
           );
-
+  
           const silver925 = filteredPurity.find((option) =>
             option.name.toLowerCase().includes("92.5")
           );
-
+  
           defaultOption = silver925 || silver24 || silver22;
           mcType = "MC / Gram"; // Silver => MC / Gram
-
+  
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -994,16 +903,21 @@ const URDPurchase = () => {
             }));
           }
         }
-
+  
         setMcOnType(mcType); // Update mcOnType state
-
+  
+        // Reset last updated field so future changes are not ignored
+        setLastUpdatedField(null);
+  
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchPurity();
   }, [formData.metal_type, formData.category]);
+   // Dependency remains the same
+
 
 
   const extractPurityPercentage = (purityValue) => {
@@ -1028,17 +942,19 @@ const URDPurchase = () => {
     const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
     const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
     const stonePrice = parseFloat(updatedFormData.stone_price) || 0;
-    const DiamondWt = parseFloat(updatedFormData.diamond_wt) || 0; // Get Diamond Weight
+    const DiamondWt = parseFloat(updatedFormData.diamond_wt) || 0;
     const makingChargesValue = parseFloat(updatedFormData.Making_Charges_Value) || 0;
     const totalMC = parseFloat(updatedFormData.total_mc) || 0;
     const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
     const rate = parseFloat(updatedFormData.rate) || 0;
     const taxSlab = parseFloat(updatedFormData.tax_slab) || 0;
-    const rateCut = parseFloat(updatedFormData.rate_cut) || 0;
+    let rateCut = parseFloat(updatedFormData.rate_cut) || 0;
     const rateCuttedWt = parseFloat(updatedFormData.rate_cut_wt) || 0;
     const hmCharges = parseFloat(updatedFormData.hm_charges) || 0;
     const otherCharges = parseFloat(updatedFormData.charges) || 0;
     const totalStoneValue = parseFloat(updatedFormData.final_stone_amount) || 0;
+    const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
+
     let paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || "";
     let paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
 
@@ -1050,7 +966,7 @@ const URDPurchase = () => {
         updatedFormData.net_weight = grossWeight.toFixed(3);
       }
     } else {
-      updatedFormData.net_weight = ""; // Set it to empty string or null instead of 0.000
+      updatedFormData.net_weight = "";
     }
 
     // Pure Weight Calculation
@@ -1072,6 +988,14 @@ const URDPurchase = () => {
 
     // Carat Weight Calculation
     updatedFormData.carat_wt = (stoneWeight * 5).toFixed(3);
+
+    // Pricing Calculation
+    if (updatedFormData.Pricing === "By fixed") {
+      updatedFormData.total_amount = ((parseFloat(updatedFormData.pcs) || 0) * rate).toFixed(2);
+    } else if (updatedFormData.Pricing === "By Weight") {
+      updatedFormData.total_amount = ((parseFloat(updatedFormData.total_pure_wt) || 0) * rate).toFixed(2);
+    }
+
     // Making Charges Calculation
     if (updatedFormData.Making_Charges_On === "MC / Gram") {
       updatedFormData.total_mc = (makingChargesValue * updatedFormData.total_pure_wt).toFixed(2);
@@ -1081,46 +1005,50 @@ const URDPurchase = () => {
       updatedFormData.total_mc = ((makingChargesValue * updatedFormData.total_amount) / 100).toFixed(2);
     }
 
-
     // Tax Amount Calculation
     updatedFormData.tax_amt = (((totalStoneValue + totalAmount + totalMC) * taxSlab) / 100).toFixed(2);
+
     // Net Amount Calculation
     updatedFormData.net_amt = (totalStoneValue + totalAmount + totalMC + parseFloat(updatedFormData.tax_amt) + hmCharges + otherCharges).toFixed(2);
 
-
-    // Pricing Calculation
-    if (updatedFormData.Pricing === "By fixed") {
-      updatedFormData.total_amount = (parseFloat(updatedFormData.pcs) || 0 * rate).toFixed(2);
-    } else {
-      updatedFormData.total_amount = (parseFloat(updatedFormData.total_pure_wt) * rate).toFixed(2);
+    // Store previous rate_cut value before updating
+    if (!updatedFormData.previousRateCut) {
+      updatedFormData.previousRateCut = updatedFormData.rate_cut;
     }
 
-    // Paid Amount & Paid Pure Weight Adjustment
-    if (lastUpdatedField === "paid_amount" && rateCut) {
-      paidPureWeight = (paidAmount / rateCut).toFixed(3);
-    } 
-    
-    updatedFormData.paid_pure_weight = paidPureWeight;
-    updatedFormData.paid_amount = paidAmount;
+    // Handling `lastUpdatedField`
+    if (lastUpdatedField === "paid_pure_weight") {
+      if (!paidPureWeight || paidPureWeight === 0) {
+        updatedFormData.balance_pure_weight = totalPureWeight.toFixed(3);
+      } else {
+        updatedFormData.balance_pure_weight = (totalPureWeight - paidPureWeight).toFixed(3);
+      }
 
-    // Balance Calculations
-    updatedFormData.balance_pure_weight = (parseFloat(updatedFormData.total_pure_wt) - paidPureWeight).toFixed(3);
-    updatedFormData.balance_amount = (totalAmount - paidAmount).toFixed(2);
+      // Only set rate_cut to 0 if it's greater than 0
+      if (updatedFormData.rate_cut > 0) {
+        updatedFormData.rate_cut = 0;
+      }
+    }
 
-    // Paid Amount Calculation (User will not enter this, it's derived)
-    updatedFormData.paid_amount = (rateCut * rateCuttedWt).toFixed(2);
+    if (lastUpdatedField === "rate_cut_wt") {
+      updatedFormData.paid_pure_weight = rateCuttedWt;
+      updatedFormData.balance_pure_weight = (totalPureWeight - rateCuttedWt).toFixed(3);
+      updatedFormData.paid_amount = (rateCuttedWt * rateCut).toFixed(2);
+    }
 
-    // Paid Pure Weight Adjustment based on calculated paid_amount
-    if (rateCut && updatedFormData.paid_amount) {
-      const calculatedPaidPureWeight = (updatedFormData.paid_amount / rateCut).toFixed(3);
-      updatedFormData.paid_pure_weight = parseFloat(calculatedPaidPureWeight) > 0 ? calculatedPaidPureWeight : "";
-    } else {
-      updatedFormData.paid_pure_weight = "";
+    // Restore previous rate_cut if paid_pure_weight is cleared
+    if (lastUpdatedField === "paid_pure_weight" && paidPureWeight === "") {
+      updatedFormData.rate_cut = updatedFormData.previousRateCut || 0;
     }
 
     // Balance Calculations
-    updatedFormData.balance_pure_weight = (parseFloat(updatedFormData.total_pure_wt) - updatedFormData.paid_pure_weight).toFixed(3);
-    updatedFormData.balance_amount = (totalAmount - updatedFormData.paid_amount).toFixed(2);
+    updatedFormData.balance_pure_weight =
+      !updatedFormData.paid_pure_weight || parseFloat(updatedFormData.paid_pure_weight) === 0
+        ? parseFloat(updatedFormData.total_pure_wt).toFixed(3)
+        : (parseFloat(updatedFormData.total_pure_wt) - parseFloat(updatedFormData.paid_pure_weight)).toFixed(3);
+
+    updatedFormData.balance_amount = (totalAmount - parseFloat(updatedFormData.paid_amount) || 0).toFixed(2);
+
     setFormData(updatedFormData);
   }, [
     formData.purity,
@@ -1129,6 +1057,7 @@ const URDPurchase = () => {
     formData.rate,
     formData.total_amount,
     formData.paid_amount,
+    formData.paid_pure_weight,
     formData.wastage,
     formData.wastage_on,
     formData.gross_weight,
@@ -1551,6 +1480,7 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("rate", e.target.value)}
                 />
               </Col>
+
               <Col xs={12} md={2}>
                 <InputField
                   label="Total Amt"
@@ -1560,14 +1490,20 @@ const URDPurchase = () => {
                   readOnly={formData.Pricing !== "By fixed"}
                 />
               </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Stone Value"
-                  name="final_stone_amount"
-                  value={formData.final_stone_amount}
-                  onChange={(e) => handleChange("final_stone_amount", e.target.value)}
-                />
-              </Col>
+
+              {formData.Pricing !== "By fixed" && (
+                <>
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Stone Value"
+                      name="final_stone_amount"
+                      value={formData.final_stone_amount}
+                      onChange={(e) => handleChange("final_stone_amount", e.target.value)}
+                      readOnly
+                    />
+                  </Col>
+                </>
+              )}
               <Col xs={12} md={2}>
                 <InputField
                   label="GST"
@@ -1594,31 +1530,33 @@ const URDPurchase = () => {
                   onChange={(e) => handleChange("net_amt", e.target.value)}
                 />
               </Col>
-              <Col xs={12} md={1}>
-                <InputField
-                  label="Rate Cut"
-                  type="number"
-                  value={formData.rate_cut}
-                  onChange={(e) => handleChange("rate_cut", e.target.value)}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Rate Cutted Wt"
-                  type="number"
-                  value={formData.rate_cut_wt}
-                  onChange={(e) => handleChange("rate_cut_wt", e.target.value)}
-                />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField
-                  label="Paid Amt"
-                  type="number"
-                  value={formData.paid_amount}
-                  onChange={(e) => handleChange("paid_amount", e.target.value)}
-                />
-              </Col>
-              {/* <Col xs={12} md={2}>
+              {formData.Pricing !== "By fixed" && (
+                <>
+                  <Col xs={12} md={1}>
+                    <InputField
+                      label="Rate Cut"
+                      type="number"
+                      value={formData.rate_cut}
+                      onChange={(e) => handleChange("rate_cut", e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Rate Cutted Wt"
+                      type="number"
+                      value={formData.rate_cut_wt}
+                      onChange={(e) => handleChange("rate_cut_wt", e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Paid Amt"
+                      type="number"
+                      value={formData.paid_amount}
+                      onChange={(e) => handleChange("paid_amount", e.target.value)}
+                    />
+                  </Col>
+                  {/* <Col xs={12} md={2}>
                 <InputField
                   label="Balance Amt"
                   type="number"
@@ -1627,14 +1565,16 @@ const URDPurchase = () => {
                 />
               </Col> */}
 
-              <Col xs={12} md={2}>
-                <InputField label="HM Charges" type="number" value={formData.hm_charges}
-                  onChange={(e) => handleChange("hm_charges", e.target.value)} />
-              </Col>
-              <Col xs={12} md={2}>
-                <InputField label="Other Charges" type="number" value={formData.charges}
-                  onChange={(e) => handleChange("charges", e.target.value)} />
-              </Col>
+                  <Col xs={12} md={2}>
+                    <InputField label="HM Charges" type="number" value={formData.hm_charges}
+                      onChange={(e) => handleChange("hm_charges", e.target.value)} />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField label="Other Charges" type="number" value={formData.charges}
+                      onChange={(e) => handleChange("charges", e.target.value)} />
+                  </Col>
+                </>
+              )}
               <Col xs={12} md={2}>
                 <InputField
                   label="Remarks"
@@ -1715,7 +1655,7 @@ const URDPurchase = () => {
                       <td>{data.stone_weight}</td>
                       <td>{data.net_weight}</td>
                       <td>{data.purity}</td>
-                      <td>{data.pure_weight}</td>
+                      <td>{data.total_pure_wt}</td>
                       <td>{data.paid_pure_weight}</td>
                       <td>{data.balance_pure_weight}</td>
                       <td>{data.paid_amount}</td>

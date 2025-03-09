@@ -11,6 +11,9 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
   const [c_weight, setC_weight] = useState("");
   const [ratepergram, setRatePerGram] = useState("");
   const [amount, setAmount] = useState("");
+  const [cut, setCut] = useState("");
+  const [color, setColor] = useState("");
+  const [clarity, setClarity] = useState("");
   const [totalweight, setTotalWeight] = useState(0);
   const [totalprice, setTotalPrice] = useState(0);
   const [data, setData] = useState([]);
@@ -20,11 +23,13 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
   const columns = React.useMemo(
     () => [
       { Header: "Stone Name", accessor: "subproductname" },
+      { Header: "Cut", accessor: "cut" },
+      { Header: "Color", accessor: "color" },
+      { Header: "Clarity", accessor: "clarity" },
       { Header: "Stone Wt", accessor: "weight" },
       { Header: "Carat Wt", accessor: "c_weight" },
       { Header: "Rate per Gram", accessor: "ratepergram" },
       { Header: "Amount", accessor: "amount" },
-
       {
         Header: "Actions",
         accessor: "actions",
@@ -61,6 +66,9 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
       ratepergram: parseFloat(ratepergram),
       amount: parseFloat(amount),
       c_weight: parseFloat(c_weight),
+      cut,
+      color,
+      clarity
     };
 
     let updatedData = [];
@@ -126,6 +134,9 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
     setWeight(rowData.weight);
     setRatePerGram(rowData.ratepergram);
     setAmount(rowData.amount);
+    setCut(rowData.cut);
+    setClarity(rowData.clarity);
+    setColor(rowData.color);
   };
 
   const handleDelete = (id) => {
@@ -173,8 +184,11 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
           weight: row.weight,
           ratepergram: row.ratepergram,
           amount: row.amount,
-          totalweight: totalweight, // Send the total weight
-          totalprice: totalprice,  // Send the total price
+          totalweight: totalweight, 
+          totalprice: totalprice, 
+          cut: row.cut, 
+          color: row.color,
+          clarity: row.clarity,
         };
 
         await axios.post(`${baseURL}/post/addProductstonedetails`, payload);
@@ -231,6 +245,15 @@ const StoneDetailsModal = ({ showModal, handleCloseModal, handleUpdateStoneDetai
               <div className="row g-3">
                 <div className="col-md-4">
                   <InputField label="Stone Name:" value={subproductname} onChange={(e) => setSubProductName(e.target.value)} />
+                </div>
+                <div className="col-md-4">
+                  <InputField label="Cut:" value={cut} onChange={(e) => setCut(e.target.value)} />
+                </div>
+                <div className="col-md-4">
+                  <InputField label="Color:" value={color} onChange={(e) => setColor(e.target.value)} />
+                </div>
+                <div className="col-md-4">
+                  <InputField label="Clarity:" value={clarity} onChange={(e) => setClarity(e.target.value)} />
                 </div>
                 <div className="col-md-4">
                   <InputField label="Stone Wt:" value={weight} onChange={handleWeightChange} />
