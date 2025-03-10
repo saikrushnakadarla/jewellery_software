@@ -272,7 +272,7 @@ const URDPurchase = () => {
       }
 
       if ((field === "purity" || field === "metal_type") && !isFixedPricing) {
-        if (updatedFormData.metal_type?.toLowerCase() === "gold" || updatedFormData.metal_type?.toLowerCase() === "diamond") {
+        if (updatedFormData.metal_type?.toLowerCase() === "gold" || updatedFormData.metal_type?.toLowerCase() === "diamond" || updatedFormData.metal_type?.toLowerCase() === "others") {
 
           const normalizedValue = value.toLowerCase().replace(/\s+/g, "");
 
@@ -819,7 +819,7 @@ const URDPurchase = () => {
       }));
     }
   }, [formData.category]);
-  
+
   useEffect(() => {
     const fetchPurity = async () => {
       if (!formData.category) {
@@ -844,7 +844,7 @@ const URDPurchase = () => {
         const response = await axios.get(`${baseURL}/purity`);
   
         // Determine if metal is gold or diamond
-        const isGoldOrDiamond = formData.metal_type.toLowerCase() === "gold" || formData.metal_type.toLowerCase() === "diamond";
+        const isGoldOrDiamond = formData.metal_type.toLowerCase() === "gold" || formData.metal_type.toLowerCase() === "diamond" || formData.metal_type.toLowerCase() === "others";
   
         // Filter purities based on metal type
         const filteredPurity = response.data.filter((item) =>

@@ -73,8 +73,8 @@ const RepairsTable = () => {
                   row.original.chq_amt,
                   row.original.online_amt,
                 )}
-              />
-              <FaTrash
+              /> */}
+              {/* <FaTrash
                 style={{
                   cursor: 'pointer',
                   marginLeft: '10px',
@@ -127,6 +127,36 @@ const RepairsTable = () => {
       console.error("Error fetching repair details:", error);
     }
   };
+
+  const handleDelete = async (invoice) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this purchase?');
+    if (!confirmDelete) return;
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${baseURL}/deletepurchases/${invoice}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(result.message || 'Purchase deleted successfully');
+        // Remove the deleted item from the state
+        setData((prevData) => prevData.filter((item) => item.invoice !== invoice));
+      } else {
+        console.error('Error deleting purchase:', result.message);
+        alert(result.message || 'Failed to delete purchase');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Something went wrong while deleting the purchase');
+    } finally {
+      setLoading(false);
+    }
+  };
   
 
   // useEffect hook to fetch data when the component is mounted
@@ -156,11 +186,9 @@ const RepairsTable = () => {
             </Button>
           </Col>
         </Row>
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
+
           <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
-        )}
+
       </div>
 
       {/* Modal to display repair details */}
