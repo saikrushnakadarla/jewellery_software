@@ -78,28 +78,30 @@ const URDPurchase = () => {
   });
 
   useEffect(() => {
-    // Function to calculate total stone weight
     const calculateTotalWeight = () => {
       const storedStoneDetails = JSON.parse(localStorage.getItem("stoneDetails")) || [];
-      const totalStoneWeight = storedStoneDetails.reduce((sum, item) => sum + (item.weight || 0), 0);
-      const totalStoneValue = storedStoneDetails.reduce((sum, item) => sum + (item.amount || 0), 0);
 
-      // Update formData state with total stone weight
+      const totalStoneWeight = storedStoneDetails.reduce(
+        (sum, item) => sum + (parseFloat(item.stoneWt) || 0),
+        0
+      );
+      const totalStoneValue = storedStoneDetails.reduce(
+        (sum, item) => sum + (parseFloat(item.amount) || 0),
+        0
+      );
+
       setFormData((prevData) => ({
         ...prevData,
-        stone_weight: totalStoneWeight.toFixed(3),
-        final_stone_amount: totalStoneValue.toFixed(2),
+        stone_weight: totalStoneWeight.toFixed(3), 
+        final_stone_amount: totalStoneValue.toFixed(2), 
       }));
     };
 
-    // Calculate total weight on component mount
     calculateTotalWeight();
 
-    // Listen for localStorage changes
     const handleStorageChange = () => calculateTotalWeight();
     window.addEventListener("storage", handleStorageChange);
 
-    // Cleanup event listener on component unmount
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
@@ -112,8 +114,26 @@ const URDPurchase = () => {
 
   const [tableData, setTableData] = useState(() => {
     const savedData = localStorage.getItem("tableData");
-    return savedData ? JSON.parse(savedData) : []; // Load saved data or initialize as empty array
+    return savedData ? JSON.parse(savedData) : [];
   });
+
+  const [show, setShow] = useState(false);
+  const [stoneDetails, setStoneDetails] = useState({
+    stoneName: "",
+    cut: "",
+    color: "",
+    clarity: "",
+    stoneWt: "",
+    caratWt: "",
+    stonePrice: "",
+    amount: "",
+  });
+
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
+
+  const [stoneList, setStoneList] = useState([]);
+  const [editingStoneIndex, setEditingStoneIndex] = useState(null);
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -326,14 +346,14 @@ const URDPurchase = () => {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-
+  
     // Prepare data to be sent to the API
     const apiData = {
       product_id: formData.product_id, // Assuming rbarcode maps to product_id
       pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
       gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
     };
-
+  
     try {
       // Make a POST request to the API
       const response = await fetch(`${baseURL}/add-entry`, {
@@ -343,27 +363,44 @@ const URDPurchase = () => {
         },
         body: JSON.stringify(apiData),
       });
-
+  
       if (response.ok) {
         const result = await response.json();
         console.log("Pcs and GrossWeight added to the database successfully:", result);
-
+  
+        // Fetch stored stoneDetails from localStorage
+        const storedStones = JSON.parse(localStorage.getItem("stoneDetails")) || [];
+  
+        // Add stoneDetails to the new entry
+        const newEntry = {
+          ...formData,
+          stoneDetails: storedStones, // Store stoneDetails inside the table entry
+        };
+  
+        let updatedTableData;
         if (editingIndex === null) {
           // Add new entry to the table
-          setTableData([...tableData, formData]);
+          updatedTableData = [...tableData, newEntry];
         } else {
           // Edit existing entry in the table
-          const updatedTableData = tableData.map((row, index) =>
-            index === editingIndex ? formData : row
+          updatedTableData = tableData.map((row, index) =>
+            index === editingIndex ? newEntry : row
           );
-          setTableData(updatedTableData);
           setEditingIndex(null); // Reset edit mode
         }
-
-        // Reset formData only when needed (optional for editing scenarios)
+  
+        // Update state and localStorage
+        setTableData(updatedTableData);
+        localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Store updated tableData
+  
+        // Remove stoneDetails from localStorage
+        localStorage.removeItem("stoneDetails");
+        window.dispatchEvent(new Event("storage"));
+        setStoneList([]); // Reset stone list in state
+  
+        // Reset formData
         setFormData({
-          ...formData, // Retain fields as necessary
-          Pricing: 'By Weight',
+          Pricing: "By Weight",
           product_id: "",
           category: "",
           metal_type: "",
@@ -415,6 +452,7 @@ const URDPurchase = () => {
       console.error("Error while adding entry to the database:", error);
     }
   };
+  
 
   const isSilverOrGold = /silver|gold/i.test(formData.category);
 
@@ -520,32 +558,55 @@ const URDPurchase = () => {
 
   const handleEdit = async (index) => {
     const selectedData = tableData[index]; // Get the data for the selected row
-    const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
+    const { product_id, pcs, gross_weight, stoneDetails } = selectedData; // Extract required fields
+  
     const pcsToSend = pcs || 0;
     const grossWeightToSend = gross_weight || 0;
+  
     try {
-      // Send a request to the backend to update the product_id entry
+      // Send a request to update the product_id entry in the backend
       const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
-        method: "PUT", // Change to PUT since we're updating, not deleting
+        method: "PUT", // Use PUT since we're updating, not deleting
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to update entry in updated_values_table");
       }
+  
       console.log("Entry updated successfully");
-      setFormData(selectedData); // Populate the form with selected row data
+  
+      // Store stoneDetails in localStorage
+      localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails || []));
+  
+      // Retrieve stoneDetails from localStorage and update state
+      const storedStones = JSON.parse(localStorage.getItem("stoneDetails")) || [];
+      setStoneList(storedStones); // Update state
+  
+      // Remove stoneDetails from the selected entry
+      const updatedData = { ...selectedData };
+      delete updatedData.stoneDetails; // Remove stoneDetails
+  
+      // Update tableData state
+      const updatedTableData = [...tableData];
+      updatedTableData[index] = updatedData; // Replace the edited entry without stoneDetails
+  
+      setTableData(updatedTableData);
+      localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Update localStorage
+  
+      setFormData(updatedData); // Populate the form with selected row data (without stoneDetails)
       setEditingIndex(index); // Track the index being edited
-
+  
     } catch (error) {
       console.error("Error updating entry:", error);
       alert("Failed to update the entry. Please try again.");
     }
   };
-
+  
+  
   const handleDelete = async (index) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
     if (!confirmDelete) return; // Stop execution if user cancels
@@ -834,38 +895,38 @@ const URDPurchase = () => {
         setMcOnType("MC %"); // Reset mcOnType
         return;
       }
-  
+
       if (!formData.metal_type) {
         setPurityOptions([]);
         return;
       }
-  
+
       try {
         const response = await axios.get(`${baseURL}/purity`);
-  
+
         // Determine if metal is gold or diamond
         const isGoldOrDiamond = formData.metal_type.toLowerCase() === "gold" || formData.metal_type.toLowerCase() === "diamond" || formData.metal_type.toLowerCase() === "others";
-  
+
         // Filter purities based on metal type
         const filteredPurity = response.data.filter((item) =>
           isGoldOrDiamond
             ? item.metal.toLowerCase() === "gold" // Show gold purities for both gold and diamond
             : item.metal.toLowerCase() === formData.metal_type.toLowerCase()
         );
-  
+
         setPurityOptions(filteredPurity);
         console.log("Purity Options:", filteredPurity);
-  
+
         let defaultOption = null;
         let mcType = "";
-  
+
         if (isGoldOrDiamond) {
           defaultOption = filteredPurity.find((option) =>
             option.name.toLowerCase().includes("22") // Prefer 22k gold if available
           );
-  
+
           mcType = "MC %"; // Gold/Diamond => MC %
-  
+
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -876,23 +937,23 @@ const URDPurchase = () => {
             }));
           }
         }
-  
+
         if (formData.metal_type.toLowerCase() === "silver") {
           const silver22 = filteredPurity.find((option) =>
             option.name.toLowerCase().includes("22")
           );
-  
+
           const silver24 = filteredPurity.find((option) =>
             option.name.toLowerCase().includes("24")
           );
-  
+
           const silver925 = filteredPurity.find((option) =>
             option.name.toLowerCase().includes("92.5")
           );
-  
+
           defaultOption = silver925 || silver24 || silver22;
           mcType = "MC / Gram"; // Silver => MC / Gram
-  
+
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
@@ -903,22 +964,19 @@ const URDPurchase = () => {
             }));
           }
         }
-  
+
         setMcOnType(mcType); // Update mcOnType state
-  
+
         // Reset last updated field so future changes are not ignored
         setLastUpdatedField(null);
-  
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchPurity();
   }, [formData.metal_type, formData.category]);
-   // Dependency remains the same
-
-
 
   const extractPurityPercentage = (purityValue) => {
     if (!purityValue || purityOptions.length === 0) return 0;
@@ -1103,26 +1161,69 @@ const URDPurchase = () => {
   const [totalWeight, setTotalWeight] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
 
-
   const handleStoneDetails = () => {
     console.log("Stone Details button clicked!");
     // Add your logic here (e.g., open a modal, navigate to another page, etc.)
   };
-  // Open Stone Details Modal
+
   const handleShowStoneModal = () => {
     setShowStoneModal(true);
   };
 
-  // Close Stone Details Modal
   const handleCloseStoneModal = () => {
     setShowStoneModal(false);
   };
 
-  // Update stone details from modal
   const handleUpdateStoneDetails = (updatedWeight, updatedPrice) => {
     setTotalWeight(updatedWeight);
     setTotalPrice(updatedPrice);
   };
+
+
+  useEffect(() => {
+    const storedStones = JSON.parse(localStorage.getItem("stoneDetails")) || [];
+    setStoneList(storedStones);
+  }, []);
+
+  const handleAddStone = () => {
+    let newStoneList = [...stoneList];
+  
+    if (editingStoneIndex !== null) {
+      newStoneList[editingStoneIndex] = stoneDetails;
+      setEditingStoneIndex(null);
+    } else {
+      newStoneList.push(stoneDetails);
+    }
+  
+    setStoneList(newStoneList);
+    localStorage.setItem("stoneDetails", JSON.stringify(newStoneList));
+    window.dispatchEvent(new Event("storage"));
+    setStoneDetails({
+      stoneName: "",
+      cut: "",
+      color: "",
+      clarity: "",  
+      stoneWt: "",
+      caratWt: "",
+      stonePrice: "",
+      amount: "",
+    });
+  };
+  
+  const handleEditStone = (index) => {
+    const selectedStone = stoneList[index];
+    setStoneDetails(selectedStone);
+    setEditingStoneIndex(index); 
+    handleShow();
+  };
+
+  const handleDeleteStone = (index) => {
+    const updatedList = stoneList.filter((_, i) => i !== index);
+    setStoneList(updatedList);
+    localStorage.setItem("stoneDetails", JSON.stringify(updatedList));
+    window.dispatchEvent(new Event("storage"));
+  };
+
 
   return (
     <div className="main-container">
@@ -1189,15 +1290,6 @@ const URDPurchase = () => {
               <Col className="urd-form2-section">
                 <h4 className="mb-4">Invoice Details</h4>
                 <Row>
-                  {/* <Col xs={12} md={3}>
-                    <InputField label="Terms" type="select" value={formData.terms}
-                      onChange={(e) => handleChange("terms", e.target.value)}
-                      options={[
-                        { value: "Cash", label: "Cash" },
-                        { value: "Credit", label: "Credit" },
-                      ]}
-                    />
-                  </Col> */}
                   <Col xs={12} md={4}>
                     <InputField
                       label="Invoice"
@@ -1205,17 +1297,6 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("invoice", e.target.value)}
                     />
                   </Col>
-
-                  {/* <Col xs={12} md={3} >
-                    <InputField label="Bill No" value={formData.bill_no}
-                      onChange={(e) => handleChange("bill_no", e.target.value)} />
-                  </Col> */}
-
-                  {/* <Col xs={12} md={3} >
-                    <InputField label="Rate-Cut" value={formData.rate_cut}
-                      onChange={(e) => handleChange("rate_cut", e.target.value)} />
-                  </Col> */}
-
                   <Col xs={12} md={4}>
                     <InputField
                       label="Bill Date"
@@ -1239,8 +1320,8 @@ const URDPurchase = () => {
                   label="Pricing"
                   name="Pricing"
                   type="select"
-                  value={formData.Pricing || ""} // Ensure it never becomes undefined
-                  onChange={(e) => handleChange("Pricing", e.target.value)} // Correctly updates the field
+                  value={formData.Pricing || ""}
+                  onChange={(e) => handleChange("Pricing", e.target.value)}
                   options={[
                     { value: "By Weight", label: "By Weight" },
                     { value: "By fixed", label: "By fixed" },
@@ -1296,7 +1377,6 @@ const URDPurchase = () => {
                 <InputField label="PCs" type="text" value={formData.pcs}
                   onChange={(e) => handleChange("pcs", e.target.value)} />
               </Col>
-              {/* Conditionally Hidden Fields */}
               {formData.Pricing !== "By fixed" && (
                 <>
                   <Col xs={12} md={1}>
@@ -1317,7 +1397,7 @@ const URDPurchase = () => {
                   </Col>
                   <Col xs={12} md="1">
                     <Button variant="primary"
-                      onClick={handleShowStoneModal}
+                      onClick={handleShow}
                       style={{
                         backgroundColor: '#a36e29',
                         borderColor: '#a36e29',
@@ -1698,10 +1778,22 @@ const URDPurchase = () => {
         </Form>
       </div>
 
-      <StoneDetailsModal
+      {/* <StoneDetailsModal
         showModal={showStoneModal}
         handleCloseModal={handleCloseStoneModal}
         handleUpdateStoneDetails={handleUpdateStoneDetails}
+      /> */}
+
+      <StoneDetailsModal
+        show={show}
+        handleClose={handleClose}
+        stoneDetails={stoneDetails}
+        setStoneDetails={setStoneDetails}
+        handleAddStone={handleAddStone}
+        stoneList={stoneList}
+        handleEditStone={handleEditStone}
+        handleDeleteStone={handleDeleteStone}
+        editingStoneIndex={editingStoneIndex}
       />
 
       <Modal
