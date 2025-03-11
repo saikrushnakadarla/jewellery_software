@@ -12,24 +12,40 @@ import PDFContent from "./ReceiptPdf";
 const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const repairData = location.state?.repairData;
-  const [formData, setFormData] = useState({
-    transaction_type: "Payment",
-    date: "",
-    mode: "",
-    cheque_number: "",
-    receipt_no: "",
-    account_name: "",
-    invoice_number: "",
-    total_wt: "",
-    paid_wt: "",
-    bal_wt: "",
-    rate: "",
-    total_amt: "",
-    discount_amt: "",
-    cash_amt: "",
-    remarks: "",
-  });
+const receivedData = location.state || {}; // Extract received data
+const repairData = location.state?.repairData;
+console.log("Received Account Name:", receivedData.account_name);
+console.log("Received Invoice:", receivedData.invoice_number);
+console.log("Received Balance Pure Weight:", receivedData.total_wt);
+
+const [formData, setFormData] = useState({
+  transaction_type: "Payment",
+  date: "",
+  mode: "",
+  cheque_number: "",
+  receipt_no: "",
+  account_name: receivedData.account_name || "",  
+  invoice_number: receivedData.invoice_number || "",  
+  total_wt: receivedData.total_wt || "", 
+  paid_wt: "",
+  bal_wt: "",
+  rate: "",
+  total_amt: "",
+  discount_amt: "",
+  cash_amt: "",
+  remarks: "",
+});
+
+// Update `formData` when received data changes
+useEffect(() => {
+  setFormData((prev) => ({
+    ...prev,
+    account_name: receivedData.account_name || "",
+    invoice_number: receivedData.invoice_number || "",
+    total_wt: receivedData.total_wt || "",
+  }));
+}, [receivedData]);
+
   const { id } = useParams();
   const [accountOptions, setAccountOptions] = useState([]);
   const [purchases, setPurchases] = useState([]);

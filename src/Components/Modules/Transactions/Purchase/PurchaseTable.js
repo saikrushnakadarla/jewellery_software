@@ -4,6 +4,7 @@ import DataTable from '../../../Pages/InputField/ExpandedTable';
 import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
 import axios from 'axios';
+import TagEntry from "./TagEntry";
 import baseURL from '../../../../Url/NodeBaseURL';
 import Swal from 'sweetalert2';
 
@@ -100,6 +101,29 @@ const RepairsTable = () => {
       setLoading(false);
     }
   };
+  // const handleAddPayment = (product) => {
+  //   navigate("/payments", { state: { product } }); // Navigate to /payments and pass product data
+  // };
+
+  const handleAddPayment = (product) => {
+    console.log("Invoice:", product.invoice);
+    console.log("Customer Name:", product.account_name);
+    console.log("Balance Pure Weight:", product.balance_pure_weight);
+  
+    navigate("/payments", { 
+      state: { 
+        account_name: product.account_name,
+        invoice_number: product.invoice,
+        total_wt: product.balance_pure_weight,
+      } 
+    });
+  };
+ const [selectedProduct, setSelectedProduct] = useState(null);
+  const handleOpenModal = (data) => {
+    setSelectedProduct(data);
+    setShowModal(true);
+  };
+  
 
   const handleExpandedDetails = async (rowIndex, invoice) => {
     try {
@@ -108,6 +132,8 @@ const RepairsTable = () => {
         <Table bordered>
           <thead>
             <tr>
+              <th>Invoice</th>
+              <th>Customer Name</th>
               <th>Category</th>
               <th>Purity</th>
               <th>Pcs</th>
@@ -117,11 +143,14 @@ const RepairsTable = () => {
               <th>Total Wt</th>
               <th>Paid Wt</th>
               <th>Bal Wt</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {response.data.repeatedData.map((product, idx) => (
               <tr key={idx}>
+                <td>{product.invoice}</td>
+                <td>{product.account_name}</td>
                 <td>{product.category}</td>
                 <td>{product.purity}</td>
                 <td>{product.pcs}</td>
@@ -131,6 +160,29 @@ const RepairsTable = () => {
                 <td>{product.total_pure_wt}</td>
                 <td>{product.paid_pure_weight}</td>
                 <td>{product.balance_pure_weight}</td>
+                <td>
+
+                <button
+                          type="button"
+                          className="btn btn-primary"
+                          style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', width: '102px', fontSize: '0.875rem', }}
+                          onClick={() => handleOpenModal(data)} // Pass entire row data
+                        >
+                          Tag Entry
+                        </button>
+
+                  <Button
+                    style={{
+                      backgroundColor: '#28a745',
+                      borderColor: '#28a745',
+                      fontSize: '0.875rem', // Smaller font size
+                      padding: '0.25rem 0.5rem', // Reduced padding
+                    }}
+                    onClick={() => handleAddPayment(product)} // Pass row data to handle receipt creation
+                  >
+                    Add Payment
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -214,7 +266,7 @@ const RepairsTable = () => {
         const formattedDetails = details.repeatedData.map((item) => ({
           ...item,
           date: today,
-          invoice, 
+          invoice,
         }));
 
         const updatedDetails = [...existingDetails, ...formattedDetails];
@@ -371,6 +423,27 @@ const RepairsTable = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+       <Modal
+              show={showModal}
+              onHide={handleCloseModal}
+              size="lg"
+              backdrop="static"
+              keyboard={false}
+              dialogClassName="custom-tagentrymodal-width"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>Tag Entry</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {selectedProduct && (
+                  <TagEntry
+                    handleCloseTagModal={handleCloseModal}
+                    selectedProduct={selectedProduct}
+                  />
+                )}
+              </Modal.Body>
+            </Modal>
     </div>
   );
 };
