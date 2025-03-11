@@ -21,6 +21,7 @@ import StockEntryTable from './Components/Modules/Transactions/StockEntry/StockE
 import EstimateTable from './Components/Modules/Transactions/Estimate/EstimateTable';
 import Purchase from './Components/Modules/Transactions/Purchase/Purchase';
 import PurchaseTable from './Components/Modules/Transactions/Purchase/PurchaseTable';
+import PurchaseTable1 from './Components/Modules/Transactions/Purchase/PurchaseTable1';
 import Receipts from './Components/Modules/Transactions/Receipts/Receipts';
 import ReceiptsTable from './Components/Modules/Transactions/Receipts/ReceiptsTable';
 import PurchaseReport from './Components/Modules/Reports/PurchaseReport/PurchaseReport'
@@ -99,6 +100,7 @@ function App() {
         <Route path="/estimates/:product_id" element={<Estimate />} />
         <Route path="/purchase" element={<Purchase />} />
         <Route path="/purchasetable" element={<PurchaseTable />} />
+        <Route path="/purchasetableold" element={<PurchaseTable1 />} />
         <Route path="/receipts" element={<Receipts />} />
         <Route path="/receipts/:id" element={<Receipts />} />
         <Route path="/receiptstable" element={<ReceiptsTable />} />

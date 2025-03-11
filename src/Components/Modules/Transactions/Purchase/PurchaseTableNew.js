@@ -12,16 +12,17 @@ const RepairsTable = () => {
   const location = useLocation();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedRows, setExpandedRows] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [purchaseDetails, setPurchaseDetails] = useState(null);
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
-
+  
   useEffect(() => {
-    fetchPurchases();
-  }, []);
-
+    if (mobile) {
+      console.log('Selected Mobile from Dashboard:', mobile);
+    }
+  }, [mobile]);
+  
   const columns = React.useMemo(
     () => [
       {
@@ -75,10 +76,29 @@ const RepairsTable = () => {
           );
         },
       },
+      {
+        Header: 'Add Payment',
+        accessor: 'add_payment',
+        Cell: ({ row }) => (
+          <button
+            style={{
+              backgroundColor: '#28a745',
+              color: '#fff',
+              border: 'none',
+              padding: '5px 10px',
+              cursor: 'pointer',
+              borderRadius: '5px',
+              marginLeft: '10px',
+            }}
+          >
+            Add Payment
+          </button>
+        ),
+      },
     ],
     []
   );
-
+  
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -94,73 +114,12 @@ const RepairsTable = () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-purchase-details`);
       setData(response.data);
+      console.log("Filtered Orders: ", response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching repair details:', error);
       setLoading(false);
     }
-  };
-
-  const handleExpandedDetails = async (rowIndex, invoice) => {
-    try {
-      const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
-      const expandedContent = (
-        <Table bordered>
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Purity</th>
-              <th>Pcs</th>
-              <th>Gross Wt</th>
-              <th>Stone Wt</th>
-              <th>W.Wt</th>
-              <th>Total Wt</th>
-              <th>Paid Wt</th>
-              <th>Bal Wt</th>
-            </tr>
-          </thead>
-          <tbody>
-            {response.data.repeatedData.map((product, idx) => (
-              <tr key={idx}>
-                <td>{product.category}</td>
-                <td>{product.purity}</td>
-                <td>{product.pcs}</td>
-                <td>{product.gross_weight}</td>
-                <td>{product.stone_weight}</td>
-                <td>{product.wastage_wt}</td>
-                <td>{product.total_pure_wt}</td>
-                <td>{product.paid_pure_weight}</td>
-                <td>{product.balance_pure_weight}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      );
-
-      setData((prevData) =>
-        prevData.map((item, index) =>
-          index === rowIndex ? { ...item, expandedContent } : item
-        )
-      );
-    } catch (error) {
-      console.error('Error fetching purchase details:', error);
-    }
-  };
-
-  const toggleRowExpansion = async (rowId, rowIndex, invoice) => {
-    setExpandedRows((prev) => {
-      const isExpanding = !prev[rowId];
-      if (isExpanding) {
-        handleExpandedDetails(rowIndex, invoice);
-      } else {
-        setData((prevData) =>
-          prevData.map((item) =>
-            item.invoice === invoice ? { ...item, expandedContent: null } : item
-          )
-        );
-      }
-      return { [rowId]: isExpanding };
-    });
   };
 
   const handleViewDetails = async (invoice) => {
@@ -273,11 +232,15 @@ const RepairsTable = () => {
     }
   };
 
+  useEffect(() => {
+    fetchPurchases();
+  }, []);
+
   const handleCloseModal = () => {
     setShowModal(false);
     setPurchaseDetails(null);
   };
-
+  
   return (
     <div className="main-container">
       <div className="sales-table-container">
@@ -293,7 +256,7 @@ const RepairsTable = () => {
             </Button>
           </Col>
         </Row>
-        <DataTable columns={columns} data={data} initialSearchValue={initialSearchValue} expandedRows={expandedRows} toggleRowExpansion={toggleRowExpansion} />
+        <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
       </div>
 
       <Modal show={showModal} onHide={handleCloseModal} size="xl" className="m-auto">
