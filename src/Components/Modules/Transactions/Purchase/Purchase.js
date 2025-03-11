@@ -415,6 +415,7 @@ const URDPurchase = () => {
   
         // Reset formData
         setFormData({
+          ...formData,
           Pricing: "By Weight",
           product_id: "",
           category: "",
@@ -476,6 +477,11 @@ const URDPurchase = () => {
     // Check if the customer's mobile number is provided
     if (!formData.mobile || formData.mobile.trim() === "") {
       alert("Please select or enter customer's mobile number");
+      return;
+    }
+
+    if (!formData.invoice) {
+      alert("Please enter Invoice number");
       return;
     }
 
@@ -757,23 +763,23 @@ const URDPurchase = () => {
     setSelectedProduct(null);
   };
 
-  useEffect(() => {
-    const fetchLastInvoice = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/lastInvoice`);
-        console.log("API Response:", response.data); // Log API response
+  // useEffect(() => {
+  //   const fetchLastInvoice = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/lastInvoice`);
+  //       console.log("API Response:", response.data); // Log API response
 
-        setFormData((prev) => ({
-          ...prev,
-          invoice: response.data.lastInvoiceNumber,
-        }));
-      } catch (error) {
-        console.error("Error fetching invoice number:", error);
-      }
-    };
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         invoice: response.data.lastInvoiceNumber,
+  //       }));
+  //     } catch (error) {
+  //       console.error("Error fetching invoice number:", error);
+  //     }
+  //   };
 
-    fetchLastInvoice();
-  }, []);
+  //   fetchLastInvoice();
+  // }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {

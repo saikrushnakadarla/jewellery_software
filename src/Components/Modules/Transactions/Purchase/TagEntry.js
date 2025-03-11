@@ -15,6 +15,8 @@ import QRCode from "qrcode";
 
 const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     console.log("Pricing=", selectedProduct.Pricing)
+    console.log("Metal Type=", selectedProduct.metal_type)
+    
     const [productDetails, setProductDetails] = useState({
         pcs: selectedProduct?.pcs || 0,
         gross_weight: selectedProduct?.gross_weight || 0,
@@ -669,18 +671,44 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         }
     };
 
+    // const fetchSubCategories = async () => {
+    //     try {
+    //         const response = await axios.get(`${baseURL}/get/subcategories`);
+    //         // const filteredSubCategories = response.data.filter(
+    //         //     (subCategory) => subCategory.category_id === selectedProduct.product_id
+    //         // );
+    //         // setSubCategories(filteredSubCategories); 
+    //         setSubCategories(response.data); 
+    //     } catch (error) {
+    //         console.error("Error fetching subcategories:", error);
+    //     }
+    // };
+
+
     const fetchSubCategories = async () => {
         try {
             const response = await axios.get(`${baseURL}/get/subcategories`);
-            const filteredSubCategories = response.data.filter(
-                (subCategory) => subCategory.category_id === selectedProduct.product_id
-            );
-            setSubCategories(filteredSubCategories); // Set the filtered subcategories
+    
+            // Convert selectedProduct.metal_type to lowercase for case-insensitive comparison
+            const selectedMetalType = selectedProduct.metal_type?.toLowerCase();
+    
+            // Apply filtering logic based on metal_type
+            const filteredSubCategories = response.data.filter((subCategory) => {
+                const subCategoryMetalType = subCategory.metal_type?.toLowerCase();
+                if (selectedMetalType === "gold" || selectedMetalType === "diamond") {
+                    return subCategoryMetalType === "gold";
+                } else if (selectedMetalType === "silver") {
+                    return subCategoryMetalType === "silver";
+                }
+                return false; // If none of the conditions match, return false
+            });
+    
+            setSubCategories(filteredSubCategories); 
         } catch (error) {
             console.error("Error fetching subcategories:", error);
         }
     };
-
+    
     useEffect(() => {
         if (selectedProduct?.product_id) {
             fetchSubCategories();

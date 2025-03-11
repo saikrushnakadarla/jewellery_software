@@ -101,31 +101,17 @@ const RepairsTable = () => {
       setLoading(false);
     }
   };
-  // const handleAddPayment = (product) => {
-  //   navigate("/payments", { state: { product } }); // Navigate to /payments and pass product data
-  // };
 
   const handleAddPayment = (product) => {
-    console.log("Invoice:", product.invoice);
-    console.log("Customer Name:", product.account_name);
-    console.log("Balance Pure Weight:", product.balance_pure_weight);
-    console.log("Category:", product.category);
-  
-    navigate("/payments", { 
-      state: { 
+    navigate("/payments", {
+      state: {
         account_name: product.account_name,
         invoice_number: product.invoice,
         total_wt: product.balance_pure_weight,
-        category:product.category
-      } 
+        category: product.category
+      }
     });
   };
- const [selectedProduct, setSelectedProduct] = useState(null);
-  const handleOpenModal = (data) => {
-    setSelectedProduct(data);
-    setShowModal(true);
-  };
-  
 
   const handleExpandedDetails = async (rowIndex, invoice) => {
     try {
@@ -134,8 +120,6 @@ const RepairsTable = () => {
         <Table bordered>
           <thead>
             <tr>
-              <th>Invoice</th>
-              <th>Customer Name</th>
               <th>Category</th>
               <th>Purity</th>
               <th>Pcs</th>
@@ -151,8 +135,7 @@ const RepairsTable = () => {
           <tbody>
             {response.data.repeatedData.map((product, idx) => (
               <tr key={idx}>
-                <td>{product.invoice}</td>
-                <td>{product.account_name}</td>
+                
                 <td>{product.category}</td>
                 <td>{product.purity}</td>
                 <td>{product.pcs}</td>
@@ -163,22 +146,21 @@ const RepairsTable = () => {
                 <td>{product.paid_pure_weight}</td>
                 <td>{product.balance_pure_weight}</td>
                 <td>
-
-                <button
-                          type="button"
-                          className="btn btn-primary"
-                          style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', width: '102px', fontSize: '0.875rem', }}
-                          onClick={() => handleOpenModal(data)} // Pass entire row data
-                        >
-                          Tag Entry
-                        </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', padding: '0.25rem 0.5rem', fontSize: '0.875rem', marginRight:'5px' }}
+                    onClick={() => handleOpenTagModal(product)} // Pass entire row data
+                  >
+                    Tag Entry
+                  </button>
 
                   <Button
                     style={{
                       backgroundColor: '#28a745',
                       borderColor: '#28a745',
-                      fontSize: '0.875rem', // Smaller font size
-                      padding: '0.25rem 0.5rem', // Reduced padding
+                      fontSize: '0.875rem', 
+                      padding: '0.25rem 0.5rem', 
                     }}
                     onClick={() => handleAddPayment(product)} // Pass row data to handle receipt creation
                   >
@@ -199,6 +181,11 @@ const RepairsTable = () => {
     } catch (error) {
       console.error('Error fetching purchase details:', error);
     }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setPurchaseDetails(null);
   };
 
   const toggleRowExpansion = async (rowId, rowIndex, invoice) => {
@@ -327,10 +314,21 @@ const RepairsTable = () => {
     }
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setPurchaseDetails(null);
+  const [showTagModal, setShowTagModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const handleOpenTagModal = (data) => {
+    console.log("Opening Modal with Data:", data); // Log data when opening modal
+    setSelectedProduct(data);
+    setShowTagModal(true);
   };
+
+  const handleCloseTagModal = () => {
+    console.log("Closing Modal, Resetting Data:", selectedProduct); // Log data before closing
+    setSelectedProduct(null);
+    setShowTagModal(false);
+  };
+
 
   return (
     <div className="main-container">
@@ -426,26 +424,26 @@ const RepairsTable = () => {
         </Modal.Footer>
       </Modal>
 
-       <Modal
-              show={showModal}
-              onHide={handleCloseModal}
-              size="lg"
-              backdrop="static"
-              keyboard={false}
-              dialogClassName="custom-tagentrymodal-width"
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>Tag Entry</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                {selectedProduct && (
-                  <TagEntry
-                    handleCloseTagModal={handleCloseModal}
-                    selectedProduct={selectedProduct}
-                  />
-                )}
-              </Modal.Body>
-            </Modal>
+      <Modal
+        show={showTagModal}
+        onHide={handleCloseTagModal}
+        size="lg"
+        backdrop="static"
+        keyboard={false}
+        dialogClassName="custom-tagentrymodal-width"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Tag Entry</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedProduct && (
+            <TagEntry
+              handleCloseTagModal={handleCloseTagModal}
+              selectedProduct={selectedProduct}
+            />
+          )}
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
