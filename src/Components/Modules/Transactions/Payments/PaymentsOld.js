@@ -17,7 +17,6 @@ const repairData = location.state?.repairData;
 console.log("Received Account Name:", receivedData.account_name);
 console.log("Received Invoice:", receivedData.invoice_number);
 console.log("Received Balance Pure Weight:", receivedData.total_wt);
-console.log("Received Category:", receivedData.category);
 
 const [formData, setFormData] = useState({
   transaction_type: "Payment",
@@ -27,7 +26,6 @@ const [formData, setFormData] = useState({
   receipt_no: "",
   account_name: receivedData.account_name || "",  
   invoice_number: receivedData.invoice_number || "",  
-  category: receivedData.category || "",
   total_wt: receivedData.total_wt || "", 
   paid_wt: "",
   bal_wt: "",
@@ -89,7 +87,7 @@ useEffect(() => {
         setFormData((prevData) => ({
           ...prevData,
           total_amt: totalAmt,
-          // total_wt: totalWt,
+          total_wt: totalWt,
           rate: rate,
         }));
       }
@@ -216,7 +214,7 @@ useEffect(() => {
         setFormData((prevData) => ({
           ...prevData,
           total_amt: totalAmt,
-          // total_wt: totalWt.toFixed(3), // Ensure 3 decimal places
+          total_wt: totalWt.toFixed(3), // Ensure 3 decimal places
         }));
       }
     } else {
@@ -479,14 +477,7 @@ useEffect(() => {
               options={invoiceOptions} // Dynamically populated with invoiceData
             />
           </Col>
-          <Col xs={12} md={2}>
-            <InputField
-              label="Category"
-              name="category"
-              value={formData.category}
-              onChange={handleInputChange}
-            />
-          </Col>
+
           <Col xs={12} md={2}>
             <InputField
               label="Out Standing Wt"
@@ -555,7 +546,7 @@ useEffect(() => {
               readOnly
             />
           </Col>
-          <Col xs={12} md={2}>
+          <Col xs={12} md={3}>
             <InputField
               label="Remarks"
               name="remarks"

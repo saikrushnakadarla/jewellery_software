@@ -109,12 +109,14 @@ const RepairsTable = () => {
     console.log("Invoice:", product.invoice);
     console.log("Customer Name:", product.account_name);
     console.log("Balance Pure Weight:", product.balance_pure_weight);
+    console.log("Category:", product.category);
   
     navigate("/payments", { 
       state: { 
         account_name: product.account_name,
         invoice_number: product.invoice,
         total_wt: product.balance_pure_weight,
+        category:product.category
       } 
     });
   };
