@@ -224,6 +224,12 @@ const URDPurchase = () => {
         setLastUpdatedField("paid_pure_weight");
       }
 
+      if (field === "gross_weight") {
+        // Reset paid_pure_weight and rate_cut when gross_weight is changed
+        updatedFormData.paid_pure_weight = "";
+        updatedFormData.rate_cut_wt = "";
+      }
+
       if (field === "category") {
         const selectedCategory = categories.find(
           (category) => category.value === value
@@ -329,6 +335,15 @@ const URDPurchase = () => {
 
 
       if (field === "rate_cut_wt") {
+        const totalWeight = parseFloat(updatedFormData.total_pure_wt) || "";
+        const paidWeight = parseFloat(value) || 0;
+        if (paidWeight > totalWeight) {
+          alert("Paid Weight cannot exceed the total Weight.");
+          return prevFormData;
+        }
+      }
+
+      if (field === "paid_pure_weight") {
         const totalWeight = parseFloat(updatedFormData.total_pure_wt) || "";
         const paidWeight = parseFloat(value) || 0;
         if (paidWeight > totalWeight) {
@@ -453,7 +468,6 @@ const URDPurchase = () => {
     }
   };
   
-
   const isSilverOrGold = /silver|gold/i.test(formData.category);
 
   const handleSave = async (e) => {
