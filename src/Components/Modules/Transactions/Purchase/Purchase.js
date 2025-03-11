@@ -571,8 +571,8 @@ const URDPurchase = () => {
   }, [formData, tableData]);
 
   const handleEdit = async (index) => {
-    const selectedData = tableData[index]; // Get the data for the selected row
-    const { product_id, pcs, gross_weight, stoneDetails } = selectedData; // Extract required fields
+    const selectedData = { ...tableData[index] }; // Clone the selected row data
+    const { product_id, pcs, gross_weight, stoneDetails } = selectedData;
   
     const pcsToSend = pcs || 0;
     const grossWeightToSend = gross_weight || 0;
@@ -580,11 +580,9 @@ const URDPurchase = () => {
     try {
       // Send a request to update the product_id entry in the backend
       const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
-        method: "PUT", // Use PUT since we're updating, not deleting
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }),
       });
   
       if (!response.ok) {
@@ -593,25 +591,28 @@ const URDPurchase = () => {
   
       console.log("Entry updated successfully");
   
-      // Store stoneDetails in localStorage
-      localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails || []));
+      // Update stoneDetails in localStorage
+      if (stoneDetails) {
+        localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails));
+        setStoneList(stoneDetails); // Ensure state updates immediately
+      } else {
+        localStorage.removeItem("stoneDetails");
+        setStoneList([]);
+      }
   
-      // Retrieve stoneDetails from localStorage and update state
-      const storedStones = JSON.parse(localStorage.getItem("stoneDetails")) || [];
-      setStoneList(storedStones); // Update state
+      // Remove stoneDetails from the selected entry before updating state
+      delete selectedData.stoneDetails;
   
-      // Remove stoneDetails from the selected entry
-      const updatedData = { ...selectedData };
-      delete updatedData.stoneDetails; // Remove stoneDetails
+      // Update tableData state properly
+      setTableData((prevTableData) => {
+        const updatedTableData = [...prevTableData];
+        updatedTableData[index] = selectedData;
+        localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Update localStorage
+        return updatedTableData;
+      });
   
-      // Update tableData state
-      const updatedTableData = [...tableData];
-      updatedTableData[index] = updatedData; // Replace the edited entry without stoneDetails
-  
-      setTableData(updatedTableData);
-      localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Update localStorage
-  
-      setFormData(updatedData); // Populate the form with selected row data (without stoneDetails)
+      // Ensure formData is updated immediately
+      setFormData(selectedData);
       setEditingIndex(index); // Track the index being edited
   
     } catch (error) {
@@ -619,6 +620,7 @@ const URDPurchase = () => {
       alert("Failed to update the entry. Please try again.");
     }
   };
+  
   
   
   const handleDelete = async (index) => {

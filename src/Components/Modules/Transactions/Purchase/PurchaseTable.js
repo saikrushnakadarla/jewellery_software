@@ -13,28 +13,29 @@ const RepairsTable = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [repairDetails, setRepairDetails] = useState(null);
-
-  // Extract mobile from location state
+  const [purchaseDetails, setPurchaseDetails] = useState(null);
+  const [expandedRow, setExpandedRow] = useState(null);
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
+  
 
   useEffect(() => {
     if (mobile) {
       console.log('Selected Mobile from Dashboard:', mobile);
     }
   }, [mobile]);
+  
 
   const columns = React.useMemo(
     () => [
       {
         Header: 'Sr. No.',
-        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+        Cell: ({ row }) => row.index + 1,
       },
       {
         Header: 'Date',
         accessor: 'date',
-        Cell: ({ value }) => formatDate(value), // Format date value
+        Cell: ({ value }) => formatDate(value),
       },
       {
         Header: 'Mobile Number',
@@ -58,7 +59,7 @@ const RepairsTable = () => {
                 style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
                 onClick={() => handleViewDetails(row.original.invoice)}
               />
-              {/* <FaEdit
+              <FaEdit
                 style={{
                   cursor: 'pointer',
                   marginLeft: '10px',
@@ -66,14 +67,8 @@ const RepairsTable = () => {
                 }}
                 onClick={() => handleEdit(row.original.invoice,
                   row.original.mobile,
-                  row.original.old_exchange_amt,
-                  row.original.scheme_amt,
-                  row.original.cash_amount,
-                  row.original.card_amt,
-                  row.original.chq_amt,
-                  row.original.online_amt,
                 )}
-              /> */}
+              />
               <FaTrash
                 style={{
                   cursor: 'pointer',
@@ -101,7 +96,6 @@ const RepairsTable = () => {
     navigate('/purchase');
   };
 
-  // Fetch repair data
   const fetchPurchases = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-purchase-details`);
@@ -116,15 +110,96 @@ const RepairsTable = () => {
 
   const handleViewDetails = async (invoice) => {
     try {
-      const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
-      console.log("Fetched order details: ", response.data);
-
-      // Set repair details directly without filtering or checking conversion status
-      setRepairDetails(response.data);
-
-      setShowModal(true);
+      if (expandedRow === invoice) {
+        setExpandedRow(null); // Collapse if clicked again
+      } else {
+        const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
+        setPurchaseDetails(response.data);
+        setExpandedRow(invoice);
+      }
     } catch (error) {
-      console.error("Error fetching repair details:", error);
+      console.error('Error fetching purchase details:', error);
+    }
+  };
+
+  const handleAddPayment = (invoice) => {
+    Swal.fire({
+      title: 'Add Payment',
+      input: 'number',
+      inputLabel: 'Enter Payment Amount',
+      inputPlaceholder: 'Amount in ₹',
+      showCancelButton: true,
+      confirmButtonText: 'Add',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire('Payment Added!', `Amount: ₹${result.value}`, 'success');
+      }
+    });
+  };
+
+  const handleEdit = async (
+    invoice,
+    mobile,
+  ) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to edit this record?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, go ahead!',
+      cancelButtonText: 'No, cancel',
+    });
+
+    if (result.isConfirmed) {
+      try {
+        // Fetch repair details
+        const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
+        const details = response.data;
+
+        if (!details || !details.repeatedData) {
+          console.error('No repeatedData found in response:', details);
+          Swal.fire('Error', 'No repair details found for the provided order number.', 'error');
+          return;
+        }
+
+        // Retrieve existing repair details from localStorage or set to an empty array if not available
+        const existingDetails = JSON.parse(localStorage.getItem('tableData')) || [];
+
+        // Get today's date in yyyy-mm-dd format
+        const today = new Date().toISOString().split('T')[0];
+
+        // Update repeatedData with today's date
+        const formattedDetails = details.repeatedData.map((item) => ({
+          ...item,
+          date: today,
+          invoice, 
+        }));
+
+        const updatedDetails = [...existingDetails, ...formattedDetails];
+
+        localStorage.setItem('tableData', JSON.stringify(updatedDetails));
+
+        console.log('Updated repair details added to localStorage:', updatedDetails);
+
+        // Navigate to the sales page with state
+        navigate('/purchase', {
+          state: {
+            invoice,
+            mobile,
+            tableData: details,
+          },
+        });
+
+        // Call handleDelete without confirmation
+        // await handleDelete(invoice, true, true);
+      } catch (error) {
+        console.error('Error fetching repair details:', error);
+        Swal.fire('Error', 'Unable to fetch repair details. Please try again.', 'error');
+      }
+    } else {
+      Swal.fire('Cancelled', 'Edit operation was cancelled.', 'info');
     }
   };
 
@@ -158,15 +233,13 @@ const RepairsTable = () => {
     }
   };
 
-
-  // useEffect hook to fetch data when the component is mounted
   useEffect(() => {
     fetchPurchases();
   }, []);
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setRepairDetails(null); // Clear repair details on modal close
+    setPurchaseDetails(null);
   };
 
 
@@ -186,41 +259,38 @@ const RepairsTable = () => {
             </Button>
           </Col>
         </Row>
-
         <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
-
       </div>
 
-      {/* Modal to display repair details */}
       <Modal show={showModal} onHide={handleCloseModal} size="xl" className="m-auto">
         <Modal.Header closeButton>
           <Modal.Title>Purchase Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {repairDetails && (
+          {purchaseDetails && (
             <>
               <h5>Customer Info</h5>
               <Table bordered>
                 <tbody>
                   <tr>
                     <td>Bill Date</td>
-                    <td>{new Date(repairDetails.uniqueData.date).toLocaleDateString('en-GB')}</td>
+                    <td>{new Date(purchaseDetails.uniqueData.date).toLocaleDateString('en-GB')}</td>
                   </tr>
                   <tr>
                     <td>Mobile</td>
-                    <td>{repairDetails.uniqueData.mobile}</td>
+                    <td>{purchaseDetails.uniqueData.mobile}</td>
                   </tr>
                   <tr>
                     <td>Account Name</td>
-                    <td>{repairDetails.uniqueData.account_name}</td>
+                    <td>{purchaseDetails.uniqueData.account_name}</td>
                   </tr>
                   <tr>
                     <td>GST Number</td>
-                    <td>{repairDetails.uniqueData.gst_in}</td>
+                    <td>{purchaseDetails.uniqueData.gst_in}</td>
                   </tr>
                   <tr>
                     <td>Invoice Number</td>
-                    <td>{repairDetails.uniqueData.invoice}</td>
+                    <td>{purchaseDetails.uniqueData.invoice}</td>
                   </tr>
                 </tbody>
               </Table>
@@ -242,7 +312,7 @@ const RepairsTable = () => {
                     </tr>
                   </thead>
                   <tbody style={{ whiteSpace: 'nowrap' }}>
-                    {repairDetails.repeatedData.map((product, index) => (
+                    {purchaseDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>{product.category}</td>
                         <td>{product.purity}</td>
