@@ -74,14 +74,14 @@ const RepairsTable = () => {
                   row.original.online_amt,
                 )}
               /> */}
-              {/* <FaTrash
+              <FaTrash
                 style={{
                   cursor: 'pointer',
                   marginLeft: '10px',
                   color: 'red',
                 }}
                 onClick={() => handleDelete(row.original.invoice)}
-              /> */}
+              />
             </div>
           );
         },
@@ -118,10 +118,10 @@ const RepairsTable = () => {
     try {
       const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
       console.log("Fetched order details: ", response.data);
-  
+
       // Set repair details directly without filtering or checking conversion status
       setRepairDetails(response.data);
-  
+
       setShowModal(true);
     } catch (error) {
       console.error("Error fetching repair details:", error);
@@ -157,7 +157,7 @@ const RepairsTable = () => {
       setLoading(false);
     }
   };
-  
+
 
   // useEffect hook to fetch data when the component is mounted
   useEffect(() => {
@@ -187,7 +187,7 @@ const RepairsTable = () => {
           </Col>
         </Row>
 
-          <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
+        <DataTable columns={columns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
 
       </div>
 
@@ -203,12 +203,20 @@ const RepairsTable = () => {
               <Table bordered>
                 <tbody>
                   <tr>
+                    <td>Bill Date</td>
+                    <td>{new Date(repairDetails.uniqueData.date).toLocaleDateString('en-GB')}</td>
+                  </tr>
+                  <tr>
                     <td>Mobile</td>
                     <td>{repairDetails.uniqueData.mobile}</td>
                   </tr>
                   <tr>
                     <td>Account Name</td>
                     <td>{repairDetails.uniqueData.account_name}</td>
+                  </tr>
+                  <tr>
+                    <td>GST Number</td>
+                    <td>{repairDetails.uniqueData.gst_in}</td>
                   </tr>
                   <tr>
                     <td>Invoice Number</td>
@@ -246,7 +254,7 @@ const RepairsTable = () => {
                         <td>{product.paid_pure_weight}</td>
                         <td>{product.balance_pure_weight}</td>
                       </tr>
-                    ))}  
+                    ))}
                   </tbody>
                 </Table>
               </div>
