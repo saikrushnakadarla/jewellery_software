@@ -14,10 +14,6 @@ const RepairForm = () => {
   const location = useLocation();
   const receivedData = location.state || {}; // Extract received data
   const repairData = location.state?.repairData;
-  console.log("Received Account Name:", receivedData.account_name);
-  console.log("Received Invoice:", receivedData.invoice_number);
-  console.log("Received Balance Pure Weight:", receivedData.total_wt);
-  console.log("Received Category:", receivedData.category);
 
   const [formData, setFormData] = useState({
     transaction_type: "Payment",
@@ -37,64 +33,11 @@ const RepairForm = () => {
     cash_amt: "",
     remarks: "",
   });
-
-  // Update `formData` when received data changes
-  useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      account_name: receivedData.account_name || "",
-      invoice_number: receivedData.invoice_number || "",
-      total_wt: receivedData.total_wt || "",
-    }));
-  }, [receivedData]);
-
   const { id } = useParams();
-  const [accountOptions, setAccountOptions] = useState([]);
   const [purchases, setPurchases] = useState([]);
+  const [accountOptions, setAccountOptions] = useState([]);
   const [invoiceOptions, setInvoiceOptions] = useState([]);
-  const { invoiceData } = location.state || {};
-
-  useEffect(() => {
-    if (invoiceData) {
-      setFormData((prevData) => ({
-        ...prevData,
-        account_name: invoiceData.account_name || "", // Set account name
-        invoice_number: invoiceData.invoice || "", // Set invoice number
-      }));
-
-      // Populate invoice number options based on account_name
-      const filteredInvoices = purchases
-        ?.filter((item) => item.account_name === invoiceData.account_name)
-        .map((item) => ({
-          value: item.invoice_number,
-          label: item.invoice_number,
-        }));
-
-      setInvoiceOptions(filteredInvoices);
-
-      // Automatically set total amount based on selected invoice
-      const selectedInvoice = purchases?.find(
-        (item) => item.invoice_number === invoiceData.invoice
-      );
-
-      if (selectedInvoice) {
-        const balAfterReceipts = Number(selectedInvoice.balance_after_receipt) || 0;
-        const balAmt = Number(selectedInvoice.balance_amount) || 0;
-        const balanceWeight = Number(selectedInvoice.balance_pure_weight) || 0;
-        const balanceWeightAfterPayment = Number(selectedInvoice.balWt_after_payment) || 0;
-        const rate = Number(selectedInvoice.rate) || 0;
-        const totalAmt = balAfterReceipts || balAmt || 0;
-        const totalWt = balanceWeightAfterPayment || balanceWeight || 0;
-        console.log("totalAmt=", totalAmt)
-        setFormData((prevData) => ({
-          ...prevData,
-          total_amt: totalAmt,
-          // total_wt: totalWt,
-          rate: rate,
-        }));
-      }
-    }
-  }, [invoiceData, purchases]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
 
   useEffect(() => {
     const fetchLastPaymentNumber = async () => {
@@ -111,30 +54,6 @@ const RepairForm = () => {
     };
 
     fetchLastPaymentNumber();
-  }, []);
-
-  useEffect(() => {
-    if (repairData) {
-      setFormData(repairData);
-    } else {
-      const today = new Date().toISOString().split("T")[0];
-      setFormData(prev => ({ ...prev, date: today }));
-    }
-  }, [repairData]);
-
-  useEffect(() => {
-    // Fetch purchases data when component mounts
-    axios.get(`${baseURL}/get/purchases`)
-      .then((response) => {
-        setPurchases(response.data);
-
-        // Extract account names for options
-        // const accounts = response.data.map((purchase) => purchase.account_name);
-        // setAccountOptions([...new Set(accounts)]); // Remove duplicates
-      })
-      .catch((error) => {
-        console.error("Error fetching purchases:", error);
-      });
   }, []);
 
   useEffect(() => {
@@ -155,79 +74,73 @@ const RepairForm = () => {
   }, []);
 
   useEffect(() => {
+    axios.get(`${baseURL}/get/purchases`)
+      .then((response) => {
+        console.log("Purchases fetched successfully:", response.data);
+        setPurchases(response.data); // Store purchases in state
+      })
+      .catch((error) => {
+        console.error("Error fetching purchases:", error);
+      });
+  }, []);
+
+  useEffect(() => {
     if (formData.account_name) {
-      // Filter purchases to get invoice options for the selected account name
       const filteredInvoices = purchases
         .filter((purchase) => purchase.account_name === formData.account_name)
-        .map((purchase) => ({
-          value: purchase.invoice, // Assuming `invoice` is the key for invoice number
-          label: purchase.invoice,
-        }));
+        .map((purchase) => purchase.invoice); // Extract invoice numbers
 
-      setInvoiceOptions(filteredInvoices); // Update invoice dropdown options
-    } else {
-      // Reset invoice options, invoice_number, and total_amt when account_name is cleared
-      setInvoiceOptions([]);
-      setFormData((prevData) => ({
-        ...prevData,
-        invoice_number: "",
-        total_amt: "",
+      // Remove duplicates using Set
+      const uniqueInvoices = [...new Set(filteredInvoices)].map((invoice) => ({
+        value: invoice,
+        label: invoice,
       }));
+
+      setInvoiceOptions(uniqueInvoices);
+    } else {
+      setInvoiceOptions([]); // Reset if no account selected
     }
   }, [formData.account_name, purchases]);
 
   useEffect(() => {
     if (formData.invoice_number) {
-      const selectedInvoice = purchases.find(
-        (purchase) => purchase.invoice === formData.invoice_number
+      const filteredCategories = purchases
+        .filter((purchase) => purchase.invoice === formData.invoice_number)
+        .map((purchase) => purchase.category);
+
+      // Remove duplicates using Set
+      const uniqueCategories = [...new Set(filteredCategories)].map((category) => ({
+        value: category,
+        label: category,
+      }));
+
+      setCategoryOptions(uniqueCategories);
+    } else {
+      setCategoryOptions([]);
+    }
+  }, [formData.invoice_number, purchases]);
+
+  // Set total_wt based on balWt_after_payment or balance_pure_weight
+  useEffect(() => {
+    if (formData.account_name && formData.invoice_number && formData.category) {
+      const matchingPurchase = purchases.find(
+        (purchase) =>
+          purchase.account_name === formData.account_name &&
+          purchase.invoice === formData.invoice_number &&
+          purchase.category === formData.category
       );
 
-      if (selectedInvoice) {
-        const paidAmt = Number(selectedInvoice.paid_amt) || 0;
-        const balanceAfterReceipt = Number(selectedInvoice.balance_after_receipt) || 0;
-        const totalAmount = Number(selectedInvoice.total_amount) || 0;
-        const paidAmount = Number(selectedInvoice.paid_amount) || 0;
-        const balanceAmount = Number(selectedInvoice.balance_amount) || 0;
-        const totalWeight = Number(selectedInvoice.total_pure_weight) || 0;
-        const paidPureWeight = Number(selectedInvoice.paid_pure_weight) || 0;
-        const balanceWeight = Number(selectedInvoice.balance_pure_weight) || 0;
-        const paidWt = Number(selectedInvoice.paid_wt) || 0;
-        const balanceWeightAfterPayment = Number(selectedInvoice.balWt_after_payment) || 0;
-        const rate = Number(selectedInvoice.rate) || 0;
-
-        let totalAmt =
-          paidAmt + paidAmount === totalAmount
-            ? balanceAfterReceipt
-            : balanceAfterReceipt > 0
-              ? balanceAfterReceipt
-              : balanceAmount;
-
-        if (!totalAmt) {
-          totalAmt = (formData.total_wt * formData.rate).toFixed(2); // Default calculation
-        }
-
-        let totalWt =
-          paidWt + paidPureWeight === totalWeight
-            ? balanceWeightAfterPayment
-            : balanceWeightAfterPayment > 0
-              ? balanceWeightAfterPayment
-              : balanceWeight;
-
-        setFormData((prevData) => ({
-          ...prevData,
-          total_amt: totalAmt,
-          // total_wt: totalWt.toFixed(3), // Ensure 3 decimal places
+      if (matchingPurchase) {
+        setFormData((prevState) => ({
+          ...prevState,
+          total_wt:
+            parseFloat(matchingPurchase.balWt_after_payment) > 0
+              ? matchingPurchase.balWt_after_payment
+              : matchingPurchase.balance_pure_weight || "",
         }));
       }
-    } else {
-      // Clear total_amt and total_wt when invoice_number is cleared
-      setFormData((prevData) => ({
-        ...prevData,
-        total_amt: "",
-        total_wt: "",
-      }));
     }
-  }, [formData.invoice_number, purchases, formData.total_wt, formData.rate]);
+  }, [formData.account_name, formData.invoice_number, formData.category, purchases]);
 
 
   useEffect(() => {
@@ -267,14 +180,13 @@ const RepairForm = () => {
         [name]: value, // Ensure the field is updated first
       };
 
-      // Ensure numerical values are properly converted
+
       const totalAmt = Number(updatedData.total_amt) || 0;
       const discountAmt = value === "" ? "" : Number(updatedData.discount_amt) || 0;
       const totalWt = Number(updatedData.total_wt) || 0;
       const paidWt = Number(updatedData.paid_wt) || 0;
       const rate = Number(updatedData.rate) || 0;
 
-      // Ensure discount_amt is valid
       if (name === "discount_amt") {
         if (discountAmt > totalAmt) {
           alert("Paid amount cannot be greater than total amount.");
@@ -291,8 +203,6 @@ const RepairForm = () => {
         updatedData.prevPaidAmt = updatedData.discount_amt;
       }
 
-
-      // Ensure paid_wt is valid
       if (name === "total_wt" || name === "paid_wt") {
         if (paidWt > totalWt) {
           alert("Balance Weight cannot be greater than total weight.");
@@ -303,7 +213,6 @@ const RepairForm = () => {
         updatedData.prevPaidWt = updatedData.paid_wt;
       }
 
-      // Ensure total_amt updates dynamically if rate or total_wt change
       if (name === "rate" || name === "total_wt") {
         updatedData.total_amt = (updatedData.total_wt * rate).toFixed(2);
       }
@@ -311,7 +220,6 @@ const RepairForm = () => {
       return updatedData;
     });
   };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -410,7 +318,7 @@ const RepairForm = () => {
   };
 
   const handleBack = () => {
-    const from = location.state?.from || "/paymentstable"; // Default to /receiptstable if no from location provided
+    const from = location.state?.from || "/paymentstable";
     navigate(from);
   };
 
@@ -486,9 +394,11 @@ const RepairForm = () => {
           <Col xs={12} md={2}>
             <InputField
               label="Category"
+              type="select"
               name="category"
               value={formData.category}
               onChange={handleInputChange}
+              options={categoryOptions} // Dynamically populated
             />
           </Col>
           <Col xs={12} md={2}>

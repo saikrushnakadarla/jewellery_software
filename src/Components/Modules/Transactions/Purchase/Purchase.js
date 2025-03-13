@@ -18,15 +18,17 @@ const URDPurchase = () => {
   const [customers, setCustomers] = useState([]);
   const { state } = useLocation();
   const { mobile } = location.state || {};
+  const { invoice } = location.state || {};
+  console.log("Invoice=", invoice)
   const initialSearchValue = location.state?.mobile || '';
 
   const [formData, setFormData] = useState({
     customer_id: "",
-    mobile: "",
+    mobile: mobile || "",
     account_name: "",
     gst_in: "",
     terms: "Cash",
-    invoice: "",
+    invoice: invoice || "",
     bill_no: "",
     date: new Date().toISOString().split("T")[0],
     bill_date: new Date().toISOString().split("T")[0],
@@ -76,6 +78,13 @@ const URDPurchase = () => {
     other_charges: "",
     purityPercentage: "100",
   });
+
+  useEffect(() => {
+    if (invoice) {
+      setFormData((prev) => ({ ...prev, invoice }));
+    }
+  }, [invoice]);
+
 
   useEffect(() => {
     const calculateTotalWeight = () => {
@@ -578,11 +587,11 @@ const URDPurchase = () => {
 
   const handleEdit = async (index) => {
     const selectedData = { ...tableData[index] }; // Clone the selected row data
-    const { product_id, pcs, gross_weight, stoneDetails } = selectedData;
-
+    const { product_id, pcs, gross_weight, stoneDetails, customer_id } = selectedData; // Include customer_id
+  
     const pcsToSend = pcs || 0;
     const grossWeightToSend = gross_weight || 0;
-
+  
     try {
       // Send a request to update the product_id entry in the backend
       const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
@@ -590,42 +599,49 @@ const URDPurchase = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }),
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to update entry in updated_values_table");
       }
-
+  
       console.log("Entry updated successfully");
-
+  
       // Update stoneDetails in localStorage
       if (stoneDetails) {
         localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails));
-        setStoneList(stoneDetails); // Ensure state updates immediately
+        setStoneList(stoneDetails);
       } else {
         localStorage.removeItem("stoneDetails");
         setStoneList([]);
       }
-
+  
       // Remove stoneDetails from the selected entry before updating state
       delete selectedData.stoneDetails;
-
-      // Update tableData state properly
+  
+      // Preserve `customer_id` before updating state
       setTableData((prevTableData) => {
         const updatedTableData = [...prevTableData];
-        updatedTableData[index] = selectedData;
+        updatedTableData[index] = { ...selectedData, customer_id }; // Ensure customer_id is not lost
         localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Update localStorage
         return updatedTableData;
       });
-
-      // Ensure formData is updated immediately
-      setFormData(selectedData);
+  
+      // Ensure formData is updated without losing customer_id
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        ...selectedData,
+        customer_id: prevFormData.customer_id || selectedData.customer_id, // Preserve customer_id
+      }));
+  
       setEditingIndex(index); // Track the index being edited
-
+  
     } catch (error) {
       console.error("Error updating entry:", error);
       alert("Failed to update the entry. Please try again.");
     }
   };
+  
+  
 
   const handleDelete = async (index) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
@@ -1320,10 +1336,16 @@ const URDPurchase = () => {
                   <Col xs={12} md={4}>
                     <InputField
                       label="Invoice"
-                      value={formData.invoice || ""} // Prevents undefined issue
-                      onChange={(e) => handleChange("invoice", e.target.value.toUpperCase())}
+                      value={formData.invoice || ""} // Ensures no undefined issue
+                      onChange={(e) =>
+                        setFormData((prevState) => ({
+                          ...prevState,
+                          invoice: e.target.value.toUpperCase(),
+                        }))
+                      }
                     />
                   </Col>
+
 
                   <Col xs={12} md={4}>
                     <InputField

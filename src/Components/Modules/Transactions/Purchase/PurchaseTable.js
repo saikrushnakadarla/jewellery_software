@@ -119,15 +119,21 @@ const RepairsTable = () => {
   };
 
   const handleAddPayment = (product) => {
+    const totalWt =
+      parseFloat(product.balWt_after_payment) > 0
+        ? product.balWt_after_payment
+        : product.balance_pure_weight;
+  
     navigate("/payments", {
       state: {
         account_name: product.account_name,
         invoice_number: product.invoice,
-        total_wt: product.balance_pure_weight,
-        category: product.category
+        total_wt: totalWt,  // Ensure this matches what's displayed in the table
+        category: product.category,
       }
     });
   };
+  
 
   const handleExpandedDetails = async (rowIndex, invoice) => {
     try {
@@ -151,7 +157,7 @@ const RepairsTable = () => {
           <tbody>
             {response.data.repeatedData.map((product, idx) => (
               <tr key={idx}>
-                
+
                 <td>{product.category}</td>
                 <td>{product.purity}</td>
                 <td>{product.pcs}</td>
@@ -159,13 +165,19 @@ const RepairsTable = () => {
                 <td>{product.stone_weight}</td>
                 <td>{product.wastage_wt}</td>
                 <td>{product.total_pure_wt}</td>
-                <td>{product.paid_pure_weight}</td>
-                <td>{product.balance_pure_weight}</td>
+                <td>
+                  {((parseFloat(product.paid_pure_weight) || 0) + (parseFloat(product.paid_wt) || 0)).toFixed(3)}
+                </td>
+                <td>
+                  {parseFloat(product.balWt_after_payment) > 0
+                    ? product.balWt_after_payment
+                    : product.balance_pure_weight}
+                </td>
                 <td>
                   <button
                     type="button"
                     className="btn btn-primary"
-                    style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', padding: '0.25rem 0.5rem', fontSize: '0.875rem', marginRight:'5px' }}
+                    style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', padding: '0.25rem 0.5rem', fontSize: '0.875rem', marginRight: '5px' }}
                     onClick={() => handleOpenTagModal(product)} // Pass entire row data
                   >
                     Tag Entry
@@ -175,8 +187,8 @@ const RepairsTable = () => {
                     style={{
                       backgroundColor: '#28a745',
                       borderColor: '#28a745',
-                      fontSize: '0.875rem', 
-                      padding: '0.25rem 0.5rem', 
+                      fontSize: '0.875rem',
+                      padding: '0.25rem 0.5rem',
                     }}
                     onClick={() => handleAddPayment(product)} // Pass row data to handle receipt creation
                   >
