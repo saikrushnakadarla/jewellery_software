@@ -202,47 +202,51 @@ function Supplier_Master() {
         // Fetch existing data to check for duplicate mobile numbers
         const response = await fetch(`${baseURL}/get/account-details`);
         if (!response.ok) {
-          throw new Error('Failed to fetch data for duplicate check.');
+          throw new Error("Failed to fetch data for duplicate check.");
         }
         const result = await response.json();
-
+  
         // Check if the mobile number already exists
-        const isDuplicateMobile = result.some((item) => item.mobile === formData.mobile);
-
+        const isDuplicateMobile = result.some(
+          (item) => item.mobile === formData.mobile
+        );
+  
         if (isDuplicateMobile) {
-          alert('This mobile number is already associated with another entry.');
+          alert("This mobile number is already associated with another entry.");
           return;
         }
       }
-
+  
       // Proceed with saving the record (POST or PUT based on id)
-      const method = id ? 'PUT' : 'POST';
+      const method = id ? "PUT" : "POST";
       const endpoint = id
         ? `${baseURL}/edit/account-details/${id}`
         : `${baseURL}/account-details`;
-
+  
       const saveResponse = await fetch(endpoint, {
         method,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ ...formData, tcsApplicable }),
       });
-
+  
       if (saveResponse.ok) {
-        alert(`Supplier ${id ? 'updated' : 'created'} successfully!`);
-        // navigate('/suppliertable');
+        alert(`Supplier ${id ? "updated" : "created"} successfully!`);
+        
+        // Navigate with mobile number in state
         const from = location.state?.from || "/suppliertable";
-        navigate(from);
+        navigate(from, { state: { mobile: formData.mobile } });
       } else {
-        console.error('Failed to save supplier');
-        alert('Failed to save supplier.');
+        console.error("Failed to save supplier");
+        alert("Failed to save supplier.");
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred while processing the request.');
+      console.error("Error:", error);
+      alert("An error occurred while processing the request.");
     }
   };
+  
 
   // const handleBack = () => {
   //   navigate('/suppliertable'); 

@@ -23,7 +23,12 @@ const StoneDetailsModal = ({
             newDetails.caratWt = (stoneWt * 5).toFixed(2);
         }
 
-        if (name === "stoneWt" || name === "stonePrice") {
+        if (name === "caratWt") {
+            const caratWt = parseFloat(value) || 0;
+            newDetails.stoneWt = (caratWt / 5).toFixed(2);
+        }
+        
+        if (name === "stoneWt" || name === "stonePrice" || name === "caratWt") {
             const stonePrice = parseFloat(newDetails.stonePrice) || 0;
             const caratWt = parseFloat(newDetails.caratWt) || 0;
             newDetails.amount = (stonePrice * caratWt).toFixed(2);
@@ -59,7 +64,7 @@ const StoneDetailsModal = ({
                             <InputField label="Stone Wt" name="stoneWt" type="number" value={stoneDetails.stoneWt || ""} onChange={handleChange} />
                         </Col>
                         <Col xs={12} md={2}>
-                            <InputField label="Carat Wt" name="caratWt" type="number" value={stoneDetails.caratWt || ""} readOnly />
+                            <InputField label="Carat Wt" name="caratWt" type="number" value={stoneDetails.caratWt || ""} onChange={handleChange} />
                         </Col>
                         <Col xs={12} md={2}>
                             <InputField label="Stone Price" name="stonePrice" type="number" value={stoneDetails.stonePrice || ""} onChange={handleChange} />

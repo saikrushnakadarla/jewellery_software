@@ -42,7 +42,7 @@ const URDPurchase = () => {
     stone_weight: "",
     deduct_st_Wt: "No",
     net_weight: "",
-    purity: "",
+    purity: "Manual",
     pure_weight: "",
     wastage_on: "Pure Wt",
     wastage: "",
@@ -284,7 +284,7 @@ const URDPurchase = () => {
         updatedFormData.balance_after_receipt = "0";
         updatedFormData.balWt_after_payment = "0";
         updatedFormData.Pricing = "By Weight";
-        updatedFormData.purityPercentage = "";
+        updatedFormData.purityPercentage = "100";
         updatedFormData.remarks = "";
         updatedFormData.rate_cut_wt = "";
         updatedFormData.net_amt = "";
@@ -427,7 +427,7 @@ const URDPurchase = () => {
           stone_weight: "",
           deduct_st_Wt: "No",
           net_weight: "",
-          purity: "",
+          purity: "Manual",
           pure_weight: "",
           wastage_on: "Pure Wt",
           wastage: "",
@@ -459,7 +459,7 @@ const URDPurchase = () => {
           balance_after_receipt: "0",
           balWt_after_payment: "0",
           other_charges: "",
-          purityPercentage: "",
+          purityPercentage: "100",
         });
       } else {
         console.error("Failed to add entry to the database:", response.statusText);
@@ -527,7 +527,7 @@ const URDPurchase = () => {
         stone_weight: "",
         deduct_st_Wt: "No",
         net_weight: "",
-        purity: "",
+        purity: "Manual",
         pure_weight: "",
         wastage_on: "Pure Wt",
         wastage: "",
@@ -559,7 +559,7 @@ const URDPurchase = () => {
         balance_after_receipt: "0",
         balWt_after_payment: "0",
         other_charges: "",
-        purityPercentage: "",
+        purityPercentage: "100",
       });
       setTableData([]);
       localStorage.removeItem("purchaseFormData");
@@ -626,8 +626,6 @@ const URDPurchase = () => {
       alert("Failed to update the entry. Please try again.");
     }
   };
-
-
 
   const handleDelete = async (index) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
@@ -842,7 +840,7 @@ const URDPurchase = () => {
               product_id: '',
               rbarcode: '',
               hsn_code: '',
-              purity: '',
+              purity: 'Manual',
               rate: '',
               rate_cut: '',
             }));
@@ -866,7 +864,7 @@ const URDPurchase = () => {
         stone_weight: "",
         deduct_st_Wt: "No",
         net_weight: "",
-        purity: "",
+        purity: "Manual",
         pure_weight: "",
         wastage_on: "Pure Wt",
         wastage: "",
@@ -898,7 +896,7 @@ const URDPurchase = () => {
         balance_after_receipt: "0",
         balWt_after_payment: "0",
         other_charges: "",
-        purityPercentage: "",
+        purityPercentage: "100",
       }));
     }
   }, [formData.category]);
@@ -908,7 +906,7 @@ const URDPurchase = () => {
       if (!formData.category) {
         setFormData((prev) => ({
           ...prev,
-          purity: "",
+          purity: "Manual",
           rate: "",
           rate_cut: "",
           Making_Charges_On: "MC %", // Reset Making Charges
@@ -952,7 +950,7 @@ const URDPurchase = () => {
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
-              purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
+              // purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
               rate: rates.rate_22crt,
               rate_cut: rates.rate_22crt,
               Making_Charges_On: mcType,
@@ -979,7 +977,7 @@ const URDPurchase = () => {
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
-              purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
+              // purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
               rate: rates.silver_rate,
               rate_cut: rates.silver_rate,
               Making_Charges_On: mcType,

@@ -47,6 +47,22 @@ const RepairsTable = () => {
         accessor: 'account_name',
       },
       {
+        Header: 'Taxable Amt',
+        accessor: 'overall_taxableAmt',
+      },
+      {
+        Header: 'Tax Amt',
+        accessor: 'overall_taxAmt',
+      },
+      {
+        Header: 'Final Amount',
+        accessor: 'overall_netAmt',
+      },
+      {
+        Header: 'HM Charges',
+        accessor: 'overall_hmCharges',
+      },
+      {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => {
