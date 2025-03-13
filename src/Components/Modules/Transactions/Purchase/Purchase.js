@@ -1365,7 +1365,7 @@ const URDPurchase = () => {
           </div>
           <div className="urd-form-section">
             <Row>
-              <Col xs={12} md={2}>
+              {/* <Col xs={12} md={2}>
                 <InputField
                   label="Pricing"
                   name="Pricing"
@@ -1377,7 +1377,40 @@ const URDPurchase = () => {
                     { value: "By fixed", label: "By fixed" },
                   ]}
                 />
+              </Col> */}
+              <Col style={{width:"350px"}} xs={12} md={2} className="d-flex align-items-center gap-2">
+                {/* Label */}
+                <label style={{marginTop:"-24px",color:"#A26D2B"}} className="fw-bold mb-0 me-2">Pricing :</label>
+
+                {/* By Weight Option */}
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="Pricing"
+                    value="By Weight"
+                    checked={formData.Pricing === "By Weight"} style={{marginBottom:"20px"}}
+                    onChange={(e) => handleChange("Pricing", e.target.value)}
+                  />
+                  <label style={{width:"80px", marginTop:"5px",color:"#A26D2B"}} className="form-check-label ms-1">By Weight</label>
+                </div>
+
+                {/* By Fixed Option */}
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="radio"
+                    name="Pricing"
+                    value="By fixed"
+                    checked={formData.Pricing === "By fixed"} style={{marginBottom:"20px"}}
+                    onChange={(e) => handleChange("Pricing", e.target.value)}
+                  />
+                  <label style={{width:"80px", marginTop:"5px",color:"#A26D2B"}} className="form-check-label ms-1">By Fixed</label>
+                </div>
               </Col>
+
+
+
               <Col xs={12} md={3} className="d-flex align-items-center">
                 <div style={{ flex: 1 }}>
                   <InputField
@@ -1514,7 +1547,7 @@ const URDPurchase = () => {
                       />
                     </Col>
                   )}
-                  <Col xs={12} md={1}>
+                  <Col xs={12} md={2}>
                     <InputField
                       label="Pure Wt"
                       type="number"
