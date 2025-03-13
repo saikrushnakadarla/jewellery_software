@@ -1358,7 +1358,7 @@ const URDPurchase = () => {
               </Col> */}
               <Col style={{width:"350px"}} xs={12} md={2} className="d-flex align-items-center gap-2">
                 {/* Label */}
-                <label style={{marginTop:"-24px"}} className="fw-bold mb-0 me-2">Pricing:</label>
+                <label style={{marginTop:"-24px"}} className="fw-bold mb-0 me-2">Pricing :</label>
 
                 {/* By Weight Option */}
                 <div className="form-check">
