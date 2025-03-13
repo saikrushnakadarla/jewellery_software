@@ -74,7 +74,7 @@ const URDPurchase = () => {
     balance_after_receipt: "0",
     balWt_after_payment: "0",
     other_charges: "",
-    purityPercentage: "",
+    purityPercentage: "100",
   });
 
   useEffect(() => {
@@ -92,8 +92,8 @@ const URDPurchase = () => {
 
       setFormData((prevData) => ({
         ...prevData,
-        stone_weight: totalStoneWeight.toFixed(3), 
-        final_stone_amount: totalStoneValue.toFixed(2), 
+        stone_weight: totalStoneWeight.toFixed(3),
+        final_stone_amount: totalStoneValue.toFixed(2),
       }));
     };
 
@@ -361,14 +361,14 @@ const URDPurchase = () => {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-  
+
     // Prepare data to be sent to the API
     const apiData = {
       product_id: formData.product_id, // Assuming rbarcode maps to product_id
       pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
       gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
     };
-  
+
     try {
       // Make a POST request to the API
       const response = await fetch(`${baseURL}/add-entry`, {
@@ -378,20 +378,20 @@ const URDPurchase = () => {
         },
         body: JSON.stringify(apiData),
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log("Pcs and GrossWeight added to the database successfully:", result);
-  
+
         // Fetch stored stoneDetails from localStorage
         const storedStones = JSON.parse(localStorage.getItem("stoneDetails")) || [];
-  
+
         // Add stoneDetails to the new entry
         const newEntry = {
           ...formData,
           stoneDetails: storedStones, // Store stoneDetails inside the table entry
         };
-  
+
         let updatedTableData;
         if (editingIndex === null) {
           // Add new entry to the table
@@ -403,16 +403,16 @@ const URDPurchase = () => {
           );
           setEditingIndex(null); // Reset edit mode
         }
-  
+
         // Update state and localStorage
         setTableData(updatedTableData);
         localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Store updated tableData
-  
+
         // Remove stoneDetails from localStorage
         localStorage.removeItem("stoneDetails");
         window.dispatchEvent(new Event("storage"));
         setStoneList([]); // Reset stone list in state
-  
+
         // Reset formData
         setFormData({
           ...formData,
@@ -468,7 +468,7 @@ const URDPurchase = () => {
       console.error("Error while adding entry to the database:", error);
     }
   };
-  
+
   const isSilverOrGold = /silver|gold/i.test(formData.category);
 
   const handleSave = async (e) => {
@@ -579,10 +579,10 @@ const URDPurchase = () => {
   const handleEdit = async (index) => {
     const selectedData = { ...tableData[index] }; // Clone the selected row data
     const { product_id, pcs, gross_weight, stoneDetails } = selectedData;
-  
+
     const pcsToSend = pcs || 0;
     const grossWeightToSend = gross_weight || 0;
-  
+
     try {
       // Send a request to update the product_id entry in the backend
       const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
@@ -590,13 +590,13 @@ const URDPurchase = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to update entry in updated_values_table");
       }
-  
+
       console.log("Entry updated successfully");
-  
+
       // Update stoneDetails in localStorage
       if (stoneDetails) {
         localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails));
@@ -605,10 +605,10 @@ const URDPurchase = () => {
         localStorage.removeItem("stoneDetails");
         setStoneList([]);
       }
-  
+
       // Remove stoneDetails from the selected entry before updating state
       delete selectedData.stoneDetails;
-  
+
       // Update tableData state properly
       setTableData((prevTableData) => {
         const updatedTableData = [...prevTableData];
@@ -616,19 +616,19 @@ const URDPurchase = () => {
         localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Update localStorage
         return updatedTableData;
       });
-  
+
       // Ensure formData is updated immediately
       setFormData(selectedData);
       setEditingIndex(index); // Track the index being edited
-  
+
     } catch (error) {
       console.error("Error updating entry:", error);
       alert("Failed to update the entry. Please try again.");
     }
   };
-  
-  
-  
+
+
+
   const handleDelete = async (index) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
     if (!confirmDelete) return; // Stop execution if user cancels
@@ -1209,14 +1209,14 @@ const URDPurchase = () => {
 
   const handleAddStone = () => {
     let newStoneList = [...stoneList];
-  
+
     if (editingStoneIndex !== null) {
       newStoneList[editingStoneIndex] = stoneDetails;
       setEditingStoneIndex(null);
     } else {
       newStoneList.push(stoneDetails);
     }
-  
+
     setStoneList(newStoneList);
     localStorage.setItem("stoneDetails", JSON.stringify(newStoneList));
     window.dispatchEvent(new Event("storage"));
@@ -1224,18 +1224,18 @@ const URDPurchase = () => {
       stoneName: "",
       cut: "",
       color: "",
-      clarity: "",  
+      clarity: "",
       stoneWt: "",
       caratWt: "",
       stonePrice: "",
       amount: "",
     });
   };
-  
+
   const handleEditStone = (index) => {
     const selectedStone = stoneList[index];
     setStoneDetails(selectedStone);
-    setEditingStoneIndex(index); 
+    setEditingStoneIndex(index);
     handleShow();
   };
 
@@ -1312,13 +1312,21 @@ const URDPurchase = () => {
               <Col className="urd-form2-section">
                 <h4 className="mb-4">Invoice Details</h4>
                 <Row>
-                  <Col xs={12} md={4}>
+                  {/* <Col xs={12} md={4}>
                     <InputField
                       label="Invoice"
                       value={formData.invoice || ""}  // Prevents undefined issue
                       onChange={(e) => handleChange("invoice", e.target.value)}
                     />
+                  </Col> */}
+                  <Col xs={12} md={4}>
+                    <InputField
+                      label="Invoice"
+                      value={formData.invoice || ""} // Prevents undefined issue
+                      onChange={(e) => handleChange("invoice", e.target.value.toUpperCase())}
+                    />
                   </Col>
+
                   <Col xs={12} md={4}>
                     <InputField
                       label="Bill Date"
@@ -1585,7 +1593,7 @@ const URDPurchase = () => {
 
               <Col xs={12} md={2}>
                 <InputField
-                  label="Total Amt"
+                  label="Metal Amount"
                   type="number"
                   value={formData.total_amount}
                   onChange={(e) => handleChange("total_amount", e.target.value)}
@@ -1626,7 +1634,7 @@ const URDPurchase = () => {
               </Col>
               <Col xs={12} md={2}>
                 <InputField
-                  label="Net Amt"
+                  label="Total Amount"
                   name="net_amt"
                   value={formData.net_amt}
                   onChange={(e) => handleChange("net_amt", e.target.value)}

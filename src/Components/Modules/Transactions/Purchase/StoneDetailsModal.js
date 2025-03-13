@@ -135,12 +135,11 @@ const StoneDetailsModal = ({
                     </div>
                 </div>
             </Modal.Body>
-            {/* <Modal.Footer>
+            <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>
-                <Button variant="primary">Save</Button>
-            </Modal.Footer> */}
+            </Modal.Footer>
         </Modal>
     );
 };
