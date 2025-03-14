@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext,useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -19,6 +19,12 @@ function Navbar() {
   // console.log(userId, userName)
   const location = useLocation();  
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.pathname !== "/purchase") {
+        localStorage.removeItem("tableData");
+    }
+}, [location.pathname]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);

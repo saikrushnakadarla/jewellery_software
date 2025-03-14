@@ -580,10 +580,10 @@ const URDPurchase = () => {
     }
   };
 
-  useEffect(() => {
-    localStorage.setItem("purchaseFormData", JSON.stringify(formData));
-    localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
-  }, [formData, tableData]);
+  // useEffect(() => {
+  //   localStorage.setItem("purchaseFormData", JSON.stringify(formData));
+  //   localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
+  // }, [formData, tableData]);
 
   const handleEdit = async (index) => {
     const selectedData = { ...tableData[index] }; // Clone the selected row data
@@ -641,8 +641,6 @@ const URDPurchase = () => {
     }
   };
   
-  
-
   const handleDelete = async (index) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
     if (!confirmDelete) return; // Stop execution if user cancels
@@ -1191,30 +1189,6 @@ const URDPurchase = () => {
       bill_date: today,
     }));
   }, []);
-
-  // State for "Stone Details" Modal
-  const [showStoneModal, setShowStoneModal] = useState(false);
-  const [totalWeight, setTotalWeight] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
-
-  const handleStoneDetails = () => {
-    console.log("Stone Details button clicked!");
-    // Add your logic here (e.g., open a modal, navigate to another page, etc.)
-  };
-
-  const handleShowStoneModal = () => {
-    setShowStoneModal(true);
-  };
-
-  const handleCloseStoneModal = () => {
-    setShowStoneModal(false);
-  };
-
-  const handleUpdateStoneDetails = (updatedWeight, updatedPrice) => {
-    setTotalWeight(updatedWeight);
-    setTotalPrice(updatedPrice);
-  };
-
 
   useEffect(() => {
     const storedStones = JSON.parse(localStorage.getItem("stoneDetails")) || [];
@@ -1826,7 +1800,7 @@ const URDPurchase = () => {
                         <button
                           type="button"
                           className="btn btn-primary"
-                          style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', width: '102px', fontSize: '0.875rem', }}
+                          style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', padding: '0.25rem 0.5rem', fontSize: '0.875rem', }}
                           onClick={() => handleOpenModal(data)} // Pass entire row data
                         >
                           Tag Entry

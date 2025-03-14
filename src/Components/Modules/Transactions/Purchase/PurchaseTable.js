@@ -110,13 +110,14 @@ const RepairsTable = () => {
   const fetchPurchases = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-purchase-details`);
-      setData(response.data);
+      setData(response.data.reverse()); // Reverse data to show latest first
       setLoading(false);
     } catch (error) {
       console.error('Error fetching repair details:', error);
       setLoading(false);
     }
   };
+  
 
   const handleAddPayment = (product) => {
     const totalWt =
