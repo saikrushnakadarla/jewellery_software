@@ -23,6 +23,7 @@ const URDPurchase = () => {
   const initialSearchValue = location.state?.mobile || '';
 
   const [formData, setFormData] = useState({
+    id:"",
     customer_id: "",
     mobile: mobile || "",
     account_name: "",
