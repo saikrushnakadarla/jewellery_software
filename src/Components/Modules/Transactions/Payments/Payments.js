@@ -13,7 +13,7 @@ const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const receivedData = location.state || {}; // Extract received data
-  const repairData = location.state?.repairData;
+  // const repairData = location.state?.repairData;
 
   const [formData, setFormData] = useState({
     transaction_type: "Payment",
@@ -46,7 +46,7 @@ const RepairForm = () => {
         // setFormData(prev => ({ ...prev, receipt_no: response.data.lastPaymentNumber }));
         setFormData((prev) => ({
           ...prev,
-          receipt_no: repairData ? repairData.receipt_no : response.data.lastPaymentNumber,
+          receipt_no:response.data.lastPaymentNumber,
         }));
       } catch (error) {
         console.error("Error fetching invoice_number number:", error);
@@ -279,43 +279,43 @@ const RepairForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-
       const endpoint = id
         ? `${baseURL}/edit/payments/${id}`
         : `${baseURL}/post/payments`;
       const method = id ? "PUT" : "POST";
-
+  
       // Save payment details to the server
       const response = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+  
       if (!response.ok) throw new Error("Failed to save data");
-
-
+  
       alert(`Payment ${id ? "updated" : "saved"} successfully!`);
-
+  
       // Generate the PDF
       const pdfDoc = <PDFContent formData={formData} purchases={purchases} />;
       const pdfBlob = await pdf(pdfDoc).toBlob();
-
+  
       // Create a download link and trigger it
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
       link.download = `Payment-receipt-${formData.receipt_no || "new"}.pdf`;
       link.click();
-
+  
       // Clean up the download link
       URL.revokeObjectURL(link.href);
-
-      // Navigate to the payments table after saving
-      navigate("/paymentstable");
+  
+      // Navigate back to the referring page or default to "/paymentstable"
+      navigate("/purchasetable" || "/paymentstable", { replace: true });
+  
     } catch (error) {
       window.alert(`Error: ${error.message}`);
     }
   };
+  
 
   const handleBack = () => {
     const from = location.state?.from || "/paymentstable";
