@@ -16,7 +16,7 @@ import QRCode from "qrcode";
 const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     console.log("Pricing=", selectedProduct.Pricing)
     console.log("Metal Type=", selectedProduct.metal_type)
-    
+
     const [productDetails, setProductDetails] = useState({
         pcs: selectedProduct?.pcs || 0,
         gross_weight: selectedProduct?.gross_weight || 0,
@@ -212,7 +212,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     }, []);
 
 
-    const isGoldCategory = formData.category && formData.category.toLowerCase().includes("gold");
+    const isGoldCategory = formData.category &&
+        ["gold", "diamond"].some((metal) => formData.category.toLowerCase().includes(metal));
+
     const isSilverCategory = formData.category && formData.category.toLowerCase().includes("silver");
 
     useEffect(() => {
@@ -273,6 +275,10 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         }
         setFormData((prevData) => {
             let updatedData = { ...prevData, [field]: value };
+
+            if (field === "Gross_Weight") {
+                updatedData.pur_Gross_Weight = value;
+            }
 
             // Update MC field only if Making_Charges_On is "MC / Gram" or "MC / Piece"
             if (field === "Making_Charges_On") {
@@ -353,38 +359,35 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             if (
                 field === "Gross_Weight" ||
                 field === "Stones_Weight" ||
-                field === "deduct_st_Wt"
+                field === "deduct_st_Wt" ||
+                field === "pur_Gross_Weight" ||
+                field === "pur_Stones_Weight" ||
+                field === "pur_deduct_st_Wt"
             ) {
+                // For normal weight calculation
                 const grossWt = parseFloat(updatedData.Gross_Weight) || 0;
                 const stonesWt = parseFloat(updatedData.Stones_Weight) || 0;
-                // Use deduct_st_Wt value if available; default to "yes" if not set.
                 const deductOption = updatedData.deduct_st_Wt
                     ? updatedData.deduct_st_Wt.toLowerCase()
                     : "";
+        
                 if (deductOption === "yes") {
                     updatedData.Weight_BW = (grossWt - stonesWt).toFixed(2);
                 } else {
                     updatedData.Weight_BW = grossWt.toFixed(2);
                 }
-            }
-
-            if (
-                field === "pur_Gross_Weight" ||
-                field === "pur_Stones_Weight" ||
-                field === "pur_deduct_st_Wt"
-            ) {
-                const grossWt = parseFloat(updatedData.pur_Gross_Weight) || 0;
-                const stonesWt = parseFloat(updatedData.pur_Stones_Weight) || 0;
-
-                // Check if the option is explicitly set to "yes"; otherwise, do NOT deduct.
-                const deductOption = updatedData.pur_deduct_st_Wt
+        
+                // For purchase weight calculation
+                const purGrossWt = parseFloat(updatedData.pur_Gross_Weight) || 0;
+                const purStonesWt = parseFloat(updatedData.pur_Stones_Weight) || 0;
+                const purDeductOption = updatedData.pur_deduct_st_Wt
                     ? updatedData.pur_deduct_st_Wt.toLowerCase()
                     : "";
-
-                if (deductOption === "yes") {
-                    updatedData.pur_Weight_BW = (grossWt - stonesWt).toFixed(2);
+        
+                if (purDeductOption === "yes") {
+                    updatedData.pur_Weight_BW = (purGrossWt - purStonesWt).toFixed(2);
                 } else {
-                    updatedData.pur_Weight_BW = grossWt.toFixed(2); // No deduction if empty or not "yes"
+                    updatedData.pur_Weight_BW = purGrossWt.toFixed(2);
                 }
             }
 
@@ -446,9 +449,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         }
     };
 
-
-
-    // Condition to check if "silver" or "gold" exists in category (case insensitive)
     const isSilverOrGold = /silver|gold/i.test(formData.category);
 
     const handleSubmit = async (e) => {
@@ -565,17 +565,17 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     const generateAndDownloadPDF = async (data) => {
         const doc = new jsPDF();
         const qrContent = `PCode: ${data.PCode_BarCode}, Name: ${data.sub_category}, Weight: ${data.Gross_Weight}`;
-    
+
         try {
             const qrImageData = await QRCode.toDataURL(qrContent);
-    
+
             doc.text("Product QR Code", 10, 10);
             doc.addImage(qrImageData, "PNG", 10, 20, 40, 40);
-    
+
             doc.text(`PCode: ${data.PCode_BarCode}`, 60, 30);
             doc.text(`Name: ${data.sub_category}`, 60, 40);
             doc.text(`Weight: ${data.Gross_Weight}`, 60, 50);
-    
+
             doc.save(`QR_Code_${data.PCode_BarCode}.pdf`);
         } catch (error) {
             console.error("Error generating QR Code PDF:", error);
@@ -671,44 +671,43 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         }
     };
 
+    const fetchSubCategories = async () => {
+        try {
+            const response = await axios.get(`${baseURL}/get/subcategories`);
+            const filteredSubCategories = response.data.filter(
+                (subCategory) => subCategory.category_id === selectedProduct.product_id
+            );
+            setSubCategories(filteredSubCategories);
+        } catch (error) {
+            console.error("Error fetching subcategories:", error);
+        }
+    };
+
+
     // const fetchSubCategories = async () => {
     //     try {
     //         const response = await axios.get(`${baseURL}/get/subcategories`);
-    //         // const filteredSubCategories = response.data.filter(
-    //         //     (subCategory) => subCategory.category_id === selectedProduct.product_id
-    //         // );
-    //         // setSubCategories(filteredSubCategories); 
-    //         setSubCategories(response.data); 
+
+    //         // Convert selectedProduct.metal_type to lowercase for case-insensitive comparison
+    //         const selectedMetalType = selectedProduct.metal_type?.toLowerCase();
+
+    //         // Apply filtering logic based on metal_type
+    //         const filteredSubCategories = response.data.filter((subCategory) => {
+    //             const subCategoryMetalType = subCategory.metal_type?.toLowerCase();
+    //             if (selectedMetalType === "gold" || selectedMetalType === "diamond") {
+    //                 return subCategoryMetalType === "gold";
+    //             } else if (selectedMetalType === "silver") {
+    //                 return subCategoryMetalType === "silver";
+    //             }
+    //             return false; // If none of the conditions match, return false
+    //         });
+
+    //         setSubCategories(filteredSubCategories); 
     //     } catch (error) {
     //         console.error("Error fetching subcategories:", error);
     //     }
     // };
 
-
-    const fetchSubCategories = async () => {
-        try {
-            const response = await axios.get(`${baseURL}/get/subcategories`);
-    
-            // Convert selectedProduct.metal_type to lowercase for case-insensitive comparison
-            const selectedMetalType = selectedProduct.metal_type?.toLowerCase();
-    
-            // Apply filtering logic based on metal_type
-            const filteredSubCategories = response.data.filter((subCategory) => {
-                const subCategoryMetalType = subCategory.metal_type?.toLowerCase();
-                if (selectedMetalType === "gold" || selectedMetalType === "diamond") {
-                    return subCategoryMetalType === "gold";
-                } else if (selectedMetalType === "silver") {
-                    return subCategoryMetalType === "silver";
-                }
-                return false; // If none of the conditions match, return false
-            });
-    
-            setSubCategories(filteredSubCategories); 
-        } catch (error) {
-            console.error("Error fetching subcategories:", error);
-        }
-    };
-    
     useEffect(() => {
         if (selectedProduct?.product_id) {
             fetchSubCategories();
@@ -765,37 +764,33 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             try {
                 const response = await axios.get(`${baseURL}/purity`);
                 const filteredPurity = response.data.filter(
-                    (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase()
+                    (item) => item.metal.toLowerCase() === formData.metal_type.toLowerCase() ||
+                        (formData.metal_type.toLowerCase() === "diamond" && item.metal.toLowerCase() === "gold")
                 );
                 setPurityOptions(filteredPurity);
 
-                console.log("Purity=", filteredPurity);
+                console.log("Purity Options:", filteredPurity);
 
-                // Set the default option based on metal type
-                if (formData.metal_type.toLowerCase() === "gold") {
-                    const defaultOption = filteredPurity.find((option) =>
-                        ["22k", "22 kt", "22"].some((match) =>
-                            option.name.toLowerCase().includes(match)
-                        )
+                let defaultOption = null;
+
+                if (["gold", "diamond"].includes(formData.metal_type.toLowerCase())) {
+                    defaultOption = filteredPurity.find((option) =>
+                        option.name.toLowerCase().includes("22")
                     );
-                    if (defaultOption) {
-                        setFormData((prevFormData) => ({
-                            ...prevFormData,
-                            purity: defaultOption.name, // Adjust based on your form data structure
-                        }));
-                    }
                 } else if (formData.metal_type.toLowerCase() === "silver") {
-                    const defaultOption = filteredPurity.find((option) =>
-                        ["22k", "22 kt", "22"].some((match) =>
-                            option.name.toLowerCase().includes(match)
-                        )
+                    defaultOption = filteredPurity.find((option) =>
+                        option.name.toLowerCase().includes("92.5")
                     );
-                    if (defaultOption) {
-                        setFormData((prevFormData) => ({
-                            ...prevFormData,
-                            purity: defaultOption.name, // Adjust based on your form data structure
-                        }));
-                    }
+                }
+
+                if (defaultOption) {
+                    const defaultPurityValue = `${defaultOption.name} | ${defaultOption.purity}`;
+                    console.log("Setting default purity:", defaultPurityValue);
+
+                    setFormData((prevFormData) => ({
+                        ...prevFormData,
+                        Purity: defaultPurityValue, // Ensure exact match
+                    }));
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -806,6 +801,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             fetchPurity();
         }
     }, [formData.metal_type]);
+
+
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -818,7 +815,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                     <div className="col-12">
                         <Form className="p-4 border rounded form-container-stockentry" >
                             <div className="stock-entry-form">
-                                <h4 className="mb-3" style={{marginTop:'-16px'}}>Stock Entry</h4>
+                                <h4 className="mb-3" style={{ marginTop: '-16px' }}>Stock Entry</h4>
                                 <Row className="stock-form-section">
                                     {/* Always visible fields */}
                                     <Col xs={12} md={2}>
@@ -915,8 +912,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField label="Stock Point" name="Stock_Point" type="select" value={formData.Stock_Point} onChange={handleChange} options={[
-                                                    { value: "Floor1", label: "Floor1" },
-                                                    { value: "Floor2", label: "Floor2" },
+                                                    { value: "Display Floor1", label: "Display Floor1" },
+                                                    { value: "Display Floor2", label: "Display Floor2" },
                                                     { value: "Strong room", label: "Strong room" },
                                                 ]} />
                                             </Col>
@@ -944,7 +941,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             </Col>
                                             <div className="purchase-form-left">
                                                 <Col className="tag-urd-form1-section">
-                                                    <h4 className="mb-3" style={{marginTop:'-10px'}}>Sales</h4>
+                                                    <h4 className="mb-3" style={{ marginTop: '-10px' }}>Sales</h4>
                                                     {/* New Row for Weight Fields */}
                                                     <Row className="mt-3">
                                                         <Col xs={12} md={4}>
@@ -1048,8 +1045,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                 </Col>
                                             </div>
                                             <div className="purchase-form-right">
-                                            <Col className="tag-urd-form2-section">
-                                                    <h4 className="mb-3" style={{marginTop:'-10px'}}>Purchase</h4>
+                                                <Col className="tag-urd-form2-section">
+                                                    <h4 className="mb-3" style={{ marginTop: '-10px' }}>Purchase</h4>
                                                     {/* New Row for Weight Fields */}
                                                     <Row className="mt-3">
                                                         <Col xs={12} md={4}>

@@ -297,7 +297,7 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Sr. No.',
+        Header: 'Sr.No.',
         Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
       {
@@ -313,7 +313,7 @@ const RepairsTable = () => {
         accessor: 'repair_no',
       },
       {
-        Header: 'Customer Name',
+        Header: 'Customer',
         accessor: 'account_name',
       },
       {

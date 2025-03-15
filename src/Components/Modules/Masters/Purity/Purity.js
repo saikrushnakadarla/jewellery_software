@@ -157,10 +157,10 @@ function Purity() {
         Header: "Purity %",
         accessor: "purity_percentage",
       },
-      // {
-      //   Header: "Purity",
-      //   accessor: "purity",
-      // },
+      {
+        Header: "Purity",
+        accessor: "purity",
+      },
       {
         Header: "URD Purity",
         accessor: "urd_purity",
@@ -254,13 +254,13 @@ function Purity() {
               onChange={handleChange}
               error={errors.purity_percentage}
             />
-            {/* <InputField
+            <InputField
               label="Purity"
               name="purity"
               value={formData.purity}
               onChange={handleChange}
               error={errors.purity}
-            /> */}
+            />
             <InputField
               label="URD Purity"
               name="urd_purity"

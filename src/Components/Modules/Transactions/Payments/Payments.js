@@ -10,8 +10,8 @@ import { useParams } from "react-router-dom";
 import PDFContent from "./ReceiptPdf";
 
 const RepairForm = () => {
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
   const receivedData = location.state || {}; // Extract received data
   // const repairData = location.state?.repairData;
 
@@ -308,19 +308,28 @@ const RepairForm = () => {
       // Clean up the download link
       URL.revokeObjectURL(link.href);
   
-      // Navigate back to the referring page or default to "/paymentstable"
-      navigate("/purchasetable" || "/paymentstable", { replace: true });
-  
+      // Navigate back to the correct previous page
+      if (location.state?.from) {
+        navigate(location.state.from, { replace: true });
+      } else {
+        navigate(-1); // Go back in history if "from" is not available
+      }
+      
     } catch (error) {
       window.alert(`Error: ${error.message}`);
     }
   };
   
+  
 
   const handleBack = () => {
-    const from = location.state?.from || "/paymentstable";
-    navigate(from);
+    if (location.state?.from) {
+      navigate(location.state.from); // If there's a specific "from" location, navigate to it
+    } else {
+      navigate(-1); // Otherwise, go back in history
+    }
   };
+  
 
   return (
     <div className="main-container">

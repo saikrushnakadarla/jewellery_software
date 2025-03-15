@@ -904,8 +904,8 @@ const SalesForm = () => {
               setShowWebcam={setShowWebcam}
               showWebcam={showWebcam}
               webcamRef={webcamRef}
-              setShowOptions={webcamRef}
-              showOptions={webcamRef}
+              setShowOptions={setShowOptions}
+              showOptions={showOptions}
               estimate={estimate}
               selectedEstimate={selectedEstimate}
               handleEstimateChange={handleEstimateChange}
