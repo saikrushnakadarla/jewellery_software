@@ -934,8 +934,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField label="Stock Point" name="Stock_Point" type="select" value={formData.Stock_Point} onChange={handleChange} options={[
-                                                    { value: "Floor1", label: "Floor1" },
-                                                    { value: "Floor2", label: "Floor2" },
+                                                    { value: "Display Floor1", label: "Display Floor1" },
+                                                    { value: "Display Floor2", label: "Display Floor2" },
                                                     { value: "Strong room", label: "Strong room" },
                                                 ]} />
                                             </Col>
