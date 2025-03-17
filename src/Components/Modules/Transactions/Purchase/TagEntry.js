@@ -27,6 +27,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     const [purityOptions, setPurityOptions] = useState([]);
     const [formData, setFormData] = useState({
         product_id: selectedProduct.product_id,
+        account_name:selectedProduct.account_name,
         category: selectedProduct.category,
         sub_category: "",
         subcategory_id: "",
@@ -77,6 +78,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         pur_TotalWeight_AW: ""
     });
     const isByFixed = formData.Pricing === "By fixed";
+    const [isGeneratePDF, setIsGeneratePDF] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const handleOpenModal = () => setShowModal(true);
     const handleCloseModal = () => setShowModal(false);
@@ -370,20 +372,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 const deductOption = updatedData.deduct_st_Wt
                     ? updatedData.deduct_st_Wt.toLowerCase()
                     : "";
-        
+
                 if (deductOption === "yes") {
                     updatedData.Weight_BW = (grossWt - stonesWt).toFixed(2);
                 } else {
                     updatedData.Weight_BW = grossWt.toFixed(2);
                 }
-        
+
                 // For purchase weight calculation
                 const purGrossWt = parseFloat(updatedData.pur_Gross_Weight) || 0;
                 const purStonesWt = parseFloat(updatedData.pur_Stones_Weight) || 0;
                 const purDeductOption = updatedData.pur_deduct_st_Wt
                     ? updatedData.pur_deduct_st_Wt.toLowerCase()
                     : "";
-        
+
                 if (purDeductOption === "yes") {
                     updatedData.pur_Weight_BW = (purGrossWt - purStonesWt).toFixed(2);
                 } else {
@@ -451,24 +453,33 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
 
     const isSilverOrGold = /silver|gold/i.test(formData.category);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    useEffect(() => {
+        const handleKeyPress = (event) => {
+            if (event.altKey && event.key.toLowerCase() === 's') {
+                event.preventDefault(); // Prevent any default browser behavior
+                handleSubmit(); // Call submit without an event
+            }
+        };
+    
+        window.addEventListener("keydown", handleKeyPress);
+        return () => {
+            window.removeEventListener("keydown", handleKeyPress);
+        };
+    }, []);
 
-        // Validate based on the Pricing field selection:
+    const handleSubmit = async (e) => {
+        if (e) e.preventDefault(); 
+
         if (formData.Pricing === "By fixed") {
-            // For 'By fixed' pricing, only check that PCS is greater than 0.
             if (pcs <= 0) {
                 alert("The product's PCS must be greater than zero to submit the form.");
                 return;
             }
-            // Additionally, ensure that Piece Cost is provided and is a valid number.
             if (!formData.pieace_cost || parseFloat(formData.pieace_cost) <= 0) {
                 alert("Please enter a Piece Cost.");
                 return;
             }
-            // grossWeight can be 0 or greater.
         } else {
-            // For pricing other than 'By fixed', both PCS and Gross Weight must be > 0.
             if (pcs <= 0 || grossWeight <= 0) {
                 alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
                 return;
@@ -480,6 +491,12 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             return;
         }
 
+        if (!formData.Gross_Weight ) {
+            alert("Please add Gross Weight");
+            return;
+        }
+
+        
         try {
             const currentSuffix = parseInt(formData.suffix || "001", 10);
             const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
@@ -501,7 +518,12 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 headers: { 'Content-Type': 'application/json' },
             });
             alert("Stock added successfully!");
-            generateAndDownloadPDF(updatedData);
+
+            // **Generate PDF only if checkbox is checked**
+            if (isGeneratePDF) {
+                generateAndDownloadPDF(updatedData);
+            }
+
             fetchData();
             setFormData((prevData) => ({
                 ...prevData,
@@ -556,6 +578,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 pur_WastageWeight: "",
                 pur_TotalWeight_AW: ""
             }));
+            setIsGeneratePDF(true);
         } catch (error) {
             console.error(error);
             alert("An error occurred. Please try again.");
@@ -820,13 +843,21 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                     {/* Always visible fields */}
                                     <Col xs={12} md={2}>
                                         <InputField
+                                            label="Supplier Name"
+                                            name="account_name"
+                                            value={formData.account_name}
+                                            onChange={handleChange}
+                                        />
+                                    </Col>
+                                    <Col xs={12} md={2}>
+                                        <InputField
                                             label="Category"
                                             name="category"
                                             value={formData.category}
                                             onChange={handleChange}
                                         />
                                     </Col>
-                                    <Col xs={12} md={4} className="d-flex align-items-center">
+                                    <Col xs={12} md={3} className="d-flex align-items-center">
                                         <div style={{ flex: 1 }}>
                                             <InputField
                                                 label="Sub Category"
@@ -858,7 +889,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                             options={designOptions.map(option => ({ value: option.value, label: option.label }))}
                                         />
                                     </Col>
-                                    <Col xs={12} md={3}>
+                                    <Col xs={12} md={2}>
                                         <InputField
                                             label="Pricing"
                                             name="Pricing"
@@ -1161,15 +1192,46 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
 
 
                             </div>
-                            <div className="text-end">
-                                <Button
-                                    variant="secondary"
-                                    onClick={handleCloseTagModal} style={{ backgroundColor: 'gray', marginRight: '10px' }}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }} onClick={handleSubmit}>Save</Button>
+                            <div className="d-flex justify-content-between align-items-center">
+                                {/* <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={isGeneratePDF}
+                                        onChange={(e) => setIsGeneratePDF(e.target.checked)}
+                                    />
+                                    Generate PDF
+                                </label> */}
+                                <label className="checkbox-label" htmlFor="tcs">
+                                    <input
+                                        type="checkbox"
+                                        id="tcs"
+                                        name="tcsApplicable"
+                                        className="checkbox-input"
+                                        checked={isGeneratePDF}
+                                        onChange={(e) => setIsGeneratePDF(e.target.checked)}
+                                    />
+                                    Print QR Code
+                                </label>
+
+                                <div className="text-end">
+                                    <Button
+                                        variant="secondary"
+                                        onClick={handleCloseTagModal}
+                                        style={{ backgroundColor: 'gray', marginRight: '10px' }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        variant="success"
+                                        style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+                                        onClick={handleSubmit}
+                                    >
+                                        Save
+                                    </Button>
+                                </div>
                             </div>
+
                         </Form>
                     </div>
                 </div>

@@ -23,7 +23,7 @@ const URDPurchase = () => {
   const initialSearchValue = location.state?.mobile || '';
 
   const [formData, setFormData] = useState({
-    id:"",
+    id: "",
     customer_id: "",
     mobile: mobile || "",
     account_name: "",
@@ -589,10 +589,10 @@ const URDPurchase = () => {
   const handleEdit = async (index) => {
     const selectedData = { ...tableData[index] }; // Clone the selected row data
     const { product_id, pcs, gross_weight, stoneDetails, customer_id } = selectedData; // Include customer_id
-  
+
     const pcsToSend = pcs || 0;
     const grossWeightToSend = gross_weight || 0;
-  
+
     try {
       // Send a request to update the product_id entry in the backend
       const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
@@ -600,13 +600,13 @@ const URDPurchase = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to update entry in updated_values_table");
       }
-  
+
       console.log("Entry updated successfully");
-  
+
       // Update stoneDetails in localStorage
       if (stoneDetails) {
         localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails));
@@ -615,10 +615,10 @@ const URDPurchase = () => {
         localStorage.removeItem("stoneDetails");
         setStoneList([]);
       }
-  
+
       // Remove stoneDetails from the selected entry before updating state
       delete selectedData.stoneDetails;
-  
+
       // Preserve `customer_id` before updating state
       setTableData((prevTableData) => {
         const updatedTableData = [...prevTableData];
@@ -626,22 +626,22 @@ const URDPurchase = () => {
         localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Update localStorage
         return updatedTableData;
       });
-  
+
       // Ensure formData is updated without losing customer_id
       setFormData((prevFormData) => ({
         ...prevFormData,
         ...selectedData,
         customer_id: prevFormData.customer_id || selectedData.customer_id, // Preserve customer_id
       }));
-  
+
       setEditingIndex(index); // Track the index being edited
-  
+
     } catch (error) {
       console.error("Error updating entry:", error);
       alert("Failed to update the entry. Please try again.");
     }
   };
-  
+
   const handleDelete = async (index) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
     if (!confirmDelete) return; // Stop execution if user cancels
@@ -1236,6 +1236,8 @@ const URDPurchase = () => {
   };
 
 
+
+
   return (
     <div className="main-container">
       <div className="purchase-form-container">
@@ -1312,14 +1314,24 @@ const URDPurchase = () => {
                     <InputField
                       label="Invoice"
                       value={formData.invoice || ""} // Ensures no undefined issue
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const input = e.target;
+                        const start = input.selectionStart; // Capture cursor position
+                        const transformedValue = input.value.toUpperCase();
+
                         setFormData((prevState) => ({
                           ...prevState,
-                          invoice: e.target.value.toUpperCase(),
-                        }))
-                      }
+                          invoice: transformedValue,
+                        }));
+
+                        // Restore cursor position after transformation
+                        requestAnimationFrame(() => {
+                          input.setSelectionRange(start, start);
+                        });
+                      }}
                     />
                   </Col>
+
 
 
                   <Col xs={12} md={4}>
@@ -1353,9 +1365,9 @@ const URDPurchase = () => {
                   ]}
                 />
               </Col> */}
-              <Col style={{width:"350px"}} xs={12} md={2} className="d-flex align-items-center gap-2">
+              <Col style={{ width: "350px" }} xs={12} md={2} className="d-flex align-items-center gap-2">
                 {/* Label */}
-                <label style={{marginTop:"-24px",color:"#A26D2B"}} className="fw-bold mb-0 me-2">Pricing :</label>
+                <label style={{ marginTop: "-24px", color: "#A26D2B" }} className="fw-bold mb-0 me-2">Pricing :</label>
 
                 {/* By Weight Option */}
                 <div className="form-check">
@@ -1364,10 +1376,10 @@ const URDPurchase = () => {
                     type="radio"
                     name="Pricing"
                     value="By Weight"
-                    checked={formData.Pricing === "By Weight"} style={{marginBottom:"20px"}}
+                    checked={formData.Pricing === "By Weight"} style={{ marginBottom: "20px" }}
                     onChange={(e) => handleChange("Pricing", e.target.value)}
                   />
-                  <label style={{width:"80px", marginTop:"5px",color:"#A26D2B"}} className="form-check-label ms-1">By Weight</label>
+                  <label style={{ width: "80px", marginTop: "5px", color: "#A26D2B" }} className="form-check-label ms-1">By Weight</label>
                 </div>
 
                 {/* By Fixed Option */}
@@ -1377,10 +1389,10 @@ const URDPurchase = () => {
                     type="radio"
                     name="Pricing"
                     value="By fixed"
-                    checked={formData.Pricing === "By fixed"} style={{marginBottom:"20px"}}
+                    checked={formData.Pricing === "By fixed"} style={{ marginBottom: "20px" }}
                     onChange={(e) => handleChange("Pricing", e.target.value)}
                   />
-                  <label style={{width:"80px", marginTop:"5px",color:"#A26D2B"}} className="form-check-label ms-1">By Fixed</label>
+                  <label style={{ width: "80px", marginTop: "5px", color: "#A26D2B" }} className="form-check-label ms-1">By Fixed</label>
                 </div>
               </Col>
 
