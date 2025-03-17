@@ -40,7 +40,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         Tag_ID: "",
         Prefix: "", // Default value
         // Category: selectedProduct.metal_type,
-        Purity: selectedProduct.purity,
+        Purity: "",
         metal_type: selectedProduct.metal_type,
         PCode_BarCode: "",
         Gross_Weight: "",
@@ -518,7 +518,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 Tag_ID: "",
                 Prefix: "",
                 metal_type: selectedProduct.metal_type,
-                Purity: selectedProduct.purity,
+                // Purity: "",
                 PCode_BarCode: `${prev?.item_prefix || ""}${nextSuffix}`,
                 suffix: nextSuffix,
                 Gross_Weight: "",
