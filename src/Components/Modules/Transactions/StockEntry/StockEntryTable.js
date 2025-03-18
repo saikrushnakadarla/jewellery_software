@@ -143,26 +143,13 @@ const StockEntryTable = (selectedProduct) => {
       },
       { Header: 'Category', accessor: 'category' },
       { Header: 'Sub Category', accessor: 'sub_category' },
-      // { Header: 'Product Name', accessor: 'product_Name' },
-      // { Header: 'Metal Type', accessor: 'metal_type' },
       { Header: 'Product Design Name', accessor: 'design_master' },
-      // { Header: 'Pricing', accessor: 'Pricing' },
       { Header: 'Barcode', accessor: 'PCode_BarCode' },
-      // { Header: 'Purity', accessor: 'Purity' },
-      // { Header: 'Prefix', accessor: 'Prefix' },
-      // { Header: 'BarCode', accessor: 'PCode_BarCode' },
       { Header: 'Gross Wt', accessor: 'Gross_Weight' },
       { Header: 'Stones Wt', accessor: 'Stones_Weight' },
-      // { Header: 'Stones Price', accessor: 'Stones_Price' },
-      // { Header: 'Weight (WW)', accessor: 'Weight_BW' },
-      // { Header: 'Wastage On', accessor: 'Wastage_On' },
-
       { Header: 'Wasatage%', accessor: 'Wastage_Percentage' },
-      // { Header: 'Wastage', accessor: 'WastageWeight' },
       { Header: 'Total Wt', accessor: 'TotalWeight_AW' },
-      // { Header: 'Making Charges On', accessor: 'Making_Charges_On' },
       { Header: 'MC', accessor: 'Making_Charges' },
-      // { Header: 'Stock Point', accessor: 'Stock_Point' },
       { Header: 'Status', accessor: 'Status' },
       {
         Header: 'Action',
@@ -176,7 +163,6 @@ const StockEntryTable = (selectedProduct) => {
               }}
               onClick={() => handleEdit(row.original)}
             />
-
             {/* <FaTrash
               style={{
                 cursor: 'pointer',
@@ -185,13 +171,27 @@ const StockEntryTable = (selectedProduct) => {
               }}
               onClick={() => handleDelete(row.original.opentag_id)}
             /> */}
-
           </div>
         ),
       },
     ],
     []
   );
+
+  const handleDelete = async (opentag_id) => {
+    if (window.confirm("Are you sure you want to delete this record?")) {
+      try {
+        const response = await axios.delete(`${baseURL}/delete/opening-tags-entry/${opentag_id}`);
+        alert(response.data.message);
+        window.location.reload(); // Reload data after deletion
+      } catch (error) {
+        console.error("Error deleting record:", error.response?.data || error.message);
+        alert("Failed to delete record.");
+      }
+    }
+  };
+  
+
   const [productOptions, setProductOptions] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const handleOpenModal = () => setShowModal(true);

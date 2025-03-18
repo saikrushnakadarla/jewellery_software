@@ -148,7 +148,7 @@ const RepairsTable = () => {
     try {
       const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
       const productData = response.data.repeatedData;
-
+  
       // Fetch balance for each product
       const productBalances = await Promise.all(
         productData.map(async (product) => {
@@ -156,13 +156,14 @@ const RepairsTable = () => {
           return { ...product, balance };
         })
       );
-
+  
       const expandedContent = (
         <Table bordered>
           <thead>
             <tr>
-              <th>Product Id</th>
+              {/* <th>Product Id</th>
               <th>Tag Id</th>
+              <th>Pricing</th> */}
               <th>Category</th>
               <th>Purity</th>
               <th>Pcs</th>
@@ -177,12 +178,22 @@ const RepairsTable = () => {
           </thead>
           <tbody>
             {productBalances.map((product, idx) => {
-              const isTagEntryDisabled = product.balance?.bal_pcs == 0 || product.balance?.bal_gross_weight == 0;
-
+              const balPcs = product.balance?.bal_pcs || 0;
+              const balGrossWeight = product.balance?.bal_gross_weight || 0;
+  
+              // Disable condition for "Tag Entry" button
+              const isTagEntryDisabled =
+                product.Pricing === "By Weight"
+                  ? balPcs === 0 || balGrossWeight === 0
+                  : product.Pricing === "By Fixed"
+                  ? balPcs === 0
+                  : false; // Default to false if Pricing is neither
+  
               return (
                 <tr key={idx}>
-                  <td>{product.product_id}</td>
+                  {/* <td>{product.product_id}</td>
                   <td>{product.tag_id}</td>
+                  <td>{product.Pricing}</td> */}
                   <td>{product.category}</td>
                   <td>{product.purity}</td>
                   <td>{product.pcs}</td>
@@ -203,24 +214,24 @@ const RepairsTable = () => {
                       type="button"
                       className="btn btn-primary"
                       style={{
-                        backgroundColor: '#a36e29',
-                        borderColor: '#a36e29',
-                        padding: '0.25rem 0.5rem',
-                        fontSize: '0.875rem',
-                        marginRight: '5px',
+                        backgroundColor: "#a36e29",
+                        borderColor: "#a36e29",
+                        padding: "0.25rem 0.5rem",
+                        fontSize: "0.875rem",
+                        marginRight: "5px",
                       }}
                       onClick={() => handleOpenTagModal(product)}
-                      disabled={isTagEntryDisabled} // Disable button if balance is 0
+                      disabled={isTagEntryDisabled} // Apply dynamic disabling logic
                     >
                       Tag Entry
                     </button>
-
+  
                     <Button
                       style={{
-                        backgroundColor: '#28a745',
-                        borderColor: '#28a745',
-                        fontSize: '0.875rem',
-                        padding: '0.25rem 0.5rem',
+                        backgroundColor: "#28a745",
+                        borderColor: "#28a745",
+                        fontSize: "0.875rem",
+                        padding: "0.25rem 0.5rem",
                       }}
                       onClick={() => handleAddPayment(product)}
                     >
@@ -233,16 +244,17 @@ const RepairsTable = () => {
           </tbody>
         </Table>
       );
-
+  
       setData((prevData) =>
         prevData.map((item, index) =>
           index === rowIndex ? { ...item, expandedContent } : item
         )
       );
     } catch (error) {
-      console.error('Error fetching purchase details:', error);
+      console.error("Error fetching purchase details:", error);
     }
   };
+  
 
 
   const handleCloseModal = () => {
