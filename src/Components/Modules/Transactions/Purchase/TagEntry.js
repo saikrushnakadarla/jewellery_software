@@ -13,7 +13,7 @@ import { Modal, Button } from "react-bootstrap";  // Add this import
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
 
-const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
+const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     console.log("Pricing=", selectedProduct.Pricing)
     console.log("Metal Type=", selectedProduct.metal_type)
 
@@ -28,7 +28,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
     const [formData, setFormData] = useState({
         tag_id: selectedProduct.tag_id,
         product_id: selectedProduct.product_id,
-        account_name:selectedProduct.account_name,
+        account_name: selectedProduct.account_name,
         category: selectedProduct.category,
         sub_category: "",
         subcategory_id: "",
@@ -77,8 +77,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
         pur_Wastage_Percentage: "",
         pur_WastageWeight: "",
         pur_TotalWeight_AW: "",
-        size:"",
-        tag_weight:"",
+        size: "",
+        tag_weight: "",
+        pcs: "1",
     });
     const isByFixed = formData.Pricing === "By fixed";
     const [isGeneratePDF, setIsGeneratePDF] = useState(true);
@@ -463,7 +464,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
                 handleSubmit(); // Call submit without an event
             }
         };
-    
+
         window.addEventListener("keydown", handleKeyPress);
         return () => {
             window.removeEventListener("keydown", handleKeyPress);
@@ -471,7 +472,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
     }, []);
 
     const handleSubmit = async (e) => {
-        if (e) e.preventDefault(); 
+        if (e) e.preventDefault();
 
         if (formData.Pricing === "By fixed") {
             if (pcs <= 0) {
@@ -494,11 +495,10 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
             return;
         }
 
-        if (!formData.Gross_Weight ) {
+        if (formData.Pricing === "By Weight" && !formData.Gross_Weight) {
             alert("Please add Gross Weight");
             return;
         }
-
         
         try {
             const currentSuffix = parseInt(formData.suffix || "001", 10);
@@ -581,8 +581,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
                 pur_Wastage_Percentage: "",
                 pur_WastageWeight: "",
                 pur_TotalWeight_AW: "",
-                size:"",
-                tag_weight:"",
+                size: "",
+                tag_weight: "",
+                pcs: "1",
             }));
             setIsGeneratePDF(true);
             fetchBalance();
@@ -660,7 +661,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
     useEffect(() => {
         if (selectedProduct) {
             console.log("Product ID:", selectedProduct.product_id);
-            console.log("Tag ID:", selectedProduct.tag_id); 
+            console.log("Tag ID:", selectedProduct.tag_id);
         }
     }, [selectedProduct]);
 
@@ -771,7 +772,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
 
     const fetchData = async () => {
         if (!selectedProduct.product_id || !selectedProduct.tag_id) return;
-    
+
         try {
             const response = await fetch(`${baseURL}/entry/${selectedProduct.product_id}/${selectedProduct.tag_id}`);
             if (!response.ok) {
@@ -785,11 +786,11 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
             console.error("Error fetching data:", error);
         }
     };
-    
+
     useEffect(() => {
         fetchData();
     }, [selectedProduct.product_id, selectedProduct.tag_id]); // Re-run when either changes
-    
+
 
     useEffect(() => {
         const fetchPurity = async () => {
@@ -1087,7 +1088,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
                                                         <Col xs={12} md={3}>
                                                             <InputField label="Total Weight" name="TotalWeight_AW" value={formData.TotalWeight_AW} onChange={handleChange} readOnly />
                                                         </Col>
-                                                        
+
                                                     </Row>
                                                 </Col>
                                             </div>
@@ -1200,9 +1201,14 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
                                     )}
 
                                     {formData.Pricing === "By fixed" && (
-                                        <Col xs={12} md={2}>
-                                            <InputField label="Piece Cost" type="number" value={formData.pieace_cost} onChange={(e) => handleChange("pieace_cost", e.target.value)} />
-                                        </Col>
+                                        <>
+                                            <Col xs={12} md={2}>
+                                                <InputField label="Pcs" type="number" value={formData.pcs} onChange={(e) => handleChange("pcs", e.target.value)} />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField label="Piece Cost" type="number" value={formData.pieace_cost} onChange={(e) => handleChange("pieace_cost", e.target.value)} />
+                                            </Col>
+                                        </>
                                     )}
                                 </Row>
 
