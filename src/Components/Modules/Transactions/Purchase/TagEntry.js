@@ -13,7 +13,7 @@ import { Modal, Button } from "react-bootstrap";  // Add this import
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
 
-const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
+const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
     console.log("Pricing=", selectedProduct.Pricing)
     console.log("Metal Type=", selectedProduct.metal_type)
 
@@ -26,6 +26,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     const [productOptions, setProductOptions] = useState([]);
     const [purityOptions, setPurityOptions] = useState([]);
     const [formData, setFormData] = useState({
+        tag_id: selectedProduct.tag_id,
         product_id: selectedProduct.product_id,
         account_name:selectedProduct.account_name,
         category: selectedProduct.category,
@@ -75,7 +76,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
         pur_Wastage_On: "Gross Weight",
         pur_Wastage_Percentage: "",
         pur_WastageWeight: "",
-        pur_TotalWeight_AW: ""
+        pur_TotalWeight_AW: "",
+        size:"",
+        tag_weight:"",
     });
     const isByFixed = formData.Pricing === "By fixed";
     const [isGeneratePDF, setIsGeneratePDF] = useState(true);
@@ -527,6 +530,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
             fetchData();
             setFormData((prevData) => ({
                 ...prevData,
+                tag_id: selectedProduct.tag_id,
                 product_id: selectedProduct.product_id,
                 category: selectedProduct.category,
                 sub_category: "",
@@ -545,8 +549,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 suffix: nextSuffix,
                 Gross_Weight: "",
                 Stones_Weight: "",
-                deduct_st_Wt: "",
-                stone_price_per_carat: "Yes",
+                deduct_st_Wt: "Yes",
+                stone_price_per_carat: "",
                 Stones_Price: "",
                 HUID_No: "",
                 Wastage_On: "Gross Weight",
@@ -576,9 +580,12 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                 pur_Wastage_On: "Gross Weight",
                 pur_Wastage_Percentage: "",
                 pur_WastageWeight: "",
-                pur_TotalWeight_AW: ""
+                pur_TotalWeight_AW: "",
+                size:"",
+                tag_weight:"",
             }));
             setIsGeneratePDF(true);
+            fetchBalance();
         } catch (error) {
             console.error(error);
             alert("An error occurred. Please try again.");
@@ -653,7 +660,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     useEffect(() => {
         if (selectedProduct) {
             console.log("Product ID:", selectedProduct.product_id);
-            console.log("Product ID:", selectedProduct.metal_type); // Use product_id as needed
+            console.log("Tag ID:", selectedProduct.tag_id); 
         }
     }, [selectedProduct]);
 
@@ -763,24 +770,26 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
     const [grossWeight, setGrossWeight] = useState(null);
 
     const fetchData = async () => {
+        if (!selectedProduct.product_id || !selectedProduct.tag_id) return;
+    
         try {
-            const response = await fetch(`${baseURL}/entry/${selectedProduct.product_id}`);
+            const response = await fetch(`${baseURL}/entry/${selectedProduct.product_id}/${selectedProduct.tag_id}`);
+            if (!response.ok) {
+                throw new Error("Entry not found or server error");
+            }
             const data = await response.json();
-            setPcs(data.pcs);
-            setGrossWeight(data.gross_weight);
-
-            // Update formData with the fetched values
-            // setFormData((prev) => ({
-            //   ...prev,
-            //   Gross_Weight: data.gross_weight,
-            // }));
+            console.log("Fetched data:", data);
+            setPcs(data.bal_pcs);
+            setGrossWeight(data.bal_gross_weight);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     };
+    
     useEffect(() => {
         fetchData();
-    }, [selectedProduct.product_id]);
+    }, [selectedProduct.product_id, selectedProduct.tag_id]); // Re-run when either changes
+    
 
     useEffect(() => {
         const fetchPurity = async () => {
@@ -1013,6 +1022,12 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                         <Col xs={12} md={4}>
                                                             <InputField label="Weight BW" name="Weight_BW" value={formData.Weight_BW} onChange={handleChange} readOnly />
                                                         </Col>
+                                                        <Col xs={12} md={3}>
+                                                            <InputField label="Tag Wt" name="tag_weight" value={formData.tag_weight} onChange={handleChange} />
+                                                        </Col>
+                                                        <Col xs={12} md={2}>
+                                                            <InputField label="Size" name="size" value={formData.size} onChange={handleChange} />
+                                                        </Col>
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="MC On"
@@ -1028,7 +1043,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                             />
                                                         </Col>
 
-                                                        <Col xs={12} md={4}>
+                                                        <Col xs={12} md={3}>
                                                             <InputField
                                                                 label={formData.MC_Per_Gram_Label}
                                                                 name="MC_Per_Gram"
@@ -1072,6 +1087,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct }) => {
                                                         <Col xs={12} md={3}>
                                                             <InputField label="Total Weight" name="TotalWeight_AW" value={formData.TotalWeight_AW} onChange={handleChange} readOnly />
                                                         </Col>
+                                                        
                                                     </Row>
                                                 </Col>
                                             </div>

@@ -78,6 +78,7 @@ const URDPurchase = () => {
     balWt_after_payment: "0",
     other_charges: "",
     purityPercentage: "100",
+    tag_id: "",
   });
 
   useEffect(() => {
@@ -85,6 +86,30 @@ const URDPurchase = () => {
       setFormData((prev) => ({ ...prev, invoice }));
     }
   }, [invoice]);
+
+
+  const fetchTagId = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/max-tag-id`);
+      const nextTagId = response.data.nextTagId || 1;
+      console.log("Fetched tag_id from API:", nextTagId);
+  
+      setFormData((prevData) => ({ ...prevData, tag_id: nextTagId }));
+  
+      return nextTagId; // Return the fetched tag_id
+    } catch (error) {
+      console.error("Error fetching tag_id:", error);
+      setFormData((prevData) => ({ ...prevData, tag_id: 1 }));
+      return 1; // Return default tag_id
+    }
+  };
+  
+  useEffect(() => {
+    fetchTagId();
+  }, []);
+  
+
+  
 
 
   useEffect(() => {
@@ -371,59 +396,49 @@ const URDPurchase = () => {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-
-    // Prepare data to be sent to the API
+  
+    const latestTagId = editingIndex !== null ? tableData[editingIndex].tag_id : await fetchTagId();
+  
     const apiData = {
-      product_id: formData.product_id, // Assuming rbarcode maps to product_id
-      pcs: formData.pcs || "0", // Allow pcs to be empty if not provided
-      gross_weight: formData.gross_weight || "0", // Allow gross_weight to be empty if not provided
+      tag_id: latestTagId,
+      product_id: formData.product_id,
+      pcs: formData.pcs || "0",
+      gross_weight: formData.gross_weight || "0",
+      bal_pcs: formData.pcs || "0",
+      bal_gross_weight: formData.gross_weight || "0",
     };
-
+  
     try {
-      // Make a POST request to the API
       const response = await fetch(`${baseURL}/add-entry`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(apiData),
       });
-
+  
       if (response.ok) {
         const result = await response.json();
-        console.log("Pcs and GrossWeight added to the database successfully:", result);
-
-        // Fetch stored stoneDetails from localStorage
+        console.log(result.message);
+  
+        // Update the local state
         const storedStones = JSON.parse(localStorage.getItem("stoneDetails")) || [];
-
-        // Add stoneDetails to the new entry
-        const newEntry = {
-          ...formData,
-          stoneDetails: storedStones, // Store stoneDetails inside the table entry
-        };
-
+        const newEntry = { ...formData, tag_id: latestTagId, stoneDetails: storedStones };
+  
         let updatedTableData;
-        if (editingIndex === null) {
-          // Add new entry to the table
-          updatedTableData = [...tableData, newEntry];
-        } else {
-          // Edit existing entry in the table
+        if (editingIndex !== null) {
           updatedTableData = tableData.map((row, index) =>
             index === editingIndex ? newEntry : row
           );
-          setEditingIndex(null); // Reset edit mode
+        } else {
+          updatedTableData = [...tableData, newEntry];
         }
-
-        // Update state and localStorage
+  
         setTableData(updatedTableData);
-        localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Store updated tableData
-
-        // Remove stoneDetails from localStorage
+        localStorage.setItem("tableData", JSON.stringify(updatedTableData));
         localStorage.removeItem("stoneDetails");
         window.dispatchEvent(new Event("storage"));
-        setStoneList([]); // Reset stone list in state
-
-        // Reset formData
+        setStoneList([]);
+        setEditingIndex(null);
+  
         setFormData({
           ...formData,
           Pricing: "By Weight",
@@ -472,14 +487,154 @@ const URDPurchase = () => {
           purityPercentage: "100",
         });
       } else {
-        console.error("Failed to add entry to the database:", response.statusText);
+        console.error("Failed to add/update entry:", response.statusText);
       }
     } catch (error) {
-      console.error("Error while adding entry to the database:", error);
+      console.error("Error adding/updating entry:", error);
     }
   };
 
-  const isSilverOrGold = /silver|gold/i.test(formData.category);
+  const resetForm = () => {
+    setFormData({
+      Pricing: "By Weight",
+      product_id: "",
+      category: "",
+      metal_type: "",
+      rbarcode: "",
+      hsn_code: "",
+      pcs: "",
+      gross_weight: "",
+      stone_weight: "",
+      deduct_st_Wt: "No",
+      net_weight: "",
+      purity: "Manual",
+      pure_weight: "",
+      wastage_on: "Pure Wt",
+      wastage: "",
+      wastage_wt: "0.000",
+      Making_Charges_On: "MC %",
+      Making_Charges_Value: "",
+      total_mc: "",
+      total_pure_wt: "",
+      paid_pure_weight: "",
+      balance_pure_weight: "0",
+      rate: "",
+      total_amount: "",
+      tax_slab: "",
+      tax_amt: "",
+      net_amt: "",
+      rate_cut: "",
+      rate_cut_wt: "",
+      paid_amount: "",
+      balance_amount: "",
+      hm_charges: "",
+      charges: "",
+      remarks: "",
+      cut: "",
+      color: "",
+      clarity: "",
+      carat_wt: "",
+      stone_price: "",
+      final_stone_amount: "",
+      balance_after_receipt: "0",
+      balWt_after_payment: "0",
+      other_charges: "",
+      purityPercentage: "100",
+    });
+  };
+  
+  const handleEdit = (index) => {
+    const selectedData = { ...tableData[index] }; // Clone the selected row data
+  
+    const { stoneDetails, customer_id } = selectedData;
+  
+    if (stoneDetails) {
+      localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails));
+      setStoneList(stoneDetails);
+    } else {
+      localStorage.removeItem("stoneDetails");
+      setStoneList([]);
+    }
+  
+    delete selectedData.stoneDetails;
+  
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      ...selectedData,
+      customer_id: prevFormData.customer_id || customer_id, // Preserve customer_id
+    }));
+  
+    setEditingIndex(index); // Track the index being edited
+  };
+  
+  // const handleDelete = async (index) => {
+  //   const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
+  //   if (!confirmDelete) return; // Stop execution if user cancels
+
+  //   const selectedData = tableData[index]; // Get the data for the selected row
+  //   const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
+  //   const pcsToSend = pcs || 0;
+  //   const grossWeightToSend = gross_weight || 0;
+
+  //   console.log("Sending to server for deletion:", { product_id, pcs: pcsToSend, gross_weight: grossWeightToSend });
+
+  //   try {
+  //     // Send a request to the backend to delete the product_id entry
+  //     const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
+  //       method: "PUT", // Assuming your API is updating records
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to delete entry in updated_values_table");
+  //     }
+
+  //     console.log("Entry deleted successfully");
+
+  //     // Remove the selected row from the table data
+  //     const updatedTableData = tableData.filter((_, i) => i !== index);
+  //     setTableData(updatedTableData);
+
+  //     // Show success alert
+  //     alert("Entry deleted successfully!");
+  //   } catch (error) {
+  //     console.error("Error deleting entry:", error);
+  //     alert("Failed to delete the entry. Please try again.");
+  //   }
+  // };
+
+
+  const handleDelete = async (tag_id, product_id) => {
+    if (!window.confirm("Are you sure you want to delete this entry?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${baseURL}/delete/${tag_id}/${product_id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Remove from localStorage and update state
+        const updatedData = tableData.filter(
+          (entry) => !(entry.tag_id === tag_id && entry.product_id === product_id)
+        );
+
+        setTableData(updatedData);
+        localStorage.setItem("tableData", JSON.stringify(updatedData));
+
+        alert("Entry deleted successfully!");
+      } else {
+        alert("Failed to delete entry.");
+      }
+    } catch (error) {
+      console.error("Error deleting entry:", error);
+      alert("Error deleting entry. Please try again.");
+    }
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -578,106 +733,6 @@ const URDPurchase = () => {
       navigate("/purchasetable");
     } catch (error) {
       console.error("Error saving data:", error);
-    }
-  };
-
-  // useEffect(() => {
-  //   localStorage.setItem("purchaseFormData", JSON.stringify(formData));
-  //   localStorage.setItem("purchaseTableData", JSON.stringify(tableData));
-  // }, [formData, tableData]);
-
-  const handleEdit = async (index) => {
-    const selectedData = { ...tableData[index] }; // Clone the selected row data
-    const { product_id, pcs, gross_weight, stoneDetails, customer_id } = selectedData; // Include customer_id
-
-    const pcsToSend = pcs || 0;
-    const grossWeightToSend = gross_weight || 0;
-
-    try {
-      // Send a request to update the product_id entry in the backend
-      const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update entry in updated_values_table");
-      }
-
-      console.log("Entry updated successfully");
-
-      // Update stoneDetails in localStorage
-      if (stoneDetails) {
-        localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails));
-        setStoneList(stoneDetails);
-      } else {
-        localStorage.removeItem("stoneDetails");
-        setStoneList([]);
-      }
-
-      // Remove stoneDetails from the selected entry before updating state
-      delete selectedData.stoneDetails;
-
-      // Preserve `customer_id` before updating state
-      setTableData((prevTableData) => {
-        const updatedTableData = [...prevTableData];
-        updatedTableData[index] = { ...selectedData, customer_id }; // Ensure customer_id is not lost
-        localStorage.setItem("tableData", JSON.stringify(updatedTableData)); // Update localStorage
-        return updatedTableData;
-      });
-
-      // Ensure formData is updated without losing customer_id
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        ...selectedData,
-        customer_id: prevFormData.customer_id || selectedData.customer_id, // Preserve customer_id
-      }));
-
-      setEditingIndex(index); // Track the index being edited
-
-    } catch (error) {
-      console.error("Error updating entry:", error);
-      alert("Failed to update the entry. Please try again.");
-    }
-  };
-
-  const handleDelete = async (index) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
-    if (!confirmDelete) return; // Stop execution if user cancels
-
-    const selectedData = tableData[index]; // Get the data for the selected row
-    const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
-    const pcsToSend = pcs || 0;
-    const grossWeightToSend = gross_weight || 0;
-
-    console.log("Sending to server for deletion:", { product_id, pcs: pcsToSend, gross_weight: grossWeightToSend });
-
-    try {
-      // Send a request to the backend to delete the product_id entry
-      const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
-        method: "PUT", // Assuming your API is updating records
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete entry in updated_values_table");
-      }
-
-      console.log("Entry deleted successfully");
-
-      // Remove the selected row from the table data
-      const updatedTableData = tableData.filter((_, i) => i !== index);
-      setTableData(updatedTableData);
-
-      // Show success alert
-      alert("Entry deleted successfully!");
-    } catch (error) {
-      console.error("Error deleting entry:", error);
-      alert("Failed to delete the entry. Please try again.");
     }
   };
 
@@ -1825,7 +1880,7 @@ const URDPurchase = () => {
                         />
                         <FaTrash
                           style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
-                          onClick={() => handleDelete(index)}
+                          onClick={() => handleDelete(data.tag_id, data.product_id)}
                           disabled={editingIndex !== null}
                         />
                       </td>

@@ -117,14 +117,13 @@ const RepairsTable = () => {
       setLoading(false);
     }
   };
-  
 
   const handleAddPayment = (product) => {
     const totalWt =
       parseFloat(product.balWt_after_payment) > 0
         ? product.balWt_after_payment
         : product.balance_pure_weight;
-  
+
     navigate("/payments", {
       state: {
         account_name: product.account_name,
@@ -134,15 +133,36 @@ const RepairsTable = () => {
       }
     });
   };
-  
+
+  const fetchBalance = async (product_id, tag_id) => {
+    try {
+      const response = await axios.get(`${baseURL}/get-balance/${product_id}/${tag_id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      return null;
+    }
+  };
 
   const handleExpandedDetails = async (rowIndex, invoice) => {
     try {
       const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
+      const productData = response.data.repeatedData;
+
+      // Fetch balance for each product
+      const productBalances = await Promise.all(
+        productData.map(async (product) => {
+          const balance = await fetchBalance(product.product_id, product.tag_id);
+          return { ...product, balance };
+        })
+      );
+
       const expandedContent = (
         <Table bordered>
           <thead>
             <tr>
+              <th>Product Id</th>
+              <th>Tag Id</th>
               <th>Category</th>
               <th>Purity</th>
               <th>Pcs</th>
@@ -156,48 +176,60 @@ const RepairsTable = () => {
             </tr>
           </thead>
           <tbody>
-            {response.data.repeatedData.map((product, idx) => (
-              <tr key={idx}>
+            {productBalances.map((product, idx) => {
+              const isTagEntryDisabled = product.balance?.bal_pcs == 0 || product.balance?.bal_gross_weight == 0;
 
-                <td>{product.category}</td>
-                <td>{product.purity}</td>
-                <td>{product.pcs}</td>
-                <td>{product.gross_weight}</td>
-                <td>{product.stone_weight}</td>
-                <td>{product.wastage_wt}</td>
-                <td>{product.total_pure_wt}</td>
-                <td>
-                  {((parseFloat(product.paid_pure_weight) || 0) + (parseFloat(product.paid_wt) || 0)).toFixed(3)}
-                </td>
-                <td>
-                  {parseFloat(product.balWt_after_payment) > 0
-                    ? product.balWt_after_payment
-                    : product.balance_pure_weight}
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', padding: '0.25rem 0.5rem', fontSize: '0.875rem', marginRight: '5px' }}
-                    onClick={() => handleOpenTagModal(product)} // Pass entire row data
-                  >
-                    Tag Entry
-                  </button>
+              return (
+                <tr key={idx}>
+                  <td>{product.product_id}</td>
+                  <td>{product.tag_id}</td>
+                  <td>{product.category}</td>
+                  <td>{product.purity}</td>
+                  <td>{product.pcs}</td>
+                  <td>{product.gross_weight}</td>
+                  <td>{product.stone_weight}</td>
+                  <td>{product.wastage_wt}</td>
+                  <td>{product.total_pure_wt}</td>
+                  <td>
+                    {((parseFloat(product.paid_pure_weight) || 0) + (parseFloat(product.paid_wt) || 0)).toFixed(3)}
+                  </td>
+                  <td>
+                    {parseFloat(product.balWt_after_payment) > 0
+                      ? product.balWt_after_payment
+                      : product.balance_pure_weight}
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{
+                        backgroundColor: '#a36e29',
+                        borderColor: '#a36e29',
+                        padding: '0.25rem 0.5rem',
+                        fontSize: '0.875rem',
+                        marginRight: '5px',
+                      }}
+                      onClick={() => handleOpenTagModal(product)}
+                      disabled={isTagEntryDisabled} // Disable button if balance is 0
+                    >
+                      Tag Entry
+                    </button>
 
-                  <Button
-                    style={{
-                      backgroundColor: '#28a745',
-                      borderColor: '#28a745',
-                      fontSize: '0.875rem',
-                      padding: '0.25rem 0.5rem',
-                    }}
-                    onClick={() => handleAddPayment(product)} // Pass row data to handle receipt creation
-                  >
-                    Add Payment
-                  </Button>
-                </td>
-              </tr>
-            ))}
+                    <Button
+                      style={{
+                        backgroundColor: '#28a745',
+                        borderColor: '#28a745',
+                        fontSize: '0.875rem',
+                        padding: '0.25rem 0.5rem',
+                      }}
+                      onClick={() => handleAddPayment(product)}
+                    >
+                      Add Payment
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       );
@@ -211,6 +243,7 @@ const RepairsTable = () => {
       console.error('Error fetching purchase details:', error);
     }
   };
+
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -469,6 +502,7 @@ const RepairsTable = () => {
             <TagEntry
               handleCloseTagModal={handleCloseTagModal}
               selectedProduct={selectedProduct}
+              fetchBalance={fetchBalance}
             />
           )}
         </Modal.Body>

@@ -19,7 +19,7 @@ const StockEntryTable = (selectedProduct) => {
   const handleCloseModal = () => setShowModal(false);
   const [designOptions, setdesignOptions] = useState([]);
   const [purityOptions, setPurityOptions] = useState([]);
-  // Fetch data from the API
+
   useEffect(() => {
     fetch(`${baseURL}/get/opening-tags-entry`) // Correct URL
       .then((response) => {
@@ -36,35 +36,12 @@ const StockEntryTable = (selectedProduct) => {
       });
   }, []);
 
-  // Handle delete action
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this record?")) {
-      fetch(`${baseURL}/delete/opening-tags-entry/${id}`, {
-        method: 'DELETE',
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to delete the record');
-          }
-          return response.json();
-        })
-        .then(() => {
-          // Update the table data after successful deletion
-          setData((prevData) => prevData.filter((item) => item.opentag_id !== id));
-          alert("Record deleted successfully.");
-        })
-        .catch((error) => {
-          console.error('Error deleting record:', error);
-        });
-    }
-  };
 
-  // Handle edit action
   const handleEdit = (rowData) => {
     setFormData(rowData); // Populate the form with the row data
     setIsEditMode(true); // Show the form
   };
-  // Automatically calculate Weight_BW when Gross_Weight or Stones_Weight changes
+
   useEffect(() => {
     const grossWeight = parseFloat(formData.Gross_Weight) || 0;
     const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
@@ -158,7 +135,6 @@ const StockEntryTable = (selectedProduct) => {
       });
   };
 
-  // Define the columns for the table
   const columns = React.useMemo(
     () => [
       {
@@ -201,14 +177,14 @@ const StockEntryTable = (selectedProduct) => {
               onClick={() => handleEdit(row.original)}
             />
 
-            <FaTrash
+            {/* <FaTrash
               style={{
                 cursor: 'pointer',
                 marginLeft: '10px',
                 color: 'red',
               }}
               onClick={() => handleDelete(row.original.opentag_id)}
-            />
+            /> */}
 
           </div>
         ),
@@ -257,56 +233,6 @@ const StockEntryTable = (selectedProduct) => {
     }
   }, [formData.category]);
 
-  // Handle field changes
-  // const handleChange = async (e) => {
-  //   const { name, value } = e.target;
-
-
-  //   if (name === "sub_category") {
-  //     // Handle sub_category field changes
-  //     const selectedCategory = subCategories.find(
-  //       (category) => category.subcategory_id === parseInt(value)
-  //     );
-
-  //     const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-
-  //     if (newPrefix) {
-  //       try {
-  //         const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
-  //           params: { prefix: newPrefix },
-  //         });
-
-  //         const nextPCodeBarCode = response.data.nextPCodeBarCode;
-
-  //         setFormData((prevData) => ({
-  //           ...prevData,
-  //           sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
-  //           subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
-  //           item_prefix: newPrefix,
-  //           Prefix: newPrefix,
-  //           PCode_BarCode: nextPCodeBarCode,
-  //         }));
-  //       } catch (error) {
-  //         console.error("Error fetching PCode_BarCode:", error);
-  //       }
-  //     } else {
-  //       setFormData((prevData) => ({
-  //         ...prevData,
-  //         sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
-  //         subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
-  //         item_prefix: "",
-  //         Prefix: "",
-  //         PCode_BarCode: "",
-  //       }));
-  //     }
-  //   } else {
-  //     // Handle generic field changes
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       [name]: value,
-  //     }));
-  //   }
-  // };
 
   const handleChange = async (fieldOrEvent, valueArg) => {
        
@@ -450,8 +376,6 @@ const StockEntryTable = (selectedProduct) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-
-  // Fetch design master options from the API
   useEffect(() => {
     const fetchDesignMaster = async () => {
       try {
@@ -771,8 +695,8 @@ const StockEntryTable = (selectedProduct) => {
                     value={formData.Stock_Point || ''}
                     onChange={handleChange}
                     options={[
-                      { value: "Floor1", label: "Floor1" },
-                      { value: "Floor2", label: "Floor2" },
+                      { value: "Display Floor1", label: "Display Floor1" },
+                      { value: "Display Floor2", label: "Display Floor2" },
                       { value: "Strong room", label: "Strong room" },
                     ]}
                   />
