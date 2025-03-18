@@ -3,7 +3,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../StockEntry/StockEntry.css";
 import InputField from "../../Masters/ItemMaster/Inputfield";
-import StoneDetailsModal from "./PurchaseStoneDetails";
+import StoneDetailsModal from "./TagStoneDetailsModal";
 import { useNavigate } from "react-router-dom";
 import { AiOutlinePlus } from "react-icons/ai";
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -25,6 +25,19 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
     const [subCategories, setSubCategories] = useState([]);
     const [productOptions, setProductOptions] = useState([]);
     const [purityOptions, setPurityOptions] = useState([]);
+     const [show, setShow] = useState(false);
+     const handleShow = () => setShow(true);
+     const handleClose = () => setShow(false);
+       const [stoneDetails, setStoneDetails] = useState({
+         stoneName: "",
+         cut: "",
+         color: "",
+         clarity: "",
+         stoneWt: "",
+         caratWt: "",
+         stonePrice: "",
+         amount: "",
+       });
     const [formData, setFormData] = useState({
         tag_id: selectedProduct.tag_id,
         product_id: selectedProduct.product_id,
@@ -80,6 +93,88 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
         size:"",
         tag_weight:"",
     });
+
+    const handleAddStone = () => {
+        let newStoneList = [...stoneList];
+    
+        if (editingStoneIndex !== null) {
+          newStoneList[editingStoneIndex] = stoneDetails;
+          setEditingStoneIndex(null);
+        } else {
+          newStoneList.push(stoneDetails);
+        }
+    
+        setStoneList(newStoneList);
+        localStorage.setItem("tagStoneDetails", JSON.stringify(newStoneList));
+        window.dispatchEvent(new Event("storage"));
+        setStoneDetails({
+          stoneName: "",
+          cut: "",
+          color: "",
+          clarity: "",
+          stoneWt: "",
+          caratWt: "",
+          stonePrice: "",
+          amount: "",
+        });
+      };
+
+      const handleEditStone = (index) => {
+        const selectedStone = stoneList[index];
+        setStoneDetails(selectedStone);
+        setEditingStoneIndex(index);
+        handleShow();
+      };
+
+      const handleDeleteStone = (index) => {
+        const updatedList = stoneList.filter((_, i) => i !== index);
+        setStoneList(updatedList);
+        localStorage.setItem("tagStoneDetails", JSON.stringify(updatedList));
+        window.dispatchEvent(new Event("storage"));
+      };
+
+      const handleAddTagPurStone = () => {
+        let newStoneList = [...stoneList];
+    
+        if (editingStoneIndex !== null) {
+          newStoneList[editingStoneIndex] = stoneDetails;
+          setEditingStoneIndex(null);
+        } else {
+          newStoneList.push(stoneDetails);
+        }
+    
+        setStoneList(newStoneList);
+        localStorage.setItem("tagPurStoneDetails", JSON.stringify(newStoneList));
+        window.dispatchEvent(new Event("storage"));
+        setStoneDetails({
+          stoneName: "",
+          cut: "",
+          color: "",
+          clarity: "",
+          stoneWt: "",
+          caratWt: "",
+          stonePrice: "",
+          amount: "",
+        });
+      };
+    
+      const [stoneList, setStoneList] = useState([]);
+
+      const handleTagPurEditStone = (index) => {
+        const selectedStone = stoneList[index];
+        setStoneDetails(selectedStone);
+        setEditingStoneIndex(index);
+        handleShow();
+      };
+
+      const handleTagPurDeleteStone = (index) => {
+        const updatedList = stoneList.filter((_, i) => i !== index);
+        setStoneList(updatedList);
+        localStorage.setItem("tagPurStoneDetails", JSON.stringify(updatedList));
+        window.dispatchEvent(new Event("storage"));
+      };
+      const [editingStoneIndex, setEditingStoneIndex] = useState(null);
+
     const isByFixed = formData.Pricing === "By fixed";
     const [isGeneratePDF, setIsGeneratePDF] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -109,6 +204,63 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
     //         pur_Weight_BW:purWeightBW.toFixed(2), // Ensures two decimal places
     //     }));
     // }, [formData.Gross_Weight, formData.Stones_Weight, formData.pur_Gross_Weight, formData.pur_Stones_Weight]);
+
+    
+      useEffect(() => {
+        const calculateTotalWeight = () => {
+          const storedStoneDetails = JSON.parse(localStorage.getItem("tagStoneDetails")) || [];
+    
+          const totalStoneWeight = storedStoneDetails.reduce(
+            (sum, item) => sum + (parseFloat(item.stoneWt) || 0),
+            0
+          );
+          const totalStoneValue = storedStoneDetails.reduce(
+            (sum, item) => sum + (parseFloat(item.amount) || 0),
+            0
+          );
+    
+          setFormData((prevData) => ({
+            ...prevData,
+            Stones_Weight: totalStoneWeight.toFixed(3),
+            Stones_Price: totalStoneValue.toFixed(2),
+          }));
+        };
+    
+        calculateTotalWeight();
+    
+        const handleStorageChange = () => calculateTotalWeight();
+        window.addEventListener("storage", handleStorageChange);
+    
+        return () => window.removeEventListener("storage", handleStorageChange);
+      }, []);
+
+      useEffect(() => {
+        const calculateTotalWeight = () => {
+          const storedStoneDetails = JSON.parse(localStorage.getItem("tagPurStoneDetails")) || [];
+    
+          const totalStoneWeight = storedStoneDetails.reduce(
+            (sum, item) => sum + (parseFloat(item.stoneWt) || 0),
+            0
+          );
+          const totalStoneValue = storedStoneDetails.reduce(
+            (sum, item) => sum + (parseFloat(item.amount) || 0),
+            0
+          );
+    
+          setFormData((prevData) => ({
+            ...prevData,
+            pur_Stones_Weight: totalStoneWeight.toFixed(3),
+            pur_Stones_Price: totalStoneValue.toFixed(2),
+          }));
+        };
+    
+        calculateTotalWeight();
+    
+        const handleStorageChange = () => calculateTotalWeight();
+        window.addEventListener("storage", handleStorageChange);
+    
+        return () => window.removeEventListener("storage", handleStorageChange);
+      }, []);
 
     useEffect(() => {
         const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
@@ -990,6 +1142,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
                                                         <Col xs={12} md={4}>
                                                             <InputField label="Stones Wt" name="Stones_Weight" value={formData.Stones_Weight} onChange={handleChange} />
                                                         </Col>
+                                                        <Col xs={12} md="1">
+                                                                            <Button variant="primary"
+                                                                              onClick={handleShow}
+                                                                              style={{
+                                                                                backgroundColor: '#a36e29',
+                                                                                borderColor: '#a36e29',
+                                                                                fontSize: '0.9rem',
+                                                                                marginLeft: '-13px',
+                                                                                whiteSpace: 'nowrap'
+                                                                              }}
+                                                                            >
+                                                                              Stone Details
+                                                                            </Button>
+                                                                          </Col>
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="Deduct St Wt"
@@ -1003,14 +1169,14 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
                                                                 ]}
                                                             />
                                                         </Col>
-                                                        <Col xs={12} md={4}>
+                                                        {/* <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="Stone Price/Carat"
                                                                 name="stone_price_per_carat"
                                                                 value={formData.stone_price_per_carat}
                                                                 onChange={handleChange}
                                                             />
-                                                        </Col>
+                                                        </Col> */}
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="Stones Price"
@@ -1102,6 +1268,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
                                                         <Col xs={12} md={4}>
                                                             <InputField label="Stones Wt" name="pur_Stones_Weight" value={formData.pur_Stones_Weight} onChange={handleChange} />
                                                         </Col>
+                                                        <Col xs={12} md="1">
+                                                                            <Button variant="primary"
+                                                                              onClick={handleShow}
+                                                                              style={{
+                                                                                backgroundColor: '#a36e29',
+                                                                                borderColor: '#a36e29',
+                                                                                fontSize: '0.9rem',
+                                                                                marginLeft: '-13px',
+                                                                                whiteSpace: 'nowrap'
+                                                                              }}
+                                                                            >
+                                                                              Stone Details
+                                                                            </Button>
+                                                                          </Col>
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="Deduct St Wt"
@@ -1115,14 +1295,14 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
                                                                 ]}
                                                             />
                                                         </Col>
-                                                        <Col xs={12} md={4}>
+                                                        {/* <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="Stone Price/Carat"
                                                                 name="pur_stone_price_per_carat"
                                                                 value={formData.pur_stone_price_per_carat}
                                                                 onChange={handleChange}
                                                             />
-                                                        </Col>
+                                                        </Col> */}
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="Stones Price"
@@ -1312,7 +1492,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct,fetchBalance }) => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-
+            <StoneDetailsModal
+        show={show}
+        handleClose={handleClose}
+        stoneDetails={stoneDetails}
+        setStoneDetails={setStoneDetails}
+        handleAddStone={handleAddStone}
+        handleAddTagPurStone={handleAddTagPurStone}
+        stoneList={stoneList}
+        handleEditStone={handleEditStone}
+        handleTagPurEditStone={handleTagPurEditStone}
+        handleDeleteStone={handleDeleteStone}
+        handleTagPurDeleteStone={handleTagPurDeleteStone}
+        editingStoneIndex={editingStoneIndex}
+      />
         </div>
     );
 };
