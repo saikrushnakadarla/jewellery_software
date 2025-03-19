@@ -63,6 +63,7 @@ const URDPurchase = () => {
     net_amt: "",
     rate_cut: "",
     rate_cut_wt: "",
+    rate_cut_amt: "",
     paid_amount: "",
     balance_amount: "",
     hm_charges: "",
@@ -93,9 +94,9 @@ const URDPurchase = () => {
       const response = await axios.get(`${baseURL}/max-tag-id`);
       const nextTagId = response.data.nextTagId || 1;
       console.log("Fetched tag_id from API:", nextTagId);
-  
+
       setFormData((prevData) => ({ ...prevData, tag_id: nextTagId }));
-  
+
       return nextTagId; // Return the fetched tag_id
     } catch (error) {
       console.error("Error fetching tag_id:", error);
@@ -103,13 +104,13 @@ const URDPurchase = () => {
       return 1; // Return default tag_id
     }
   };
-  
+
   useEffect(() => {
     fetchTagId();
   }, []);
-  
 
-  
+
+
 
 
   useEffect(() => {
@@ -269,12 +270,12 @@ const URDPurchase = () => {
         const selectedCategory = categories.find(
           (category) => category.value === value
         );
-
+      
         if (selectedCategory) {
           const matchedTaxSlab = taxOptions.find(
             (tax) => tax.value === selectedCategory.tax_slab
           );
-
+      
           if (matchedTaxSlab) {
             updatedFormData.tax_slab = matchedTaxSlab.value;
           } else {
@@ -283,7 +284,13 @@ const URDPurchase = () => {
         } else {
           updatedFormData.tax_slab = "";
         }
+      
+        // Reset paid_amount if it has a value
+        if (updatedFormData.paid_amount) {
+          updatedFormData.paid_amount = "";
+        }
       }
+      
 
       if (field === "category" && value === "") {
         updatedFormData.rbarcode = "";
@@ -314,6 +321,7 @@ const URDPurchase = () => {
         updatedFormData.tax_slab = "";
         updatedFormData.tax_amt = "";
         updatedFormData.total_amount = "";
+        updatedFormData.rate_cut_amt = "";
         updatedFormData.paid_amount = "";
         updatedFormData.balance_amount = "";
         updatedFormData.balance_after_receipt = "0";
@@ -360,14 +368,13 @@ const URDPurchase = () => {
       }
 
       if (field === "paid_amount") {
-        const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
+        const totalAmount = parseFloat(updatedFormData.rate_cut_amt) || 0;
         const paidAmount = parseFloat(value) || 0;
         if (paidAmount > totalAmount) {
-          alert("Paid amount cannot exceed the total amount.");
+          alert("Paid amount cannot exceed the Rate Cut amount.");
           return prevFormData;
         }
       }
-
 
       if (field === "rate_cut_wt") {
         const totalWeight = parseFloat(updatedFormData.total_pure_wt) || "";
@@ -396,9 +403,9 @@ const URDPurchase = () => {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-  
+
     const latestTagId = editingIndex !== null ? tableData[editingIndex].tag_id : await fetchTagId();
-  
+
     const apiData = {
       tag_id: latestTagId,
       product_id: formData.product_id,
@@ -407,22 +414,22 @@ const URDPurchase = () => {
       bal_pcs: formData.pcs || "0",
       bal_gross_weight: formData.gross_weight || "0",
     };
-  
+
     try {
       const response = await fetch(`${baseURL}/add-entry`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(apiData),
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log(result.message);
-  
+
         // Update the local state
         const storedStones = JSON.parse(localStorage.getItem("stoneDetails")) || [];
         const newEntry = { ...formData, tag_id: latestTagId, stoneDetails: storedStones };
-  
+
         let updatedTableData;
         if (editingIndex !== null) {
           updatedTableData = tableData.map((row, index) =>
@@ -431,14 +438,14 @@ const URDPurchase = () => {
         } else {
           updatedTableData = [...tableData, newEntry];
         }
-  
+
         setTableData(updatedTableData);
         localStorage.setItem("tableData", JSON.stringify(updatedTableData));
         localStorage.removeItem("stoneDetails");
         window.dispatchEvent(new Event("storage"));
         setStoneList([]);
         setEditingIndex(null);
-  
+
         setFormData({
           ...formData,
           Pricing: "By Weight",
@@ -470,6 +477,7 @@ const URDPurchase = () => {
           net_amt: "",
           rate_cut: "",
           rate_cut_wt: "",
+          rate_cut_amt: "",
           paid_amount: "",
           balance_amount: "",
           hm_charges: "",
@@ -494,60 +502,11 @@ const URDPurchase = () => {
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      Pricing: "By Weight",
-      product_id: "",
-      category: "",
-      metal_type: "",
-      rbarcode: "",
-      hsn_code: "",
-      pcs: "",
-      gross_weight: "",
-      stone_weight: "",
-      deduct_st_Wt: "No",
-      net_weight: "",
-      purity: "Manual",
-      pure_weight: "",
-      wastage_on: "Pure Wt",
-      wastage: "",
-      wastage_wt: "0.000",
-      Making_Charges_On: "MC %",
-      Making_Charges_Value: "",
-      total_mc: "",
-      total_pure_wt: "",
-      paid_pure_weight: "",
-      balance_pure_weight: "0",
-      rate: "",
-      total_amount: "",
-      tax_slab: "",
-      tax_amt: "",
-      net_amt: "",
-      rate_cut: "",
-      rate_cut_wt: "",
-      paid_amount: "",
-      balance_amount: "",
-      hm_charges: "",
-      charges: "",
-      remarks: "",
-      cut: "",
-      color: "",
-      clarity: "",
-      carat_wt: "",
-      stone_price: "",
-      final_stone_amount: "",
-      balance_after_receipt: "0",
-      balWt_after_payment: "0",
-      other_charges: "",
-      purityPercentage: "100",
-    });
-  };
-  
   const handleEdit = (index) => {
     const selectedData = { ...tableData[index] }; // Clone the selected row data
-  
+
     const { stoneDetails, customer_id } = selectedData;
-  
+
     if (stoneDetails) {
       localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails));
       setStoneList(stoneDetails);
@@ -555,57 +514,17 @@ const URDPurchase = () => {
       localStorage.removeItem("stoneDetails");
       setStoneList([]);
     }
-  
+
     delete selectedData.stoneDetails;
-  
+
     setFormData((prevFormData) => ({
       ...prevFormData,
       ...selectedData,
       customer_id: prevFormData.customer_id || customer_id, // Preserve customer_id
     }));
-  
+
     setEditingIndex(index); // Track the index being edited
   };
-  
-  // const handleDelete = async (index) => {
-  //   const confirmDelete = window.confirm("Are you sure you want to delete this entry?");
-  //   if (!confirmDelete) return; // Stop execution if user cancels
-
-  //   const selectedData = tableData[index]; // Get the data for the selected row
-  //   const { product_id, pcs, gross_weight } = selectedData; // Extract product_id, pcs, and gross_weight
-  //   const pcsToSend = pcs || 0;
-  //   const grossWeightToSend = gross_weight || 0;
-
-  //   console.log("Sending to server for deletion:", { product_id, pcs: pcsToSend, gross_weight: grossWeightToSend });
-
-  //   try {
-  //     // Send a request to the backend to delete the product_id entry
-  //     const response = await fetch(`${baseURL}/delete-updated-values/${product_id}`, {
-  //       method: "PUT", // Assuming your API is updating records
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ pcs: pcsToSend, gross_weight: grossWeightToSend }), // Pass pcs and gross_weight
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to delete entry in updated_values_table");
-  //     }
-
-  //     console.log("Entry deleted successfully");
-
-  //     // Remove the selected row from the table data
-  //     const updatedTableData = tableData.filter((_, i) => i !== index);
-  //     setTableData(updatedTableData);
-
-  //     // Show success alert
-  //     alert("Entry deleted successfully!");
-  //   } catch (error) {
-  //     console.error("Error deleting entry:", error);
-  //     alert("Failed to delete the entry. Please try again.");
-  //   }
-  // };
-
 
   const handleDelete = async (tag_id, product_id) => {
     if (!window.confirm("Are you sure you want to delete this entry?")) {
@@ -710,6 +629,7 @@ const URDPurchase = () => {
         net_amt: "",
         rate_cut: "",
         rate_cut_wt: "",
+        rate_cut_amt: "",
         paid_amount: "",
         balance_amount: "",
         hm_charges: "",
@@ -952,6 +872,7 @@ const URDPurchase = () => {
         net_amt: "",
         rate_cut: "",
         rate_cut_wt: "",
+        rate_cut_amt: "",
         paid_amount: "",
         balance_amount: "",
         hm_charges: "",
@@ -1104,7 +1025,7 @@ const URDPurchase = () => {
     const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
 
     let paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || "";
-    let paidAmount = parseFloat(updatedFormData.paid_amount) || 0;
+    let paidAmount = parseFloat(updatedFormData.rate_cut_amt) || 0;
 
     // Net Weight Calculation
     if (grossWeight || stoneWeight) {
@@ -1181,12 +1102,19 @@ const URDPurchase = () => {
     if (lastUpdatedField === "rate_cut_wt") {
       updatedFormData.paid_pure_weight = rateCuttedWt;
       updatedFormData.balance_pure_weight = (totalPureWeight - rateCuttedWt).toFixed(3);
-      updatedFormData.paid_amount = (rateCuttedWt * rateCut).toFixed(2);
+      updatedFormData.rate_cut_amt = (rateCuttedWt * rateCut).toFixed(2);
     }
 
     // Restore previous rate_cut if paid_pure_weight is cleared
     if (lastUpdatedField === "paid_pure_weight" && paidPureWeight === "") {
       updatedFormData.rate_cut = updatedFormData.previousRateCut || 0;
+    }
+
+    // Handle rate_cut and rate_cut_amt
+    if (rateCut > 0 || rateCuttedWt > 0) {
+      updatedFormData.rate_cut_amt = (rateCuttedWt * rateCut).toFixed(2);
+    } else {
+      updatedFormData.rate_cut_amt = "0.00";
     }
 
     // Balance Calculations
@@ -1195,7 +1123,13 @@ const URDPurchase = () => {
         ? parseFloat(updatedFormData.total_pure_wt).toFixed(3)
         : (parseFloat(updatedFormData.total_pure_wt) - parseFloat(updatedFormData.paid_pure_weight)).toFixed(3);
 
-    updatedFormData.balance_amount = (totalAmount - parseFloat(updatedFormData.paid_amount) || 0).toFixed(2);
+    // updatedFormData.balance_amount = (totalAmount - parseFloat(updatedFormData.rate_cut_amt) || 0).toFixed(2);
+
+    updatedFormData.balance_amount = (
+      parseFloat(updatedFormData.rate_cut_amt || 0) -
+      parseFloat(updatedFormData.paid_amount || 0)
+    ).toFixed(2);
+
 
     setFormData(updatedFormData);
   }, [
@@ -1204,6 +1138,7 @@ const URDPurchase = () => {
     formData.net_weight,
     formData.rate,
     formData.total_amount,
+    formData.rate_cut_amt,
     formData.paid_amount,
     formData.paid_pure_weight,
     formData.wastage,
@@ -1289,9 +1224,6 @@ const URDPurchase = () => {
     localStorage.setItem("stoneDetails", JSON.stringify(updatedList));
     window.dispatchEvent(new Event("storage"));
   };
-
-
-
 
   return (
     <div className="main-container">
@@ -1755,20 +1687,28 @@ const URDPurchase = () => {
                   </Col>
                   <Col xs={12} md={2}>
                     <InputField
+                      label="Rate Cut Amt"
+                      type="number"
+                      value={formData.rate_cut_amt}
+                      onChange={(e) => handleChange("rate_cut_amt", e.target.value)}
+                    />
+                  </Col>
+                  <Col xs={12} md={2}>
+                    <InputField
                       label="Paid Amt"
                       type="number"
                       value={formData.paid_amount}
                       onChange={(e) => handleChange("paid_amount", e.target.value)}
                     />
                   </Col>
-                  {/* <Col xs={12} md={2}>
-                <InputField
-                  label="Balance Amt"
-                  type="number"
-                  value={formData.balance_amount}
-                  onChange={(e) => handleChange("balance_amount", e.target.value)}
-                />
-              </Col> */}
+                  <Col xs={12} md={2}>
+                    <InputField
+                      label="Balance Amt"
+                      type="number"
+                      value={formData.balance_amount}
+                      onChange={(e) => handleChange("balance_amount", e.target.value)}
+                    />
+                  </Col>
 
                   <Col xs={12} md={2}>
                     <InputField label="HM Charges" type="number" value={formData.hm_charges}
@@ -1863,7 +1803,7 @@ const URDPurchase = () => {
                       <td>{data.total_pure_wt}</td>
                       <td>{data.paid_pure_weight}</td>
                       <td>{data.balance_pure_weight}</td>
-                      <td>{data.paid_amount}</td>
+                      <td>{data.rate_cut_amt}</td>
                       <td style={{ display: 'flex', alignItems: 'center' }}>
                         <button
                           type="button"

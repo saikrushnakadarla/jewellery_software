@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../StockEntry/StockEntry.css";
 import InputField from "../../Masters/ItemMaster/Inputfield";
 import StoneDetailsModal from "./TagStoneDetailsModal";
+import PurchaseStoneDetailsModal from "./PurchaseStoneDetailsModal";
 import { useNavigate } from "react-router-dom";
 import { AiOutlinePlus } from "react-icons/ai";
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -25,19 +26,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     const [subCategories, setSubCategories] = useState([]);
     const [productOptions, setProductOptions] = useState([]);
     const [purityOptions, setPurityOptions] = useState([]);
-     const [show, setShow] = useState(false);
-     const handleShow = () => setShow(true);
-     const handleClose = () => setShow(false);
-       const [stoneDetails, setStoneDetails] = useState({
-         stoneName: "",
-         cut: "",
-         color: "",
-         clarity: "",
-         stoneWt: "",
-         caratWt: "",
-         stonePrice: "",
-         amount: "",
-       });
+
     const [formData, setFormData] = useState({
         tag_id: selectedProduct.tag_id,
         product_id: selectedProduct.product_id,
@@ -94,87 +83,123 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         tag_weight: "",
         pcs: "1",
     });
+    const [show, setShow] = useState(false);
+    const [showPurchase, setShowPurchase] = useState(false);
+    const handleShow = () => setShow(true);
+    const handleClose = () => setShow(false);
+
+    const [stoneDetails, setStoneDetails] = useState({
+        stoneName: "",
+        cut: "",
+        color: "",
+        clarity: "",
+        stoneWt: "",
+        caratWt: "",
+        stonePrice: "",
+        amount: "",
+    });
+
+    const [stoneList, setStoneList] = useState([]);
+    const [editingStoneIndex, setEditingStoneIndex] = useState(null);
 
     const handleAddStone = () => {
         let newStoneList = [...stoneList];
-    
+
         if (editingStoneIndex !== null) {
-          newStoneList[editingStoneIndex] = stoneDetails;
-          setEditingStoneIndex(null);
+            newStoneList[editingStoneIndex] = stoneDetails;
+            setEditingStoneIndex(null);
         } else {
-          newStoneList.push(stoneDetails);
+            newStoneList.push(stoneDetails);
         }
-    
+
         setStoneList(newStoneList);
         localStorage.setItem("tagStoneDetails", JSON.stringify(newStoneList));
         window.dispatchEvent(new Event("storage"));
         setStoneDetails({
-          stoneName: "",
-          cut: "",
-          color: "",
-          clarity: "",
-          stoneWt: "",
-          caratWt: "",
-          stonePrice: "",
-          amount: "",
+            stoneName: "",
+            cut: "",
+            color: "",
+            clarity: "",
+            stoneWt: "",
+            caratWt: "",
+            stonePrice: "",
+            amount: "",
         });
-      };
+    };
 
-      const handleEditStone = (index) => {
+    const handleEditStone = (index) => {
         const selectedStone = stoneList[index];
         setStoneDetails(selectedStone);
         setEditingStoneIndex(index);
         handleShow();
-      };
+    };
 
-      const handleDeleteStone = (index) => {
+    const handleDeleteStone = (index) => {
         const updatedList = stoneList.filter((_, i) => i !== index);
         setStoneList(updatedList);
         localStorage.setItem("tagStoneDetails", JSON.stringify(updatedList));
         window.dispatchEvent(new Event("storage"));
-      };
+    };
 
-      const handleAddTagPurStone = () => {
-        let newStoneList = [...stoneList];
+    const handleShowPurchase = () => {
+        console.log("Opening PurchaseStoneDetailsModal...");
+        setShowPurchase(true);
+    };
     
-        if (editingStoneIndex !== null) {
-          newStoneList[editingStoneIndex] = stoneDetails;
-          setEditingStoneIndex(null);
+   const handleClosePurchase = () => setShowPurchase(false);
+
+    const [purStoneDetails, setPurStoneDetails] = useState({
+        stoneName: "",
+        cut: "",
+        color: "",
+        clarity: "",
+        stoneWt: "",
+        caratWt: "",
+        stonePrice: "",
+        amount: "",
+    });
+    const [purchaseStoneList, setPurchaseStoneList] = useState([]);
+    const [editingPurchaseStoneIndex, setEditingPurchaseStoneIndex] = useState(null);
+
+    const handleAddTagPurStone = () => {
+        let newPurchaseStoneList = [...purchaseStoneList];
+
+        if (editingPurchaseStoneIndex !== null) {
+            newPurchaseStoneList[editingPurchaseStoneIndex] = purStoneDetails;
+            setEditingPurchaseStoneIndex(null);
         } else {
-          newStoneList.push(stoneDetails);
+            newPurchaseStoneList.push(purStoneDetails);
         }
-    
-        setStoneList(newStoneList);
-        localStorage.setItem("tagPurStoneDetails", JSON.stringify(newStoneList));
+
+        setPurchaseStoneList(newPurchaseStoneList);
+        localStorage.setItem("tagPurStoneDetails", JSON.stringify(newPurchaseStoneList));
         window.dispatchEvent(new Event("storage"));
-        setStoneDetails({
-          stoneName: "",
-          cut: "",
-          color: "",
-          clarity: "",
-          stoneWt: "",
-          caratWt: "",
-          stonePrice: "",
-          amount: "",
+        setPurStoneDetails({
+            stoneName: "",
+            cut: "",
+            color: "",
+            clarity: "",
+            stoneWt: "",
+            caratWt: "",
+            stonePrice: "",
+            amount: "",
         });
-      };
-    
-      const [stoneList, setStoneList] = useState([]);
+    };
 
-      const handleTagPurEditStone = (index) => {
-        const selectedStone = stoneList[index];
-        setStoneDetails(selectedStone);
-        setEditingStoneIndex(index);
-        handleShow();
-      };
+    const handleTagPurEditStone = (index) => {
+        const selectedStone = purchaseStoneList[index];
+        setPurStoneDetails(selectedStone);
+        setEditingPurchaseStoneIndex(index);
+        handleShowPurchase();
+    };
 
-      const handleTagPurDeleteStone = (index) => {
-        const updatedList = stoneList.filter((_, i) => i !== index);
-        setStoneList(updatedList);
+    const handleTagPurDeleteStone = (index) => {
+        const updatedList = purchaseStoneList.filter((_, i) => i !== index);
+        setPurchaseStoneList(updatedList);
         localStorage.setItem("tagPurStoneDetails", JSON.stringify(updatedList));
         window.dispatchEvent(new Event("storage"));
-      };
-      const [editingStoneIndex, setEditingStoneIndex] = useState(null);
+    };
+    
 
     const isByFixed = formData.Pricing === "By fixed";
     const [isGeneratePDF, setIsGeneratePDF] = useState(true);
@@ -191,77 +216,61 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         }
     }, [selectedProduct]);
 
-    // useEffect(() => {
-    //     const grossWeight = parseFloat(formData.Gross_Weight) || 0;
-    //     const stonesWeight = parseFloat(formData.Stones_Weight) || 0;
-    //     const weightBW = grossWeight - stonesWeight;
-    //     const purGrossWeight = parseFloat(formData.pur_Gross_Weight) || 0;
-    //     const purStonesWeight = parseFloat(formData.pur_Stones_Weight) || 0;
-    //     const purWeightBW = purGrossWeight - purStonesWeight;
-
-    //     setFormData((prev) => ({
-    //         ...prev,
-    //         Weight_BW: weightBW.toFixed(2), // Ensures two decimal places
-    //         pur_Weight_BW:purWeightBW.toFixed(2), // Ensures two decimal places
-    //     }));
-    // }, [formData.Gross_Weight, formData.Stones_Weight, formData.pur_Gross_Weight, formData.pur_Stones_Weight]);
-
-    
-      useEffect(() => {
+    useEffect(() => {
         const calculateTotalWeight = () => {
-          const storedStoneDetails = JSON.parse(localStorage.getItem("tagStoneDetails")) || [];
-    
-          const totalStoneWeight = storedStoneDetails.reduce(
-            (sum, item) => sum + (parseFloat(item.stoneWt) || 0),
-            0
-          );
-          const totalStoneValue = storedStoneDetails.reduce(
-            (sum, item) => sum + (parseFloat(item.amount) || 0),
-            0
-          );
-    
-          setFormData((prevData) => ({
-            ...prevData,
-            Stones_Weight: totalStoneWeight.toFixed(3),
-            Stones_Price: totalStoneValue.toFixed(2),
-          }));
+            const storedStoneDetails = JSON.parse(localStorage.getItem("tagStoneDetails")) || [];
+
+            const totalStoneWeight = storedStoneDetails.reduce(
+                (sum, item) => sum + (parseFloat(item.stoneWt) || 0),
+                0
+            );
+            const totalStoneValue = storedStoneDetails.reduce(
+                (sum, item) => sum + (parseFloat(item.amount) || 0),
+                0
+            );
+
+            setFormData((prevData) => ({
+                ...prevData,
+                Stones_Weight: totalStoneWeight.toFixed(3),
+                Stones_Price: totalStoneValue.toFixed(2),
+            }));
         };
-    
+
         calculateTotalWeight();
-    
+
         const handleStorageChange = () => calculateTotalWeight();
         window.addEventListener("storage", handleStorageChange);
-    
-        return () => window.removeEventListener("storage", handleStorageChange);
-      }, []);
 
-      useEffect(() => {
+        return () => window.removeEventListener("storage", handleStorageChange);
+    }, []);
+
+    useEffect(() => {
         const calculateTotalWeight = () => {
-          const storedStoneDetails = JSON.parse(localStorage.getItem("tagPurStoneDetails")) || [];
-    
-          const totalStoneWeight = storedStoneDetails.reduce(
-            (sum, item) => sum + (parseFloat(item.stoneWt) || 0),
-            0
-          );
-          const totalStoneValue = storedStoneDetails.reduce(
-            (sum, item) => sum + (parseFloat(item.amount) || 0),
-            0
-          );
-    
-          setFormData((prevData) => ({
-            ...prevData,
-            pur_Stones_Weight: totalStoneWeight.toFixed(3),
-            pur_Stones_Price: totalStoneValue.toFixed(2),
-          }));
+            const storedStoneDetails = JSON.parse(localStorage.getItem("tagPurStoneDetails")) || [];
+
+            const totalStoneWeight = storedStoneDetails.reduce(
+                (sum, item) => sum + (parseFloat(item.stoneWt) || 0),
+                0
+            );
+            const totalStoneValue = storedStoneDetails.reduce(
+                (sum, item) => sum + (parseFloat(item.amount) || 0),
+                0
+            );
+
+            setFormData((prevData) => ({
+                ...prevData,
+                pur_Stones_Weight: totalStoneWeight.toFixed(3),
+                pur_Stones_Price: totalStoneValue.toFixed(2),
+            }));
         };
-    
+
         calculateTotalWeight();
-    
+
         const handleStorageChange = () => calculateTotalWeight();
         window.addEventListener("storage", handleStorageChange);
-    
+
         return () => window.removeEventListener("storage", handleStorageChange);
-      }, []);
+    }, []);
 
     useEffect(() => {
         const wastagePercentage = parseFloat(formData.Wastage_Percentage) || 0;
@@ -651,7 +660,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             alert("Please add Gross Weight");
             return;
         }
-        
+
         try {
             const currentSuffix = parseInt(formData.suffix || "001", 10);
             const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
@@ -747,23 +756,41 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
     const generateAndDownloadPDF = async (data) => {
         const doc = new jsPDF();
-        const qrContent = `PCode: ${data.PCode_BarCode}, Name: ${data.sub_category}, Weight: ${data.Gross_Weight}`;
-
+        let qrContent = "";
+    
+        if (data.Pricing === "By Weight") {
+            qrContent = `PCode: ${data.PCode_BarCode}, Name: ${data.sub_category}, Weight: ${data.Gross_Weight}, Tag Weight: ${data.tag_weight}, Total Weight AW: ${data.TotalWeight_AW}, Making Charges: ${data.Making_Charges}`;
+        } else if (data.Pricing === "By fixed") {
+            qrContent = `PCode: ${data.PCode_BarCode}, Name: ${data.sub_category}, Piece Cost: ${data.pieace_cost}`;
+        }
+    
         try {
             const qrImageData = await QRCode.toDataURL(qrContent);
-
+    
+            doc.setFontSize(10); // Set a smaller font size
             doc.text("Product QR Code", 10, 10);
-            doc.addImage(qrImageData, "PNG", 10, 20, 40, 40);
-
-            doc.text(`PCode: ${data.PCode_BarCode}`, 60, 30);
-            doc.text(`Name: ${data.sub_category}`, 60, 40);
-            doc.text(`Weight: ${data.Gross_Weight}`, 60, 50);
-
+            doc.addImage(qrImageData, "PNG", 10, 15, 30, 30); // Smaller QR code
+    
+            doc.setFontSize(8); // Reduce font size for text content
+            doc.text(`PCode: ${data.PCode_BarCode}`, 50, 20);
+            doc.text(`Name: ${data.sub_category}`, 50, 25);
+    
+            if (data.Pricing === "By Weight") {
+                doc.text(`Weight: ${data.Gross_Weight}`, 50, 30);
+                doc.text(`Tag Weight: ${data.tag_weight}`, 50, 35);
+                doc.text(`Total Weight: ${data.TotalWeight_AW}`, 50, 40);
+                doc.text(`Making Charges: ${data.Making_Charges}`, 50, 45);
+            } else if (data.Pricing === "By fixed") {
+                doc.text(`Piece Cost: ${data.pieace_cost}`, 50, 30);
+            }
+    
             doc.save(`QR_Code_${data.PCode_BarCode}.pdf`);
         } catch (error) {
             console.error("Error generating QR Code PDF:", error);
         }
     };
+    
+    
 
     useEffect(() => {
         const getLastPcode = async () => {
@@ -782,7 +809,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
         getLastPcode();
     }, []);
-
 
     const [newSubCategory, setNewSubCategory] = useState({
         name: '',
@@ -1064,7 +1090,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             ]}
                                         />
                                     </Col>
-
+{/* 
                                     {!isSilverOrGold && (
                                         <>
                                             <Col xs={12} md={1}>
@@ -1092,7 +1118,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                 />
                                             </Col>
                                         </>
-                                    )}
+                                    )} */}
 
                                     {/* Render different fields based on Pricing selection */}
                                     {isByFixed ? (
@@ -1144,19 +1170,19 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                             <InputField label="Stones Wt" name="Stones_Weight" value={formData.Stones_Weight} onChange={handleChange} />
                                                         </Col>
                                                         <Col xs={12} md="1">
-                                                                            <Button variant="primary"
-                                                                              onClick={handleShow}
-                                                                              style={{
-                                                                                backgroundColor: '#a36e29',
-                                                                                borderColor: '#a36e29',
-                                                                                fontSize: '0.9rem',
-                                                                                marginLeft: '-13px',
-                                                                                whiteSpace: 'nowrap'
-                                                                              }}
-                                                                            >
-                                                                              Stone Details
-                                                                            </Button>
-                                                                          </Col>
+                                                            <Button variant="primary"
+                                                                onClick={handleShow}
+                                                                style={{
+                                                                    backgroundColor: '#a36e29',
+                                                                    borderColor: '#a36e29',
+                                                                    fontSize: '0.9rem',
+                                                                    marginLeft: '-13px',
+                                                                    whiteSpace: 'nowrap'
+                                                                }}
+                                                            >
+                                                                Stone Details
+                                                            </Button>
+                                                        </Col>
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="Deduct St Wt"
@@ -1270,19 +1296,19 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                             <InputField label="Stones Wt" name="pur_Stones_Weight" value={formData.pur_Stones_Weight} onChange={handleChange} />
                                                         </Col>
                                                         <Col xs={12} md="1">
-                                                                            <Button variant="primary"
-                                                                              onClick={handleShow}
-                                                                              style={{
-                                                                                backgroundColor: '#a36e29',
-                                                                                borderColor: '#a36e29',
-                                                                                fontSize: '0.9rem',
-                                                                                marginLeft: '-13px',
-                                                                                whiteSpace: 'nowrap'
-                                                                              }}
-                                                                            >
-                                                                              Stone Details
-                                                                            </Button>
-                                                                          </Col>
+                                                            <Button variant="primary"
+                                                                onClick={handleShowPurchase}
+                                                                style={{
+                                                                    backgroundColor: '#a36e29',
+                                                                    borderColor: '#a36e29',
+                                                                    fontSize: '0.9rem',
+                                                                    marginLeft: '-13px',
+                                                                    whiteSpace: 'nowrap'
+                                                                }}
+                                                            >
+                                                                Stone Details
+                                                            </Button>
+                                                        </Col>
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="Deduct St Wt"
@@ -1499,19 +1525,27 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 </Modal.Footer>
             </Modal>
             <StoneDetailsModal
-        show={show}
-        handleClose={handleClose}
-        stoneDetails={stoneDetails}
-        setStoneDetails={setStoneDetails}
-        handleAddStone={handleAddStone}
-        handleAddTagPurStone={handleAddTagPurStone}
-        stoneList={stoneList}
-        handleEditStone={handleEditStone}
-        handleTagPurEditStone={handleTagPurEditStone}
-        handleDeleteStone={handleDeleteStone}
-        handleTagPurDeleteStone={handleTagPurDeleteStone}
-        editingStoneIndex={editingStoneIndex}
-      />
+                show={show}
+                handleClose={handleClose}
+                stoneDetails={stoneDetails}
+                setStoneDetails={setStoneDetails}
+                handleAddStone={handleAddStone}
+                stoneList={stoneList}
+                handleEditStone={handleEditStone}
+                handleDeleteStone={handleDeleteStone}
+                editingStoneIndex={editingStoneIndex}
+            />
+            <PurchaseStoneDetailsModal
+                showPurchase={showPurchase}
+                handleClosePurchase={handleClosePurchase}
+                purStoneDetails={purStoneDetails}
+                setPurStoneDetails={setPurStoneDetails}
+                handleAddTagPurStone={handleAddTagPurStone}
+                purchaseStoneList={purchaseStoneList}
+                handleTagPurEditStone={handleTagPurEditStone}
+                handleTagPurDeleteStone={handleTagPurDeleteStone}
+                editingPurchaseStoneIndex={editingPurchaseStoneIndex}
+            />
         </div>
     );
 };
