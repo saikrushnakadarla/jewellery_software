@@ -9,8 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { AiOutlinePlus } from "react-icons/ai";
 import baseURL from "../../../../Url/NodeBaseURL";
 import "./TagEntry.css";
-import { Form, Row, Col } from 'react-bootstrap';
-import { FaCamera, FaUpload, FaTrash } from "react-icons/fa";
+import { Form, Row, Col, Table } from 'react-bootstrap';
+import { FaCamera, FaUpload, FaTrash, FaEdit } from "react-icons/fa";
 import {
     Modal, Button, Dropdown,
     DropdownButton,
@@ -442,7 +442,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         if (fieldOrEvent && fieldOrEvent.target) {
             field = fieldOrEvent.target.name;
             value = fieldOrEvent.target.value;
-    
+
             // Handle file input
             if (fieldOrEvent.target.type === "file") {
                 const file = fieldOrEvent.target.files[0];
@@ -722,11 +722,30 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             };
 
             // Save form data
-            await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
-                headers: { 'Content-Type': 'application/json' },
-            });
-            alert("Stock added successfully!");
+            // await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
+            //     headers: { 'Content-Type': 'application/json' },
+            // });
+            // alert("Stock added successfully!");
+            let apiURL = `${baseURL}/post/opening-tags-entry`; // Default: Add new entry
+            let method = "POST";
 
+            if (formData.opentag_id) {
+                // If opentag_id exists, update the existing entry
+                apiURL = `${baseURL}/update/opening-tags-entry/${formData.opentag_id}`;
+                method = "PUT";
+            }
+
+            await axios({
+                method: method,
+                url: apiURL,
+                data: updatedData,
+                headers: { "Content-Type": "application/json" },
+            });
+
+            alert(formData.opentag_id ? "Stock updated successfully!" : "Stock added successfully!");
+            fetchData(); // Refresh data
+           
+            setIsEditMode(false); // Reset edit mode
             // **Generate PDF only if checkbox is checked**
             if (isGeneratePDF) {
                 generateAndDownloadPDF(updatedData);
@@ -790,8 +809,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 tag_weight: "",
                 pcs: "1",
             }));
+            fetchTagData();
             setIsGeneratePDF(true);
-            fetchBalance();
+            // fetchBalance();
         } catch (error) {
             console.error(error);
             alert("An error occurred. Please try again.");
@@ -1057,7 +1077,46 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         }
     }, [formData.metal_type]);
 
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
+    const [isEditMode, setIsEditMode] = useState(false); // State to toggle form visibility
+
+    const fetchTagData = async () => {
+        try {
+            const response = await fetch("http://localhost:5000/get/opening-tags-entry");
+            const jsonData = await response.json();
+
+            console.log("Fetched Data:", jsonData); // Log the entire response
+
+            if (jsonData.result && Array.isArray(jsonData.result)) {
+                // Filter data based on selectedProduct conditions
+                const filteredData = jsonData.result.filter(
+                    (item) =>
+                        item.invoice === selectedProduct.invoice &&
+                        item.category === selectedProduct.category
+                );
+
+                setData(filteredData);
+            } else {
+                console.error("Unexpected API response format:", jsonData);
+                setData([]); // Set an empty array if the format is incorrect
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            setData([]); // Handle errors by setting an empty array
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        fetchTagData();
+    }, [selectedProduct]); // Dependency array includes selectedProduct
+
+    const handleEdit = (rowData) => {
+        setFormData(rowData); // Populate the form with the row data
+        setIsEditMode(true); // Show the form
+    };
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -1081,27 +1140,27 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             onChange={handleChange}
                                         />
                                     </Col>
-                                     <Col xs={12} md={2}>
-                                                        <InputField
-                                                          label="Invoice"
-                                                          value={formData.invoice || ""} // Ensures no undefined issue
-                                                          onChange={(e) => {
-                                                            const input = e.target;
-                                                            const start = input.selectionStart; // Capture cursor position
-                                                            const transformedValue = input.value.toUpperCase();
-                                    
-                                                            setFormData((prevState) => ({
-                                                              ...prevState,
-                                                              invoice: transformedValue,
-                                                            }));
-                                    
-                                                            // Restore cursor position after transformation
-                                                            requestAnimationFrame(() => {
-                                                              input.setSelectionRange(start, start);
-                                                            });
-                                                          }}
-                                                        />
-                                                      </Col>
+                                    <Col xs={12} md={2}>
+                                        <InputField
+                                            label="Invoice"
+                                            value={formData.invoice || ""} // Ensures no undefined issue
+                                            onChange={(e) => {
+                                                const input = e.target;
+                                                const start = input.selectionStart; // Capture cursor position
+                                                const transformedValue = input.value.toUpperCase();
+
+                                                setFormData((prevState) => ({
+                                                    ...prevState,
+                                                    invoice: transformedValue,
+                                                }));
+
+                                                // Restore cursor position after transformation
+                                                requestAnimationFrame(() => {
+                                                    input.setSelectionRange(start, start);
+                                                });
+                                            }}
+                                        />
+                                    </Col>
                                     <Col xs={12} md={2}>
                                         <InputField
                                             label="Category"
@@ -1201,7 +1260,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                     { value: "Strong room", label: "Strong room" },
                                                 ]} />
                                             </Col>
-                                           
+
                                         </>
                                     ) : (
                                         <>
@@ -1225,74 +1284,74 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                 ]} />
                                             </Col>
                                             <Row className="stock-form-section">
-                                            <Col xs={12} md={2}>
-                                                <DropdownButton
-                                                    id="dropdown-basic-button"
-                                                    title="Choose / Capture Image"
-                                                    variant="primary"
-                                                >
-                                                    <Dropdown.Item onClick={() => fileInputRef.current.click()}>
-                                                        <FaUpload /> Choose Image
-                                                    </Dropdown.Item>
-                                                    <Dropdown.Item onClick={() => setShowWebcam(true)}>
-                                                        <FaCamera /> Capture Image
-                                                    </Dropdown.Item>
-                                                </DropdownButton>
-                                                <input
-                                                    type="file"
-                                                    name="productImage"
-                                                    accept="image/*"
-                                                    ref={fileInputRef}
-                                                    style={{ display: "none" }}
-                                                    onChange={handleChange}
-                                                />
-                                                {showWebcam && (
-                                                    <div className="mt-2">
-                                                        <Webcam
-                                                            ref={webcamRef}
-                                                            screenshotFormat="image/jpeg"
-                                                            width={200}
-                                                            height={150}
-                                                        />
-                                                        <Button
-                                                            variant="success"
-                                                            size="sm"
-                                                            className="m-1"
-                                                            onClick={captureImage}
-                                                        >
-                                                            Capture
-                                                        </Button>
-                                                        <Button
-                                                            variant="secondary"
-                                                            size="sm"
-                                                            onClick={() => setShowWebcam(false)}
-                                                        >
-                                                            Cancel
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                                {formData.imagePreview && (
-                                                    <div className="mt-2 position-relative">
-                                                        <img
-                                                            src={
-                                                                formData.imagePreview.startsWith("data")
-                                                                    ? formData.imagePreview
-                                                                    : `${baseURL}/uploads/images/${formData.imagePreview}`
-                                                            }
-                                                            alt="Selected"
-                                                            className="img-thumbnail"
-                                                            width={100}
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={clearImage}
-                                                            className="btn btn-danger btn-sm position-absolute top-0 end-0"
-                                                        >
-                                                            <FaTrash />
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </Col>
+                                                <Col xs={12} md={2}>
+                                                    <DropdownButton
+                                                        id="dropdown-basic-button"
+                                                        title="Choose / Capture Image"
+                                                        variant="primary"
+                                                    >
+                                                        <Dropdown.Item onClick={() => fileInputRef.current.click()}>
+                                                            <FaUpload /> Choose Image
+                                                        </Dropdown.Item>
+                                                        <Dropdown.Item onClick={() => setShowWebcam(true)}>
+                                                            <FaCamera /> Capture Image
+                                                        </Dropdown.Item>
+                                                    </DropdownButton>
+                                                    <input
+                                                        type="file"
+                                                        name="productImage"
+                                                        accept="image/*"
+                                                        ref={fileInputRef}
+                                                        style={{ display: "none" }}
+                                                        onChange={handleChange}
+                                                    />
+                                                    {showWebcam && (
+                                                        <div className="mt-2">
+                                                            <Webcam
+                                                                ref={webcamRef}
+                                                                screenshotFormat="image/jpeg"
+                                                                width={200}
+                                                                height={150}
+                                                            />
+                                                            <Button
+                                                                variant="success"
+                                                                size="sm"
+                                                                className="m-1"
+                                                                onClick={captureImage}
+                                                            >
+                                                                Capture
+                                                            </Button>
+                                                            <Button
+                                                                variant="secondary"
+                                                                size="sm"
+                                                                onClick={() => setShowWebcam(false)}
+                                                            >
+                                                                Cancel
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                    {formData.imagePreview && (
+                                                        <div className="mt-2 position-relative">
+                                                            <img
+                                                                src={
+                                                                    formData.imagePreview.startsWith("data")
+                                                                        ? formData.imagePreview
+                                                                        : `${baseURL}/uploads/images/${formData.imagePreview}`
+                                                                }
+                                                                alt="Selected"
+                                                                className="img-thumbnail"
+                                                                width={100}
+                                                            />
+                                                            <button
+                                                                type="button"
+                                                                onClick={clearImage}
+                                                                className="btn btn-danger btn-sm position-absolute top-0 end-0"
+                                                            >
+                                                                <FaTrash />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </Col>
                                             </Row>
                                             <div className="purchase-form-left">
                                                 <Col className="tag-urd-form1-section">
@@ -1659,9 +1718,62 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                         style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
                                         onClick={handleSubmit}
                                     >
-                                        Save
+                                        {isEditMode ? "Update" : "Save"}
                                     </Button>
                                 </div>
+                            </div>
+
+
+                            {/* <OpeningTagsTable /> */}
+                            <div className="container mt-4">
+                                <Table striped bordered hover responsive>
+                                    <thead>
+                                        <tr>
+                                            <th>Sr. No.</th>
+                                            <th>Category</th>
+                                            <th>Sub Category</th>
+                                            <th>Product Design Name</th>
+                                            <th>Barcode</th>
+                                            <th>Gross Wt</th>
+                                            <th>Stones Wt</th>
+                                            <th>Wastage%</th>
+                                            <th>Total Wt</th>
+                                            <th>MC</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.length > 0 ? (
+                                            data.map((item, index) => (
+                                                <tr key={index}>
+                                                    <td>{index + 1}</td>
+                                                    <td>{item.category}</td>
+                                                    <td>{item.sub_category}</td>
+                                                    <td>{item.design_master}</td>
+                                                    <td>{item.PCode_BarCode}</td>
+                                                    <td>{item.Gross_Weight}</td>
+                                                    <td>{item.Stones_Weight}</td>
+                                                    <td>{item.Wastage_Percentage}</td>
+                                                    <td>{item.TotalWeight_AW}</td>
+                                                    <td>{item.Making_Charges}</td>
+                                                    <td>{item.Status}</td>
+                                                    <td>
+                                                        {/* Edit Button */}
+                                                        <FaEdit
+                                                            style={{ cursor: "pointer", color: "blue" }}
+                                                            onClick={() => handleEdit(item)}
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="11" className="text-center">No data available</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </Table>
                             </div>
 
                         </Form>
