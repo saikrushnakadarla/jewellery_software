@@ -39,6 +39,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         product_id: selectedProduct.product_id,
         account_name: selectedProduct.account_name,
         category: selectedProduct.category,
+        invoice: selectedProduct.invoice,
         sub_category: "",
         subcategory_id: "",
         // subcategory_id: "SBI001",
@@ -1080,6 +1081,27 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             onChange={handleChange}
                                         />
                                     </Col>
+                                     <Col xs={12} md={2}>
+                                                        <InputField
+                                                          label="Invoice"
+                                                          value={formData.invoice || ""} // Ensures no undefined issue
+                                                          onChange={(e) => {
+                                                            const input = e.target;
+                                                            const start = input.selectionStart; // Capture cursor position
+                                                            const transformedValue = input.value.toUpperCase();
+                                    
+                                                            setFormData((prevState) => ({
+                                                              ...prevState,
+                                                              invoice: transformedValue,
+                                                            }));
+                                    
+                                                            // Restore cursor position after transformation
+                                                            requestAnimationFrame(() => {
+                                                              input.setSelectionRange(start, start);
+                                                            });
+                                                          }}
+                                                        />
+                                                      </Col>
                                     <Col xs={12} md={2}>
                                         <InputField
                                             label="Category"
@@ -1202,6 +1224,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                     { value: "Strong room", label: "Strong room" },
                                                 ]} />
                                             </Col>
+                                            <Row className="stock-form-section">
                                             <Col xs={12} md={2}>
                                                 <DropdownButton
                                                     id="dropdown-basic-button"
@@ -1270,6 +1293,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                     </div>
                                                 )}
                                             </Col>
+                                            </Row>
                                             <div className="purchase-form-left">
                                                 <Col className="tag-urd-form1-section">
                                                     <h4 className="mb-3" style={{ marginTop: '-10px' }}>Sales</h4>

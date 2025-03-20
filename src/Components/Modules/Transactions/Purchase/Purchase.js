@@ -403,6 +403,11 @@ const URDPurchase = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
 
+    if (!formData.invoice || formData.invoice.trim() === "") {
+      alert("Please fill the invoice field.");
+      return;
+    }    
+
     const latestTagId = editingIndex !== null ? tableData[editingIndex].tag_id : await fetchTagId();
 
     const apiData = {
