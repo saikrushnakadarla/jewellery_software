@@ -163,14 +163,14 @@ const StockEntryTable = (selectedProduct) => {
               }}
               onClick={() => handleEdit(row.original)}
             />
-            {/* <FaTrash
+            <FaTrash
               style={{
                 cursor: 'pointer',
                 marginLeft: '10px',
                 color: 'red',
               }}
               onClick={() => handleDelete(row.original.opentag_id)}
-            /> */}
+            />
           </div>
         ),
       },

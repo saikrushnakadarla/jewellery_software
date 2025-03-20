@@ -1084,7 +1084,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
     const fetchTagData = async () => {
         try {
-            const response = await fetch("http://localhost:5000/get/opening-tags-entry");
+            const response = await fetch(`${baseURL}/get/opening-tags-entry`);
             const jsonData = await response.json();
 
             console.log("Fetched Data:", jsonData); // Log the entire response
