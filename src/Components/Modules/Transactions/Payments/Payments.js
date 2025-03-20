@@ -120,7 +120,6 @@ const RepairForm = () => {
     }
   }, [formData.invoice_number, purchases]);
 
-  // Set total_wt based on balWt_after_payment or balance_pure_weight
   useEffect(() => {
     if (formData.account_name && formData.invoice_number && formData.category) {
       const matchingPurchase = purchases.find(

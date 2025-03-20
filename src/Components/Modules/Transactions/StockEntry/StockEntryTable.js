@@ -121,7 +121,7 @@ const StockEntryTable = (selectedProduct) => {
         return response.json();
       })
       .then(() => {
-        alert('Record updated successfully');
+        alert('Stock updated successfully');
         setIsEditMode(false); // Hide the form
         // Refresh the table data
         setData((prevData) =>

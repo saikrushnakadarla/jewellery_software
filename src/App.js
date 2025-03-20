@@ -30,7 +30,8 @@ import EstimateReport from './Components/Modules/Reports/EstimateReport/Estimate
 import RepairsReport from './Components/Modules/Reports/RepairsReport/RepairsReport'
 import URDPurchaseReport from './Components/Modules/Reports/URDPurchaseReport/URDPurchase'
 import Payments from './Components/Modules/Transactions/Payments/Payments';
-import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTable';
+// import PaymentsTable from './Components/Modules/Transactions/Payments/PaymentsTable';
+import PaymentsTable from './Components/Modules/Transactions/Purchase/PurchasePaymentTable';
 import Accounts from './Components/Modules/Masters/Accounts/Accounts';
 import AccountsTable from './Components/Modules/Masters/Accounts/AccountsTable';
 // import Sales from './Components/Modules/Transactions/Sales/SalesForm';
@@ -64,6 +65,9 @@ import SubCategoryTable from "./Components/Modules/Masters/SubCategory/SubCatego
 import { AuthProvider } from "./Components/Pages/Login/Context";
 import EstimateSales from './Components/Modules/Transactions/Sales/EstimateSales';
 import QRScanner from "./Components/QRScanner ";
+import RateCuts from './Components/Modules/Transactions/Purchase/RateCuts'
+import PurchasePayment from './Components/Modules/Transactions/Purchase/PurchasePayment';
+
 function App() {
   const location = useLocation();
 
@@ -144,12 +148,11 @@ function App() {
         <Route path="/subcategory" element={<SubCategory />} />
         <Route path="/subcategorytable" element={<SubCategoryTable />} />
         <Route path="/subcategory/:id" element={<SubCategory />} />
-
-
         <Route path="/estimateSales" element={<EstimateSales />} />
-
-
         <Route path="/qrcode" element={<QRScanner />} />
+
+        <Route path="/purchase-payment" element={<PurchasePayment />} />
+        <Route path="/ratecuts" element={<RateCuts />} />
       </Routes>
       </AuthProvider>
     </>

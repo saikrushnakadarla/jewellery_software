@@ -80,6 +80,8 @@ const URDPurchase = () => {
     other_charges: "",
     purityPercentage: "100",
     tag_id: "",
+    discount_amt: "",
+    final_amt: "",
   });
 
   useEffect(() => {
@@ -87,7 +89,6 @@ const URDPurchase = () => {
       setFormData((prev) => ({ ...prev, invoice }));
     }
   }, [invoice]);
-
 
   const fetchTagId = async () => {
     try {
@@ -108,10 +109,6 @@ const URDPurchase = () => {
   useEffect(() => {
     fetchTagId();
   }, []);
-
-
-
-
 
   useEffect(() => {
     const calculateTotalWeight = () => {
@@ -270,12 +267,12 @@ const URDPurchase = () => {
         const selectedCategory = categories.find(
           (category) => category.value === value
         );
-      
+
         if (selectedCategory) {
           const matchedTaxSlab = taxOptions.find(
             (tax) => tax.value === selectedCategory.tax_slab
           );
-      
+
           if (matchedTaxSlab) {
             updatedFormData.tax_slab = matchedTaxSlab.value;
           } else {
@@ -284,13 +281,13 @@ const URDPurchase = () => {
         } else {
           updatedFormData.tax_slab = "";
         }
-      
+
         // Reset paid_amount if it has a value
         if (updatedFormData.paid_amount) {
           updatedFormData.paid_amount = "";
         }
       }
-      
+
 
       if (field === "category" && value === "") {
         updatedFormData.rbarcode = "";
@@ -332,6 +329,8 @@ const URDPurchase = () => {
         updatedFormData.rate_cut_wt = "";
         updatedFormData.net_amt = "";
         updatedFormData.diamond_wt = "";
+        updatedFormData.discount_amt = "";
+        updatedFormData.final_amt = "";
       }
 
       if (field === "Making_Charges_On") {
@@ -493,6 +492,8 @@ const URDPurchase = () => {
           balWt_after_payment: "0",
           other_charges: "",
           purityPercentage: "100",
+          discount_amt: "",
+          final_amt: "",
         });
       } else {
         console.error("Failed to add/update entry:", response.statusText);
@@ -504,8 +505,7 @@ const URDPurchase = () => {
 
   const handleEdit = (index) => {
     const selectedData = { ...tableData[index] }; // Clone the selected row data
-
-    const { stoneDetails, customer_id } = selectedData;
+    const { stoneDetails, customer_id, rate_cut } = selectedData;
 
     if (stoneDetails) {
       localStorage.setItem("stoneDetails", JSON.stringify(stoneDetails));
@@ -519,8 +519,9 @@ const URDPurchase = () => {
 
     setFormData((prevFormData) => ({
       ...prevFormData,
-      ...selectedData,
-      customer_id: prevFormData.customer_id || customer_id, // Preserve customer_id
+      ...selectedData,  // Always take the latest data from selectedData
+      customer_id: prevFormData.customer_id || customer_id,
+      rate_cut: rate_cut, // Ensure rate_cut is updated
     }));
 
     setEditingIndex(index); // Track the index being edited
@@ -645,6 +646,8 @@ const URDPurchase = () => {
         balWt_after_payment: "0",
         other_charges: "",
         purityPercentage: "100",
+        discount_amt: "",
+        final_amt: "",
       });
       setTableData([]);
       localStorage.removeItem("purchaseFormData");
@@ -888,6 +891,8 @@ const URDPurchase = () => {
         balWt_after_payment: "0",
         other_charges: "",
         purityPercentage: "100",
+        discount_amt: "",
+        final_amt: "",
       }));
     }
   }, [formData.category]);
@@ -1023,6 +1028,7 @@ const URDPurchase = () => {
     const otherCharges = parseFloat(updatedFormData.charges) || 0;
     const totalStoneValue = parseFloat(updatedFormData.final_stone_amount) || 0;
     const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
+    const discountAmt = parseFloat(updatedFormData.discount_amt) || 0;
 
     let paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || "";
     let paidAmount = parseFloat(updatedFormData.rate_cut_amt) || 0;
@@ -1079,6 +1085,9 @@ const URDPurchase = () => {
 
     // Net Amount Calculation
     updatedFormData.net_amt = (totalStoneValue + totalAmount + totalMC + parseFloat(updatedFormData.tax_amt) + hmCharges + otherCharges).toFixed(2);
+
+    // Final Amount Calculation
+    updatedFormData.final_amt = (parseFloat(updatedFormData.net_amt) - discountAmt).toFixed(2);
 
     // Store previous rate_cut value before updating
     if (!updatedFormData.previousRateCut) {
@@ -1161,6 +1170,8 @@ const URDPurchase = () => {
     formData.hm_charges,
     formData.charges,
     formData.net_amt,
+    formData.discount_amt,
+    formData.final_amt,
   ]);
 
   const handleOpenModal = (data) => {
@@ -1382,9 +1393,6 @@ const URDPurchase = () => {
                   <label style={{ width: "80px", marginTop: "5px", color: "#A26D2B" }} className="form-check-label ms-1">By Fixed</label>
                 </div>
               </Col>
-
-
-
               <Col xs={12} md={3} className="d-flex align-items-center">
                 <div style={{ flex: 1 }}>
                   <InputField
@@ -1651,7 +1659,7 @@ const URDPurchase = () => {
                   options={taxOptions}
                 />
               </Col>
-              <Col xs={12} md={1}>
+              <Col xs={12} md={2}>
                 <InputField
                   label="Tax Amt"
                   name="tax_amt"
@@ -1661,15 +1669,31 @@ const URDPurchase = () => {
               </Col>
               <Col xs={12} md={2}>
                 <InputField
-                  label="Total Amount"
+                  label="Total Amt"
                   name="net_amt"
                   value={formData.net_amt}
                   onChange={(e) => handleChange("net_amt", e.target.value)}
                 />
               </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Discount Amt"
+                  name="discount_amt"
+                  value={formData.discount_amt}
+                  onChange={(e) => handleChange("discount_amt", e.target.value)}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Net Amt"
+                  name="final_amt"
+                  value={formData.final_amt}
+                  onChange={(e) => handleChange("final_amt", e.target.value)}
+                />
+              </Col>
               {formData.Pricing !== "By fixed" && (
                 <>
-                  <Col xs={12} md={1}>
+                  <Col xs={12} md={2}>
                     <InputField
                       label="Rate Cut"
                       type="number"

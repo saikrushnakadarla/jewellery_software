@@ -119,20 +119,40 @@ const RepairsTable = () => {
   };
 
   const handleAddPayment = (product) => {
-    const totalWt =
-      parseFloat(product.balWt_after_payment) > 0
-        ? product.balWt_after_payment
-        : product.balance_pure_weight;
-
-    navigate("/payments", {
+    navigate("/purchase-payment", {
       state: {
         account_name: product.account_name,
-        invoice_number: product.invoice,
-        total_wt: totalWt,  // Ensure this matches what's displayed in the table
+        invoice: product.invoice,
         category: product.category,
       }
     });
   };
+
+
+
+  const handleAddRateCut = (product) => {
+    console.log("Product Data:", product);
+    console.log("product.total_pure_wt:", product.total_pure_wt);
+    console.log("product.paid_pure_weight:", product.paid_pure_weight);
+    console.log("product.paid_wt:", product.paid_wt);
+
+    const total_pure_wt =
+      (Number(product.total_pure_wt) || 0) -
+      ((Number(product.paid_pure_weight) || 0) + (Number(product.paid_wt) || 0));
+
+    const formatted_total_pure_wt = total_pure_wt.toFixed(3);
+    console.log("Calculated total_pure_wt:", formatted_total_pure_wt);
+
+    navigate("/ratecuts", {
+      state: {
+        invoice: product.invoice,
+        category: product.category,
+        purchase_id: product.id,
+        total_pure_wt: formatted_total_pure_wt,
+      },
+    });
+  };
+
 
   const fetchBalance = async (product_id, tag_id) => {
     try {
@@ -148,7 +168,7 @@ const RepairsTable = () => {
     try {
       const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
       const productData = response.data.repeatedData;
-  
+
       // Fetch balance for each product
       const productBalances = await Promise.all(
         productData.map(async (product) => {
@@ -156,7 +176,7 @@ const RepairsTable = () => {
           return { ...product, balance };
         })
       );
-  
+
       const expandedContent = (
         <Table bordered>
           <thead>
@@ -180,15 +200,15 @@ const RepairsTable = () => {
             {productBalances.map((product, idx) => {
               const balPcs = product.balance?.bal_pcs || 0;
               const balGrossWeight = product.balance?.bal_gross_weight || 0;
-  
+
               // Disable condition for "Tag Entry" button
               const isTagEntryDisabled =
                 product.Pricing === "By Weight"
                   ? balPcs === 0 || balGrossWeight === 0
                   : product.Pricing === "By Fixed"
-                  ? balPcs === 0
-                  : false; // Default to false if Pricing is neither
-  
+                    ? balPcs === 0
+                    : false; // Default to false if Pricing is neither
+
               return (
                 <tr key={idx}>
                   {/* <td>{product.product_id}</td>
@@ -205,9 +225,9 @@ const RepairsTable = () => {
                     {((parseFloat(product.paid_pure_weight) || 0) + (parseFloat(product.paid_wt) || 0)).toFixed(3)}
                   </td>
                   <td>
-                    {parseFloat(product.balWt_after_payment) > 0
-                      ? product.balWt_after_payment
-                      : product.balance_pure_weight}
+                    {((Number(product.total_pure_wt) || 0) -
+                      ((Number(product.paid_pure_weight) || 0) + (Number(product.paid_wt) || 0)))
+                      .toFixed(3)}
                   </td>
                   <td>
                     <button
@@ -225,7 +245,20 @@ const RepairsTable = () => {
                     >
                       Tag Entry
                     </button>
-  
+
+                    <Button
+                      style={{
+                        backgroundColor: "#28a745",
+                        borderColor: "#28a745",
+                        fontSize: "0.875rem",
+                        padding: "0.25rem 0.5rem",
+                        marginRight: "5px",
+                      }}
+                      onClick={() => handleAddRateCut(product)}
+                    >
+                      Add RateCut
+                    </Button>
+
                     <Button
                       style={{
                         backgroundColor: "#28a745",
@@ -244,7 +277,7 @@ const RepairsTable = () => {
           </tbody>
         </Table>
       );
-  
+
       setData((prevData) =>
         prevData.map((item, index) =>
           index === rowIndex ? { ...item, expandedContent } : item
@@ -254,8 +287,6 @@ const RepairsTable = () => {
       console.error("Error fetching purchase details:", error);
     }
   };
-  
-
 
   const handleCloseModal = () => {
     setShowModal(false);
