@@ -744,14 +744,14 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
             alert(formData.opentag_id ? "Stock updated successfully!" : "Stock added successfully!");
             fetchData(); // Refresh data
-           
+
             setIsEditMode(false); // Reset edit mode
             // **Generate PDF only if checkbox is checked**
             if (isGeneratePDF) {
                 generateAndDownloadPDF(updatedData);
             }
 
-            fetchData();
+            // fetchData();
             setFormData((prevData) => ({
                 ...prevData,
                 tag_id: selectedProduct.tag_id,
@@ -1117,6 +1117,24 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         setFormData(rowData); // Populate the form with the row data
         setIsEditMode(true); // Show the form
     };
+
+    const handleDelete = async (id) => {
+        console.log("Deleting ID:", id); // Confirming ID before sending request
+        const url = `${baseURL}/delete/opening-tags-entry/${id}`;
+        console.log("DELETE Request URL:", url);
+        fetchTagData();
+      
+        if (window.confirm("Are you sure you want to delete this record?")) {
+          try {
+            const response = await axios.delete(url);
+            alert(response.data.message);
+            
+          } catch (error) {
+            console.error("Error deleting record:", error.response?.data || error.message);
+            alert("Failed to delete record.");
+          }
+        }
+      };
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -1763,6 +1781,14 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                         <FaEdit
                                                             style={{ cursor: "pointer", color: "blue" }}
                                                             onClick={() => handleEdit(item)}
+                                                        />
+                                                        <FaTrash
+                                                            style={{
+                                                                cursor: 'pointer',
+                                                                marginLeft: '10px',
+                                                                color: 'red',
+                                                            }}
+                                                            onClick={() => handleDelete(item.opentag_id)}
                                                         />
                                                     </td>
                                                 </tr>

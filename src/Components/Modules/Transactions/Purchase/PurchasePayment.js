@@ -27,6 +27,7 @@ const RepairForm = () => {
         bal_amt: "",
         remarks: "",
         rate_cut_id: "",
+        paid_by:"",
     });
 
     const [purchases, setPurchases] = useState([]);
@@ -40,56 +41,58 @@ const RepairForm = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         let updatedFormData = { ...formData, [name]: value };
-
+    
         if (name === "paid_amt") {
             const paidAmt = parseFloat(value) || 0;
             const rateCut = parseFloat(formData.rate_cut) || 1; // Prevent division by zero
             const totalAmt = parseFloat(formData.total_amt) || 0;
             const totalWt = parseFloat(formData.total_wt) || 0;
-
+    
             if (paidAmt > totalAmt) {
                 alert("Paid Amount cannot be greater than Outstanding Amount!");
                 return;
             }
-
+    
             const paidWt = (paidAmt / rateCut).toFixed(3);
             const balAmt = totalAmt - paidAmt;
             const balWt = (totalWt - paidWt).toFixed(3);
-
+    
             updatedFormData = {
                 ...updatedFormData,
                 bal_amt: balAmt,
                 paid_wt: paidWt,
-                bal_wt: balWt
+                bal_wt: balWt,
+                paid_by: "By Amount"  // Set paid_by value
             };
         }
-
+    
         else if (name === "paid_wt") {
             const paidWt = parseFloat(value) || 0;
             const rateCut = parseFloat(formData.rate_cut) || 1; // Prevent multiplication errors
             const totalAmt = parseFloat(formData.total_amt) || 0;
             const totalWt = parseFloat(formData.total_wt) || 0;
-
+    
             if (paidWt > totalWt) {
                 alert("Paid Weight cannot be greater than Outstanding Weight!");
                 return;
             }
-
+    
             const paidAmt = paidWt * rateCut;
             const balAmt = totalAmt - paidAmt;
             const balWt = (totalWt - paidWt).toFixed(3);
-
+    
             updatedFormData = {
                 ...updatedFormData,
                 bal_amt: balAmt,
                 paid_amt: paidAmt,
-                bal_wt: balWt
+                bal_wt: balWt,
+                paid_by: "By Weight"  // Set paid_by value
             };
         }
-
+    
         setFormData(updatedFormData);
     };
-
+    
     useEffect(() => {
         const fetchAccountNames = async () => {
             try {
@@ -156,7 +159,6 @@ const RepairForm = () => {
         }
     }, [formData.invoice, purchases]);
 
-
     useEffect(() => {
         const fetchRateCuts = async () => {
             try {
@@ -217,24 +219,26 @@ const RepairForm = () => {
             const response = await axios.post("http://localhost:5000/purchasePayments", formData);
             alert("Purchase Payment Added Successfully!");
             console.log(response.data);
-            // setFormData({
-            //     date: new Date().toISOString().split("T")[0],
-            //     mode: "",
-            //     cheque_number: "",
-            //     payment_no: "",
-            //     account_name: "",
-            //     invoice: "",
-            //     category: "",
-            //     rate_cut: "",
-            //     total_wt: "",
-            //     paid_wt: "",
-            //     bal_wt: "",
-            //     total_amt: "",
-            //     paid_amt: "",
-            //     bal_amt: "",
-            //     remarks: "",
-            //     rate_cut_id: "",
-            // });
+            setFormData({
+                date: new Date().toISOString().split("T")[0],
+                mode: "",
+                cheque_number: "",
+                payment_no: "",
+                account_name: "",
+                invoice: "",
+                category: "",
+                rate_cut: "",
+                total_wt: "",
+                paid_wt: "",
+                bal_wt: "",
+                total_amt: "",
+                paid_amt: "",
+                bal_amt: "",
+                remarks: "",
+                rate_cut_id: "",
+                paid_by:"",
+            });
+            navigate("/purchasetable");
         } catch (error) {
             console.error("Error submitting data:", error);
             alert("Error adding purchase payment. Please try again.");

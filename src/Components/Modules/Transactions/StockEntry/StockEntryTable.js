@@ -141,6 +141,7 @@ const StockEntryTable = (selectedProduct) => {
         Header: 'Sr. No.',
         Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
+      { Header: 'OpenTag ID', accessor: 'opentag_id' },
       { Header: 'Category', accessor: 'category' },
       { Header: 'Sub Category', accessor: 'sub_category' },
       { Header: 'Product Design Name', accessor: 'design_master' },
@@ -178,18 +179,24 @@ const StockEntryTable = (selectedProduct) => {
     []
   );
 
-  const handleDelete = async (opentag_id) => {
+  const handleDelete = async (id) => {
+    console.log("Deleting ID:", id); // Confirming ID before sending request
+    const url = `${baseURL}/delete/opening-tags-entry/${id}`;
+    console.log("DELETE Request URL:", url);
+  
     if (window.confirm("Are you sure you want to delete this record?")) {
       try {
-        const response = await axios.delete(`${baseURL}/delete/opening-tags-entry/${opentag_id}`);
+        const response = await axios.delete(url);
         alert(response.data.message);
-        window.location.reload(); // Reload data after deletion
+        window.location.reload();
       } catch (error) {
         console.error("Error deleting record:", error.response?.data || error.message);
         alert("Failed to delete record.");
       }
     }
   };
+  
+  
   
 
   const [productOptions, setProductOptions] = useState([]);

@@ -128,21 +128,12 @@ const RepairsTable = () => {
     });
   };
 
-
-
   const handleAddRateCut = (product) => {
-    console.log("Product Data:", product);
-    console.log("product.total_pure_wt:", product.total_pure_wt);
-    console.log("product.paid_pure_weight:", product.paid_pure_weight);
-    console.log("product.paid_wt:", product.paid_wt);
-
     const total_pure_wt =
       (Number(product.total_pure_wt) || 0) -
       ((Number(product.paid_pure_weight) || 0) + (Number(product.paid_wt) || 0));
 
     const formatted_total_pure_wt = total_pure_wt.toFixed(3);
-    console.log("Calculated total_pure_wt:", formatted_total_pure_wt);
-
     navigate("/ratecuts", {
       state: {
         invoice: product.invoice,
@@ -193,6 +184,9 @@ const RepairsTable = () => {
               <th>Total Wt</th>
               <th>Paid Wt</th>
               <th>Bal Wt</th>
+              <th>Tags Total</th>
+              <th>Diff</th>
+              <th>Excess/Short</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -229,6 +223,9 @@ const RepairsTable = () => {
                       ((Number(product.paid_pure_weight) || 0) + (Number(product.paid_wt) || 0)))
                       .toFixed(3)}
                   </td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
                   <td>
                     <button
                       type="button"

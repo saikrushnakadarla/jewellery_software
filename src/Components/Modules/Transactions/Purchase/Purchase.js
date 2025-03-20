@@ -538,7 +538,7 @@ const URDPurchase = () => {
     }
 
     try {
-      const response = await fetch(`${baseURL}/delete/${tag_id}/${product_id}`, {
+      const response = await fetch(`${baseURL}/delete/updatedvalues/${tag_id}/${product_id}`, {
         method: "DELETE",
       });
 

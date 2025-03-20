@@ -52,8 +52,8 @@ const RepairsTable = () => {
         accessor: row => ` ${row.bal_wt} / ${row.bal_amt}`
       },
       {
-        Header: 'Remarks',
-        accessor: 'remarks',
+        Header: 'Paid By',
+        accessor: 'paid_by',
       },
     //   {
     //     Header: 'Actions',
