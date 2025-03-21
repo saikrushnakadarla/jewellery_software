@@ -19,7 +19,7 @@ import Webcam from "react-webcam";
 const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     console.log("Pricing=", selectedProduct.Pricing)
     console.log("Metal Type=", selectedProduct.metal_type)
-
+    const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [productDetails, setProductDetails] = useState({
         pcs: selectedProduct?.pcs || 0,
         gross_weight: selectedProduct?.gross_weight || 0,
@@ -31,6 +31,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     const [productOptions, setProductOptions] = useState([]);
     const [purityOptions, setPurityOptions] = useState([]);
     const [showWebcam, setShowWebcam] = useState(false);
+    const [image, setImage] = useState(null);
     const [formData, setFormData] = useState({
         tag_id: selectedProduct.tag_id,
         product_id: selectedProduct.product_id,
@@ -64,9 +65,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         Source: "Purchase",
         Stock_Point: "",
         pieace_cost: "",
-        tax_percent:"",
-        mrp_price:"",
-        total_pcs_cost:"",
+        tax_percent: "",
+        mrp_price: "",
+        total_pcs_cost: "",
         WastageWeight: "",
         TotalWeight_AW: "",
         MC_Per_Gram: "",
@@ -587,13 +588,13 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 const pieaceCost = parseFloat(field === "pieace_cost" ? value : prevData.pieace_cost) || 0;
                 updatedData.mrp_price = ((pieaceCost / (100 + taxPercent)) * 100).toFixed(2);
             }
-            
 
-        if (field === "pieace_cost" || field === "pcs") {
-            const pcs = parseFloat(field === "pcs" ? value : prevData.pcs) || 0;
-            const pieaceCost = parseFloat(field === "pieace_cost" ? value : prevData.pieace_cost) || 0;
-            updatedData.total_pcs_cost = (pcs * pieaceCost).toFixed(2);
-        }
+
+            if (field === "pieace_cost" || field === "pcs") {
+                const pcs = parseFloat(field === "pcs" ? value : prevData.pcs) || 0;
+                const pieaceCost = parseFloat(field === "pieace_cost" ? value : prevData.pieace_cost) || 0;
+                updatedData.total_pcs_cost = (pcs * pieaceCost).toFixed(2);
+            }
 
 
             return updatedData;
@@ -647,7 +648,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             }
         }
 
-        
+
 
     };
 
@@ -667,29 +668,52 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         };
     }, []);
 
-    const captureImage = () => {
-        if (webcamRef.current) {
-            const imageSrc = webcamRef.current.getScreenshot();
-            setFormData((prev) => ({
-                ...prev,
-                imagePreview: imageSrc,
-                productImage: imageSrc,
-            }));
-            setShowWebcam(false);
+    // const captureImage = () => {
+    //     if (webcamRef.current) {
+    //         const imageSrc = webcamRef.current.getScreenshot();
+    //         setFormData((prev) => ({
+    //             ...prev,
+    //             imagePreview: imageSrc,
+    //             productImage: imageSrc,
+    //         }));
+    //         setShowWebcam(false);
+    //     }
+    // };
+
+    // const clearImage = () => {
+    //     setFormData((prev) => ({
+    //         ...prev,
+    //         productImage: null,
+    //         imagePreview: null,
+    //     }));
+    // };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImage(reader.result); // Convert image to base64 and update state
+            };
+            reader.readAsDataURL(file);
         }
     };
 
-    const clearImage = () => {
-        setFormData((prev) => ({
-            ...prev,
-            productImage: null,
-            imagePreview: null,
-        }));
+    const captureImage = () => {
+        const imageSrc = webcamRef.current.getScreenshot();
+        setImage(imageSrc);
+        setIsCameraOpen(false);
     };
+
+    const clearImage = () => {
+        setImage(null);
+    };
+
+
 
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
-    
+
         if (formData.Pricing === "By fixed") {
             if (pcs <= 0) {
                 alert("The product's PCS must be greater than zero to submit the form.");
@@ -705,63 +729,63 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 return;
             }
         }
-    
+
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
             return;
         }
-    
+
         if (formData.Pricing === "By Weight" && !formData.Gross_Weight) {
             alert("Please add Gross Weight");
             return;
         }
-    
+
         try {
             const currentSuffix = parseInt(formData.suffix || "001", 10);
             const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
-    
+
             const updatedGrossWeight = -parseFloat(formData.Gross_Weight || 0);
             const updatedPcs = -1;
-    
+
             const prev = {
                 item_prefix: "", // Adjust as needed
             };
-    
-            const updatedData = { ...formData };
-    
+
+            const updatedData = { ...formData, image };
+
             let apiURL = `${baseURL}/post/opening-tags-entry`; // Default: Add new entry
             let method = "POST";
-    
+
             if (formData.opentag_id) {
                 // If opentag_id exists, update the existing entry
                 apiURL = `${baseURL}/update/opening-tags-entry/${formData.opentag_id}`;
                 method = "PUT";
             }
-    
+
             await axios({
                 method: method,
                 url: apiURL,
                 data: updatedData,
                 headers: { "Content-Type": "application/json" },
             });
-    
+
             alert(formData.opentag_id ? "Stock updated successfully!" : "Stock added successfully!");
             fetchData(); // Refresh data
-    
+
             setIsEditMode(false); // Reset edit mode
-    
+
             // Generate PDF if checkbox is checked
             if (isGeneratePDF) {
                 generateAndDownloadPDF(updatedData);
             }
-    
+
             // Remove tag details from localStorage
             localStorage.removeItem("tagStoneDetails");
             localStorage.removeItem("tagPurStoneDetails");
-    
+
             setStoneList([]);
             setPurchaseStoneList([]);
-    
+
             setFormData((prevData) => ({
                 ...prevData,
                 tag_id: selectedProduct.tag_id,
@@ -786,24 +810,24 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 pur_Gross_Weight: "",
                 pur_Stones_Weight: "",
                 pur_deduct_st_Wt: "Yes",
-                pur_Weight_BW:"",
+                pur_Weight_BW: "",
                 pur_WastageWeight: "",
                 pur_Wastage_On: "Gross Weight",
                 pcs: "1",
-                pieace_cost:"",
-                mrp_price:"",
-                total_pcs_cost:"",
+                pieace_cost: "",
+                mrp_price: "",
+                total_pcs_cost: "",
             }));
-    
+
             fetchTagData();
             setIsGeneratePDF(true);
-    
+
         } catch (error) {
             console.error(error);
             alert("An error occurred. Please try again.");
         }
     };
-    
+
 
 
     const generateAndDownloadPDF = async (data) => {
@@ -1100,26 +1124,28 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     useEffect(() => {
         fetchTagData();
     }, [selectedProduct]); // Dependency array includes selectedProduct
-
     const handleEdit = (rowData) => {
-        setFormData(rowData); // Populate the form with the row data
-        setIsEditMode(true); // Show the form
+        setFormData(rowData); // Populate the form with row data
+        setIsEditMode(true);  // Show the form
+    
+        // Set the selected image for preview
+        setImage(rowData.image || ""); 
     };
-
+    
     const handleDelete = async (id) => {
         console.log("Deleting ID:", id); // Confirming ID before sending request
         const url = `${baseURL}/delete/opening-tags-entry/${id}`;
         console.log("DELETE Request URL:", url);
-    
+
         // Confirm before proceeding
         if (!window.confirm("Are you sure you want to delete this record?")) {
             return;
         }
-    
+
         try {
             const response = await axios.delete(url);
             alert(response.data.message);
-    
+
             // Fetch updated data after successful deletion
             fetchData();
             fetchTagData();
@@ -1128,7 +1154,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             alert("Failed to delete record.");
         }
     };
-    
+
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -1296,73 +1322,80 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                 ]} />
                                             </Col>
 
-                                            <Col xs={12} md={2}>
-                                                <DropdownButton
-                                                    id="dropdown-basic-button"
-                                                    title="Choose / Capture Image"
-                                                    variant="primary"
-                                                >
-                                                    <Dropdown.Item onClick={() => fileInputRef.current.click()}>
-                                                        <FaUpload /> Choose Image
-                                                    </Dropdown.Item>
-                                                    <Dropdown.Item onClick={() => setShowWebcam(true)}>
-                                                        <FaCamera /> Capture Image
-                                                    </Dropdown.Item>
-                                                </DropdownButton>
-                                                <input
-                                                    type="file"
-                                                    name="productImage"
-                                                    accept="image/*"
-                                                    ref={fileInputRef}
-                                                    style={{ display: "none" }}
-                                                    onChange={handleChange}
-                                                />
-                                                {showWebcam && (
-                                                    <div className="mt-2">
-                                                        <Webcam
-                                                            ref={webcamRef}
-                                                            screenshotFormat="image/jpeg"
-                                                            width={200}
-                                                            height={150}
-                                                        />
-                                                        <Button
-                                                            variant="success"
-                                                            size="sm"
-                                                            className="m-1"
-                                                            onClick={captureImage}
-                                                        >
-                                                            Capture
-                                                        </Button>
-                                                        <Button
-                                                            variant="secondary"
-                                                            size="sm"
-                                                            onClick={() => setShowWebcam(false)}
-                                                        >
-                                                            Cancel
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                                {formData.imagePreview && (
-                                                    <div className="mt-2 position-relative">
-                                                        <img
-                                                            src={
-                                                                formData.imagePreview.startsWith("data")
-                                                                    ? formData.imagePreview
-                                                                    : `${baseURL}/uploads/images/${formData.imagePreview}`
-                                                            }
-                                                            alt="Selected"
-                                                            className="img-thumbnail"
-                                                            width={100}
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={clearImage}
-                                                            className="btn btn-danger btn-sm position-absolute top-0 end-0"
-                                                        >
-                                                            <FaTrash />
-                                                        </button>
-                                                    </div>
-                                                )}
+                                            <Col xs={12} md={4}>
+                                                <div className="image-upload-container">
+                                                    {/* Dropdown Button for Upload Options */}
+                                                    <Dropdown>
+                                                        <Dropdown.Toggle id="dropdown-basic-button">Upload Image</Dropdown.Toggle>
+
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item onClick={() => fileInputRef.current.click()}>
+                                                                Select Image
+                                                            </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => setIsCameraOpen(true)}>
+                                                                Capture Image
+                                                            </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+
+                                                    {/* Hidden file input */}
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        ref={fileInputRef}
+                                                        onChange={handleImageChange}
+                                                        style={{ display: "none" }}
+                                                    />
+
+                                                    {/* Webcam Modal */}
+                                                    {isCameraOpen && (
+                                                        <div className="webcam-container mt-2">
+                                                            <Webcam
+                                                                audio={false}
+                                                                ref={webcamRef}
+                                                                screenshotFormat="image/jpeg"
+                                                                className="img-thumbnail"
+                                                            />
+                                                            <div className="d-flex gap-2 mt-2">
+                                                                <Button onClick={captureImage} variant="primary">
+                                                                    Capture
+                                                                </Button>
+                                                                <Button onClick={() => setIsCameraOpen(false)} variant="danger">
+                                                                    Cancel
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Image Preview with Delete Icon */}
+                                                    {image && (
+                                                        <div style={{ position: "relative", display: "inline-block", marginTop: "10px" }}>
+                                                            <img src={image} alt="Selected"
+                                                                style={{
+                                                                    width: "100px",
+                                                                    height: "100px",
+                                                                    borderRadius: "8px",
+                                                                }} />
+                                                            <button
+                                                                type="button"
+                                                                onClick={clearImage}
+                                                                style={{
+                                                                    position: "absolute",
+                                                                    top: "5px",
+                                                                    right: "5px",
+                                                                    background: "transparent",
+                                                                    border: "none",
+                                                                    color: "red",
+                                                                    fontSize: "16px",
+                                                                    cursor: "pointer",
+                                                                    zIndex: 10,
+                                                                }}
+                                                            >
+                                                                <FaTrash />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </Col>
 
                                             <div className="purchase-form-left">
@@ -1622,7 +1655,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                 <InputField label="Piece Cost" type="number" value={formData.pieace_cost} onChange={(e) => handleChange("pieace_cost", e.target.value)} />
                                             </Col>
                                             <Col xs={12} md={1}>
-                                                <InputField label="Tax %"  value={formData.tax_percent} onChange={(e) => handleChange("tax_percent", e.target.value)} />
+                                                <InputField label="Tax %" value={formData.tax_percent} onChange={(e) => handleChange("tax_percent", e.target.value)} />
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField label="MRP" type="number" value={formData.mrp_price} onChange={(e) => handleChange("mrp_price", e.target.value)} />
@@ -1630,73 +1663,80 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             <Col xs={12} md={2}>
                                                 <InputField label="Total Pcs Cost" type="number" value={formData.total_pcs_cost} onChange={(e) => handleChange("total_pcs_cost", e.target.value)} />
                                             </Col>
-                                            <Col xs={12} md={2}>
-                                                <DropdownButton
-                                                    id="dropdown-basic-button"
-                                                    title="Choose / Capture Image"
-                                                    variant="primary"
-                                                >
-                                                    <Dropdown.Item onClick={() => fileInputRef.current.click()}>
-                                                        <FaUpload /> Choose Image
-                                                    </Dropdown.Item>
-                                                    <Dropdown.Item onClick={() => setShowWebcam(true)}>
-                                                        <FaCamera /> Capture Image
-                                                    </Dropdown.Item>
-                                                </DropdownButton>
-                                                <input
-                                                    type="file"
-                                                    name="productImage"
-                                                    accept="image/*"
-                                                    ref={fileInputRef}
-                                                    style={{ display: "none" }}
-                                                    onChange={handleChange}
-                                                />
-                                                {showWebcam && (
-                                                    <div className="mt-2">
-                                                        <Webcam
-                                                            ref={webcamRef}
-                                                            screenshotFormat="image/jpeg"
-                                                            width={200}
-                                                            height={150}
-                                                        />
-                                                        <Button
-                                                            variant="success"
-                                                            size="sm"
-                                                            className="m-1"
-                                                            onClick={captureImage}
-                                                        >
-                                                            Capture
-                                                        </Button>
-                                                        <Button
-                                                            variant="secondary"
-                                                            size="sm"
-                                                            onClick={() => setShowWebcam(false)}
-                                                        >
-                                                            Cancel
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                                {formData.imagePreview && (
-                                                    <div className="mt-2 position-relative">
-                                                        <img
-                                                            src={
-                                                                formData.imagePreview.startsWith("data")
-                                                                    ? formData.imagePreview
-                                                                    : `${baseURL}/uploads/images/${formData.imagePreview}`
-                                                            }
-                                                            alt="Selected"
-                                                            className="img-thumbnail"
-                                                            width={100}
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={clearImage}
-                                                            className="btn btn-danger btn-sm position-absolute top-0 end-0"
-                                                        >
-                                                            <FaTrash />
-                                                        </button>
-                                                    </div>
-                                                )}
+                                            <Col xs={12} md={4}>
+                                                <div className="image-upload-container">
+                                                    {/* Dropdown Button for Upload Options */}
+                                                    <Dropdown>
+                                                        <Dropdown.Toggle id="dropdown-basic-button">Upload Image</Dropdown.Toggle>
+
+                                                        <Dropdown.Menu>
+                                                            <Dropdown.Item onClick={() => fileInputRef.current.click()}>
+                                                                Select Image
+                                                            </Dropdown.Item>
+                                                            <Dropdown.Item onClick={() => setIsCameraOpen(true)}>
+                                                                Capture Image
+                                                            </Dropdown.Item>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+
+                                                    {/* Hidden file input */}
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        ref={fileInputRef}
+                                                        onChange={handleImageChange}
+                                                        style={{ display: "none" }}
+                                                    />
+
+                                                    {/* Webcam Modal */}
+                                                    {isCameraOpen && (
+                                                        <div className="webcam-container mt-2">
+                                                            <Webcam
+                                                                audio={false}
+                                                                ref={webcamRef}
+                                                                screenshotFormat="image/jpeg"
+                                                                className="img-thumbnail"
+                                                            />
+                                                            <div className="d-flex gap-2 mt-2">
+                                                                <Button onClick={captureImage} variant="primary">
+                                                                    Capture
+                                                                </Button>
+                                                                <Button onClick={() => setIsCameraOpen(false)} variant="danger">
+                                                                    Cancel
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Image Preview with Delete Icon */}
+                                                    {image && (
+                                                        <div style={{ position: "relative", display: "inline-block", marginTop: "10px" }}>
+                                                            <img src={image} alt="Selected"
+                                                                style={{
+                                                                    width: "100px",
+                                                                    height: "100px",
+                                                                    borderRadius: "8px",
+                                                                }} />
+                                                            <button
+                                                                type="button"
+                                                                onClick={clearImage}
+                                                                style={{
+                                                                    position: "absolute",
+                                                                    top: "5px",
+                                                                    right: "5px",
+                                                                    background: "transparent",
+                                                                    border: "none",
+                                                                    color: "red",
+                                                                    fontSize: "16px",
+                                                                    cursor: "pointer",
+                                                                    zIndex: 10,
+                                                                }}
+                                                            >
+                                                                <FaTrash />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </Col>
                                         </>
                                     )}
@@ -1760,6 +1800,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             <th>Wt BW</th>
                                             <th>W.Wt</th>
                                             <th>Total Wt</th>
+                                            <th>Image</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -1777,6 +1818,30 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                     <td>{item.Weight_BW}</td>
                                                     <td>{item.WastageWeight}</td>
                                                     <td>{item.TotalWeight_AW}</td>
+                                                    <td>
+                                                        {item.image ? (
+                                                            <img
+                                                                src={item.image}
+                                                                alt="Product Image"
+                                                                style={{
+                                                                    width: "50px",
+                                                                    height: "50px",
+                                                                    objectFit: "cover",
+                                                                    borderRadius: "5px",
+                                                                    cursor: "pointer",
+                                                                }}
+                                                                onClick={() => {
+                                                                    const newWindow = window.open();
+                                                                    newWindow.document.write(
+                                                                        `<img src="${item.image}" alt="Product Image" style="width: 100%; height: auto;" />`
+                                                                    );
+                                                                }}
+                                                                onError={(e) => (e.target.src = "/placeholder.png")}
+                                                            />
+                                                        ) : (
+                                                            "No Image"
+                                                        )}
+                                                    </td>
                                                     <td>
                                                         {/* Edit Button */}
                                                         <FaEdit
