@@ -28,7 +28,7 @@ const RepairsTable = () => {
       },
       {
         Header: 'Payment No',
-        accessor: 'receipt_no',
+        accessor: 'payment_no',
       },
       {
         Header: 'Account Name',

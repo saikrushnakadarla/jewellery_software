@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../StockEntry/StockEntry.css";
-import InputField from "../../Masters/ItemMaster/Inputfield";
+import InputField from "./InputField";
 import StoneDetailsModal from "./TagStoneDetailsModal";
 import PurchaseStoneDetailsModal from "./PurchaseStoneDetailsModal";
 import { useNavigate } from "react-router-dom";
@@ -11,10 +11,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import "./TagEntry.css";
 import { Form, Row, Col, Table } from 'react-bootstrap';
 import { FaCamera, FaUpload, FaTrash, FaEdit } from "react-icons/fa";
-import {
-    Modal, Button, Dropdown,
-    DropdownButton,
-} from "react-bootstrap";  // Add this import
+import { Modal, Button, Dropdown, DropdownButton } from "react-bootstrap";  // Add this import
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
 import Webcam from "react-webcam";
@@ -67,6 +64,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         Source: "Purchase",
         Stock_Point: "",
         pieace_cost: "",
+        tax_percent:"",
+        mrp_price:"",
+        total_pcs_cost:"",
         WastageWeight: "",
         TotalWeight_AW: "",
         MC_Per_Gram: "",
@@ -581,6 +581,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 }
             }
 
+            // Update MRP Price and Total Pcs Cost when Pricing is "By fixed"
+            if (field === "pieace_cost" || field === "tax_percent") {
+                const taxPercent = parseFloat(field === "tax_percent" ? value : prevData.tax_percent) || 0;
+                const pieaceCost = parseFloat(field === "pieace_cost" ? value : prevData.pieace_cost) || 0;
+                updatedData.mrp_price = ((pieaceCost / (100 + taxPercent)) * 100).toFixed(2);
+            }
+            
+
+        if (field === "pieace_cost" || field === "pcs") {
+            const pcs = parseFloat(field === "pcs" ? value : prevData.pcs) || 0;
+            const pieaceCost = parseFloat(field === "pieace_cost" ? value : prevData.pieace_cost) || 0;
+            updatedData.total_pcs_cost = (pcs * pieaceCost).toFixed(2);
+        }
+
 
             return updatedData;
         });
@@ -607,17 +621,16 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                         params: { prefix: newPrefix },
                     });
                     const nextPCodeBarCode = response.data.nextPCodeBarCode;
+                    const nextSuffix = nextPCodeBarCode.replace(newPrefix, ""); // Extract numeric suffix
+
                     setFormData((prevData) => ({
                         ...prevData,
-                        sub_category: selectedCategory
-                            ? selectedCategory.sub_category_name
-                            : "",
-                        subcategory_id: selectedCategory
-                            ? selectedCategory.subcategory_id
-                            : "",
+                        sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
+                        subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
                         item_prefix: newPrefix,
                         Prefix: newPrefix,
                         PCode_BarCode: nextPCodeBarCode,
+                        suffix: nextSuffix, // Store suffix properly
                     }));
                 } catch (error) {
                     console.error("Error fetching PCode_BarCode:", error);
@@ -625,18 +638,17 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             } else {
                 setFormData((prevData) => ({
                     ...prevData,
-                    sub_category: selectedCategory
-                        ? selectedCategory.sub_category_name
-                        : "",
-                    subcategory_id: selectedCategory
-                        ? selectedCategory.subcategory_id
-                        : "",
+                    sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
+                    subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
                     item_prefix: "",
                     Prefix: "",
                     PCode_BarCode: "",
                 }));
             }
         }
+
+        
+
     };
 
     const isSilverOrGold = /silver|gold/i.test(formData.category);
@@ -675,10 +687,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         }));
     };
 
-
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
-
+    
         if (formData.Pricing === "By fixed") {
             if (pcs <= 0) {
                 alert("The product's PCS must be greater than zero to submit the form.");
@@ -694,129 +705,106 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 return;
             }
         }
-
+    
         if (!formData.sub_category || !formData.subcategory_id) {
             alert("Please select a valid sub-category before submitting.");
             return;
         }
-
+    
         if (formData.Pricing === "By Weight" && !formData.Gross_Weight) {
             alert("Please add Gross Weight");
             return;
         }
-
+    
         try {
             const currentSuffix = parseInt(formData.suffix || "001", 10);
             const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
-
+    
             const updatedGrossWeight = -parseFloat(formData.Gross_Weight || 0);
             const updatedPcs = -1;
-
-            // Replace with actual logic for `prev`
+    
             const prev = {
                 item_prefix: "", // Adjust as needed
             };
-
-            const updatedData = {
-                ...formData,
-            };
-
-            // Save form data
-            // await axios.post(`${baseURL}/post/opening-tags-entry`, formData, {
-            //     headers: { 'Content-Type': 'application/json' },
-            // });
-            // alert("Stock added successfully!");
+    
+            const updatedData = { ...formData };
+    
             let apiURL = `${baseURL}/post/opening-tags-entry`; // Default: Add new entry
             let method = "POST";
-
+    
             if (formData.opentag_id) {
                 // If opentag_id exists, update the existing entry
                 apiURL = `${baseURL}/update/opening-tags-entry/${formData.opentag_id}`;
                 method = "PUT";
             }
-
+    
             await axios({
                 method: method,
                 url: apiURL,
                 data: updatedData,
                 headers: { "Content-Type": "application/json" },
             });
-
+    
             alert(formData.opentag_id ? "Stock updated successfully!" : "Stock added successfully!");
             fetchData(); // Refresh data
-
+    
             setIsEditMode(false); // Reset edit mode
-            // **Generate PDF only if checkbox is checked**
+    
+            // Generate PDF if checkbox is checked
             if (isGeneratePDF) {
                 generateAndDownloadPDF(updatedData);
             }
-
-            // fetchData();
+    
+            // Remove tag details from localStorage
+            localStorage.removeItem("tagStoneDetails");
+            localStorage.removeItem("tagPurStoneDetails");
+    
+            setStoneList([]);
+            setPurchaseStoneList([]);
+    
             setFormData((prevData) => ({
                 ...prevData,
                 tag_id: selectedProduct.tag_id,
                 product_id: selectedProduct.product_id,
                 category: selectedProduct.category,
-                sub_category: "",
-                subcategory_id: "",
-                product_Name: "",
-                design_master: "",
                 Pricing: selectedProduct.Pricing,
-                cut: "",
-                color: "",
-                clarity: "",
-                Tag_ID: "",
-                Prefix: "",
                 metal_type: selectedProduct.metal_type,
-                // Purity: "",
                 PCode_BarCode: `${prev?.item_prefix || ""}${nextSuffix}`,
                 suffix: nextSuffix,
                 Gross_Weight: "",
                 Stones_Weight: "",
                 deduct_st_Wt: "Yes",
-                stone_price_per_carat: "",
-                Stones_Price: "",
-                HUID_No: "",
+                Weight_BW: "",
                 Wastage_On: "Gross Weight",
-                Wastage_Percentage: "",
+                WastageWeight: "",
                 Status: "Available",
                 Source: "Purchase",
-                Stock_Point: "",
-                pieace_cost: "",
-                WastageWeight: "",
-                TotalWeight_AW: "",
-                MC_Per_Gram: "",
                 Making_Charges_On: prevData.Making_Charges_On, // Preserve value
                 MC_Per_Gram_Label: prevData.MC_Per_Gram_Label, // Preserve value
-                pur_MC_Per_Gram_Label: prevData.pur_MC_Per_Gram_Label, // Preserve value
-                Making_Charges: "",
+                pur_MC_Per_Gram_Label: prevData.MC_Per_Gram_Label, // Preserve value
                 Design_Master: selectedProduct.design_name,
-                Weight_BW: "",
                 pur_Gross_Weight: "",
                 pur_Stones_Weight: "",
                 pur_deduct_st_Wt: "Yes",
-                pur_stone_price_per_carat: "",
-                pur_Stones_Price: "",
-                pur_Weight_BW: "",
-                pur_Making_Charges_On: "",
-                pur_MC_Per_Gram: "",
-                pur_Making_Charges: "",
-                pur_Wastage_On: "Gross Weight",
-                pur_Wastage_Percentage: "",
+                pur_Weight_BW:"",
                 pur_WastageWeight: "",
-                pur_TotalWeight_AW: "",
-                size: "",
-                tag_weight: "",
+                pur_Wastage_On: "Gross Weight",
                 pcs: "1",
+                pieace_cost:"",
+                mrp_price:"",
+                total_pcs_cost:"",
             }));
+    
             fetchTagData();
             setIsGeneratePDF(true);
-            // fetchBalance();
+    
         } catch (error) {
             console.error(error);
             alert("An error occurred. Please try again.");
         }
     };
+    
+
 
     const generateAndDownloadPDF = async (data) => {
         const doc = new jsPDF();
@@ -1122,19 +1110,25 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         console.log("Deleting ID:", id); // Confirming ID before sending request
         const url = `${baseURL}/delete/opening-tags-entry/${id}`;
         console.log("DELETE Request URL:", url);
-        fetchTagData();
-      
-        if (window.confirm("Are you sure you want to delete this record?")) {
-          try {
+    
+        // Confirm before proceeding
+        if (!window.confirm("Are you sure you want to delete this record?")) {
+            return;
+        }
+    
+        try {
             const response = await axios.delete(url);
             alert(response.data.message);
-            
-          } catch (error) {
+    
+            // Fetch updated data after successful deletion
+            fetchData();
+            fetchTagData();
+        } catch (error) {
             console.error("Error deleting record:", error.response?.data || error.message);
             alert("Failed to delete record.");
-          }
         }
-      };
+    };
+    
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -1158,7 +1152,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             onChange={handleChange}
                                         />
                                     </Col>
-                                    <Col xs={12} md={2}>
+                                    {/* <Col xs={12} md={2}>
                                         <InputField
                                             label="Invoice"
                                             value={formData.invoice || ""} // Ensures no undefined issue
@@ -1178,7 +1172,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                 });
                                             }}
                                         />
-                                    </Col>
+                                    </Col> */}
                                     <Col xs={12} md={2}>
                                         <InputField
                                             label="Category"
@@ -1285,7 +1279,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             <Col xs={12} md={2}>
                                                 <InputField label="PCode/BarCode" name="PCode_BarCode" type="text" value={formData.PCode_BarCode} onChange={handleChange} />
                                             </Col>
-                                            <Col xs={12} md={3}>
+                                            <Col xs={12} md={2}>
                                                 <InputField label="Purity" name="Purity" type="select" value={formData.Purity} onChange={handleChange} options={purityOptions.map((option) => ({
                                                     value: `${option.name} | ${option.purity}`,
                                                     label: `${option.name} | ${option.purity}`,
@@ -1301,95 +1295,95 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                     { value: "Strong room", label: "Strong room" },
                                                 ]} />
                                             </Col>
-                                            <Row className="stock-form-section">
-                                                <Col xs={12} md={2}>
-                                                    <DropdownButton
-                                                        id="dropdown-basic-button"
-                                                        title="Choose / Capture Image"
-                                                        variant="primary"
-                                                    >
-                                                        <Dropdown.Item onClick={() => fileInputRef.current.click()}>
-                                                            <FaUpload /> Choose Image
-                                                        </Dropdown.Item>
-                                                        <Dropdown.Item onClick={() => setShowWebcam(true)}>
-                                                            <FaCamera /> Capture Image
-                                                        </Dropdown.Item>
-                                                    </DropdownButton>
-                                                    <input
-                                                        type="file"
-                                                        name="productImage"
-                                                        accept="image/*"
-                                                        ref={fileInputRef}
-                                                        style={{ display: "none" }}
-                                                        onChange={handleChange}
-                                                    />
-                                                    {showWebcam && (
-                                                        <div className="mt-2">
-                                                            <Webcam
-                                                                ref={webcamRef}
-                                                                screenshotFormat="image/jpeg"
-                                                                width={200}
-                                                                height={150}
-                                                            />
-                                                            <Button
-                                                                variant="success"
-                                                                size="sm"
-                                                                className="m-1"
-                                                                onClick={captureImage}
-                                                            >
-                                                                Capture
-                                                            </Button>
-                                                            <Button
-                                                                variant="secondary"
-                                                                size="sm"
-                                                                onClick={() => setShowWebcam(false)}
-                                                            >
-                                                                Cancel
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                    {formData.imagePreview && (
-                                                        <div className="mt-2 position-relative">
-                                                            <img
-                                                                src={
-                                                                    formData.imagePreview.startsWith("data")
-                                                                        ? formData.imagePreview
-                                                                        : `${baseURL}/uploads/images/${formData.imagePreview}`
-                                                                }
-                                                                alt="Selected"
-                                                                className="img-thumbnail"
-                                                                width={100}
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                onClick={clearImage}
-                                                                className="btn btn-danger btn-sm position-absolute top-0 end-0"
-                                                            >
-                                                                <FaTrash />
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </Col>
-                                            </Row>
+
+                                            <Col xs={12} md={2}>
+                                                <DropdownButton
+                                                    id="dropdown-basic-button"
+                                                    title="Choose / Capture Image"
+                                                    variant="primary"
+                                                >
+                                                    <Dropdown.Item onClick={() => fileInputRef.current.click()}>
+                                                        <FaUpload /> Choose Image
+                                                    </Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => setShowWebcam(true)}>
+                                                        <FaCamera /> Capture Image
+                                                    </Dropdown.Item>
+                                                </DropdownButton>
+                                                <input
+                                                    type="file"
+                                                    name="productImage"
+                                                    accept="image/*"
+                                                    ref={fileInputRef}
+                                                    style={{ display: "none" }}
+                                                    onChange={handleChange}
+                                                />
+                                                {showWebcam && (
+                                                    <div className="mt-2">
+                                                        <Webcam
+                                                            ref={webcamRef}
+                                                            screenshotFormat="image/jpeg"
+                                                            width={200}
+                                                            height={150}
+                                                        />
+                                                        <Button
+                                                            variant="success"
+                                                            size="sm"
+                                                            className="m-1"
+                                                            onClick={captureImage}
+                                                        >
+                                                            Capture
+                                                        </Button>
+                                                        <Button
+                                                            variant="secondary"
+                                                            size="sm"
+                                                            onClick={() => setShowWebcam(false)}
+                                                        >
+                                                            Cancel
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                                {formData.imagePreview && (
+                                                    <div className="mt-2 position-relative">
+                                                        <img
+                                                            src={
+                                                                formData.imagePreview.startsWith("data")
+                                                                    ? formData.imagePreview
+                                                                    : `${baseURL}/uploads/images/${formData.imagePreview}`
+                                                            }
+                                                            alt="Selected"
+                                                            className="img-thumbnail"
+                                                            width={100}
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={clearImage}
+                                                            className="btn btn-danger btn-sm position-absolute top-0 end-0"
+                                                        >
+                                                            <FaTrash />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </Col>
+
                                             <div className="purchase-form-left">
                                                 <Col className="tag-urd-form1-section">
                                                     <h4 className="mb-3" style={{ marginTop: '-10px' }}>Sales</h4>
                                                     {/* New Row for Weight Fields */}
                                                     <Row className="mt-3">
-                                                        <Col xs={12} md={4}>
+                                                        <Col xs={12} md={3}>
                                                             <InputField label="Gross Wt" name="Gross_Weight" value={formData.Gross_Weight} onChange={handleChange} />
                                                         </Col>
-                                                        <Col xs={12} md={4}>
+                                                        <Col xs={12} md={3}>
                                                             <InputField label="Stones Wt" name="Stones_Weight" value={formData.Stones_Weight} onChange={handleChange} />
                                                         </Col>
-                                                        <Col xs={12} md="1">
+                                                        <Col xs={12} md="2">
                                                             <Button variant="primary"
                                                                 onClick={handleShow}
                                                                 style={{
                                                                     backgroundColor: '#a36e29',
                                                                     borderColor: '#a36e29',
-                                                                    fontSize: '0.9rem',
-                                                                    marginLeft: '-13px',
+                                                                    fontSize: '0.8rem',
+                                                                    marginLeft: '-20px',
                                                                     whiteSpace: 'nowrap'
                                                                 }}
                                                             >
@@ -1417,7 +1411,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                                 onChange={handleChange}
                                                             />
                                                         </Col> */}
-                                                        <Col xs={12} md={4}>
+                                                        <Col xs={12} md={3}>
                                                             <InputField
                                                                 label="Stones Price"
                                                                 name="Stones_Price"
@@ -1460,7 +1454,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
                                                         {/* Show Making_Charges field only when Making_Charges_On is "MC / Gram" or "MC / Piece" */}
                                                         {(formData.Making_Charges_On === "MC / Gram" || formData.Making_Charges_On === "MC / Piece") && (
-                                                            <Col xs={12} md={4}>
+                                                            <Col xs={12} md={3}>
                                                                 <InputField
                                                                     label="MC"
                                                                     name="Making_Charges"
@@ -1502,20 +1496,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                     <h4 className="mb-3" style={{ marginTop: '-10px' }}>Purchase</h4>
                                                     {/* New Row for Weight Fields */}
                                                     <Row className="mt-3">
-                                                        <Col xs={12} md={4}>
+                                                        <Col xs={12} md={3}>
                                                             <InputField label="Gross Wt" name="pur_Gross_Weight" value={formData.pur_Gross_Weight} onChange={handleChange} />
                                                         </Col>
-                                                        <Col xs={12} md={4}>
+                                                        <Col xs={12} md={3}>
                                                             <InputField label="Stones Wt" name="pur_Stones_Weight" value={formData.pur_Stones_Weight} onChange={handleChange} />
                                                         </Col>
-                                                        <Col xs={12} md="1">
+                                                        <Col xs={12} md="2">
                                                             <Button variant="primary"
                                                                 onClick={handleShowPurchase}
                                                                 style={{
                                                                     backgroundColor: '#a36e29',
                                                                     borderColor: '#a36e29',
-                                                                    fontSize: '0.9rem',
-                                                                    marginLeft: '-13px',
+                                                                    fontSize: '0.8rem',
+                                                                    marginLeft: '-17px',
                                                                     whiteSpace: 'nowrap'
                                                                 }}
                                                             >
@@ -1543,7 +1537,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                                 onChange={handleChange}
                                                             />
                                                         </Col> */}
-                                                        <Col xs={12} md={4}>
+                                                        <Col xs={12} md={3}>
                                                             <InputField
                                                                 label="Stones Price"
                                                                 name="pur_Stones_Price"
@@ -1551,7 +1545,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                                 onChange={handleChange}
                                                             />
                                                         </Col>
-                                                        <Col xs={12} md={4}>
+                                                        <Col xs={12} md={3}>
                                                             <InputField label="Weight BW" name="pur_Weight_BW" value={formData.pur_Weight_BW} onChange={handleChange} readOnly />
                                                         </Col>
                                                         <Col xs={12} md={4}>
@@ -1569,7 +1563,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                             />
                                                         </Col>
 
-                                                        <Col xs={12} md={4}>
+                                                        <Col xs={12} md={2}>
                                                             <InputField
                                                                 label={formData.pur_MC_Per_Gram_Label}
                                                                 name="pur_MC_Per_Gram"
@@ -1580,7 +1574,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
                                                         {/* Show Making_Charges field only when Making_Charges_On is "MC / Gram" or "MC / Piece" */}
                                                         {(formData.pur_Making_Charges_On === "MC / Gram" || formData.pur_Making_Charges_On === "MC / Piece") && (
-                                                            <Col xs={12} md={4}>
+                                                            <Col xs={12} md={3}>
                                                                 <InputField
                                                                     label="MC"
                                                                     name="pur_Making_Charges"
@@ -1626,6 +1620,15 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField label="Piece Cost" type="number" value={formData.pieace_cost} onChange={(e) => handleChange("pieace_cost", e.target.value)} />
+                                            </Col>
+                                            <Col xs={12} md={1}>
+                                                <InputField label="Tax %"  value={formData.tax_percent} onChange={(e) => handleChange("tax_percent", e.target.value)} />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField label="MRP" type="number" value={formData.mrp_price} onChange={(e) => handleChange("mrp_price", e.target.value)} />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField label="Total Pcs Cost" type="number" value={formData.total_pcs_cost} onChange={(e) => handleChange("total_pcs_cost", e.target.value)} />
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <DropdownButton
@@ -1743,39 +1746,37 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
 
                             {/* <OpeningTagsTable /> */}
-                            <div className="container mt-4">
-                                <Table striped bordered hover responsive>
-                                    <thead>
+                            <div className="container mt-4" style={{ overflowX: "auto", maxWidth: "100%" }}>
+                                <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}>
+                                    <thead style={{ fontSize: "14px", fontWeight: "bold" }}>
                                         <tr>
-                                            <th>Sr. No.</th>
+                                            <th>SI</th>
+                                            <th>Barcode</th>
                                             <th>Category</th>
                                             <th>Sub Category</th>
-                                            <th>Product Design Name</th>
-                                            <th>Barcode</th>
+                                            <th>Design Name</th>
                                             <th>Gross Wt</th>
-                                            <th>Stones Wt</th>
-                                            <th>Wastage%</th>
+                                            <th>Stone Wt</th>
+                                            <th>Wt BW</th>
+                                            <th>W.Wt</th>
                                             <th>Total Wt</th>
-                                            <th>MC</th>
-                                            <th>Status</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody style={{ fontSize: "14px" }}>
                                         {data.length > 0 ? (
                                             data.map((item, index) => (
                                                 <tr key={index}>
                                                     <td>{index + 1}</td>
+                                                    <td>{item.PCode_BarCode}</td>
                                                     <td>{item.category}</td>
                                                     <td>{item.sub_category}</td>
                                                     <td>{item.design_master}</td>
-                                                    <td>{item.PCode_BarCode}</td>
                                                     <td>{item.Gross_Weight}</td>
                                                     <td>{item.Stones_Weight}</td>
-                                                    <td>{item.Wastage_Percentage}</td>
+                                                    <td>{item.Weight_BW}</td>
+                                                    <td>{item.WastageWeight}</td>
                                                     <td>{item.TotalWeight_AW}</td>
-                                                    <td>{item.Making_Charges}</td>
-                                                    <td>{item.Status}</td>
                                                     <td>
                                                         {/* Edit Button */}
                                                         <FaEdit

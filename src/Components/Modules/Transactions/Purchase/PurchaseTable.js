@@ -169,111 +169,112 @@ const RepairsTable = () => {
       );
 
       const expandedContent = (
-        <Table bordered>
-          <thead>
-            <tr>
-              {/* <th>Product Id</th>
-              <th>Tag Id</th>
-              <th>Pricing</th> */}
-              <th>Category</th>
-              <th>Purity</th>
-              <th>Pcs</th>
-              <th>Gross Wt</th>
-              <th>Stone Wt</th>
-              <th>W.Wt</th>
-              <th>Total Wt</th>
-              <th>Paid Wt</th>
-              <th>Bal Wt</th>
-              <th>Tags Total</th>
-              <th>Diff</th>
-              <th>Excess/Short</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productBalances.map((product, idx) => {
-              const balPcs = product.balance?.bal_pcs || 0;
-              const balGrossWeight = product.balance?.bal_gross_weight || 0;
-
-              // Disable condition for "Tag Entry" button
-              const isTagEntryDisabled =
-                product.Pricing === "By Weight"
-                  ? balPcs === 0 || balGrossWeight === 0
-                  : product.Pricing === "By Fixed"
-                    ? balPcs === 0
-                    : false; // Default to false if Pricing is neither
-
-              return (
-                <tr key={idx}>
-                  {/* <td>{product.product_id}</td>
-                  <td>{product.tag_id}</td>
-                  <td>{product.Pricing}</td> */}
-                  <td>{product.category}</td>
-                  <td>{product.purity}</td>
-                  <td>{product.pcs}</td>
-                  <td>{product.gross_weight}</td>
-                  <td>{product.stone_weight}</td>
-                  <td>{product.wastage_wt}</td>
-                  <td>{product.total_pure_wt}</td>
-                  <td>
-                    {((parseFloat(product.paid_pure_weight) || 0) + (parseFloat(product.paid_wt) || 0)).toFixed(3)}
-                  </td>
-                  <td>
-                    {((Number(product.total_pure_wt) || 0) -
-                      ((Number(product.paid_pure_weight) || 0) + (Number(product.paid_wt) || 0)))
-                      .toFixed(3)}
-                  </td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      style={{
-                        backgroundColor: "#a36e29",
-                        borderColor: "#a36e29",
-                        padding: "0.25rem 0.5rem",
-                        fontSize: "0.875rem",
-                        marginRight: "5px",
-                      }}
-                      onClick={() => handleOpenTagModal(product)}
-                      disabled={isTagEntryDisabled} // Apply dynamic disabling logic
-                    >
-                      Tag Entry
-                    </button>
-
-                    <Button
-                      style={{
-                        backgroundColor: "#28a745",
-                        borderColor: "#28a745",
-                        fontSize: "0.875rem",
-                        padding: "0.25rem 0.5rem",
-                        marginRight: "5px",
-                      }}
-                      onClick={() => handleAddRateCut(product)}
-                    >
-                      Add RateCut
-                    </Button>
-
-                    <Button
-                      style={{
-                        backgroundColor: "#28a745",
-                        borderColor: "#28a745",
-                        fontSize: "0.875rem",
-                        padding: "0.25rem 0.5rem",
-                      }}
-                      onClick={() => handleAddPayment(product)}
-                    >
-                      Add Payment
-                    </Button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
+        <div style={{ overflowX: "auto", maxWidth: "100%" }}>
+          <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}> {/* Decrease font size here */}
+            <thead style={{ fontSize: "14px", fontWeight: "bold" }}> {/* Smaller font for headers */}
+              <tr>
+                <th>Category</th>
+                <th>Purity</th>
+                <th>Pcs</th>
+                <th>Gross Wt</th>
+                <th>Stone Wt</th>
+                <th>Net Wt</th>
+                <th>W.Wt</th>
+                <th>MC</th>
+                <th>Total Wt</th>
+                <th>Paid Wt</th>
+                <th>Bal Wt</th>
+                <th>Tags Total</th>
+                <th>Diff</th>
+                <th>Excess/Short</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody style={{ fontSize: "14px" }}> {/* Smaller font for body */}
+              {productBalances.map((product, idx) => {
+                const balPcs = product.balance?.bal_pcs || 0;
+                const balGrossWeight = product.balance?.bal_gross_weight || 0;
+      
+                const isTagEntryDisabled =
+                  product.Pricing === "By Weight"
+                    ? balPcs === 0 || balGrossWeight === 0
+                    : product.Pricing === "By Fixed"
+                      ? balPcs === 0
+                      : false;
+      
+                return (
+                  <tr key={idx}>
+                    <td>{product.category}</td>
+                    <td>{product.purityPercentage} %</td>
+                    <td>{product.pcs}</td>
+                    <td>{product.gross_weight}</td>
+                    <td>{product.stone_weight}</td>
+                    <td>{product.net_weight}</td>
+                    <td>{product.wastage_wt}</td>
+                    <td>{product.Making_Charges_Value}</td>
+                    <td>{product.total_pure_wt}</td>
+                    <td>
+                      {((parseFloat(product.paid_pure_weight) || 0) + (parseFloat(product.paid_wt) || 0)).toFixed(3)}
+                    </td>
+                    <td>
+                      {((Number(product.total_pure_wt) || 0) -
+                        ((Number(product.paid_pure_weight) || 0) + (Number(product.paid_wt) || 0)))
+                        .toFixed(3)}
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        style={{
+                          backgroundColor: "#a36e29",
+                          borderColor: "#a36e29",
+                          padding: "0.25rem 0.5rem",
+                          fontSize: "0.75rem", // Decrease button font size
+                          marginRight: "5px",
+                        }}
+                        onClick={() => handleOpenTagModal(product)}
+                        disabled={isTagEntryDisabled}
+                      >
+                        Tag Entry
+                      </button>
+      
+                      <Button
+                        style={{
+                          backgroundColor: "#28a745",
+                          borderColor: "#28a745",
+                          fontSize: "0.75rem", // Decrease button font size
+                          padding: "0.25rem 0.5rem",
+                          marginRight: "5px",
+                        }}
+                        onClick={() => handleAddRateCut(product)}
+                      >
+                        Add RateCut
+                      </Button>
+      
+                      <Button
+                        style={{
+                          backgroundColor: "#28a745",
+                          borderColor: "#28a745",
+                          fontSize: "0.75rem", // Decrease button font size
+                          padding: "0.25rem 0.5rem",
+                        }}
+                        onClick={() => handleAddPayment(product)}
+                      >
+                        Add Payment
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </div>
       );
+      
+      
 
       setData((prevData) =>
         prevData.map((item, index) =>

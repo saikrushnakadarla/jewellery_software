@@ -406,7 +406,7 @@ const URDPurchase = () => {
     if (!formData.invoice || formData.invoice.trim() === "") {
       alert("Please fill the invoice field.");
       return;
-    }    
+    }
 
     const latestTagId = editingIndex !== null ? tableData[editingIndex].tag_id : await fetchTagId();
 
@@ -1092,7 +1092,10 @@ const URDPurchase = () => {
     updatedFormData.net_amt = (totalStoneValue + totalAmount + totalMC + parseFloat(updatedFormData.tax_amt) + hmCharges + otherCharges).toFixed(2);
 
     // Final Amount Calculation
-    updatedFormData.final_amt = (parseFloat(updatedFormData.net_amt) - discountAmt).toFixed(2);
+    updatedFormData.final_amt = (
+      parseFloat(updatedFormData.net_amt) + discountAmt
+    ).toFixed(2);
+
 
     // Store previous rate_cut value before updating
     if (!updatedFormData.previousRateCut) {
@@ -1816,7 +1819,10 @@ const URDPurchase = () => {
                     <th>Total Wt</th>
                     <th>Paid wt</th>
                     <th>Bal wt</th>
+                    <th>RateCut Amt</th>
                     <th>Paid Amt</th>
+                    <th>Bal Amt</th>
+                    <th>Net Amt</th>
                     <th>Actions</th> {/* New Action column */}
                   </tr>
                 </thead>
@@ -1828,11 +1834,14 @@ const URDPurchase = () => {
                       <td>{data.gross_weight}</td>
                       <td>{data.stone_weight}</td>
                       <td>{data.net_weight}</td>
-                      <td>{data.purity}</td>
+                      <td>{data.purityPercentage}</td>
                       <td>{data.total_pure_wt}</td>
                       <td>{data.paid_pure_weight}</td>
                       <td>{data.balance_pure_weight}</td>
                       <td>{data.rate_cut_amt}</td>
+                      <td>{data.paid_amount}</td>
+                      <td>{data.balance_amount}</td>
+                      <td>{data.final_amt}</td>
                       <td style={{ display: 'flex', alignItems: 'center' }}>
                         <button
                           type="button"
