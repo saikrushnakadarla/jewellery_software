@@ -21,7 +21,7 @@ const StockEntryTable = (selectedProduct) => {
   const [purityOptions, setPurityOptions] = useState([]);
 
   useEffect(() => {
-    fetch(`${baseURL}/get/opening-tags-entry`) // Correct URL
+    fetch(`${baseURL}/get/opening-tags-entry`) 
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch stock entries');
@@ -29,7 +29,7 @@ const StockEntryTable = (selectedProduct) => {
         return response.json();
       })
       .then((data) => {
-        setData(data.result); // Use data.result since the backend sends { result: [...] }
+        setData(data.result); 
       })
       .catch((error) => {
         console.error('Error fetching stock entries:', error);
@@ -141,7 +141,7 @@ const StockEntryTable = (selectedProduct) => {
         Header: 'Sr. No.',
         Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
-      { Header: 'OpenTag ID', accessor: 'opentag_id' },
+      // { Header: 'OpenTag ID', accessor: 'opentag_id' },
       { Header: 'Category', accessor: 'category' },
       { Header: 'Sub Category', accessor: 'sub_category' },
       { Header: 'Product Design Name', accessor: 'design_master' },

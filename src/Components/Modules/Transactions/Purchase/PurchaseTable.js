@@ -12,6 +12,8 @@ const RepairsTable = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [data, setData] = useState([]);
+  const [tagEntry, setTagEntry] = useState([]); 
+  const [rateCuts, setRateCuts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -144,7 +146,6 @@ const RepairsTable = () => {
     });
   };
 
-
   const fetchBalance = async (product_id, tag_id) => {
     try {
       const response = await axios.get(`${baseURL}/get-balance/${product_id}/${tag_id}`);
@@ -155,27 +156,90 @@ const RepairsTable = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchStockEntries = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/opening-tags-entry`);
+        const data = await response.json();
+        console.log("Stock Entries:", data.result);
+        if (data?.result) {
+          setTagEntry(data.result);
+        } else {
+          console.warn("No stock entries found.");
+        }
+      } catch (error) {
+        console.error("Error fetching stock entries:", error.message);
+      }
+    };
+
+    fetchStockEntries();
+  }, []);
+
+  useEffect(() => {
+      const fetchRateCuts = async () => {
+          try {
+              const response = await axios.get(`${baseURL}/rateCuts`);
+              console.log("RateCuts Data:", response.data);
+  
+              setRateCuts(response.data);
+          } catch (error) {
+              console.error("Error fetching rateCuts:", error);
+          }
+      };
+  
+      fetchRateCuts();
+  }, []);
+
+  const getBalanceAmountForProduct = (productId) => {
+    const filteredRateCuts = rateCuts.filter(rateCut => rateCut.purchase_id === productId);
+    const totalBalance = filteredRateCuts.reduce((sum, rateCut) => sum + parseFloat(rateCut.balance_amount || 0), 0);
+    return totalBalance.toFixed(2); 
+  };
+
+
   const toggleRowExpansion = async (rowId, rowIndex, invoice) => {
     setExpandedRows((prev) => {
-      const isExpanding = !prev[rowId];
-      if (isExpanding) {
-        handleExpandedDetails(rowIndex, invoice);
-      } else {
-        setData((prevData) =>
-          prevData.map((item) =>
-            item.invoice === invoice ? { ...item, expandedContent: null } : item
-          )
-        );
-      }
-      return { [rowId]: isExpanding };
+        const isExpanding = !prev[rowId];
+
+        if (isExpanding) {
+            // Store only the new expanded invoice
+            localStorage.setItem("expandedInvoice", JSON.stringify({ invoice, rowIndex }));
+            handleExpandedDetails(rowIndex, invoice);
+        } else {
+            // Remove from localStorage when collapsing
+            localStorage.removeItem("expandedInvoice");
+            setData((prevData) =>
+                prevData.map((item) =>
+                    item.invoice === invoice ? { ...item, expandedContent: null } : item
+                )
+            );
+        }
+
+        // Ensure only one row is expanded at a time
+        return { [rowId]: isExpanding };
     });
-  };
+};
+
+
+useEffect(() => {
+  const storedData = localStorage.getItem("expandedInvoice");
+  if (storedData) {
+      const { invoice, rowIndex } = JSON.parse(storedData);
+      if (invoice) {
+          // Expand the row stored in localStorage
+          handleExpandedDetails(rowIndex, invoice);
+          setExpandedRows({ [invoice]: true });
+      }
+  }
+}, []);
+
+
 
   const handleExpandedDetails = async (rowIndex, invoice) => {
     try {
       const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
       const productData = response.data.repeatedData;
-  
+
       // Fetch balance for each product
       const productBalances = await Promise.all(
         productData.map(async (product) => {
@@ -183,33 +247,22 @@ const RepairsTable = () => {
           return { ...product, balance };
         })
       );
-  
-      // Fetch rate cuts
-      const rateCutsResponse = await axios.get(`${baseURL}/rateCuts`);
-      const rateCuts = rateCutsResponse.data;
-  
-      // Calculate total balance amount for each purchase_id
-      const balanceAmountMap = rateCuts.reduce((acc, rateCut) => {
-        const purchaseId = rateCut.purchase_id;
-        const balanceAmount = parseFloat(rateCut.balance_amount) || 0;
-  
-        if (!acc[purchaseId]) {
-          acc[purchaseId] = 0;
-        }
-        acc[purchaseId] += balanceAmount; // Sum balance amounts for the same purchase_id
-  
-        return acc;
-      }, {});
-  
-      // Map balance amount to products
-      const productsWithBalanceAmt = productBalances.map((product) => {
-        const totalBalanceAmount = balanceAmountMap[product.purchase_id] || 0;
-        return {
-          ...product,
-          balance_amount: totalBalanceAmount.toFixed(2), // Ensure it’s formatted as a number with 2 decimal places
-        };
-      });
-  
+
+      // Fetch Tag Entries to calculate tag totals
+      const tagResponse = await fetch(`${baseURL}/get/opening-tags-entry`);
+      const tagData = await tagResponse.json();
+
+      // Calculate total Gross Weight for each tag_id
+      const tagTotals = {};
+      if (tagData?.result) {
+        tagData.result.forEach((entry) => {
+          if (!tagTotals[entry.tag_id]) {
+            tagTotals[entry.tag_id] = 0;
+          }
+          tagTotals[entry.tag_id] += parseFloat(entry.Gross_Weight) || 0;
+        });
+      }
+
       const expandedContent = (
         <div style={{ overflowX: "auto", maxWidth: "100%" }}>
           <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}>
@@ -226,7 +279,7 @@ const RepairsTable = () => {
                 <th>Total Wt</th>
                 <th>Paid Wt</th>
                 <th>Bal Wt</th>
-                <th>Balance Amt</th> {/* New Column */}
+                <th>Bal Amt</th>
                 <th>Tags Total</th>
                 <th>Diff</th>
                 <th>Excess/Short</th>
@@ -234,17 +287,20 @@ const RepairsTable = () => {
               </tr>
             </thead>
             <tbody style={{ fontSize: "14px" }}>
-              {productsWithBalanceAmt.map((product, idx) => {
+              {productBalances.map((product, idx) => {
                 const balPcs = product.balance?.bal_pcs || 0;
                 const balGrossWeight = product.balance?.bal_gross_weight || 0;
-  
+                const tagTotal = tagTotals[product.tag_id] || 0; 
+                const diff = parseFloat(product.gross_weight) - tagTotal; 
+
                 const isTagEntryDisabled =
                   product.Pricing === "By Weight"
-                    ? balPcs === 0 || balGrossWeight === 0
+                    ? balPcs <= 0 || balGrossWeight <= 0
                     : product.Pricing === "By Fixed"
-                    ? balPcs === 0
-                    : false;
-  
+                      ? balPcs <= 0
+                      : false;
+
+
                 return (
                   <tr key={idx}>
                     <td>{product.category}</td>
@@ -264,10 +320,13 @@ const RepairsTable = () => {
                         ((Number(product.paid_pure_weight) || 0) + (Number(product.paid_wt) || 0)))
                         .toFixed(3)}
                     </td>
-                    <td>{product.balance_amount || "0.00"}</td> {/* Display summed Balance Amt */}
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>{getBalanceAmountForProduct(product.id)}</td>
+                    <td>{tagTotal.toFixed(3)}</td> {/* Display Tags Total */}
+                    <td>{diff.toFixed(3)}</td> {/* Display Difference */}
+                    <td>
+                      {parseFloat(product.gross_weight) > tagTotal ? "Short" : "Excess"}
+                    </td>
+
                     <td>
                       <button
                         type="button"
@@ -284,7 +343,7 @@ const RepairsTable = () => {
                       >
                         Tag Entry
                       </button>
-  
+
                       <Button
                         style={{
                           backgroundColor: "#28a745",
@@ -295,9 +354,10 @@ const RepairsTable = () => {
                         }}
                         onClick={() => handleAddRateCut(product)}
                       >
-                        Add RateCut
+                        {/* Add  */}
+                        RateCut
                       </Button>
-  
+
                       <Button
                         style={{
                           backgroundColor: "#28a745",
@@ -307,7 +367,8 @@ const RepairsTable = () => {
                         }}
                         onClick={() => handleAddPayment(product)}
                       >
-                        Add Payment
+                        {/* Add  */}
+                        Payment
                       </Button>
                     </td>
                   </tr>
@@ -317,7 +378,7 @@ const RepairsTable = () => {
           </Table>
         </div>
       );
-  
+
       setData((prevData) =>
         prevData.map((item, index) =>
           index === rowIndex ? { ...item, expandedContent } : item
@@ -327,7 +388,8 @@ const RepairsTable = () => {
       console.error("Error fetching purchase details:", error);
     }
   };
-  
+
+
   const handleCloseModal = () => {
     setShowModal(false);
     setPurchaseDetails(null);
