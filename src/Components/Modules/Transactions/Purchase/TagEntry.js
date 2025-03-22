@@ -10,7 +10,8 @@ import { AiOutlinePlus } from "react-icons/ai";
 import baseURL from "../../../../Url/NodeBaseURL";
 import "./TagEntry.css";
 import { Form, Row, Col, Table } from 'react-bootstrap';
-import { FaCamera, FaUpload, FaTrash, FaEdit } from "react-icons/fa";
+import * as XLSX from "xlsx";
+import { FaCamera, FaUpload, FaTrash, FaEdit, FaFileExcel } from "react-icons/fa";
 import { Modal, Button, Dropdown, DropdownButton } from "react-bootstrap";  // Add this import
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
@@ -1127,11 +1128,11 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     const handleEdit = (rowData) => {
         setFormData(rowData); // Populate the form with row data
         setIsEditMode(true);  // Show the form
-    
+
         // Set the selected image for preview
-        setImage(rowData.image || ""); 
+        setImage(rowData.image || "");
     };
-    
+
     const handleDelete = async (id) => {
         console.log("Deleting ID:", id); // Confirming ID before sending request
         const url = `${baseURL}/delete/opening-tags-entry/${id}`;
@@ -1153,6 +1154,36 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             console.error("Error deleting record:", error.response?.data || error.message);
             alert("Failed to delete record.");
         }
+    };
+
+    const exportToExcel = () => {
+        if (data.length === 0) {
+            alert("No data available to export.");
+            return;
+        }
+
+        const worksheet = XLSX.utils.json_to_sheet(
+            data.map((item, index) => ({
+                "SI": index + 1,
+                "Barcode": item.PCode_BarCode,
+                "Category": item.category,
+                "Sub Category": item.sub_category,
+                "Design Name": item.design_master,
+                "Gross Wt": item.Gross_Weight,
+                "Stone Wt": item.Stones_Weight,
+                "Wt BW": item.Weight_BW,
+                "W.Wt": item.WastageWeight,
+                "Total Wt": item.TotalWeight_AW,
+                "Supplier Name":item.account_name,
+                "Purity":item.Purity,
+                // "Image URL": item.image || "No Image"
+            }))
+        );
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+        XLSX.writeFile(workbook, "TableData.xlsx");
     };
 
 
@@ -1787,6 +1818,25 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
                             {/* <OpeningTagsTable /> */}
                             <div className="container mt-4" style={{ overflowX: "auto", maxWidth: "100%" }}>
+                                {/* Excel Export Button */}
+                                <button
+                                    onClick={exportToExcel}
+                                    style={{
+                                        marginBottom: "10px",
+                                        padding: "8px 12px",
+                                        backgroundColor: "green",
+                                        color: "white",
+                                        border: "none",
+                                        borderRadius: "5px",
+                                        cursor: "pointer",
+                                        display: "flex",
+                                        alignItems: "center"
+                                    }}
+                                >
+                                    <FaFileExcel style={{ marginRight: "5px" }} /> Export to Excel
+                                </button>
+
+                                {/* Table */}
                                 <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}>
                                     <thead style={{ fontSize: "14px", fontWeight: "bold" }}>
                                         <tr>
@@ -1843,16 +1893,15 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                         )}
                                                     </td>
                                                     <td>
-                                                        {/* Edit Button */}
                                                         <FaEdit
                                                             style={{ cursor: "pointer", color: "blue" }}
                                                             onClick={() => handleEdit(item)}
                                                         />
                                                         <FaTrash
                                                             style={{
-                                                                cursor: 'pointer',
-                                                                marginLeft: '10px',
-                                                                color: 'red',
+                                                                cursor: "pointer",
+                                                                marginLeft: "10px",
+                                                                color: "red",
                                                             }}
                                                             onClick={() => handleDelete(item.opentag_id)}
                                                         />
@@ -1861,7 +1910,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             ))
                                         ) : (
                                             <tr>
-                                                <td colSpan="11" className="text-center">No data available</td>
+                                                <td colSpan="12" className="text-center">No data available</td>
                                             </tr>
                                         )}
                                     </tbody>
