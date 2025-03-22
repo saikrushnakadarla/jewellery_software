@@ -794,10 +794,12 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 category: selectedProduct.category,
                 Pricing: selectedProduct.Pricing,
                 metal_type: selectedProduct.metal_type,
+                sub_category: "",
                 PCode_BarCode: `${prev?.item_prefix || ""}${nextSuffix}`,
                 suffix: nextSuffix,
                 Gross_Weight: "",
                 Stones_Weight: "",
+                Stones_Price: "",
                 deduct_st_Wt: "Yes",
                 Weight_BW: "",
                 Wastage_On: "Gross Weight",
@@ -810,6 +812,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 Design_Master: selectedProduct.design_name,
                 pur_Gross_Weight: "",
                 pur_Stones_Weight: "",
+                pur_Stones_Price: "",
                 pur_deduct_st_Wt: "Yes",
                 pur_Weight_BW: "",
                 pur_WastageWeight: "",
@@ -819,6 +822,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 mrp_price: "",
                 total_pcs_cost: "",
             }));
+            setImage(null);
 
             fetchTagData();
             setIsGeneratePDF(true);
@@ -1174,8 +1178,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 "Wt BW": item.Weight_BW,
                 "W.Wt": item.WastageWeight,
                 "Total Wt": item.TotalWeight_AW,
-                "Supplier Name":item.account_name,
-                "Purity":item.Purity,
+                "Supplier Name": item.account_name,
+                "Purity": item.Purity,
                 // "Image URL": item.image || "No Image"
             }))
         );
@@ -1183,7 +1187,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
 
-        XLSX.writeFile(workbook, "TableData.xlsx");
+        XLSX.writeFile(workbook, "TagDetails.xlsx");
     };
 
 
@@ -1353,13 +1357,13 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                 ]} />
                                             </Col>
 
-                                            <Col xs={12} md={4}>
+                                            <Col xs={12} md={2}>
                                                 <div className="image-upload-container">
                                                     {/* Dropdown Button for Upload Options */}
                                                     <Dropdown>
                                                         <Dropdown.Toggle id="dropdown-basic-button">Upload Image</Dropdown.Toggle>
 
-                                                        <Dropdown.Menu>
+                                                        <Dropdown.Menu style={{ zIndex: 1050, position: "absolute" }}>
                                                             <Dropdown.Item onClick={() => fileInputRef.current.click()}>
                                                                 Select Image
                                                             </Dropdown.Item>
@@ -1368,6 +1372,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                             </Dropdown.Item>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
+
 
                                                     {/* Hidden file input */}
                                                     <input

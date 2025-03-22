@@ -26,33 +26,34 @@ const RepairForm = () => {
 
     const [isEditable, setIsEditable] = useState(false); // Toggle edit mode
     const [rateCuts, setRateCuts] = useState([]);
-
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => {
             let updatedData = { ...prevData, [name]: value };
-
+    
             // Auto-calculate rate_cut_amt
             if (updatedData.rate_cut_wt && updatedData.rate_cut) {
                 updatedData.rate_cut_amt = parseFloat(updatedData.rate_cut_wt) * parseFloat(updatedData.rate_cut);
             }
-
-            // Auto-calculate balance_amount
-            if (updatedData.rate_cut_amt && updatedData.paid_amount) {
-                let calculatedBalance = updatedData.rate_cut_amt - parseFloat(updatedData.paid_amount);
-
+    
+            // Ensure balance_amount is calculated even if paid_amount is empty
+            let paidAmount = updatedData.paid_amount ? parseFloat(updatedData.paid_amount) : 0;
+            if (updatedData.rate_cut_amt !== undefined) {
+                let calculatedBalance = updatedData.rate_cut_amt - paidAmount;
+    
                 // Check if paid_amount is greater than rate_cut_amt
-                if (parseFloat(updatedData.paid_amount) > updatedData.rate_cut_amt) {
+                if (paidAmount > updatedData.rate_cut_amt) {
                     alert("Paid Amount cannot be greater than Rate Cut Amount.");
                     return prevData; // Prevent state update if invalid
                 }
-
+    
                 updatedData.balance_amount = calculatedBalance;
             }
-
+    
             return updatedData;
         });
     };
+    
 
     const handleBack = () => {
         navigate("/purchasetable");
@@ -63,8 +64,8 @@ const RepairForm = () => {
 
         try {
             const response = await axios.post(`${baseURL}/ratecuts`, formData);
-            alert("Data saved successfully!");
-            // navigate("/purchasetable");
+            alert("RateCut added successfully!");
+            navigate("/purchasetable");
         } catch (error) {
             console.error("Error saving data:", error);
             alert("Failed to save data.");

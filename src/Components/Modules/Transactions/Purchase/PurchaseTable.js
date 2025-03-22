@@ -155,6 +155,22 @@ const RepairsTable = () => {
     }
   };
 
+  const toggleRowExpansion = async (rowId, rowIndex, invoice) => {
+    setExpandedRows((prev) => {
+      const isExpanding = !prev[rowId];
+      if (isExpanding) {
+        handleExpandedDetails(rowIndex, invoice);
+      } else {
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.invoice === invoice ? { ...item, expandedContent: null } : item
+          )
+        );
+      }
+      return { [rowId]: isExpanding };
+    });
+  };
+
   const handleExpandedDetails = async (rowIndex, invoice) => {
     try {
       const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
@@ -194,14 +210,14 @@ const RepairsTable = () => {
               {productBalances.map((product, idx) => {
                 const balPcs = product.balance?.bal_pcs || 0;
                 const balGrossWeight = product.balance?.bal_gross_weight || 0;
-      
+
                 const isTagEntryDisabled =
                   product.Pricing === "By Weight"
                     ? balPcs === 0 || balGrossWeight === 0
                     : product.Pricing === "By Fixed"
                       ? balPcs === 0
                       : false;
-      
+
                 return (
                   <tr key={idx}>
                     <td>{product.category}</td>
@@ -240,7 +256,7 @@ const RepairsTable = () => {
                       >
                         Tag Entry
                       </button>
-      
+
                       <Button
                         style={{
                           backgroundColor: "#28a745",
@@ -253,7 +269,7 @@ const RepairsTable = () => {
                       >
                         Add RateCut
                       </Button>
-      
+
                       <Button
                         style={{
                           backgroundColor: "#28a745",
@@ -273,8 +289,8 @@ const RepairsTable = () => {
           </Table>
         </div>
       );
-      
-      
+
+
 
       setData((prevData) =>
         prevData.map((item, index) =>
@@ -291,21 +307,7 @@ const RepairsTable = () => {
     setPurchaseDetails(null);
   };
 
-  const toggleRowExpansion = async (rowId, rowIndex, invoice) => {
-    setExpandedRows((prev) => {
-      const isExpanding = !prev[rowId];
-      if (isExpanding) {
-        handleExpandedDetails(rowIndex, invoice);
-      } else {
-        setData((prevData) =>
-          prevData.map((item) =>
-            item.invoice === invoice ? { ...item, expandedContent: null } : item
-          )
-        );
-      }
-      return { [rowId]: isExpanding };
-    });
-  };
+
 
   const handleViewDetails = async (invoice) => {
     try {

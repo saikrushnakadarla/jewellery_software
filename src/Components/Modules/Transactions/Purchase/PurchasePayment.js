@@ -37,6 +37,23 @@ const RepairForm = () => {
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [rateCutOptions, setRateCutOptions] = useState([]);
 
+      useEffect(() => {
+        const fetchLastPaymentNumber = async () => {
+          try {
+            const response = await axios.get(`${baseURL}/lastPaymentNumber`);
+            // setFormData(prev => ({ ...prev, payment_no: response.data.lastPaymentNumber }));
+            setFormData((prev) => ({
+              ...prev,
+              payment_no:response.data.lastPaymentNumber,
+            }));
+          } catch (error) {
+            console.error("Error fetching invoice_number number:", error);
+          }
+        };
+    
+        fetchLastPaymentNumber();
+      }, []);
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -271,6 +288,7 @@ const RepairForm = () => {
                             name="payment_no"
                             value={formData.payment_no}
                             onChange={handleInputChange}
+                            readOnly
                         />
                     </Col>
                     <Col xs={12} md={2}>

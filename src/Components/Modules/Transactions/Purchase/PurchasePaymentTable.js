@@ -9,6 +9,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 const RepairsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
   const [data, setData] = useState([]); // State to hold fetched data
+  
 
   // Define table columns
   const columns = React.useMemo(

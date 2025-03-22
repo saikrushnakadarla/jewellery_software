@@ -1583,7 +1583,7 @@ const URDPurchase = () => {
                     />
                   </Col>
                   {mcOnType && (
-                    <Col xs={12} md={2}>
+                    <Col xs={12} md={1}>
                       <InputField
                         label={mcOnType} // Change label dynamically
                         name="Making_Charges_Value"
@@ -1593,7 +1593,7 @@ const URDPurchase = () => {
                       />
                     </Col>
                   )}
-                  <Col xs={12} md={1}>
+                  <Col xs={12} md={2}>
                     <InputField
                       label="Total MC"
                       name="total_mc"
