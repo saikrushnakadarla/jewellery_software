@@ -12,7 +12,7 @@ const RepairsTable = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [data, setData] = useState([]);
-  const [tagEntry, setTagEntry] = useState([]); 
+  const [tagEntry, setTagEntry] = useState([]);
   const [rateCuts, setRateCuts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState({});
@@ -176,67 +176,63 @@ const RepairsTable = () => {
   }, []);
 
   useEffect(() => {
-      const fetchRateCuts = async () => {
-          try {
-              const response = await axios.get(`${baseURL}/rateCuts`);
-              console.log("RateCuts Data:", response.data);
-  
-              setRateCuts(response.data);
-          } catch (error) {
-              console.error("Error fetching rateCuts:", error);
-          }
-      };
-  
-      fetchRateCuts();
+    const fetchRateCuts = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/rateCuts`);
+        console.log("RateCuts Data:", response.data);
+
+        setRateCuts(response.data);
+      } catch (error) {
+        console.error("Error fetching rateCuts:", error);
+      }
+    };
+
+    fetchRateCuts();
   }, []);
-
-  const getBalanceAmountForProduct = (productId) => {
-    const filteredRateCuts = rateCuts.filter(rateCut => rateCut.purchase_id === productId);
-    const totalBalance = filteredRateCuts.reduce((sum, rateCut) => sum + parseFloat(rateCut.balance_amount || 0), 0);
-    return totalBalance.toFixed(2); 
-  };
-
 
   const toggleRowExpansion = async (rowId, rowIndex, invoice) => {
     setExpandedRows((prev) => {
-        const isExpanding = !prev[rowId];
+      const isExpanding = !prev[rowId];
 
-        if (isExpanding) {
-            // Store only the new expanded invoice
-            localStorage.setItem("expandedInvoice", JSON.stringify({ invoice, rowIndex }));
-            handleExpandedDetails(rowIndex, invoice);
-        } else {
-            // Remove from localStorage when collapsing
-            localStorage.removeItem("expandedInvoice");
-            setData((prevData) =>
-                prevData.map((item) =>
-                    item.invoice === invoice ? { ...item, expandedContent: null } : item
-                )
-            );
-        }
+      if (isExpanding) {
+        // Store only the new expanded invoice
+        localStorage.setItem("expandedInvoice", JSON.stringify({ invoice, rowIndex }));
+        handleExpandedDetails(rowIndex, invoice);
+      } else {
+        // Remove from localStorage when collapsing
+        localStorage.removeItem("expandedInvoice");
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.invoice === invoice ? { ...item, expandedContent: null } : item
+          )
+        );
+      }
 
-        // Ensure only one row is expanded at a time
-        return { [rowId]: isExpanding };
+      // Ensure only one row is expanded at a time
+      return { [rowId]: isExpanding };
     });
-};
+  };
 
 
-useEffect(() => {
-  const storedData = localStorage.getItem("expandedInvoice");
-  if (storedData) {
+  useEffect(() => {
+    const storedData = localStorage.getItem("expandedInvoice");
+    if (storedData) {
       const { invoice, rowIndex } = JSON.parse(storedData);
       if (invoice) {
-          // Expand the row stored in localStorage
-          handleExpandedDetails(rowIndex, invoice);
-          setExpandedRows({ [invoice]: true });
+        // Expand the row stored in localStorage
+        handleExpandedDetails(rowIndex, invoice);
+        setExpandedRows({ [invoice]: true });
       }
-  }
-}, []);
-
-
+    }
+  }, []);
 
   const handleExpandedDetails = async (rowIndex, invoice) => {
     try {
+      // Fetch latest rateCuts data
+      const rateCutsResponse = await axios.get(`${baseURL}/rateCuts`);
+      const latestRateCuts = rateCutsResponse.data;
+
+      // Fetch product details
       const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
       const productData = response.data.repeatedData;
 
@@ -263,6 +259,13 @@ useEffect(() => {
         });
       }
 
+      // Function to get balance amount for each product from fresh rateCuts data
+      const getBalanceAmountForProduct = (productId) => {
+        const filteredRateCuts = latestRateCuts.filter(rateCut => rateCut.purchase_id === productId);
+        const totalBalance = filteredRateCuts.reduce((sum, rateCut) => sum + parseFloat(rateCut.balance_amount || 0), 0);
+        return totalBalance.toFixed(2);
+      };
+
       const expandedContent = (
         <div style={{ overflowX: "auto", maxWidth: "100%" }}>
           <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}>
@@ -283,6 +286,7 @@ useEffect(() => {
                 <th>Tags Total</th>
                 <th>Diff</th>
                 <th>Excess/Short</th>
+                <th>Claim</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -290,8 +294,8 @@ useEffect(() => {
               {productBalances.map((product, idx) => {
                 const balPcs = product.balance?.bal_pcs || 0;
                 const balGrossWeight = product.balance?.bal_gross_weight || 0;
-                const tagTotal = tagTotals[product.tag_id] || 0; 
-                const diff = parseFloat(product.gross_weight) - tagTotal; 
+                const tagTotal = tagTotals[product.tag_id] || 0;
+                const diff = parseFloat(product.gross_weight) - tagTotal;
 
                 const isTagEntryDisabled =
                   product.Pricing === "By Weight"
@@ -299,7 +303,6 @@ useEffect(() => {
                     : product.Pricing === "By Fixed"
                       ? balPcs <= 0
                       : false;
-
 
                 return (
                   <tr key={idx}>
@@ -326,7 +329,14 @@ useEffect(() => {
                     <td>
                       {parseFloat(product.gross_weight) > tagTotal ? "Short" : "Excess"}
                     </td>
-
+                    <td>
+                      <select
+                        style={{ width: "80px", height: "30px", fontSize: "0.80rem", padding: "0.20rem 0.5rem", }}
+                      >
+                        <option value="Claim">Claim</option>
+                        <option value="UnClaim">UnClaim</option>
+                      </select>
+                    </td>
                     <td>
                       <button
                         type="button"
@@ -388,6 +398,7 @@ useEffect(() => {
       console.error("Error fetching purchase details:", error);
     }
   };
+
 
 
   const handleCloseModal = () => {
