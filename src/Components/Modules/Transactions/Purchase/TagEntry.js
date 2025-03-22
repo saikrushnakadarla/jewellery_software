@@ -1117,23 +1117,22 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 setData(filteredData);
             } else {
                 console.error("Unexpected API response format:", jsonData);
-                setData([]); // Set an empty array if the format is incorrect
+                setData([]); 
             }
         } catch (error) {
             console.error("Error fetching data:", error);
-            setData([]); // Handle errors by setting an empty array
+            setData([]); 
         } finally {
             setLoading(false);
         }
     };
     useEffect(() => {
         fetchTagData();
-    }, [selectedProduct]); // Dependency array includes selectedProduct
-    const handleEdit = (rowData) => {
-        setFormData(rowData); // Populate the form with row data
-        setIsEditMode(true);  // Show the form
+    }, [selectedProduct]);
 
-        // Set the selected image for preview
+    const handleEdit = (rowData) => {
+        setFormData(rowData); 
+        setIsEditMode(true);  
         setImage(rowData.image || "");
     };
 

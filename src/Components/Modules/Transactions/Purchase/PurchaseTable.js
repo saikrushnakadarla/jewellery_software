@@ -12,6 +12,8 @@ const RepairsTable = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [data, setData] = useState([]);
+  const [tagEntry, setTagEntry] = useState([]); 
+  const [rateCuts, setRateCuts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -144,7 +146,6 @@ const RepairsTable = () => {
     });
   };
 
-
   const fetchBalance = async (product_id, tag_id) => {
     try {
       const response = await axios.get(`${baseURL}/get-balance/${product_id}/${tag_id}`);
@@ -154,6 +155,47 @@ const RepairsTable = () => {
       return null;
     }
   };
+
+  useEffect(() => {
+    const fetchStockEntries = async () => {
+      try {
+        const response = await fetch(`${baseURL}/get/opening-tags-entry`);
+        const data = await response.json();
+        console.log("Stock Entries:", data.result);
+        if (data?.result) {
+          setTagEntry(data.result);
+        } else {
+          console.warn("No stock entries found.");
+        }
+      } catch (error) {
+        console.error("Error fetching stock entries:", error.message);
+      }
+    };
+
+    fetchStockEntries();
+  }, []);
+
+  useEffect(() => {
+      const fetchRateCuts = async () => {
+          try {
+              const response = await axios.get(`${baseURL}/rateCuts`);
+              console.log("RateCuts Data:", response.data);
+  
+              setRateCuts(response.data);
+          } catch (error) {
+              console.error("Error fetching rateCuts:", error);
+          }
+      };
+  
+      fetchRateCuts();
+  }, []);
+
+  const getBalanceAmountForProduct = (productId) => {
+    const filteredRateCuts = rateCuts.filter(rateCut => rateCut.purchase_id === productId);
+    const totalBalance = filteredRateCuts.reduce((sum, rateCut) => sum + parseFloat(rateCut.balance_amount || 0), 0);
+    return totalBalance.toFixed(2); 
+  };
+
 
   const toggleRowExpansion = async (rowId, rowIndex, invoice) => {
     setExpandedRows((prev) => {
@@ -184,10 +226,25 @@ const RepairsTable = () => {
         })
       );
 
+      // Fetch Tag Entries to calculate tag totals
+      const tagResponse = await fetch(`${baseURL}/get/opening-tags-entry`);
+      const tagData = await tagResponse.json();
+
+      // Calculate total Gross Weight for each tag_id
+      const tagTotals = {};
+      if (tagData?.result) {
+        tagData.result.forEach((entry) => {
+          if (!tagTotals[entry.tag_id]) {
+            tagTotals[entry.tag_id] = 0;
+          }
+          tagTotals[entry.tag_id] += parseFloat(entry.Gross_Weight) || 0;
+        });
+      }
+
       const expandedContent = (
         <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-          <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}> {/* Decrease font size here */}
-            <thead style={{ fontSize: "14px", fontWeight: "bold" }}> {/* Smaller font for headers */}
+          <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}>
+            <thead style={{ fontSize: "14px", fontWeight: "bold" }}>
               <tr>
                 <th>Category</th>
                 <th>Purity</th>
@@ -200,23 +257,27 @@ const RepairsTable = () => {
                 <th>Total Wt</th>
                 <th>Paid Wt</th>
                 <th>Bal Wt</th>
+                <th>Bal Amt</th>
                 <th>Tags Total</th>
                 <th>Diff</th>
                 <th>Excess/Short</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody style={{ fontSize: "14px" }}> {/* Smaller font for body */}
+            <tbody style={{ fontSize: "14px" }}>
               {productBalances.map((product, idx) => {
                 const balPcs = product.balance?.bal_pcs || 0;
                 const balGrossWeight = product.balance?.bal_gross_weight || 0;
+                const tagTotal = tagTotals[product.tag_id] || 0; // Get tag total for this tag_id
+                const diff = parseFloat(product.gross_weight) - tagTotal; // Calculate Diff
 
                 const isTagEntryDisabled =
                   product.Pricing === "By Weight"
-                    ? balPcs === 0 || balGrossWeight === 0
+                    ? balPcs <= 0 || balGrossWeight <= 0
                     : product.Pricing === "By Fixed"
-                      ? balPcs === 0
+                      ? balPcs <= 0
                       : false;
+
 
                 return (
                   <tr key={idx}>
@@ -237,9 +298,13 @@ const RepairsTable = () => {
                         ((Number(product.paid_pure_weight) || 0) + (Number(product.paid_wt) || 0)))
                         .toFixed(3)}
                     </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
+                    <td>{getBalanceAmountForProduct(product.id)}</td>
+                    <td>{tagTotal.toFixed(3)}</td> {/* Display Tags Total */}
+                    <td>{diff.toFixed(3)}</td> {/* Display Difference */}
+                    <td>
+                      {parseFloat(product.gross_weight) > tagTotal ? "Short" : "Excess"}
+                    </td>
+
                     <td>
                       <button
                         type="button"
@@ -248,7 +313,7 @@ const RepairsTable = () => {
                           backgroundColor: "#a36e29",
                           borderColor: "#a36e29",
                           padding: "0.25rem 0.5rem",
-                          fontSize: "0.75rem", // Decrease button font size
+                          fontSize: "0.75rem",
                           marginRight: "5px",
                         }}
                         onClick={() => handleOpenTagModal(product)}
@@ -261,7 +326,7 @@ const RepairsTable = () => {
                         style={{
                           backgroundColor: "#28a745",
                           borderColor: "#28a745",
-                          fontSize: "0.75rem", // Decrease button font size
+                          fontSize: "0.75rem",
                           padding: "0.25rem 0.5rem",
                           marginRight: "5px",
                         }}
@@ -274,7 +339,7 @@ const RepairsTable = () => {
                         style={{
                           backgroundColor: "#28a745",
                           borderColor: "#28a745",
-                          fontSize: "0.75rem", // Decrease button font size
+                          fontSize: "0.75rem",
                           padding: "0.25rem 0.5rem",
                         }}
                         onClick={() => handleAddPayment(product)}
@@ -290,8 +355,6 @@ const RepairsTable = () => {
         </div>
       );
 
-
-
       setData((prevData) =>
         prevData.map((item, index) =>
           index === rowIndex ? { ...item, expandedContent } : item
@@ -301,6 +364,7 @@ const RepairsTable = () => {
       console.error("Error fetching purchase details:", error);
     }
   };
+
 
   const handleCloseModal = () => {
     setShowModal(false);

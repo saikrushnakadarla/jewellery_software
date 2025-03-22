@@ -90,7 +90,7 @@ const RepairForm = () => {
         if (receivedData.purchase_id) {
             fetchRateCuts();
         }
-    }, [receivedData.purchase_id]); // Dependency added to re-fetch when purchase_id changes
+    }, [receivedData.purchase_id]); 
     
 
     return (
