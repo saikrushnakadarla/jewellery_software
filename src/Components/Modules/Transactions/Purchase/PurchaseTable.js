@@ -175,7 +175,7 @@ const RepairsTable = () => {
     try {
       const response = await axios.get(`${baseURL}/get-purchase-details/${invoice}`);
       const productData = response.data.repeatedData;
-
+  
       // Fetch balance for each product
       const productBalances = await Promise.all(
         productData.map(async (product) => {
@@ -183,11 +183,37 @@ const RepairsTable = () => {
           return { ...product, balance };
         })
       );
-
+  
+      // Fetch rate cuts
+      const rateCutsResponse = await axios.get(`${baseURL}/rateCuts`);
+      const rateCuts = rateCutsResponse.data;
+  
+      // Calculate total balance amount for each purchase_id
+      const balanceAmountMap = rateCuts.reduce((acc, rateCut) => {
+        const purchaseId = rateCut.purchase_id;
+        const balanceAmount = parseFloat(rateCut.balance_amount) || 0;
+  
+        if (!acc[purchaseId]) {
+          acc[purchaseId] = 0;
+        }
+        acc[purchaseId] += balanceAmount; // Sum balance amounts for the same purchase_id
+  
+        return acc;
+      }, {});
+  
+      // Map balance amount to products
+      const productsWithBalanceAmt = productBalances.map((product) => {
+        const totalBalanceAmount = balanceAmountMap[product.purchase_id] || 0;
+        return {
+          ...product,
+          balance_amount: totalBalanceAmount.toFixed(2), // Ensure it’s formatted as a number with 2 decimal places
+        };
+      });
+  
       const expandedContent = (
         <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-          <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}> {/* Decrease font size here */}
-            <thead style={{ fontSize: "14px", fontWeight: "bold" }}> {/* Smaller font for headers */}
+          <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}>
+            <thead style={{ fontSize: "14px", fontWeight: "bold" }}>
               <tr>
                 <th>Category</th>
                 <th>Purity</th>
@@ -200,24 +226,25 @@ const RepairsTable = () => {
                 <th>Total Wt</th>
                 <th>Paid Wt</th>
                 <th>Bal Wt</th>
+                <th>Balance Amt</th> {/* New Column */}
                 <th>Tags Total</th>
                 <th>Diff</th>
                 <th>Excess/Short</th>
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody style={{ fontSize: "14px" }}> {/* Smaller font for body */}
-              {productBalances.map((product, idx) => {
+            <tbody style={{ fontSize: "14px" }}>
+              {productsWithBalanceAmt.map((product, idx) => {
                 const balPcs = product.balance?.bal_pcs || 0;
                 const balGrossWeight = product.balance?.bal_gross_weight || 0;
-
+  
                 const isTagEntryDisabled =
                   product.Pricing === "By Weight"
                     ? balPcs === 0 || balGrossWeight === 0
                     : product.Pricing === "By Fixed"
-                      ? balPcs === 0
-                      : false;
-
+                    ? balPcs === 0
+                    : false;
+  
                 return (
                   <tr key={idx}>
                     <td>{product.category}</td>
@@ -237,6 +264,7 @@ const RepairsTable = () => {
                         ((Number(product.paid_pure_weight) || 0) + (Number(product.paid_wt) || 0)))
                         .toFixed(3)}
                     </td>
+                    <td>{product.balance_amount || "0.00"}</td> {/* Display summed Balance Amt */}
                     <td></td>
                     <td></td>
                     <td></td>
@@ -248,7 +276,7 @@ const RepairsTable = () => {
                           backgroundColor: "#a36e29",
                           borderColor: "#a36e29",
                           padding: "0.25rem 0.5rem",
-                          fontSize: "0.75rem", // Decrease button font size
+                          fontSize: "0.75rem",
                           marginRight: "5px",
                         }}
                         onClick={() => handleOpenTagModal(product)}
@@ -256,12 +284,12 @@ const RepairsTable = () => {
                       >
                         Tag Entry
                       </button>
-
+  
                       <Button
                         style={{
                           backgroundColor: "#28a745",
                           borderColor: "#28a745",
-                          fontSize: "0.75rem", // Decrease button font size
+                          fontSize: "0.75rem",
                           padding: "0.25rem 0.5rem",
                           marginRight: "5px",
                         }}
@@ -269,12 +297,12 @@ const RepairsTable = () => {
                       >
                         Add RateCut
                       </Button>
-
+  
                       <Button
                         style={{
                           backgroundColor: "#28a745",
                           borderColor: "#28a745",
-                          fontSize: "0.75rem", // Decrease button font size
+                          fontSize: "0.75rem",
                           padding: "0.25rem 0.5rem",
                         }}
                         onClick={() => handleAddPayment(product)}
@@ -289,9 +317,7 @@ const RepairsTable = () => {
           </Table>
         </div>
       );
-
-
-
+  
       setData((prevData) =>
         prevData.map((item, index) =>
           index === rowIndex ? { ...item, expandedContent } : item
@@ -301,7 +327,7 @@ const RepairsTable = () => {
       console.error("Error fetching purchase details:", error);
     }
   };
-
+  
   const handleCloseModal = () => {
     setShowModal(false);
     setPurchaseDetails(null);
