@@ -199,19 +199,41 @@ const RepairsTable = () => {
 
   const toggleRowExpansion = async (rowId, rowIndex, invoice) => {
     setExpandedRows((prev) => {
-      const isExpanding = !prev[rowId];
-      if (isExpanding) {
-        handleExpandedDetails(rowIndex, invoice);
-      } else {
-        setData((prevData) =>
-          prevData.map((item) =>
-            item.invoice === invoice ? { ...item, expandedContent: null } : item
-          )
-        );
-      }
-      return { [rowId]: isExpanding };
+        const isExpanding = !prev[rowId];
+
+        if (isExpanding) {
+            // Store only the new expanded invoice
+            localStorage.setItem("expandedInvoice", JSON.stringify({ invoice, rowIndex }));
+            handleExpandedDetails(rowIndex, invoice);
+        } else {
+            // Remove from localStorage when collapsing
+            localStorage.removeItem("expandedInvoice");
+            setData((prevData) =>
+                prevData.map((item) =>
+                    item.invoice === invoice ? { ...item, expandedContent: null } : item
+                )
+            );
+        }
+
+        // Ensure only one row is expanded at a time
+        return { [rowId]: isExpanding };
     });
-  };
+};
+
+
+useEffect(() => {
+  const storedData = localStorage.getItem("expandedInvoice");
+  if (storedData) {
+      const { invoice, rowIndex } = JSON.parse(storedData);
+      if (invoice) {
+          // Expand the row stored in localStorage
+          handleExpandedDetails(rowIndex, invoice);
+          setExpandedRows({ [invoice]: true });
+      }
+  }
+}, []);
+
+
 
   const handleExpandedDetails = async (rowIndex, invoice) => {
     try {
@@ -268,8 +290,8 @@ const RepairsTable = () => {
               {productBalances.map((product, idx) => {
                 const balPcs = product.balance?.bal_pcs || 0;
                 const balGrossWeight = product.balance?.bal_gross_weight || 0;
-                const tagTotal = tagTotals[product.tag_id] || 0; // Get tag total for this tag_id
-                const diff = parseFloat(product.gross_weight) - tagTotal; // Calculate Diff
+                const tagTotal = tagTotals[product.tag_id] || 0; 
+                const diff = parseFloat(product.gross_weight) - tagTotal; 
 
                 const isTagEntryDisabled =
                   product.Pricing === "By Weight"
@@ -332,7 +354,8 @@ const RepairsTable = () => {
                         }}
                         onClick={() => handleAddRateCut(product)}
                       >
-                        Add RateCut
+                        {/* Add  */}
+                        RateCut
                       </Button>
 
                       <Button
@@ -344,7 +367,8 @@ const RepairsTable = () => {
                         }}
                         onClick={() => handleAddPayment(product)}
                       >
-                        Add Payment
+                        {/* Add  */}
+                        Payment
                       </Button>
                     </td>
                   </tr>

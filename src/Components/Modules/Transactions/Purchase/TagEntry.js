@@ -590,12 +590,27 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 updatedData.mrp_price = ((pieaceCost / (100 + taxPercent)) * 100).toFixed(2);
             }
 
-
             if (field === "pieace_cost" || field === "pcs") {
                 const pcs = parseFloat(field === "pcs" ? value : prevData.pcs) || 0;
                 const pieaceCost = parseFloat(field === "pieace_cost" ? value : prevData.pieace_cost) || 0;
                 updatedData.total_pcs_cost = (pcs * pieaceCost).toFixed(2);
             }
+
+            // If user enters MRP Price, update pieace_cost and total_pcs_cost
+            if (field === "mrp_price") {
+                const mrpPrice = parseFloat(value) || 0;
+                const taxPercent = parseFloat(prevData.tax_percent) || 0;
+
+                // Calculate Pieace Cost
+                const pieaceCost = (mrpPrice * taxPercent / 100) + mrpPrice;
+                updatedData.pieace_cost = pieaceCost.toFixed(2);
+
+                // Update Total Pcs Cost
+                const pcs = parseFloat(prevData.pcs) || 0;
+                updatedData.total_pcs_cost = (pcs * pieaceCost).toFixed(2);
+            }
+
+
 
 
             return updatedData;
@@ -655,11 +670,51 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
     const isSilverOrGold = /silver|gold/i.test(formData.category);
 
+
+    const isGeneratePDFRef = useRef(isGeneratePDF); // Create a ref to track latest state
+
+    useEffect(() => {
+        isGeneratePDFRef.current = isGeneratePDF; // Update ref whenever state changes
+    }, [isGeneratePDF]);
+
     useEffect(() => {
         const handleKeyPress = (event) => {
-            if (event.altKey && event.key.toLowerCase() === 's') {
-                event.preventDefault(); // Prevent any default browser behavior
-                handleSubmit(); // Call submit without an event
+            if (event.altKey && event.key.toLowerCase() === "s") {
+                event.preventDefault(); // Prevent default behavior
+                console.log("Alt + S detected, submitting form...");
+
+                // Ensure latest values are used
+                const pcsValue = parseFloat(formData.pcs) || 0;
+                const grossWeightValue = parseFloat(formData.Gross_Weight) || 0;
+
+                console.log("PCS:", pcsValue, "Gross Weight:", grossWeightValue);
+
+                if (formData.Pricing === "By fixed" && pcsValue <= 0) {
+                    alert("The product's PCS must be greater than zero to submit the form.");
+                    return;
+                }
+
+                if (formData.Pricing === "By fixed" && (!formData.pieace_cost || parseFloat(formData.pieace_cost) <= 0)) {
+                    alert("Please enter a Piece Cost.");
+                    return;
+                }
+
+                if (formData.Pricing !== "By fixed" && (pcsValue <= 0 || grossWeightValue <= 0)) {
+                    alert("The product's PCS and Gross Weight must be greater than zero to submit the form.");
+                    return;
+                }
+
+                if (!formData.sub_category || !formData.subcategory_id) {
+                    alert("Please select a valid sub-category before submitting.");
+                    return;
+                }
+
+                if (formData.Pricing === "By Weight" && !formData.Gross_Weight) {
+                    alert("Please add Gross Weight");
+                    return;
+                }
+
+                handleSubmit(); // Call submit function after validations
             }
         };
 
@@ -667,7 +722,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         return () => {
             window.removeEventListener("keydown", handleKeyPress);
         };
-    }, []);
+    }, [formData]);
 
     // const captureImage = () => {
     //     if (webcamRef.current) {
@@ -775,8 +830,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
             setIsEditMode(false); // Reset edit mode
 
-            // Generate PDF if checkbox is checked
-            if (isGeneratePDF) {
+            // Use ref to check latest isGeneratePDF value
+            if (isGeneratePDFRef.current) {
                 generateAndDownloadPDF(updatedData);
             }
 
@@ -1117,11 +1172,11 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 setData(filteredData);
             } else {
                 console.error("Unexpected API response format:", jsonData);
-                setData([]); 
+                setData([]);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
-            setData([]); 
+            setData([]);
         } finally {
             setLoading(false);
         }
@@ -1131,8 +1186,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     }, [selectedProduct]);
 
     const handleEdit = (rowData) => {
-        setFormData(rowData); 
-        setIsEditMode(true);  
+        setFormData(rowData);
+        setIsEditMode(true);
         setImage(rowData.image || "");
     };
 
