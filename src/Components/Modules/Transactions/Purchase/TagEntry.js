@@ -92,6 +92,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         size: "",
         tag_weight: "",
         pcs: "1",
+        MC_Per_Gram_Label:"",
     });
     const [show, setShow] = useState(false);
     const [showPurchase, setShowPurchase] = useState(false);
@@ -1186,7 +1187,16 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         setFormData(rowData);
         setIsEditMode(true);
         setImage(rowData.image || "");
+    
+        // Check if Making_Charges_On is "MC %" and set MC_Per_Gram_Label accordingly
+        if (rowData.Making_Charges_On === "MC %") {
+            setFormData((prevData) => ({
+                ...prevData,
+                MC_Per_Gram_Label: "MC%",
+            }));
+        }
     };
+    
 
     const handleDelete = async (id) => {
         console.log("Deleting ID:", id); // Confirming ID before sending request
@@ -1702,7 +1712,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
                                                         <Col xs={12} md={2}>
                                                             <InputField
-                                                                label={formData.pur_MC_Per_Gram_Label}
+                                                                label={formData.MC_Per_Gram_Label}
                                                                 name="pur_MC_Per_Gram"
                                                                 value={formData.pur_MC_Per_Gram}
                                                                 onChange={handleChange}
