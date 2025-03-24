@@ -1329,7 +1329,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                 value={formData.sub_category}
                                                 onChange={handleChange}
                                                 options={subCategories.map((category) => ({
-                                                    value: category.subcategory_id,
+                                                    value: category.sub_category_name,
                                                     label: category.sub_category_name,
                                                 }))}
                                                 autoFocus
