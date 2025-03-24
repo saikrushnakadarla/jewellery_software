@@ -26,10 +26,17 @@ const RepairForm = () => {
 
     const [isEditable, setIsEditable] = useState(false); // Toggle edit mode
     const [rateCuts, setRateCuts] = useState([]);
+    
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => {
             let updatedData = { ...prevData, [name]: value };
+    
+            // Validate rate_cut_wt should not be greater than total_pure_wt
+            if (name === "rate_cut_wt" && parseFloat(value) > parseFloat(prevData.total_pure_wt)) {
+                alert("Rate Cut Weight cannot be greater than Total Pure Weight.");
+                return prevData; // Prevent state update if invalid
+            }
     
             // Auto-calculate rate_cut_amt
             if (updatedData.rate_cut_wt && updatedData.rate_cut) {
@@ -53,6 +60,7 @@ const RepairForm = () => {
             return updatedData;
         });
     };
+    
     
 
     const handleBack = () => {

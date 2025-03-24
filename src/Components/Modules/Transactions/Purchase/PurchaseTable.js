@@ -57,13 +57,13 @@ const RepairsTable = () => {
         accessor: 'overall_taxAmt',
       },
       {
-        Header: 'Final Amount',
-        accessor: 'overall_netAmt',
-      },
-      {
         Header: 'HM Charges',
         accessor: 'overall_hmCharges',
       },
+      {
+        Header: 'Final Amount',
+        accessor: 'overall_netAmt',
+      },  
       {
         Header: 'Actions',
         accessor: 'actions',

@@ -664,8 +664,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             }
         }
 
-
-
     };
 
     const isSilverOrGold = /silver|gold/i.test(formData.category);
@@ -765,8 +763,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         setImage(null);
     };
 
-
-
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
 
@@ -799,12 +795,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         try {
             const currentSuffix = parseInt(formData.suffix || "001", 10);
             const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
-
-            const updatedGrossWeight = -parseFloat(formData.Gross_Weight || 0);
-            const updatedPcs = -1;
-
             const prev = {
-                item_prefix: "", // Adjust as needed
+                item_prefix: "", 
             };
 
             const updatedData = { ...formData, image };
@@ -842,41 +834,48 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             setStoneList([]);
             setPurchaseStoneList([]);
 
-            setFormData((prevData) => ({
-                ...prevData,
-                tag_id: selectedProduct.tag_id,
-                product_id: selectedProduct.product_id,
-                category: selectedProduct.category,
-                Pricing: selectedProduct.Pricing,
-                metal_type: selectedProduct.metal_type,
-                sub_category: "",
-                PCode_BarCode: `${prev?.item_prefix || ""}${nextSuffix}`,
-                suffix: nextSuffix,
-                Gross_Weight: "",
-                Stones_Weight: "",
-                Stones_Price: "",
-                deduct_st_Wt: "Yes",
-                Weight_BW: "",
-                Wastage_On: "Gross Weight",
-                WastageWeight: "",
-                Status: "Available",
-                Source: "Purchase",
-                Making_Charges_On: prevData.Making_Charges_On, // Preserve value
-                MC_Per_Gram_Label: prevData.MC_Per_Gram_Label, // Preserve value
-                pur_MC_Per_Gram_Label: prevData.MC_Per_Gram_Label, // Preserve value
-                Design_Master: selectedProduct.design_name,
-                pur_Gross_Weight: "",
-                pur_Stones_Weight: "",
-                pur_Stones_Price: "",
-                pur_deduct_st_Wt: "Yes",
-                pur_Weight_BW: "",
-                pur_WastageWeight: "",
-                pur_Wastage_On: "Gross Weight",
-                pcs: "1",
-                pieace_cost: "",
-                mrp_price: "",
-                total_pcs_cost: "",
-            }));
+            if (formData.sub_category) {
+                const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+                    params: { prefix: formData.item_prefix },
+                });
+                const nextPCodeBarCode = response.data.nextPCodeBarCode;
+    
+                setFormData((prevData) => ({
+                    ...prevData,
+                    PCode_BarCode: nextPCodeBarCode,
+                    suffix: nextPCodeBarCode.replace(formData.item_prefix, ""), // Extract numeric suffix
+                    tag_id: selectedProduct.tag_id,
+                    product_id: selectedProduct.product_id,
+                    category: selectedProduct.category,
+                    Pricing: selectedProduct.Pricing,
+                    metal_type: selectedProduct.metal_type,
+                    Gross_Weight: "",
+                    Stones_Weight: "",
+                    Stones_Price: "",
+                    deduct_st_Wt: "Yes",
+                    Weight_BW: "",
+                    Wastage_On: "Gross Weight",
+                    WastageWeight: "",
+                    Status: "Available",
+                    Source: "Purchase",
+                    pur_Gross_Weight: "",
+                    pur_Stones_Weight: "",
+                    pur_Stones_Price: "",
+                    pur_deduct_st_Wt: "Yes",
+                    pur_Weight_BW: "",
+                    pur_WastageWeight: "",
+                    pur_Wastage_On: "Gross Weight",
+                    pcs: "1",
+                    pieace_cost: "",
+                    mrp_price: "",
+                    total_pcs_cost: ""
+                }));
+                setImage(null);
+            } else {
+                
+                setFormData({
+                });
+            }
             setImage(null);
 
             fetchTagData();
@@ -887,8 +886,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             alert("An error occurred. Please try again.");
         }
     };
-
-
 
     const generateAndDownloadPDF = async (data) => {
         const doc = new jsPDF();
@@ -925,8 +922,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             console.error("Error generating QR Code PDF:", error);
         }
     };
-
-
 
     useEffect(() => {
         const getLastPcode = async () => {
@@ -1149,10 +1144,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         }
     }, [formData.metal_type]);
 
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    const [isEditMode, setIsEditMode] = useState(false); // State to toggle form visibility
 
     const fetchTagData = async () => {
         try {
@@ -1185,6 +1177,11 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         fetchTagData();
     }, [selectedProduct]);
 
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const [isEditMode, setIsEditMode] = useState(false); 
+
     const handleEdit = (rowData) => {
         setFormData(rowData);
         setIsEditMode(true);
@@ -1214,35 +1211,52 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         }
     };
 
-    const exportToExcel = () => {
+    const exportToExcel = (event) => {
+        event.preventDefault(); // Prevent form submission if inside a form
+    
         if (data.length === 0) {
             alert("No data available to export.");
             return;
         }
-
-        const worksheet = XLSX.utils.json_to_sheet(
-            data.map((item, index) => ({
-                "SI": index + 1,
-                "Barcode": item.PCode_BarCode,
-                "Category": item.category,
-                "Sub Category": item.sub_category,
-                "Design Name": item.design_master,
-                "Gross Wt": item.Gross_Weight,
-                "Stone Wt": item.Stones_Weight,
-                "Wt BW": item.Weight_BW,
-                "W.Wt": item.WastageWeight,
-                "Total Wt": item.TotalWeight_AW,
-                "Supplier Name": item.account_name,
-                "Purity": item.Purity,
-                // "Image URL": item.image || "No Image"
-            }))
-        );
-
+    
+        const worksheetData = data.map((item, index) => ({
+            "SI": index + 1,
+            "Supplier Name": item.account_name,
+            "Barcode": item.PCode_BarCode,
+            "Category": item.category,
+            "Sub Category": item.sub_category,
+            "Design Name": item.design_master,
+            "Purity": item.Purity,
+            "Pcs": item.pcs,
+            "Gross Wt": item.Gross_Weight,            
+            "Stone Wt": item.Stones_Weight,
+            "Wt BW": item.Weight_BW,
+            "W.Wt": item.WastageWeight,
+            "Total Wt": item.TotalWeight_AW,
+            "MC On": item.Making_Charges_On,
+            "Total MC": item.Making_Charges,
+            "Piece Cost": item.pieace_cost,    
+        }));
+    
+        const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+    
+        // Auto-adjust column width
+        const columnWidths = Object.keys(worksheetData[0]).map((key) => ({
+            wch: Math.max(
+                key.length,
+                ...worksheetData.map(row => row[key] ? row[key].toString().length : 0)
+            ) + 2
+        }));
+    
+        worksheet["!cols"] = columnWidths;
+    
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
+    
         XLSX.writeFile(workbook, "TagDetails.xlsx");
     };
+    
+    
 
 
     return (
