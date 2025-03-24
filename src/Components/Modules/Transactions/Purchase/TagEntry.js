@@ -466,6 +466,51 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             field = fieldOrEvent;
             value = valueArg;
         }
+
+        if (field === "sub_category") {
+            const selectedCategory = subCategories.find(
+                (category) => category.sub_category_name === value
+            );
+    
+            if (selectedCategory) {
+                const newPrefix = selectedCategory.prefix;
+    
+                try {
+                    const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+                        params: { prefix: newPrefix },
+                    });
+    
+                    const nextPCodeBarCode = response.data.nextPCodeBarCode; // e.g., GRN002
+    
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        sub_category: selectedCategory.sub_category_name, // Store selected sub_category_name
+                        subcategory_id: selectedCategory.subcategory_id, // Store subcategory_id
+                        item_prefix: newPrefix,
+                        Prefix: newPrefix,
+                        PCode_BarCode: nextPCodeBarCode,
+                        suffix: nextPCodeBarCode.replace(newPrefix, ""), // Extract numeric suffix
+                    }));
+                } catch (error) {
+                    console.error("Error fetching PCode_BarCode:", error);
+                }
+            } else {
+                setFormData((prevData) => ({
+                    ...prevData,
+                    sub_category: "",
+                    subcategory_id: "",
+                    item_prefix: "",
+                    Prefix: "",
+                    PCode_BarCode: "",
+                }));
+            }
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [field]: value,
+            }));
+        }
+
         setFormData((prevData) => {
             let updatedData = { ...prevData, [field]: value };
 
@@ -610,10 +655,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 const pcs = parseFloat(prevData.pcs) || 0;
                 updatedData.total_pcs_cost = (pcs * pieaceCost).toFixed(2);
             }
-
-
-
-
             return updatedData;
         });
 
@@ -625,46 +666,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             }));
             return;
         }
-
-        // --- Handle Sub-Category Change and Fetch Prefix/PCode_BarCode ---
-        if (field === "sub_category") {
-            const selectedCategory = subCategories.find(
-                (category) => category.subcategory_id === parseInt(value)
-            );
-
-            const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-            if (newPrefix) {
-                try {
-                    const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
-                        params: { prefix: newPrefix },
-                    });
-                    const nextPCodeBarCode = response.data.nextPCodeBarCode;
-                    const nextSuffix = nextPCodeBarCode.replace(newPrefix, ""); // Extract numeric suffix
-
-                    setFormData((prevData) => ({
-                        ...prevData,
-                        sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
-                        subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
-                        item_prefix: newPrefix,
-                        Prefix: newPrefix,
-                        PCode_BarCode: nextPCodeBarCode,
-                        suffix: nextSuffix, // Store suffix properly
-                    }));
-                } catch (error) {
-                    console.error("Error fetching PCode_BarCode:", error);
-                }
-            } else {
-                setFormData((prevData) => ({
-                    ...prevData,
-                    sub_category: selectedCategory ? selectedCategory.sub_category_name : "",
-                    subcategory_id: selectedCategory ? selectedCategory.subcategory_id : "",
-                    item_prefix: "",
-                    Prefix: "",
-                    PCode_BarCode: "",
-                }));
-            }
-        }
-
     };
 
     const isSilverOrGold = /silver|gold/i.test(formData.category);
@@ -796,6 +797,10 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         try {
             const currentSuffix = parseInt(formData.suffix || "001", 10);
             const nextSuffix = (currentSuffix + 1).toString().padStart(3, "0");
+
+            // const updatedGrossWeight = -parseFloat(formData.Gross_Weight || 0);
+            // const updatedPcs = -1;
+
             const prev = {
                 item_prefix: "", 
             };
@@ -836,20 +841,61 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             setPurchaseStoneList([]);
 
             if (formData.sub_category) {
-                const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
-                    params: { prefix: formData.item_prefix },
-                });
-                const nextPCodeBarCode = response.data.nextPCodeBarCode;
-    
-                setFormData((prevData) => ({
-                    ...prevData,
-                    PCode_BarCode: nextPCodeBarCode,
-                    suffix: nextPCodeBarCode.replace(formData.item_prefix, ""), // Extract numeric suffix
-                    tag_id: selectedProduct.tag_id,
-                    product_id: selectedProduct.product_id,
-                    category: selectedProduct.category,
-                    Pricing: selectedProduct.Pricing,
-                    metal_type: selectedProduct.metal_type,
+                try {
+                    // **Fetch new barcode first before resetting the form**
+                    const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+                        params: { prefix: formData.item_prefix },
+                    });
+                    const nextPCodeBarCode = response.data.nextPCodeBarCode;
+            
+                    // **Now reset form with the new PCode_BarCode**
+                    setFormData((prevData) => ({
+                        ...prevData, // Use prevData correctly inside the setState function
+                        PCode_BarCode: nextPCodeBarCode,
+                        suffix: nextPCodeBarCode.replace(formData.item_prefix, ""), // Extract numeric suffix
+                        tag_id: selectedProduct?.tag_id || "",
+                        product_id: selectedProduct?.product_id || "",
+                        category: selectedProduct?.category || "",
+                        Pricing: selectedProduct?.Pricing || "",
+                        metal_type: selectedProduct?.metal_type || "",
+                        Gross_Weight: "",
+                        Stones_Weight: "",
+                        Stones_Price: "",
+                        deduct_st_Wt: "Yes",
+                        Weight_BW: "",
+                        Wastage_On: "Gross Weight",
+                        WastageWeight: "",
+                        Making_Charges_On: prevData.Making_Charges_On, // Preserve value
+                        MC_Per_Gram_Label: prevData.MC_Per_Gram_Label, // Preserve value
+                        pur_MC_Per_Gram_Label: prevData.MC_Per_Gram_Label, // Preserve value
+                        Status: "Available",
+                        Source: "Purchase",
+                        pur_Gross_Weight: "",
+                        pur_Stones_Weight: "",
+                        pur_Stones_Price: "",
+                        pur_deduct_st_Wt: "Yes",
+                        pur_Weight_BW: "",
+                        pur_WastageWeight: "",
+                        pur_Wastage_On: "Gross Weight",
+                        pcs: "1",
+                        pieace_cost: "",
+                        mrp_price: "",
+                        total_pcs_cost: "",
+                    }));
+                    setImage(null);
+                } catch (error) {
+                    console.error("Error fetching PCode_BarCode:", error);
+                }
+            } else {
+                // Reset the form fields completely
+                setFormData({
+                    PCode_BarCode: "",
+                    suffix: "",
+                    tag_id: "",
+                    product_id: "",
+                    category: "",
+                    Pricing: "",
+                    metal_type: "",
                     Gross_Weight: "",
                     Stones_Weight: "",
                     Stones_Price: "",
@@ -869,14 +915,11 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                     pcs: "1",
                     pieace_cost: "",
                     mrp_price: "",
-                    total_pcs_cost: ""
-                }));
-                setImage(null);
-            } else {
-                
-                setFormData({
+                    total_pcs_cost: "",
                 });
             }
+            
+    
             setImage(null);
 
             fetchTagData();
@@ -887,6 +930,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             alert("An error occurred. Please try again.");
         }
     };
+
+
 
     const generateAndDownloadPDF = async (data) => {
         const doc = new jsPDF();
@@ -923,6 +968,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             console.error("Error generating QR Code PDF:", error);
         }
     };
+
+
 
     useEffect(() => {
         const getLastPcode = async () => {
@@ -1019,6 +1066,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 (subCategory) => subCategory.category_id === selectedProduct.product_id
             );
             setSubCategories(filteredSubCategories);
+            console.log("filteredSubCategories=",filteredSubCategories)
         } catch (error) {
             console.error("Error fetching subcategories:", error);
         }
@@ -1145,7 +1193,10 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         }
     }, [formData.metal_type]);
 
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
+    const [isEditMode, setIsEditMode] = useState(false); // State to toggle form visibility
 
     const fetchTagData = async () => {
         try {
@@ -1178,11 +1229,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         fetchTagData();
     }, [selectedProduct]);
 
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    const [isEditMode, setIsEditMode] = useState(false); 
-
     const handleEdit = (rowData) => {
         setFormData(rowData);
         setIsEditMode(true);
@@ -1196,7 +1242,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             }));
         }
     };
-    
 
     const handleDelete = async (id) => {
         console.log("Deleting ID:", id); // Confirming ID before sending request

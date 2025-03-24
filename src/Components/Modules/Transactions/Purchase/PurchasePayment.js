@@ -27,7 +27,7 @@ const RepairForm = () => {
         bal_amt: "",
         remarks: "",
         rate_cut_id: "",
-        paid_by:"",
+        paid_by: "",
     });
 
     const [purchases, setPurchases] = useState([]);
@@ -36,44 +36,54 @@ const RepairForm = () => {
     const [invoiceOptions, setInvoiceOptions] = useState([]);
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [rateCutOptions, setRateCutOptions] = useState([]);
+    const [rateCutIdOptions, setRateCutIdOptions] = useState([]);
 
-      useEffect(() => {
+    useEffect(() => {
         const fetchLastPaymentNumber = async () => {
-          try {
-            const response = await axios.get(`${baseURL}/lastPaymentNumber`);
-            // setFormData(prev => ({ ...prev, payment_no: response.data.lastPaymentNumber }));
-            setFormData((prev) => ({
-              ...prev,
-              payment_no:response.data.lastPaymentNumber,
-            }));
-          } catch (error) {
-            console.error("Error fetching invoice_number number:", error);
-          }
+            try {
+                const response = await axios.get(`${baseURL}/lastPaymentNumber`);
+                // setFormData(prev => ({ ...prev, payment_no: response.data.lastPaymentNumber }));
+                setFormData((prev) => ({
+                    ...prev,
+                    payment_no: response.data.lastPaymentNumber,
+                }));
+            } catch (error) {
+                console.error("Error fetching invoice_number number:", error);
+            }
         };
-    
+
         fetchLastPaymentNumber();
-      }, []);
+    }, []);
 
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         let updatedFormData = { ...formData, [name]: value };
-    
+
+        if (name === "rate_cut_id" && value === "") {
+            updatedFormData = {
+                ...updatedFormData,
+                rate_cut: "",
+                total_amt: "",
+                total_wt: ""
+            };
+        }
+
         if (name === "paid_amt") {
             const paidAmt = parseFloat(value) || 0;
             const rateCut = parseFloat(formData.rate_cut) || 1; // Prevent division by zero
             const totalAmt = parseFloat(formData.total_amt) || 0;
             const totalWt = parseFloat(formData.total_wt) || 0;
-    
+
             if (paidAmt > totalAmt) {
                 alert("Paid Amount cannot be greater than Outstanding Amount!");
                 return;
             }
-    
+
             const paidWt = (paidAmt / rateCut).toFixed(3);
             const balAmt = totalAmt - paidAmt;
             const balWt = (totalWt - paidWt).toFixed(3);
-    
+
             updatedFormData = {
                 ...updatedFormData,
                 bal_amt: balAmt,
@@ -82,22 +92,22 @@ const RepairForm = () => {
                 paid_by: "By Amount"  // Set paid_by value
             };
         }
-    
+
         else if (name === "paid_wt") {
             const paidWt = parseFloat(value) || 0;
             const rateCut = parseFloat(formData.rate_cut) || 1; // Prevent multiplication errors
             const totalAmt = parseFloat(formData.total_amt) || 0;
             const totalWt = parseFloat(formData.total_wt) || 0;
-    
+
             if (paidWt > totalWt) {
                 alert("Paid Weight cannot be greater than Outstanding Weight!");
                 return;
             }
-    
+
             const paidAmt = paidWt * rateCut;
             const balAmt = totalAmt - paidAmt;
             const balWt = (totalWt - paidWt).toFixed(3);
-    
+
             updatedFormData = {
                 ...updatedFormData,
                 bal_amt: balAmt,
@@ -106,10 +116,10 @@ const RepairForm = () => {
                 paid_by: "By Weight"  // Set paid_by value
             };
         }
-    
+
         setFormData(updatedFormData);
     };
-    
+
     useEffect(() => {
         const fetchAccountNames = async () => {
             try {
@@ -192,42 +202,49 @@ const RepairForm = () => {
 
     useEffect(() => {
         if (formData.invoice && formData.category) {
-            const matchingRateCuts = rateCuts
-                .filter(
-                    (rateCut) =>
-                        rateCut.invoice === formData.invoice &&
-                        rateCut.category === formData.category
-                )
-                .map((rateCut) => rateCut.rate_cut);
+            const matchingRateCuts = rateCuts.filter(
+                (rateCut) =>
+                    rateCut.invoice === formData.invoice &&
+                    rateCut.category === formData.category
+            );
 
             setRateCutOptions(
-                matchingRateCuts.map((rate) => ({
-                    label: rate.toString(),
-                    value: rate,
+                matchingRateCuts.map((rateCut) => ({
+                    label: rateCut.rate_cut.toString(),
+                    value: rateCut.rate_cut,
+                }))
+            );
+
+            setRateCutIdOptions(
+                matchingRateCuts.map((rateCut) => ({
+                    label: rateCut.rate_cut_id?.toString() || "", // Ensure it's a string
+                    value: rateCut.rate_cut_id || "",
                 }))
             );
         }
     }, [formData.invoice, formData.category, rateCuts]);
 
+
     useEffect(() => {
-        if (formData.invoice && formData.category && formData.rate_cut) {
+        if (formData.invoice && formData.category && formData.rate_cut_id) {
             const matchingRateCut = rateCuts.find(
                 (rateCut) =>
                     rateCut.invoice === formData.invoice &&
                     rateCut.category === formData.category &&
-                    rateCut.rate_cut === formData.rate_cut
+                    rateCut.rate_cut_id === formData.rate_cut_id
             );
+            console.log("matchingRateCut=",matchingRateCut)
 
             if (matchingRateCut) {
                 setFormData((prevState) => ({
                     ...prevState,
-                    rate_cut_id: matchingRateCut.rate_cut_id,
+                    rate_cut: matchingRateCut.rate_cut,
                     total_amt: matchingRateCut.balance_amount,
                     total_wt: matchingRateCut.bal_wt,
                 }));
             }
         }
-    }, [formData.invoice, formData.category, formData.rate_cut, rateCuts]);
+    }, [formData.invoice, formData.category, formData.rate_cut_id, rateCuts]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -253,7 +270,7 @@ const RepairForm = () => {
                 bal_amt: "",
                 remarks: "",
                 rate_cut_id: "",
-                paid_by:"",
+                paid_by: "",
             });
             navigate("/purchasetable");
         } catch (error) {
@@ -346,6 +363,16 @@ const RepairForm = () => {
                     </Col>
                     <Col xs={12} md={2}>
                         <InputField
+                            label="Rate Cut Id"
+                            type="select"
+                            name="rate_cut_id"
+                            value={formData.rate_cut_id}
+                            onChange={handleInputChange}
+                            options={rateCutIdOptions}
+                        />
+                    </Col>
+                    {/* <Col xs={12} md={2}>
+                        <InputField
                             label="Rate Cut"
                             type="select"
                             name="rate_cut"
@@ -354,17 +381,19 @@ const RepairForm = () => {
                             options={rateCutOptions}
                         >
                         </InputField>
-                    </Col>
-                    {/* <Col xs={12} md={2}>
-                        <InputField
-                            label="Out Standing Amt"
-                            type="number"
-                            name="rate_cut_id"
-                            value={formData.rate_cut_id}
-                            onChange={handleInputChange}
-                            readOnly
-                        />
                     </Col> */}
+                    <Col xs={12} md={2}>
+                        <InputField
+                            label="Rate Cut"
+                            // type="select"
+                            name="rate_cut"
+                            value={formData.rate_cut}
+                            onChange={handleInputChange}
+                            // options={rateCutOptions}
+                        >
+                        </InputField>
+                    </Col>
+                    
 
 
                     <Col xs={12} md={2}>

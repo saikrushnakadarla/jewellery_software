@@ -283,6 +283,7 @@ const RepairsTable = () => {
                 <th>Paid Wt</th>
                 <th>Bal Wt</th>
                 <th>Bal Amt</th>
+                <th>Rate/Piece Cost</th>
                 <th>Tags Total</th>
                 <th>Diff</th>
                 <th>Excess/Short</th>
@@ -324,6 +325,7 @@ const RepairsTable = () => {
                         .toFixed(3)}
                     </td>
                     <td>{getBalanceAmountForProduct(product.id)}</td>
+                    <td>{product.rate}</td>
                     <td>{tagTotal.toFixed(3)}</td> {/* Display Tags Total */}
                     <td>{diff.toFixed(3)}</td> {/* Display Difference */}
                     <td>
