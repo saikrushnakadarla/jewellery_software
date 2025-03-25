@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/ExpandedTable';
 import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
-import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
+import { Button, Row, Col, Modal, Table, Form } from 'react-bootstrap';
 import axios from 'axios';
 import TagEntry from "./TagEntry";
 import baseURL from '../../../../Url/NodeBaseURL';
@@ -63,7 +63,7 @@ const RepairsTable = () => {
       {
         Header: 'Final Amount',
         accessor: 'overall_netAmt',
-      },  
+      },
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -213,7 +213,6 @@ const RepairsTable = () => {
     });
   };
 
-
   useEffect(() => {
     const storedData = localStorage.getItem("expandedInvoice");
     if (storedData) {
@@ -250,12 +249,21 @@ const RepairsTable = () => {
 
       // Calculate total Gross Weight for each tag_id
       const tagTotals = {};
+      const taggedPcs = {};
       if (tagData?.result) {
         tagData.result.forEach((entry) => {
           if (!tagTotals[entry.tag_id]) {
             tagTotals[entry.tag_id] = 0;
           }
           tagTotals[entry.tag_id] += parseFloat(entry.Gross_Weight) || 0;
+        });
+      }
+      if (tagData?.result) {
+        tagData.result.forEach((entry) => {
+          if (!taggedPcs[entry.tag_id]) {
+            taggedPcs[entry.tag_id] = 0;
+          }
+          taggedPcs[entry.tag_id] += parseFloat(entry.pcs) || 0;
         });
       }
 
@@ -284,6 +292,7 @@ const RepairsTable = () => {
                 <th>Bal Wt</th>
                 <th>Bal Amt</th>
                 <th>Rate/Piece Cost</th>
+                <th>Tagged Pcs</th>
                 <th>Tags Total</th>
                 <th>Diff</th>
                 <th>Excess/Short</th>
@@ -296,6 +305,7 @@ const RepairsTable = () => {
                 const balPcs = product.balance?.bal_pcs || 0;
                 const balGrossWeight = product.balance?.bal_gross_weight || 0;
                 const tagTotal = tagTotals[product.tag_id] || 0;
+                const taggedPieces = taggedPcs[product.tag_id] || 0;
                 const diff = parseFloat(product.gross_weight) - tagTotal;
 
                 const isTagEntryDisabled =
@@ -326,18 +336,29 @@ const RepairsTable = () => {
                     </td>
                     <td>{getBalanceAmountForProduct(product.id)}</td>
                     <td>{product.rate}</td>
+                    <td>{taggedPieces}</td>
                     <td>{tagTotal.toFixed(3)}</td> {/* Display Tags Total */}
                     <td>{diff.toFixed(3)}</td> {/* Display Difference */}
                     <td>
                       {parseFloat(product.gross_weight) > tagTotal ? "Short" : "Excess"}
                     </td>
-                    <td>
-                      <select
-                        style={{ width: "80px", height: "30px", fontSize: "0.80rem", padding: "0.20rem 0.5rem", }}
+                    <td onClick={() => handleClaim(product)} style={{ cursor: "pointer" }}>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        style={{
+                          backgroundColor: product.claim_remark ? "#a36e29" : "#a36e29", // Gray if claimed
+                          borderColor: product.claim_remark ? "#a36e29" : "#a36e29",
+                          padding: "0.25rem 0.5rem",
+                          fontSize: "0.75rem",
+                          marginRight: "5px",
+                          cursor: "pointer",
+                          opacity: product.claim_remark ? 0.6 : 1, // Reduce opacity if claimed
+                        }}
+                        disabled={!!product.claim_remark} // Disable button if claim_remark exists
                       >
-                        <option value="Claim">Claim</option>
-                        <option value="UnClaim">UnClaim</option>
-                      </select>
+                        {product.claim_remark ? "Claimed" : "Claim"}
+                      </button>
                     </td>
                     <td>
                       <button
@@ -401,14 +422,10 @@ const RepairsTable = () => {
     }
   };
 
-
-
   const handleCloseModal = () => {
     setShowModal(false);
     setPurchaseDetails(null);
   };
-
-
 
   const handleViewDetails = async (invoice) => {
     try {
@@ -535,6 +552,50 @@ const RepairsTable = () => {
     setShowTagModal(false);
   };
 
+  const [show, setShow] = useState(false);
+  const [remark, setRemark] = useState("");
+  const handleClaim = (product) => {
+    setSelectedProduct(product);  // Store product in state
+    setShow(true);  // Show modal
+  };
+
+  const handleClose = () => setShow(false);
+
+  const handleSubmit = async () => {
+    if (!remark) {
+      alert("Please enter a remark.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/update-remark", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: selectedProduct.id,
+          remark: remark,
+        }),
+
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Remark Updated:", data);
+        alert("Remark updated successfully!");
+        setShow(false);
+        setRemark();
+        // fetchPurchases();
+      } else {
+        console.error("Error updating remark:", data.message);
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+    }
+  };
+
+
 
   return (
     <div className="main-container">
@@ -651,6 +712,40 @@ const RepairsTable = () => {
           )}
         </Modal.Body>
       </Modal>
+
+      <Modal show={show} onHide={handleClose} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Enter Remark</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            {/* Show existing remark if available */}
+            {selectedProduct?.claim_remark && (
+              <div className="mb-2" style={{ fontWeight: "bold", }}>
+                Previous Remark: {selectedProduct.claim_remark}
+              </div>
+            )}
+
+            <Form.Group controlId="remarkInput">
+              <Form.Label>New Remark</Form.Label>
+              <Form.Control
+                type="text"
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleSubmit}>
+            Submit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
     </div>
   );
 };

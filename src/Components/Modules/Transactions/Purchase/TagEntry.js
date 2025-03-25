@@ -1407,6 +1407,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                         <InputField
                                             label="Pricing"
                                             name="Pricing"
+                                            // type="select"
+                                            value={formData.Pricing}
+                                            onChange={handleChange}
+                                            readOnly
+                                            // options={[
+                                            //     { value: "By Weight", label: "By Weight" },
+                                            //     { value: "By fixed", label: "By fixed" },
+                                            // ]}
+                                        />
+                                    </Col>
+                                    {/* <Col xs={12} md={2}>
+                                        <InputField
+                                            label="Pricing"
+                                            name="Pricing"
                                             type="select"
                                             value={formData.Pricing}
                                             onChange={handleChange}
@@ -1415,7 +1429,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                 { value: "By fixed", label: "By fixed" },
                                             ]}
                                         />
-                                    </Col>
+                                    </Col> */}
                                     {/* 
                                     {!isSilverOrGold && (
                                         <>
