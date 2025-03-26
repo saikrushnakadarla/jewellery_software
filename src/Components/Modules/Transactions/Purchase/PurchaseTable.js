@@ -276,8 +276,8 @@ const RepairsTable = () => {
 
       const expandedContent = (
         <div style={{ overflowX: "auto", maxWidth: "100%" }}>
-          <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}>
-            <thead style={{ fontSize: "14px", fontWeight: "bold" }}>
+          <Table bordered style={{ whiteSpace: "nowrap", fontSize: "13px" }}>
+            <thead style={{ fontSize: "13px", fontWeight: "bold", }}>
               <tr>
                 <th>Category</th>
                 <th>Purity</th>
@@ -292,7 +292,7 @@ const RepairsTable = () => {
                 <th>Bal Wt</th>
                 <th>Bal Amt</th>
                 <th>Rate/Piece Cost</th>
-                <th>Tagged Pcs</th>
+                <th>Tag Pcs</th>
                 <th>Tags Total</th>
                 <th>Diff</th>
                 <th>Excess/Short</th>
@@ -300,7 +300,7 @@ const RepairsTable = () => {
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody style={{ fontSize: "14px" }}>
+            <tbody style={{ fontSize: "13px" }}>
               {productBalances.map((product, idx) => {
                 const balPcs = product.balance?.bal_pcs || 0;
                 const balGrossWeight = product.balance?.bal_gross_weight || 0;
@@ -566,9 +566,9 @@ const RepairsTable = () => {
       alert("Please enter a remark.");
       return;
     }
-
+  
     try {
-      const response = await fetch("http://localhost:5000/update-remark", {
+      const response = await fetch(`${baseURL}/update-remark`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -577,16 +577,34 @@ const RepairsTable = () => {
           productId: selectedProduct.id,
           remark: remark,
         }),
-
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         console.log("Remark Updated:", data);
         alert("Remark updated successfully!");
         setShow(false);
-        setRemark();
-        // fetchPurchases();
+        setRemark("");
+  
+        // Update localStorage with new values
+        const storedData = localStorage.getItem("expandedInvoice");
+        if (storedData) {
+          let parsedData = JSON.parse(storedData);
+          parsedData.remark = remark; // Update remark in localStorage
+          localStorage.setItem("expandedInvoice", JSON.stringify(parsedData));
+        }
+  
+        // Fetch updated localStorage data and re-expand the row
+        setTimeout(() => {
+          const updatedData = localStorage.getItem("expandedInvoice");
+          if (updatedData) {
+            const { invoice, rowIndex } = JSON.parse(updatedData);
+            if (invoice) {
+              handleExpandedDetails(rowIndex, invoice);
+              setExpandedRows({ [invoice]: true });
+            }
+          }
+        }, 500);
       } else {
         console.error("Error updating remark:", data.message);
       }
@@ -737,11 +755,11 @@ const RepairsTable = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleClose} style={{ backgroundColor: 'gray', marginRight: '10px' }}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSubmit}>
-            Submit
+          <Button variant="primary" onClick={handleSubmit} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+          {selectedProduct?.claim_remark ? "Update" : "Submit"}
           </Button>
         </Modal.Footer>
       </Modal>

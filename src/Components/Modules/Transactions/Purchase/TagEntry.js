@@ -64,7 +64,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         Wastage_Percentage: "",
         Status: "Available",
         Source: "Purchase",
-        Stock_Point: "",
+        Stock_Point: "Display Floor1",
         pieace_cost: "",
         tax_percent: "",
         mrp_price: "",
@@ -1997,6 +1997,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             <th>Stone Wt</th>
                                             <th>Wt BW</th>
                                             <th>W.Wt</th>
+                                            <th>MC</th>
                                             <th>Total Wt</th>
                                             <th>Image</th>
                                             <th>Action</th>
@@ -2015,7 +2016,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                     <td>{item.Stones_Weight}</td>
                                                     <td>{item.Weight_BW}</td>
                                                     <td>{item.WastageWeight}</td>
-                                                    <td>{item.TotalWeight_AW}</td>
+                                                    <td>{item.MC_Per_Gram}</td>
+                                                    <td>{item.TotalWeight_AW}</td>                                                    
                                                     <td>
                                                         {item.image ? (
                                                             <img

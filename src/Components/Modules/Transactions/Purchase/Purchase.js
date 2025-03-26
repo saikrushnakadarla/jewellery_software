@@ -908,8 +908,8 @@ const URDPurchase = () => {
         setFormData((prev) => ({
           ...prev,
           purity: "Manual",
-          rate: "",
-          rate_cut: "",
+          rate: prev.rate || "",  // Preserve existing rate if available
+          rate_cut: prev.rate_cut || "",  // Preserve existing rate_cut if available
           Making_Charges_On: "MC %", // Reset Making Charges
         }));
         setPurityOptions([]);
@@ -926,7 +926,10 @@ const URDPurchase = () => {
         const response = await axios.get(`${baseURL}/purity`);
 
         // Determine if metal is gold or diamond
-        const isGoldOrDiamond = formData.metal_type.toLowerCase() === "gold" || formData.metal_type.toLowerCase() === "diamond" || formData.metal_type.toLowerCase() === "others";
+        const isGoldOrDiamond =
+          formData.metal_type.toLowerCase() === "gold" ||
+          formData.metal_type.toLowerCase() === "diamond" ||
+          formData.metal_type.toLowerCase() === "others";
 
         // Filter purities based on metal type
         const filteredPurity = response.data.filter((item) =>
@@ -951,9 +954,8 @@ const URDPurchase = () => {
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
-              // purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
-              rate: rates.rate_22crt,
-              rate_cut: rates.rate_22crt,
+              rate: prev.rate || rates.rate_22crt, // Preserve existing rate if available
+              rate_cut: prev.rate_cut || rates.rate_22crt, // Preserve existing rate_cut if available
               Making_Charges_On: mcType,
             }));
           }
@@ -978,9 +980,8 @@ const URDPurchase = () => {
           if (defaultOption) {
             setFormData((prev) => ({
               ...prev,
-              // purity: `${defaultOption.name} | ${defaultOption.purity_percentage}`,
-              rate: rates.silver_rate,
-              rate_cut: rates.silver_rate,
+              rate: prev.rate || rates.silver_rate, // Preserve existing rate if available
+              rate_cut: prev.rate_cut || rates.silver_rate, // Preserve existing rate_cut if available
               Making_Charges_On: mcType,
             }));
           }
@@ -990,7 +991,6 @@ const URDPurchase = () => {
 
         // Reset last updated field so future changes are not ignored
         setLastUpdatedField(null);
-
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -998,6 +998,7 @@ const URDPurchase = () => {
 
     fetchPurity();
   }, [formData.metal_type, formData.category]);
+
 
   const extractPurityPercentage = (purityValue) => {
     if (!purityValue || purityOptions.length === 0) return 0;
