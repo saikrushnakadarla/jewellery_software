@@ -840,8 +840,8 @@ useEffect(() => {
 
 
     const handleAddDesign = async () => {
-        if (!newDesign.design_name || !newDesign.metal) {
-            alert("Both Product Design Name and Metal Type are required!");
+        if (!newDesign.design_name) {
+            alert("Product Design Name required!");
             return;
         }
 
@@ -849,14 +849,15 @@ useEffect(() => {
             const response = await axios.post(`${baseURL}/designmaster`, {
                 category: newDesign.category || formData.category,
                 design_name: newDesign.design_name,
-                metal: newDesign.metal,  // Storing metal type in the DB
+                metal: newDesign.metal || formData.metal_type,  // Storing metal type in the DB
             });
 
             if (response.status === 201 || response.status === 200) {
                 alert("Product Design Name added successfully!");
-                setNewDesign({ design_name: "", metal: "", category: formData.category }); // Reset form
+                setNewDesign({ design_name: "", metal: formData.metal_type, category: formData.category }); // Reset form
                 handleCloseDesignModal(); // Close modal
             }
+            fetchDesignMaster();
         } catch (error) {
             console.error("Error adding Product Design Name:", error);
             alert("Failed to add Product Design Name. Please try again.");
@@ -1033,10 +1034,6 @@ useEffect(() => {
         }
     };
 
-
-
-
-
     const generateAndDownloadPDF = async (data) => {
         const doc = new jsPDF();
         let qrContent = "";
@@ -1072,8 +1069,6 @@ useEffect(() => {
             console.error("Error generating QR Code PDF:", error);
         }
     };
-
-
 
     useEffect(() => {
         const getLastPcode = async () => {
@@ -1208,7 +1203,7 @@ useEffect(() => {
     }, [selectedProduct]);
 
     const [designOptions, setdesignOptions] = useState([]);
-    useEffect(() => {
+
         const fetchDesignMaster = async () => {
             try {
                 const response = await axios.get(`${baseURL}/designmaster`);
@@ -1225,7 +1220,7 @@ useEffect(() => {
                 console.error('Error fetching design masters:', error);
             }
         };
-
+        useEffect(() => {
         fetchDesignMaster();
     }, []);
 
