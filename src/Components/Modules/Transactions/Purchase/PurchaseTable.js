@@ -388,12 +388,15 @@ const RepairsTable = () => {
                           fontSize: "0.75rem",
                           padding: "0.25rem 0.5rem",
                           marginRight: "5px",
+                          opacity: product.Pricing === "By fixed" ? 0.6 : 1, // Reduce opacity when disabled
+                          cursor: product.Pricing === "By fixed" ? "not-allowed" : "pointer", // Change cursor style
                         }}
                         onClick={() => handleAddRateCut(product)}
+                        disabled={product.Pricing === "By fixed"}
                       >
-                        {/* Add  */}
                         RateCut
                       </Button>
+
 
                       <Button
                         style={{
@@ -570,7 +573,7 @@ const RepairsTable = () => {
       alert("Please enter a remark.");
       return;
     }
-  
+
     try {
       const response = await fetch(`${baseURL}/update-remark`, {
         method: "POST",
@@ -582,14 +585,14 @@ const RepairsTable = () => {
           remark: remark,
         }),
       });
-  
+
       const data = await response.json();
       if (response.ok) {
         console.log("Remark Updated:", data);
         alert("Remark updated successfully!");
         setShow(false);
         setRemark("");
-  
+
         // Update localStorage with new values
         const storedData = localStorage.getItem("expandedInvoice");
         if (storedData) {
@@ -597,7 +600,7 @@ const RepairsTable = () => {
           parsedData.remark = remark; // Update remark in localStorage
           localStorage.setItem("expandedInvoice", JSON.stringify(parsedData));
         }
-  
+
         // Fetch updated localStorage data and re-expand the row
         setTimeout(() => {
           const updatedData = localStorage.getItem("expandedInvoice");
@@ -763,7 +766,7 @@ const RepairsTable = () => {
             Cancel
           </Button>
           <Button variant="primary" onClick={handleSubmit} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
-          {selectedProduct?.claim_remark ? "Update" : "Submit"}
+            {selectedProduct?.claim_remark ? "Update" : "Submit"}
           </Button>
         </Modal.Footer>
       </Modal>
