@@ -394,7 +394,7 @@ const URDPurchase = () => {
       if (field === "net_amt") {
         // Mark net_amt as manually entered
         setIsNetAmtManual(value !== "");
-  
+
         if (value !== "") {
           // Perform reverse calculations
           const hmCharges = parseFloat(updatedFormData.hm_charges) || 0;
@@ -404,13 +404,13 @@ const URDPurchase = () => {
           const makingChargesValue = parseFloat(updatedFormData.Making_Charges_Value) || 0;
           const taxSlab = parseFloat(updatedFormData.tax_slab) || 0;
           const makingChargesOn = updatedFormData.Making_Charges_On;
-  
+
           const firstValue = parseFloat(value) - hmCharges - otherCharges;
           const secondValue = (firstValue / (taxSlab + 100)) * 100;
-  
+
           let calculatedRate = 0;
           let totalMC = 0;
-  
+
           if (makingChargesOn === "MC %") {
             const thirdValue = secondValue - totalStoneValue;
             calculatedRate = (thirdValue / (makingChargesValue + 100)) * 100 / totalPureWeight;
@@ -420,7 +420,7 @@ const URDPurchase = () => {
             calculatedRate = thirdValue / totalPureWeight;
             totalMC = makingChargesValue * totalPureWeight;
           }
-  
+
           updatedFormData.rate = calculatedRate.toFixed(2);
           updatedFormData.total_amount = (calculatedRate * totalPureWeight).toFixed(2);
           updatedFormData.total_mc = totalMC.toFixed(2);
@@ -1068,142 +1068,142 @@ const URDPurchase = () => {
     if (!isNetAmtManual) {
       setFormData((prevData) => {
         let updatedFormData = { ...prevData };
-      const netWeight = parseFloat(updatedFormData.net_weight) || "";
-      const purityPercentage = extractPurityPercentage(updatedFormData.purity) || parseFloat(updatedFormData.purityPercentage) || 0;
-      const wastagePercentage = parseFloat(updatedFormData.wastage) || "";
-      const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
-      const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
-      const stonePrice = parseFloat(updatedFormData.stone_price) || 0;
-      const DiamondWt = parseFloat(updatedFormData.diamond_wt) || 0;
-      const makingChargesValue = parseFloat(updatedFormData.Making_Charges_Value) || 0;
-      const totalMC = parseFloat(updatedFormData.total_mc) || 0;
-      const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
-      const rate = parseFloat(updatedFormData.rate) || 0;
-      const taxSlab = parseFloat(updatedFormData.tax_slab) || 0;
-      let rateCut = parseFloat(updatedFormData.rate_cut) || 0;
-      const rateCuttedWt = parseFloat(updatedFormData.rate_cut_wt) || 0;
-      const hmCharges = parseFloat(updatedFormData.hm_charges) || 0;
-      const otherCharges = parseFloat(updatedFormData.charges) || 0;
-      const totalStoneValue = parseFloat(updatedFormData.final_stone_amount) || 0;
-      const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
-      const discountAmt = parseFloat(updatedFormData.discount_amt) || 0;
+        const netWeight = parseFloat(updatedFormData.net_weight) || "";
+        const purityPercentage = extractPurityPercentage(updatedFormData.purity) || parseFloat(updatedFormData.purityPercentage) || 0;
+        const wastagePercentage = parseFloat(updatedFormData.wastage) || "";
+        const grossWeight = parseFloat(updatedFormData.gross_weight) || 0;
+        const stoneWeight = parseFloat(updatedFormData.stone_weight) || 0;
+        const stonePrice = parseFloat(updatedFormData.stone_price) || 0;
+        const DiamondWt = parseFloat(updatedFormData.diamond_wt) || 0;
+        const makingChargesValue = parseFloat(updatedFormData.Making_Charges_Value) || 0;
+        const totalMC = parseFloat(updatedFormData.total_mc) || 0;
+        const totalAmount = parseFloat(updatedFormData.total_amount) || 0;
+        const rate = parseFloat(updatedFormData.rate) || 0;
+        const taxSlab = parseFloat(updatedFormData.tax_slab) || 0;
+        let rateCut = parseFloat(updatedFormData.rate_cut) || 0;
+        const rateCuttedWt = parseFloat(updatedFormData.rate_cut_wt) || 0;
+        const hmCharges = parseFloat(updatedFormData.hm_charges) || 0;
+        const otherCharges = parseFloat(updatedFormData.charges) || 0;
+        const totalStoneValue = parseFloat(updatedFormData.final_stone_amount) || 0;
+        const totalPureWeight = parseFloat(updatedFormData.total_pure_wt) || 0;
+        const discountAmt = parseFloat(updatedFormData.discount_amt) || 0;
 
-      let paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || "";
-      let paidAmount = parseFloat(updatedFormData.rate_cut_amt) || 0;
+        let paidPureWeight = parseFloat(updatedFormData.paid_pure_weight) || "";
+        let paidAmount = parseFloat(updatedFormData.rate_cut_amt) || 0;
 
-      // Net Weight Calculation
-      if (grossWeight || stoneWeight) {
-        if (updatedFormData.deduct_st_Wt === "Yes") {
-          updatedFormData.net_weight = (grossWeight - stoneWeight).toFixed(3);
+        // Net Weight Calculation
+        if (grossWeight || stoneWeight) {
+          if (updatedFormData.deduct_st_Wt === "Yes") {
+            updatedFormData.net_weight = (grossWeight - stoneWeight).toFixed(3);
+          } else {
+            updatedFormData.net_weight = grossWeight.toFixed(3);
+          }
         } else {
-          updatedFormData.net_weight = grossWeight.toFixed(3);
+          updatedFormData.net_weight = "";
         }
-      } else {
-        updatedFormData.net_weight = "";
-      }
 
-      // Pure Weight Calculation
-      updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(3);
+        // Pure Weight Calculation
+        updatedFormData.pure_weight = ((netWeight * purityPercentage) / 100).toFixed(3);
 
-      // Wastage Calculation
-      let baseWeight = 0;
-      if (updatedFormData.wastage_on === "Gross Wt") {
-        baseWeight = grossWeight;
-      } else if (updatedFormData.wastage_on === "Net Wt") {
-        baseWeight = netWeight;
-      } else if (updatedFormData.wastage_on === "Pure Wt") {
-        baseWeight = parseFloat(updatedFormData.pure_weight) || "";
-      }
-      updatedFormData.wastage_wt = ((wastagePercentage * baseWeight) / 100).toFixed(3);
+        // Wastage Calculation
+        let baseWeight = 0;
+        if (updatedFormData.wastage_on === "Gross Wt") {
+          baseWeight = grossWeight;
+        } else if (updatedFormData.wastage_on === "Net Wt") {
+          baseWeight = netWeight;
+        } else if (updatedFormData.wastage_on === "Pure Wt") {
+          baseWeight = parseFloat(updatedFormData.pure_weight) || "";
+        }
+        updatedFormData.wastage_wt = ((wastagePercentage * baseWeight) / 100).toFixed(3);
 
-      // Total Pure Weight
-      updatedFormData.total_pure_wt = (parseFloat(updatedFormData.pure_weight) + parseFloat(updatedFormData.wastage_wt)).toFixed(3);
+        // Total Pure Weight
+        updatedFormData.total_pure_wt = (parseFloat(updatedFormData.pure_weight) + parseFloat(updatedFormData.wastage_wt)).toFixed(3);
 
-      // Carat Weight Calculation
-      updatedFormData.carat_wt = (stoneWeight * 5).toFixed(3);
+        // Carat Weight Calculation
+        updatedFormData.carat_wt = (stoneWeight * 5).toFixed(3);
 
-      // Pricing Calculation
-      if (updatedFormData.Pricing === "By fixed") {
-        updatedFormData.total_amount = ((parseFloat(updatedFormData.pcs) || 0) * rate).toFixed(2);
-      } else if (updatedFormData.Pricing === "By Weight") {
-        updatedFormData.total_amount = ((parseFloat(updatedFormData.total_pure_wt) || 0) * rate).toFixed(2);
-      }
+        // Pricing Calculation
+        if (updatedFormData.Pricing === "By fixed") {
+          updatedFormData.total_amount = ((parseFloat(updatedFormData.pcs) || 0) * rate).toFixed(2);
+        } else if (updatedFormData.Pricing === "By Weight") {
+          updatedFormData.total_amount = ((parseFloat(updatedFormData.total_pure_wt) || 0) * rate).toFixed(2);
+        }
 
-      // Making Charges Calculation
-      if (updatedFormData.Making_Charges_On === "MC / Gram") {
-        updatedFormData.total_mc = (makingChargesValue * updatedFormData.total_pure_wt).toFixed(2);
-      } else if (updatedFormData.Making_Charges_On === "MC / Piece" && updatedFormData.total_pure_wt > 0) {
-        updatedFormData.Making_Charges_Value = (totalMC / updatedFormData.total_pure_wt).toFixed(2);
-      } else if (updatedFormData.Making_Charges_On === "MC %") {
-        updatedFormData.total_mc = ((makingChargesValue * updatedFormData.total_amount) / 100).toFixed(2);
-      }
+        // Making Charges Calculation
+        if (updatedFormData.Making_Charges_On === "MC / Gram") {
+          updatedFormData.total_mc = (makingChargesValue * updatedFormData.total_pure_wt).toFixed(2);
+        } else if (updatedFormData.Making_Charges_On === "MC / Piece" && updatedFormData.total_pure_wt > 0) {
+          updatedFormData.Making_Charges_Value = (totalMC / updatedFormData.total_pure_wt).toFixed(2);
+        } else if (updatedFormData.Making_Charges_On === "MC %") {
+          updatedFormData.total_mc = ((makingChargesValue * updatedFormData.total_amount) / 100).toFixed(2);
+        }
 
-      // Tax Amount Calculation
-      updatedFormData.tax_amt = (((totalStoneValue + totalAmount + totalMC) * taxSlab) / 100).toFixed(2);
+        // Tax Amount Calculation
+        updatedFormData.tax_amt = (((totalStoneValue + totalAmount + totalMC) * taxSlab) / 100).toFixed(2);
 
-      // Net Amount Calculation
-      updatedFormData.net_amt = (totalStoneValue + totalAmount + totalMC + parseFloat(updatedFormData.tax_amt) + hmCharges + otherCharges).toFixed(2);
+        // Net Amount Calculation
+        updatedFormData.net_amt = (totalStoneValue + totalAmount + totalMC + parseFloat(updatedFormData.tax_amt) + hmCharges + otherCharges).toFixed(2);
 
-      // Final Amount Calculation
-      updatedFormData.final_amt = (
-        parseFloat(updatedFormData.net_amt) + discountAmt
-      ).toFixed(2);
+        // Final Amount Calculation
+        updatedFormData.final_amt = (
+          parseFloat(updatedFormData.net_amt) + discountAmt
+        ).toFixed(2);
 
 
-      // Store previous rate_cut value before updating
-      if (!updatedFormData.previousRateCut) {
-        updatedFormData.previousRateCut = updatedFormData.rate_cut;
-      }
+        // Store previous rate_cut value before updating
+        if (!updatedFormData.previousRateCut) {
+          updatedFormData.previousRateCut = updatedFormData.rate_cut;
+        }
 
-      // Handling `lastUpdatedField`
-      if (lastUpdatedField === "paid_pure_weight") {
-        if (!paidPureWeight || paidPureWeight === 0) {
-          updatedFormData.balance_pure_weight = totalPureWeight.toFixed(3);
+        // Handling `lastUpdatedField`
+        if (lastUpdatedField === "paid_pure_weight") {
+          if (!paidPureWeight || paidPureWeight === 0) {
+            updatedFormData.balance_pure_weight = totalPureWeight.toFixed(3);
+          } else {
+            updatedFormData.balance_pure_weight = (totalPureWeight - paidPureWeight).toFixed(3);
+          }
+
+          // Only set rate_cut to 0 if it's greater than 0
+          if (updatedFormData.rate_cut > 0) {
+            updatedFormData.rate_cut = 0;
+          }
+        }
+
+        if (lastUpdatedField === "rate_cut_wt") {
+          updatedFormData.paid_pure_weight = rateCuttedWt;
+          updatedFormData.balance_pure_weight = (totalPureWeight - rateCuttedWt).toFixed(3);
+          updatedFormData.rate_cut_amt = (rateCuttedWt * rateCut).toFixed(2);
+        }
+
+        // Restore previous rate_cut if paid_pure_weight is cleared
+        if (lastUpdatedField === "paid_pure_weight" && paidPureWeight === "") {
+          updatedFormData.rate_cut = updatedFormData.previousRateCut || 0;
+        }
+
+        // Handle rate_cut and rate_cut_amt
+        if (rateCut > 0 || rateCuttedWt > 0) {
+          updatedFormData.rate_cut_amt = (rateCuttedWt * rateCut).toFixed(2);
         } else {
-          updatedFormData.balance_pure_weight = (totalPureWeight - paidPureWeight).toFixed(3);
+          updatedFormData.rate_cut_amt = "0.00";
         }
 
-        // Only set rate_cut to 0 if it's greater than 0
-        if (updatedFormData.rate_cut > 0) {
-          updatedFormData.rate_cut = 0;
-        }
-      }
+        // Balance Calculations
+        updatedFormData.balance_pure_weight =
+          !updatedFormData.paid_pure_weight || parseFloat(updatedFormData.paid_pure_weight) === 0
+            ? parseFloat(updatedFormData.total_pure_wt).toFixed(3)
+            : (parseFloat(updatedFormData.total_pure_wt) - parseFloat(updatedFormData.paid_pure_weight)).toFixed(3);
 
-      if (lastUpdatedField === "rate_cut_wt") {
-        updatedFormData.paid_pure_weight = rateCuttedWt;
-        updatedFormData.balance_pure_weight = (totalPureWeight - rateCuttedWt).toFixed(3);
-        updatedFormData.rate_cut_amt = (rateCuttedWt * rateCut).toFixed(2);
-      }
+        // updatedFormData.balance_amount = (totalAmount - parseFloat(updatedFormData.rate_cut_amt) || 0).toFixed(2);
 
-      // Restore previous rate_cut if paid_pure_weight is cleared
-      if (lastUpdatedField === "paid_pure_weight" && paidPureWeight === "") {
-        updatedFormData.rate_cut = updatedFormData.previousRateCut || 0;
-      }
-
-      // Handle rate_cut and rate_cut_amt
-      if (rateCut > 0 || rateCuttedWt > 0) {
-        updatedFormData.rate_cut_amt = (rateCuttedWt * rateCut).toFixed(2);
-      } else {
-        updatedFormData.rate_cut_amt = "0.00";
-      }
-
-      // Balance Calculations
-      updatedFormData.balance_pure_weight =
-        !updatedFormData.paid_pure_weight || parseFloat(updatedFormData.paid_pure_weight) === 0
-          ? parseFloat(updatedFormData.total_pure_wt).toFixed(3)
-          : (parseFloat(updatedFormData.total_pure_wt) - parseFloat(updatedFormData.paid_pure_weight)).toFixed(3);
-
-      // updatedFormData.balance_amount = (totalAmount - parseFloat(updatedFormData.rate_cut_amt) || 0).toFixed(2);
-
-      updatedFormData.balance_amount = (
-        parseFloat(updatedFormData.rate_cut_amt || 0) -
-        parseFloat(updatedFormData.paid_amount || 0)
-      ).toFixed(2);
+        updatedFormData.balance_amount = (
+          parseFloat(updatedFormData.rate_cut_amt || 0) -
+          parseFloat(updatedFormData.paid_amount || 0)
+        ).toFixed(2);
 
 
-      return updatedFormData;
-    });
-  }
+        return updatedFormData;
+      });
+    }
   }, [
     formData.purity,
     formData.purityPercentage,
@@ -1782,6 +1782,8 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("rate_cut_amt", e.target.value)}
                     />
                   </Col>
+                  </>
+              )}
                   <Col xs={12} md={2}>
                     <InputField
                       label="Paid Amt"
@@ -1798,7 +1800,8 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("balance_amount", e.target.value)}
                     />
                   </Col>
-
+                  {formData.Pricing !== "By fixed" && (
+                <>
                   <Col xs={12} md={2}>
                     <InputField label="HM Charges" type="number" value={formData.hm_charges}
                       onChange={(e) => handleChange("hm_charges", e.target.value)} />
@@ -1807,7 +1810,7 @@ const URDPurchase = () => {
                     <InputField label="Other Charges" type="number" value={formData.charges}
                       onChange={(e) => handleChange("charges", e.target.value)} />
                   </Col>
-                </>
+                  </>
               )}
               <Col xs={12} md={2}>
                 <InputField
@@ -1823,44 +1826,6 @@ const URDPurchase = () => {
                 </Button>
               </Col>
             </Row>
-            {/* {!isSilverOrGold && (
-                <>
-                  <Col xs={12} md={1}>
-                    <InputField
-                      label="Cut"
-                      name="cut"
-                      value={formData.cut}
-                      onChange={(e) => handleChange("cut", e.target.value)}
-                    />
-                  </Col>
-                  <Col xs={12} md={1}>
-                    <InputField
-                      label="Color"
-                      name="color"
-                      value={formData.color}
-                      onChange={(e) => handleChange("color", e.target.value)}
-                    />
-                  </Col>
-                  <Col xs={12} md={1}>
-                    <InputField
-                      label="Clarity"
-                      name="clarity"
-                      value={formData.clarity}
-                      onChange={(e) => handleChange("clarity", e.target.value)}
-                    />
-                  </Col>
-                </>
-              )} */}
-
-            {/* <Col xs={12} md={2}>
-                <InputField
-                  label=" Stone Price"
-                  name="stone_price"
-                  value={formData.stone_price}
-                  onChange={(e) => handleChange("stone_price", e.target.value)}
-                />
-              </Col> */}
-
             <Row>
             </Row>
             <div style={{ overflowX: "scroll", marginTop: '-20px' }}>
@@ -1916,8 +1881,6 @@ const URDPurchase = () => {
                           }}
                           disabled={editingIndex !== null}
                         />
-
-
                         <FaTrash
                           style={{ cursor: 'pointer', marginLeft: '10px', color: 'red' }}
                           onClick={() => handleDelete(data.tag_id, data.product_id)}

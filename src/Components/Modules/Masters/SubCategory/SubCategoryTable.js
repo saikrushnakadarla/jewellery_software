@@ -16,23 +16,27 @@ const SubCategoryTable = () => {
     () => [
       {
         Header: "Sr. No.",
-        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+        Cell: ({ row }) => row.index + 1,
       },
       {
         Header: "Metal Type",
-        accessor: "metal_type", // Accessor for metal_type
+        accessor: "metal_type",
       },
       {
         Header: "Category",
-        accessor: "category", // Accessor for category
+        accessor: "category",
       },
       {
         Header: "Sub Category",
-        accessor: "sub_category_name", // Accessor for sub_category_name
+        accessor: "sub_category_name", 
       },
       {
         Header: "Prefix",
-        accessor: "prefix", // Accessor for prefix
+        accessor: "prefix", 
+      },
+      {
+        Header: "Purity",
+        accessor: "purity", 
       },
       {
         Header: "Actions",

@@ -17,6 +17,7 @@ function SubCategory() {
     category: "",
     sub_category_name: "",
     prefix: "",
+    purity:"",
   });
 
   const [metalOptions, setMetalOptions] = useState([]);
@@ -176,7 +177,7 @@ function SubCategory() {
           <Row>
             <Col md={4}>
               <InputField
-                label="Metal Type:"
+                label="Metal Type"
                 name="metal_type"
                 type="select"
                 value={formData.metal_type}
@@ -191,7 +192,7 @@ function SubCategory() {
             </Col>
             <Col md={4}>
               <InputField
-                label="Category:"
+                label="Category"
                 name="category"
                 type="select"
                 value={formData.category}
@@ -206,7 +207,7 @@ function SubCategory() {
 
             <Col md={4}>
               <InputField
-                label="Sub Category:"
+                label="Sub Category"
                 name="sub_category_name"
                 value={formData.sub_category_name}
                 onChange={handleChange}
@@ -215,9 +216,18 @@ function SubCategory() {
             </Col>
             <Col md={4}>
               <InputField
-                label="Prefix:"
+                label="Prefix"
                 name="prefix"
                 value={formData.prefix}
+                onChange={handleChange}
+                required
+              />
+            </Col>
+            <Col md={4}>
+              <InputField
+                label="Purity"
+                name="purity"
+                value={formData.purity}
                 onChange={handleChange}
                 required
               />

@@ -319,7 +319,7 @@ function DesignMaster() {
               name="item_type"
               value={formData.item_type}
               onChange={handleChange}
-              required={true}
+              // required={true}
             
               error={errors.item_type}
 

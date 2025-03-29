@@ -79,6 +79,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         pur_Gross_Weight: "",
         pur_rate_cut: "",
         pur_Purity: "",
+        pur_purityPercentage:"",
         pur_Stones_Weight: "",
         pur_deduct_st_Wt: "Yes",
         pur_stone_price_per_carat: "",
@@ -448,8 +449,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         rate_16crt: ""
     });
 
-
-    // Fetch current rates when component mounts
     useEffect(() => {
         const fetchRates = async () => {
             try {
@@ -468,38 +467,36 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         fetchRates();
     }, []);
 
-    // Update Rate Cut when Purity changes
- // Update Rate Cut when Purity or Metal Type changes
-useEffect(() => {
-    if (formData.pur_Purity && formData.metal_type) {
-        const normalizedValue = formData.pur_Purity.toLowerCase(); // Normalize case
-        const metalType = formData.metal_type.toLowerCase(); // Normalize metal type
-        let newRate = "";
+    useEffect(() => {
+        if (formData.pur_Purity && formData.metal_type) {
+            const normalizedValue = formData.pur_Purity.toLowerCase(); // Normalize case
+            const metalType = formData.metal_type.toLowerCase(); // Normalize metal type
+            let newRate = "";
 
-        if (metalType === "silver") {
-            newRate = rates.silver_rate;
-        } else {
-            if (normalizedValue === "manual") {
-                newRate = rates.rate_22crt;
-            } else if (normalizedValue.includes("22")) {
-                newRate = rates.rate_22crt;
-            } else if (normalizedValue.includes("24")) {
-                newRate = rates.rate_24crt;
-            } else if (normalizedValue.includes("18")) {
-                newRate = rates.rate_18crt;
-            } else if (normalizedValue.includes("16")) {
-                newRate = rates.rate_16crt;
+            if (metalType === "silver") {
+                newRate = rates.silver_rate;
             } else {
-                newRate = rates.rate_22crt;
+                if (normalizedValue === "manual") {
+                    newRate = rates.rate_22crt;
+                } else if (normalizedValue.includes("22")) {
+                    newRate = rates.rate_22crt;
+                } else if (normalizedValue.includes("24")) {
+                    newRate = rates.rate_24crt;
+                } else if (normalizedValue.includes("18")) {
+                    newRate = rates.rate_18crt;
+                } else if (normalizedValue.includes("16")) {
+                    newRate = rates.rate_16crt;
+                } else {
+                    newRate = rates.rate_22crt;
+                }
             }
-        }
 
-        setFormData((prev) => ({
-            ...prev,
-            pur_rate_cut: newRate,
-        }));
-    }
-}, [formData.pur_Purity, formData.metal_type, rates]);
+            setFormData((prev) => ({
+                ...prev,
+                pur_rate_cut: newRate,
+            }));
+        }
+    }, [formData.pur_Purity, formData.metal_type, rates]);
 
 
     const handleChange = async (fieldOrEvent, valueArg) => {
@@ -547,13 +544,24 @@ useEffect(() => {
 
                     setFormData((prevData) => ({
                         ...prevData,
-                        sub_category: selectedCategory.sub_category_name, // Store selected sub_category_name
-                        subcategory_id: selectedCategory.subcategory_id, // Store subcategory_id
+                        sub_category: selectedCategory.sub_category_name,
+                        subcategory_id: selectedCategory.subcategory_id,
                         item_prefix: newPrefix,
                         Prefix: newPrefix,
                         PCode_BarCode: nextPCodeBarCode,
-                        suffix: nextPCodeBarCode.replace(newPrefix, ""), // Extract numeric suffix
+                        suffix: nextPCodeBarCode.replace(newPrefix, ""),
+                        Purity: selectedCategory.purity, // Set default purity from subcategory
                     }));
+
+                    // Ensure selectedCategory.purity is part of purityOptions
+                    setPurityOptions((prevOptions) => {
+                        const formattedPurity = {
+                            value: selectedCategory.purity,
+                            label: selectedCategory.purity,
+                        };
+                        return [...prevOptions.filter(opt => opt.value !== formattedPurity.value), formattedPurity];
+                    });
+
                 } catch (error) {
                     console.error("Error fetching PCode_BarCode:", error);
                 }
@@ -565,6 +573,7 @@ useEffect(() => {
                     item_prefix: "",
                     Prefix: "",
                     PCode_BarCode: "",
+                    Purity: "", // Reset purity when no subcategory is selected
                 }));
             }
         } else {
@@ -573,6 +582,7 @@ useEffect(() => {
                 [field]: value,
             }));
         }
+
 
         setFormData((prevData) => {
             let updatedData = { ...prevData, [field]: value };
@@ -838,7 +848,6 @@ useEffect(() => {
         setNewDesign({ ...newDesign, [e.target.name]: e.target.value });
     };
 
-
     const handleAddDesign = async () => {
         if (!newDesign.design_name) {
             alert("Product Design Name required!");
@@ -854,17 +863,40 @@ useEffect(() => {
 
             if (response.status === 201 || response.status === 200) {
                 alert("Product Design Name added successfully!");
-                setNewDesign({ design_name: "", metal: formData.metal_type, category: formData.category }); // Reset form
-                handleCloseDesignModal(); // Close modal
+
+                // Close modal and reset form
+                handleCloseDesignModal();
+                setNewDesign({ design_name: "", metal: formData.metal_type, category: formData.category });
+
+                // Refresh design list
+                await fetchDesignMaster();
+
+                // Fetch updated design list
+                const updatedResponse = await axios.get(`${baseURL}/designmaster`);
+                const updatedDesignMasters = updatedResponse.data.map((item) => ({
+                    value: item.design_name,
+                    label: item.design_name,
+                    id: item.design_id,
+                }));
+
+                setdesignOptions(updatedDesignMasters);
+
+                // Find and auto-select the newly added design
+                const addedDesign = updatedDesignMasters.find(design => design.value === newDesign.design_name);
+
+                if (addedDesign) {
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        design_master: addedDesign.value, // Store selected design name
+                        design_id: addedDesign.id, // Store the design ID
+                    }));
+                }
             }
-            fetchDesignMaster();
         } catch (error) {
             console.error("Error adding Product Design Name:", error);
             alert("Failed to add Product Design Name. Please try again.");
         }
     };
-
-
 
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
@@ -1091,7 +1123,8 @@ useEffect(() => {
     const [newSubCategory, setNewSubCategory] = useState({
         name: '',
         prefix: '',
-        category: ''
+        category: '',
+        purity: '',
     });
 
     const handleModalChange = (e) => {
@@ -1130,26 +1163,50 @@ useEffect(() => {
                 category: newSubCategory.category || formData.category,
                 prefix: newSubCategory.prefix,
                 metal_type: selectedProduct.metal_type,
+                purity: newSubCategory.purity,
             };
 
             // Make POST request to the API
             const response = await axios.post(`${baseURL}/post/subcategory`, data);
 
             if (response.status === 201) { // Use 201 instead of 200 for created status
-                // Successfully added the subcategory
-                handleCloseModal();
                 console.log('Subcategory added successfully');
                 alert("Subcategory added successfully");
 
-                // Clear the form
-                setNewSubCategory({
-                    name: '',
-                    prefix: '',
-                    category: ''
-                });
+                // Close modal and clear form
+                handleCloseModal();
+                setNewSubCategory({ name: '', prefix: '', category: '', purity: '' });
 
-                // Refresh the subcategory list
-                fetchSubCategories();
+                // Refresh subcategories and auto-select the new one
+                await fetchSubCategories(); // Ensure categories are updated first
+
+                // Find the newly added subcategory
+                const updatedSubCategories = await axios.get(`${baseURL}/get/subcategories`);
+                const filteredSubCategories = updatedSubCategories.data.filter(
+                    (subCategory) => subCategory.category_id === selectedProduct.product_id
+                );
+
+                const addedSubCategory = filteredSubCategories.find(sub => sub.sub_category_name === newSubCategory.name);
+
+                if (addedSubCategory) {
+                    // Fetch next PCode_BarCode
+                    const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+                        params: { prefix: addedSubCategory.prefix },
+                    });
+
+                    const nextPCodeBarCode = response.data.nextPCodeBarCode;
+
+                    // Auto-select the new subcategory and update form data
+                    setFormData((prevData) => ({
+                        ...prevData,
+                        sub_category: addedSubCategory.sub_category_name,
+                        subcategory_id: addedSubCategory.subcategory_id,
+                        item_prefix: addedSubCategory.prefix,
+                        Prefix: addedSubCategory.prefix,
+                        PCode_BarCode: nextPCodeBarCode,
+                        suffix: nextPCodeBarCode.replace(addedSubCategory.prefix, ""), // Extract numeric suffix
+                    }));
+                }
             } else {
                 console.error('Error adding subcategory:', response);
             }
@@ -1165,12 +1222,13 @@ useEffect(() => {
                 (subCategory) => subCategory.category_id === selectedProduct.product_id
             );
             setSubCategories(filteredSubCategories);
-            console.log("filteredSubCategories=", filteredSubCategories)
+            console.log("filteredSubCategories=", filteredSubCategories);
+            return filteredSubCategories; // Return the updated list
         } catch (error) {
             console.error("Error fetching subcategories:", error);
+            return [];
         }
     };
-
 
     // const fetchSubCategories = async () => {
     //     try {
@@ -1204,23 +1262,24 @@ useEffect(() => {
 
     const [designOptions, setdesignOptions] = useState([]);
 
-        const fetchDesignMaster = async () => {
-            try {
-                const response = await axios.get(`${baseURL}/designmaster`);
-                const designMasters = response.data.map((item) => {
-                    console.log('Design ID:', item.design_id); // Log design_id
-                    return {
-                        value: item.design_name,
-                        label: item.design_name,
-                        id: item.design_id,
-                    };
-                });
-                setdesignOptions(designMasters);
-            } catch (error) {
-                console.error('Error fetching design masters:', error);
-            }
-        };
-        useEffect(() => {
+    const fetchDesignMaster = async () => {
+        try {
+            const response = await axios.get(`${baseURL}/designmaster`);
+            const designMasters = response.data.map((item) => {
+                console.log('Design ID:', item.design_id); // Log design_id
+                return {
+                    value: item.design_name,
+                    label: item.design_name,
+                    id: item.design_id,
+                };
+            });
+            setdesignOptions(designMasters);
+        } catch (error) {
+            console.error('Error fetching design masters:', error);
+        }
+    };
+
+    useEffect(() => {
         fetchDesignMaster();
     }, []);
 
@@ -1254,11 +1313,11 @@ useEffect(() => {
             try {
                 const response = await axios.get(`${baseURL}/purity`);
                 const filteredPurity = response.data.filter(
-                    (item) => 
+                    (item) =>
                         item.metal.toLowerCase() === formData.metal_type.toLowerCase() ||
                         (["diamond", "others"].includes(formData.metal_type.toLowerCase()) && item.metal.toLowerCase() === "gold")
                 );
-                
+
                 setPurityOptions(filteredPurity);
 
                 console.log("Purity Options:", filteredPurity);
@@ -1413,7 +1472,9 @@ useEffect(() => {
         XLSX.writeFile(workbook, "TagDetails.xlsx");
     };
 
-
+    const selectedCategory = subCategories.find(
+        (category) => category.sub_category_name === formData.sub_category
+    );
 
     return (
         <div style={{ paddingTop: "0px" }}>
@@ -1513,14 +1574,9 @@ useEffect(() => {
                                         <InputField
                                             label="Pricing"
                                             name="Pricing"
-                                            // type="select"
                                             value={formData.Pricing}
                                             onChange={handleChange}
                                             readOnly
-                                        // options={[
-                                        //     { value: "By Weight", label: "By Weight" },
-                                        //     { value: "By fixed", label: "By fixed" },
-                                        // ]}
                                         />
                                     </Col>
                                     {/* <Col xs={12} md={2}>
@@ -1536,37 +1592,6 @@ useEffect(() => {
                                             ]}
                                         />
                                     </Col> */}
-                                    {/* 
-                                    {!isSilverOrGold && (
-                                        <>
-                                            <Col xs={12} md={1}>
-                                                <InputField
-                                                    label="Cut"
-                                                    name="cut"
-                                                    value={formData.cut}
-                                                    onChange={handleChange}
-                                                />
-                                            </Col>
-                                            <Col xs={12} md={1}>
-                                                <InputField
-                                                    label="Color"
-                                                    name="color"
-                                                    value={formData.color}
-                                                    onChange={handleChange}
-                                                />
-                                            </Col>
-                                            <Col xs={12} md={1}>
-                                                <InputField
-                                                    label="Clarity"
-                                                    name="clarity"
-                                                    value={formData.clarity}
-                                                    onChange={handleChange}
-                                                />
-                                            </Col>
-                                        </>
-                                    )} */}
-
-                                    {/* Render different fields based on Pricing selection */}
                                     {isByFixed ? (
                                         <>
                                             <Col xs={12} md={2}>
@@ -1590,10 +1615,31 @@ useEffect(() => {
                                                 <InputField label="PCode/BarCode" name="PCode_BarCode" type="text" value={formData.PCode_BarCode} onChange={handleChange} />
                                             </Col>
                                             <Col xs={12} md={2}>
-                                                <InputField label="Purity" name="Purity" type="select" value={formData.Purity} onChange={handleChange} options={purityOptions.map((option) => ({
-                                                    value: `${option.name} | ${option.purity}`,
-                                                    label: `${option.name} | ${option.purity}`,
-                                                }))} />
+                                                <InputField
+                                                    label="Purity"
+                                                    name="Purity"
+                                                    type="select"
+                                                    value={formData.Purity} // Ensure correct value
+                                                    onChange={handleChange}
+                                                    // options={[
+                                                    //     { value: selectedCategory?.purity, label: selectedCategory?.purity }, // Show subcategory purity
+                                                    //     ...purityOptions.map((option) => ({
+                                                    //         value: `${option.name} | ${option.purity}`,
+                                                    //         label: `${option.name} | ${option.purity}`,
+                                                    //     })),
+                                                    // ]}
+                                                    options={[
+                                                        ...(formData.Purity
+                                                            ? [{ value: selectedCategory?.purity, label: selectedCategory?.purity }]
+                                                            : []),
+                                                        ...purityOptions
+                                                            .filter(option => option.name && option.purity) // Remove undefined values
+                                                            .map(option => ({
+                                                                value: `${option.name} | ${option.purity}`,
+                                                                label: `${option.name} | ${option.purity}`,
+                                                            })),
+                                                    ]}
+                                                />
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField label="HUID No" name="HUID_No" value={formData.HUID_No} onChange={handleChange} />
@@ -1824,19 +1870,39 @@ useEffect(() => {
                                                                 type="select"
                                                                 value={formData.pur_Purity}
                                                                 onChange={(e) => handleChange("pur_Purity", e.target.value)}
-                                                                options={purityOptions.map((option) => ({
-                                                                    value: `${option.name} | ${option.purity}`,
-                                                                    label: `${option.name} | ${option.purity}`
-                                                                }))}
+                                                                // options={[
+                                                                //     ...purityOptions.map((option) => ({
+                                                                //         value: `${option.name} | ${option.purity}`,
+                                                                //         label: `${option.name} | ${option.purity}`,
+                                                                //     })),
+                                                                //     { value: "Manual", label: "Manual" } // Correct placement of Manual option
+                                                                // ]}
+                                                                options={[
+                                                                    ...(formData.Purity
+                                                                        ? [{ value: selectedCategory?.purity, label: selectedCategory?.purity }]
+                                                                        : []),
+                                                                    ...purityOptions
+                                                                        .filter(option => option.name && option.purity) // Remove undefined values
+                                                                        .map(option => ({
+                                                                            value: `${option.name} | ${option.purity}`,
+                                                                            label: `${option.name} | ${option.purity}`,
+                                                                        })),
+                                                                        { value: "Manual", label: "Manual" }
+                                                                ]}
                                                             />
                                                         </Col>
+                                                        {formData.pur_Purity === "Manual" && (
+                                                            <Col xs={12} md={4}>
+                                                                <InputField
+                                                                    label="Custom Purity %"
+                                                                    // type="number"
+                                                                    name="pur_purityPercentage"
+                                                                    value={formData.pur_purityPercentage || ""}
 
-
-
-
-
-
-
+                                                                    onChange={(e) => handleChange("pur_purityPercentage", e.target.value)}
+                                                                />
+                                                            </Col>
+                                                        )}
 
                                                         <Col xs={12} md={3}>
                                                             <InputField label="Stones Wt" name="pur_Stones_Weight" value={formData.pur_Stones_Weight} onChange={handleChange} />
@@ -1848,7 +1914,7 @@ useEffect(() => {
                                                                     backgroundColor: '#a36e29',
                                                                     borderColor: '#a36e29',
                                                                     fontSize: '0.8rem',
-                                                                    marginLeft: '-17px',
+                                                                    marginLeft: '-20px',
                                                                     whiteSpace: 'nowrap'
                                                                 }}
                                                             >
@@ -2241,7 +2307,15 @@ useEffect(() => {
                                 name="prefix"
                                 value={newSubCategory.prefix}
                                 onChange={handleModalChange}
-
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="subCategoryPrefix">
+                            <Form.Label>Purity</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="purity"
+                                value={newSubCategory.purity}
+                                onChange={handleModalChange}
                             />
                         </Form.Group>
 
