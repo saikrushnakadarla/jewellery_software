@@ -126,6 +126,8 @@ const RepairsTable = () => {
         account_name: product.account_name,
         invoice: product.invoice,
         category: product.category,
+        Pricing: product.Pricing,
+        purchase_id: product.id,
       }
     });
   };
@@ -279,6 +281,7 @@ const RepairsTable = () => {
           <Table bordered style={{ whiteSpace: "nowrap", fontSize: "13px" }}>
             <thead style={{ fontSize: "13px", fontWeight: "bold", }}>
               <tr>
+                {/* <th>Id</th> */}
                 <th>Category</th>
                 <th>Purity</th>
                 <th>Pcs</th>
@@ -317,6 +320,7 @@ const RepairsTable = () => {
 
                 return (
                   <tr key={idx}>
+                    {/* <td>{product.id}</td> */}
                     <td>{product.category}</td>
                     <td>{product.purityPercentage} %</td>
                     <td>{product.pcs}</td>

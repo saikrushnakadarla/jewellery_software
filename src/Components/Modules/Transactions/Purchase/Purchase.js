@@ -365,13 +365,19 @@ const URDPurchase = () => {
       }
 
       if (field === "paid_amount") {
-        const totalAmount = parseFloat(updatedFormData.rate_cut_amt) || 0;
+        const totalAmount =
+          updatedFormData.Pricing === "By fixed"
+            ? parseFloat(updatedFormData.final_amt) || 0
+            : parseFloat(updatedFormData.rate_cut_amt) || 0;
+
         const paidAmount = parseFloat(value) || 0;
+
         if (paidAmount > totalAmount) {
-          alert("Paid amount cannot exceed the Rate Cut amount.");
+          alert("Paid amount cannot exceed the allowable amount.");
           return prevFormData;
         }
       }
+
 
       if (field === "rate_cut_wt") {
         const totalWeight = parseFloat(updatedFormData.total_pure_wt) || "";
@@ -1195,10 +1201,17 @@ const URDPurchase = () => {
 
         // updatedFormData.balance_amount = (totalAmount - parseFloat(updatedFormData.rate_cut_amt) || 0).toFixed(2);
 
-        updatedFormData.balance_amount = (
-          parseFloat(updatedFormData.rate_cut_amt || 0) -
-          parseFloat(updatedFormData.paid_amount || 0)
-        ).toFixed(2);
+        // Balance Amount Calculation
+        if (updatedFormData.Pricing === "By fixed") {
+          updatedFormData.balance_amount = (
+            parseFloat(updatedFormData.final_amt || 0) - parseFloat(updatedFormData.paid_amount || 0)
+          ).toFixed(2);
+        } else {
+          updatedFormData.balance_amount = (
+            parseFloat(updatedFormData.rate_cut_amt || 0) - parseFloat(updatedFormData.paid_amount || 0)
+          ).toFixed(2);
+        }
+
 
 
         return updatedFormData;
@@ -1782,25 +1795,25 @@ const URDPurchase = () => {
                       onChange={(e) => handleChange("rate_cut_amt", e.target.value)}
                     />
                   </Col>
-                  </>
+                </>
               )}
-                  <Col xs={12} md={2}>
-                    <InputField
-                      label="Paid Amt"
-                      type="number"
-                      value={formData.paid_amount}
-                      onChange={(e) => handleChange("paid_amount", e.target.value)}
-                    />
-                  </Col>
-                  <Col xs={12} md={2}>
-                    <InputField
-                      label="Balance Amt"
-                      type="number"
-                      value={formData.balance_amount}
-                      onChange={(e) => handleChange("balance_amount", e.target.value)}
-                    />
-                  </Col>
-                  {formData.Pricing !== "By fixed" && (
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Paid Amt"
+                  type="number"
+                  value={formData.paid_amount}
+                  onChange={(e) => handleChange("paid_amount", e.target.value)}
+                />
+              </Col>
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Balance Amt"
+                  type="number"
+                  value={formData.balance_amount}
+                  onChange={(e) => handleChange("balance_amount", e.target.value)}
+                />
+              </Col>
+              {formData.Pricing !== "By fixed" && (
                 <>
                   <Col xs={12} md={2}>
                     <InputField label="HM Charges" type="number" value={formData.hm_charges}
@@ -1810,7 +1823,7 @@ const URDPurchase = () => {
                     <InputField label="Other Charges" type="number" value={formData.charges}
                       onChange={(e) => handleChange("charges", e.target.value)} />
                   </Col>
-                  </>
+                </>
               )}
               <Col xs={12} md={2}>
                 <InputField
