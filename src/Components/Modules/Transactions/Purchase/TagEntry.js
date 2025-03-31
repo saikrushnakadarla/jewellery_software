@@ -79,7 +79,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         pur_Gross_Weight: "",
         pur_rate_cut: "",
         pur_Purity: "",
-        pur_purityPercentage:"",
+        pur_purityPercentage: "",
         pur_Stones_Weight: "",
         pur_deduct_st_Wt: "Yes",
         pur_stone_price_per_carat: "",
@@ -1125,27 +1125,30 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         prefix: '',
         category: '',
         purity: '',
+        selling_purity: '',
     });
 
     const handleModalChange = (e) => {
-        const { name, value } = e.target;
-        // Update newSubCategory values
+        let { name, value } = e.target;
+
+        // Capitalize first letter if the field is "name"
+        if (name === "name") {
+            value = value.charAt(0).toUpperCase() + value.slice(1);
+        }
+
         setNewSubCategory((prev) => ({
             ...prev,
             [name]: value,
         }));
+
         if (name === "prefix") {
             setFormData((prev) => ({
                 ...prev,
                 Prefix: value,
             }));
         }
-
-        setNewSubCategory((prevState) => ({
-            ...prevState,
-            [name]: value,
-        }));
     };
+
 
     useEffect(() => {
         if (selectedProduct) {
@@ -1887,7 +1890,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                                             value: `${option.name} | ${option.purity}`,
                                                                             label: `${option.name} | ${option.purity}`,
                                                                         })),
-                                                                        { value: "Manual", label: "Manual" }
+                                                                    { value: "Manual", label: "Manual" }
                                                                 ]}
                                                             />
                                                         </Col>
@@ -2198,7 +2201,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             <th>Stone Wt</th>
                                             <th>Wt BW</th>
                                             <th>W.Wt</th>
-                                            <th>MC</th>
+                                            <th>{formData.MC_Per_Gram_Label || "MC"}</th> {/* Dynamically Updated */}
                                             <th>Total Wt</th>
                                             <th>Image</th>
                                             <th>Action</th>
@@ -2217,13 +2220,13 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                     <td>{item.Stones_Weight}</td>
                                                     <td>{item.Weight_BW}</td>
                                                     <td>{item.WastageWeight}</td>
-                                                    <td>{item.MC_Per_Gram}</td>
+                                                    <td>{item.MC_Per_Gram}</td> {/* MC column remains unchanged */}
                                                     <td>{item.TotalWeight_AW}</td>
                                                     <td>
                                                         {item.image ? (
                                                             <img
                                                                 src={item.image}
-                                                                alt="Product Image"
+                                                                alt="Product"
                                                                 style={{
                                                                     width: "50px",
                                                                     height: "50px",
@@ -2234,7 +2237,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                                 onClick={() => {
                                                                     const newWindow = window.open();
                                                                     newWindow.document.write(
-                                                                        `<img src="${item.image}" alt="Product Image" style="width: 100%; height: auto;" />`
+                                                                        `<img src="${item.image}" alt="Product" style="width: 100%; height: auto;" />`
                                                                     );
                                                                 }}
                                                                 onError={(e) => (e.target.src = "/placeholder.png")}
@@ -2249,11 +2252,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                             onClick={() => handleEdit(item)}
                                                         />
                                                         <FaTrash
-                                                            style={{
-                                                                cursor: "pointer",
-                                                                marginLeft: "10px",
-                                                                color: "red",
-                                                            }}
+                                                            style={{ cursor: "pointer", marginLeft: "10px", color: "red" }}
                                                             onClick={() => handleDelete(item.opentag_id)}
                                                         />
                                                     </td>
@@ -2266,6 +2265,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                         )}
                                     </tbody>
                                 </Table>
+
                             </div>
 
                         </Form>
@@ -2315,6 +2315,15 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                 type="text"
                                 name="purity"
                                 value={newSubCategory.purity}
+                                onChange={handleModalChange}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="subCategoryPrefix">
+                            <Form.Label>Selling Purity</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name="selling_purity"
+                                value={newSubCategory.selling_purity}
                                 onChange={handleModalChange}
                             />
                         </Form.Group>
