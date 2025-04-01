@@ -1878,14 +1878,14 @@ const URDPurchase = () => {
                       <td>{data.balance_amount}</td>
                       <td>{data.final_amt}</td>
                       <td style={{ display: 'flex', alignItems: 'center' }}>
-                        <button
+                        {/* <button
                           type="button"
                           className="btn btn-primary"
                           style={{ backgroundColor: '#a36e29', borderColor: '#a36e29', padding: '0.25rem 0.5rem', fontSize: '0.875rem', }}
                           onClick={() => handleOpenModal(data)} // Pass entire row data
                         >
                           Tag Entry
-                        </button>
+                        </button> */}
                         <FaEdit
                           style={{ cursor: 'pointer', marginLeft: '10px', color: 'blue' }}
                           onClick={() => {

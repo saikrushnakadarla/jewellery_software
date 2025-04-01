@@ -550,17 +550,19 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                         Prefix: newPrefix,
                         PCode_BarCode: nextPCodeBarCode,
                         suffix: nextPCodeBarCode.replace(newPrefix, ""),
-                        Purity: selectedCategory.purity, // Set default purity from subcategory
+                        // Purity: selectedCategory.purity, 
+                        Purity: selectedCategory.selling_purity, 
+                        pur_Purity: selectedCategory.purity,
                     }));
 
                     // Ensure selectedCategory.purity is part of purityOptions
-                    setPurityOptions((prevOptions) => {
-                        const formattedPurity = {
-                            value: selectedCategory.purity,
-                            label: selectedCategory.purity,
-                        };
-                        return [...prevOptions.filter(opt => opt.value !== formattedPurity.value), formattedPurity];
-                    });
+                    // setPurityOptions((prevOptions) => {
+                    //     const formattedPurity = {
+                    //         value: selectedCategory.selling_purity,
+                    //         label: selectedCategory.selling_purity,
+                    //     };
+                    //     return [...prevOptions.filter(opt => opt.value !== formattedPurity.value), formattedPurity];
+                    // });
 
                 } catch (error) {
                     console.error("Error fetching PCode_BarCode:", error);
@@ -573,7 +575,8 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                     item_prefix: "",
                     Prefix: "",
                     PCode_BarCode: "",
-                    Purity: "", // Reset purity when no subcategory is selected
+                    Purity: "", 
+                    pur_Purity:"",
                 }));
             }
         } else {
@@ -1158,6 +1161,11 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     }, [selectedProduct]);
 
     const handleAddSubCategory = async () => {
+        if (!newSubCategory.name || !newSubCategory.prefix || !newSubCategory.category ||
+            !newSubCategory.purity || !newSubCategory.selling_purity) {
+            alert("All fields are required.");
+            return;
+        }
         try {
             const data = {
                 category_id: selectedProduct.product_id,
@@ -1167,6 +1175,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 prefix: newSubCategory.prefix,
                 metal_type: selectedProduct.metal_type,
                 purity: newSubCategory.purity,
+                selling_purity: newSubCategory.selling_purity,
             };
 
             // Make POST request to the API
@@ -1178,7 +1187,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
                 // Close modal and clear form
                 handleCloseModal();
-                setNewSubCategory({ name: '', prefix: '', category: '', purity: '' });
+                setNewSubCategory({ name: '', prefix: '', category: '', purity: '', selling_purity: '' });
 
                 // Refresh subcategories and auto-select the new one
                 await fetchSubCategories(); // Ensure categories are updated first
@@ -1207,7 +1216,10 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                         item_prefix: addedSubCategory.prefix,
                         Prefix: addedSubCategory.prefix,
                         PCode_BarCode: nextPCodeBarCode,
-                        suffix: nextPCodeBarCode.replace(addedSubCategory.prefix, ""), // Extract numeric suffix
+                        suffix: nextPCodeBarCode.replace(addedSubCategory.prefix, ""),
+                        // Purity: addedSubCategory.purity,
+                        Purity: addedSubCategory.selling_purity,
+                        pur_Purity: addedSubCategory.purity,
                     }));
                 }
             } else {
@@ -1633,7 +1645,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                     // ]}
                                                     options={[
                                                         ...(formData.Purity
-                                                            ? [{ value: selectedCategory?.purity, label: selectedCategory?.purity }]
+                                                            ? [{ value: selectedCategory?.selling_purity, label: selectedCategory?.selling_purity }]
                                                             : []),
                                                         ...purityOptions
                                                             .filter(option => option.name && option.purity) // Remove undefined values

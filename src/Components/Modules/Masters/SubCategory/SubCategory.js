@@ -18,6 +18,7 @@ function SubCategory() {
     sub_category_name: "",
     prefix: "",
     purity:"",
+    selling_purity:"",
   });
 
   const [metalOptions, setMetalOptions] = useState([]);
@@ -228,6 +229,15 @@ function SubCategory() {
                 label="Purity"
                 name="purity"
                 value={formData.purity}
+                onChange={handleChange}
+                required
+              />
+            </Col>
+            <Col md={4}>
+              <InputField
+                label="Selling Purity"
+                name="selling_purity"
+                value={formData.selling_purity}
                 onChange={handleChange}
                 required
               />
