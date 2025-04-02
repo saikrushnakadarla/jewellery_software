@@ -1161,7 +1161,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     }, [selectedProduct]);
 
     const handleAddSubCategory = async () => {
-        if (!newSubCategory.name || !newSubCategory.prefix || !newSubCategory.category ||
+        if (!newSubCategory.name || !newSubCategory.prefix ||
             !newSubCategory.purity || !newSubCategory.selling_purity) {
             alert("All fields are required.");
             return;
