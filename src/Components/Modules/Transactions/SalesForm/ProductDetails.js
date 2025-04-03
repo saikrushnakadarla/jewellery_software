@@ -77,9 +77,6 @@ const ProductDetails = ({
     }
   }, [formData.category, defaultBarcode]);
 
-
-
-
   return (
     <Col >
       <Row>
