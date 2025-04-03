@@ -137,13 +137,28 @@ function Dashboard() {
             >
               Details
             </a>
-            <a
+            {/* <a
 
               href="#"
               className="btn-link"
               onClick={(e) => {
                 e.preventDefault();
                 navigate("/sales", { state: { mobile: selectedMobile } });
+              }}
+            >
+              New
+            </a> */}
+            <a
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                if (selectedMobile) {
+                  navigate("/sales", { state: { mobile: selectedMobile } }); 
+                } else {
+                  
+                  window.open("/sales", "_blank"); 
+                }
               }}
             >
               New

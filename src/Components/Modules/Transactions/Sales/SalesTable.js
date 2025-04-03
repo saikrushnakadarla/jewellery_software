@@ -98,22 +98,22 @@ const RepairsTable = () => {
           return finalBalance.toFixed(2);
         },
       },
-      {
-        Header: 'Status',
-        accessor: 'status',
-        Cell: ({ row }) => {
-          const { net_bill_amount, paid_amt, receipts_amt } = row.original;
+      // {
+      //   Header: 'Status',
+      //   accessor: 'status',
+      //   Cell: ({ row }) => {
+      //     const { net_bill_amount, paid_amt, receipts_amt } = row.original;
       
-          const totalPaid = Number(paid_amt) + Number(receipts_amt);
-          const netBill = Number(net_bill_amount);
+      //     const totalPaid = Number(paid_amt) + Number(receipts_amt);
+      //     const netBill = Number(net_bill_amount);
       
-          return (
-            <span style={{  color: netBill === totalPaid ? 'green' : 'red' }}>
-              {netBill === totalPaid ? 'Delivered' : 'Not Delivered'}
-            </span>
-          );
-        },
-      },
+      //     return (
+      //       <span style={{  color: netBill === totalPaid ? 'green' : 'red' }}>
+      //         {netBill === totalPaid ? 'Delivered' : 'Not Delivered'}
+      //       </span>
+      //     );
+      //   },
+      // },
       {
         Header: 'Actions',
         accessor: 'actions',
@@ -312,7 +312,7 @@ const RepairsTable = () => {
         });
 
         // Call handleDelete without confirmation
-        await handleDelete(invoice_number, true, true);
+        // await handleDelete(invoice_number, true, true);
       } catch (error) {
         console.error('Error fetching details:', error);
         Swal.fire('Error', 'Unable to fetch repair or old item details. Please try again.', 'error');
@@ -520,7 +520,8 @@ const RepairsTable = () => {
                       <th>MC</th>
                       <th>Rate</th>
                       <th>Tax Amt</th>
-                      <th>Status</th>
+                      {/* <th>Status</th> */}
+                      <th>Sale Status</th>
                       <th>Total Price</th>
                     </tr>
                   </thead>
@@ -538,7 +539,8 @@ const RepairsTable = () => {
                         <td>{product.making_charges}</td>
                         <td>{product.rate}</td>
                         <td>{product.tax_amt}</td>
-                        <td>{product.transaction_status}</td>
+                        {/* <td>{product.transaction_status}</td> */}
+                        <td>{product.sale_status}</td>
                         <td>{product.total_price}</td>
 
                       </tr>

@@ -26,6 +26,7 @@ const PaymentDetails = ({
   netPayAmount,
   discount,
   handleDiscountChange,
+  refreshSalesData
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const location = useLocation();
@@ -193,6 +194,15 @@ const PaymentDetails = ({
               style={{ backgroundColor: 'gray', marginLeft: '-40px' }}
             >
               Cancel
+            </Button>
+          </Col>
+          <Col xs={12} md={2}>
+            <Button
+              variant="secondary"
+              onClick={refreshSalesData}
+              style={{ backgroundColor: 'gray', marginLeft: '-30px' }}
+            >
+              Clear
             </Button>
           </Col>
         </Row>

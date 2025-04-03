@@ -1,4 +1,4 @@
-import React, { useState, useContext,useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
@@ -17,14 +17,26 @@ function Navbar() {
   const [utilityDropdownOpen, setUtilityDropdownOpen] = useState(false);
   const { authToken, userId, userName } = useContext(AuthContext);
   // console.log(userId, userName)
-  const location = useLocation();  
+  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (location.pathname !== "/purchase") {
-        localStorage.removeItem("tableData");
+      localStorage.removeItem("tableData");
     }
-}, [location.pathname]);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (location.pathname !== "/sales") {
+      localStorage.removeItem('oldSalesData');
+      localStorage.removeItem('schemeSalesData');
+      localStorage.removeItem('repairDetails');
+      localStorage.removeItem('paymentDetails');
+      localStorage.removeItem('oldTableData'); 
+      localStorage.removeItem('schemeTableData'); 
+      localStorage.removeItem("discount");
+    }
+  }, [location.pathname]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);

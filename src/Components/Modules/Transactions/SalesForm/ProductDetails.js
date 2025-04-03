@@ -83,17 +83,7 @@ const ProductDetails = ({
   return (
     <Col >
       <Row>
-        <Col xs={12} md={2}>
-          <InputField
-            label="Category"
-            name="category"
-            value={formData.category || ""}
-            type="select"
-            onChange={handleChange}
-            options={categoryOptions}
-          />
-        </Col>
-        <Col xs={12} md={2}>
+      <Col xs={12} md={2}>
           <InputField
             label="BarCode/Rbarcode"
             name="code"
@@ -104,6 +94,17 @@ const ProductDetails = ({
             autoFocus
           />
         </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Category"
+            name="category"
+            value={formData.category || ""}
+            type="select"
+            onChange={handleChange}
+            options={categoryOptions}
+          />
+        </Col>
+
         <Col xs={12} md={2}>
           <InputField
             label="Metal Type"
@@ -214,6 +215,19 @@ const ProductDetails = ({
                 name="remarks"
                 value={formData.remarks}
                 onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Status"
+                type='select'
+                name="sale_status"
+                value={formData.sale_status}
+                onChange={handleChange}
+                options={[
+                  { value: "Delivered", label: "Delivered" },
+                  { value: "Not Delivered", label: "Not Delivered" },  
+                ]}
               />
             </Col>
             {/* <Col xs={12} md={2}>
@@ -343,7 +357,7 @@ const ProductDetails = ({
         ) : (
           // Otherwise (if Pricing is not "By fixed"), show all fields:
           <>
-            <Col xs={12} md={2}>
+            {/* <Col xs={12} md={2}>
               <InputField
                 label="Purity"
                 name="purity"
@@ -351,6 +365,16 @@ const ProductDetails = ({
                 onChange={handleChange}
                 type="select"
                 options={purityOptions}
+              />
+            </Col> */}
+            <Col xs={12} md={2}>
+              <InputField
+                label="Purity"
+                name="purity"
+                value={formData.purity || ""}
+                onChange={handleChange}
+                // type="select"
+                // options={purityOptions}
               />
             </Col>
             <Col xs={12} md={1}>
@@ -552,6 +576,19 @@ const ProductDetails = ({
                 name="remarks"
                 value={formData.remarks}
                 onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Status"
+                type='select'
+                name="sale_status"
+                value={formData.sale_status}
+                onChange={handleChange}
+                options={[
+                  { value: "Delivered", label: "Delivered" },
+                  { value: "Not Delivered", label: "Not Delivered" },  
+                ]}
               />
             </Col>
             {/* <Col xs={12} md={2}>

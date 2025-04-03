@@ -44,7 +44,7 @@ const useProductHandlers = () => {
     metal_type: "",
     design_name: "",
     purity: "",
-    pricing:"",
+    pricing: "",
     category: "",
     sub_category: "",
     gross_weight: "",
@@ -65,15 +65,15 @@ const useProductHandlers = () => {
     rate_amt: "",
     tax_percent: "03% GST",
     tax_amt: "",
-    hm_charges:"60.00",
+    hm_charges: "60.00",
     total_price: "",
     transaction_status: "Sales",
     qty: "1",
     opentag_id: "",
     product_image: null,
     imagePreview: null,
-    remarks:"",
-
+    remarks: "",
+    sale_status: "",
   });
   const [uniqueProducts, setUniqueProducts] = useState([]);
   const [metalTypes, setMetalTypes] = useState([]);
@@ -86,7 +86,7 @@ const useProductHandlers = () => {
   const [subcategoryOptions, setSubcategoryOptions] = useState([]);
   const [metaltypeOptions, setMetaltypeOptions] = useState([]);
   const [purityOptions, setpurityOptions] = useState([]);
-  const [designOptions, setDesignOptions] = useState([]); 
+  const [designOptions, setDesignOptions] = useState([]);
   const [image, setImage] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
   const [showWebcam, setShowWebcam] = useState(false);
@@ -95,7 +95,7 @@ const useProductHandlers = () => {
 
   useEffect(() => {
     let currentRate = "";
-  
+
     if (formData.metal_type?.toLowerCase() === "gold" && formData.purity) {
       // Check if the purity value includes specific numbers
       if (formData.purity.includes("24")) {
@@ -106,17 +106,19 @@ const useProductHandlers = () => {
         currentRate = rates.rate_18crt;
       } else if (formData.purity.includes("16")) {
         currentRate = rates.rate_16crt;
+      } else {
+        currentRate = rates.rate_22crt; // Default to 22-carat rate if no match
       }
     } else if (formData.metal_type?.toLowerCase() === "silver" && formData.purity) {
       currentRate = rates.silver_rate;
     }
-  
+
     setFormData((prevData) => ({
       ...prevData,
       rate: currentRate,
     }));
   }, [formData.purity, formData.metal_type, rates]);
-  
+
   useEffect(() => {
     const fetchCurrentRates = async () => {
       try {
@@ -156,8 +158,8 @@ const useProductHandlers = () => {
         throw new Error("Failed to fetch tags");
       }
       const result = await response.json();
-      setData(result.result); 
-      
+      setData(result.result);
+
     } catch (error) {
       console.error("Error fetching tags:", error);
     }
@@ -209,14 +211,15 @@ const useProductHandlers = () => {
         rate_amt: "",
         tax_percent: "03% GST",
         tax_amt: "",
-        hm_charges:"60.00",
+        hm_charges: "60.00",
         total_price: "",
         transaction_status: "Sales",
         qty: "1",
         opentag_id: "",
         product_image: null,
         imagePreview: null,
-        remarks:"",
+        remarks: "",
+        sale_status: ""
       };
     }
 
@@ -360,10 +363,11 @@ const useProductHandlers = () => {
         rate_amt: "",
         tax_percent: "",
         tax_amt: "",
-        hm_charges:"60.00",
+        hm_charges: "60.00",
         total_price: "",
         qty: "", // Rese
-        remarks:"",
+        remarks: "",
+        sale_status: ""
       }));
 
       setFilteredMetalTypes(metalTypes);
@@ -470,13 +474,13 @@ const useProductHandlers = () => {
           const filteredData = formData.category
             ? result.data.filter((item) => item.category === formData.category)
             : result.data;
-  
+
           // Format the filtered options
           const formattedOptions = filteredData.map((item) => ({
             label: item.sub_category_name, // Display value
             value: item.sub_category_name, // Unique ID for value
           }));
-  
+
           setSubcategoryOptions(formattedOptions);
         } else {
           console.error("Invalid API response format", result);
@@ -485,25 +489,25 @@ const useProductHandlers = () => {
         console.error("Error fetching data:", error);
       }
     };
-  
+
     // Run the function initially and when formData.metal_type changes
     fetchSubCategory();
-  }, [formData.category]); 
+  }, [formData.category]);
 
-  const [allMetalTypes, setAllMetalTypes] = useState([]); 
-  
+  const [allMetalTypes, setAllMetalTypes] = useState([]);
+
   useEffect(() => {
     const fetchMetalType = async () => {
       try {
         const response = await fetch(`${baseURL}/metaltype`);
         const data = await response.json();
-        
+
         // Extract all metal types
         const allMetalTypes = Array.from(new Set(data.map((product) => product.metal_name)));
-  
+
         // Store all metal types
         setAllMetalTypes(allMetalTypes);
-  
+
         // Initially, show all metal types
         setMetaltypeOptions(allMetalTypes.map((category) => ({
           value: category,
@@ -513,10 +517,10 @@ const useProductHandlers = () => {
         console.error('Error fetching metal types:', error);
       }
     };
-  
+
     fetchMetalType();
   }, []);
-  
+
   useEffect(() => {
     if (!formData.category) {
       // Show all metal types if no category is selected
@@ -526,7 +530,7 @@ const useProductHandlers = () => {
       })));
       return;
     }
-  
+
     const fetchFilteredMetalTypes = async () => {
       try {
         const response = await fetch(`${baseURL}/get/products`);
@@ -534,22 +538,22 @@ const useProductHandlers = () => {
           throw new Error("Failed to fetch products");
         }
         const result = await response.json();
-  
+
         // Find selected category object
         const selectedProduct = result.find((item) => item.product_name === formData.category);
-  
+
         if (selectedProduct) {
           const filteredMetals = allMetalTypes.filter(
             (metal) => metal === selectedProduct.Category
           );
-  
+
           const options = filteredMetals.map((category) => ({
             value: category,
             label: category,
           }));
-  
+
           setMetaltypeOptions(options);
-  
+
           // Auto-select the first option only when a category is selected
           if (formData.category && options.length > 0) {
             setFormData((prev) => ({ ...prev, metal_type: options[0].value }));
@@ -559,10 +563,10 @@ const useProductHandlers = () => {
         console.error("Error fetching filtered metal types:", error);
       }
     };
-  
+
     fetchFilteredMetalTypes();
   }, [formData.category, allMetalTypes]);
-  
+
   useEffect(() => {
     const fetchDesignName = async () => {
       try {
@@ -622,7 +626,7 @@ const useProductHandlers = () => {
 
           setFormData((prevData) => ({
             ...prevData,
-            purity: defaultPurity || "",
+            // purity: defaultPurity || "",
           }));
         }
       } catch (error) {
@@ -646,7 +650,7 @@ const useProductHandlers = () => {
           metal_type: "",
           design_name: "",
           purity: "",
-          pricing:"",
+          pricing: "",
           category: "",
           sub_category: "",
           gross_weight: "",
@@ -667,10 +671,11 @@ const useProductHandlers = () => {
           rate_amt: "",
           tax_percent: "",
           tax_amt: "",
-          hm_charges:"60.00",
+          hm_charges: "60.00",
           total_price: "",
           qty: "", // Reset qty
-          remarks:"",
+          remarks: "",
+          sale_status: ""
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
@@ -692,8 +697,8 @@ const useProductHandlers = () => {
           product_name: "", // Make editable
           metal_type: product.Category,
           design_name: "", // Make editable
-          purity: defaultPurity || "",
-          pricing:"",
+          // purity: defaultPurity || "",
+          pricing: "",
           category: product.product_name,
           sub_category: "",
           gross_weight: "",
@@ -741,7 +746,7 @@ const useProductHandlers = () => {
             metal_type: tag.metal_type || "",
             design_name: tag.design_master || "", // Make editable
             purity: tag.Purity || "",
-            pricing:tag.Pricing || "",
+            pricing: tag.Pricing || "",
             category: tag.category || "",
             sub_category: tag.sub_category || "",
             gross_weight: tag.Gross_Weight || "",
@@ -770,7 +775,7 @@ const useProductHandlers = () => {
             metal_type: "",
             design_name: "",
             purity: "",
-            pricing:"",
+            pricing: "",
             category: "",
             sub_category: "",
             gross_weight: "",
@@ -791,10 +796,11 @@ const useProductHandlers = () => {
             rate_amt: "",
             tax_percent: "",
             tax_amt: "",
-            hm_charges:"60.00",
+            hm_charges: "60.00",
             total_price: "",
             qty: "", // Reset qty
-            remarks:"",
+            remarks: "",
+            sale_status: ""
           }));
           setIsQtyEditable(true); // Default to editable
         }
@@ -818,9 +824,9 @@ const useProductHandlers = () => {
   //   }
   // };
 
-   // This function handles the file input change event for the gallery selection.
+  // This function handles the file input change event for the gallery selection.
 
-   const handleImageChange = (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();

@@ -526,6 +526,7 @@ const SalesForm = () => {
       qty: "",
       imagePreview: null,
       remarks: "",
+      sale_status:"",
     }));
   };
 
@@ -752,8 +753,8 @@ const SalesForm = () => {
     localStorage.removeItem('schemeSalesData');
     localStorage.removeItem('repairDetails');
     localStorage.removeItem('paymentDetails');
-    localStorage.removeItem('oldTableData'); // Explicitly remove oldTableData from local storage
-    localStorage.removeItem('schemeTableData'); // Explicitly remove oldTableData from local storage
+    localStorage.removeItem('oldTableData'); 
+    localStorage.removeItem('schemeTableData'); 
     localStorage.removeItem("discount");
     console.log("Data cleared successfully");
   };
@@ -843,6 +844,32 @@ const SalesForm = () => {
       console.error("Error saving data:", error);
       alert("Error saving data");
     }
+  };
+
+  const refreshSalesData = () => {
+    setOldSalesData([]);
+    setSchemeSalesData([]);
+    setRepairDetails([]);
+    setPaymentDetails({
+      cash_amount: 0,
+      card_amt: 0,
+      chq: "",
+      chq_amt: 0,
+      online: "",
+      online_amt: 0,
+    });
+    setOldTableData([]); // Clear the oldTableData state
+    setSchemeTableData([])
+    setDiscount(0);
+    localStorage.removeItem('oldSalesData');
+    localStorage.removeItem('schemeSalesData');
+    localStorage.removeItem('repairDetails');
+    localStorage.removeItem('paymentDetails');
+    localStorage.removeItem('oldTableData'); 
+    localStorage.removeItem('schemeTableData'); 
+    localStorage.removeItem("discount");
+    console.log("Data cleared successfully");
+    window.location.reload();
   };
 
 
@@ -944,7 +971,6 @@ const SalesForm = () => {
                 salesTaxableAmount={salesTaxableAmount}
                 salesTaxAmount={salesTaxAmount}
                 salesNetAmount={salesNetAmount}
-
                 repairDetails={repairDetails}
                 resetSaleReturnForm={resetSaleReturnForm}
                 handleCheckout={handleCheckout}
@@ -973,6 +999,7 @@ const SalesForm = () => {
                 oldSalesData={oldSalesData} schemeSalesData={schemeSalesData}
                 discount={discount}
                 handleDiscountChange={handleDiscountChange}
+                refreshSalesData={refreshSalesData}
               />
             </div>
           </div>

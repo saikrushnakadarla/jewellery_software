@@ -96,6 +96,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         tag_weight: "",
         pcs: "1",
         MC_Per_Gram_Label: "",
+        printing_purity: '',
     });
     const [show, setShow] = useState(false);
     const [showPurchase, setShowPurchase] = useState(false);
@@ -550,20 +551,10 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                         Prefix: newPrefix,
                         PCode_BarCode: nextPCodeBarCode,
                         suffix: nextPCodeBarCode.replace(newPrefix, ""),
-                        // Purity: selectedCategory.purity, 
-                        Purity: selectedCategory.selling_purity, 
-                        pur_Purity: selectedCategory.purity,
+                        Purity: selectedCategory.selling_purity || "", // Set empty if undefined/null
+                        pur_Purity: selectedCategory.purity || "", // Set empty if undefined/null
+                        printing_purity: selectedCategory.printing_purity || "", // Set empty if undefined/null
                     }));
-
-                    // Ensure selectedCategory.purity is part of purityOptions
-                    // setPurityOptions((prevOptions) => {
-                    //     const formattedPurity = {
-                    //         value: selectedCategory.selling_purity,
-                    //         label: selectedCategory.selling_purity,
-                    //     };
-                    //     return [...prevOptions.filter(opt => opt.value !== formattedPurity.value), formattedPurity];
-                    // });
-
                 } catch (error) {
                     console.error("Error fetching PCode_BarCode:", error);
                 }
@@ -575,8 +566,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                     item_prefix: "",
                     Prefix: "",
                     PCode_BarCode: "",
-                    Purity: "", 
-                    pur_Purity:"",
+                    Purity: "",
+                    pur_Purity: "",
+                    printing_purity: "",
                 }));
             }
         } else {
@@ -585,6 +577,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 [field]: value,
             }));
         }
+
 
 
         setFormData((prevData) => {
@@ -930,6 +923,15 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             return;
         }
 
+        // **Check if Gross Weight exceeds the limit**
+        if (parseFloat(formData.Gross_Weight) > parseFloat(grossWeight)) {
+            const diff = (parseFloat(formData.Gross_Weight) - parseFloat(grossWeight)).toFixed(3);
+            const confirmSubmit = window.confirm(`The tag gross weight exceeds by ${diff} of balance Gross Weight. Do you want to proceed?`);
+            if (!confirmSubmit) {
+                return; // Stop submission if user clicks "No"
+            }
+        }
+
         try {
             const updatedData = { ...formData, image };
 
@@ -986,7 +988,9 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                         Wastage_On: "Gross Weight",
                         WastageWeight: "",
                         // sub_category: prevData.sub_category,
-                        Purity: prevData.Purity,
+                        Purity: "",
+                        printing_purity: "",
+                        pur_Purity: "",
                         HUID_No: prevData.HUID_No,
                         Stock_Point: prevData.Stock_Point,
                         design_master: prevData.design_master,
@@ -1129,14 +1133,15 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         category: '',
         purity: '',
         selling_purity: '',
+        printing_purity: '',
     });
 
     const handleModalChange = (e) => {
         let { name, value } = e.target;
 
-        // Capitalize first letter if the field is "name"
-        if (name === "name") {
-            value = value.charAt(0).toUpperCase() + value.slice(1);
+        // Capitalize all letters if the field is "name" or "prefix"
+        if (name === "name" || name === "prefix") {
+            value = value.toUpperCase();
         }
 
         setNewSubCategory((prev) => ({
@@ -1153,6 +1158,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     };
 
 
+
     useEffect(() => {
         if (selectedProduct) {
             console.log("Product ID:", selectedProduct.product_id);
@@ -1162,7 +1168,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
     const handleAddSubCategory = async () => {
         if (!newSubCategory.name || !newSubCategory.prefix ||
-            !newSubCategory.purity || !newSubCategory.selling_purity) {
+            !newSubCategory.purity || !newSubCategory.selling_purity || !newSubCategory.printing_purity) {
             alert("All fields are required.");
             return;
         }
@@ -1176,6 +1182,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 metal_type: selectedProduct.metal_type,
                 purity: newSubCategory.purity,
                 selling_purity: newSubCategory.selling_purity,
+                printing_purity: newSubCategory.printing_purity,
             };
 
             // Make POST request to the API
@@ -1187,7 +1194,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
                 // Close modal and clear form
                 handleCloseModal();
-                setNewSubCategory({ name: '', prefix: '', category: '', purity: '', selling_purity: '' });
+                setNewSubCategory({ name: '', prefix: '', category: '', purity: '', selling_purity: '', printing_purity: '' });
 
                 // Refresh subcategories and auto-select the new one
                 await fetchSubCategories(); // Ensure categories are updated first
@@ -1220,6 +1227,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                         // Purity: addedSubCategory.purity,
                         Purity: addedSubCategory.selling_purity,
                         pur_Purity: addedSubCategory.purity,
+                        printing_purity: addedSubCategory.printing_purity
                     }));
                 }
             } else {
@@ -1323,51 +1331,51 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     }, [selectedProduct.product_id, selectedProduct.tag_id]); // Re-run when either changes
 
 
-    useEffect(() => {
-        const fetchPurity = async () => {
-            try {
-                const response = await axios.get(`${baseURL}/purity`);
-                const filteredPurity = response.data.filter(
-                    (item) =>
-                        item.metal.toLowerCase() === formData.metal_type.toLowerCase() ||
-                        (["diamond", "others"].includes(formData.metal_type.toLowerCase()) && item.metal.toLowerCase() === "gold")
-                );
+    // useEffect(() => {
+    //     const fetchPurity = async () => {
+    //         try {
+    //             const response = await axios.get(`${baseURL}/purity`);
+    //             const filteredPurity = response.data.filter(
+    //                 (item) =>
+    //                     item.metal.toLowerCase() === formData.metal_type.toLowerCase() ||
+    //                     (["diamond", "others"].includes(formData.metal_type.toLowerCase()) && item.metal.toLowerCase() === "gold")
+    //             );
 
-                setPurityOptions(filteredPurity);
+    //             setPurityOptions(filteredPurity);
 
-                console.log("Purity Options:", filteredPurity);
+    //             console.log("Purity Options:", filteredPurity);
 
-                let defaultOption = null;
+    //             let defaultOption = null;
 
-                if (["gold", "diamond", "others"].includes(formData.metal_type.toLowerCase())) {
-                    defaultOption = filteredPurity.find((option) =>
-                        option.name.toLowerCase().includes("22")
-                    );
-                } else if (formData.metal_type.toLowerCase() === "silver") {
-                    defaultOption = filteredPurity.find((option) =>
-                        option.name.toLowerCase().includes("92.5")
-                    );
-                }
+    //             if (["gold", "diamond", "others"].includes(formData.metal_type.toLowerCase())) {
+    //                 defaultOption = filteredPurity.find((option) =>
+    //                     option.name.toLowerCase().includes("22")
+    //                 );
+    //             } else if (formData.metal_type.toLowerCase() === "silver") {
+    //                 defaultOption = filteredPurity.find((option) =>
+    //                     option.name.toLowerCase().includes("92.5")
+    //                 );
+    //             }
 
-                if (defaultOption) {
-                    const defaultPurityValue = `${defaultOption.name} | ${defaultOption.purity}`;
-                    console.log("Setting default purity:", defaultPurityValue);
+    //             if (defaultOption) {
+    //                 const defaultPurityValue = `${defaultOption.name} | ${defaultOption.purity}`;
+    //                 console.log("Setting default purity:", defaultPurityValue);
 
-                    setFormData((prevFormData) => ({
-                        ...prevFormData,
-                        Purity: defaultPurityValue,
-                        pur_Purity: defaultPurityValue, // Ensure exact match
-                    }));
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
+    //                 setFormData((prevFormData) => ({
+    //                     ...prevFormData,
+    //                     Purity: defaultPurityValue,
+    //                     pur_Purity: defaultPurityValue, // Ensure exact match
+    //                 }));
+    //             }
+    //         } catch (error) {
+    //             console.error("Error fetching data:", error);
+    //         }
+    //     };
 
-        if (formData.metal_type) {
-            fetchPurity();
-        }
-    }, [formData.metal_type]);
+    //     if (formData.metal_type) {
+    //         fetchPurity();
+    //     }
+    // }, [formData.metal_type]);
 
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -1410,14 +1418,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
         setIsEditMode(true);
         setImage(rowData.image || "");
 
-        // Check if Making_Charges_On is "MC %" and set MC_Per_Gram_Label accordingly
+        // Check Making_Charges_On value and set MC_Per_Gram_Label accordingly
         if (rowData.Making_Charges_On === "MC %") {
             setFormData((prevData) => ({
                 ...prevData,
                 MC_Per_Gram_Label: "MC%",
             }));
+        } else if (rowData.Making_Charges_On === "MC / Gram" || rowData.Making_Charges_On === "MC / Piece") {
+            setFormData((prevData) => ({
+                ...prevData,
+                MC_Per_Gram_Label: "MC/Gm",
+            }));
         }
     };
+
 
     const handleDelete = async (id) => {
         console.log("Deleting ID:", id); // Confirming ID before sending request
@@ -1613,6 +1627,30 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                 <InputField label="PCode/BarCode" name="PCode_BarCode" type="text" value={formData.PCode_BarCode} onChange={handleChange} />
                                             </Col>
                                             <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Printing Purity"
+                                                    name="Purity"
+                                                    value={formData.printing_purity} // Ensure correct value
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Selling Purity"
+                                                    name="Purity"
+                                                    value={formData.Purity}
+                                                    onChange={handleChange}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
+                                                <InputField
+                                                    label="Purchase Purity"
+                                                    name="pur_Purity"
+                                                    value={formData.pur_Purity}
+                                                    onChange={(e) => handleChange("pur_Purity", e.target.value)}
+                                                />
+                                            </Col>
+                                            <Col xs={12} md={2}>
                                                 <InputField label="HUID No" name="HUID_No" value={formData.HUID_No} onChange={handleChange} />
                                             </Col>
                                             <Col xs={12} md={2}>
@@ -1631,29 +1669,29 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                             </Col>
                                             <Col xs={12} md={2}>
                                                 <InputField
-                                                    label="Purity"
+                                                    label="Printing Purity"
                                                     name="Purity"
-                                                    type="select"
-                                                    value={formData.Purity} // Ensure correct value
+                                                    // type="select"
+                                                    value={formData.printing_purity} // Ensure correct value
                                                     onChange={handleChange}
-                                                    // options={[
-                                                    //     { value: selectedCategory?.purity, label: selectedCategory?.purity }, // Show subcategory purity
-                                                    //     ...purityOptions.map((option) => ({
-                                                    //         value: `${option.name} | ${option.purity}`,
-                                                    //         label: `${option.name} | ${option.purity}`,
-                                                    //     })),
-                                                    // ]}
-                                                    options={[
-                                                        ...(formData.Purity
-                                                            ? [{ value: selectedCategory?.selling_purity, label: selectedCategory?.selling_purity }]
-                                                            : []),
-                                                        ...purityOptions
-                                                            .filter(option => option.name && option.purity) // Remove undefined values
-                                                            .map(option => ({
-                                                                value: `${option.name} | ${option.purity}`,
-                                                                label: `${option.name} | ${option.purity}`,
-                                                            })),
-                                                    ]}
+                                                // options={[
+                                                //     { value: selectedCategory?.purity, label: selectedCategory?.purity }, // Show subcategory purity
+                                                //     ...purityOptions.map((option) => ({
+                                                //         value: `${option.name} | ${option.purity}`,
+                                                //         label: `${option.name} | ${option.purity}`,
+                                                //     })),
+                                                // ]}
+                                                // options={[
+                                                //     ...(formData.printing_purity
+                                                //         ? [{ value: selectedCategory?.printing_purity, label: selectedCategory?.printing_purity }]
+                                                //         : []),
+                                                //     ...purityOptions
+                                                //         .filter(option => option.name && option.purity) // Remove undefined values
+                                                //         .map(option => ({
+                                                //             value: `${option.name} | ${option.purity}`,
+                                                //             label: `${option.name} | ${option.purity}`,
+                                                //         })),
+                                                // ]}
                                                 />
                                             </Col>
                                             <Col xs={12} md={2}>
@@ -1798,15 +1836,37 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                                 onChange={handleChange}
                                                             />
                                                         </Col>
-                                                        <Col xs={12} md={4}>
-                                                            <InputField label="Weight BW" name="Weight_BW" value={formData.Weight_BW} onChange={handleChange} readOnly />
-                                                        </Col>
                                                         <Col xs={12} md={3}>
-                                                            <InputField label="Tag Wt" name="tag_weight" value={formData.tag_weight} onChange={handleChange} />
+                                                            <InputField
+                                                                label="Selling Purity"
+                                                                name="Purity"
+                                                                // type="select"
+                                                                value={formData.Purity}
+                                                                onChange={handleChange}
+                                                            // options={[
+                                                            //     { value: selectedCategory?.purity, label: selectedCategory?.purity }, // Show subcategory purity
+                                                            //     ...purityOptions.map((option) => ({
+                                                            //         value: `${option.name} | ${option.purity}`,
+                                                            //         label: `${option.name} | ${option.purity}`,
+                                                            //     })),
+                                                            // ]}
+                                                            // options={[
+                                                            //     ...(formData.Purity
+                                                            //         ? [{ value: selectedCategory?.selling_purity, label: selectedCategory?.selling_purity }]
+                                                            //         : []),
+                                                            //     ...purityOptions
+                                                            //         .filter(option => option.name && option.purity) // Remove undefined values
+                                                            //         .map(option => ({
+                                                            //             value: `${option.name} | ${option.purity}`,
+                                                            //             label: `${option.name} | ${option.purity}`,
+                                                            //         })),
+                                                            // ]}
+                                                            />
                                                         </Col>
                                                         <Col xs={12} md={2}>
-                                                            <InputField label="Size" name="size" value={formData.size} onChange={handleChange} />
+                                                            <InputField label="Wt BW" name="Weight_BW" value={formData.Weight_BW} onChange={handleChange} readOnly />
                                                         </Col>
+
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="MC On"
@@ -1833,7 +1893,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
                                                         {/* Show Making_Charges field only when Making_Charges_On is "MC / Gram" or "MC / Piece" */}
                                                         {(formData.Making_Charges_On === "MC / Gram" || formData.Making_Charges_On === "MC / Piece") && (
-                                                            <Col xs={12} md={3}>
+                                                            <Col xs={12} md={2}>
                                                                 <InputField
                                                                     label="MC"
                                                                     name="Making_Charges"
@@ -1842,8 +1902,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                                 />
                                                             </Col>
                                                         )}
-
-
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="Wastage On"
@@ -1864,9 +1922,14 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                             <InputField label="W.Wt" name="WastageWeight" value={formData.WastageWeight} onChange={handleChange} readOnly />
                                                         </Col>
                                                         <Col xs={12} md={3}>
-                                                            <InputField label="Total Weight" name="TotalWeight_AW" value={formData.TotalWeight_AW} onChange={handleChange} readOnly />
+                                                            <InputField label="Total Wt" name="TotalWeight_AW" value={formData.TotalWeight_AW} onChange={handleChange} readOnly />
                                                         </Col>
-
+                                                        <Col xs={12} md={2}>
+                                                            <InputField label="Tag Wt" name="tag_weight" value={formData.tag_weight} onChange={handleChange} />
+                                                        </Col>
+                                                        <Col xs={12} md={2}>
+                                                            <InputField label="Size" name="size" value={formData.size} onChange={handleChange} />
+                                                        </Col>
                                                     </Row>
                                                 </Col>
                                             </div>
@@ -1878,47 +1941,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                         <Col xs={12} md={3}>
                                                             <InputField label="Gross Wt" name="pur_Gross_Weight" value={formData.pur_Gross_Weight} onChange={handleChange} />
                                                         </Col>
-                                                        <Col xs={12} md={4}>
-                                                            <InputField
-                                                                label="Purity"
-                                                                name="pur_Purity"
-                                                                type="select"
-                                                                value={formData.pur_Purity}
-                                                                onChange={(e) => handleChange("pur_Purity", e.target.value)}
-                                                                // options={[
-                                                                //     ...purityOptions.map((option) => ({
-                                                                //         value: `${option.name} | ${option.purity}`,
-                                                                //         label: `${option.name} | ${option.purity}`,
-                                                                //     })),
-                                                                //     { value: "Manual", label: "Manual" } // Correct placement of Manual option
-                                                                // ]}
-                                                                options={[
-                                                                    ...(formData.Purity
-                                                                        ? [{ value: selectedCategory?.purity, label: selectedCategory?.purity }]
-                                                                        : []),
-                                                                    ...purityOptions
-                                                                        .filter(option => option.name && option.purity) // Remove undefined values
-                                                                        .map(option => ({
-                                                                            value: `${option.name} | ${option.purity}`,
-                                                                            label: `${option.name} | ${option.purity}`,
-                                                                        })),
-                                                                    { value: "Manual", label: "Manual" }
-                                                                ]}
-                                                            />
-                                                        </Col>
-                                                        {formData.pur_Purity === "Manual" && (
-                                                            <Col xs={12} md={4}>
-                                                                <InputField
-                                                                    label="Custom Purity %"
-                                                                    // type="number"
-                                                                    name="pur_purityPercentage"
-                                                                    value={formData.pur_purityPercentage || ""}
-
-                                                                    onChange={(e) => handleChange("pur_purityPercentage", e.target.value)}
-                                                                />
-                                                            </Col>
-                                                        )}
-
                                                         <Col xs={12} md={3}>
                                                             <InputField label="Stones Wt" name="pur_Stones_Weight" value={formData.pur_Stones_Weight} onChange={handleChange} />
                                                         </Col>
@@ -1965,17 +1987,50 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                                 onChange={handleChange}
                                                             />
                                                         </Col>
+                                                        <Col xs={12} md={3}>
+                                                            <InputField
+                                                                label="Purity"
+                                                                name="pur_Purity"
+                                                                // type="select"
+                                                                value={formData.pur_Purity}
+                                                                onChange={(e) => handleChange("pur_Purity", e.target.value)}
+                                                            // options={[
+                                                            //     ...purityOptions.map((option) => ({
+                                                            //         value: `${option.name} | ${option.purity}`,
+                                                            //         label: `${option.name} | ${option.purity}`,
+                                                            //     })),
+                                                            //     { value: "Manual", label: "Manual" } // Correct placement of Manual option
+                                                            // ]}
+                                                            // options={[
+                                                            //     ...(formData.Purity
+                                                            //         ? [{ value: selectedCategory?.purity, label: selectedCategory?.purity }]
+                                                            //         : []),
+                                                            //     ...purityOptions
+                                                            //         .filter(option => option.name && option.purity) // Remove undefined values
+                                                            //         .map(option => ({
+                                                            //             value: `${option.name} | ${option.purity}`,
+                                                            //             label: `${option.name} | ${option.purity}`,
+                                                            //         })),
+                                                            //     { value: "Manual", label: "Manual" }
+                                                            // ]}
+                                                            />
+                                                        </Col>
+                                                        {formData.pur_Purity === "Manual" && (
+                                                            <Col xs={12} md={4}>
+                                                                <InputField
+                                                                    label="Custom Purity %"
+                                                                    // type="number"
+                                                                    name="pur_purityPercentage"
+                                                                    value={formData.pur_purityPercentage || ""}
+
+                                                                    onChange={(e) => handleChange("pur_purityPercentage", e.target.value)}
+                                                                />
+                                                            </Col>
+                                                        )}
                                                         <Col xs={12} md={2}>
                                                             <InputField label="Wt BW" name="pur_Weight_BW" value={formData.pur_Weight_BW} onChange={handleChange} readOnly />
                                                         </Col>
-                                                        <Col xs={12} md={3}>
-                                                            <InputField
-                                                                label="Rate"
-                                                                type="number"
-                                                                value={formData.pur_rate_cut}
-                                                                onChange={(e) => handleChange("pur_rate_cut", e.target.value)}
-                                                            />
-                                                        </Col>
+
                                                         <Col xs={12} md={4}>
                                                             <InputField
                                                                 label="MC On"
@@ -1991,7 +2046,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                             />
                                                         </Col>
 
-                                                        <Col xs={12} md={2}>
+                                                        <Col xs={12} md={3}>
                                                             <InputField
                                                                 label={formData.MC_Per_Gram_Label}
                                                                 name="pur_MC_Per_Gram"
@@ -2034,6 +2089,14 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                         </Col>
                                                         <Col xs={12} md={3}>
                                                             <InputField label="Total Wt" name="pur_TotalWeight_AW" value={formData.pur_TotalWeight_AW} onChange={handleChange} readOnly />
+                                                        </Col>
+                                                        <Col xs={12} md={3}>
+                                                            <InputField
+                                                                label="Rate"
+                                                                type="number"
+                                                                value={formData.pur_rate_cut}
+                                                                onChange={(e) => handleChange("pur_rate_cut", e.target.value)}
+                                                            />
                                                         </Col>
                                                     </Row>
                                                 </Col>
@@ -2136,8 +2199,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                         </>
                                     )}
                                 </Row>
-
-
                             </div>
                             <div className="d-flex justify-content-between align-items-center">
                                 {/* <label>
@@ -2181,13 +2242,13 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
 
                             {/* <OpeningTagsTable /> */}
-                            <div className="container mt-4" style={{ overflowX: "auto", maxWidth: "100%" }}>
+                            <div className="container mt-2" style={{ overflowX: "auto", maxWidth: "100%" }}>
                                 {/* Excel Export Button */}
                                 <button
                                     onClick={exportToExcel}
                                     style={{
                                         marginBottom: "10px",
-                                        padding: "8px 12px",
+                                        padding: "5px 5px",
                                         backgroundColor: "green",
                                         color: "white",
                                         border: "none",
@@ -2199,8 +2260,6 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                 >
                                     <FaFileExcel style={{ marginRight: "5px" }} /> Export to Excel
                                 </button>
-
-                                {/* Table */}
                                 <Table bordered style={{ whiteSpace: "nowrap", fontSize: "15px" }}>
                                     <thead style={{ fontSize: "14px", fontWeight: "bold" }}>
                                         <tr>
@@ -2309,48 +2368,60 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                 name="name"
                                 value={newSubCategory.name}
                                 onChange={handleModalChange}
-
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="subCategoryPrefix">
-                            <Form.Label>Prefix</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="prefix"
-                                value={newSubCategory.prefix}
-                                onChange={handleModalChange}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="subCategoryPrefix">
-                            <Form.Label>Purity</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="purity"
-                                value={newSubCategory.purity}
-                                onChange={handleModalChange}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="subCategoryPrefix">
-                            <Form.Label>Selling Purity</Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="selling_purity"
-                                value={newSubCategory.selling_purity}
-                                onChange={handleModalChange}
                             />
                         </Form.Group>
 
-                        {/* <Form.Group controlId="categoryName">
-                <Form.Label>Category</Form.Label>
-                <Form.Control
-                    type="text"
-                    name="category"
-                    value={formData.category} 
-                    onChange={handleModalChange}
-                   readOnly
-                />
-            </Form.Group> */}
+                        <Row>
+                            <Col>
+                                <Form.Group controlId="subCategoryPrefix">
+                                    <Form.Label>Prefix</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="prefix"
+                                        value={newSubCategory.prefix}
+                                        onChange={handleModalChange}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group controlId="subCategoryPrintingPurity">
+                                    <Form.Label>Printing Purity</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="printing_purity"
+                                        value={newSubCategory.printing_purity}
+                                        onChange={handleModalChange}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <Row>
+                            <Col>
+                                <Form.Group controlId="subCategorySellingPurity">
+                                    <Form.Label>Selling Purity</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        name="selling_purity"
+                                        value={newSubCategory.selling_purity}
+                                        onChange={handleModalChange}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group controlId="subCategoryPurity">
+                                    <Form.Label>Purchase Purity</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="purity"
+                                        value={newSubCategory.purity}
+                                        onChange={handleModalChange}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
                     </Form>
+
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleCloseModal}>

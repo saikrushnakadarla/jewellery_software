@@ -11,7 +11,7 @@ const RepairForm = () => {
     const receivedData = location.state || {};
     console.log("Pricing=", receivedData.Pricing)
     console.log("Purchase Id=", receivedData.purchase_id)
-    
+
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split("T")[0], // Sets today's date in YYYY-MM-DD format
         mode: "",
@@ -61,7 +61,7 @@ const RepairForm = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         let updatedFormData = { ...formData, [name]: value };
-    
+
         if (name === "rate_cut_id" && value === "") {
             updatedFormData = {
                 ...updatedFormData,
@@ -70,22 +70,22 @@ const RepairForm = () => {
                 total_wt: ""
             };
         }
-    
+
         if (name === "paid_amt") {
             const paidAmt = parseFloat(value) || 0;
             const rateCut = parseFloat(formData.rate_cut) || 1; // Prevent division by zero
             const totalAmt = parseFloat(formData.total_amt) || 0;
             const totalWt = parseFloat(formData.total_wt) || 0;
-    
+
             if (paidAmt > totalAmt) {
                 alert("Paid Amount cannot be greater than Outstanding Amount!");
                 return;
             }
-    
+
             const paidWt = (paidAmt / rateCut).toFixed(3);
             const balAmt = (totalAmt - paidAmt).toFixed(2); // Set to two decimal places
             const balWt = (totalWt - paidWt).toFixed(3);
-    
+
             updatedFormData = {
                 ...updatedFormData,
                 bal_amt: balAmt,
@@ -98,16 +98,16 @@ const RepairForm = () => {
             const rateCut = parseFloat(formData.rate_cut) || 1; // Prevent multiplication errors
             const totalAmt = parseFloat(formData.total_amt) || 0;
             const totalWt = parseFloat(formData.total_wt) || 0;
-    
+
             if (paidWt > totalWt) {
                 alert("Paid Weight cannot be greater than Outstanding Weight!");
                 return;
             }
-    
+
             const paidAmt = (paidWt * rateCut).toFixed(2);
             const balAmt = (totalAmt - paidAmt).toFixed(2); // Set to two decimal places
             const balWt = (totalWt - paidWt).toFixed(3);
-    
+
             updatedFormData = {
                 ...updatedFormData,
                 bal_amt: balAmt,
@@ -116,10 +116,10 @@ const RepairForm = () => {
                 paid_by: "By Weight"
             };
         }
-    
+
         setFormData(updatedFormData);
     };
-    
+
 
     useEffect(() => {
         const fetchAccountNames = async () => {
@@ -231,11 +231,11 @@ const RepairForm = () => {
             const matchingRateCut = rateCuts.find(
                 (rateCut) => rateCut.purchase_id === receivedData.purchase_id
             );
-    
+
             if (matchingRateCut) {
                 setFormData((prevState) => ({
                     ...prevState,
-                    total_amt: matchingRateCut.balance_amount, 
+                    total_amt: matchingRateCut.balance_amount,
                     rate_cut_id: matchingRateCut.rate_cut_id,
                 }));
             }
@@ -246,9 +246,9 @@ const RepairForm = () => {
                     rateCut.category === formData.category &&
                     rateCut.rate_cut_id === formData.rate_cut_id
             );
-    
+
             console.log("matchingRateCut=", matchingRateCut);
-    
+
             if (matchingRateCut) {
                 setFormData((prevState) => ({
                     ...prevState,
@@ -259,18 +259,18 @@ const RepairForm = () => {
             }
         }
     }, [formData.invoice, formData.category, formData.rate_cut_id, rateCuts, receivedData]);
-    
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         console.log("Submitting Data:", formData); // Log the form data before sending
-        
+
         try {
             const response = await axios.post("http://localhost:5000/purchasePayments", formData);
             alert("Purchase Payment Added Successfully!");
             console.log(response.data);
-    
+
             setFormData({
                 date: new Date().toISOString().split("T")[0],
                 mode: "",
@@ -290,7 +290,7 @@ const RepairForm = () => {
                 rate_cut_id: "",
                 paid_by: "",
             });
-    
+
             navigate("/purchasetable");
         } catch (error) {
             console.error("Error submitting data:", error);
@@ -298,7 +298,7 @@ const RepairForm = () => {
             alert(`Error: ${error.response?.data?.message || "Failed to add purchase payment."}`);
         }
     };
-    
+
 
     const handleBack = () => {
         navigate("/purchasetable");
@@ -383,19 +383,19 @@ const RepairForm = () => {
                         />
                     </Col>
                     {receivedData.Pricing !== "By fixed" && (
-                    <>
+                        <>
 
-                    <Col xs={12} md={2}>
-                        <InputField
-                            label="Rate Cut Id"
-                            type="select"
-                            name="rate_cut_id"
-                            value={formData.rate_cut_id}
-                            onChange={handleInputChange}
-                            options={rateCutIdOptions}
-                        />
-                    </Col>
-                    {/* <Col xs={12} md={2}>
+                            <Col xs={12} md={2}>
+                                <InputField
+                                    label="Rate Cut Id"
+                                    type="select"
+                                    name="rate_cut_id"
+                                    value={formData.rate_cut_id}
+                                    onChange={handleInputChange}
+                                    options={rateCutIdOptions}
+                                />
+                            </Col>
+                            {/* <Col xs={12} md={2}>
                         <InputField
                             label="Rate Cut"
                             type="select"
@@ -406,20 +406,20 @@ const RepairForm = () => {
                         >
                         </InputField>
                     </Col> */}
-                    <Col xs={12} md={2}>
-                        <InputField
-                            label="Rate Cut"
-                            // type="select"
-                            name="rate_cut"
-                            value={formData.rate_cut}
-                            onChange={handleInputChange}
-                            // options={rateCutOptions}
-                        >
-                        </InputField>
-                    </Col>
-                    
-                    </>
-                )}
+                            <Col xs={12} md={2}>
+                                <InputField
+                                    label="Rate Cut"
+                                    // type="select"
+                                    name="rate_cut"
+                                    value={formData.rate_cut}
+                                    onChange={handleInputChange}
+                                // options={rateCutOptions}
+                                >
+                                </InputField>
+                            </Col>
+
+                        </>
+                    )}
 
                     <Col xs={12} md={2}>
                         <InputField
@@ -448,38 +448,38 @@ const RepairForm = () => {
                             value={formData.bal_amt}
                         />
                     </Col>
-                    {receivedData.Pricing !== "By fixed" && (
-                    <>
-                    <Col xs={12} md={2}>
-                        <InputField
-                            label="Out Standing Wt"
-                            type="number"
-                            name="total_wt"
-                            value={formData.total_wt}
-                            onChange={handleInputChange}
-                            readOnly
-                        />
-                    </Col>
-                    <Col xs={12} md={2}>
-                        <InputField
-                            label="Paid Wt"
-                            type="number"
-                            name="paid_wt"
-                            value={formData.paid_wt}
-                            onChange={handleInputChange}
-                        />
-                    </Col>
-                    <Col xs={12} md={2}>
-                        <InputField
-                            label="Bal Wt"
-                            type="number"
-                            name="bal_wt"
-                            value={formData.bal_wt}
-                            readOnly
-                        />
-                    </Col>
-                    </>
-                )}
+                    {/* {receivedData.Pricing !== "By fixed" && (
+                        <>
+                            <Col xs={12} md={2}>
+                                <InputField
+                                    label="Out Standing Wt"
+                                    type="number"
+                                    name="total_wt"
+                                    value={formData.total_wt}
+                                    onChange={handleInputChange}
+                                    readOnly
+                                />
+                            </Col>
+                            <Col xs={12} md={2}>
+                                <InputField
+                                    label="Paid Wt"
+                                    type="number"
+                                    name="paid_wt"
+                                    value={formData.paid_wt}
+                                    onChange={handleInputChange}
+                                />
+                            </Col>
+                            <Col xs={12} md={2}>
+                                <InputField
+                                    label="Bal Wt"
+                                    type="number"
+                                    name="bal_wt"
+                                    value={formData.bal_wt}
+                                    readOnly
+                                />
+                            </Col>
+                        </>
+                    )} */}
 
                     <Col xs={12} md={2}>
                         <InputField
