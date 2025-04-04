@@ -12,7 +12,7 @@ const FestOffersTable = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch data from GET API
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -28,7 +28,6 @@ const FestOffersTable = () => {
     fetchData();
   }, []);
 
-  // Table columns configuration
   const columns = React.useMemo(
     () => [
       {
@@ -66,11 +65,11 @@ const FestOffersTable = () => {
             <div>
               <FaEdit
                 style={{ cursor: "pointer", color: "blue", marginRight: "10px" }}
-                onClick={() => navigate("/festoffers", { state: { subcategory_id: offer.offer_id, location: offer } })}
+                onClick={() => handleEdit(offer.offer_id)}
               />
               <FaTrash
                 style={{ cursor: "pointer", color: "red" }}
-                onClick={() => handleDelete(offer.offer_id)}
+                onClick={() => handleDelete(offer)}
               />
             </div>
           );
@@ -80,8 +79,24 @@ const FestOffersTable = () => {
     [data]
   );
 
-  // Handle delete (optional logic using Swal confirmation)
-  const handleDelete = async (id) => {
+  const handleEdit = async (id) => {
+    try {
+      const res = await axios.get(`${baseURL}/api/offers/${id}`);
+      const offerData = res.data;
+
+      navigate("/festoffers", {
+        state: {
+          offer_id: id,
+          location: offerData,
+        },
+      });
+    } catch (err) {
+      console.error("Error fetching offer by ID:", err);
+      Swal.fire("Error", "Failed to fetch offer data for editing", "error");
+    }
+  };
+
+  const handleDelete = async (offer) => {
     const confirm = await Swal.fire({
       title: "Are you sure?",
       text: "You want to delete this offer?",
@@ -94,8 +109,12 @@ const FestOffersTable = () => {
 
     if (confirm.isConfirmed) {
       try {
-        await axios.delete(`${baseURL}/api/offers/${id}`);
-        setData((prev) => prev.filter((item) => item.offer_id !== id));
+        await axios.delete(`${baseURL}/api/offers/${offer.offer_id}`, {
+          data: offer,
+        });
+
+        // Update state to remove the deleted offer
+        setData((prev) => prev.filter((item) => item.offer_id !== offer.offer_id));
         Swal.fire("Deleted!", "The offer has been deleted.", "success");
       } catch (error) {
         console.error("Delete error:", error);
@@ -104,7 +123,6 @@ const FestOffersTable = () => {
     }
   };
 
-  // Navigate to create subcategory page
   const handleCreate = () => {
     navigate("/festoffers");
   };
