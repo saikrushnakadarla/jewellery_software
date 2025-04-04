@@ -153,6 +153,7 @@ function Navbar() {
               <Link to="/designmaster" onClick={handleItemClick} className={isActive('/designmaster')}>Design Master</Link>
               <Link to="/accountstable" onClick={handleItemClick} className={isActive('/accountstable') || isActive('/accounts')}>Accounts</Link>
               <Link to="/workerstable" onClick={handleItemClick} className={isActive('/workerstable') || isActive('/workermaster')}>Worker Master</Link>
+              <Link to="/festofferstable" onClick={handleItemClick} className={isActive('/festofferstable') || isActive('/festoffers')}>Festival Offers</Link>
               <Link to="/rates" onClick={handleItemClick} className={isActive('/rates')}>Rates</Link>
               <Link to="/company_info" onClick={handleItemClick} className={isActive('/company_info')}>Company Info</Link>
 
@@ -247,6 +248,7 @@ function Navbar() {
             {(location.pathname === '/sales' || location.pathname === '/salestable') && <h1 className="path-heading">SALES</h1>}
             {(location.pathname === '/purchase' || location.pathname === '/purchasetable') && <h1 className="path-heading">PURCHASE</h1>}
             {(location.pathname === '/subcategory' || location.pathname === '/subcategorytable') && <h1 className="path-heading">SUB CATEGORY</h1>}
+            {(location.pathname === '/festoffers' || location.pathname === '/festofferstable') && <h1 className="path-heading">FESTIVAL OFFERS</h1>}
             {location.pathname === '/salesreturn' && <h1 className="path-heading">SALES RETURN</h1>}
             {(location.pathname === '/estimates' || location.pathname === '/estimatetable') && <h1 className="path-heading">ESTIMATE</h1>}
             {(location.pathname === '/payments' || location.pathname === '/paymentstable') && <h1 className="path-heading">PAYMENTS</h1>}

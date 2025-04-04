@@ -67,6 +67,8 @@ import EstimateSales from './Components/Modules/Transactions/Sales/EstimateSales
 import QRScanner from "./Components/QRScanner ";
 import RateCuts from './Components/Modules/Transactions/Purchase/RateCuts'
 import PurchasePayment from './Components/Modules/Transactions/Purchase/PurchasePayment';
+import Festoffers from './Components/Modules/Masters/FestivalOffers/FestOffers';
+import Festofferstable from './Components/Modules/Masters/FestivalOffers/FestOffersTable';
 
 function App() {
   const location = useLocation();
@@ -147,6 +149,8 @@ function App() {
         <Route path="/usermaster/:id" element={<UserMaster />} />
         <Route path="/subcategory" element={<SubCategory />} />
         <Route path="/subcategorytable" element={<SubCategoryTable />} />
+        <Route path="/festoffers" element={<Festoffers />} />
+        <Route path="/festofferstable" element={<Festofferstable />} />
         <Route path="/subcategory/:id" element={<SubCategory />} />
         <Route path="/estimateSales" element={<EstimateSales />} />
         <Route path="/qrcode" element={<QRScanner />} />
