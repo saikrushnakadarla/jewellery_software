@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef  } from "react";
 import { Col, Row } from "react-bootstrap";
 import InputField from "./../../../Pages/InputField/InputField";
 import { AiOutlinePlus } from "react-icons/ai";
@@ -12,6 +12,7 @@ const CustomerDetails = ({
   handleAddCustomer,
   customers,
   setSelectedMobile,
+  mobileRef
 }) => {
   const location = useLocation();
   const [balance, setBalance] = useState(0); // State to store balance
@@ -108,6 +109,7 @@ const CustomerDetails = ({
                   label: customer.mobile,
                 })),
               ]}
+              ref={mobileRef}
             />
           </div>
           <AiOutlinePlus

@@ -19,6 +19,7 @@ function SubCategory() {
     prefix: "",
     purity:"",
     selling_purity:"",
+    printing_purity:"",
   });
 
   const [metalOptions, setMetalOptions] = useState([]);
@@ -215,7 +216,7 @@ function SubCategory() {
                 required
               />
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Prefix"
                 name="prefix"
@@ -224,7 +225,7 @@ function SubCategory() {
                 required
               />
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Purity"
                 name="purity"
@@ -233,11 +234,20 @@ function SubCategory() {
                 required
               />
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Selling Purity"
                 name="selling_purity"
                 value={formData.selling_purity}
+                onChange={handleChange}
+                required
+              />
+            </Col>
+            <Col md={3}>
+              <InputField
+                label="Printing Purity"
+                name="printing_purity"
+                value={formData.printing_purity}
                 onChange={handleChange}
                 required
               />

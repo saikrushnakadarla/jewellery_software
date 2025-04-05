@@ -73,7 +73,7 @@ const useProductHandlers = () => {
     product_image: null,
     imagePreview: null,
     remarks: "",
-    sale_status: "",
+    sale_status: "Delivered",
   });
   const [uniqueProducts, setUniqueProducts] = useState([]);
   const [metalTypes, setMetalTypes] = useState([]);
@@ -96,9 +96,12 @@ const useProductHandlers = () => {
   useEffect(() => {
     let currentRate = "";
 
-    if (formData.metal_type?.toLowerCase() === "gold" && formData.purity) {
-      // Check if the purity value includes specific numbers
-      if (formData.purity.includes("24")) {
+    const isGoldLikeMetal = ["gold", "diamond", "others"].includes(formData.metal_type?.toLowerCase());
+
+    if (isGoldLikeMetal) {
+      if (!formData.purity) {
+        currentRate = rates.rate_22crt; // Default to 22-carat rate if purity is empty
+      } else if (formData.purity.includes("24")) {
         currentRate = rates.rate_24crt;
       } else if (formData.purity.includes("22")) {
         currentRate = rates.rate_22crt;
@@ -109,7 +112,7 @@ const useProductHandlers = () => {
       } else {
         currentRate = rates.rate_22crt; // Default to 22-carat rate if no match
       }
-    } else if (formData.metal_type?.toLowerCase() === "silver" && formData.purity) {
+    } else if (formData.metal_type?.toLowerCase() === "silver") {
       currentRate = rates.silver_rate;
     }
 
@@ -118,6 +121,8 @@ const useProductHandlers = () => {
       rate: currentRate,
     }));
   }, [formData.purity, formData.metal_type, rates]);
+
+
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -219,7 +224,7 @@ const useProductHandlers = () => {
         product_image: null,
         imagePreview: null,
         remarks: "",
-        sale_status: ""
+        sale_status: "Delivered"
       };
     }
 
@@ -236,38 +241,38 @@ const useProductHandlers = () => {
       }
     }
 
-    if (name === "purity" || name === "metal_type") {
-      if (formData.metal_type.toLowerCase() === "gold") {
-        // Check for different purity values and set the rate accordingly for gold
-        if (
-          value.toLowerCase().includes("22") || // Check for 22 KT, 22K, 22k, etc.
-          value.toLowerCase().includes("22kt") ||
-          value.toLowerCase().includes("22k")
-        ) {
-          updatedFormData.rate = rates.rate_22crt;
-        } else if (
-          value.toLowerCase().includes("24") || // Check for 24 KT, 24K, etc.
-          value.toLowerCase().includes("24kt") ||
-          value.toLowerCase().includes("24k")
-        ) {
-          updatedFormData.rate = rates.rate_24crt;
-        } else if (
-          value.toLowerCase().includes("18") || // Check for 18 KT, 18K, etc.
-          value.toLowerCase().includes("18kt") ||
-          value.toLowerCase().includes("18k")
-        ) {
-          updatedFormData.rate = rates.rate_18crt;
-        } else if (
-          value.toLowerCase().includes("16") || // Check for 16 KT, 16K, etc.
-          value.toLowerCase().includes("16kt") ||
-          value.toLowerCase().includes("16k")
-        ) {
-          updatedFormData.rate = rates.rate_16crt;
-        } else {
-          updatedFormData.rate = "";
-        }
-      }
-    }
+    // if (name === "purity" || name === "metal_type") {
+    //   if (formData.metal_type.toLowerCase() === "gold") {
+    //     // Check for different purity values and set the rate accordingly for gold
+    //     if (
+    //       value.toLowerCase().includes("22") || // Check for 22 KT, 22K, 22k, etc.
+    //       value.toLowerCase().includes("22kt") ||
+    //       value.toLowerCase().includes("22k")
+    //     ) {
+    //       updatedFormData.rate = rates.rate_22crt;
+    //     } else if (
+    //       value.toLowerCase().includes("24") || // Check for 24 KT, 24K, etc.
+    //       value.toLowerCase().includes("24kt") ||
+    //       value.toLowerCase().includes("24k")
+    //     ) {
+    //       updatedFormData.rate = rates.rate_24crt;
+    //     } else if (
+    //       value.toLowerCase().includes("18") || // Check for 18 KT, 18K, etc.
+    //       value.toLowerCase().includes("18kt") ||
+    //       value.toLowerCase().includes("18k")
+    //     ) {
+    //       updatedFormData.rate = rates.rate_18crt;
+    //     } else if (
+    //       value.toLowerCase().includes("16") || // Check for 16 KT, 16K, etc.
+    //       value.toLowerCase().includes("16kt") ||
+    //       value.toLowerCase().includes("16k")
+    //     ) {
+    //       updatedFormData.rate = rates.rate_16crt;
+    //     } else {
+    //       updatedFormData.rate = "";
+    //     }
+    //   }
+    // }
 
     if (
       formData.metal_type?.toLowerCase() === "gold" &&
@@ -367,7 +372,7 @@ const useProductHandlers = () => {
         total_price: "",
         qty: "", // Rese
         remarks: "",
-        sale_status: ""
+        sale_status: "Delivered"
       }));
 
       setFilteredMetalTypes(metalTypes);
@@ -436,61 +441,59 @@ const useProductHandlers = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const response = await fetch(`${baseURL}/get/products`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
-        const result = await response.json();
-        if (result && Array.isArray(result)) {
-          const formattedOptions = result.map((item) => ({
-            label: item.product_name, // Display name
-            value: item.product_name, // Unique value
-          }));
-          setCategoryOptions(formattedOptions);
-        } else {
-          console.error("Invalid API response format", result);
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error);
+  const fetchCategory = async () => {
+    try {
+      const response = await fetch(`${baseURL}/get/products`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
       }
-    };
-
+      const result = await response.json();
+      if (result && Array.isArray(result)) {
+        const formattedOptions = result.map((item) => ({
+          label: item.product_name, // Display name
+          value: item.product_name, // Unique value
+        }));
+        setCategoryOptions(formattedOptions);
+      } else {
+        console.error("Invalid API response format", result);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+  useEffect(() => {
     fetchCategory();
   }, []);
 
-  useEffect(() => {
-    const fetchSubCategory = async () => {
-      try {
-        const response = await fetch(`${baseURL}/subcategory`); // Use the correct API endpoint
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const result = await response.json();
-        if (result && result.data) {
-          // If formData.metal_type is available, filter based on it, otherwise show all
-          const filteredData = formData.category
-            ? result.data.filter((item) => item.category === formData.category)
-            : result.data;
-
-          // Format the filtered options
-          const formattedOptions = filteredData.map((item) => ({
-            label: item.sub_category_name, // Display value
-            value: item.sub_category_name, // Unique ID for value
-          }));
-
-          setSubcategoryOptions(formattedOptions);
-        } else {
-          console.error("Invalid API response format", result);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+  const fetchSubCategory = async () => {
+    try {
+      const response = await fetch(`${baseURL}/subcategory`); // Use the correct API endpoint
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
       }
-    };
+      const result = await response.json();
+      if (result && result.data) {
+        // If formData.metal_type is available, filter based on it, otherwise show all
+        const filteredData = formData.category
+          ? result.data.filter((item) => item.category === formData.category)
+          : result.data;
 
-    // Run the function initially and when formData.metal_type changes
+        // Format the filtered options
+        const formattedOptions = filteredData.map((item) => ({
+          label: item.sub_category_name, // Display value
+          value: item.sub_category_name, // Unique ID for value
+        }));
+
+        setSubcategoryOptions(formattedOptions);
+      } else {
+        console.error("Invalid API response format", result);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchSubCategory();
   }, [formData.category]);
 
@@ -675,7 +678,7 @@ const useProductHandlers = () => {
           total_price: "",
           qty: "", // Reset qty
           remarks: "",
-          sale_status: ""
+          sale_status: "Delivered"
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
@@ -800,7 +803,7 @@ const useProductHandlers = () => {
             total_price: "",
             qty: "", // Reset qty
             remarks: "",
-            sale_status: ""
+            sale_status: "Delivered"
           }));
           setIsQtyEditable(true); // Default to editable
         }
@@ -886,6 +889,8 @@ const useProductHandlers = () => {
     metaltypeOptions,
     uniqueProducts,
     isBarcodeSelected,
+    fetchCategory,
+    fetchSubCategory,
   };
 
 };

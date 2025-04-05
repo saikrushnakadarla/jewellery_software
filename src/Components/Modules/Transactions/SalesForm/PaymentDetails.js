@@ -196,7 +196,7 @@ const PaymentDetails = ({
               Cancel
             </Button>
           </Col>
-          <Col xs={12} md={2}>
+          {/* <Col xs={12} md={2}>
             <Button
               variant="secondary"
               onClick={refreshSalesData}
@@ -204,7 +204,7 @@ const PaymentDetails = ({
             >
               Clear
             </Button>
-          </Col>
+          </Col> */}
         </Row>
       </Col>
     </div>

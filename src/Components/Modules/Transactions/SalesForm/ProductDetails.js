@@ -42,7 +42,10 @@ const ProductDetails = ({
   isQtyEditable,
   estimate,
   selectedEstimate,
-  handleEstimateChange
+  handleEstimateChange,
+  refreshSalesData,
+  fetchCategory,
+  fetchSubCategory,
 }) => {
 
 
@@ -80,7 +83,7 @@ const ProductDetails = ({
   return (
     <Col >
       <Row>
-      <Col xs={12} md={2}>
+        <Col xs={12} md={2}>
           <InputField
             label="BarCode/Rbarcode"
             name="code"
@@ -223,7 +226,7 @@ const ProductDetails = ({
                 onChange={handleChange}
                 options={[
                   { value: "Delivered", label: "Delivered" },
-                  { value: "Not Delivered", label: "Not Delivered" },  
+                  { value: "Not Delivered", label: "Not Delivered" },
                 ]}
               />
             </Col>
@@ -370,8 +373,8 @@ const ProductDetails = ({
                 name="purity"
                 value={formData.purity || ""}
                 onChange={handleChange}
-                // type="select"
-                // options={purityOptions}
+              // type="select"
+              // options={purityOptions}
               />
             </Col>
             <Col xs={12} md={1}>
@@ -584,7 +587,7 @@ const ProductDetails = ({
                 onChange={handleChange}
                 options={[
                   { value: "Delivered", label: "Delivered" },
-                  { value: "Not Delivered", label: "Not Delivered" },  
+                  { value: "Not Delivered", label: "Not Delivered" },
                 ]}
               />
             </Col>
@@ -725,7 +728,16 @@ const ProductDetails = ({
             {isEditing ? "Update" : "Add"}
           </Button>
         </Col>
-        <Col xs={12} md={4}></Col>
+        <Col xs={12} md={2}>
+          <Button
+            variant="secondary"
+            onClick={refreshSalesData}
+            style={{ backgroundColor: 'gray', marginLeft: '-30px' }}
+          >
+            Clear
+          </Button>
+        </Col>
+
         <Col xs={12} md={3}>
           <InputField
             label="Estimate Number"

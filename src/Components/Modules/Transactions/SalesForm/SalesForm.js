@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -87,6 +87,8 @@ const SalesForm = () => {
     webcamRef,
     setShowOptions,
     showOptions,
+    fetchCategory,
+    fetchSubCategory,
   } = useProductHandlers();
 
 
@@ -353,18 +355,18 @@ const SalesForm = () => {
 
   const fetchEstimateDetails = async (estimate_number) => {
     if (!estimate_number) return;
-  
+
     try {
       const response = await axios.get(`${baseURL}/get-estimates/${estimate_number}`);
-  
+
       // First, update the state with the full estimate details
       setEstimateDetails(response.data);
-  
+
       if (!stock) {
         console.warn("Stock data not yet available!");
         return;
       }
-  
+
       // Filter only matching repeatedData items
       const filteredData = response.data.repeatedData
         .filter(item =>
@@ -374,16 +376,16 @@ const SalesForm = () => {
           ...item,
           invoice_number: formData.invoice_number, // Add invoice_number from formData
           transaction_status: "Sales", // Add transaction_status as "Sales"
-          date:formData.date,
+          date: formData.date,
         }));
-  
+
       if (filteredData.length > 0) {
         // Store filtered data in localStorage
         localStorage.setItem("repairDetails", JSON.stringify(filteredData));
-  
+
         // Update state with filtered data
         setRepairDetails(filteredData);
-  
+
         // Immediately retrieve and log stored data
         const storedData = JSON.parse(localStorage.getItem("repairDetails"));
         console.log("Stored repairDetails:", storedData);
@@ -397,7 +399,7 @@ const SalesForm = () => {
       console.error('Error fetching selected estimate details:', error);
     }
   };
-  
+
 
   const handleEstimateChange = (e) => {
     const selectedValue = e.target.value;
@@ -526,7 +528,7 @@ const SalesForm = () => {
       qty: "",
       imagePreview: null,
       remarks: "",
-      sale_status:"",
+      sale_status: "",
     }));
   };
 
@@ -753,8 +755,8 @@ const SalesForm = () => {
     localStorage.removeItem('schemeSalesData');
     localStorage.removeItem('repairDetails');
     localStorage.removeItem('paymentDetails');
-    localStorage.removeItem('oldTableData'); 
-    localStorage.removeItem('schemeTableData'); 
+    localStorage.removeItem('oldTableData');
+    localStorage.removeItem('schemeTableData');
     localStorage.removeItem("discount");
     console.log("Data cleared successfully");
   };
@@ -865,12 +867,20 @@ const SalesForm = () => {
     localStorage.removeItem('schemeSalesData');
     localStorage.removeItem('repairDetails');
     localStorage.removeItem('paymentDetails');
-    localStorage.removeItem('oldTableData'); 
-    localStorage.removeItem('schemeTableData'); 
+    localStorage.removeItem('oldTableData');
+    localStorage.removeItem('schemeTableData');
     localStorage.removeItem("discount");
     console.log("Data cleared successfully");
     window.location.reload();
   };
+
+  const mobileRef = useRef(null); // Reference to Mobile input field in CustomerDetails
+
+  useEffect(() => {
+    if (formData.code) {
+      mobileRef.current?.focus(); // Move focus to Mobile when BarCode is entered
+    }
+  }, [formData.code]);
 
 
   return (
@@ -888,6 +898,7 @@ const SalesForm = () => {
                 handleAddCustomer={handleAddCustomer}
                 customers={customers}
                 setSelectedMobile={setSelectedMobile} // Pass the setSelectedMobile function here
+                mobileRef={mobileRef}
               />
 
             </div>
@@ -898,7 +909,7 @@ const SalesForm = () => {
               />
             </div>
           </div>
-          <div className="sales-form-section">
+          <div className="sales-form-section" style={{ marginTop: '-20px' }}>
             <ProductDetails
               formData={formData}
               handleChange={handleChange}
@@ -936,6 +947,9 @@ const SalesForm = () => {
               estimate={estimate}
               selectedEstimate={selectedEstimate}
               handleEstimateChange={handleEstimateChange}
+              refreshSalesData={refreshSalesData}
+              fetchCategory={fetchCategory}
+              fetchSubCategory={fetchSubCategory}
             />
           </div>
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Select from "react-select";
 import "./InputField.css";
 
@@ -14,6 +14,7 @@ const InputField = ({
   required = false,
   max,
   autoFocus ,
+  nextRef,
 }) => {
   // Custom styles for react-select
   const customStyles = {
@@ -44,6 +45,21 @@ const InputField = ({
       zIndex: 9999, // Ensure the dropdown is on top
     }),
     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+  };
+
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (autoFocus && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [autoFocus]);
+
+  const handleChange = (e) => {
+    onChange(e);
+    if (nextRef && e.target.value) {
+      nextRef.current?.focus();
+    }
   };
 
   return (
@@ -86,7 +102,7 @@ const InputField = ({
             placeholder={placeholder}
             value={value}
             readOnly={readOnly}
-            onChange={onChange}
+            onChange={handleChange}
             required={required}
             max={max}
             autoFocus={autoFocus}
