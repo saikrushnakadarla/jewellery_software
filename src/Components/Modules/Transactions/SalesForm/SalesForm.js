@@ -400,7 +400,6 @@ const SalesForm = () => {
     }
   };
 
-
   const handleEstimateChange = (e) => {
     const selectedValue = e.target.value;
     setSelectedEstimate(selectedValue);
@@ -413,7 +412,6 @@ const SalesForm = () => {
       setRepairDetails([]);
     }
   };
-
 
   const handleAdd = () => {
     const storedRepairDetails = JSON.parse(localStorage.getItem("repairDetails")) || [];
@@ -587,22 +585,43 @@ const SalesForm = () => {
     navigate("/customermaster", { state: { from: "/sales" } });
   };
 
-  const totalAmount = repairDetails.reduce((sum, item) => {
+  let totalAmount = 0;
+let discountAmt = 0;
+let taxableAmount = 0;
+let taxAmount = 0;
+let netAmount = 0;
+
+repairDetails.forEach((item) => {
+  const pricing = item.pricing;
+  
+  if (pricing === "By Weight") {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
     const rateAmt = parseFloat(item.rate_amt) || 0;
     const hmCharges = parseFloat(item.hm_charges) || 0;
-    return sum + stonePrice + makingCharges + rateAmt + hmCharges;
-  }, 0);
+    const itemDiscount = parseFloat(item.disscount) || 0;
+    const itemTax = parseFloat(item.tax_amt) || 0;
 
-  const discountAmt = repairDetails.reduce((sum, item) => {
-    const discountAmt = parseFloat(item.disscount) || 0;
-    return sum + discountAmt;
-  }, 0);
+    const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
+    totalAmount += itemTotal;
+    discountAmt += itemDiscount;
+    taxableAmount += itemTotal - itemDiscount;
+    taxAmount += itemTax;
+    netAmount += itemTotal - itemDiscount + itemTax;
 
-  const taxableAmount = totalAmount - discountAmt;
-  const taxAmount = repairDetails.reduce((sum, item) => sum + parseFloat(item.tax_amt || 0), 0);
-  const netAmount = taxableAmount + taxAmount;
+  } else {
+    const pieceCost = parseFloat(item.pieace_cost) || 0;
+    const mrpPrice = parseFloat(item.mrp_price) || 0;
+
+    totalAmount += pieceCost;
+    // no discount or tax applied
+    taxableAmount += pieceCost;
+    netAmount += mrpPrice;
+  }
+});
+
+  
+
 
   const oldItemsAmount = location.state?.old_exchange_amt
     ? parseFloat(location.state.old_exchange_amt)
@@ -617,11 +636,6 @@ const SalesForm = () => {
       (sum, item) => sum + parseFloat(item.paid_amount || 0),
       0
     );
-
-  // Calculate Net Payable Amount
-  const payableAmount = netAmount - (schemeAmount + oldItemsAmount);
-  const netPayableAmount = Math.round(payableAmount);
-
 
   const [selectedRows, setSelectedRows] = useState([]);
   const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
@@ -696,7 +710,6 @@ const SalesForm = () => {
     }
   };
 
-
   // Calculate taxable amount based on selected rows
   const salesTaxableAmount = selectedRows.reduce((sum, rowIndex) => {
     const detail = invoiceDetails[rowIndex];
@@ -712,8 +725,34 @@ const SalesForm = () => {
   }, 0);
 
   const salesNetAmount = salesTaxableAmount + salesTaxAmount;
+
+  const isSameMonth = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+  };
+  
+  const allSelectedRowsAreThisMonth = selectedRows.every(rowIndex =>
+    isSameMonth(invoiceDetails[rowIndex]?.date)
+  );
+  
+  // Conditionally assign the correct value
+  const salesAmountToPass = allSelectedRowsAreThisMonth ? salesNetAmount : salesTaxableAmount;
+  
+
+  // Calculate Net Payable Amount
+  // const payableAmount = netAmount - (schemeAmount + oldItemsAmount);
+  // const netPayableAmount = Math.round(payableAmount);
+
+  // const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
+  // const netPayAmount = netPayableAmount - salesNetAmount
+
+
+  const payableAmount = netAmount - (schemeAmount + oldItemsAmount + salesNetAmount);
+  const netPayableAmount = Math.round(payableAmount);
+
   const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
-  const netPayAmount = netPayableAmount - salesNetAmount
+  const netPayAmount = netPayableAmount
 
   const [paymentDetails, setPaymentDetails] = useState({
     cash_amount: "", // Fix to two decimal places
@@ -766,48 +805,58 @@ const SalesForm = () => {
       alert("Please select the Customer or enter the Customer Mobile Number");
       return;
     }
-    const dataToSave = {
-      repairDetails: repairDetails.map(item => ({
-        ...item,
-        customer_id: formData.customer_id,
-        mobile: formData.mobile,
-        account_name: formData.account_name,
-        email: formData.email,
-        address1: formData.address1,
-        address2: formData.address2,
-        city: formData.city,
-        pincode: formData.pincode,
-        state: formData.state,
-        state_code: formData.state_code,
-        aadhar_card: formData.aadhar_card,
-        gst_in: formData.gst_in,
-        pan_card: formData.pan_card,
-        terms: formData.terms,
-        cash_amount: paymentDetails.cash_amount || 0,
-        card_amt: paymentDetails.card_amt || 0,
-        chq_amt: paymentDetails.chq_amt || 0,
-        online_amt: paymentDetails.online_amt || 0,
-
-      })),
-      oldItems: oldSalesData,
-      memberSchemes: schemeSalesData,
-      oldItemsAmount: oldItemsAmount || 0, // Explicitly include value
-      schemeAmount: schemeAmount || 0,    // Explicitly include value
-      salesNetAmount: salesNetAmount || 0,
-    };
-
-    console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-
-    console.log("Saving data:", dataToSave);
 
     try {
+      // Fetch the latest invoice number
+      const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
+      const latestInvoiceNumber = response.data.lastInvoiceNumber;
+
+      // Update formData with latest invoice number
+      const updatedFormData = {
+        ...formData,
+        invoice_number: latestInvoiceNumber,
+      };
+      setFormData(updatedFormData); // Update state (optional depending on your use)
+
+      const dataToSave = {
+        repairDetails: repairDetails.map(item => ({
+          ...item,
+          invoice_number: updatedFormData.invoice_number,
+          customer_id: updatedFormData.customer_id,
+          mobile: updatedFormData.mobile,
+          account_name: updatedFormData.account_name,
+          email: updatedFormData.email,
+          address1: updatedFormData.address1,
+          address2: updatedFormData.address2,
+          city: updatedFormData.city,
+          pincode: updatedFormData.pincode,
+          state: updatedFormData.state,
+          state_code: updatedFormData.state_code,
+          aadhar_card: updatedFormData.aadhar_card,
+          gst_in: updatedFormData.gst_in,
+          pan_card: updatedFormData.pan_card,
+          terms: updatedFormData.terms,
+          cash_amount: paymentDetails.cash_amount || 0,
+          card_amt: paymentDetails.card_amt || 0,
+          chq_amt: paymentDetails.chq_amt || 0,
+          online_amt: paymentDetails.online_amt || 0,
+        })),
+        oldItems: oldSalesData,
+        memberSchemes: schemeSalesData,
+        oldItemsAmount: oldItemsAmount || 0,
+        schemeAmount: schemeAmount || 0,
+        salesNetAmount: salesNetAmount || 0,
+        salesTaxableAmount: salesTaxableAmount || 0,
+      };
+
+      console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
+
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Sales added successfully");
 
-      // Generate PDF Blob
       const pdfDoc = (
         <PDFLayout
-          formData={formData}
+          formData={updatedFormData}
           repairDetails={repairDetails}
           cash_amount={paymentDetails.cash_amount || 0}
           card_amt={paymentDetails.card_amt || 0}
@@ -818,6 +867,8 @@ const SalesForm = () => {
           discountAmt={discountAmt}
           oldItemsAmount={oldItemsAmount}
           schemeAmount={schemeAmount}
+          salesNetAmount={salesNetAmount}
+          salesTaxableAmount={salesTaxableAmount}
           netAmount={netAmount}
           netPayableAmount={netPayableAmount}
         />
@@ -825,19 +876,13 @@ const SalesForm = () => {
 
       const pdfBlob = await pdf(pdfDoc).toBlob();
 
-      // Create a download link and trigger it
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = `invoice-${formData.invoice_number}.pdf`;
+      link.download = `invoice-${updatedFormData.invoice_number}.pdf`;
       link.click();
-
-      // Clean up
       URL.revokeObjectURL(link.href);
 
-      // Clear all data after saving
       clearData();
-
-      // Reset the form and reload the page if necessary
       resetForm();
       navigate("/salestable");
       window.location.reload();
@@ -847,6 +892,7 @@ const SalesForm = () => {
       alert("Error saving data");
     }
   };
+
 
   const refreshSalesData = () => {
     setOldSalesData([]);
@@ -1007,7 +1053,8 @@ const SalesForm = () => {
                 oldItemsAmount={oldItemsAmount}
                 schemeAmount={schemeAmount}
                 netPayableAmount={netPayableAmount}
-                salesNetAmount={salesNetAmount}
+                salesNetAmount={salesAmountToPass}
+                salesTaxableAmount={salesTaxableAmount}
                 updatedOldItemsAmount={updatedOldItemsAmount}
                 netPayAmount={netPayAmount}
                 oldSalesData={oldSalesData} schemeSalesData={schemeSalesData}

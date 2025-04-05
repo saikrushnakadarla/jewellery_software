@@ -29,7 +29,7 @@ const ProductTable = ({
   const netAmount = taxableAmount + taxAmount;
 
   return (
-    <Table bordered hover responsive>
+    <Table striped bordered hover>
       <thead>
         <tr>
           <th>
@@ -39,15 +39,15 @@ const ProductTable = ({
               onChange={handleSelectAllChange} // Handle "Check All" toggle
             />
           </th>
-          <th>Invoice Number</th>
+          <th>Date</th>
+          <th>Invoice</th>
           <th>Code</th>
           <th>Product Name</th>
-          <th>Metal Type</th>
-          <th>Gross Weight</th>
-          <th>Total Weight AW</th>
+          {/* <th>Metal Type</th> */}
+          <th>Gross Wt</th>
+          <th>Total Wt</th>
           <th>Rate</th>
-          <th>Rate Amount</th>
-          <th>Tax %</th>
+          {/* <th>Tax %</th> */}
           <th>Tax Amount</th>
           <th>Total Price</th>
         </tr>
@@ -63,15 +63,15 @@ const ProductTable = ({
                   onChange={(event) => handleCheckboxChange(event, index)} // Handle checkbox change
                 />
               </td>
+              <td>{new Date(detail.date).toLocaleDateString('en-GB')}</td>
+
               <td>{detail.invoice_number}</td>
               <td>{detail.code}</td>
               <td>{detail.product_name}</td>
-              <td>{detail.metal_type}</td>
               <td>{detail.gross_weight}</td>
               <td>{detail.total_weight_av}</td>
               <td>{detail.rate}</td>
-              <td>{detail.rate_amt}</td>
-              <td>{detail.tax_percent}</td>
+              {/* <td>{detail.tax_percent}</td> */}
               <td>{detail.tax_amt}</td>
               <td>{detail.total_price}</td>
             </tr>

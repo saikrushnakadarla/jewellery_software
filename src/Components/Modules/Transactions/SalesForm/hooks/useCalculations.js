@@ -98,26 +98,44 @@ const useCalculations = (formData, setFormData) => {
 
   // Calculate Tax Amount and Total Price
   useEffect(() => {
-    const taxPercent = parseFloat(formData.tax_percent) || 0;
-    const rateAmt = parseFloat(formData.rate_amt) || 0;
-    const stonePrice = parseFloat(formData.stone_price) || 0;
-    const makingCharges = parseFloat(formData.making_charges) || 0;
-    const discountAmt = parseFloat(formData.disscount) || 0;
-    const hmCharges = parseFloat(formData.hm_charges) || 0;
+    if (formData.pricing === "By Weight") {
+      const taxPercent = parseFloat(formData.tax_percent) || 0;
+      const rateAmt = parseFloat(formData.rate_amt) || 0;
+      const stonePrice = parseFloat(formData.stone_price) || 0;
+      const makingCharges = parseFloat(formData.making_charges) || 0;
+      const discountAmt = parseFloat(formData.disscount) || 0;
+      const hmCharges = parseFloat(formData.hm_charges) || 0;
 
-    // Ensure discount is subtracted before tax calculation
-    const taxableAmount = rateAmt + stonePrice + makingCharges + hmCharges - discountAmt;
-    const taxAmt = (taxableAmount * taxPercent) / 100;
+      const taxableAmount = rateAmt + stonePrice + makingCharges + hmCharges - discountAmt;
+      const taxAmt = (taxableAmount * taxPercent) / 100;
+      const totalPrice = taxableAmount + taxAmt;
 
-    // Calculate Total Price
-    const totalPrice = taxableAmount + taxAmt;
+      setFormData((prev) => ({
+        ...prev,
+        tax_amt: taxAmt.toFixed(2),
+        total_price: totalPrice.toFixed(2),
+      }));
+    } else {
+      // Pricing is not "By Weight"
+      const mrpPrice = parseFloat(formData.mrp_price) || 0;
+      setFormData((prev) => ({
+        ...prev,
+        tax_amt: "0.00",
+        total_price: mrpPrice.toFixed(2),
+      }));
+    }
+  }, [
+    formData.tax_percent,
+    formData.rate_amt,
+    formData.stone_price,
+    formData.making_charges,
+    formData.disscount,
+    formData.hm_charges,
+    formData.pricing,
+    formData.mrp_price,
+  ]);
 
-    setFormData((prev) => ({
-      ...prev,
-      tax_amt: taxAmt.toFixed(2),
-      total_price: totalPrice.toFixed(2),
-    }));
-  }, [formData.tax_percent, formData.rate_amt, formData.stone_price, formData.making_charges, formData.disscount, formData.hm_charges]);
+
 
 };
 

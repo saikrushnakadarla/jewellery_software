@@ -168,9 +168,9 @@ const ProductDetails = ({
             </Col>
             <Col xs={12} md={1}>
               <InputField
-                label="Amount"
-                name="rate_amt"
-                value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
+                label="MRP"
+                name="mrp_price"
+                value={formData.mrp_price || "0.00"} // Default to "0.00" if undefined
                 onChange={handleChange} // Trigger recalculation of Total MC
                 readOnly={false} // Ensure it's editable
               />
@@ -184,7 +184,7 @@ const ProductDetails = ({
                 readOnly={!isQtyEditable}
               />
             </Col>
-            <Col xs={12} md={1}>
+            {/* <Col xs={12} md={1}>
               <InputField label="Tax%"
                 name="tax_percent"
                 value={formData.tax_percent}
@@ -199,7 +199,7 @@ const ProductDetails = ({
                 onChange={handleChange} // Optional, since it's auto-calculated
                 readOnly
               />
-            </Col>
+            </Col> */}
             <Col xs={12} md={1}>
               <InputField
                 label="Total Price"
@@ -728,7 +728,7 @@ const ProductDetails = ({
             {isEditing ? "Update" : "Add"}
           </Button>
         </Col>
-        <Col xs={12} md={2}>
+        <Col xs={12} md={1}>
           <Button
             variant="secondary"
             onClick={refreshSalesData}

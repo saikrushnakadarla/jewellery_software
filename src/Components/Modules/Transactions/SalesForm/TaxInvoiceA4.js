@@ -3,6 +3,7 @@ import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/render
 import logo1 from '../../../../Navbar/sadashri.png'
 import { toWords } from "number-to-words";
 import QRCode from "qrcode";
+import baseURL from '../../../../Url/NodeBaseURL';
 
 const styles = StyleSheet.create({
         page: {
@@ -214,7 +215,6 @@ const styles = StyleSheet.create({
         },
 });
 
-
 const TaxINVoiceReceipt = ({
         formData,
         repairDetails,
@@ -227,10 +227,35 @@ const TaxINVoiceReceipt = ({
         taxAmount,
         oldItemsAmount,
         schemeAmount,
+        salesNetAmount,
+        salesTaxableAmount,
         netAmount,
         netPayableAmount,
 }) => {
         const [qrCodeUrl, setQrCodeUrl] = useState("");
+        const [loading, setLoading] = useState(true); // State for loading
+        const [error, setError] = useState(null); // State for error handling
+        const [data, setData] = useState([]); // State to store table data
+
+
+        const fetchProducts = async () => {
+                try {
+                        const response = await fetch(`${baseURL}/get/products`);
+                        if (!response.ok) {
+                                throw new Error('Failed to fetch products');
+                        }
+                        const result = await response.json();
+                        setData(result);
+                } catch (error) {
+                        setError(error.message);
+                } finally {
+                        setLoading(false);
+                }
+        };
+
+        useEffect(() => {
+                fetchProducts();
+        }, []);
 
         useEffect(() => {
                 const generateQRCode = async () => {
@@ -411,65 +436,77 @@ const TaxINVoiceReceipt = ({
                                                         <View style={styles.horizontalLine} />
 
                                                         {/* Add rows of data below */}
-                                                        {repairDetails.map((item, index) => (
-                                                                <View style={[styles.tableRow, { fontFamily: 'Times-Roman' }]} key={index}>
-                                                                        <Text style={[styles.tableCell, styles.tableCellHeader]}>{index + 1}</Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                        {repairDetails.map((item, index) => {
+                                                                const matchedProduct = data.find(product => product.product_name === item.category);
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellDescription]}>
-                                                                                {item.product_name || "N/A"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                return (
+                                                                        <View style={[styles.tableRow, { fontFamily: 'Times-Roman' }]} key={index}>
+                                                                                <Text style={[styles.tableCell, styles.tableCellHeader]}>{index + 1}</Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellHSN]}>{item.hsn_code}</Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                                <Text style={[styles.tableCell, styles.tableCellDescription]}>
+                                                                                        {item.product_name || "N/A"}
+                                                                                </Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellQty]}>
-                                                                                {item.qty || "0"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                                <Text style={[styles.tableCell, styles.tableCellHSN]}>{matchedProduct?.hsn_code || "N/A"}</Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellPurity]}>
-                                                                                {item.purity || "N/A"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                                <Text style={[styles.tableCell, styles.tableCellQty]}>
+                                                                                        {item.qty || "0"}
+                                                                                </Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellGrossWt]}>
-                                                                                {item.gross_weight || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                                <Text style={[styles.tableCell, styles.tableCellPurity]}>
+                                                                                        {(() => {
+                                                                                                const category = item.category?.toLowerCase();
+                                                                                                if (category === "gold jewellery") return "91.6 HM";
+                                                                                                if (category === "silver articles") return "92.5 Sterling";
+                                                                                                if (category === "silver jewellery") return "80 HM";
+                                                                                                if (category === "diamond jewellery") return "91.6 HM";
+                                                                                                return "";
+                                                                                        })()}
+                                                                                </Text>
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellStoneWt]}>
-                                                                                {item.stone_weight || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellNetWt]}>
-                                                                                {item.total_weight_av || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                                <Text style={[styles.tableCell, styles.tableCellGrossWt]}>
+                                                                                        {item.gross_weight || "0.00"}
+                                                                                </Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellRate]}>
-                                                                                {/* {item.rate || "0.00"} */}
-                                                                                {item.pieace_cost ? item.pieace_cost : item.rate}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                                <Text style={[styles.tableCell, styles.tableCellStoneWt]}>
+                                                                                        {item.stone_weight || "0.00"}
+                                                                                </Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellMC]}>
-                                                                                {item.making_charges || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                                <Text style={[styles.tableCell, styles.tableCellNetWt]}>
+                                                                                        {item.total_weight_av || "0.00"}
+                                                                                </Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellStAmt]}>
-                                                                                {item.stone_price || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                                <Text style={[styles.tableCell, styles.tableCellRate]}>
+                                                                                        {/* {item.rate || "0.00"} */}
+                                                                                        {item.pieace_cost ? item.pieace_cost : item.rate}
+                                                                                </Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellTotal]}>
-                                                                                {(parseFloat(item.rate_amt || 0) + parseFloat(item.stone_price || 0) + parseFloat(item.making_charges || 0)).toFixed(2) || "0.00"}
-                                                                        </Text>
-                                                                </View>
-                                                        ))}
+                                                                                <Text style={[styles.tableCell, styles.tableCellMC]}>
+                                                                                        {item.making_charges || "0.00"}
+                                                                                </Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
+
+                                                                                <Text style={[styles.tableCell, styles.tableCellStAmt]}>
+                                                                                        {item.stone_price || "0.00"}
+                                                                                </Text>
+                                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
+
+                                                                                <Text style={[styles.tableCell, styles.tableCellTotal]}>
+                                                                                        {(parseFloat(item.rate_amt || 0) + parseFloat(item.stone_price || 0) + parseFloat(item.making_charges || 0)).toFixed(2) || "0.00"}
+                                                                                </Text>
+                                                                        </View>
+                                                                );
+                                                        })}
 
 
                                                 </View>
@@ -584,6 +621,10 @@ const TaxINVoiceReceipt = ({
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text>(-) SCHEME:</Text>
                                                                         <Text style={{ textAlign: "right" }}>{schemeAmount.toFixed(2)}</Text>
+                                                                </View>
+                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                        <Text>(-) SALE RETURN:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{salesNetAmount.toFixed(2)}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
                                                                         <Text style={[styles.bold]}>Net Amount:</Text>

@@ -312,7 +312,7 @@ const RepairsTable = () => {
         });
 
         // Call handleDelete without confirmation
-        // await handleDelete(invoice_number, true, true);
+        await handleDelete(invoice_number, true, true);
       } catch (error) {
         console.error('Error fetching details:', error);
         Swal.fire('Error', 'Unable to fetch repair or old item details. Please try again.', 'error');
@@ -378,7 +378,6 @@ const RepairsTable = () => {
     navigate('/sales');
   };
 
-  // Fetch repair data
   const fetchRepairs = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-repair-details`);
@@ -399,7 +398,6 @@ const RepairsTable = () => {
     }
   };
 
-  // Handle view details of a specific invoice
   const handleViewDetails = async (invoice_number) => {
     try {
       const response = await axios.get(`${baseURL}/get-repair-details/${invoice_number}`);
@@ -427,11 +425,9 @@ const RepairsTable = () => {
     }
   };
 
-  // useEffect hook to fetch data when the component is mounted
   useEffect(() => {
     fetchRepairs();
   }, []);
-
 
   const handleAddReceipt = (invoiceData) => {
     navigate("/receipts", { state: { from: "/salestable", invoiceData } });
@@ -441,8 +437,6 @@ const RepairsTable = () => {
     setShowModal(false);
     setRepairDetails(null); // Clear repair details on modal close
   };
-
-
 
   return (
     <div className="main-container">

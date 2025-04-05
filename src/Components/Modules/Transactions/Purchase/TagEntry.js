@@ -702,7 +702,12 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
             if (field === "pieace_cost" || field === "tax_percent") {
                 const taxPercent = parseFloat(field === "tax_percent" ? value : prevData.tax_percent) || 0;
                 const pieaceCost = parseFloat(field === "pieace_cost" ? value : prevData.pieace_cost) || 0;
-                updatedData.mrp_price = ((pieaceCost / (100 + taxPercent)) * 100).toFixed(2);
+                const mrpPrice = (pieaceCost * taxPercent / 100) + pieaceCost;
+                updatedData.mrp_price = mrpPrice.toFixed(2);
+
+
+                // updatedData.mrp_price = ((pieaceCost / (100 + taxPercent)) * 100).toFixed(2);
+                
             }
 
             if (field === "pieace_cost" || field === "pcs") {
@@ -717,7 +722,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 const taxPercent = parseFloat(prevData.tax_percent) || 0;
 
                 // Calculate Pieace Cost
-                const pieaceCost = (mrpPrice * taxPercent / 100) + mrpPrice;
+                const pieaceCost = ((mrpPrice / (100 + taxPercent)) * 100);
                 updatedData.pieace_cost = pieaceCost.toFixed(2);
 
                 // Update Total Pcs Cost
