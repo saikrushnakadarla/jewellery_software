@@ -8,7 +8,7 @@ import baseURL from "../../../../Url/NodeBaseURL"; // Ensure this is correctly s
 function SubCategory() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { subcategory_id, location } = state || {}; // Destructure state to get subcategory_id and location
+  const { subcategory_id } = state || {}; // Destructure state to get subcategory_id and location
 
   const [formData, setFormData] = useState({
     category_id: "",
@@ -160,15 +160,19 @@ function SubCategory() {
         await axios.post(`${baseURL}/subcategory`, formData);
         alert("Subcategory created successfully!");
       }
-      navigate("/subcategorytable");
+      // navigate("/subcategorytable");
+      const from = location.state?.from || "/subcategorytable";
+      navigate(from);
     } catch (error) {
       console.error("Error saving subcategory:", error.message);
       alert("Failed to save subcategory. Please try again.");
     }
   };
-
+  const location = useLocation();
   const handleBack = () => {
-    navigate("/subcategorytable");
+    // navigate("/subcategorytable");
+    const from = location.state?.from || "/subcategorytable";
+    navigate(from);
   };
 
   return (

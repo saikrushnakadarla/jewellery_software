@@ -83,76 +83,6 @@ const ProductDetails = ({
   }, [formData.category, defaultBarcode]);
 
 
-
-
-  const [newSubCategory, setNewSubCategory] = useState({
-    category: "",
-    name: "",
-    prefix: "",
-    printing_purity: "",
-    selling_purity: "",
-    purity: ""
-  });
-
-  const handleOpenModal = () => {
-    setNewSubCategory(prev => ({
-      ...prev,
-      category: formData.category || "" // default to selected category
-    }));
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleModalChange = (e) => {
-    const { name, value } = e.target;
-    setNewSubCategory((prev) => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleAddSubCategory = async () => {
-    try {
-      // Construct the payload
-      const payload = [
-        {
-          subcategory_id: 0, // assuming it's auto-generated on backend or can be left as 0
-          category_id: formData.category_id, // ensure this is available in formData
-          metal_type_id: formData.metal_type_id, // ensure this is available
-          metal_type: formData.metal_type, // ensure this is available
-          sub_category_name: newSubCategory.name,
-          category: newSubCategory.category,
-          prefix: newSubCategory.prefix,
-          purity: newSubCategory.purity,
-          selling_purity: newSubCategory.selling_purity || null
-        }
-      ];
-
-      const response = await fetch(`${baseURL}/post/subcategory`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add subcategory");
-      }
-
-      const result = await response.json();
-      console.log("Subcategory successfully added:", result);
-      alert("Subcategory added successfully");
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error adding subcategory:", error);
-    }
-  };
-
-
   return (
     <Col >
       <Row>
@@ -221,7 +151,7 @@ const ProductDetails = ({
               cursor: "pointer",
               marginBottom: "20px",
             }}
-            onClick={handleOpenModal}
+            onClick={() => navigate("/subcategory", { state: { from: "/sales" } })}
           />
         </Col>
 
@@ -853,92 +783,6 @@ const ProductDetails = ({
           />
         </Col>
       </Row>
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add New Sub Category</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group controlId="categoryName">
-              <Form.Label>Category</Form.Label>
-              <Form.Control
-                type="text"
-                name="category"
-                value={newSubCategory.category}
-                onChange={handleModalChange}
-                readOnly
-              />
-            </Form.Group>
-            <Form.Group controlId="subCategoryName">
-              <Form.Label>Sub Category Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="name"
-                value={newSubCategory.name}
-                onChange={handleModalChange}
-              />
-            </Form.Group>
-
-            <Row>
-              <Col>
-                <Form.Group controlId="subCategoryPrefix">
-                  <Form.Label>Prefix</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="prefix"
-                    value={newSubCategory.prefix}
-                    onChange={handleModalChange}
-                  />
-                </Form.Group>
-              </Col>
-              <Col>
-                <Form.Group controlId="subCategoryPrintingPurity">
-                  <Form.Label>Printing Purity</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="printing_purity"
-                    value={newSubCategory.printing_purity}
-                    onChange={handleModalChange}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-
-            <Row>
-              <Col>
-                <Form.Group controlId="subCategorySellingPurity">
-                  <Form.Label>Selling Purity</Form.Label>
-                  <Form.Control
-                    type="number"
-                    name="selling_purity"
-                    value={newSubCategory.selling_purity}
-                    onChange={handleModalChange}
-                  />
-                </Form.Group>
-              </Col>
-              <Col>
-                <Form.Group controlId="subCategoryPurity">
-                  <Form.Label>Purchase Purity</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="purity"
-                    value={newSubCategory.purity}
-                    onChange={handleModalChange}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleAddSubCategory}>
-            Save
-          </Button>
-        </Modal.Footer>
-      </Modal>
 
     </Col>
 
