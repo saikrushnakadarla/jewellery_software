@@ -20,6 +20,7 @@ const RepairForm = () => {
     cheque_number: "",
     receipt_no: "",
     account_name: "",
+    mobile: "",
     invoice_number:"",
     total_amt: "",
     discount_amt: "",
@@ -33,7 +34,7 @@ const RepairForm = () => {
       console.log('Received Invoice Data:', invoiceData);
     }
   }, [invoiceData]);
-
+  const [mobileOptions, setMobileOptions] = useState([]);
   const [accountOptions, setAccountOptions] = useState([]);
   const [repairDetails, setRepairDetails] = useState(null);
   const [invoiceNumberOptions, setInvoiceNumberOptions] = useState([]);
@@ -105,6 +106,23 @@ const RepairForm = () => {
           label: item.account_name,
         }));
         setAccountOptions(formattedOptions);
+      } catch (error) {
+        console.error("Error fetching account names:", error);
+      }
+    };
+
+    fetchAccountNames();
+  }, []);
+
+  useEffect(() => {
+    const fetchAccountNames = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/account-names`);
+        const formattedOptions = response.data.map((item) => ({
+          value: item.mobile,
+          label: item.mobile,
+        }));
+        setMobileOptions(formattedOptions);
       } catch (error) {
         console.error("Error fetching account names:", error);
       }
@@ -323,6 +341,7 @@ const RepairForm = () => {
         ...prevData,
         account_name: invoiceData.account_name || "", // Set account name
         invoice_number: invoiceData.invoice_number || "", // Set invoice number
+        mobile: invoiceData.mobile || "", // Set mobile number
       }));
   
       // Populate invoice number options based on account_name
@@ -344,7 +363,7 @@ const RepairForm = () => {
         const balAfterReceipts = Number(selectedInvoice.bal_after_receipts) || 0;
         const balAmt = Number(selectedInvoice.bal_amt) || 0;
         const totalAmt = balAfterReceipts || balAmt || 0;
-        console.log("totalAmt=",totalAmt)
+        console.log("totalAmt=", totalAmt);
         setFormData((prevData) => ({
           ...prevData,
           total_amt: totalAmt,
@@ -414,6 +433,16 @@ const RepairForm = () => {
               value={formData.account_name}
               onChange={handleInputChange}
               options={accountOptions}
+            />
+          </Col>
+          <Col xs={12} md={3}>
+            <InputField
+              label="Mobile Number Name"
+              type="select"
+              name="mobile"
+              value={formData.mobile}
+              onChange={handleInputChange}
+              options={mobileOptions}
             />
           </Col>
           <Col xs={12} md={2}>

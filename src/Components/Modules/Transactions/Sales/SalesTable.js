@@ -430,8 +430,19 @@ const RepairsTable = () => {
     fetchRepairs();
   }, []);
 
+  // const handleAddReceipt = (invoiceData) => {
+  //   navigate("/receipts", { state: { from: "/salestable", invoiceData } });
+  // };
   const handleAddReceipt = (invoiceData) => {
-    navigate("/receipts", { state: { from: "/salestable", invoiceData } });
+    navigate("/receipts", { 
+      state: { 
+        from: "/salestable", 
+        invoiceData: {
+          ...invoiceData, // Spread all existing invoice data
+          mobile: invoiceData.mobile // Ensure mobile is included
+        } 
+      } 
+    });
   };
 
   const handleCloseModal = () => {

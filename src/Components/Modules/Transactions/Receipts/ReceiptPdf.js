@@ -119,12 +119,18 @@ const PDFContent = ({ formData }) => {
           <View style={styles.row}>
             <Text style={styles.leftText}>Receipt No: {formData.receipt_no || "N/A"}</Text>
             <Text style={styles.rightText}>Account Name: {formData.account_name || "N/A"}</Text>
+          
           </View>
           <View style={styles.row}>
             <Text style={styles.leftText}>Date: {formData.date || "N/A"}</Text>
             <Text style={styles.rightText}>Time: {currentTime}</Text>
           </View>
         </View>
+       
+        <View style={styles.row}>
+        <Text style={styles.rightText}>Mobile Number: {formData.mobile || "N/A"}</Text>
+        </View>
+        
 
         {/* Table Header */}
         <View style={styles.tableHeader}>
