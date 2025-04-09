@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import your reusable DataTable component
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import { Button, Row, Col } from 'react-bootstrap';
 import InputField from '../../../Modules/Masters/ItemMaster/Inputfield'; // Assuming you have this reusable input field component
 import './StockEntryTable.css';
 import StoneDetailsModal from "./StoneDetailsModal";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
-
+import Modal from 'react-bootstrap/Modal';
 
 const StockEntryTable = (selectedProduct) => {
   const navigate = useNavigate();
@@ -19,9 +19,12 @@ const StockEntryTable = (selectedProduct) => {
   const handleCloseModal = () => setShowModal(false);
   const [designOptions, setdesignOptions] = useState([]);
   const [purityOptions, setPurityOptions] = useState([]);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+
 
   useEffect(() => {
-    fetch(`${baseURL}/get/opening-tags-entry`) 
+    fetch(`${baseURL}/get/opening-tags-entry`)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch stock entries');
@@ -29,13 +32,23 @@ const StockEntryTable = (selectedProduct) => {
         return response.json();
       })
       .then((data) => {
-        setData(data.result); 
+        setData(data.result);
       })
       .catch((error) => {
         console.error('Error fetching stock entries:', error);
       });
   }, []);
 
+  const handleView = (row) => {
+    setSelectedRow(row);
+    setShowViewModal(true);
+  };
+  
+  const handleCloseViewModal = () => {
+    setShowViewModal(false);
+    setSelectedRow(null);
+  };
+  
 
   const handleEdit = (rowData) => {
     setFormData(rowData); // Populate the form with the row data
@@ -156,6 +169,10 @@ const StockEntryTable = (selectedProduct) => {
         Header: 'Action',
         Cell: ({ row }) => (
           <div className="d-flex align-items-center">
+            <FaEye
+              style={{ cursor: 'pointer', color: 'green' }}
+              onClick={() => handleView(row.original)}
+            />
             <FaEdit
               style={{
                 cursor: 'pointer',
@@ -183,7 +200,7 @@ const StockEntryTable = (selectedProduct) => {
     console.log("Deleting ID:", id); // Confirming ID before sending request
     const url = `${baseURL}/delete/opening-tags-entry/${id}`;
     console.log("DELETE Request URL:", url);
-  
+
     if (window.confirm("Are you sure you want to delete this record?")) {
       try {
         const response = await axios.delete(url);
@@ -195,9 +212,9 @@ const StockEntryTable = (selectedProduct) => {
       }
     }
   };
-  
-  
-  
+
+
+
 
   const [productOptions, setProductOptions] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -242,134 +259,134 @@ const StockEntryTable = (selectedProduct) => {
 
 
   const handleChange = async (fieldOrEvent, valueArg) => {
-       
+
     let field, value;
     if (fieldOrEvent && fieldOrEvent.target) {
-        
-        field = fieldOrEvent.target.name;
-        value = fieldOrEvent.target.value;
+
+      field = fieldOrEvent.target.name;
+      value = fieldOrEvent.target.value;
     } else {
-        
-        field = fieldOrEvent;
-        value = valueArg;
+
+      field = fieldOrEvent;
+      value = valueArg;
     }
     setFormData((prevData) => {
-        let updatedData = { ...prevData, [field]: value };
+      let updatedData = { ...prevData, [field]: value };
 
-        // Update MC field only if Making_Charges_On is "MC / Gram" or "MC / Piece"
-        if (field === "Making_Charges_On") {
-            if (value === "MC / Gram" || value === "MC / Piece") {
-                updatedData.Making_Charges = prevData.Making_Charges || "";
-            } else {
-                updatedData.Making_Charges = ""; // Hide field
-            }
+      // Update MC field only if Making_Charges_On is "MC / Gram" or "MC / Piece"
+      if (field === "Making_Charges_On") {
+        if (value === "MC / Gram" || value === "MC / Piece") {
+          updatedData.Making_Charges = prevData.Making_Charges || "";
+        } else {
+          updatedData.Making_Charges = ""; // Hide field
         }
+      }
 
-        // Update MC_Per_Gram_Label when Making_Charges_On changes
-        if (field === "Making_Charges_On") {
-            let newLabel = "MC/Gm"; // Default
-            if (value === "MC %") newLabel = "MC%";
-            else if (value === "MC / Gram") newLabel = "MC/Gm";
-            else if (value === "MC / Piece") newLabel = "MC/Gm";
+      // Update MC_Per_Gram_Label when Making_Charges_On changes
+      if (field === "Making_Charges_On") {
+        let newLabel = "MC/Gm"; // Default
+        if (value === "MC %") newLabel = "MC%";
+        else if (value === "MC / Gram") newLabel = "MC/Gm";
+        else if (value === "MC / Piece") newLabel = "MC/Gm";
 
-            updatedData.MC_Per_Gram_Label = newLabel;
+        updatedData.MC_Per_Gram_Label = newLabel;
+      }
+
+      // --- Calculate Stones Price ---
+      if (field === "Stones_Weight" || field === "stone_price_per_carat") {
+        const stoneWeight =
+          parseFloat(
+            field === "Stones_Weight" ? value : prevData.Stones_Weight
+          ) || 0;
+        const stonePricePerCarat =
+          parseFloat(
+            field === "stone_price_per_carat"
+              ? value
+              : prevData.stone_price_per_carat
+          ) || 0;
+        if (stoneWeight > 0 && stonePricePerCarat > 0) {
+          const calculatedStonePrice = (stoneWeight / 0.20) * stonePricePerCarat;
+          updatedData.Stones_Price = calculatedStonePrice.toFixed(2);
+        } else {
+          updatedData.Stones_Price = "";
         }
+      }
 
-        // --- Calculate Stones Price ---
-        if (field === "Stones_Weight" || field === "stone_price_per_carat") {
-            const stoneWeight =
-                parseFloat(
-                    field === "Stones_Weight" ? value : prevData.Stones_Weight
-                ) || 0;
-            const stonePricePerCarat =
-                parseFloat(
-                    field === "stone_price_per_carat"
-                        ? value
-                        : prevData.stone_price_per_carat
-                ) || 0;
-            if (stoneWeight > 0 && stonePricePerCarat > 0) {
-                const calculatedStonePrice = (stoneWeight / 0.20) * stonePricePerCarat;
-                updatedData.Stones_Price = calculatedStonePrice.toFixed(2);
-            } else {
-                updatedData.Stones_Price = "";
-            }
+      // --- Recalculate Weight BW ---
+      if (
+        field === "Gross_Weight" ||
+        field === "Stones_Weight" ||
+        field === "deduct_st_Wt"
+      ) {
+        const grossWt = parseFloat(updatedData.Gross_Weight) || 0;
+        const stonesWt = parseFloat(updatedData.Stones_Weight) || 0;
+        // Use deduct_st_Wt value if available; default to "yes" if not set.
+        const deductOption = updatedData.deduct_st_Wt
+          ? updatedData.deduct_st_Wt.toLowerCase()
+          : "yes";
+        if (deductOption === "yes") {
+          updatedData.Weight_BW = (grossWt - stonesWt).toFixed(2);
+        } else {
+          updatedData.Weight_BW = grossWt.toFixed(2);
         }
+      }
 
-        // --- Recalculate Weight BW ---
-        if (
-            field === "Gross_Weight" ||
-            field === "Stones_Weight" ||
-            field === "deduct_st_Wt"
-        ) {
-            const grossWt = parseFloat(updatedData.Gross_Weight) || 0;
-            const stonesWt = parseFloat(updatedData.Stones_Weight) || 0;
-            // Use deduct_st_Wt value if available; default to "yes" if not set.
-            const deductOption = updatedData.deduct_st_Wt
-                ? updatedData.deduct_st_Wt.toLowerCase()
-                : "yes";
-            if (deductOption === "yes") {
-                updatedData.Weight_BW = (grossWt - stonesWt).toFixed(2);
-            } else {
-                updatedData.Weight_BW = grossWt.toFixed(2);
-            }
-        }
-
-        return updatedData;
+      return updatedData;
     });
 
     // --- Handle Category Change ---
     if (field === "category") {
-        setFormData((prevData) => ({
-            ...prevData,
-            category: value,
-        }));
-        return;
+      setFormData((prevData) => ({
+        ...prevData,
+        category: value,
+      }));
+      return;
     }
 
     // --- Handle Sub-Category Change and Fetch Prefix/PCode_BarCode ---
     if (field === "sub_category") {
-        const selectedCategory = subCategories.find(
-            (category) => category.subcategory_id === parseInt(value)
-        );
+      const selectedCategory = subCategories.find(
+        (category) => category.subcategory_id === parseInt(value)
+      );
 
-        const newPrefix = selectedCategory ? selectedCategory.prefix : "";
-        if (newPrefix) {
-            try {
-                const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
-                    params: { prefix: newPrefix },
-                });
-                const nextPCodeBarCode = response.data.nextPCodeBarCode;
-                setFormData((prevData) => ({
-                    ...prevData,
-                    sub_category: selectedCategory
-                        ? selectedCategory.sub_category_name
-                        : "",
-                    subcategory_id: selectedCategory
-                        ? selectedCategory.subcategory_id
-                        : "",
-                    item_prefix: newPrefix,
-                    Prefix: newPrefix,
-                    PCode_BarCode: nextPCodeBarCode,
-                }));
-            } catch (error) {
-                console.error("Error fetching PCode_BarCode:", error);
-            }
-        } else {
-            setFormData((prevData) => ({
-                ...prevData,
-                sub_category: selectedCategory
-                    ? selectedCategory.sub_category_name
-                    : "",
-                subcategory_id: selectedCategory
-                    ? selectedCategory.subcategory_id
-                    : "",
-                item_prefix: "",
-                Prefix: "",
-                PCode_BarCode: "",
-            }));
+      const newPrefix = selectedCategory ? selectedCategory.prefix : "";
+      if (newPrefix) {
+        try {
+          const response = await axios.get(`${baseURL}/getNextPCodeBarCode`, {
+            params: { prefix: newPrefix },
+          });
+          const nextPCodeBarCode = response.data.nextPCodeBarCode;
+          setFormData((prevData) => ({
+            ...prevData,
+            sub_category: selectedCategory
+              ? selectedCategory.sub_category_name
+              : "",
+            subcategory_id: selectedCategory
+              ? selectedCategory.subcategory_id
+              : "",
+            item_prefix: newPrefix,
+            Prefix: newPrefix,
+            PCode_BarCode: nextPCodeBarCode,
+          }));
+        } catch (error) {
+          console.error("Error fetching PCode_BarCode:", error);
         }
+      } else {
+        setFormData((prevData) => ({
+          ...prevData,
+          sub_category: selectedCategory
+            ? selectedCategory.sub_category_name
+            : "",
+          subcategory_id: selectedCategory
+            ? selectedCategory.subcategory_id
+            : "",
+          item_prefix: "",
+          Prefix: "",
+          PCode_BarCode: "",
+        }));
+      }
     }
-};
+  };
 
   const handleUpdateStoneDetails = (totalWeight, totalPrice) => {
     setFormData({
@@ -734,6 +751,72 @@ const StockEntryTable = (selectedProduct) => {
         handleCloseModal={handleCloseModal}
         handleUpdateStoneDetails={handleUpdateStoneDetails}
       />
+      <Modal show={showViewModal} onHide={handleCloseViewModal} centered >
+  <Modal.Header closeButton>
+    <Modal.Title>View Product Details</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {selectedRow ? (
+      <div className="container-fluid">
+      <div className="row">
+        <div className="col-md-4">
+          <p><strong>Purity:</strong> {selectedRow.Purity}</p>
+          <p><strong>Metal Type:</strong> {selectedRow.metal_type}</p>
+          <p><strong>Pricing Type:</strong> {selectedRow.Pricing}</p>
+          <p><strong>Prefix:</strong> {selectedRow.Prefix}</p>
+          <p><strong>HUID No:</strong> {selectedRow.HUID_No}</p>
+          <p><strong>Wastage On:</strong> {selectedRow.Wastage_On}</p>
+          <p><strong>Wastage Weight:</strong> {selectedRow.WastageWeight}</p>
+          <p><strong>MC Per Gram:</strong> {selectedRow.MC_Per_Gram}</p>
+          <p><strong>Making Charges On:</strong> {selectedRow.Making_Charges_On}</p>
+          <p><strong>Source:</strong> {selectedRow.Source}</p>
+          <p><strong>Stock Point:</strong> {selectedRow.Stock_Point}</p>
+        </div>
+        <div className="col-md-4">
+          <p><strong>QR Status:</strong> {selectedRow.qr_status}</p>
+          <p><strong>Added At:</strong> {new Date(selectedRow.added_at).toLocaleString()}</p>
+          <p><strong>Deduct Stone Wt:</strong> {selectedRow.deduct_st_Wt}</p>
+          <p><strong>Pur. Gross Weight:</strong> {selectedRow.pur_Gross_Weight}</p>
+          <p><strong>Pur. Stone Weight:</strong> {selectedRow.pur_Stones_Weight}</p>
+          <p><strong>Pur. Deduct Stone Wt:</strong> {selectedRow.pur_deduct_st_Wt}</p>
+          <p><strong>Pur. Stones Price:</strong> {selectedRow.pur_Stones_Price}</p>
+          <p><strong>Pur. Weight BW:</strong> {selectedRow.pur_Weight_BW}</p>
+          <p><strong>Pur. Wastage On:</strong> {selectedRow.pur_Wastage_On}</p>
+          <p><strong>Pur. Wastage %:</strong> {selectedRow.pur_Wastage_Percentage}</p>
+        </div>
+        <div className="col-md-4">
+          <p><strong>Pur. Wastage Weight:</strong> {selectedRow.pur_WastageWeight}</p>
+          <p><strong>Pur. Total Weight:</strong> {selectedRow.pur_TotalWeight_AW}</p>
+          <p><strong>Pur. MC / Gram:</strong> {selectedRow.pur_MC_Per_Gram}</p>
+          <p><strong>Pur. MC Charges:</strong> {selectedRow.pur_Making_Charges}</p>
+          <p><strong>Size:</strong> {selectedRow.size}</p>
+          <p><strong>Tag ID:</strong> {selectedRow.tag_id}</p>
+          <p><strong>Tag Weight:</strong> {selectedRow.tag_weight}</p>
+          <p><strong>Account Name:</strong> {selectedRow.account_name}</p>
+          <p><strong>Invoice:</strong> {selectedRow.invoice}</p>
+          <p><strong>Stone Price / Carat:</strong> {selectedRow.stone_price_per_carat}</p>
+          <p><strong>Product ID:</strong> {selectedRow.product_id}</p>
+          <p><strong>Subcategory ID:</strong> {selectedRow.subcategory_id}</p>
+          <p><strong>Pcs:</strong> {selectedRow.pcs}</p>
+          <p><strong>Piece Cost:</strong> {selectedRow.pieace_cost}</p>
+          <p><strong>Selling Price:</strong> {selectedRow.selling_price}</p>
+          <p><strong>Tax %:</strong> {selectedRow.tax_percent}</p>
+          <p><strong>MRP Price:</strong> {selectedRow.mrp_price}</p>
+          <p><strong>Total Pcs Cost:</strong> {selectedRow.total_pcs_cost}</p>
+        </div>
+      </div>
+    </div>
+    ) : (
+      <p>No data available.</p>
+    )}
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={handleCloseViewModal}>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
+
     </div>
   );
 };

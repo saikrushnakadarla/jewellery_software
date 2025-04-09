@@ -234,6 +234,30 @@ const ProductDetails = ({
         {isByFixed ? (
           // If Pricing is "By fixed", show only these fields:
           <>
+           <Col xs={12} md={2}>
+              <InputField
+                label="Purity"
+                name="purity"
+                value={formData.purity || ""}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Gross Wt"
+                name="gross_weight"
+                value={formData.gross_weight || ""}
+                onChange={handleChange}
+              />
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Rate"
+                name="rate"
+                value={formData.rate}
+                onChange={handleChange}
+              />
+            </Col>
             <Col xs={12} md={1}>
               <InputField
                 label="Piece Cost"

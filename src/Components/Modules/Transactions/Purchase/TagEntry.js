@@ -11,7 +11,7 @@ import baseURL from "../../../../Url/NodeBaseURL";
 import "./TagEntry.css";
 import { Form, Row, Col, Table } from 'react-bootstrap';
 import * as XLSX from "xlsx";
-import { FaCamera, FaUpload, FaTrash, FaEdit, FaFileExcel } from "react-icons/fa";
+import { FaCamera, FaUpload, FaTrash, FaEdit, FaFileExcel, FaEye } from "react-icons/fa";
 import { Modal, Button, Dropdown, DropdownButton } from "react-bootstrap";  // Add this import
 import { jsPDF } from "jspdf";
 import QRCode from "qrcode";
@@ -102,6 +102,20 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
     const [showPurchase, setShowPurchase] = useState(false);
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
+
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [selectedRow, setSelectedRow] = useState(null);
+
+    const handleView = (item) => {
+        setSelectedRow(item);
+        setShowViewModal(true);
+    };
+
+    const handleCloseViewModal = () => {
+        setShowViewModal(false);
+        setSelectedRow(null);
+    };
+
 
     const [stoneDetails, setStoneDetails] = useState({
         stoneName: "",
@@ -707,7 +721,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
 
 
                 // updatedData.mrp_price = ((pieaceCost / (100 + taxPercent)) * 100).toFixed(2);
-                
+
             }
 
             if (field === "pieace_cost" || field === "pcs") {
@@ -2323,6 +2337,10 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                         )}
                                                     </td>
                                                     <td>
+                                                        <FaEye
+                                                            style={{ cursor: "pointer", color: "green", marginRight: "10px" }}
+                                                            onClick={() => handleView(item)}
+                                                        />
                                                         <FaEdit
                                                             style={{ cursor: "pointer", color: "blue" }}
                                                             onClick={() => handleEdit(item)}
@@ -2510,6 +2528,79 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                 handleTagPurDeleteStone={handleTagPurDeleteStone}
                 editingPurchaseStoneIndex={editingPurchaseStoneIndex}
             />
+            <Modal show={showViewModal} onHide={handleCloseViewModal} centered size="xl">
+  <Modal.Header closeButton>
+    <Modal.Title>View Product Details</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {selectedRow ? (
+    //   <div className="container-fluid">
+    //     <div className="row">
+    //       {/* COLUMN 1 */}
+    //       <div className="col-md-4">
+     <Row>
+                  <Col md={3}>
+            <p><strong>Purity:</strong> {selectedRow.Purity}</p>
+            <p><strong>Metal Type:</strong> {selectedRow.metal_type}</p>
+            <p><strong>Pricing Type:</strong> {selectedRow.Pricing}</p>
+            <p><strong>Prefix:</strong> {selectedRow.Prefix}</p>
+            <p><strong>HUID No:</strong> {selectedRow.HUID_No}</p>
+            <p><strong>Wastage On:</strong> {selectedRow.Wastage_On}</p>
+            <p><strong>Wastage Weight:</strong> {selectedRow.WastageWeight}</p>
+            <p><strong>MC Per Gram:</strong> {selectedRow.MC_Per_Gram}</p>
+            <p><strong>Making Charges On:</strong> {selectedRow.Making_Charges_On}</p>
+            <p><strong>Source:</strong> {selectedRow.Source}</p>
+            <p><strong>Stock Point:</strong> {selectedRow.Stock_Point}</p>
+            </Col>
+          {/* COLUMN 2 */}
+          <Col md={3}>
+            <p><strong>QR Status:</strong> {selectedRow.qr_status}</p>
+            <p><strong>Added At:</strong> {new Date(selectedRow.added_at).toLocaleString()}</p>
+            <p><strong>Deduct Stone Wt:</strong> {selectedRow.deduct_st_Wt}</p>
+            <p><strong>Pur. Gross Weight:</strong> {selectedRow.pur_Gross_Weight}</p>
+            <p><strong>Pur. Stone Weight:</strong> {selectedRow.pur_Stones_Weight}</p>
+            <p><strong>Pur. Deduct Stone Wt:</strong> {selectedRow.pur_deduct_st_Wt}</p>
+            <p><strong>Pur. Stones Price:</strong> {selectedRow.pur_Stones_Price}</p>
+            <p><strong>Pur. Weight BW:</strong> {selectedRow.pur_Weight_BW}</p>
+            <p><strong>Pur. Wastage On:</strong> {selectedRow.pur_Wastage_On}</p>
+            <p><strong>Pur. Wastage %:</strong> {selectedRow.pur_Wastage_Percentage}</p>
+            </Col>
+          {/* COLUMN 3 */}
+          <Col md={3}>
+            <p><strong>Pur. Wastage Weight:</strong> {selectedRow.pur_WastageWeight}</p>
+            <p><strong>Pur. Total Weight:</strong> {selectedRow.pur_TotalWeight_AW}</p>
+            <p><strong>Pur. MC / Gram:</strong> {selectedRow.pur_MC_Per_Gram}</p>
+            <p><strong>Pur. MC Charges:</strong> {selectedRow.pur_Making_Charges}</p>
+            <p><strong>Size:</strong> {selectedRow.size}</p>
+            <p><strong>Tag ID:</strong> {selectedRow.tag_id}</p>
+            <p><strong>Tag Weight:</strong> {selectedRow.tag_weight}</p>
+            <p><strong>Account Name:</strong> {selectedRow.account_name}</p>
+            <p><strong>Invoice:</strong> {selectedRow.invoice}</p>
+            <p><strong>Stone Price / Carat:</strong> {selectedRow.stone_price_per_carat}</p>
+            <p><strong>Product ID:</strong> {selectedRow.product_id}</p>
+            <p><strong>Subcategory ID:</strong> {selectedRow.subcategory_id}</p>
+            </Col>
+            <Col md={3}>
+            <p><strong>Pcs:</strong> {selectedRow.pcs}</p>
+            <p><strong>Piece Cost:</strong> {selectedRow.pieace_cost}</p>
+            <p><strong>Selling Price:</strong> {selectedRow.selling_price}</p>
+            <p><strong>Tax %:</strong> {selectedRow.tax_percent}</p>
+            <p><strong>MRP Price:</strong> {selectedRow.mrp_price}</p>
+            <p><strong>Total Pcs Cost:</strong> {selectedRow.total_pcs_cost}</p>
+            </Col>
+        
+      </Row>
+    ) : (
+      <p>No data available.</p>
+    )}
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={handleCloseViewModal}>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
+
         </div>
     );
 };
