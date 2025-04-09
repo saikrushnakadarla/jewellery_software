@@ -117,6 +117,10 @@ const PaymentDetails = ({
               </td>
             </tr>
             <tr>
+              <td colSpan="16" className="text-right">Special Discount</td>
+              {/* <td colSpan="4">{taxableAmount.toFixed(2)}</td> */}
+            </tr>
+            <tr>
               <td colSpan="16" className="text-right">Taxable Amount</td>
               <td colSpan="4">{taxableAmount.toFixed(2)}</td>
             </tr>

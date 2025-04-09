@@ -1044,6 +1044,7 @@ repairDetails.forEach((item) => {
           <div className="sales-form-section" style={{ marginTop: '-20px' }}>
             <ProductDetails
               formData={formData}
+              setFormData={setFormData}
               handleChange={handleChange}
               handleBarcodeChange={handleBarcodeChange}
               handleProductChange={handleProductChange}

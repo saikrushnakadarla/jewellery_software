@@ -15,6 +15,7 @@ const ProductDetails = ({
   handleUpdate,
   isEditing,
   formData,
+  setFormData,
   data,
   handleChange,
   handleImageChange,
@@ -81,6 +82,51 @@ const ProductDetails = ({
       handleBarcodeChange(defaultBarcode);
     }
   }, [formData.category, defaultBarcode]);
+
+  const handleClear = () => {
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      code: "",
+      product_id: "",
+      metal: "",
+      product_name: "",
+      metal_type: "",
+      design_name: "",
+      purity: "",
+      pricing: "By Weight",
+      category: "",
+      sub_category: "",
+      gross_weight: "",
+      stone_weight: "",
+      weight_bw: "",
+      stone_price: "",
+      va_on: "Gross Weight",
+      va_percent: "",
+      wastage_weight: "",
+      total_weight_av: "",
+      mc_on: "MC %",
+      disscount_percentage: "",
+      disscount: "",
+      mc_per_gram: "",
+      making_charges: "",
+      rate: "",
+      pieace_cost: "",
+      mrp_price: "",
+      rate_amt: "",
+      tax_percent: "03% GST",
+      tax_amt: "",
+      hm_charges: "60.00",
+      total_price: "",
+      transaction_status: "Sales",
+      qty: "1",
+      opentag_id: "",
+      product_image: null,
+      imagePreview: null,
+      remarks: "",
+      sale_status: "Delivered",
+    }));
+  };
+  
 
 
   return (
@@ -761,7 +807,8 @@ const ProductDetails = ({
         <Col xs={12} md={1}>
           <Button
             variant="secondary"
-            onClick={refreshSalesData}
+            // onClick={refreshSalesData}
+            onClick={handleClear}
             style={{ backgroundColor: 'gray', marginLeft: '-30px' }}
           >
             Clear
