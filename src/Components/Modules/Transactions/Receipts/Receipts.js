@@ -377,6 +377,27 @@ const RepairForm = () => {
     navigate(from);
   };
   
+  useEffect(() => {
+    if (invoiceData) {
+      setFormData(prevData => ({
+        ...prevData,
+        account_name: invoiceData.account_name || "",
+        mobile: invoiceData.mobile || "",
+        total_amt: invoiceData.total_amt || ""
+      }));
+  
+      // Populate invoice number options based on account_name
+      const filteredInvoices = repairDetails
+        ?.filter(item => item.account_name === invoiceData.account_name)
+        .map(item => ({
+          value: item.invoice_number,
+          label: item.invoice_number,
+        }));
+  
+      setInvoiceNumberOptions(filteredInvoices);
+    }
+  }, [invoiceData, repairDetails]);
+
   return (
     <div className="main-container">
       <Container className="payments-form-container">

@@ -1,8 +1,8 @@
-import React, { useEffect, useState,useRef  } from "react";
-import { Col, Row } from "react-bootstrap";
+import React, { useEffect, useState, useRef } from "react";
+import { Col, Row, Button} from "react-bootstrap";
 import InputField from "./../../../Pages/InputField/InputField";
 import { AiOutlinePlus } from "react-icons/ai";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate  } from "react-router-dom";
 import axios from "axios";
 import baseURL from './../../../../Url/NodeBaseURL';
 
@@ -14,6 +14,7 @@ const CustomerDetails = ({
   setSelectedMobile,
   mobileRef
 }) => {
+   const navigate = useNavigate();
   const location = useLocation();
   const [balance, setBalance] = useState(0); // State to store balance
   const [loading, setLoading] = useState(false);
@@ -81,6 +82,27 @@ const CustomerDetails = ({
     }
   }, [selectedMobile]);
 
+  const handleAddReceipt = () => {
+    const selectedCustomer = customers.find(
+      cust => cust.account_id === formData.customer_id
+    );
+    
+    if (selectedCustomer) {
+      navigate("/receipts", {
+        state: {
+          from: "/sales",
+          invoiceData: {
+            account_name: selectedCustomer.account_name,
+            mobile: selectedCustomer.mobile,
+            total_amt: balance // The balance amount calculated earlier
+          }
+        }
+      });
+    } else {
+      alert("Please select a customer first");
+    }
+  };
+
   return (
     <Col className="sales-form-section">
       <Row>
@@ -123,7 +145,7 @@ const CustomerDetails = ({
             }}
           />
         </Col>
-       
+
         <Col xs={12} md={3}>
           <InputField
             label="Customer Name:"
@@ -212,14 +234,14 @@ const CustomerDetails = ({
             readOnly
           />
         </Col>
-        <Col xs={12} md={2}>
+        {/* <Col xs={12} md={2}>
           <InputField
             label="PAN"
             name="pan_card"
             value={formData.pan_card || ""}
             readOnly
           />
-        </Col>
+        </Col> */}
         <Col xs={12} md={2}>
           <InputField
             label="Balance Amount:"
@@ -227,6 +249,20 @@ const CustomerDetails = ({
             value={loading ? "Loading..." : `₹ ${balance}`}
             readOnly
           />
+        </Col>
+        <Col xs={12} md={2}>
+        <Button
+  style={{
+    backgroundColor: '#28a745',
+    borderColor: '#28a745',
+    fontSize: '0.875rem',
+    padding: '0.25rem 0.5rem',
+  }}
+  onClick={handleAddReceipt}
+>
+  Add Receipt
+</Button>
+
         </Col>
       </Row>
     </Col>
