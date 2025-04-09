@@ -278,7 +278,7 @@ const SalesForm = () => {
 
   const [editIndex, setEditIndex] = useState(null);
   const [discount, setDiscount] = useState(() => {
-    return parseFloat(localStorage.getItem("discount")) || 0; // Load discount from localStorage
+    return parseFloat(localStorage.getItem("discount")) || ""; // Load discount from localStorage
   });
 
   useEffect(() => {
@@ -286,7 +286,7 @@ const SalesForm = () => {
   }, [discount]);
 
   const handleDiscountChange = (e) => {
-    const discountValue = parseFloat(e.target.value) || 0; // Default to 0 if empty or NaN
+    const discountValue = parseFloat(e.target.value) || ""; // Default to 0 if empty or NaN
     if (discountValue > 15) {
       alert("Discount cannot be greater than 15%");
       return; // Prevent further execution
@@ -518,7 +518,7 @@ const SalesForm = () => {
       disscount: "",
       rate: "",
       rate_amt: "",
-      pricing: "",
+      pricing: "By Weight",
       tax_percent: "",
       tax_amt: "",
       hm_charges: "60.00",
