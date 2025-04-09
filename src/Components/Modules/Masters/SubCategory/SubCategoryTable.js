@@ -39,6 +39,14 @@ const SubCategoryTable = () => {
         accessor: "purity", 
       },
       {
+        Header: "Selling Purity",
+        accessor: "selling_purity", 
+      },
+      {
+        Header: "Printing Purity",
+        accessor: "printing_purity", 
+      },
+      {
         Header: "Actions",
         Cell: ({ row }) => {
           const handleDelete = async (subcategory_id) => {

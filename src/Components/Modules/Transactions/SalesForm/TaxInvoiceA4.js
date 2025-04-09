@@ -301,6 +301,17 @@ const TaxINVoiceReceipt = ({
 
         // Convert the value into words
         const netBillValueInWords = toWords(netPayableAmount).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase()); // Capitalize words
+        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const formatDate = (dateString) => {
+                if (!dateString) return "";
+                const date = new Date(dateString);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+                const year = date.getFullYear();
+                return `${day}-${month}-${year}`;
+        };
+
+
 
         return (
                 <Document>
@@ -333,8 +344,17 @@ const TaxINVoiceReceipt = ({
                                                 {/* DATE */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>DATE:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.date}</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formatDate(formData.date)}</Text>
                                                 </View>
+
+
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                                        <Text>TIME:</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>
+                                                                {currentTime}
+                                                        </Text>
+                                                </View>
+
 
                                                 {/* STAFF */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>

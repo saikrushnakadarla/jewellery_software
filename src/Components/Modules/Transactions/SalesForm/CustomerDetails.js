@@ -124,7 +124,7 @@ const CustomerDetails = ({
           />
         </Col>
        
-        <Col xs={12} md={2}>
+        <Col xs={12} md={3}>
           <InputField
             label="Customer Name:"
             name="account_name"
@@ -156,15 +156,15 @@ const CustomerDetails = ({
             readOnly
           />
         </Col>
-        <Col xs={12} md={2}>
+        {/* <Col xs={12} md={2}>
           <InputField
             label="Address2:"
             name="address2"
             value={formData.address2 || ""}
             readOnly
           />
-        </Col>
-        <Col xs={12} md={1}>
+        </Col> */}
+        <Col xs={12} md={2}>
           <InputField
             label="City"
             name="city"
@@ -180,7 +180,7 @@ const CustomerDetails = ({
             readOnly
           />
         </Col>
-        <Col xs={12} md={1}>
+        <Col xs={12} md={2}>
           <InputField
             label="State:"
             name="state"
@@ -188,14 +188,14 @@ const CustomerDetails = ({
             readOnly
           />
         </Col>
-        <Col xs={12} md={2}>
+        {/* <Col xs={12} md={1}>
           <InputField
-            label="State Code:"
+            label="St Code:"
             name="state_code"
             value={formData.state_code || ""}
             readOnly
           />
-        </Col>
+        </Col> */}
         <Col xs={12} md={2}>
           <InputField
             label="Aadhar"

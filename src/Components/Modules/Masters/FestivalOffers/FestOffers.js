@@ -13,6 +13,7 @@ function FestOffers() {
   const [formData, setFormData] = useState({
     offer_name: "",
     discount_on: "",
+    discount_on_rate:"",
     discount_percentage: "",
     valid_from: "",
     valid_to: "",
@@ -24,6 +25,7 @@ function FestOffers() {
       setFormData({
         offer_name: location.offer_name || "",
         discount_on: location.discount_on || "",
+        discount_on_rate: location.discount_on_rate || "",
         discount_percentage: location.discount_percentage || "",
         valid_from: location.valid_from?.split("T")[0] || "",
         valid_to: location.valid_to?.split("T")[0] || "",
@@ -83,7 +85,7 @@ function FestOffers() {
                 required
               />
             </Col>
-            <Col md={4}>
+            {/* <Col md={4}>
               <InputField
                 label="Discount On"
                 name="discount_on"
@@ -97,12 +99,22 @@ function FestOffers() {
                 ]}
                 required
               />
+            </Col> */}
+             <Col md={4}>
+              <InputField
+                label="Discount on Rate"
+                name="discount_on_rate"
+                type="number"
+                value={formData.discount_on_rate}
+                onChange={handleChange}
+                required
+              />
             </Col>
             <Col md={4}>
               <InputField
-                label="Discount %"
+                label="Discount % on MC"
                 name="discount_percentage"
-                type="number"
+                // type="number"
                 value={formData.discount_percentage}
                 onChange={handleChange}
                 required

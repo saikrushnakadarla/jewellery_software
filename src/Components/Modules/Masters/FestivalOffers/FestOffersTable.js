@@ -39,11 +39,11 @@ const FestOffersTable = () => {
         accessor: "offer_name",
       },
       {
-        Header: "Discount On",
-        accessor: "discount_on",
+        Header: "Discount On Rate",
+        accessor: "discount_on_rate",
       },
       {
-        Header: "Discount%",
+        Header: "Discount % on MC",
         accessor: "discount_percentage",
       },
       {

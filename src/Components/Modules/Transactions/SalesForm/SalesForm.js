@@ -501,6 +501,7 @@ const SalesForm = () => {
       metal_type: "",
       design_name: "",
       purity: "",
+      selling_purity: "",
       category: "",
       sub_category: "",
       gross_weight: "",
@@ -586,41 +587,41 @@ const SalesForm = () => {
   };
 
   let totalAmount = 0;
-let discountAmt = 0;
-let taxableAmount = 0;
-let taxAmount = 0;
-let netAmount = 0;
+  let discountAmt = 0;
+  let taxableAmount = 0;
+  let taxAmount = 0;
+  let netAmount = 0;
 
-repairDetails.forEach((item) => {
-  const pricing = item.pricing;
-  
-  if (pricing === "By Weight") {
-    const stonePrice = parseFloat(item.stone_price) || 0;
-    const makingCharges = parseFloat(item.making_charges) || 0;
-    const rateAmt = parseFloat(item.rate_amt) || 0;
-    const hmCharges = parseFloat(item.hm_charges) || 0;
-    const itemDiscount = parseFloat(item.disscount) || 0;
-    const itemTax = parseFloat(item.tax_amt) || 0;
+  repairDetails.forEach((item) => {
+    const pricing = item.pricing;
 
-    const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
-    totalAmount += itemTotal;
-    discountAmt += itemDiscount;
-    taxableAmount += itemTotal - itemDiscount;
-    taxAmount += itemTax;
-    netAmount += itemTotal - itemDiscount + itemTax;
+    if (pricing === "By Weight") {
+      const stonePrice = parseFloat(item.stone_price) || 0;
+      const makingCharges = parseFloat(item.making_charges) || 0;
+      const rateAmt = parseFloat(item.rate_amt) || 0;
+      const hmCharges = parseFloat(item.hm_charges) || 0;
+      const itemDiscount = parseFloat(item.disscount) || 0;
+      const itemTax = parseFloat(item.tax_amt) || 0;
 
-  } else {
-    const pieceCost = parseFloat(item.pieace_cost) || 0;
-    const mrpPrice = parseFloat(item.mrp_price) || 0;
+      const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
+      totalAmount += itemTotal;
+      discountAmt += itemDiscount;
+      taxableAmount += itemTotal - itemDiscount;
+      taxAmount += itemTax;
+      netAmount += itemTotal - itemDiscount + itemTax;
 
-    totalAmount += pieceCost;
-    // no discount or tax applied
-    taxableAmount += pieceCost;
-    netAmount += mrpPrice;
-  }
-});
+    } else {
+      const pieceCost = parseFloat(item.pieace_cost) || 0;
+      const mrpPrice = parseFloat(item.mrp_price) || 0;
 
-  
+      totalAmount += pieceCost;
+      // no discount or tax applied
+      taxableAmount += pieceCost;
+      netAmount += mrpPrice;
+    }
+  });
+
+
 
 
   const oldItemsAmount = location.state?.old_exchange_amt
@@ -731,14 +732,14 @@ repairDetails.forEach((item) => {
     const now = new Date();
     return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
   };
-  
+
   const allSelectedRowsAreThisMonth = selectedRows.every(rowIndex =>
     isSameMonth(invoiceDetails[rowIndex]?.date)
   );
-  
+
   // Conditionally assign the correct value
   const salesAmountToPass = allSelectedRowsAreThisMonth ? salesNetAmount : salesTaxableAmount;
-  
+
 
   // Calculate Net Payable Amount
   // const payableAmount = netAmount - (schemeAmount + oldItemsAmount);
@@ -800,145 +801,63 @@ repairDetails.forEach((item) => {
     console.log("Data cleared successfully");
   };
 
-  // const handleSave = async () => {
-  //   if (!formData.account_name || !formData.mobile) {
-  //     alert("Please select the Customer or enter the Customer Mobile Number");
-  //     return;
-  //   }
-
-  //   try {
-  //     // Fetch the latest invoice number
-  //     const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
-  //     const latestInvoiceNumber = response.data.lastInvoiceNumber;
-
-  //     // Update formData with latest invoice number
-  //     const updatedFormData = {
-  //       ...formData,
-  //       invoice_number: latestInvoiceNumber,
-  //     };
-  //     setFormData(updatedFormData); // Update state (optional depending on your use)
-
-  //     const dataToSave = {
-  //       repairDetails: repairDetails.map(item => ({
-  //         ...item,
-  //         invoice_number: updatedFormData.invoice_number,
-  //         customer_id: updatedFormData.customer_id,
-  //         mobile: updatedFormData.mobile,
-  //         account_name: updatedFormData.account_name,
-  //         email: updatedFormData.email,
-  //         address1: updatedFormData.address1,
-  //         address2: updatedFormData.address2,
-  //         city: updatedFormData.city,
-  //         pincode: updatedFormData.pincode,
-  //         state: updatedFormData.state,
-  //         state_code: updatedFormData.state_code,
-  //         aadhar_card: updatedFormData.aadhar_card,
-  //         gst_in: updatedFormData.gst_in,
-  //         pan_card: updatedFormData.pan_card,
-  //         terms: updatedFormData.terms,
-  //         cash_amount: paymentDetails.cash_amount || 0,
-  //         card_amt: paymentDetails.card_amt || 0,
-  //         chq_amt: paymentDetails.chq_amt || 0,
-  //         online_amt: paymentDetails.online_amt || 0,
-  //       })),
-  //       oldItems: oldSalesData,
-  //       memberSchemes: schemeSalesData,
-  //       oldItemsAmount: oldItemsAmount || 0,
-  //       schemeAmount: schemeAmount || 0,
-  //       salesNetAmount: salesNetAmount || 0,
-  //       salesTaxableAmount: salesTaxableAmount || 0,
-  //     };
-
-  //     console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-
-  //     await axios.post(`${baseURL}/save-repair-details`, dataToSave);
-  //     alert("Sales added successfully");
-
-  //     const pdfDoc = (
-  //       <PDFLayout
-  //         formData={updatedFormData}
-  //         repairDetails={repairDetails}
-  //         cash_amount={paymentDetails.cash_amount || 0}
-  //         card_amt={paymentDetails.card_amt || 0}
-  //         chq_amt={paymentDetails.chq_amt || 0}
-  //         online_amt={paymentDetails.online_amt || 0}
-  //         taxableAmount={taxableAmount}
-  //         taxAmount={taxAmount}
-  //         discountAmt={discountAmt}
-  //         oldItemsAmount={oldItemsAmount}
-  //         schemeAmount={schemeAmount}
-  //         salesNetAmount={salesNetAmount}
-  //         salesTaxableAmount={salesTaxableAmount}
-  //         netAmount={netAmount}
-  //         netPayableAmount={netPayableAmount}
-  //       />
-  //     );
-
-  //     const pdfBlob = await pdf(pdfDoc).toBlob();
-
-  //     const link = document.createElement("a");
-  //     link.href = URL.createObjectURL(pdfBlob);
-  //     link.download = `invoice-${updatedFormData.invoice_number}.pdf`;
-  //     link.click();
-  //     URL.revokeObjectURL(link.href);
-
-  //     clearData();
-  //     resetForm();
-  //     navigate("/salestable");
-  //     window.location.reload();
-  //     await handleCheckout();
-  //   } catch (error) {
-  //     console.error("Error saving data:", error);
-  //     alert("Error saving data");
-  //   }
-  // };
-
-  const handleSave = async () => { 
+  const handleSave = async () => {
     if (!formData.account_name || !formData.mobile) {
       alert("Please select the Customer or enter the Customer Mobile Number");
       return;
     }
-    const dataToSave = {
-      repairDetails: repairDetails.map(item => ({
-        ...item,
-        customer_id: formData.customer_id,
-        mobile: formData.mobile,
-        account_name: formData.account_name,
-        email: formData.email,
-        address1: formData.address1,
-        address2: formData.address2,
-        city: formData.city,
-        pincode: formData.pincode,
-        state: formData.state,
-        state_code: formData.state_code,
-        aadhar_card: formData.aadhar_card,
-        gst_in: formData.gst_in,
-        pan_card: formData.pan_card,
-        terms: formData.terms,
-        cash_amount: paymentDetails.cash_amount || 0,
-        card_amt: paymentDetails.card_amt || 0,
-        chq_amt: paymentDetails.chq_amt || 0,
-        online_amt: paymentDetails.online_amt || 0,
-      })),
-      oldItems: oldSalesData,
-      memberSchemes: schemeSalesData,
-      oldItemsAmount: oldItemsAmount || 0, // Explicitly include value
-      schemeAmount: schemeAmount || 0,    // Explicitly include value
-      salesNetAmount: salesAmountToPass || 0,
-    };
-
-    console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-
-    console.log("Saving data:", dataToSave);
 
     try {
+      // Fetch the latest invoice number
+      const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
+      const latestInvoiceNumber = response.data.lastInvoiceNumber;
+
+      // Update formData with latest invoice number
+      const updatedFormData = {
+        ...formData,
+        invoice_number: latestInvoiceNumber,
+      };
+      setFormData(updatedFormData); // Update state (optional depending on your use)
+
+      const dataToSave = {
+        repairDetails: repairDetails.map(item => ({
+          ...item,
+          invoice_number: updatedFormData.invoice_number,
+          customer_id: updatedFormData.customer_id,
+          mobile: updatedFormData.mobile,
+          account_name: updatedFormData.account_name,
+          email: updatedFormData.email,
+          address1: updatedFormData.address1,
+          address2: updatedFormData.address2,
+          city: updatedFormData.city,
+          pincode: updatedFormData.pincode,
+          state: updatedFormData.state,
+          state_code: updatedFormData.state_code,
+          aadhar_card: updatedFormData.aadhar_card,
+          gst_in: updatedFormData.gst_in,
+          pan_card: updatedFormData.pan_card,
+          terms: updatedFormData.terms,
+          cash_amount: paymentDetails.cash_amount || 0,
+          card_amt: paymentDetails.card_amt || 0,
+          chq_amt: paymentDetails.chq_amt || 0,
+          online_amt: paymentDetails.online_amt || 0,
+        })),
+        oldItems: oldSalesData,
+        memberSchemes: schemeSalesData,
+        oldItemsAmount: oldItemsAmount || 0,
+        schemeAmount: schemeAmount || 0,
+        salesNetAmount: salesNetAmount || 0,
+        salesTaxableAmount: salesTaxableAmount || 0,
+      };
+
+      console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
+
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Sales added successfully");
 
-      // Generate PDF Blob
       const pdfDoc = (
         <PDFLayout
-          formData={formData}
+          formData={updatedFormData}
           repairDetails={repairDetails}
           cash_amount={paymentDetails.cash_amount || 0}
           card_amt={paymentDetails.card_amt || 0}
@@ -949,7 +868,8 @@ repairDetails.forEach((item) => {
           discountAmt={discountAmt}
           oldItemsAmount={oldItemsAmount}
           schemeAmount={schemeAmount}
-          salesNetAmount={salesAmountToPass}
+          salesNetAmount={salesNetAmount}
+          salesTaxableAmount={salesTaxableAmount}
           netAmount={netAmount}
           netPayableAmount={netPayableAmount}
         />
@@ -957,19 +877,13 @@ repairDetails.forEach((item) => {
 
       const pdfBlob = await pdf(pdfDoc).toBlob();
 
-      // Create a download link and trigger it
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
-      link.download = `invoice-${formData.invoice_number}.pdf`;
+      link.download = `invoice-${updatedFormData.invoice_number}.pdf`;
       link.click();
-
-      // Clean up
       URL.revokeObjectURL(link.href);
 
-      // Clear all data after saving
       clearData();
-
-      // Reset the form and reload the page if necessary
       resetForm();
       navigate("/salestable");
       window.location.reload();
@@ -979,6 +893,93 @@ repairDetails.forEach((item) => {
       alert("Error saving data");
     }
   };
+
+  // const handleSave = async () => { 
+  //   if (!formData.account_name || !formData.mobile) {
+  //     alert("Please select the Customer or enter the Customer Mobile Number");
+  //     return;
+  //   }
+  //   const dataToSave = {
+  //     repairDetails: repairDetails.map(item => ({
+  //       ...item,
+  //       customer_id: formData.customer_id,
+  //       mobile: formData.mobile,
+  //       account_name: formData.account_name,
+  //       email: formData.email,
+  //       address1: formData.address1,
+  //       address2: formData.address2,
+  //       city: formData.city,
+  //       pincode: formData.pincode,
+  //       state: formData.state,
+  //       state_code: formData.state_code,
+  //       aadhar_card: formData.aadhar_card,
+  //       gst_in: formData.gst_in,
+  //       pan_card: formData.pan_card,
+  //       terms: formData.terms,
+  //       cash_amount: paymentDetails.cash_amount || 0,
+  //       card_amt: paymentDetails.card_amt || 0,
+  //       chq_amt: paymentDetails.chq_amt || 0,
+  //       online_amt: paymentDetails.online_amt || 0,
+  //     })),
+  //     oldItems: oldSalesData,
+  //     memberSchemes: schemeSalesData,
+  //     oldItemsAmount: oldItemsAmount || 0, // Explicitly include value
+  //     schemeAmount: schemeAmount || 0,    // Explicitly include value
+  //     salesNetAmount: salesAmountToPass || 0,
+  //   };
+
+  //   console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
+
+  //   console.log("Saving data:", dataToSave);
+
+  //   try {
+  //     await axios.post(`${baseURL}/save-repair-details`, dataToSave);
+  //     alert("Sales added successfully");
+
+  //     // Generate PDF Blob
+  //     const pdfDoc = (
+  //       <PDFLayout
+  //         formData={formData}
+  //         repairDetails={repairDetails}
+  //         cash_amount={paymentDetails.cash_amount || 0}
+  //         card_amt={paymentDetails.card_amt || 0}
+  //         chq_amt={paymentDetails.chq_amt || 0}
+  //         online_amt={paymentDetails.online_amt || 0}
+  //         taxableAmount={taxableAmount}
+  //         taxAmount={taxAmount}
+  //         discountAmt={discountAmt}
+  //         oldItemsAmount={oldItemsAmount}
+  //         schemeAmount={schemeAmount}
+  //         salesNetAmount={salesAmountToPass}
+  //         netAmount={netAmount}
+  //         netPayableAmount={netPayableAmount}
+  //       />
+  //     );
+
+  //     const pdfBlob = await pdf(pdfDoc).toBlob();
+
+  //     // Create a download link and trigger it
+  //     const link = document.createElement("a");
+  //     link.href = URL.createObjectURL(pdfBlob);
+  //     link.download = `invoice-${formData.invoice_number}.pdf`;
+  //     link.click();
+
+  //     // Clean up
+  //     URL.revokeObjectURL(link.href);
+
+  //     // Clear all data after saving
+  //     clearData();
+
+  //     // Reset the form and reload the page if necessary
+  //     resetForm();
+  //     navigate("/salestable");
+  //     window.location.reload();
+  //     await handleCheckout();
+  //   } catch (error) {
+  //     console.error("Error saving data:", error);
+  //     alert("Error saving data");
+  //   }
+  // };
 
   const refreshSalesData = () => {
     setOldSalesData([]);

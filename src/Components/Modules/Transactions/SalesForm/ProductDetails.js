@@ -266,15 +266,7 @@ const ProductDetails = ({
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={12} md={1}>
-              <InputField
-                label="MRP"
-                name="mrp_price"
-                value={formData.mrp_price || "0.00"} // Default to "0.00" if undefined
-                onChange={handleChange} // Trigger recalculation of Total MC
-                readOnly={false} // Ensure it's editable
-              />
-            </Col>
+           
             <Col xs={12} md={1}>
               <InputField
                 label="Qty"
@@ -284,7 +276,7 @@ const ProductDetails = ({
                 readOnly={!isQtyEditable}
               />
             </Col>
-            {/* <Col xs={12} md={1}>
+            <Col xs={12} md={1}>
               <InputField label="Tax%"
                 name="tax_percent"
                 value={formData.tax_percent}
@@ -299,7 +291,16 @@ const ProductDetails = ({
                 onChange={handleChange} // Optional, since it's auto-calculated
                 readOnly
               />
-            </Col> */}
+            </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="MRP"
+                name="mrp_price"
+                value={formData.mrp_price || "0.00"} // Default to "0.00" if undefined
+                onChange={handleChange} // Trigger recalculation of Total MC
+                readOnly={false} // Ensure it's editable
+              />
+            </Col>
             <Col xs={12} md={1}>
               <InputField
                 label="Total Price"
@@ -472,6 +473,16 @@ const ProductDetails = ({
                 label="Purity"
                 name="purity"
                 value={formData.purity || ""}
+                onChange={handleChange}
+              // type="select"
+              // options={purityOptions}
+              />
+            </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Selling Purity"
+                name="selling_purity"
+                value={formData.selling_purity || ""}
                 onChange={handleChange}
               // type="select"
               // options={purityOptions}
@@ -839,7 +850,7 @@ const ProductDetails = ({
           </Button>
         </Col>
 
-        <Col xs={12} md={3}>
+        <Col xs={12} md={2}>
           <InputField
             label="Estimate Number"
             type="select"

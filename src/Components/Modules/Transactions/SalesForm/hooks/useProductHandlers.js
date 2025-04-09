@@ -44,6 +44,7 @@ const useProductHandlers = () => {
     metal_type: "",
     design_name: "",
     purity: "",
+    selling_purity:"",
     pricing: "By Weight",
     category: "",
     sub_category: "",
@@ -196,6 +197,7 @@ const useProductHandlers = () => {
         metal_type: "",
         design_name: "",
         purity: "",
+        selling_purity:"",
         pricing: "By Weight",
         category: "",
         sub_category: "",
@@ -305,6 +307,7 @@ const useProductHandlers = () => {
     if (name === "pricing" && value === "By fixed") {
       // Clear the specified fields if pricing is "By fixed"
       updatedFormData.purity = "";
+      updatedFormData.selling_purity = "";
       updatedFormData.gross_weight = "";
       updatedFormData.stone_weight = "";
       updatedFormData.weight_bw = "";
@@ -350,6 +353,7 @@ const useProductHandlers = () => {
         metal_type: "",
         design_name: "",
         purity: "",
+        selling_purity:"",
         category: "",
         sub_category: "",
         gross_weight: "",
@@ -429,6 +433,7 @@ const useProductHandlers = () => {
         ...prevData,
         design_name: designName,
         purity: "",
+        selling_purity:"",
       }));
 
       setFilteredPurityOptions(uniquePurityOptions); // Update purity options based on design
@@ -437,7 +442,7 @@ const useProductHandlers = () => {
         ...prevData,
         design_name: "",
         purity: "",
-
+        selling_purity:"",
       }));
 
       setFilteredPurityOptions([]);
@@ -656,6 +661,7 @@ const useProductHandlers = () => {
           metal_type: "",
           design_name: "",
           purity: "",
+          selling_purity:"",
           pricing: "By Weight",
           category: "",
           sub_category: "",
@@ -753,7 +759,8 @@ const useProductHandlers = () => {
             product_name: tag.sub_category || "", // Make editable
             metal_type: tag.metal_type || "",
             design_name: tag.design_master || "", // Make editable
-            purity: tag.Purity || "",
+            purity: tag.pur_Purity || "",
+            selling_purity: tag.Purity || "",
             pricing: tag.Pricing || "By Weight",
             category: tag.category || "",
             sub_category: tag.sub_category || "",
@@ -770,10 +777,10 @@ const useProductHandlers = () => {
             mc_on: tag.Making_Charges_On || "",
             mc_per_gram: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
-            tax_percent: productDetails?.tax_slab || "",
+            tax_percent: tag.tax_percent || productDetails?.tax_slab || "",
             qty: 1, // Allow qty to be editable for tag
           }));
-          setIsQtyEditable(false); // Allow editing of qty
+          setIsQtyEditable(true); // Allow editing of qty
         } else {
           // Reset form if no tag is found
           setFormData((prevData) => ({
