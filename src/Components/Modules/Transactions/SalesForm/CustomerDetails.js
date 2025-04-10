@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Col, Row, Button} from "react-bootstrap";
+import { Col, Row, Button } from "react-bootstrap";
 import InputField from "./../../../Pages/InputField/InputField";
 import { AiOutlinePlus } from "react-icons/ai";
-import { useLocation, useNavigate  } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import baseURL from './../../../../Url/NodeBaseURL';
 
@@ -14,7 +14,7 @@ const CustomerDetails = ({
   setSelectedMobile,
   mobileRef
 }) => {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
   const [balance, setBalance] = useState(0); // State to store balance
   const [loading, setLoading] = useState(false);
@@ -86,7 +86,7 @@ const CustomerDetails = ({
     const selectedCustomer = customers.find(
       cust => cust.account_id === formData.customer_id
     );
-    
+
     if (selectedCustomer) {
       navigate("/receipts", {
         state: {
@@ -251,19 +251,32 @@ const CustomerDetails = ({
           />
         </Col>
         <Col xs={12} md={2}>
-        <Button
-  style={{
-    backgroundColor: '#28a745',
-    borderColor: '#28a745',
-    fontSize: '0.875rem',
-    padding: '0.25rem 0.5rem',
-  }}
-  onClick={handleAddReceipt}
->
-  Add Receipt
-</Button>
-
+          <Button
+            style={{
+              backgroundColor: '#28a745',
+              borderColor: '#28a745',
+              fontSize: '0.952rem',
+              padding: '0.35rem 0.35rem',
+            }}
+            onClick={handleAddReceipt}
+          >
+            Add Receipt
+          </Button>
         </Col>
+        <Col xs={12} md={1}>
+          <Button
+            onClick={() => window.open("/sales", "_blank")}
+            style={{
+              backgroundColor: '#28a745',
+              borderColor: '#28a745',
+              fontSize: '0.952rem',
+              padding: '0.35rem 0.35rem',
+            }}
+          >
+            + New
+          </Button>
+        </Col>
+
       </Row>
     </Col>
   );

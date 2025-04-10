@@ -12,7 +12,7 @@ import { useParams } from "react-router-dom";
 const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const repairData = location.state?.repairData; 
+  const repairData = location.state?.repairData;
   const [formData, setFormData] = useState({
     transaction_type: "Receipt",
     date: "",
@@ -21,7 +21,7 @@ const RepairForm = () => {
     receipt_no: "",
     account_name: "",
     mobile: "",
-    invoice_number:"",
+    invoice_number: "",
     total_amt: "",
     discount_amt: "",
     cash_amt: "",
@@ -38,6 +38,7 @@ const RepairForm = () => {
   const [accountOptions, setAccountOptions] = useState([]);
   const [repairDetails, setRepairDetails] = useState(null);
   const [invoiceNumberOptions, setInvoiceNumberOptions] = useState([]);
+  const [accountData, setAccountData] = useState([]);
 
   useEffect(() => {
     const fetchLastReceiptNumber = async () => {
@@ -61,7 +62,7 @@ const RepairForm = () => {
         ...prev,
         ...repairData, // Override with existing repair data
       }));
-  
+
       if (repairData.account_name) {
         // Populate invoiceNumberOptions for the account
         const filteredInvoices = repairDetails
@@ -70,21 +71,21 @@ const RepairForm = () => {
             value: item.invoice_number,
             label: item.invoice_number,
           }));
-  
+
         setInvoiceNumberOptions(filteredInvoices);
-  
+
         // Set total_amt based on the selected invoice_number
         const selectedRepair = repairDetails?.find(
           (item) => item.invoice_number === repairData.invoice_number
         );
-  
+
         if (selectedRepair) {
           // Use bal_after_receipts if it exists, otherwise fall back to bal_amt
           const totalAmt = Number(
             selectedRepair.bal_after_receipts || selectedRepair.bal_amt || 0
           );
-          console.log("totalAmt=",totalAmt)
-  
+          console.log("totalAmt=", totalAmt)
+
           setFormData((prev) => ({
             ...prev,
             total_amt: totalAmt,
@@ -96,70 +97,61 @@ const RepairForm = () => {
       setFormData((prev) => ({ ...prev, date: today }));
     }
   }, [repairData, repairDetails]);
-  
-  useEffect(() => {
-    const fetchAccountNames = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/account-names`);
-        const formattedOptions = response.data.map((item) => ({
-          value: item.account_name,
-          label: item.account_name,
-        }));
-        setAccountOptions(formattedOptions);
-      } catch (error) {
-        console.error("Error fetching account names:", error);
-      }
-    };
-
-    fetchAccountNames();
-  }, []);
-
-  useEffect(() => {
-    const fetchAccountNames = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/account-names`);
-        const formattedOptions = response.data.map((item) => ({
-          value: item.mobile,
-          label: item.mobile,
-        }));
-        setMobileOptions(formattedOptions);
-      } catch (error) {
-        console.error("Error fetching account names:", error);
-      }
-    };
-
-    fetchAccountNames();
-  }, []);
 
   useEffect(() => {
     const fetchRepairs = async () => {
       try {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
-        
+
         // Filter the data based on the 'transaction_status' column
-        const filteredData = response.data.filter(item => item.transaction_status === 'Sales'|| item.transaction_status === "ConvertedInvoice");
-        
+        const filteredData = response.data.filter(item => item.transaction_status === 'Sales' || item.transaction_status === "ConvertedInvoice");
+
         setRepairDetails(filteredData);
-        console.log("filteredData=",filteredData)
-        
+        console.log("filteredData=", filteredData)
+
       } catch (error) {
         console.error('Error fetching repair details:', error);
-        
+
       }
     };
-  
+
     fetchRepairs();
+  }, []);
+
+  useEffect(() => {
+    const fetchAccountNames = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/account-names`);
+        setAccountData(response.data); // store full data
+
+        const nameOptions = response.data.map((item) => ({
+          value: item.account_name,
+          label: item.account_name,
+        }));
+        const mobileOptions = response.data.map((item) => ({
+          value: item.mobile,
+          label: item.mobile,
+        }));
+
+        setAccountOptions(nameOptions);
+        setMobileOptions(mobileOptions);
+      } catch (error) {
+        console.error("Error fetching account names:", error);
+      }
+    };
+
+    fetchAccountNames();
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     setFormData((prevData) => {
       const updatedData = {
         ...prevData,
         [name]: value,
       };
-  
+
       // Clear `invoice_number` and related fields when `account_name` is cleared
       if (name === "account_name" && value === "") {
         updatedData.invoice_number = "";
@@ -167,12 +159,49 @@ const RepairForm = () => {
         updatedData.cash_amt = "";
         setInvoiceNumberOptions([]);
       }
-  
+
+
+      // Sync fields using accountData
+      if (name === "account_name") {
+        const match = accountData.find((item) => item.account_name === value);
+        updatedData.mobile = match?.mobile || "";
+
+        if (value === "") {
+          updatedData.invoice_number = "";
+          updatedData.total_amt = "";
+          updatedData.cash_amt = "";
+          setInvoiceNumberOptions([]);
+        } else {
+          const filteredInvoices = repairDetails
+            .filter((item) => item.account_name === value)
+            .map((item) => ({
+              value: item.invoice_number,
+              label: item.invoice_number,
+            }));
+          setInvoiceNumberOptions(filteredInvoices);
+        }
+      }
+
+      if (name === "mobile") {
+        const match = accountData.find((item) => item.mobile === value);
+        updatedData.account_name = match?.account_name || "";
+
+        if (match?.account_name) {
+          const filteredInvoices = repairDetails
+            .filter((item) => item.account_name === match.account_name)
+            .map((item) => ({
+              value: item.invoice_number,
+              label: item.invoice_number,
+            }));
+          setInvoiceNumberOptions(filteredInvoices);
+        }
+      }
+
       // Handle changes to `total_amt` or `discount_amt`
       if (name === "total_amt" || name === "discount_amt") {
         const totalAmt = Number(updatedData.total_amt) || 0;
         const discountAmt = Number(updatedData.discount_amt) || 0;
-  
+
         // If `total_amt` is cleared, clear `cash_amt`
         if (name === "total_amt" && value === "") {
           updatedData.cash_amt = "";
@@ -184,7 +213,7 @@ const RepairForm = () => {
           updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
         }
       }
-  
+
       // Update `invoiceNumberOptions` when `account_name` changes
       if (name === "account_name") {
         const filteredInvoices = repairDetails
@@ -195,7 +224,7 @@ const RepairForm = () => {
           }));
         setInvoiceNumberOptions(filteredInvoices);
       }
-  
+
       // Update `total_amt` when `invoice_number` changes
       if (name === "invoice_number") {
         if (value === "") {
@@ -207,36 +236,36 @@ const RepairForm = () => {
           const selectedRepair = repairDetails.find(
             (item) => item.invoice_number === value
           );
-  
+
           if (selectedRepair) {
             const paidAmt = Number(selectedRepair.paid_amt) || 0;
             const receiptsAmt = Number(selectedRepair.receipts_amt) || 0;
             const netBillAmount = Number(selectedRepair.net_bill_amount) || 0;
             const balAfterReceipts = Number(selectedRepair.bal_after_receipts) || 0;
             const balAmt = Number(selectedRepair.bal_amt) || 0;
-          
+
             updatedData.total_amt =
               paidAmt + receiptsAmt === netBillAmount
                 ? balAfterReceipts
                 : balAfterReceipts || balAmt;
-          
-            updatedData.cash_amt = ""; 
+
+            updatedData.cash_amt = "";
           }
-          
+
 
           // if (selectedRepair) {
           //   updatedData.total_amt = Number(
           //      selectedRepair.bal_amt || 0
           //   );
-  
+
           //   updatedData.cash_amt = ""; 
           // }
 
-          
+
 
         }
       }
-  
+
       return updatedData;
     });
   };
@@ -257,13 +286,13 @@ const RepairForm = () => {
             const year = dateObj.getFullYear();
             formattedDate = `${year}-${month}-${day}`;
           }
-  
+
           setFormData((prevData) => ({
             ...prevData,
             ...result.payment,
             date: formattedDate, // Set formatted date
           }));
-  
+
           // Fetch related invoices immediately after setting account_name
           if (result.payment.account_name) {
             const filteredInvoices = repairDetails
@@ -272,9 +301,9 @@ const RepairForm = () => {
                 value: item.invoice_number,
                 label: item.invoice_number,
               }));
-  
+
             setInvoiceNumberOptions(filteredInvoices);
-  
+
             // If invoice_number exists, set it in formData
             if (result.payment.invoice_number) {
               setFormData((prevData) => ({
@@ -290,12 +319,12 @@ const RepairForm = () => {
         console.error("Error fetching payment:", error);
       }
     };
-  
+
     if (id) {
       fetchData();
     }
   }, [id, repairDetails]);
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -303,38 +332,38 @@ const RepairForm = () => {
         ? `${baseURL}/edit/receipt/${id}`
         : `${baseURL}/post/payments`;
       const method = id ? "PUT" : "POST";
-  
+
       const response = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) throw new Error("Failed to save data");
-  
+
       alert(`Receipt ${id ? "updated" : "saved"} successfully!`);
-  
+
       console.log("FormData being passed to PDF generation:", formData);
-  
+
       // Generate PDF
       const pdfBlob = await pdf(
         <PDFContent formData={formData} repairDetails={repairDetails} />
       ).toBlob();
-  
+
       // Create download link and trigger download
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
       link.download = `receipt-${formData.receipt_no || "new"}.pdf`;
       link.click();
       URL.revokeObjectURL(link.href);
-  
+
       // Navigate to receipts table
       navigate("/receiptstable");
     } catch (error) {
       alert(`Error: ${error.message}`);
     }
   };
-  
+
   useEffect(() => {
     if (invoiceData) {
       setFormData((prevData) => ({
@@ -343,7 +372,7 @@ const RepairForm = () => {
         invoice_number: invoiceData.invoice_number || "", // Set invoice number
         mobile: invoiceData.mobile || "", // Set mobile number
       }));
-  
+
       // Populate invoice number options based on account_name
       const filteredInvoices = repairDetails
         ?.filter((item) => item.account_name === invoiceData.account_name)
@@ -351,14 +380,14 @@ const RepairForm = () => {
           value: item.invoice_number,
           label: item.invoice_number,
         }));
-  
+
       setInvoiceNumberOptions(filteredInvoices);
-  
+
       // Automatically set total amount based on selected invoice
       const selectedInvoice = repairDetails?.find(
         (item) => item.invoice_number === invoiceData.invoice_number
       );
-  
+
       if (selectedInvoice) {
         const balAfterReceipts = Number(selectedInvoice.bal_after_receipts) || 0;
         const balAmt = Number(selectedInvoice.bal_amt) || 0;
@@ -376,7 +405,7 @@ const RepairForm = () => {
     const from = location.state?.from || "/receiptstable"; // Default to /receiptstable if no from location provided
     navigate(from);
   };
-  
+
   useEffect(() => {
     if (invoiceData) {
       setFormData(prevData => ({
@@ -385,7 +414,7 @@ const RepairForm = () => {
         mobile: invoiceData.mobile || "",
         total_amt: invoiceData.total_amt || ""
       }));
-  
+
       // Populate invoice number options based on account_name
       const filteredInvoices = repairDetails
         ?.filter(item => item.account_name === invoiceData.account_name)
@@ -393,7 +422,7 @@ const RepairForm = () => {
           value: item.invoice_number,
           label: item.invoice_number,
         }));
-  
+
       setInvoiceNumberOptions(filteredInvoices);
     }
   }, [invoiceData, repairDetails]);
@@ -456,9 +485,9 @@ const RepairForm = () => {
               options={accountOptions}
             />
           </Col>
-          <Col xs={12} md={3}>
+          <Col xs={12} md={2}>
             <InputField
-              label="Mobile Number Name"
+              label="Mobile"
               type="select"
               name="mobile"
               value={formData.mobile}
@@ -467,15 +496,15 @@ const RepairForm = () => {
             />
           </Col>
           <Col xs={12} md={2}>
-          <InputField
-            label="Invoice Number"
-            type="select"
-            name="invoice_number"
-            value={formData.invoice_number}
-            onChange={handleInputChange}
-            options={invoiceNumberOptions}
-          />
-        </Col>
+            <InputField
+              label="Invoice Number"
+              type="select"
+              name="invoice_number"
+              value={formData.invoice_number}
+              onChange={handleInputChange}
+              options={invoiceNumberOptions}
+            />
+          </Col>
 
           <Col xs={12} md={2}>
             <InputField
@@ -505,7 +534,7 @@ const RepairForm = () => {
               readOnly
             />
           </Col>
-          <Col xs={12} md={3}>
+          <Col xs={12} md={2}>
             <InputField
               label="Remarks"
               name="remarks"
@@ -526,13 +555,13 @@ const RepairForm = () => {
             Cancel
           </Button>
           <Button
-        type="submit"
-        variant="primary"
-        style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
-        onClick={handleSubmit}
-      >
-        {id ? "Update" : "Save"}
-      </Button>
+            type="submit"
+            variant="primary"
+            style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+            onClick={handleSubmit}
+          >
+            {id ? "Update" : "Save"}
+          </Button>
         </div>
       </Container>
     </div>
