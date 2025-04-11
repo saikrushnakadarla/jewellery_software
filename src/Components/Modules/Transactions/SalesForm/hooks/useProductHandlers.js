@@ -400,7 +400,7 @@ const useProductHandlers = () => {
       }
     }
     
-    if (name === "pur_purityPercentage" && formData.selling_purity === "Manual") {
+    if (name === "custom_purity" && formData.selling_purity === "Manual") {
       const purityValue = parseFloat(value);
       const baseRate = parseFloat(rates?.rate_24crt) || 0;
       if (!isNaN(purityValue)) {
