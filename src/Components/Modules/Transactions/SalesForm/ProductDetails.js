@@ -124,9 +124,10 @@ const ProductDetails = ({
       imagePreview: null,
       remarks: "",
       sale_status: "Delivered",
+      custom_purity: "",
     }));
   };
-  
+
 
 
   return (
@@ -143,7 +144,7 @@ const ProductDetails = ({
             autoFocus
           />
         </Col>
-      
+
         <Col xs={12} md={2} className="d-flex align-items-center">
           <div style={{ flex: 1 }}>
             <InputField
@@ -234,7 +235,7 @@ const ProductDetails = ({
         {isByFixed ? (
           // If Pricing is "By fixed", show only these fields:
           <>
-           <Col xs={12} md={2}>
+            <Col xs={12} md={2}>
               <InputField
                 label="Printing Purity"
                 name="printing_purity"
@@ -266,7 +267,7 @@ const ProductDetails = ({
                 onChange={handleChange}
               />
             </Col>
-           
+
             <Col xs={12} md={1}>
               <InputField
                 label="Qty"
@@ -482,13 +483,30 @@ const ProductDetails = ({
               <InputField
                 label="Selling Purity"
                 name="selling_purity"
-                // type='number'
+                type="select"
                 value={formData.selling_purity || ""}
                 onChange={handleChange}
-              // type="select"
-              // options={purityOptions}
+                options={[
+                  {
+                    label: formData.selling_purity || "Select Purity",
+                    value: formData.selling_purity || "",
+                  },
+                  { label: "Manual", value: "Manual" },
+                ]}
               />
             </Col>
+            {formData.selling_purity === "Manual" && (
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Custom Purity %"
+                  name="custom_purity"
+                  value={formData.custom_purity || ""}
+                  onChange={handleChange}
+                />
+              </Col>
+            )}
+
+
             <Col xs={12} md={1}>
               <InputField
                 label="Gross Wt"
@@ -594,7 +612,7 @@ const ProductDetails = ({
                 label="MC On"
                 name="mc_on"
                 type="select"
-                
+
                 value={formData.mc_on || ""}
                 onChange={handleChange}
                 options={[

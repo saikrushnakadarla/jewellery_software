@@ -78,6 +78,7 @@ const useProductHandlers = () => {
     imagePreview: null,
     remarks: "",
     sale_status: "Delivered",
+    custom_purity: "",
   });
 
   // const [formData, setFormData] = useState(() => {
@@ -260,6 +261,21 @@ const useProductHandlers = () => {
       [name]: value,
     }));
 
+    if (name === "selling_purity") {
+      if (value === "Manual") {
+        // Clear rate if manual mode is selected
+        updatedFormData.rate = "";
+      } else if (rates.rate_24crt) {
+        const purityValue = parseFloat(value);
+        if (!isNaN(purityValue)) {
+          const baseRate = parseFloat(rates.rate_24crt);
+          const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+          updatedFormData.rate = calculatedRate;
+        }
+      }
+    }  
+
+
     if (name === "product_name") {
       if (value === "") {
         updatedFormData.selling_purity = "";
@@ -269,14 +285,31 @@ const useProductHandlers = () => {
         const selectedSubCategory = subcategoryOptions.find(
           (option) => option.value === value
         );
-
+    
         if (selectedSubCategory) {
           updatedFormData.selling_purity = selectedSubCategory.selling_purity || "";
           updatedFormData.purity = selectedSubCategory.purity || "";
           updatedFormData.printing_purity = selectedSubCategory.printing_purity || "";
+    
+          // <-- Paste this block here
+          const purityValue = parseFloat(selectedSubCategory.selling_purity);
+          const baseRate = parseFloat(rates?.rate_24crt) || 0;
+          if (!isNaN(purityValue)) {
+            updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
+          }
         }
       }
     }
+    
+    if (name === "pur_purityPercentage" && formData.selling_purity === "Manual") {
+      const purityValue = parseFloat(value);
+      const baseRate = parseFloat(rates?.rate_24crt) || 0;
+      if (!isNaN(purityValue)) {
+        const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+        updatedFormData.rate = calculatedRate;
+      }
+    }
+    
 
     if (name === "metal_type") {
       const metal = value.toLowerCase();
@@ -329,7 +362,8 @@ const useProductHandlers = () => {
         product_image: null,
         imagePreview: null,
         remarks: "",
-        sale_status: "Delivered"
+        sale_status: "Delivered",
+        custom_purity: "",
       };
     }
 
@@ -424,6 +458,7 @@ const useProductHandlers = () => {
       updatedFormData.disscount_percentage = "";
       updatedFormData.disscount = "";
       updatedFormData.rate = "";
+      updatedFormData.custom_purity = ""
     }
 
     setFormData(updatedFormData);
@@ -482,7 +517,8 @@ const useProductHandlers = () => {
         total_price: "",
         qty: "", // Rese
         remarks: "",
-        sale_status: "Delivered"
+        sale_status: "Delivered",
+        custom_purity: "",
       }));
 
       setFilteredMetalTypes(metalTypes);
@@ -797,7 +833,8 @@ const useProductHandlers = () => {
           total_price: "",
           qty: "", // Reset qty
           remarks: "",
-          sale_status: "Delivered"
+          sale_status: "Delivered",
+          custom_purity: "",
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
@@ -842,6 +879,7 @@ const useProductHandlers = () => {
           disscount: "",
           tax_percent: product.tax_slab,
           qty: 1, // Set qty to 1 for product
+          custom_purity: "",
         }));
         setIsQtyEditable(true); // Set qty as read-only
       } else {
