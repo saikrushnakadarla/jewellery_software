@@ -49,6 +49,7 @@ const ProductDetails = ({
   refreshSalesData,
   fetchCategory,
   fetchSubCategory,
+  taxableAmount
 }) => {
 
   const [showModal, setShowModal] = useState(false);
@@ -126,7 +127,7 @@ const ProductDetails = ({
       sale_status: "Delivered",
     }));
   };
-  
+
 
 
   return (
@@ -143,7 +144,7 @@ const ProductDetails = ({
             autoFocus
           />
         </Col>
-      
+
         <Col xs={12} md={2} className="d-flex align-items-center">
           <div style={{ flex: 1 }}>
             <InputField
@@ -234,7 +235,7 @@ const ProductDetails = ({
         {isByFixed ? (
           // If Pricing is "By fixed", show only these fields:
           <>
-           <Col xs={12} md={2}>
+            <Col xs={12} md={2}>
               <InputField
                 label="Printing Purity"
                 name="printing_purity"
@@ -266,7 +267,7 @@ const ProductDetails = ({
                 onChange={handleChange}
               />
             </Col>
-           
+
             <Col xs={12} md={1}>
               <InputField
                 label="Qty"
@@ -276,6 +277,16 @@ const ProductDetails = ({
                 readOnly={!isQtyEditable}
               />
             </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Taxable Amt"
+                name="piece_taxable_amt"
+                value={formData.piece_taxable_amt}
+                onChange={handleChange}
+                readOnly
+              />
+            </Col>
+
             <Col xs={12} md={1}>
               <InputField label="Tax%"
                 name="tax_percent"
@@ -594,7 +605,7 @@ const ProductDetails = ({
                 label="MC On"
                 name="mc_on"
                 type="select"
-                
+
                 value={formData.mc_on || ""}
                 onChange={handleChange}
                 options={[

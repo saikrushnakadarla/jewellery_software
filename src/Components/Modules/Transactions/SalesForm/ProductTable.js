@@ -43,7 +43,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
             <th>MC</th>
             {/* <th>Discount %</th> */}
             <th>Discount</th>
-
+            <th>Fest Discount</th>
             <th>Tax %</th>
             <th>Tax Amt</th>
             <th>Total Price</th>
@@ -71,6 +71,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
                 <td>{detail.making_charges}</td>
                 {/* <td>{detail.disscount_percentage}</td> */}
                 <td>{detail.disscount}</td>
+                <td>{detail.festival_discount}</td>
                 {/* <td>{detail.pieace_cost ?? detail.rate}</td> */}
                 <td>{detail.tax_percent}</td>
                 <td>{detail.tax_amt}</td>
@@ -93,7 +94,11 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
                       style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
                     />
                     <FaEdit
-                      onClick={() => onEdit(index)}
+                      // onClick={() => onEdit(index)}
+                      onClick={() => {
+                        onEdit(index);
+                        setTimeout(() => onEdit(index), 1); // Triggers again after 100ms
+                      }}
                       style={{ cursor: "pointer", marginLeft: "10px", color: "blue" }}
                     />
                     <FaTrash

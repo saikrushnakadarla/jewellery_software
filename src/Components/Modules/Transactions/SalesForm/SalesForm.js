@@ -293,38 +293,81 @@ const SalesForm = () => {
   }, [discount]);
 
   const handleDiscountChange = (e) => {
-    const discountValue = parseFloat(e.target.value) || ""; // Default to 0 if empty or NaN
+    const discountValue = parseFloat(e.target.value) || ""; // Default to empty if invalid
+  
     if (discountValue > 15) {
       alert("Discount cannot be greater than 15%");
-      return; // Prevent further execution
+      return;
     }
+  
     setDiscount(discountValue);
-
+  
     const storedRepairDetails = JSON.parse(localStorage.getItem("repairDetails")) || [];
-
+  
     const updatedRepairDetails = storedRepairDetails.map((item) => {
       const makingCharges = parseFloat(item.making_charges) || 0;
-      const calculatedDiscount = (makingCharges * discountValue) / 100;
-
-      const previousTotalPrice = parseFloat(item.total_price) || 0;
-      const originalTotalPrice = item.original_total_price
-        ? parseFloat(item.original_total_price)
-        : previousTotalPrice;
-
-      const updatedTotalPrice = originalTotalPrice - calculatedDiscount;
-
-      return {
-        ...item,
-        original_total_price: originalTotalPrice.toFixed(2),
-        disscount: calculatedDiscount.toFixed(2),
-        disscount_percentage: discountValue,
-        total_price: updatedTotalPrice.toFixed(2),
-      };
+      const pieceCost = parseFloat(item.pieace_cost) || 0;
+      const qty = parseFloat(item.qty) || 1;
+      const taxPercent = parseFloat(item.tax_percent) || 1;
+      const piece_taxable_amt = parseFloat(item.piece_taxable_amt) || 0;
+      const rateAmt = parseFloat(item.rate_amt) || 0;
+      const stonePrice = parseFloat(item.stone_price) || 0;
+      const discountAmt = parseFloat(item.disscount) || 0;
+      const hmCharges = parseFloat(item.hm_charges) || 0;
+      const pricingType = item.pricing;
+      
+    
+      let calculatedDiscount = 0;
+    
+      if (pricingType === "By fixed") {
+        const pieceTaxableAmt = pieceCost * qty;
+        calculatedDiscount = (pieceTaxableAmt * discountValue) / 100;
+    
+        const originalPieceTaxableAmt = item.original_piece_taxable_amt
+          ? parseFloat(item.original_piece_taxable_amt)
+          : pieceTaxableAmt;
+    
+        const updatedPieceTaxableAmt = originalPieceTaxableAmt - calculatedDiscount;
+        const taxAmt = (taxPercent * updatedPieceTaxableAmt) / 100;
+        const totalPrice = updatedPieceTaxableAmt + taxAmt;
+    
+        return {
+          ...item,
+          original_piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
+          disscount: calculatedDiscount.toFixed(2),
+          disscount_percentage: discountValue,
+          piece_taxable_amt: updatedPieceTaxableAmt.toFixed(2),
+          tax_amt: taxAmt.toFixed(2),
+          total_price: totalPrice.toFixed(2),
+        };
+      } else {
+        calculatedDiscount = (makingCharges * discountValue) / 100;
+      
+        const previousTotalPrice = parseFloat(item.total_price) || 0;
+        const originalTotalPrice = item.original_total_price
+          ? parseFloat(item.original_total_price)
+          : previousTotalPrice;
+      
+        // Tax calculation
+        const totalBeforeTax = rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount;
+        const taxAmt = (totalBeforeTax * taxPercent) / 100;
+        const updatedTotalPrice = totalBeforeTax + taxAmt;
+      
+        return {
+          ...item,
+          original_total_price: originalTotalPrice.toFixed(2),
+          disscount: calculatedDiscount.toFixed(2),
+          disscount_percentage: discountValue,
+          tax_amt: taxAmt.toFixed(2),
+          total_price: updatedTotalPrice.toFixed(2),
+        };
+      }
     });
-
+  
     setRepairDetails(updatedRepairDetails);
     localStorage.setItem("repairDetails", JSON.stringify(updatedRepairDetails));
   };
+  
 
   const [estimate, setEstimate] = useState([]);
   const [selectedEstimate, setSelectedEstimate] = useState("");
@@ -459,6 +502,8 @@ const SalesForm = () => {
       pieace_cost: "",
       imagePreview: null,
       sale_status: "Delivered",
+      piece_taxable_amt:"",
+      festival_discount :"",
     }));
 
     resetProductFields();
@@ -469,19 +514,23 @@ const SalesForm = () => {
 
   const handleEdit = (index) => {
     setEditIndex(index);
-
+  
+    const item = repairDetails[index];
+    const pieceCost = parseFloat(item.pieace_cost) || 0;
+    const qty = parseFloat(item.qty) || 1;
+    const pieceTaxableAmt = parseFloat(item.piece_taxable_amt).toFixed(2);
+  
     setFormData((prevFormData) => ({
       ...prevFormData,
-      ...repairDetails[index],
-      pieace_cost: repairDetails[index].pieace_cost && parseFloat(repairDetails[index].pieace_cost) > 0
-        ? parseFloat(repairDetails[index].pieace_cost).toFixed(2)
+      ...item,
+      pieace_cost: pieceCost > 0 ? pieceCost.toFixed(2) : "",
+      rate: item.rate && parseFloat(item.rate) > 0
+        ? parseFloat(item.rate).toFixed(2)
         : "",
-      rate: repairDetails[index].rate && parseFloat(repairDetails[index].rate) > 0
-        ? parseFloat(repairDetails[index].rate).toFixed(2)
-        : "",
-
+      piece_taxable_amt: pieceTaxableAmt,
     }));
   };
+  
 
   const handleUpdate = () => {
     const updatedDetails = repairDetails.map((item, index) =>
@@ -537,6 +586,8 @@ const SalesForm = () => {
       imagePreview: null,
       remarks: "",
       sale_status: "Delivered",
+      piece_taxable_amt:"",
+      festival_discount :"",
     }));
   };
 
@@ -611,22 +662,28 @@ const SalesForm = () => {
       const hmCharges = parseFloat(item.hm_charges) || 0;
       const itemDiscount = parseFloat(item.disscount) || 0;
       const itemTax = parseFloat(item.tax_amt) || 0;
+      const itemPercent = parseFloat(item.tax_percent) || 0;
 
       const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
       totalAmount += itemTotal;
       discountAmt += itemDiscount;
       taxableAmount += itemTotal - itemDiscount;
-      taxAmount += itemTax;
+      taxAmount += (taxableAmount*itemPercent)/100;
       netAmount += itemTotal - itemDiscount + itemTax;
 
     } else {
       const pieceCost = parseFloat(item.pieace_cost) || 0;
       const mrpPrice = parseFloat(item.mrp_price) || 0;
+      const qty = parseFloat(item.qty) || 0;
+      const itemDiscount = parseFloat(item.disscount) || 0;
+      const itemTax = parseFloat(item.tax_amt) || 0;
+      const itemPercent = parseFloat(item.tax_percent) || 0;
 
-      totalAmount += pieceCost;
-      // no discount or tax applied
-      taxableAmount += pieceCost;
-      netAmount += mrpPrice;
+      totalAmount += pieceCost * qty; 
+      discountAmt += itemDiscount;
+      taxableAmount += totalAmount- itemDiscount;
+      taxAmount += (taxableAmount*itemPercent)/100;
+      netAmount += taxableAmount+taxAmount;
     }
   });
 
@@ -1102,6 +1159,7 @@ const SalesForm = () => {
               refreshSalesData={refreshSalesData}
               fetchCategory={fetchCategory}
               fetchSubCategory={fetchSubCategory}
+              taxableAmount={taxableAmount}
             />
           </div>
 
