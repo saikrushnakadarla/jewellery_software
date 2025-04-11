@@ -20,6 +20,7 @@ const useProductHandlers = () => {
     rate_16crt: ""
   });
 
+
   // const [formData, setFormData] = useState({
   //   id: '',
   //   customer_id: "value001",
@@ -80,7 +81,69 @@ const useProductHandlers = () => {
   //   sale_status: "Delivered",
   //   piece_taxable_amt:"",
   //   festival_discount :"",
+
+  // const [formData, setFormData] = useState({
+  //   id: '',
+  //   customer_id: "value001",
+  //   mobile: mobile,
+  //   account_name: "",
+  //   email: "",
+  //   address1: "",
+  //   address2: "",
+  //   city: "",
+  //   pincode: "",
+  //   state: "",
+  //   state_code: "",
+  //   aadhar_card: "",
+  //   gst_in: "",
+  //   pan_card: "",
+  //   terms: "Cash",
+  //   date: "",
+  //   invoice_number: invoice_number,
+  //   code: "",
+  //   product_id: "",
+  //   metal: "",
+  //   product_name: "",
+  //   metal_type: "",
+  //   design_name: "",
+  //   purity: "",
+  //   selling_purity: "",
+  //   printing_purity: "",
+  //   pricing: "By Weight",
+  //   category: "",
+  //   sub_category: "",
+  //   gross_weight: "",
+  //   stone_weight: "",
+  //   weight_bw: "",
+  //   stone_price: "",
+  //   va_on: "Gross Weight",
+  //   va_percent: "",
+  //   wastage_weight: "",
+  //   total_weight_av: "",
+  //   mc_on: "MC %",
+  //   disscount_percentage: "",
+  //   disscount: "",
+  //   mc_per_gram: "",
+  //   making_charges: "",
+  //   rate: "",
+  //   pieace_cost: "",
+  //   mrp_price: "",
+  //   rate_amt: "",
+  //   tax_percent: "03% GST",
+  //   tax_amt: "",
+  //   hm_charges: "60.00",
+  //   total_price: "",
+  //   transaction_status: "Sales",
+  //   qty: "1",
+  //   opentag_id: "",
+  //   product_image: null,
+  //   imagePreview: null,
+  //   remarks: "",
+  //   sale_status: "Delivered",
+  //   custom_purity: "",
   // });
+
+
 
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem("saleFormData");
@@ -297,6 +360,21 @@ const useProductHandlers = () => {
       [name]: value,
     }));
 
+    if (name === "selling_purity") {
+      if (value === "Manual") {
+        // Clear rate if manual mode is selected
+        updatedFormData.rate = "";
+      } else if (rates.rate_24crt) {
+        const purityValue = parseFloat(value);
+        if (!isNaN(purityValue)) {
+          const baseRate = parseFloat(rates.rate_24crt);
+          const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+          updatedFormData.rate = calculatedRate;
+        }
+      }
+    }  
+
+
     if (name === "product_name") {
       if (value === "") {
         updatedFormData.selling_purity = "";
@@ -306,14 +384,31 @@ const useProductHandlers = () => {
         const selectedSubCategory = subcategoryOptions.find(
           (option) => option.value === value
         );
-
+    
         if (selectedSubCategory) {
           updatedFormData.selling_purity = selectedSubCategory.selling_purity || "";
           updatedFormData.purity = selectedSubCategory.purity || "";
           updatedFormData.printing_purity = selectedSubCategory.printing_purity || "";
+    
+          // <-- Paste this block here
+          const purityValue = parseFloat(selectedSubCategory.selling_purity);
+          const baseRate = parseFloat(rates?.rate_24crt) || 0;
+          if (!isNaN(purityValue)) {
+            updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
+          }
         }
       }
     }
+    
+    if (name === "pur_purityPercentage" && formData.selling_purity === "Manual") {
+      const purityValue = parseFloat(value);
+      const baseRate = parseFloat(rates?.rate_24crt) || 0;
+      if (!isNaN(purityValue)) {
+        const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+        updatedFormData.rate = calculatedRate;
+      }
+    }
+    
 
     if (name === "metal_type") {
       const metal = value.toLowerCase();
@@ -367,8 +462,12 @@ const useProductHandlers = () => {
         imagePreview: null,
         remarks: "",
         sale_status: "Delivered",
+
         piece_taxable_amt:"",
         festival_discount :"",
+
+        custom_purity: "",
+
       };
     }
 
@@ -463,6 +562,7 @@ const useProductHandlers = () => {
       updatedFormData.disscount_percentage = "";
       updatedFormData.disscount = "";
       updatedFormData.rate = "";
+      updatedFormData.custom_purity = ""
     }
 
     setFormData(updatedFormData);
@@ -522,8 +622,12 @@ const useProductHandlers = () => {
         qty: "", // Rese
         remarks: "",
         sale_status: "Delivered",
+
         piece_taxable_amt:"",
         festival_discount :"",
+
+        custom_purity: "",
+
       }));
 
       setFilteredMetalTypes(metalTypes);
@@ -839,8 +943,12 @@ const useProductHandlers = () => {
           qty: "", // Reset qty
           remarks: "",
           sale_status: "Delivered",
+
           piece_taxable_amt:"",
           festival_discount :"",
+
+          custom_purity: "",
+
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
@@ -885,7 +993,11 @@ const useProductHandlers = () => {
           disscount: "",
           tax_percent: product.tax_slab,
           qty: 1, // Set qty to 1 for product
+
           festival_discount :"",
+
+          custom_purity: "",
+
         }));
         setIsQtyEditable(true); // Set qty as read-only
       } else {

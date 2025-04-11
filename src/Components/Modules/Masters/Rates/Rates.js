@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Rates = () => {
     const [rates, setRates] = useState({
-        currentDate: new Date().toISOString().split('T')[0], // Set today's date by default
+        currentDate: new Date().toISOString().split('T')[0],
         gold16: '',
         gold18: '',
         gold22: '',
@@ -14,13 +14,11 @@ const Rates = () => {
         silverRate: '',
     });
 
-    const navigate = useNavigate(); // Initialize navigate
-    // const [allowEdit, setAllowEdit] = useState(false); // Track if editing is allowed for all fields
+    const navigate = useNavigate();
 
-     // Separate state for each field confirmation
-     const [allowEdit16, setAllowEdit16] = useState(false);
-     const [allowEdit18, setAllowEdit18] = useState(false);
-     const [allowEdit24, setAllowEdit24] = useState(false);
+    const [allowEdit16, setAllowEdit16] = useState(false);
+    const [allowEdit18, setAllowEdit18] = useState(false);
+    const [allowEdit24, setAllowEdit24] = useState(false);
 
     useEffect(() => {
         const fetchRates = async () => {
@@ -34,7 +32,6 @@ const Rates = () => {
                     const formattedDate = localDate.toISOString().split('T')[0];
 
                     setRates({
-                        // currentDate: formattedDate,
                         gold16: result.rate_16crt,
                         gold18: result.rate_18crt,
                         gold22: result.rate_22crt,
@@ -52,13 +49,16 @@ const Rates = () => {
         fetchRates();
     }, []);
 
-    const calculateRates = (gold22) => {
+    const calculateRatesFrom22K = (gold22) => {
         const gold22Value = parseFloat(gold22) || 0;
-    
+        const gold24 = Math.round((gold22Value * 24) / 22);
+        const gold18 = Math.round(gold24 * 0.76);
+        const gold16 = Math.round(gold24 * 0.6);
+
         return {
-            gold16: Math.round((gold22Value * 16) / 22),
-            gold18: Math.round((gold22Value * 18) / 22),
-            gold24: Math.round((gold22Value * 24) / 22),
+            gold24,
+            gold18,
+            gold16,
         };
     };
 
@@ -66,7 +66,7 @@ const Rates = () => {
         const { name, value } = e.target;
 
         if (name === 'gold16' && !allowEdit16) {
-            const confirmChange = window.confirm("You are modifying the 16K gold rate. Do you want to proceed?");
+            const confirmChange = window.confirm("You are modifying the 14K gold rate. Do you want to proceed?");
             if (!confirmChange) return;
             setAllowEdit16(true);
         }
@@ -82,15 +82,15 @@ const Rates = () => {
             if (!confirmChange) return;
             setAllowEdit24(true);
         }
-        
+
         if (name === 'gold22') {
-            const calculatedRates = calculateRates(value);
+            const calculated = calculateRatesFrom22K(value);
             setRates((prevRates) => ({
                 ...prevRates,
                 gold22: value,
-                gold16: calculatedRates.gold16.toFixed(2),
-                gold18: calculatedRates.gold18.toFixed(2),
-                gold24: calculatedRates.gold24.toFixed(2),
+                gold24: calculated.gold24,
+                gold18: calculated.gold18,
+                gold16: calculated.gold16,
             }));
         } else {
             setRates((prevRates) => ({
@@ -101,16 +101,16 @@ const Rates = () => {
     };
 
     const handleUpdateRates = async () => {
-        const { currentDate, gold16, gold18, gold22, gold24, silverRate } = rates;
+        const { gold16, gold18, gold22, gold24, silverRate } = rates;
 
         const requestData = {
             rate_date: new Date().toISOString().split('T')[0],
             rate_time: new Date().toLocaleTimeString(),
-            rate_16crt: gold16,
-            rate_18crt: gold18,
-            rate_22crt: gold22,
-            rate_24crt: gold24,
-            silver_rate: silverRate,
+            rate_16crt: Math.round(gold16),
+            rate_18crt: Math.round(gold18),
+            rate_22crt: Math.round(gold22),
+            rate_24crt: Math.round(gold24),
+            silver_rate: Math.round(silverRate),
         };
 
         try {
@@ -127,7 +127,7 @@ const Rates = () => {
             if (response.ok) {
                 alert('Rates updated successfully!');
                 console.log(result);
-                navigate('/dashboard'); // Redirect to Dashboard
+                navigate('/dashboard');
             } else {
                 alert(`Error: ${result.error}`);
             }
@@ -159,7 +159,7 @@ const Rates = () => {
                     </h3>
                     <div className="form-row">
                         <InputField
-                            label="16 Crt"
+                            label="14 Crt"
                             name="gold16"
                             type="text"
                             value={rates.gold16}
@@ -210,4 +210,5 @@ const Rates = () => {
         </div>
     );
 };
+
 export default Rates;

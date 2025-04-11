@@ -125,6 +125,7 @@ const ProductDetails = ({
       imagePreview: null,
       remarks: "",
       sale_status: "Delivered",
+      custom_purity: "",
     }));
   };
 
@@ -493,13 +494,30 @@ const ProductDetails = ({
               <InputField
                 label="Selling Purity"
                 name="selling_purity"
-                // type='number'
+                type="select"
                 value={formData.selling_purity || ""}
                 onChange={handleChange}
-              // type="select"
-              // options={purityOptions}
+                options={[
+                  {
+                    label: formData.selling_purity || "Select Purity",
+                    value: formData.selling_purity || "",
+                  },
+                  { label: "Manual", value: "Manual" },
+                ]}
               />
             </Col>
+            {formData.selling_purity === "Manual" && (
+              <Col xs={12} md={2}>
+                <InputField
+                  label="Custom Purity %"
+                  name="custom_purity"
+                  value={formData.custom_purity || ""}
+                  onChange={handleChange}
+                />
+              </Col>
+            )}
+
+
             <Col xs={12} md={1}>
               <InputField
                 label="Gross Wt"
