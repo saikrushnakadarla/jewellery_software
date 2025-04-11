@@ -94,7 +94,7 @@ const CustomerDetails = ({
           invoiceData: {
             account_name: selectedCustomer.account_name,
             mobile: selectedCustomer.mobile,
-            total_amt: balance // The balance amount calculated earlier
+            // total_amt: balance 
           }
         }
       });

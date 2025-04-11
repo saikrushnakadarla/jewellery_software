@@ -236,29 +236,29 @@ const ProductDetails = ({
           <>
            <Col xs={12} md={2}>
               <InputField
-                label="Purity"
-                name="purity"
-                value={formData.purity || ""}
+                label="Printing Purity"
+                name="printing_purity"
+                value={formData.printing_purity || ""}
                 onChange={handleChange}
               />
             </Col>
-            <Col xs={12} md={1}>
+            {/* <Col xs={12} md={1}>
               <InputField
                 label="Gross Wt"
                 name="gross_weight"
                 value={formData.gross_weight || ""}
                 onChange={handleChange}
               />
-            </Col>
-            <Col xs={12} md={1}>
+            </Col> */}
+            {/* <Col xs={12} md={1}>
               <InputField
                 label="Rate"
                 name="rate"
                 value={formData.rate}
                 onChange={handleChange}
               />
-            </Col>
-            <Col xs={12} md={1}>
+            </Col> */}
+            <Col xs={12} md={2}>
               <InputField
                 label="Piece Cost"
                 name="pieace_cost"
@@ -301,7 +301,7 @@ const ProductDetails = ({
                 readOnly={false} // Ensure it's editable
               />
             </Col>
-            <Col xs={12} md={1}>
+            <Col xs={12} md={2}>
               <InputField
                 label="Total Price"
                 name="total_price"
@@ -468,7 +468,7 @@ const ProductDetails = ({
                 options={purityOptions}
               />
             </Col> */}
-            <Col xs={12} md={2}>
+            {/* <Col xs={12} md={2}>
               <InputField
                 label="Purity"
                 name="purity"
@@ -477,11 +477,12 @@ const ProductDetails = ({
               // type="select"
               // options={purityOptions}
               />
-            </Col>
+            </Col> */}
             <Col xs={12} md={2}>
               <InputField
                 label="Selling Purity"
                 name="selling_purity"
+                // type='number'
                 value={formData.selling_purity || ""}
                 onChange={handleChange}
               // type="select"
@@ -492,6 +493,7 @@ const ProductDetails = ({
               <InputField
                 label="Gross Wt"
                 name="gross_weight"
+                type='number'
                 value={formData.gross_weight || ""}
                 onChange={handleChange}
               />
@@ -500,6 +502,7 @@ const ProductDetails = ({
               <InputField
                 label="Stone Wt"
                 name="stone_weight"
+                type='number'
                 value={formData.stone_weight || ""}
                 onChange={handleChange}
               />
@@ -508,6 +511,7 @@ const ProductDetails = ({
               <InputField
                 label="St Price"
                 name="stone_price"
+                type='number'
                 value={formData.stone_price || ""}
                 onChange={handleChange}
               />
@@ -543,6 +547,7 @@ const ProductDetails = ({
               <InputField
                 label="Wastage%"
                 name="va_percent"
+                type='number'
                 value={formData.va_percent || "0"}
                 onChange={handleChange}
               />
@@ -570,6 +575,7 @@ const ProductDetails = ({
               <InputField
                 label="Rate"
                 name="rate"
+                type='number'
                 value={formData.rate}
                 onChange={handleChange}
               />
@@ -580,7 +586,7 @@ const ProductDetails = ({
                 name="rate_amt"
                 value={formData.rate_amt || "0.00"} // Default to "0.00" if undefined
                 onChange={handleChange} // Trigger recalculation of Total MC
-                readOnly={false} // Ensure it's editable
+                readOnly={true} // Ensure it's editable
               />
             </Col>
             <Col xs={12} md={2}>
@@ -588,6 +594,7 @@ const ProductDetails = ({
                 label="MC On"
                 name="mc_on"
                 type="select"
+                
                 value={formData.mc_on || ""}
                 onChange={handleChange}
                 options={[
@@ -606,6 +613,7 @@ const ProductDetails = ({
               <InputField
                 label={formData.mc_on === "MC %" ? "MC %" : "MC/Gm"}
                 name="mc_per_gram"
+                type='number'
                 value={formData.mc_per_gram || ""}
                 onChange={handleChange}
                 disabled={formData.mc_on === "MC / Piece"} // Disable when MC / Piece is selected
@@ -616,6 +624,7 @@ const ProductDetails = ({
               <InputField
                 label="Total MC"
                 name="making_charges"
+                type='number'
                 value={formData.making_charges || ""}
                 onChange={handleChange}
                 disabled={formData.mc_on === "MC / Gram"} // Disable when MC / Gram is selected
@@ -652,6 +661,7 @@ const ProductDetails = ({
               <InputField
                 label="HM Charges"
                 name="hm_charges"
+                type='number'
                 value={formData.hm_charges || "0.00"} // Default to "0.00" if undefined
                 onChange={handleChange} // Optional, since it's auto-calculated
               />

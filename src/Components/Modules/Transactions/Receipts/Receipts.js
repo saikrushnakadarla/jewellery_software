@@ -15,7 +15,7 @@ const RepairForm = () => {
   const repairData = location.state?.repairData;
   const [formData, setFormData] = useState({
     transaction_type: "Receipt",
-    date: "",
+    date: new Date().toISOString().split("T")[0],
     mode: "",
     cheque_number: "",
     receipt_no: "",
@@ -55,48 +55,6 @@ const RepairForm = () => {
 
     fetchLastReceiptNumber();
   }, [repairData]);
-
-  useEffect(() => {
-    if (repairData) {
-      setFormData((prev) => ({
-        ...prev,
-        ...repairData, // Override with existing repair data
-      }));
-
-      if (repairData.account_name) {
-        // Populate invoiceNumberOptions for the account
-        const filteredInvoices = repairDetails
-          ?.filter((item) => item.account_name === repairData.account_name)
-          .map((item) => ({
-            value: item.invoice_number,
-            label: item.invoice_number,
-          }));
-
-        setInvoiceNumberOptions(filteredInvoices);
-
-        // Set total_amt based on the selected invoice_number
-        const selectedRepair = repairDetails?.find(
-          (item) => item.invoice_number === repairData.invoice_number
-        );
-
-        if (selectedRepair) {
-          // Use bal_after_receipts if it exists, otherwise fall back to bal_amt
-          const totalAmt = Number(
-            selectedRepair.bal_after_receipts || selectedRepair.bal_amt || 0
-          );
-          console.log("totalAmt=", totalAmt)
-
-          setFormData((prev) => ({
-            ...prev,
-            total_amt: totalAmt,
-          }));
-        }
-      }
-    } else {
-      const today = new Date().toISOString().split("T")[0];
-      setFormData((prev) => ({ ...prev, date: today }));
-    }
-  }, [repairData, repairDetails]);
 
   useEffect(() => {
     const fetchRepairs = async () => {
@@ -174,11 +132,27 @@ const RepairForm = () => {
         } else {
           const filteredInvoices = repairDetails
             .filter((item) => item.account_name === value)
+            .filter((item) => {
+              const paidAmt = Number(item.paid_amt) || 0;
+              const receiptsAmt = Number(item.receipts_amt) || 0;
+              const netBillAmount = Number(item.net_bill_amount) || 0;
+              const balAfterReceipts = Number(item.bal_after_receipts) || 0;
+              const balAmt = Number(item.bal_amt) || 0;
+
+              const total =
+                paidAmt + receiptsAmt === netBillAmount
+                  ? balAfterReceipts
+                  : balAfterReceipts || balAmt;
+
+              return total > 0; // Only include invoices with non-zero balance
+            })
             .map((item) => ({
               value: item.invoice_number,
               label: item.invoice_number,
             }));
+
           setInvoiceNumberOptions(filteredInvoices);
+
         }
       }
 
@@ -189,12 +163,36 @@ const RepairForm = () => {
         if (match?.account_name) {
           const filteredInvoices = repairDetails
             .filter((item) => item.account_name === match.account_name)
+            .filter((item) => {
+              const paidAmt = Number(item.paid_amt) || 0;
+              const receiptsAmt = Number(item.receipts_amt) || 0;
+              const netBillAmount = Number(item.net_bill_amount) || 0;
+              const balAfterReceipts = Number(item.bal_after_receipts) || 0;
+              const balAmt = Number(item.bal_amt) || 0;
+
+              const total =
+                paidAmt + receiptsAmt === netBillAmount
+                  ? balAfterReceipts
+                  : balAfterReceipts || balAmt;
+
+              return total > 0; // Exclude if total is 0
+            })
             .map((item) => ({
               value: item.invoice_number,
               label: item.invoice_number,
             }));
+
           setInvoiceNumberOptions(filteredInvoices);
+
         }
+
+        if (value === "") {
+          updatedData.invoice_number = "";
+          updatedData.total_amt = "";
+          updatedData.cash_amt = "";
+          setInvoiceNumberOptions([]);
+        }
+
       }
 
       // Handle changes to `total_amt` or `discount_amt`
@@ -218,11 +216,27 @@ const RepairForm = () => {
       if (name === "account_name") {
         const filteredInvoices = repairDetails
           .filter((item) => item.account_name === value)
+          .filter((item) => {
+            const paidAmt = Number(item.paid_amt) || 0;
+            const receiptsAmt = Number(item.receipts_amt) || 0;
+            const netBillAmount = Number(item.net_bill_amount) || 0;
+            const balAfterReceipts = Number(item.bal_after_receipts) || 0;
+            const balAmt = Number(item.bal_amt) || 0;
+
+            const total =
+              paidAmt + receiptsAmt === netBillAmount
+                ? balAfterReceipts
+                : balAfterReceipts || balAmt;
+
+            return total > 0; // Only include invoices with non-zero balance
+          })
           .map((item) => ({
             value: item.invoice_number,
             label: item.invoice_number,
           }));
+
         setInvoiceNumberOptions(filteredInvoices);
+
       }
 
       // Update `total_amt` when `invoice_number` changes
@@ -244,11 +258,12 @@ const RepairForm = () => {
             const balAfterReceipts = Number(selectedRepair.bal_after_receipts) || 0;
             const balAmt = Number(selectedRepair.bal_amt) || 0;
 
-            updatedData.total_amt =
+            const total =
               paidAmt + receiptsAmt === netBillAmount
                 ? balAfterReceipts
                 : balAfterReceipts || balAmt;
 
+            updatedData.total_amt = total.toFixed(2);  // ✅ 2 decimal places
             updatedData.cash_amt = "";
           }
 
@@ -366,16 +381,31 @@ const RepairForm = () => {
 
   useEffect(() => {
     if (invoiceData) {
-      setFormData((prevData) => ({
-        ...prevData,
-        account_name: invoiceData.account_name || "", // Set account name
-        invoice_number: invoiceData.invoice_number || "", // Set invoice number
-        mobile: invoiceData.mobile || "", // Set mobile number
-      }));
+      // Set common fields
+      const updatedData = {
+        account_name: invoiceData.account_name || "",
+        invoice_number: invoiceData.invoice_number || "",
+        mobile: invoiceData.mobile || "",
+        total_amt: invoiceData.total_amt || ""
+      };
 
-      // Populate invoice number options based on account_name
+      // Get filtered invoice options
       const filteredInvoices = repairDetails
         ?.filter((item) => item.account_name === invoiceData.account_name)
+        .filter((item) => {
+          const paidAmt = Number(item.paid_amt) || 0;
+          const receiptsAmt = Number(item.receipts_amt) || 0;
+          const netBillAmount = Number(item.net_bill_amount) || 0;
+          const balAfterReceipts = Number(item.bal_after_receipts) || 0;
+          const balAmt = Number(item.bal_amt) || 0;
+
+          const total =
+            paidAmt + receiptsAmt === netBillAmount
+              ? balAfterReceipts
+              : balAfterReceipts || balAmt;
+
+          return total > 0;
+        })
         .map((item) => ({
           value: item.invoice_number,
           label: item.invoice_number,
@@ -383,7 +413,8 @@ const RepairForm = () => {
 
       setInvoiceNumberOptions(filteredInvoices);
 
-      // Automatically set total amount based on selected invoice
+
+      // Calculate total amount based on invoice_number if present
       const selectedInvoice = repairDetails?.find(
         (item) => item.invoice_number === invoiceData.invoice_number
       );
@@ -392,40 +423,23 @@ const RepairForm = () => {
         const balAfterReceipts = Number(selectedInvoice.bal_after_receipts) || 0;
         const balAmt = Number(selectedInvoice.bal_amt) || 0;
         const totalAmt = balAfterReceipts || balAmt || 0;
-        console.log("totalAmt=", totalAmt);
-        setFormData((prevData) => ({
-          ...prevData,
-          total_amt: totalAmt,
-        }));
+
+        updatedData.total_amt = totalAmt.toFixed(2);
+        console.log("Final total_amt set to:", totalAmt);
       }
+
+      setFormData((prev) => ({
+        ...prev,
+        ...updatedData,
+      }));
     }
   }, [invoiceData, repairDetails]);
+
 
   const handleBack = () => {
     const from = location.state?.from || "/receiptstable"; // Default to /receiptstable if no from location provided
     navigate(from);
   };
-
-  useEffect(() => {
-    if (invoiceData) {
-      setFormData(prevData => ({
-        ...prevData,
-        account_name: invoiceData.account_name || "",
-        mobile: invoiceData.mobile || "",
-        total_amt: invoiceData.total_amt || ""
-      }));
-
-      // Populate invoice number options based on account_name
-      const filteredInvoices = repairDetails
-        ?.filter(item => item.account_name === invoiceData.account_name)
-        .map(item => ({
-          value: item.invoice_number,
-          label: item.invoice_number,
-        }));
-
-      setInvoiceNumberOptions(filteredInvoices);
-    }
-  }, [invoiceData, repairDetails]);
 
   return (
     <div className="main-container">
@@ -511,11 +525,12 @@ const RepairForm = () => {
               label="Out Standing Amt"
               type="number"
               name="total_amt"
-              value={formData.total_amt}
+              value={formData.total_amt || ""}
               onChange={handleInputChange}
               readOnly
             />
           </Col>
+
           <Col xs={12} md={2}>
             <InputField
               label="Paid Amt"

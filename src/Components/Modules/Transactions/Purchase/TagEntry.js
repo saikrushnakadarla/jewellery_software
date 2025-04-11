@@ -2010,7 +2010,7 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                             <InputField
                                                                 label="Purity"
                                                                 name="pur_Purity"
-                                                                // type="select"
+                                                                type="select"
                                                                 value={formData.pur_Purity}
                                                                 onChange={(e) => handleChange("pur_Purity", e.target.value)}
                                                             // options={[
@@ -2020,18 +2020,18 @@ const TagEntry = ({ handleCloseTagModal, selectedProduct, fetchBalance }) => {
                                                             //     })),
                                                             //     { value: "Manual", label: "Manual" } // Correct placement of Manual option
                                                             // ]}
-                                                            // options={[
-                                                            //     ...(formData.Purity
-                                                            //         ? [{ value: selectedCategory?.purity, label: selectedCategory?.purity }]
-                                                            //         : []),
-                                                            //     ...purityOptions
-                                                            //         .filter(option => option.name && option.purity) // Remove undefined values
-                                                            //         .map(option => ({
-                                                            //             value: `${option.name} | ${option.purity}`,
-                                                            //             label: `${option.name} | ${option.purity}`,
-                                                            //         })),
-                                                            //     { value: "Manual", label: "Manual" }
-                                                            // ]}
+                                                            options={[
+                                                                ...(formData.Purity
+                                                                    ? [{ value: selectedCategory?.purity, label: selectedCategory?.purity }]
+                                                                    : []),
+                                                                ...purityOptions
+                                                                    .filter(option => option.name && option.purity) // Remove undefined values
+                                                                    .map(option => ({
+                                                                        value: `${option.name} | ${option.purity}`,
+                                                                        label: `${option.name} | ${option.purity}`,
+                                                                    })),
+                                                                { value: "Manual", label: "Manual" }
+                                                            ]}
                                                             />
                                                         </Col>
                                                         {formData.pur_Purity === "Manual" && (

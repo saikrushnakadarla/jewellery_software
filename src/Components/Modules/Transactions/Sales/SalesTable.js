@@ -313,7 +313,7 @@ const RepairsTable = () => {
         });
 
         // Call handleDelete without confirmation
-        await handleDelete(invoice_number, true, true);
+        // await handleDelete(invoice_number, true, true);
       } catch (error) {
         console.error('Error fetching details:', error);
         Swal.fire('Error', 'Unable to fetch repair or old item details. Please try again.', 'error');

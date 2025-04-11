@@ -230,7 +230,7 @@ const SalesForm = () => {
 
   const handleCustomerChange = (customerId) => {
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
-
+  
     if (customer) {
       setFormData((prevData) => ({
         ...prevData,
@@ -247,16 +247,20 @@ const SalesForm = () => {
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
+        // keep invoice_number untouched
+        invoice_number: prevData.invoice_number || "",
       }));
-      setSelectedMobile(customer.mobile || ""); // Update selectedMobile
+      setSelectedMobile(customer.mobile || "");
+      
       const filtered = uniqueInvoice.filter(
         (invoice) =>
-          invoice.customer_name === customer.account_name || invoice.mobile === customer.mobile
+          invoice.customer_name === customer.account_name ||
+          invoice.mobile === customer.mobile
       );
       setFilteredInvoices(filtered);
-      // console.log("FilteredInvoices=",filtered)
     } else {
-      setFormData({
+      setFormData((prevData) => ({
+        ...prevData,
         customer_id: "",
         account_name: "",
         mobile: "",
@@ -270,11 +274,14 @@ const SalesForm = () => {
         aadhar_card: "",
         gst_in: "",
         pan_card: "",
-      });
-      setSelectedMobile(""); // Reset selectedMobile
+        // preserve invoice_number
+        invoice_number: prevData.invoice_number || "",
+      }));
+      setSelectedMobile("");
       setFilteredInvoices(uniqueInvoice);
     }
   };
+  
 
   const [editIndex, setEditIndex] = useState(null);
   const [discount, setDiscount] = useState(() => {
@@ -451,6 +458,7 @@ const SalesForm = () => {
       disscount_percentage: "",
       pieace_cost: "",
       imagePreview: null,
+      sale_status: "Delivered",
     }));
 
     resetProductFields();
@@ -502,6 +510,7 @@ const SalesForm = () => {
       design_name: "",
       purity: "",
       selling_purity: "",
+      printing_purity: "",
       category: "",
       sub_category: "",
       gross_weight: "",
@@ -527,7 +536,7 @@ const SalesForm = () => {
       qty: "",
       imagePreview: null,
       remarks: "",
-      sale_status: "",
+      sale_status: "Delivered",
     }));
   };
 
@@ -806,19 +815,27 @@ const SalesForm = () => {
       alert("Please select the Customer or enter the Customer Mobile Number");
       return;
     }
-
+  
     try {
-      // Fetch the latest invoice number
-      const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
-      const latestInvoiceNumber = response.data.lastInvoiceNumber;
-
-      // Update formData with latest invoice number
-      const updatedFormData = {
-        ...formData,
-        invoice_number: latestInvoiceNumber,
-      };
-      setFormData(updatedFormData); // Update state (optional depending on your use)
-
+      // Check if all items have item.id === ""
+      const allItemsAreNew = repairDetails.every(item => item.id === "");
+  
+      let updatedFormData = { ...formData };
+  
+      if (allItemsAreNew) {
+        // Fetch the latest invoice number only if all items are new
+        const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
+        const latestInvoiceNumber = response.data.lastInvoiceNumber;
+  
+        // Update formData with latest invoice number
+        updatedFormData = {
+          ...formData,
+          invoice_number: latestInvoiceNumber,
+        };
+  
+        setFormData(updatedFormData); // Update state if needed
+      }
+  
       const dataToSave = {
         repairDetails: repairDetails.map(item => ({
           ...item,
@@ -849,12 +866,12 @@ const SalesForm = () => {
         salesNetAmount: salesNetAmount || 0,
         salesTaxableAmount: salesTaxableAmount || 0,
       };
-
+  
       console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-
+  
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Sales added successfully");
-
+  
       const pdfDoc = (
         <PDFLayout
           formData={updatedFormData}
@@ -874,15 +891,15 @@ const SalesForm = () => {
           netPayableAmount={netPayableAmount}
         />
       );
-
+  
       const pdfBlob = await pdf(pdfDoc).toBlob();
-
+  
       const link = document.createElement("a");
       link.href = URL.createObjectURL(pdfBlob);
       link.download = `invoice-${updatedFormData.invoice_number}.pdf`;
       link.click();
       URL.revokeObjectURL(link.href);
-
+  
       clearData();
       resetForm();
       navigate("/salestable");
@@ -893,6 +910,7 @@ const SalesForm = () => {
       alert("Error saving data");
     }
   };
+  
 
   // const handleSave = async () => { 
   //   if (!formData.account_name || !formData.mobile) {

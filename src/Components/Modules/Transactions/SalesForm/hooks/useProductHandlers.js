@@ -20,63 +20,136 @@ const useProductHandlers = () => {
     rate_16crt: ""
   });
 
-  const [formData, setFormData] = useState({
-    customer_id: "value001",
-    mobile: mobile,
-    account_name: "",
-    email: "",
-    address1: "",
-    address2: "",
-    city: "",
-    pincode: "",
-    state: "",
-    state_code: "",
-    aadhar_card: "",
-    gst_in: "",
-    pan_card: "",
-    terms: "Cash",
-    date: "",
-    invoice_number: invoice_number,
-    code: "",
-    product_id: "",
-    metal: "",
-    product_name: "",
-    metal_type: "",
-    design_name: "",
-    purity: "",
-    selling_purity:"",
-    pricing: "By Weight",
-    category: "",
-    sub_category: "",
-    gross_weight: "",
-    stone_weight: "",
-    weight_bw: "",
-    stone_price: "",
-    va_on: "Gross Weight",
-    va_percent: "",
-    wastage_weight: "",
-    total_weight_av: "",
-    mc_on: "MC %",
-    disscount_percentage: "",
-    disscount: "",
-    mc_per_gram: "",
-    making_charges: "",
-    rate: "",
-    pieace_cost: "",
-    mrp_price:"",
-    rate_amt: "",
-    tax_percent: "03% GST",
-    tax_amt: "",
-    hm_charges: "60.00",
-    total_price: "",
-    transaction_status: "Sales",
-    qty: "1",
-    opentag_id: "",
-    product_image: null,
-    imagePreview: null,
-    remarks: "",
-    sale_status: "Delivered",
+  // const [formData, setFormData] = useState({
+  //   id: '',
+  //   customer_id: "value001",
+  //   mobile: mobile,
+  //   account_name: "",
+  //   email: "",
+  //   address1: "",
+  //   address2: "",
+  //   city: "",
+  //   pincode: "",
+  //   state: "",
+  //   state_code: "",
+  //   aadhar_card: "",
+  //   gst_in: "",
+  //   pan_card: "",
+  //   terms: "Cash",
+  //   date: "",
+  //   invoice_number: invoice_number,
+  //   code: "",
+  //   product_id: "",
+  //   metal: "",
+  //   product_name: "",
+  //   metal_type: "",
+  //   design_name: "",
+  //   purity: "",
+  //   selling_purity: "",
+  //   printing_purity: "",
+  //   pricing: "By Weight",
+  //   category: "",
+  //   sub_category: "",
+  //   gross_weight: "",
+  //   stone_weight: "",
+  //   weight_bw: "",
+  //   stone_price: "",
+  //   va_on: "Gross Weight",
+  //   va_percent: "",
+  //   wastage_weight: "",
+  //   total_weight_av: "",
+  //   mc_on: "MC %",
+  //   disscount_percentage: "",
+  //   disscount: "",
+  //   mc_per_gram: "",
+  //   making_charges: "",
+  //   rate: "",
+  //   pieace_cost: "",
+  //   mrp_price: "",
+  //   rate_amt: "",
+  //   tax_percent: "03% GST",
+  //   tax_amt: "",
+  //   hm_charges: "60.00",
+  //   total_price: "",
+  //   transaction_status: "Sales",
+  //   qty: "1",
+  //   opentag_id: "",
+  //   product_image: null,
+  //   imagePreview: null,
+  //   remarks: "",
+  //   sale_status: "Delivered",
+  // });
+
+  const [formData, setFormData] = useState(() => {
+    const savedData = localStorage.getItem("saleFormData");
+    return savedData
+      ? JSON.parse(savedData)
+      :
+      {
+        customer_id: "value001",
+        mobile: mobile,
+        account_name: "",
+        email: "",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        state: "",
+        state_code: "",
+        aadhar_card: "",
+        gst_in: "",
+        pan_card: "",
+        terms: "Cash",
+        date: "",
+        invoice_number: invoice_number,
+        code: "",
+        product_id: "",
+        metal: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        selling_purity: "",
+        printing_purity:"",
+        pricing: "By Weight",
+        category: "",
+        sub_category: "",
+        gross_weight: "",
+        stone_weight: "",
+        weight_bw: "",
+        stone_price: "",
+        va_on: "Gross Weight",
+        va_percent: "",
+        wastage_weight: "",
+        total_weight_av: "",
+        mc_on: "MC %",
+        disscount_percentage: "",
+        disscount: "",
+        mc_per_gram: "",
+        making_charges: "",
+        rate: "",
+        pieace_cost: "",
+        mrp_price: "",
+        rate_amt: "",
+        tax_percent: "03% GST",
+        tax_amt: "",
+        hm_charges: "60.00",
+        total_price: "",
+        transaction_status: "Sales",
+        qty: "1",
+        opentag_id: "",
+        product_image: null,
+        imagePreview: null,
+        remarks: "",
+        sale_status: "Delivered",
+      };
   });
+
+    useEffect(() => {
+      localStorage.setItem("saleFormData", JSON.stringify(formData));  
+    }, [formData]);
+
+
   const [uniqueProducts, setUniqueProducts] = useState([]);
   const [metalTypes, setMetalTypes] = useState([]);
   const [purity, setPurity] = useState([]);
@@ -187,6 +260,33 @@ const useProductHandlers = () => {
       [name]: value,
     }));
 
+    if (name === "product_name") {
+      if (value === "") {
+        updatedFormData.selling_purity = "";
+        updatedFormData.purity = "";
+        updatedFormData.printing_purity = "";
+      } else {
+        const selectedSubCategory = subcategoryOptions.find(
+          (option) => option.value === value
+        );
+
+        if (selectedSubCategory) {
+          updatedFormData.selling_purity = selectedSubCategory.selling_purity || "";
+          updatedFormData.purity = selectedSubCategory.purity || "";
+          updatedFormData.printing_purity = selectedSubCategory.printing_purity || "";
+        }
+      }
+    }
+
+    if (name === "metal_type") {
+      const metal = value.toLowerCase();
+      if (metal === "gold" || metal === "diamond" || metal === "other") {
+        updatedFormData.mc_on = "MC %";
+      } else if (metal === "silver") {
+        updatedFormData.mc_on = "MC / Gram";
+      }
+    }
+
     if (name === "category" && value === "") {
       updatedFormData = {
         ...updatedFormData, // Keep other existing values
@@ -197,7 +297,8 @@ const useProductHandlers = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        selling_purity:"",
+        selling_purity: "",
+        printing_purity:"",
         pricing: "By Weight",
         category: "",
         sub_category: "",
@@ -216,7 +317,7 @@ const useProductHandlers = () => {
         making_charges: "",
         rate: "",
         pieace_cost: "",
-        mrp_price:"",
+        mrp_price: "",
         rate_amt: "",
         tax_percent: "03% GST",
         tax_amt: "",
@@ -308,6 +409,7 @@ const useProductHandlers = () => {
       // Clear the specified fields if pricing is "By fixed"
       updatedFormData.purity = "";
       updatedFormData.selling_purity = "";
+      updatedFormData.printing_purity = "";
       updatedFormData.gross_weight = "";
       updatedFormData.stone_weight = "";
       updatedFormData.weight_bw = "";
@@ -353,25 +455,26 @@ const useProductHandlers = () => {
         metal_type: "",
         design_name: "",
         purity: "",
-        selling_purity:"",
+        selling_purity: "",
+        printing_purity:"",
         category: "",
         sub_category: "",
         gross_weight: "",
         stone_weight: "",
         stone_price: "",
         weight_bw: "",
-        va_on: "",
+        va_on: "Gross Weight",
         va_percent: "",
         wastage_weight: "",
         total_weight_aw: "",
-        mc_on: "",
+        mc_on: "MC %",
         mc_per_gram: "",
         making_charges: "",
         disscount_percentage: "",
         disscount: "",
         rate: "",
         pieace_cost: "",
-        mrp_price:"",
+        mrp_price: "",
         rate_amt: "",
         tax_percent: "",
         tax_amt: "",
@@ -433,7 +536,8 @@ const useProductHandlers = () => {
         ...prevData,
         design_name: designName,
         purity: "",
-        selling_purity:"",
+        selling_purity: "",
+        printing_purity:"",
       }));
 
       setFilteredPurityOptions(uniquePurityOptions); // Update purity options based on design
@@ -442,7 +546,8 @@ const useProductHandlers = () => {
         ...prevData,
         design_name: "",
         purity: "",
-        selling_purity:"",
+        selling_purity: "",
+        printing_purity:"",
       }));
 
       setFilteredPurityOptions([]);
@@ -482,14 +587,17 @@ const useProductHandlers = () => {
       const result = await response.json();
       if (result && result.data) {
         // If formData.metal_type is available, filter based on it, otherwise show all
-        const filteredData = formData.category
-          ? result.data.filter((item) => item.category === formData.category)
+        const filteredData = formData.product_id
+          ? result.data.filter((item) => item.category_id === formData.product_id)
           : result.data;
 
         // Format the filtered options
         const formattedOptions = filteredData.map((item) => ({
           label: item.sub_category_name, // Display value
           value: item.sub_category_name, // Unique ID for value
+          selling_purity: item.selling_purity,
+          printing_purity: item.printing_purity,
+          purity: item.purity,
         }));
 
         setSubcategoryOptions(formattedOptions);
@@ -661,7 +769,8 @@ const useProductHandlers = () => {
           metal_type: "",
           design_name: "",
           purity: "",
-          selling_purity:"",
+          selling_purity: "",
+          printing_purity:"",
           pricing: "By Weight",
           category: "",
           sub_category: "",
@@ -680,7 +789,7 @@ const useProductHandlers = () => {
           disscount: "",
           rate: "",
           pieace_cost: "",
-          mrp_price:"",
+          mrp_price: "",
           rate_amt: "",
           tax_percent: "",
           tax_amt: "",
@@ -703,6 +812,8 @@ const useProductHandlers = () => {
         const defaultPurity = purityOptions.find((option) =>
           /22/i.test(option.value)
         )?.value;  // Set the barcode as selected
+        const metalType = product.Category || "";
+        const mcOnValue = metalType.toLowerCase() === "silver" ? "MC / Gram" : "MC %";
         setFormData((prevData) => ({
           ...prevData,
           code: product.rbarcode,  // Retain the selected barcode
@@ -723,8 +834,8 @@ const useProductHandlers = () => {
           wastage_weight: "",
           total_weight_aw: "",
           pieace_cost: "",
-          mrp_price:"",
-          mc_on: "MC %",
+          mrp_price: "",
+          mc_on: mcOnValue,
           mc_per_gram: "",
           making_charges: "",
           disscount_percentage: "",
@@ -761,6 +872,7 @@ const useProductHandlers = () => {
             design_name: tag.design_master || "", // Make editable
             purity: tag.pur_Purity || "",
             selling_purity: tag.Purity || "",
+            printing_purity: tag.printing_purity || "",
             pricing: tag.Pricing || "By Weight",
             category: tag.category || "",
             sub_category: tag.sub_category || "",
@@ -768,13 +880,13 @@ const useProductHandlers = () => {
             stone_weight: tag.Stones_Weight || "",
             stone_price: tag.Stones_Price || "",
             weight_bw: tag.Weight_BW || "",
-            va_on: tag.Wastage_On || "",
+            va_on: tag.Wastage_On || "Gross Weight",
             va_percent: tag.Wastage_Percentage || "",
             wastage_weight: tag.WastageWeight || "",
             total_weight_aw: tag.TotalWeight_AW || "",
             pieace_cost: tag.pieace_cost || "",
             mrp_price: tag.mrp_price || "",
-            mc_on: tag.Making_Charges_On || "",
+            mc_on: tag.Making_Charges_On || "MC %",
             mc_per_gram: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
             tax_percent: tag.tax_percent || productDetails?.tax_slab || "",
@@ -809,7 +921,7 @@ const useProductHandlers = () => {
             disscount: "",
             rate: "",
             pieace_cost: "",
-            mrp_price:"",
+            mrp_price: "",
             rate_amt: "",
             tax_percent: "",
             tax_amt: "",
