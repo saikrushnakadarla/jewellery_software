@@ -8,6 +8,7 @@ import baseURL from './../../../../Url/NodeBaseURL';
 
 const CustomerDetails = ({
   formData,
+  setFormData,
   handleCustomerChange,
   handleAddCustomer,
   customers,
@@ -57,23 +58,51 @@ const CustomerDetails = ({
 
   // Function to fetch balance based on mobile
   const fetchBalance = (mobile) => {
+    if (!mobile) return setBalance("0.00");
+  
     setLoading(true);
+  
     const customerData = data.filter((item) => item.mobile === mobile);
-
+  
     const totalBalance = customerData.reduce((sum, item) => {
       const bal_amt = Number(item.bal_amt) || 0;
       const bal_after_receipts = Number(item.bal_after_receipts) || 0;
       const receipts_amt = Number(item.receipts_amt) || 0;
-
-      // If bal_amt equals receipts_amt, use bal_after_receipts
-      const balance = bal_amt === receipts_amt ? bal_after_receipts : bal_after_receipts || bal_amt;
-
+  
+      const balance = bal_amt === receipts_amt
+        ? bal_after_receipts
+        : bal_after_receipts || bal_amt;
+  
       return sum + balance;
     }, 0);
-
-    setBalance(totalBalance.toFixed(2)); // Set the calculated balance
-    setLoading(false); // Set loading to false once balance is fetched
+  
+    setBalance(totalBalance.toFixed(2));
+    setLoading(false);
   };
+  
+  
+  
+  useEffect(() => {
+    const savedData = JSON.parse(localStorage.getItem("saleFormData"));
+    if (savedData?.mobile) {
+      setFormData((prev) => ({ ...prev, mobile: savedData.mobile }));
+    }
+  }, []);
+  
+  
+
+  useEffect(() => {
+    if (formData.mobile && data.length > 0) {
+      fetchBalance(formData.mobile);
+    }
+    if (!formData.mobile) {
+      setBalance("0.00");
+    }
+  }, [formData.mobile, data]);
+  
+  
+  
+  
 
   // Trigger balance fetch when selectedMobile changes
   useEffect(() => {

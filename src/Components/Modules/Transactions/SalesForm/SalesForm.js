@@ -403,10 +403,6 @@ const SalesForm = () => {
     fetchData();
   }, []);
   
-
-
-  
-
   const [estimate, setEstimate] = useState([]);
   const [selectedEstimate, setSelectedEstimate] = useState("");
   const [estimateDetails, setEstimateDetails] = useState(null);
@@ -913,6 +909,7 @@ const SalesForm = () => {
     localStorage.removeItem('oldTableData');
     localStorage.removeItem('schemeTableData');
     localStorage.removeItem("discount");
+    localStorage.removeItem("saleFormData");
     console.log("Data cleared successfully");
   };
 
@@ -1151,6 +1148,7 @@ const SalesForm = () => {
             <div className="sales-form-left">
               <CustomerDetails
                 formData={formData}
+                setFormData={setFormData}
                 handleCustomerChange={handleCustomerChange}
                 handleAddCustomer={handleAddCustomer}
                 customers={customers}
