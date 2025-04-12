@@ -47,15 +47,32 @@ const FestOffersTable = () => {
         accessor: "discount_percentage",
       },
       {
+        Header: "Discount % for Fixed",
+        accessor: "discount_percent_fixed",
+      },
+      {
         Header: "Valid From",
         accessor: "valid_from",
-        Cell: ({ value }) => new Date(value).toLocaleDateString(),
+        Cell: ({ value }) => {
+          const date = new Date(value);
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+          const year = date.getFullYear();
+          return `${day}-${month}-${year}`;
+        },
       },
       {
         Header: "Valid To",
         accessor: "valid_to",
-        Cell: ({ value }) => new Date(value).toLocaleDateString(),
+        Cell: ({ value }) => {
+          const date = new Date(value);
+          const day = String(date.getDate()).padStart(2, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const year = date.getFullYear();
+          return `${day}-${month}-${year}`;
+        },
       },
+      
       {
         Header: "Actions",
         Cell: ({ row }) => {

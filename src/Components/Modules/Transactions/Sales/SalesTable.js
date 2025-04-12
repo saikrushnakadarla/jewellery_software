@@ -537,7 +537,7 @@ const RepairsTable = () => {
                         <td>{product.code}</td>
                         <td>{product.product_name}</td>
                         <td>{product.metal_type}</td>
-                        <td>{product.purity}</td>
+                        <td>{product.selling_purity}</td>
                         <td>{product.gross_weight}</td>
                         <td>{product.stone_weight}</td>
                         <td>{product.wastage_weight}</td>

@@ -8,6 +8,7 @@ import axios from "axios";
 import { pdf } from "@react-pdf/renderer";
 import PDFContent from "./ReceiptPdf";
 import { useParams } from "react-router-dom";
+import { saveAs } from "file-saver";
 
 const RepairForm = () => {
   const navigate = useNavigate();
@@ -365,17 +366,40 @@ const RepairForm = () => {
         <PDFContent formData={formData} repairDetails={repairDetails} />
       ).toBlob();
 
+      saveAs(pdfBlob, `${formData.receipt_no}.pdf`);
+      await handleSavePDFToServer(pdfBlob, formData.receipt_no);
+
       // Create download link and trigger download
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(pdfBlob);
-      link.download = `receipt-${formData.receipt_no || "new"}.pdf`;
-      link.click();
-      URL.revokeObjectURL(link.href);
+      // const link = document.createElement("a");
+      // link.href = URL.createObjectURL(pdfBlob);
+      // link.download = `receipt-${formData.receipt_no || "new"}.pdf`;
+      // link.click();
+      // URL.revokeObjectURL(link.href);
 
       // Navigate to receipts table
       navigate("/receiptstable");
     } catch (error) {
       alert(`Error: ${error.message}`);
+    }
+  };
+
+  const handleSavePDFToServer = async (pdfBlob, estimateNumber) => {
+    const formData = new FormData();
+    formData.append("invoice", pdfBlob, `${estimateNumber}.pdf`);
+
+    try {
+      const response = await fetch(`${baseURL}/upload-invoice`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload invoice");
+      }
+
+      console.log(`Estimate ${estimateNumber} saved on server`);
+    } catch (error) {
+      console.error("Error uploading invoice:", error);
     }
   };
 

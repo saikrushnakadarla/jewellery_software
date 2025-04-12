@@ -315,6 +315,7 @@ const SalesForm = () => {
       const discountAmt = parseFloat(item.disscount) || 0;
       const hmCharges = parseFloat(item.hm_charges) || 0;
       const pricingType = item.pricing;
+      const festivalDiscount = parseFloat(item.festival_discount) || 0;
       
     
       let calculatedDiscount = 0;
@@ -327,7 +328,7 @@ const SalesForm = () => {
           ? parseFloat(item.original_piece_taxable_amt)
           : pieceTaxableAmt;
     
-        const updatedPieceTaxableAmt = originalPieceTaxableAmt - calculatedDiscount;
+        const updatedPieceTaxableAmt = originalPieceTaxableAmt - calculatedDiscount - festivalDiscount;
         const taxAmt = (taxPercent * updatedPieceTaxableAmt) / 100;
         const totalPrice = updatedPieceTaxableAmt + taxAmt;
     
@@ -349,7 +350,7 @@ const SalesForm = () => {
           : previousTotalPrice;
       
         // Tax calculation
-        const totalBeforeTax = rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount;
+        const totalBeforeTax = rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount - festivalDiscount;
         const taxAmt = (totalBeforeTax * taxPercent) / 100;
         const updatedTotalPrice = totalBeforeTax + taxAmt;
       
@@ -367,6 +368,43 @@ const SalesForm = () => {
     setRepairDetails(updatedRepairDetails);
     localStorage.setItem("repairDetails", JSON.stringify(updatedRepairDetails));
   };
+
+  const [festivalShowModal, festivalSetShowModal] = useState(false);
+  const [offers, setOffers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const handleFestivalShowModal = () => festivalSetShowModal(true);
+  const handleFestivalCloseModal = () => festivalSetShowModal(false);
+  const [appliedOffers, setAppliedOffers] = useState({});
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/api/offers`);
+        const allOffers = response.data;
+  
+        const today = new Date();
+        const filteredOffers = allOffers.filter((offer) => {
+          const validFrom = new Date(offer.valid_from);
+          const validTo = new Date(offer.valid_to);
+  
+          // Compare dates - check if today is in between valid_from and valid_to
+          return today >= validFrom && today <= validTo;
+        });
+  
+        setOffers(filteredOffers);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching offers:", error);
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, []);
+  
+
+
   
 
   const [estimate, setEstimate] = useState([]);
@@ -467,14 +505,14 @@ const SalesForm = () => {
     const storedRepairDetails = JSON.parse(localStorage.getItem("repairDetails")) || [];
 
     // Check if the code already exists
-    const isDuplicate = storedRepairDetails.some(
-      (item) => item.code === formData.code
-    );
+    // const isDuplicate = storedRepairDetails.some(
+    //   (item) => item.code === formData.code
+    // );
 
-    if (isDuplicate) {
-      alert("The product is already selected.");
-      return;
-    }
+    // if (isDuplicate) {
+    //   alert("The product is already selected.");
+    //   return;
+    // }
 
     // Add new repair detail
     const updatedRepairDetails = [
@@ -648,44 +686,55 @@ const SalesForm = () => {
 
   let totalAmount = 0;
   let discountAmt = 0;
+  let festivalDiscountAmt = 0;
   let taxableAmount = 0;
   let taxAmount = 0;
   let netAmount = 0;
-
+  
   repairDetails.forEach((item) => {
     const pricing = item.pricing;
-
+  
+    // Parse common discounts
+    const itemDiscount = parseFloat(item.disscount) || 0;
+    const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
+    const itemTax = parseFloat(item.tax_amt) || 0;
+  
     if (pricing === "By Weight") {
       const stonePrice = parseFloat(item.stone_price) || 0;
       const makingCharges = parseFloat(item.making_charges) || 0;
       const rateAmt = parseFloat(item.rate_amt) || 0;
       const hmCharges = parseFloat(item.hm_charges) || 0;
-      const itemDiscount = parseFloat(item.disscount) || 0;
-      const itemTax = parseFloat(item.tax_amt) || 0;
-      const itemPercent = parseFloat(item.tax_percent) || 0;
-
+  
       const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
       totalAmount += itemTotal;
       discountAmt += itemDiscount;
-      taxableAmount += itemTotal - itemDiscount;
-      taxAmount += (taxableAmount*itemPercent)/100;
-      netAmount += itemTotal - itemDiscount + itemTax;
-
+      festivalDiscountAmt += itemFestivalDiscount;
+  
+      const totalDiscount = itemDiscount + itemFestivalDiscount;
+      const itemTaxable = itemTotal - totalDiscount;
+  
+      taxableAmount += itemTaxable;
+      taxAmount += itemTax;
+      netAmount += itemTaxable + itemTax;
+  
     } else {
       const pieceCost = parseFloat(item.pieace_cost) || 0;
-      const mrpPrice = parseFloat(item.mrp_price) || 0;
       const qty = parseFloat(item.qty) || 0;
-      const itemDiscount = parseFloat(item.disscount) || 0;
-      const itemTax = parseFloat(item.tax_amt) || 0;
-      const itemPercent = parseFloat(item.tax_percent) || 0;
-
-      totalAmount += pieceCost * qty; 
+  
+      const itemTotal = pieceCost * qty;
+      totalAmount += itemTotal;
       discountAmt += itemDiscount;
-      taxableAmount += totalAmount- itemDiscount;
-      taxAmount += (taxableAmount*itemPercent)/100;
-      netAmount += taxableAmount+taxAmount;
+      festivalDiscountAmt += itemFestivalDiscount;
+  
+      const totalDiscount = itemDiscount + itemFestivalDiscount;
+      const itemTaxable = itemTotal - totalDiscount;
+  
+      taxableAmount += itemTaxable;
+      taxAmount += itemTax;
+      netAmount += itemTaxable + itemTax;
     }
   });
+  
 
 
 
@@ -1225,6 +1274,16 @@ const SalesForm = () => {
                 discount={discount}
                 handleDiscountChange={handleDiscountChange}
                 refreshSalesData={refreshSalesData}
+                setOffers={setOffers}
+                offers={offers}
+                loading={loading}
+                festivalShowModal={festivalShowModal}
+                // handleApply={handleApply}
+                handleFestivalShowModal={handleFestivalShowModal}
+                handleFestivalCloseModal={handleFestivalCloseModal}
+                appliedOffers={appliedOffers}
+                setAppliedOffers={setAppliedOffers}
+                festivalDiscountAmt={festivalDiscountAmt}
               />
             </div>
           </div>

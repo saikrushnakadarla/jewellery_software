@@ -1094,7 +1094,7 @@ const useProductHandlers = () => {
             mc_on: tag.Making_Charges_On || "MC %",
             mc_per_gram: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
-            tax_percent: tag.tax_percent || productDetails?.tax_slab || "",
+            tax_percent: productDetails?.tax_slab || tag.tax_percent || "",
             qty: 1, // Allow qty to be editable for tag
           }));
           setIsQtyEditable(false); // Allow editing of qty

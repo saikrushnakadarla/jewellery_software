@@ -29,38 +29,83 @@ const PaymentDetails = ({
   netPayAmount,
   discount,
   handleDiscountChange,
-  refreshSalesData
+  refreshSalesData,
+  offers,
+  loading,
+  festivalShowModal,
+  handleFestivalShowModal,
+  handleFestivalCloseModal,
+  appliedOffers,
+  setAppliedOffers,
+  festivalDiscountAmt
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const location = useLocation();
-
-  const [showModal, setShowModal] = useState(false);
-  const [offers, setOffers] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const handleShowModal = () => setShowModal(true);
-  const handleCloseModal = () => setShowModal(false);
-  const [appliedOffers, setAppliedOffers] = useState({});// Keyed by offer ID or offer_name
+  const [appliedOfferKey, setAppliedOfferKey] = useState(null);
 
 
-
-  const handleApply = (selectedOffer) => {
-    const discountValue = parseFloat(selectedOffer.discount_percentage) || 0;
+  const handleApply = (selectedOffer, offerIndex) => {
     const storedRepairDetails = JSON.parse(localStorage.getItem("repairDetails")) || [];
+    const currentOfferKey = `${selectedOffer._id}_${offerIndex}`;
+    const isAlreadyApplied = appliedOffers[currentOfferKey];
 
-    const isAlreadyApplied = appliedOffers[selectedOffer._id];
+    let updatedRepairDetails = [...storedRepairDetails];
 
-    const updatedRepairDetails = storedRepairDetails.map((item) => {
+    // First, reset all offers (revert to original state)
+    updatedRepairDetails = updatedRepairDetails.map((item) => {
+      const taxPercent = parseFloat(item.tax_percent) || 1;
+      const pieceCost = parseFloat(item.pieace_cost) || 0;
+      const qty = parseFloat(item.qty) || 1;
+      const discountAmt = parseFloat(item.disscount) || 0;
+      const pieceTaxableAmt = pieceCost * qty;
+      const originalPieceTaxableAmt = item.original_piece_taxable_amt
+        ? parseFloat(item.original_piece_taxable_amt)
+        : pieceTaxableAmt;
+
+      const taxAmt = (taxPercent * originalPieceTaxableAmt) / 100;
+      const totalPrice = originalPieceTaxableAmt + taxAmt;
+
+      return {
+        ...item,
+        piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
+        tax_amt: taxAmt.toFixed(2),
+        total_price: totalPrice.toFixed(2),
+        festival_discount: 0,
+        festival_discount_percentage: 0,
+        festival_discount_on_rate: 0,
+      };
+    });
+
+    // If already applied, just reset state and exit
+    if (isAlreadyApplied) {
+      setRepairDetails(updatedRepairDetails);
+      localStorage.setItem("repairDetails", JSON.stringify(updatedRepairDetails));
+      setAppliedOffers({});
+      return;
+    }
+
+    // Else apply the new offer
+    const updatedWithNewOffer = updatedRepairDetails.map((item) => {
       const makingCharges = parseFloat(item.making_charges) || 0;
       const pieceCost = parseFloat(item.pieace_cost) || 0;
       const qty = parseFloat(item.qty) || 1;
       const taxPercent = parseFloat(item.tax_percent) || 1;
-      const piece_taxable_amt = parseFloat(item.piece_taxable_amt) || 0;
+      const pieceTaxableAmt = parseFloat(item.piece_taxable_amt) || 0;
       const rateAmt = parseFloat(item.rate_amt) || 0;
       const stonePrice = parseFloat(item.stone_price) || 0;
       const discountAmt = parseFloat(item.disscount) || 0;
       const hmCharges = parseFloat(item.hm_charges) || 0;
       const pricingType = item.pricing;
+      const grossWeight = parseFloat(item.gross_weight) || 0;
+
+      const percentageDiscount = parseFloat(selectedOffer.discount_percentage) || 0;
+      const rateDiscount = parseFloat(selectedOffer.discount_on_rate) || 0;
+      const fixedPercentageDiscount = parseFloat(selectedOffer.discount_percent_fixed) || 0;
+      const weightBasedDiscount = (rateDiscount / 10) * grossWeight;
+      const totalDiscountValue =
+        pricingType === "By fixed"
+          ? fixedPercentageDiscount
+          : percentageDiscount + weightBasedDiscount;
 
       let calculatedDiscount = 0;
 
@@ -70,91 +115,52 @@ const PaymentDetails = ({
           ? parseFloat(item.original_piece_taxable_amt)
           : pieceTaxableAmt;
 
-        if (isAlreadyApplied) {
-          // Revert
-          const taxAmt = (taxPercent * originalPieceTaxableAmt) / 100;
-          const totalPrice = originalPieceTaxableAmt + taxAmt;
+        calculatedDiscount = (pieceTaxableAmt * totalDiscountValue) / 100;
+        const updatedPieceTaxableAmt = originalPieceTaxableAmt - calculatedDiscount - discountAmt;
+        const taxAmt = (taxPercent * updatedPieceTaxableAmt) / 100;
+        const totalPrice = updatedPieceTaxableAmt + taxAmt;
 
-          return {
-            ...item,
-            piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
-            tax_amt: taxAmt.toFixed(2),
-            total_price: totalPrice.toFixed(2),
-            festival_discount: 0,
-            festival_discount_percentage: 0,
-          };
-        } else {
-          calculatedDiscount = (pieceTaxableAmt * discountValue) / 100;
-          const updatedPieceTaxableAmt = originalPieceTaxableAmt - calculatedDiscount;
-          const taxAmt = (taxPercent * updatedPieceTaxableAmt) / 100;
-          const totalPrice = updatedPieceTaxableAmt + taxAmt;
-
-          return {
-            ...item,
-            original_piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
-            festival_discount: calculatedDiscount.toFixed(2),
-            festival_discount_percentage: discountValue,
-            piece_taxable_amt: updatedPieceTaxableAmt.toFixed(2),
-            tax_amt: taxAmt.toFixed(2),
-            total_price: totalPrice.toFixed(2),
-          };
-        }
+        return {
+          ...item,
+          original_piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
+          festival_discount: calculatedDiscount.toFixed(2),
+          festival_discount_percentage: percentageDiscount.toFixed(2),
+          festival_discount_on_rate: rateDiscount.toFixed(2),
+          piece_taxable_amt: updatedPieceTaxableAmt.toFixed(2),
+          tax_amt: taxAmt.toFixed(2),
+          total_price: totalPrice.toFixed(2),
+        };
       } else {
-        const originalTotalPrice = item.original_total_price
-          ? parseFloat(item.original_total_price)
-          : parseFloat(item.total_price) || 0;
+        const makingChargeDiscount = (makingCharges * percentageDiscount) / 100;
+        const weightDiscount = (rateDiscount / 10) * grossWeight;
+        calculatedDiscount = makingChargeDiscount + weightDiscount;
+        const totalBeforeTax = rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount - discountAmt;
+        const taxAmt = (totalBeforeTax * taxPercent) / 100;
+        const updatedTotalPrice = totalBeforeTax + taxAmt;
 
-        if (isAlreadyApplied) {
-          return {
-            ...item,
-            total_price: originalTotalPrice.toFixed(2),
-            festival_discount: 0,
-            festival_discount_percentage: 0,
-          };
-        } else {
-          calculatedDiscount = (makingCharges * discountValue) / 100;
-          const totalBeforeTax = rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount;
-          const taxAmt = (totalBeforeTax * taxPercent) / 100;
-          const updatedTotalPrice = totalBeforeTax + taxAmt;
-
-          return {
-            ...item,
-            original_total_price: originalTotalPrice.toFixed(2),
-            festival_discount: calculatedDiscount.toFixed(2),
-            // festival_discount_percentage: discountValue,
-            total_price: updatedTotalPrice.toFixed(2),
-          };
-        }
+        return {
+          ...item,
+          original_total_price: parseFloat(item.total_price).toFixed(2),
+          festival_discount: calculatedDiscount.toFixed(2),
+          festival_discount_percentage: percentageDiscount.toFixed(2),
+          festival_discount_on_rate: rateDiscount.toFixed(2),
+          tax_amt: taxAmt.toFixed(2),
+          total_price: updatedTotalPrice.toFixed(2),
+        };
       }
     });
 
-    setRepairDetails(updatedRepairDetails);
-    localStorage.setItem("repairDetails", JSON.stringify(updatedRepairDetails));
+    setRepairDetails(updatedWithNewOffer);
+    localStorage.setItem("repairDetails", JSON.stringify(updatedWithNewOffer));
 
-    // Toggle applied state for this offer
-    setAppliedOffers((prev) => ({
-      ...prev,
-      [selectedOffer._id]: !prev[selectedOffer._id] // ✅ toggles only for the clicked row
-    }));
-
+    // Set the only applied offer key
+    setAppliedOffers({
+      [currentOfferKey]: true,
+    });
   };
 
 
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/api/offers`);
-        setOffers(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching offers:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     // Retrieve payment details from localStorage
@@ -182,7 +188,6 @@ const PaymentDetails = ({
       });
     }
   }, [netPayAmount]);
-
 
   useEffect(() => {
     // Sum of all payment details
@@ -253,10 +258,10 @@ const PaymentDetails = ({
                       borderRadius: '4px',
                       cursor: 'pointer'
                     }}
-                    onClick={handleShowModal}
+                    onClick={handleFestivalShowModal}
                   >Apply</Button>
                 </td>
-                <td colSpan="4"></td>
+                <td colSpan="4">{festivalDiscountAmt.toFixed(2)}</td>
               </tr>
               <tr>
                 <td colSpan="16" className="text-right">Taxable Amount</td>
@@ -343,21 +348,12 @@ const PaymentDetails = ({
                 Cancel
               </Button>
             </Col>
-            {/* <Col xs={12} md={2}>
-            <Button
-              variant="secondary"
-              onClick={refreshSalesData}
-              style={{ backgroundColor: 'gray', marginLeft: '-30px' }}
-            >
-              Clear
-            </Button>
-          </Col> */}
           </Row>
         </Col>
 
       </div>
 
-      <Modal show={showModal} onHide={handleCloseModal} size="lg" centered>
+      <Modal show={festivalShowModal} onHide={handleFestivalCloseModal} size="xl" centered>
         <Modal.Header closeButton>
           <Modal.Title>Available Offers</Modal.Title>
         </Modal.Header>
@@ -372,6 +368,7 @@ const PaymentDetails = ({
                   <th>Offer Name</th>
                   <th>Discount On Rate</th>
                   <th>Discount % on MC</th>
+                  <th>Discount % for Fixed</th>
                   <th>Valid From</th>
                   <th>Valid To</th>
                   <th>Action</th>
@@ -379,29 +376,30 @@ const PaymentDetails = ({
               </thead>
               <tbody>
                 {offers.map((offer, index) => {
-                  const formatDate = (dateString) => {
-                    const date = new Date(dateString);
-                    const day = String(date.getDate()).padStart(2, "0");
-                    const month = String(date.getMonth() + 1).padStart(2, "0");
-                    const year = date.getFullYear();
-                    return `${day}-${month}-${year}`;
+                  const offerKey = `${offer._id}_${index}`;
+                  const isApplied = appliedOffers[offerKey] || false;
+
+                  const formatDate = (dateStr) => {
+                    const date = new Date(dateStr);
+                    return `${date.getDate().toString().padStart(2, "0")}-${(date.getMonth() + 1)
+                      .toString()
+                      .padStart(2, "0")}-${date.getFullYear()}`;
                   };
 
-                  const isApplied = appliedOffers[offer._id] || false;
-
                   return (
-                    <tr key={offer._id}> {/* ✅ Use unique ID as key */}
+                    <tr key={offer._id}>
                       <td>{index + 1}</td>
                       <td>{offer.offer_name}</td>
                       <td>{offer.discount_on_rate}</td>
                       <td>{offer.discount_percentage}</td>
+                      <td>{offer.discount_percent_fixed}</td>
                       <td>{formatDate(offer.valid_from)}</td>
                       <td>{formatDate(offer.valid_to)}</td>
                       <td>
                         <Button
                           variant={isApplied ? "secondary" : "success"}
                           size="sm"
-                          onClick={() => handleApply(offer)}
+                          onClick={() => handleApply(offer, index)}
                         >
                           {isApplied ? "Applied" : "Apply"}
                         </Button>
@@ -411,18 +409,18 @@ const PaymentDetails = ({
                 })}
               </tbody>
             </Table>
-
-
           ) : (
             <p>No offers available at the moment.</p>
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="secondary" onClick={handleFestivalCloseModal}>
             Close
           </Button>
         </Modal.Footer>
       </Modal>
+
+
     </>
   );
 };

@@ -15,9 +15,20 @@ function FestOffers() {
     discount_on: "",
     discount_on_rate:"",
     discount_percentage: "",
+    discount_percent_fixed: "",
     valid_from: "",
     valid_to: "",
   });
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`; // Returns in local timezone
+  };
+  
 
   // Populate form for editing
   useEffect(() => {
@@ -27,11 +38,15 @@ function FestOffers() {
         discount_on: location.discount_on || "",
         discount_on_rate: location.discount_on_rate || "",
         discount_percentage: location.discount_percentage || "",
-        valid_from: location.valid_from?.split("T")[0] || "",
-        valid_to: location.valid_to?.split("T")[0] || "",
+        discount_percent_fixed: location.discount_percent_fixed || "",
+        valid_from: formatDate(location.valid_from),
+        valid_to: formatDate(location.valid_to),
       });
     }
   }, [offer_id, location]);
+  
+  
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -116,6 +131,16 @@ function FestOffers() {
                 name="discount_percentage"
                 // type="number"
                 value={formData.discount_percentage}
+                onChange={handleChange}
+                required
+              />
+            </Col>
+            <Col md={4}>
+              <InputField
+                label="Discount % for Fixed"
+                name="discount_percent_fixed"
+                // type="number"
+                value={formData.discount_percent_fixed}
                 onChange={handleChange}
                 required
               />

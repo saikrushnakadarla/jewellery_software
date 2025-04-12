@@ -55,6 +55,23 @@ const ReceiptsTable = () => {
         accessor: 'remarks',
       },
       {
+        Header: "Receipt",
+        Cell: ({ row }) =>
+          // row.original.invoice_generated === "Yes" && row.original.invoice_number ? (
+            <a
+              href={`${baseURL}/invoices/${row.original.receipt_no}.pdf`} // Fetch from backend
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none' }}
+            >
+              📝 View
+            </a>
+        //   ) : (
+        //     "Not Available"
+        //   ),
+        // id: "invoice",
+      },
+      {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => (

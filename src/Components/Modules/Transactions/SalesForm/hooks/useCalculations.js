@@ -105,9 +105,10 @@ const useCalculations = (formData, setFormData) => {
       const stonePrice = parseFloat(formData.stone_price) || 0;
       const makingCharges = parseFloat(formData.making_charges) || 0;
       const discountAmt = parseFloat(formData.disscount) || 0;
+      const festivalDiscount = parseFloat(formData.festival_discount) || 0;
       const hmCharges = parseFloat(formData.hm_charges) || 0;
 
-      const taxableAmount = rateAmt + stonePrice + makingCharges + hmCharges - discountAmt;
+      const taxableAmount = rateAmt + stonePrice + makingCharges + hmCharges - discountAmt - festivalDiscount;
       const taxAmt = (taxableAmount * taxPercent) / 100;
       const totalPrice = taxableAmount + taxAmt;
 
