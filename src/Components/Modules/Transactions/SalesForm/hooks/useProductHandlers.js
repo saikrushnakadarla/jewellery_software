@@ -275,6 +275,38 @@ const useProductHandlers = () => {
       }
     }  
 
+    // Clear the field if "Select Purity" is chosen
+  if (name === "selling_purity" && value === "") {
+    setFormData(prev => ({
+      ...prev,
+      [name]: "",
+      custom_purity: "" // Also clear custom purity if it exists
+    }));
+    return;
+  }
+
+    // Handle selling_purity changes
+    if (name === "selling_purity") {
+      if (value === "") {
+        // Clear when "Select Purity" is chosen
+        setFormData(prev => ({
+          ...prev,
+          selling_purity: "",
+          custom_purity: "",
+          rate: ""
+        }));
+        return;
+      } else if (value === "Manual") {
+        updatedFormData.rate = "";
+      } else {
+        // Calculate rate for purity value
+        const purityValue = parseFloat(value);
+        if (!isNaN(purityValue) && rates.rate_24crt) {
+          const baseRate = parseFloat(rates.rate_24crt);
+          updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
+        }
+      }
+    }
 
     if (name === "product_name") {
       if (value === "") {
@@ -301,7 +333,7 @@ const useProductHandlers = () => {
       }
     }
     
-    if (name === "pur_purityPercentage" && formData.selling_purity === "Manual") {
+    if (name === "custom_purity" && formData.selling_purity === "Manual") {
       const purityValue = parseFloat(value);
       const baseRate = parseFloat(rates?.rate_24crt) || 0;
       if (!isNaN(purityValue)) {
@@ -462,7 +494,24 @@ const useProductHandlers = () => {
     }
 
     setFormData(updatedFormData);
-  };
+  };// In your component, add useEffect to handle initial rate calculation
+  
+  useEffect(() => {
+    if (formData.product_name && formData.selling_purity && formData.selling_purity !== "Manual") {
+      const purityValue = parseFloat(formData.selling_purity);
+      if (!isNaN(purityValue) && rates.rate_24crt) {
+        const baseRate = parseFloat(rates.rate_24crt);
+        const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+        setFormData(prev => ({
+          ...prev,
+          rate: calculatedRate
+        }));
+      }
+    }
+  }, [formData.product_name, formData.selling_purity, rates.rate_24crt]);
+  
+
+
 
   const handleProductNameChange = (productName) => {
     const productEntries = data.filter((prod) => prod.sub_category === productName);

@@ -484,17 +484,21 @@ const ProductDetails = ({
                 label="Selling Purity"
                 name="selling_purity"
                 type="select"
-                value={formData.selling_purity || ""}
+                value={formData.selling_purity}
                 onChange={handleChange}
                 options={[
-                  {
-                    label: formData.selling_purity || "Select Purity",
-                    value: formData.selling_purity || "",
-                  },
-                  { label: "Manual", value: "Manual" },
+                  // { label: "Select Purity", value: "" },
+                  ...(formData.product_name
+                    ? [{
+                      label: subcategoryOptions.find(option => option.value === formData.product_name)?.selling_purity || "Default Purity",
+                      value: subcategoryOptions.find(option => option.value === formData.product_name)?.selling_purity || ""
+                    }]
+                    : []),
+                  { label: "Manual", value: "Manual" }
                 ]}
               />
             </Col>
+
             {formData.selling_purity === "Manual" && (
               <Col xs={12} md={2}>
                 <InputField
@@ -588,6 +592,7 @@ const ProductDetails = ({
                 readOnly
               />
             </Col>
+
 
             <Col xs={12} md={1}>
               <InputField
