@@ -1,81 +1,141 @@
 import React, { useEffect, useState } from "react";
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
+import logo1 from '../../../../Navbar/sadashri.png';
 import QRCode from "qrcode";
+import { toWords } from "number-to-words";
 
 const styles = StyleSheet.create({
   page: {
-    padding: 10,
-    fontSize: 10,
+    padding: 5,
+    fontSize: 8,
     fontFamily: "Helvetica",
-    lineHeight: 1.2,
-    backgroundColor: "#fff",
-    width: 226, // Approx. 80mm in points
   },
-  heading: {
-    fontSize: 14,
-    fontWeight: "bold",
+  section: {
     marginBottom: 10,
-    textAlign: "center",
-    textTransform: "uppercase",
   },
   row: {
+    display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 3,
+    marginBottom: 10,
   },
-  leftText: {
-    fontSize: 10,
+  boldText: {
+    fontWeight: "bold",
   },
-  rightText: {
+  image1: {
+    height: 50,
+    marginTop: 0,
+  },
+  divider: {
+    marginVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    borderBottomStyle: "solid",
+  },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    padding: 20,
+    marginTop: -60,
+  },
+  heading: {
+    fontWeight: 'bold',
     fontSize: 10,
-    textAlign: "right",
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderColor: 'black',
+    width: '100%',
+  },
+  leftColumn: {
+    marginLeft: 100,
+    fontSize: 7,
+  },
+  rightColumn: {
+    flex: 1,
+    paddingLeft: 10,
+    fontSize: 7,
+  },
+  flatNo: {
+    marginBottom: 2,
+  },
+  cin: {
+    marginBottom: 2,
+  },
+  branch: {
+    fontWeight: 'bold',
+    marginBottom: 2,
+  },
+  branchContent: {
+    marginBottom: 2,
+  },
+  divider1: {
+    width: 1,
+    height: '100%',
+    backgroundColor: 'black',
+  },
+  horizontalLine1: {
+    width: '100%',
+    height: 1,
+    alignSelf: 'center',
+    marginBottom: 2,
+  },
+  horizontalLine: {
+    width: '100%',
+    height: 1,
+    backgroundColor: 'black',
+    alignSelf: 'center',
+    marginBottom: 2,
+  },
+  boxContainer: {
+    width: '100%',
+    height: 200,
+    marginTop: 5,
+    border: '1px solid black',
+    marginBottom: 20,
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
   },
   tableHeader: {
-    flexDirection: "row",
+    backgroundColor: '#f2f2f2',
+    fontWeight: 'bold',
     borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    marginBottom: 3,
-    paddingBottom: 3,
-  },
-  tableRow: {
-    flexDirection: "row",
-    marginBottom: 2,
-    paddingBottom: 2,
+    borderBottomColor: '#000',
   },
   tableCell: {
-    fontSize: 10,
+    padding: 5,
+    textAlign: 'center',
   },
-  sno: {
-    width: "10%",
-    fontWeight: "bold",
-    textAlign: "center",
+  tableRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    fontFamily: 'Times-Roman'
   },
-  inv: {
-    width: "30%",
-    textAlign: "center",
+  tableCellHeader: {
+    width: '10%',
+    textAlign: 'center',
   },
-  totalAmt: {
-    width: "20%",
-    textAlign: "right",
+  tableCellDescription: {
+    width: '30%',
+    textAlign: 'center',
   },
-  balanceAmt: {
-    width: "20%",
-    textAlign: "right",
+  tableCellTotalAmt: {
+    width: '20%',
+    textAlign: 'right',
   },
-  paidAmt: {
-    width: "20%",
-    textAlign: "right",
+  tableCellBalanceAmt: {
+    width: '20%',
+    textAlign: 'right',
   },
-  footerRow: {
-    flexDirection: "row",
-    marginTop: 3,
-    borderTopWidth: 1,
-    borderTopColor: "#000",
-    borderBottomWidth: 1,
-    borderBottomColor: "#000",
-    paddingTop: 3,
-    paddingBottom: 3,
-
+  tableCellPaidAmt: {
+    width: '20%',
+    textAlign: 'right',
   },
   qrCodeContainer: {
     alignItems: "center",
@@ -86,16 +146,22 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
   },
+  amountInWords: {
+    textAlign: 'left',
+    paddingLeft: 10,
+    marginTop: 5,
+    fontStyle: 'italic',
+  },
 });
 
 const PDFContent = ({ formData }) => {
-  const currentTime = new Date().toLocaleTimeString();
+  const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const [qrCodeUrl, setQrCodeUrl] = useState("");
 
   useEffect(() => {
     const generateQRCode = async () => {
       try {
-        const qrCodeDataUrl = await QRCode.toDataURL(formData[0]?.receipt_no || "", {
+        const qrCodeDataUrl = await QRCode.toDataURL(formData?.receipt_no || "", {
           width: 100,
           margin: 2,
         });
@@ -108,66 +174,170 @@ const PDFContent = ({ formData }) => {
     generateQRCode();
   }, [formData]);
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  // Convert amount to words
+  const amountInWords = toWords(parseFloat(formData.discount_amt || 0)).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
+
   return (
     <Document>
-      <Page size={[250, 500]} style={styles.page}>
-        {/* Heading */}
-        <Text style={styles.heading}>Receipt</Text>
-
-        {/* Details */}
-        <View>
-          <View style={styles.row}>
-            <Text style={styles.leftText}>Receipt No: {formData.receipt_no || "N/A"}</Text>
-            <Text style={styles.rightText}>Account Name: {formData.account_name || "N/A"}</Text>
-          
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.leftText}>Date: {formData.date || "N/A"}</Text>
-            <Text style={styles.rightText}>Time: {currentTime}</Text>
-          </View>
-        </View>
-       
+      <Page size="A4" style={styles.page}>
+        {/* First Row */}
         <View style={styles.row}>
-        <Text style={styles.rightText}>Mobile Number: {formData.mobile || "N/A"}</Text>
-        </View>
-        
-
-        {/* Table Header */}
-        <View style={styles.tableHeader}>
-          <Text style={[styles.tableCell, styles.sno]}>S.No.</Text>
-          <Text style={[styles.tableCell, styles.inv]}>Invoice ID</Text>
-          <Text style={[styles.tableCell, styles.totalAmt]}>Total Amt</Text>
-          <Text style={[styles.tableCell, styles.balanceAmt]}>Paid Amt</Text>
-          <Text style={[styles.tableCell, styles.paidAmt]}>Bal Amt</Text>
-        </View>
-
-        {/* Table Rows */}
-        {[1].map((item, index) => (
-          <View style={styles.tableRow} key={index}>
-            <Text style={[styles.tableCell, styles.sno]}>{item}</Text>
-            <Text style={[styles.tableCell, styles.inv]}>{formData.invoice_number}</Text>
-            <Text style={[styles.tableCell, styles.totalAmt]}>{formData.total_amt}</Text>
-            <Text style={[styles.tableCell, styles.balanceAmt]}>{formData.discount_amt}</Text>
-            <Text style={[styles.tableCell, styles.paidAmt]}>{formData.cash_amt}</Text>
+          <View style={[styles.column, { marginTop: 20, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
+            <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
+            <Text style={{ marginBottom: 5 }}>{formData.account_name || "N/A"},</Text>
+            <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile || "N/A"}</Text>
           </View>
-        ))}
 
-        {/* Footer Row */}
-        <View style={styles.footerRow}>
-          <Text style={[styles.tableCell, styles.sno]}></Text>
-          <Text style={[styles.tableCell, styles.inv]}>Total</Text>
-          <Text style={[styles.tableCell, styles.totalAmt]}>{formData.total_amt}</Text>
-          <Text style={[styles.tableCell, styles.balanceAmt]}>{formData.discount_amt}</Text>
-          <Text style={[styles.tableCell, styles.paidAmt]}>{formData.cash_amt}</Text>
+          <View style={[styles.column, { width: "40%" }]}>
+            <Image style={styles.image1} src={logo1} />
+          </View>
+
+          <View style={[styles.column, { width: "10%" }]}></View>
+
+          <View style={[styles.column, { marginTop: 0, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
+            <Text style={{ fontWeight: "bold", fontSize: 12, marginBottom: 10, marginLeft: 20 }}>RECEIPT</Text>
+
+            {/* RECEIPT NO */}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+              <Text>RECEIPT NO:</Text>
+              <Text style={{ textAlign: "right", flex: 1 }}>{formData.receipt_no || "N/A"}</Text>
+            </View>
+
+            {/* DATE */}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+              <Text>DATE:</Text>
+              <Text style={{ textAlign: "right", flex: 1 }}>{formatDate(formData.date)}</Text>
+            </View>
+
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+              <Text>TIME:</Text>
+              <Text style={{ textAlign: "right", flex: 1 }}>{currentTime}</Text>
+            </View>
+
+            {/* STAFF */}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+              <Text>STAFF:</Text>
+              <Text style={{ textAlign: "right", flex: 1 }}>Sadashri Jewels</Text>
+            </View>
+
+            {/* GSTIN */}
+            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+              <Text>GSTIN:</Text>
+              <Text style={{ textAlign: "right", flex: 1 }}>29ABMCS9253K1ZG</Text>
+            </View>
+          </View>
         </View>
-        <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-          {qrCodeUrl && <Image style={styles.qrCode} src={qrCodeUrl} />}
+
+        <View style={styles.container}>
+          {/* Centered Heading */}
+          <Text style={[styles.heading, { fontFamily: 'Times-Bold' }]}>SADASHRI VENTURES PRIVATE LIMITED</Text>
+
+          {/* Flat No. and Branch section */}
+          <View style={styles.contentContainer}>
+            {/* Flat No. Section */}
+            <View style={styles.leftColumn}>
+              <Text style={styles.flatNo}>Flat No.: 1322/1324, 16th B Cross Housing Board Colony EWS 3rd Phase,</Text>
+              <Text style={styles.cin}>Yelahanka New Town, Bengaluru Urban, Karnataka - 560064.</Text>
+              <Text style={styles.cin}>CN : U46498KX2024PTC185784</Text>
+            </View>
+
+            {/* Vertical Divider */}
+            <View style={styles.divider1} />
+
+            {/* Branch Section */}
+            <View style={styles.rightColumn}>
+              <Text style={[styles.branch, { fontFamily: 'Times-Bold' }]}>BRANCH:</Text>
+              <Text style={styles.branchContent}>Shop no. 1 No.2063, Dairy Circle, Asha Arcade,</Text>
+              <Text style={styles.branchContent}>16th B Cross Rd, Yalahanka New Town, Bangalore - 064</Text>
+            </View>
+          </View>
+
+          {/* Horizontal Divider under both sections */}
+          <View style={styles.horizontalLine1} />
+
+          <View>
+            <Text>Mob : 9964644424 EMAIL : sadashri.Yel@gmail.com</Text>
+          </View>
+
+          <View style={styles.boxContainer}>
+            {/* Table Header */}
+            <View style={[styles.tableRow, { fontFamily: 'Times-Bold' }]}>
+              <Text style={[styles.tableCell, styles.tableCellHeader]}>S.No.</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellDescription]}>Invoice ID</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellTotalAmt]}>Total Amt</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellBalanceAmt]}>Paid Amt</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellPaidAmt]}>Bal Amt</Text>
+            </View>
+            <View style={styles.horizontalLine} />
+
+            {/* Table Row */}
+            <View style={[styles.tableRow, { fontFamily: 'Times-Roman' }]}>
+              <Text style={[styles.tableCell, styles.tableCellHeader]}>1</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellDescription]}>{formData.invoice_number || "N/A"}</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellTotalAmt]}>{formData.total_amt || "0.00"}</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellBalanceAmt]}>{formData.discount_amt || "0.00"}</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellPaidAmt]}>{formData.cash_amt || "0.00"}</Text>
+            </View>
+
+            <View style={styles.horizontalLine} />
+
+            {/* Footer Row */}
+            <View style={[styles.tableRow, { fontFamily: 'Times-Bold' }]}>
+              <Text style={[styles.tableCell, styles.tableCellHeader]}></Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellDescription]}>Total</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellTotalAmt]}>{formData.total_amt || "0.00"}</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellBalanceAmt]}>{formData.discount_amt || "0.00"}</Text>
+              <View style={styles.divider1} />
+              <Text style={[styles.tableCell, styles.tableCellPaidAmt]}>{formData.cash_amt || "0.00"}</Text>
+            </View>
+
+            <View style={styles.horizontalLine} />
+
+            {/* Amount in words */}
+            <Text style={styles.amountInWords}>
+              Rupees {amountInWords} Only
+            </Text>
+
+            <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 20 }}>
+              {qrCodeUrl && <Image style={styles.qrCode} src={qrCodeUrl} />}
+            </View>
+
+            <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "space-between", marginBottom: 3, fontFamily: 'Times-Bold' }}>
+              {/* Left Side */}
+              <View style={{ alignItems: "flex-start", paddingLeft: 10 }}>
+                <Text style={[styles.boldText]}>For Customer</Text>
+              </View>
+
+              {/* Right Side */}
+              <View style={{ alignItems: "flex-end", paddingRight: 10 }}>
+                <Text style={[styles.boldText]}>For SADASHRI VENTURES PRIVATE LIMITED</Text>
+              </View>
+            </View>
+          </View>
         </View>
       </Page>
     </Document>
   );
 };
-
-
 
 export default PDFContent;
