@@ -99,18 +99,18 @@ const useCalculations = (formData, setFormData) => {
   // Calculate Tax Amount and Total Price
   useEffect(() => {
     const taxPercent = parseFloat(formData.tax_percent) || 0;
-  
+
     if (formData.pricing === "By Weight") {
       const rateAmt = parseFloat(formData.rate_amt) || 0;
       const stonePrice = parseFloat(formData.stone_price) || 0;
       const makingCharges = parseFloat(formData.making_charges) || 0;
       const discountAmt = parseFloat(formData.disscount) || 0;
       const hmCharges = parseFloat(formData.hm_charges) || 0;
-  
+
       const taxableAmount = rateAmt + stonePrice + makingCharges + hmCharges - discountAmt;
       const taxAmt = (taxableAmount * taxPercent) / 100;
       const totalPrice = taxableAmount + taxAmt;
-  
+
       setFormData((prev) => ({
         ...prev,
         tax_amt: taxAmt.toFixed(2),
@@ -119,13 +119,15 @@ const useCalculations = (formData, setFormData) => {
     } else if (formData.pricing === "By fixed") {
       const pieceCost = parseFloat(formData.pieace_cost) || 0;
       const qty = parseFloat(formData.qty) || 1;
-  
-      const taxAmt = (taxPercent * pieceCost) / 100;
-      const mrpPrice = pieceCost + taxAmt;
-      const totalPrice = mrpPrice * qty;
-  
+
+      const pieceTaxableAmt = pieceCost * qty;
+      const taxAmt = (taxPercent * pieceCost * qty) / 100;
+      const mrpPrice = pieceCost + (taxAmt / qty); // ✅ corrected here
+      const totalPrice = pieceTaxableAmt + taxAmt;
+
       setFormData((prev) => ({
         ...prev,
+        piece_taxable_amt: pieceTaxableAmt.toFixed(2),
         tax_amt: taxAmt.toFixed(2),
         mrp_price: mrpPrice.toFixed(2),
         total_price: totalPrice.toFixed(2),
@@ -150,9 +152,9 @@ const useCalculations = (formData, setFormData) => {
     formData.pieace_cost,
     formData.qty,
   ]);
-  
-  
-  
+
+
+
 
 
 

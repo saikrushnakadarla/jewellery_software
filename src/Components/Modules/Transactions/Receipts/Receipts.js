@@ -16,7 +16,7 @@ const RepairForm = () => {
   const [formData, setFormData] = useState({
     transaction_type: "Receipt",
     date: new Date().toISOString().split("T")[0],
-    mode: "",
+    mode: "Cash",
     cheque_number: "",
     receipt_no: "",
     account_name: "",
@@ -477,26 +477,15 @@ const RepairForm = () => {
                 { value: "Cheque", label: "Cheque" },
                 { value: "Online", label: "Online" },
               ]}
-              autoFocus
+              
             />
           </Col>
-          <Col xs={12} md={3}>
+          <Col xs={12} md={2}>
             <InputField
-              label="Reference Number"
+              label="Reference No."
               name="cheque_number"
               value={formData.cheque_number}
               onChange={handleInputChange}
-            />
-          </Col>
-
-          <Col xs={12} md={3}>
-            <InputField
-              label="Account Name"
-              type="select"
-              name="account_name"
-              value={formData.account_name}
-              onChange={handleInputChange}
-              options={accountOptions}
             />
           </Col>
           <Col xs={12} md={2}>
@@ -509,6 +498,19 @@ const RepairForm = () => {
               options={mobileOptions}
             />
           </Col>
+
+          <Col xs={12} md={2}>
+            <InputField
+              label="Account Name"
+              type="select"
+              name="account_name"
+              value={formData.account_name}
+              onChange={handleInputChange}
+              options={accountOptions}
+              autoFocus
+            />
+          </Col>
+          
           <Col xs={12} md={2}>
             <InputField
               label="Invoice Number"

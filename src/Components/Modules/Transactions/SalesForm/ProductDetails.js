@@ -49,6 +49,7 @@ const ProductDetails = ({
   refreshSalesData,
   fetchCategory,
   fetchSubCategory,
+  taxableAmount
 }) => {
 
   const [showModal, setShowModal] = useState(false);
@@ -277,6 +278,16 @@ const ProductDetails = ({
                 readOnly={!isQtyEditable}
               />
             </Col>
+            <Col xs={12} md={2}>
+              <InputField
+                label="Taxable Amt"
+                name="piece_taxable_amt"
+                value={formData.piece_taxable_amt}
+                onChange={handleChange}
+                readOnly
+              />
+            </Col>
+
             <Col xs={12} md={1}>
               <InputField label="Tax%"
                 name="tax_percent"
