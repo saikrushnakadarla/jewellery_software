@@ -270,47 +270,43 @@ const PDFContent = ({ formData }) => {
 
           <View style={styles.boxContainer}>
             {/* Table Header */}
-            <View style={[styles.tableRow, { fontFamily: 'Times-Bold' }]}>
+            <View style={[styles.tableRow, { fontFamily: 'Times-Bold', borderBottomWidth: 1, borderBottomColor: '#000' }]}>
               <Text style={[styles.tableCell, styles.tableCellHeader]}>S.No.</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellDescription]}>Invoice ID</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellTotalAmt]}>Total Amt</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellBalanceAmt]}>Paid Amt</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellPaidAmt]}>Bal Amt</Text>
             </View>
-            <View style={styles.horizontalLine} />
 
             {/* Table Row */}
-            <View style={[styles.tableRow, { fontFamily: 'Times-Roman' }]}>
+            <View style={[styles.tableRow, { fontFamily: 'Times-Roman', borderBottomWidth: 1, borderBottomColor: '#000' }]}>
               <Text style={[styles.tableCell, styles.tableCellHeader]}>1</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellDescription]}>{formData.invoice_number || "N/A"}</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellTotalAmt]}>{formData.total_amt || "0.00"}</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellBalanceAmt]}>{formData.discount_amt || "0.00"}</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellPaidAmt]}>{formData.cash_amt || "0.00"}</Text>
             </View>
-
-            <View style={styles.horizontalLine} />
 
             {/* Footer Row */}
-            <View style={[styles.tableRow, { fontFamily: 'Times-Bold' }]}>
+            <View style={[styles.tableRow, { fontFamily: 'Times-Bold', borderBottomWidth: 1, borderBottomColor: '#000' }]}>
               <Text style={[styles.tableCell, styles.tableCellHeader]}></Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellDescription]}>Total</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellTotalAmt]}>{formData.total_amt || "0.00"}</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellBalanceAmt]}>{formData.discount_amt || "0.00"}</Text>
-              <View style={styles.divider1} />
+              <View style={[styles.divider1, { height: '100%' }]} />
               <Text style={[styles.tableCell, styles.tableCellPaidAmt]}>{formData.cash_amt || "0.00"}</Text>
             </View>
-
             <View style={styles.horizontalLine} />
 
             {/* Amount in words */}
