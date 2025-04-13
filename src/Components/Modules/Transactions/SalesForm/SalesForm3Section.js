@@ -26,7 +26,8 @@ const SalesFormSection = ({ setOldSalesData,
   salesNetAmount,
   repairDetails,
   resetSaleReturnForm,
-  handleCheckout
+  handleCheckout,
+  tabId
 }) => {
 
   const [activeForm, setActiveForm] = useState("old");
@@ -102,7 +103,7 @@ const SalesFormSection = ({ setOldSalesData,
 
       </Row>
 
-      {activeForm === "old" && <OldSalesForm setOldSalesData={setOldSalesData} repairDetails={repairDetails} />}
+      {activeForm === "old" && <OldSalesForm setOldSalesData={setOldSalesData} repairDetails={repairDetails} tabId={tabId}/>}
       {activeForm === "schemes" && (
         <SchemeSalesForm
           setSchemeSalesData={setSchemeSalesData}

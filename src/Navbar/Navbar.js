@@ -26,17 +26,47 @@ function Navbar() {
     }
   }, [location.pathname]);
 
+  const getTabId = () => {
+    // First try to get from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let tabId = urlParams.get('tabId');
+    
+    // If not in URL, try sessionStorage
+    if (!tabId) {
+      tabId = sessionStorage.getItem('tabId');
+    }
+    
+    // If still not found, generate new ID
+    if (!tabId) {
+      tabId = crypto.randomUUID();
+      sessionStorage.setItem('tabId', tabId);
+      
+      // Update URL without page reload
+      const newUrl = `${window.location.pathname}?tabId=${tabId}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    return tabId;
+  };
+
+  const tabId = getTabId();
+
   useEffect(() => {
-    if (location.pathname !== "/sales") {
+    const currentPathWithQuery = `${location.pathname}${location.search}`;
+    const expectedPath = `/sales?tabId=${tabId}`;
+  
+    if (currentPathWithQuery !== expectedPath) {
       localStorage.removeItem('oldSalesData');
       localStorage.removeItem('schemeSalesData');
-      localStorage.removeItem('repairDetails');
-      localStorage.removeItem('paymentDetails');
-      localStorage.removeItem('oldTableData'); 
-      localStorage.removeItem('schemeTableData'); 
-      localStorage.removeItem("discount");
+      localStorage.removeItem(`repairDetails_${tabId}`);
+      localStorage.removeItem(`paymentDetails_${tabId}`);
+      localStorage.removeItem(`oldTableData_${tabId}`);
+      localStorage.removeItem('schemeTableData');
+      localStorage.removeItem('discount');
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.search, tabId]);
+  
+  
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);

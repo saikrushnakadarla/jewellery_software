@@ -19,6 +19,31 @@ const RepairsTable = () => {
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
 
+  const getTabId = () => {
+    // First try to get from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let tabId = urlParams.get('tabId');
+    
+    // If not in URL, try sessionStorage
+    if (!tabId) {
+      tabId = sessionStorage.getItem('tabId');
+    }
+    
+    // If still not found, generate new ID
+    if (!tabId) {
+      tabId = crypto.randomUUID();
+      sessionStorage.setItem('tabId', tabId);
+      
+      // Update URL without page reload
+      const newUrl = `${window.location.pathname}?tabId=${tabId}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    return tabId;
+  };
+
+  const tabId = getTabId();
+
   useEffect(() => {
     if (mobile) {
       console.log('Selected Mobile from Dashboard:', mobile);
@@ -28,7 +53,7 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Sr. No.',
+        Header: 'S No.',
         Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
       {
@@ -37,8 +62,12 @@ const RepairsTable = () => {
         Cell: ({ value }) => formatDate(value), // Format date value
       },
       {
-        Header: 'Mobile Number',
+        Header: 'Mobile',
         accessor: 'mobile',
+      },
+      {
+        Header: 'Account',
+        accessor: 'account_name',
       },
       {
         Header: 'Invoice No.',
@@ -47,11 +76,7 @@ const RepairsTable = () => {
       {
         Header: 'Order No.',
         accessor: 'order_number',
-      },
-      {
-        Header: 'Account Name',
-        accessor: 'account_name',
-      },
+      },      
       {
         Header: 'Total Amt',
         accessor: 'net_amount',
@@ -97,6 +122,24 @@ const RepairsTable = () => {
           }
           return finalBalance.toFixed(2);
         },
+      },
+
+      {
+        Header: "Invoice",
+        Cell: ({ row }) =>
+          // row.original.invoice_generated === "Yes" && row.original.invoice_number ? (
+            <a
+              href={`${baseURL}/invoices/${row.original.invoice_number}.pdf`} // Fetch from backend
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none' }}
+            >
+              📝 View
+            </a>
+        //   ) : (
+        //     "Not Available"
+        //   ),
+        // id: "invoice",
       },
       // {
       //   Header: 'Status',
@@ -160,8 +203,6 @@ const RepairsTable = () => {
                 }}
                 onClick={() => handleEdit(row.original.invoice_number,
                   row.original.mobile,
-                  row.original.old_exchange_amt,
-                  row.original.scheme_amt,
                   row.original.cash_amount,
                   row.original.card_amt,
                   row.original.chq_amt,
@@ -227,6 +268,11 @@ const RepairsTable = () => {
     chq_amt,
     online_amt
   ) => {
+
+    console.log("cash_amount=",cash_amount)
+    console.log("card_amt=",card_amt)
+    console.log("chq_amt=",chq_amt)
+    console.log("online_amt=",online_amt)
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to edit this record?',
@@ -237,6 +283,8 @@ const RepairsTable = () => {
       confirmButtonText: 'Yes, go ahead!',
       cancelButtonText: 'No, cancel',
     });
+
+    const tabId = crypto.randomUUID();
 
     if (result.isConfirmed) {
       try {
@@ -268,8 +316,8 @@ const RepairsTable = () => {
         const oldItemsDetails = oldItemsResponse.data;
 
         // Retrieve existing data from localStorage
-        const existingDetails = JSON.parse(localStorage.getItem('repairDetails')) || [];
-        const existingOldItems = JSON.parse(localStorage.getItem('oldTableData')) || [];
+        const existingDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
+        const existingOldItems = JSON.parse(localStorage.getItem(`oldTableData_${tabId}`)) || [];
 
         // Get today's date in yyyy-mm-dd format
         const today = new Date().toISOString().split('T')[0];
@@ -291,8 +339,21 @@ const RepairsTable = () => {
         const updatedRepairDetails = [...existingDetails, ...formattedRepairDetails];
         const updatedOldItems = [...existingOldItems, ...formattedOldItems];
 
-        localStorage.setItem('repairDetails', JSON.stringify(updatedRepairDetails));
-        localStorage.setItem('oldTableData', JSON.stringify(updatedOldItems));
+        localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedRepairDetails));
+        localStorage.setItem(`oldTableData_${tabId}`, JSON.stringify(updatedOldItems));
+
+        const paymentDetails = {
+          cash_amount: parseFloat(cash_amount) || 0,
+          card_amt: parseFloat(card_amt) || 0,
+          chq_amt: parseFloat(chq_amt) || 0,
+          online_amt: parseFloat(online_amt) || 0,
+        };
+        
+        console.log("Storing paymentDetails to localStorage:", paymentDetails);
+        
+        localStorage.setItem(`paymentDetails_${tabId}`, JSON.stringify(paymentDetails));
+        
+
         // **Set discount percentage in localStorage**
         if (updatedRepairDetails.length > 0 && updatedRepairDetails[0].disscount_percentage) {
           localStorage.setItem('discount', updatedRepairDetails[0].disscount_percentage);
@@ -300,7 +361,7 @@ const RepairsTable = () => {
         }
 
         // Navigate to the sales page
-        navigate('/sales', {
+        navigate(`/sales?tabId=${tabId}`, {
           state: {
             invoice_number,
             mobile,
@@ -376,7 +437,11 @@ const RepairsTable = () => {
     ).padStart(2, '0')}-${date.getFullYear()}`;
   };
   const handleCreate = () => {
-    navigate('/sales');
+    // Generate a new tab ID or use existing one if available
+    const tabId = crypto.randomUUID();
+    
+    // Navigate to sales page with the tabId
+    navigate(`/sales?tabId=${tabId}`);
   };
 
   const fetchRepairs = async () => {
@@ -524,7 +589,7 @@ const RepairsTable = () => {
                       <th>W.Wt</th>
                       <th>Total Wt</th>
                       <th>MC</th>
-                      <th>Rate</th>
+                      <th>Rate / Piece Cost</th>
                       <th>Tax Amt</th>
                       {/* <th>Status</th> */}
                       <th>Sale Status</th>
@@ -543,7 +608,7 @@ const RepairsTable = () => {
                         <td>{product.wastage_weight}</td>
                         <td>{product.total_weight_av}</td>
                         <td>{product.making_charges}</td>
-                        <td>{product.rate}</td>
+                        <td>{product.pieace_cost ? product.pieace_cost : product.rate}</td>
                         <td>{product.tax_amt}</td>
                         {/* <td>{product.transaction_status}</td> */}
                         <td>{product.sale_status}</td>

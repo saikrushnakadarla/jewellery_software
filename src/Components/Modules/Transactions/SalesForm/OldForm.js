@@ -4,7 +4,7 @@ import { Col, Row, Button, Table } from "react-bootstrap";
 import InputField from "./../../Masters/ItemMaster/Inputfield";
 import baseURL from "../../../../Url/NodeBaseURL";
 import { FaEdit, FaTrash } from "react-icons/fa";
-const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
+const OldSalesForm = ({ setOldSalesData, repairDetails, tabId }) => {
   const [metalOptions, setMetalOptions] = useState([]);
   const [purityOptions, setPurityOptions] = useState([]);
   const [oldDetails, setOldDetails] = useState({
@@ -24,13 +24,13 @@ const OldSalesForm = ({ setOldSalesData, repairDetails }) => {
   });
 
   const [oldTableData, setOldTableData] = useState(() => {
-    const savedData = localStorage.getItem('oldTableData');
+    const savedData = localStorage.getItem(`oldTableData_${tabId}`);
     return savedData ? JSON.parse(savedData) : [];
   });
   const [rates, setRates] = useState({ rate_24crt: "", rate_22crt: "", rate_18crt: "", rate_16crt: "" });
 
   useEffect(() => {
-    localStorage.setItem('oldTableData', JSON.stringify(oldTableData));
+    localStorage.setItem(`oldTableData_${tabId}`, JSON.stringify(oldTableData));
     setOldSalesData(oldTableData); // Update parent component's state
   }, [oldTableData, setOldSalesData]);
 

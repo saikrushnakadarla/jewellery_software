@@ -40,6 +40,9 @@ const RepairForm = () => {
   const [repairDetails, setRepairDetails] = useState(null);
   const [invoiceNumberOptions, setInvoiceNumberOptions] = useState([]);
   const [accountData, setAccountData] = useState([]);
+  const [repeatedData, setRepeatedData] = useState([]);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
 
   useEffect(() => {
     const fetchLastReceiptNumber = async () => {
@@ -62,20 +65,38 @@ const RepairForm = () => {
       try {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
 
-        // Filter the data based on the 'transaction_status' column
-        const filteredData = response.data.filter(item => item.transaction_status === 'Sales' || item.transaction_status === "ConvertedInvoice");
+        const filteredData = response.data.filter(
+          item => item.transaction_status === 'Sales' || item.transaction_status === "ConvertedInvoice"
+        );
 
         setRepairDetails(filteredData);
-        console.log("filteredData=", filteredData)
-
+        console.log("filteredData =", filteredData);
       } catch (error) {
         console.error('Error fetching repair details:', error);
-
       }
     };
 
     fetchRepairs();
   }, []);
+
+  useEffect(() => {
+    const fetchRepairDetailsByInvoice = async () => {
+      if (formData.invoice_number) {
+        try {
+          const response = await axios.get(`${baseURL}/get-repair-details/${formData.invoice_number}`);
+          console.log("Detailed repair data:", response.data);
+
+          // Store repeatedData in state
+          setRepeatedData(response.data.repeatedData || []);
+
+        } catch (error) {
+          console.error('Error fetching repair details by invoice number:', error);
+        }
+      }
+    };
+
+    fetchRepairDetailsByInvoice();
+  }, [formData.invoice_number]);
 
   useEffect(() => {
     const fetchAccountNames = async () => {
@@ -246,6 +267,7 @@ const RepairForm = () => {
           // Clear `total_amt` and `cash_amt` when `invoice_number` is cleared
           updatedData.total_amt = "";
           updatedData.cash_amt = "";
+          setRepeatedData([]);
         } else {
           // Set `total_amt` to the `bal_amt` of the selected invoice
           const selectedRepair = repairDetails.find(
@@ -358,6 +380,7 @@ const RepairForm = () => {
       if (!response.ok) throw new Error("Failed to save data");
 
       alert(`Receipt ${id ? "updated" : "saved"} successfully!`);
+      setIsSubmitted(true);
 
       console.log("FormData being passed to PDF generation:", formData);
 
@@ -377,7 +400,7 @@ const RepairForm = () => {
       // URL.revokeObjectURL(link.href);
 
       // Navigate to receipts table
-      navigate("/receiptstable");
+      // navigate("/receiptstable");
     } catch (error) {
       alert(`Error: ${error.message}`);
     }
@@ -460,10 +483,35 @@ const RepairForm = () => {
   }, [invoiceData, repairDetails]);
 
 
+  // const handleBack = () => {
+  //   const from = location.state?.from || "/receiptstable"; // Default to /receiptstable if no from location provided
+  //   navigate(from);
+  // };
+
   const handleBack = () => {
-    const from = location.state?.from || "/receiptstable"; // Default to /receiptstable if no from location provided
-    navigate(from);
+    navigate(-1); // Go back one step in the browser history
   };
+
+  const handleStatusUpdate = async (id) => {
+    try {
+      const response = await axios.put(`${baseURL}/update-repair-status/${id}`, {
+        sale_status: "Delivered"
+      });
+
+      if (response.status === 200) {
+        // Update the UI immediately after success
+        const updatedData = repeatedData.map(item =>
+          item.id === id ? { ...item, sale_status: "Delivered" } : item
+        );
+        setRepeatedData(updatedData);
+      }
+
+    } catch (error) {
+      console.error("Error updating sale_status:", error);
+    }
+  };
+
+
 
   return (
     <div className="main-container">
@@ -501,7 +549,7 @@ const RepairForm = () => {
                 { value: "Cheque", label: "Cheque" },
                 { value: "Online", label: "Online" },
               ]}
-              
+
             />
           </Col>
           <Col xs={12} md={2}>
@@ -534,7 +582,7 @@ const RepairForm = () => {
               autoFocus
             />
           </Col>
-          
+
           <Col xs={12} md={2}>
             <InputField
               label="Invoice Number"
@@ -583,9 +631,94 @@ const RepairForm = () => {
               onChange={handleInputChange}
             />
           </Col>
-        </Row>
+          <div className="form-buttons" style={{ marginTop: '0px' }}>
+            <Button
+              variant="secondary"
+              className="cus-back-btn"
+              type="button"
+              // onClick={() => navigate("/receiptstable")}
+              onClick={handleBack}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={isSubmitted}
+              style={{
+                backgroundColor: isSubmitted ? "#a36e29" : "#a36e29",
+                borderColor: isSubmitted ? "#a36e29" : "#a36e29",
+                cursor: isSubmitted ? "not-allowed" : "pointer",
+              }}
+              onClick={handleSubmit}
+            >
+              {isSubmitted ? (id ? "Updated" : "Saved") : id ? "Update" : "Save"}
+            </Button>
 
-        <div className="form-buttons">
+          </div>
+        </Row>
+        <Row className="payments-form-section">
+          <h4>Invoice Item Details</h4>
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                {/* <th>Id</th> */}
+                <th>Bar Code</th>
+                <th>Product Name</th>
+                <th>Metal</th>
+                <th>Purity</th>
+                <th>Gross Wt</th>
+                <th>Stone Wt</th>
+                <th>W.Wt</th>
+                <th>Total Wt</th>
+                <th>MC</th>
+                <th>Rate / Piece Cost</th>
+                <th>Tax Amt</th>
+                <th>Total Price</th>
+                <th>Sale Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {repeatedData.length > 0 ? (
+                repeatedData.map((item, index) => (
+                  <tr key={index}>
+                    {/* <td>{item.id}</td> */}
+                    <td>{item.code}</td>
+                    <td>{item.product_name}</td>
+                    <td>{item.metal_type}</td>
+                    <td>{item.selling_purity}</td>
+                    <td>{item.gross_weight}</td>
+                    <td>{item.stone_weight}</td>
+                    <td>{item.wastage_weight}</td>
+                    <td>{item.total_weight_av}</td>
+                    <td>{item.making_charges}</td>
+                    <td>{item.pieace_cost ? item.pieace_cost : item.rate}</td>
+                    <td>{item.tax_amt}</td>
+                    <td>{item.total_price}</td>
+                    <td>{item.sale_status}</td>
+                    <td>
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => handleStatusUpdate(item.id)}
+                        disabled={item.sale_status === "Delivered"}
+                      >
+                        {item.sale_status === "Delivered" ? "Delivered" : "Update"}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="13" className="text-center">No item Details available.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+
+        </Row>
+        <div className="form-buttons" style={{ marginTop: '0px' }}>
           <Button
             variant="secondary"
             className="cus-back-btn"
@@ -593,17 +726,11 @@ const RepairForm = () => {
             // onClick={() => navigate("/receiptstable")}
             onClick={handleBack}
           >
-            Cancel
+            Back
           </Button>
-          <Button
-            type="submit"
-            variant="primary"
-            style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
-            onClick={handleSubmit}
-          >
-            {id ? "Update" : "Save"}
-          </Button>
+
         </div>
+
       </Container>
     </div>
   );

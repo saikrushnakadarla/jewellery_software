@@ -122,6 +122,7 @@ function App() {
         <Route path="/accounts/:id" element={<Accounts />} />
         <Route path="/accountstable" element={<AccountsTable />} />
         <Route path="/sales" element={<Sales />} />
+        <Route path="/sales2" element={<Sales />} />
         <Route path="/metaltype" element={<MetalType />}/>
         <Route path="/purity" element={<Purity />}/>
         <Route path="/rates" element={<Rates />}/>

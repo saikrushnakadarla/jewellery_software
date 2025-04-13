@@ -91,6 +91,15 @@ function Dashboard() {
     ],
   };
 
+  const handleNewSalesTab = () => {
+    const newTabId = crypto.randomUUID();
+    const url = selectedMobile 
+      ? `/sales?tabId=${newTabId}&mobile=${selectedMobile}`
+      : `/sales?tabId=${newTabId}`;
+    
+    window.open(url, "_blank");
+  };
+
 
   return (
     <div className="main-container" style={{ backgroundColor: '#b7721834' }}>
@@ -149,20 +158,15 @@ function Dashboard() {
               New
             </a> */}
             <a
-              href="#"
-              className="btn-link"
-              onClick={(e) => {
-                e.preventDefault();
-                if (selectedMobile) {
-                  navigate("/sales", { state: { mobile: selectedMobile } }); 
-                } else {
-                  
-                  window.open("/sales", "_blank"); 
-                }
-              }}
-            >
-              New
-            </a>
+          href="#"
+          className="btn-link"
+          onClick={(e) => {
+            e.preventDefault();
+            handleNewSalesTab();
+          }}
+        >
+          New
+        </a>
           </div>
           <div className="metric-card">
             <Purchases selectedCustomerMobile={selectedMobile} />

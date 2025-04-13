@@ -13,7 +13,8 @@ const CustomerDetails = ({
   handleAddCustomer,
   customers,
   setSelectedMobile,
-  mobileRef
+  mobileRef,
+  tabId
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,37 +60,37 @@ const CustomerDetails = ({
   // Function to fetch balance based on mobile
   const fetchBalance = (mobile) => {
     if (!mobile) return setBalance("0.00");
-  
+
     setLoading(true);
-  
+
     const customerData = data.filter((item) => item.mobile === mobile);
-  
+
     const totalBalance = customerData.reduce((sum, item) => {
       const bal_amt = Number(item.bal_amt) || 0;
       const bal_after_receipts = Number(item.bal_after_receipts) || 0;
       const receipts_amt = Number(item.receipts_amt) || 0;
-  
+
       const balance = bal_amt === receipts_amt
         ? bal_after_receipts
         : bal_after_receipts || bal_amt;
-  
+
       return sum + balance;
     }, 0);
-  
+
     setBalance(totalBalance.toFixed(2));
     setLoading(false);
   };
-  
-  
-  
-  useEffect(() => {
-    const savedData = JSON.parse(localStorage.getItem("saleFormData"));
-    if (savedData?.mobile) {
-      setFormData((prev) => ({ ...prev, mobile: savedData.mobile }));
-    }
-  }, []);
-  
-  
+
+
+
+  // useEffect(() => {
+  //   const savedData = JSON.parse(localStorage.getItem("saleFormData"));
+  //   if (savedData?.mobile) {
+  //     setFormData((prev) => ({ ...prev, mobile: savedData.mobile }));
+  //   }
+  // }, []);
+
+
 
   useEffect(() => {
     if (formData.mobile && data.length > 0) {
@@ -99,10 +100,16 @@ const CustomerDetails = ({
       setBalance("0.00");
     }
   }, [formData.mobile, data]);
-  
-  
-  
-  
+
+
+
+  const handleNewTab = () => {
+    const newTabId = crypto.randomUUID();
+    // Open new tab with the new tabId in URL
+    window.open(`/sales?tabId=${newTabId}`, "_blank");
+  };
+
+
 
   // Trigger balance fetch when selectedMobile changes
   useEffect(() => {
@@ -294,7 +301,7 @@ const CustomerDetails = ({
         </Col>
         <Col xs={12} md={1}>
           <Button
-            onClick={() => window.open("/sales", "_blank")}
+            onClick={handleNewTab}
             style={{
               backgroundColor: '#28a745',
               borderColor: '#28a745',
@@ -305,6 +312,7 @@ const CustomerDetails = ({
             + New
           </Button>
         </Col>
+
 
       </Row>
     </Col>

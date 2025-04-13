@@ -84,110 +84,106 @@ const useProductHandlers = () => {
   //   custom_purity:"",
   // });
 
-  const [formData, setFormData] = useState(() => {
-    const savedData = localStorage.getItem("saleFormData");
-    const customerData = savedData
-      ? JSON.parse(savedData)
-      : {
-          customer_id: "value001",
-          mobile: mobile,
-          account_name: "",
-          email: "",
-          address1: "",
-          address2: "",
-          city: "",
-          pincode: "",
-          state: "",
-          state_code: "",
-          aadhar_card: "",
-          gst_in: "",
-          pan_card: "",
-        };
+  // At the top of your component
+  const getTabId = () => {
+    // First try to get from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let tabId = urlParams.get('tabId');
+    
+    // If not in URL, try sessionStorage
+    if (!tabId) {
+      tabId = sessionStorage.getItem('tabId');
+    }
+    
+    // If still not found, generate new ID
+    if (!tabId) {
+      tabId = crypto.randomUUID();
+      sessionStorage.setItem('tabId', tabId);
+      
+      // Update URL without page reload
+      const newUrl = `${window.location.pathname}?tabId=${tabId}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    return tabId;
+  };
 
-    return {
-      ...customerData,
-      date: "",
-      invoice_number: invoice_number,
-      code: "",
-      product_id: "",
-      metal: "",
-      product_name: "",
-      metal_type: "",
-      design_name: "",
-      purity: "",
-      selling_purity: "",
-      printing_purity: "",
-      pricing: "By Weight",
-      category: "",
-      sub_category: "",
-      gross_weight: "",
-      stone_weight: "",
-      weight_bw: "",
-      stone_price: "",
-      va_on: "Gross Weight",
-      va_percent: "",
-      wastage_weight: "",
-      total_weight_av: "",
-      mc_on: "MC %",
-      disscount_percentage: "",
-      disscount: "",
-      mc_per_gram: "",
-      making_charges: "",
-      rate: "",
-      pieace_cost: "",
-      mrp_price: "",
-      rate_amt: "",
-      tax_percent: "03% GST",
-      tax_amt: "",
-      hm_charges: "60.00",
-      total_price: "",
-      transaction_status: "Sales",
-      qty: "1",
-      opentag_id: "",
-      product_image: null,
-      imagePreview: null,
-      remarks: "",
-      sale_status: "Delivered",
-      piece_taxable_amt: "",
-      terms: "Cash",
-      festival_discount :"",
-    };
+  const tabId = getTabId();
+
+  const getFreshFormData = (mobile) => ({
+    customer_id: "value001",
+    mobile: mobile,
+    account_name: "",
+    email: "",
+    address1: "",
+    address2: "",
+    city: "",
+    pincode: "",
+    state: "",
+    state_code: "",
+    aadhar_card: "",
+    gst_in: "",
+    pan_card: "",
+    terms: "Cash",
+    date: "",
+    invoice_number: invoice_number,
+    code: "",
+    product_id: "",
+    metal: "",
+    product_name: "",
+    metal_type: "",
+    design_name: "",
+    purity: "",
+    selling_purity: "",
+    printing_purity: "",
+    pricing: "By Weight",
+    category: "",
+    sub_category: "",
+    gross_weight: "",
+    stone_weight: "",
+    weight_bw: "",
+    stone_price: "",
+    va_on: "Gross Weight",
+    va_percent: "",
+    wastage_weight: "",
+    total_weight_av: "",
+    mc_on: "MC %",
+    disscount_percentage: "",
+    disscount: "",
+    mc_per_gram: "",
+    making_charges: "",
+    rate: "",
+    pieace_cost: "",
+    mrp_price: "",
+    rate_amt: "",
+    tax_percent: "03% GST",
+    tax_amt: "",
+    hm_charges: "60.00",
+    total_price: "",
+    transaction_status: "Sales",
+    qty: "1",
+    opentag_id: "",
+    product_image: null,
+    imagePreview: null,
+    remarks: "",
+    sale_status: "Delivered",
+    piece_taxable_amt: "",
+    festival_discount: "",
+    custom_purity: ""
+  });
+
+
+  const [formData, setFormData] = useState(() => {
+    const savedData = localStorage.getItem(`saleFormData_${tabId}`);
+    if (savedData) {
+      return JSON.parse(savedData);
+    }
+    return getFreshFormData(mobile);
   });
 
   useEffect(() => {
-    const customerData = {
-      customer_id: formData.customer_id,
-      mobile: formData.mobile,
-      account_name: formData.account_name,
-      email: formData.email,
-      address1: formData.address1,
-      address2: formData.address2,
-      city: formData.city,
-      pincode: formData.pincode,
-      state: formData.state,
-      state_code: formData.state_code,
-      aadhar_card: formData.aadhar_card,
-      gst_in: formData.gst_in,
-      pan_card: formData.pan_card,
-    };
-
-    localStorage.setItem("saleFormData", JSON.stringify(customerData));
-  }, [
-    formData.customer_id,
-    formData.mobile,
-    formData.account_name,
-    formData.email,
-    formData.address1,
-    formData.address2,
-    formData.city,
-    formData.pincode,
-    formData.state,
-    formData.state_code,
-    formData.aadhar_card,
-    formData.gst_in,
-    formData.pan_card,
-  ]);
-
+    localStorage.setItem(`saleFormData_${tabId}`, JSON.stringify(formData));
+  }, [formData, tabId]);
 
   const [uniqueProducts, setUniqueProducts] = useState([]);
   const [metalTypes, setMetalTypes] = useState([]);
@@ -1163,6 +1159,7 @@ const useProductHandlers = () => {
     isBarcodeSelected,
     fetchCategory,
     fetchSubCategory,
+    tabId
   };
 
 };

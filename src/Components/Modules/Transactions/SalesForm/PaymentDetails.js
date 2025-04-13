@@ -37,7 +37,8 @@ const PaymentDetails = ({
   handleFestivalCloseModal,
   appliedOffers,
   setAppliedOffers,
-  festivalDiscountAmt
+  festivalDiscountAmt,
+  tabId
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const location = useLocation();
@@ -45,7 +46,7 @@ const PaymentDetails = ({
 
 
   const handleApply = (selectedOffer, offerIndex) => {
-    const storedRepairDetails = JSON.parse(localStorage.getItem("repairDetails")) || [];
+    const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
     const currentOfferKey = `${selectedOffer._id}_${offerIndex}`;
     const isAlreadyApplied = appliedOffers[currentOfferKey];
 
@@ -79,7 +80,7 @@ const PaymentDetails = ({
     // If already applied, just reset state and exit
     if (isAlreadyApplied) {
       setRepairDetails(updatedRepairDetails);
-      localStorage.setItem("repairDetails", JSON.stringify(updatedRepairDetails));
+      localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedRepairDetails));
       setAppliedOffers({});
       return;
     }
@@ -151,7 +152,7 @@ const PaymentDetails = ({
     });
 
     setRepairDetails(updatedWithNewOffer);
-    localStorage.setItem("repairDetails", JSON.stringify(updatedWithNewOffer));
+    localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedWithNewOffer));
 
     // Set the only applied offer key
     setAppliedOffers({
@@ -159,35 +160,62 @@ const PaymentDetails = ({
     });
   };
 
+useEffect(() => {
+  const storedPaymentDetails = JSON.parse(localStorage.getItem(`paymentDetails_${tabId}`)) || {};
+
+  const cashAmount =
+    location.state?.cash_amount ??
+    storedPaymentDetails.cash_amount ??
+    netPayAmount;
+
+  const cardAmt =
+    location.state?.card_amt ??
+    storedPaymentDetails.card_amt ??
+    0;
+
+  const chqAmt =
+    location.state?.chq_amt ??
+    storedPaymentDetails.chq_amt ??
+    0;
+
+  const onlineAmt =
+    location.state?.online_amt ??
+    storedPaymentDetails.online_amt ??
+    0;
+
+  setPaymentDetails({
+    cash_amount: cashAmount,
+    card_amt: cardAmt,
+    chq_amt: chqAmt,
+    online_amt: onlineAmt,
+  });
+}, [location.state, netPayAmount, tabId]);
 
 
+  // useEffect(() => {
+  //   setPaymentDetails((prev) => ({
+  //     ...prev,
+  //     cash_amount: location.state?.cash_amount ?? netPayAmount,
+  //     card_amt: location.state?.card_amt ?? prev.card_amt,
+  //     chq_amt: location.state?.chq_amt ?? prev.chq_amt,
+  //     online_amt: location.state?.online_amt ?? prev.online_amt,
+  //   }));
+  // }, [location.state, netPayAmount]);
 
   useEffect(() => {
-    // Retrieve payment details from localStorage
-    const storedPaymentDetails = JSON.parse(localStorage.getItem('paymentDetails')) || {};
-
-    setPaymentDetails((prev) => ({
-      ...prev,
-      cash_amount: storedPaymentDetails.cash_amount ?? location.state?.cash_amount ?? netPayAmount,
-      card_amt: storedPaymentDetails.card_amt ?? location.state?.card_amt ?? prev.card_amt,
-      chq_amt: storedPaymentDetails.chq_amt ?? location.state?.chq_amt ?? prev.chq_amt,
-      online_amt: storedPaymentDetails.online_amt ?? location.state?.online_amt ?? prev.online_amt,
-    }));
-  }, [location.state, netPayAmount]);
-
-  useEffect(() => {
-    // Update localStorage whenever netPayAmount changes
-    if (netPayAmount) {
+    // Only update if cash_amount is NOT provided from location.state
+    if (netPayAmount && location.state?.cash_amount === undefined) {
       setPaymentDetails((prev) => {
         const updatedDetails = {
           ...prev,
-          cash_amount: parseFloat(netPayAmount).toFixed(2) // Fix to two decimal places
+          cash_amount: parseFloat(netPayAmount).toFixed(2), // Fixed to two decimal places
         };
-        localStorage.setItem('paymentDetails', JSON.stringify(updatedDetails));
+        localStorage.setItem(`paymentDetails_${tabId}`, JSON.stringify(updatedDetails));
         return updatedDetails;
       });
     }
-  }, [netPayAmount]);
+  }, [netPayAmount, location.state, tabId]);
+  
 
   useEffect(() => {
     // Sum of all payment details
@@ -218,7 +246,7 @@ const PaymentDetails = ({
 
     const updatedDetails = { ...paymentDetails, [field]: newValue };
     setPaymentDetails(updatedDetails);
-    localStorage.setItem('paymentDetails', JSON.stringify(updatedDetails)); // Update localStorage on change
+    localStorage.setItem(`paymentDetails_${tabId}`, JSON.stringify(updatedDetails)); // Update localStorage on change
   };
 
   return (
