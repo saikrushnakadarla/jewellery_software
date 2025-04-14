@@ -27,7 +27,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
       <Table className='dataTable_headerCell1' bordered hover responsive>
         <thead style={{ position: "sticky", top: 0, background: "white", zIndex: 2 }}>
           <tr>
-            {/* <th>Code</th> */}
+            <th>BarCode</th>
             <th>Product Name</th>
             <th>Metal</th>
             {/* <th>Design Name</th> */}
@@ -55,7 +55,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
           {repairDetails.length > 0 ? (
             repairDetails.map((detail, index) => (
               <tr key={index}>
-                {/* <td>{detail.code}</td> */}
+                <td>{detail.code}</td>
                 <td>{detail.product_name}</td>
                 <td>{detail.metal_type}</td>
                 {/* <td>{detail.design_name}</td> */}

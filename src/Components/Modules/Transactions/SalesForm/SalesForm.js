@@ -932,27 +932,43 @@ const SalesForm = () => {
       alert("Please select the Customer or enter the Customer Mobile Number");
       return;
     }
-
+  
     try {
-      // Check if all items have item.id === ""
+      // Fetch tags first (or ensure they're already loaded in `data`)
+      const tagResponse = await fetch(`${baseURL}/get/opening-tags-entry`);
+      const tagResult = await tagResponse.json();
+      const tagData = tagResult.result || [];
+  
+      // Check if any item in repairDetails is already sold
+      const soldItem = repairDetails.find((item) => {
+        const matchedTag = tagData.find(
+          (data) => data.PCode_BarCode === item.code && data.Status === "Sold"
+        );
+        return matchedTag !== undefined;
+      });
+  
+      if (soldItem) {
+        alert(`Item with code "${soldItem.code}" is already sold out.`);
+        return;
+      }
+  
+      // Check if all items are new
       const allItemsAreNew = repairDetails.every(item => item.id === "");
-
+  
       let updatedFormData = { ...formData };
-
+  
       if (allItemsAreNew) {
-        // Fetch the latest invoice number only if all items are new
         const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
         const latestInvoiceNumber = response.data.lastInvoiceNumber;
-
-        // Update formData with latest invoice number
+  
         updatedFormData = {
           ...formData,
           invoice_number: latestInvoiceNumber,
         };
-
-        setFormData(updatedFormData); // Update state if needed
+  
+        setFormData(updatedFormData);
       }
-
+  
       const dataToSave = {
         repairDetails: repairDetails.map(item => ({
           ...item,
@@ -983,12 +999,12 @@ const SalesForm = () => {
         salesNetAmount: salesNetAmount || 0,
         salesTaxableAmount: salesTaxableAmount || 0,
       };
-
+  
       console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-
+  
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Sales added successfully");
-
+  
       const pdfDoc = (
         <PDFLayout
           formData={updatedFormData}
@@ -1008,29 +1024,23 @@ const SalesForm = () => {
           netPayableAmount={netPayableAmount}
         />
       );
-
+  
       const pdfBlob = await pdf(pdfDoc).toBlob();
-
-      // const link = document.createElement("a");
-      // link.href = URL.createObjectURL(pdfBlob);
-      // link.download = `invoice-${updatedFormData.invoice_number}.pdf`;
-      // link.click();
-      // URL.revokeObjectURL(link.href);
-
-
       saveAs(pdfBlob, `${updatedFormData.invoice_number}.pdf`);
       await handleSavePDFToServer(pdfBlob, updatedFormData.invoice_number);
-
+  
       clearData();
       resetForm();
       navigate("/salestable");
       window.location.reload();
       await handleCheckout();
+  
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Error saving data");
     }
   };
+  
 
   const handleSavePDFToServer = async (pdfBlob, invoiceNumber) => {
     const formData = new FormData();
