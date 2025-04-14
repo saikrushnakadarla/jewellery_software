@@ -108,8 +108,12 @@ const useCalculations = (formData, setFormData) => {
       const festivalDiscount = parseFloat(formData.festival_discount) || 0;
       const hmCharges = parseFloat(formData.hm_charges) || 0;
 
-      const taxableAmount = rateAmt + stonePrice + makingCharges + hmCharges - discountAmt - festivalDiscount;
+      const totalDiscount = discountAmt + festivalDiscount;
+
+      const taxableAmount = rateAmt + stonePrice + makingCharges + hmCharges - totalDiscount;
+      console.log("taxableAmount=", taxableAmount)
       const taxAmt = (taxableAmount * taxPercent) / 100;
+      console.log("taxAmt=", taxAmt)
       const totalPrice = taxableAmount + taxAmt;
 
       setFormData((prev) => ({

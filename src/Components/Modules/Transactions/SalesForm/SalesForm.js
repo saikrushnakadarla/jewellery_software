@@ -704,6 +704,7 @@ const SalesForm = () => {
     const itemDiscount = parseFloat(item.disscount) || 0;
     const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
     const itemTax = parseFloat(item.tax_amt) || 0;
+    const itemTaxPercent = parseFloat(item.tax_percent) || 0;
 
     if (pricing === "By Weight") {
       const stonePrice = parseFloat(item.stone_price) || 0;
@@ -713,14 +714,15 @@ const SalesForm = () => {
 
       const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
       totalAmount += itemTotal;
+      
       discountAmt += itemDiscount;
       festivalDiscountAmt += itemFestivalDiscount;
 
       const totalDiscount = itemDiscount + itemFestivalDiscount;
       const itemTaxable = itemTotal - totalDiscount;
-
+      const taxAmt = (itemTaxable * itemTaxPercent) / 100;
       taxableAmount += itemTaxable;
-      taxAmount += itemTax;
+      taxAmount += taxAmt;
       netAmount += itemTaxable + itemTax;
 
     } else {
