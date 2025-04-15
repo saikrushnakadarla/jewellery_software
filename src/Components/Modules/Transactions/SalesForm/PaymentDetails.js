@@ -459,11 +459,11 @@ useEffect(() => {
                       <td>{formatDate(offer.valid_to)}</td>
                       <td>
                         <Button
-                          variant={isApplied ? "secondary" : "success"}
+                          variant={isApplied ? "danger" : "success"}
                           size="sm"
                           onClick={() => handleApply(offer, index)}
                         >
-                          {isApplied ? "Applied" : "Apply"}
+                          {isApplied ? "Unapply" : "Apply"}
                         </Button>
                       </td>
                     </tr>
