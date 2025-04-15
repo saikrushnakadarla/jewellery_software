@@ -295,6 +295,32 @@ const useProductHandlers = () => {
       [name]: value,
     }));
 
+    
+      // Handle category changes
+      if (name === "category") {
+        // Find the first product that matches this category
+        const categoryProduct = products.find(prod => 
+            prod.product_name === value
+        );
+        
+        if (categoryProduct) {
+            updatedFormData = {
+                ...updatedFormData,
+                code: categoryProduct.rbarcode || "",
+                product_id: categoryProduct.product_id || "",
+                metal_type: categoryProduct.Category || ""
+            };
+        } else {
+            // If no product found, clear related fields
+            updatedFormData = {
+                ...updatedFormData,
+                code: "",
+                product_id: "",
+                metal_type: ""
+            };
+        }
+    }
+
     if (name === "selling_purity") {
       if (value === "Manual") {
         // Clear rate if manual mode is selected
@@ -885,22 +911,159 @@ const useProductHandlers = () => {
     fetchPurity();
   }, [formData.metal_type]);
 
-  const handleBarcodeChange = async (code) => {
-    try {
-      if (!code) {
-        // If barcode is cleared, reset all related fields and set code to ""
-        setIsBarcodeSelected(false);  // Reset the barcode selection flag
+const handleBarcodeChange = async (code) => {
+  try {
+    if (!code) {
+      // If barcode is cleared, reset all related fields and set code to ""
+      setIsBarcodeSelected(false);  // Reset the barcode selection flag
+      setFormData((prevData) => ({
+        ...prevData,
+        code: "",  // Reset code when barcode is cleared
+        product_id: "",
+        product_name: "",
+        metal_type: "",
+        design_name: "",
+        purity: "",
+        selling_purity: "",
+        printing_purity: "",
+        // Don't reset pricing here - keep existing value
+        category: "",
+        sub_category: "",
+        gross_weight: "",
+        stone_weight: "",
+        stone_price: "",
+        weight_bw: "",
+        va_on: "Gross Weight",
+        va_percent: "",
+        wastage_weight: "",
+        total_weight_aw: "",
+        mc_on: "MC %",
+        mc_per_gram: "",
+        making_charges: "",
+        disscount_percentage: "",
+        disscount: "",
+        rate: "",
+        pieace_cost: "",
+        mrp_price: "",
+        rate_amt: "",
+        tax_percent: "",
+        tax_amt: "",
+        hm_charges: "60.00",
+        total_price: "",
+        qty: "", // Reset qty
+        remarks: "",
+        sale_status: "Delivered",
+        piece_taxable_amt: "",
+        festival_discount: "",
+        custom_purity: "",
+      }));
+      setIsQtyEditable(true); // Default to editable if barcode is cleared
+      return; // Exit early
+    }
+
+    // Check for product by code
+    const product = products.find((prod) => String(prod.rbarcode) === String(code));
+    if (product) {
+      setIsBarcodeSelected(true);
+
+      // Find the default purity value that includes "22"
+      const defaultPurity = purityOptions.find((option) =>
+        /22/i.test(option.value)
+      )?.value;  // Set the barcode as selected
+      const metalType = product.Category || "";
+      const mcOnValue = metalType.toLowerCase() === "silver" ? "MC / Gram" : "MC %";
+      setFormData((prevData) => ({
+        ...prevData,
+        code: product.rbarcode,  // Retain the selected barcode
+        product_id: product.product_id,
+        product_name: "", // Make editable
+        metal_type: product.Category,
+        design_name: "", // Make editable
+        // purity: defaultPurity || "",
+        // Don't reset pricing here - keep existing value
+        category: product.product_name,
+        sub_category: "",
+        gross_weight: "",
+        stone_weight: "",
+        stone_price: "",
+        weight_bw: "",
+        va_on: "Gross Weight",
+        va_percent: "",
+        wastage_weight: "",
+        total_weight_aw: "",
+        pieace_cost: "",
+        mrp_price: "",
+        mc_on: mcOnValue,
+        mc_per_gram: "",
+        making_charges: "",
+        disscount_percentage: "",
+        disscount: "",
+        tax_percent: product.tax_slab,
+        qty: 1, // Set qty to 1 for product
+        festival_discount: "",
+        custom_purity: "",
+      }));
+      setIsQtyEditable(true); // Set qty as read-only
+    } else {
+      // Check if tag exists by code
+      const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
+      if (tag) {
+        // If the tag is marked as "Sold"
+        if (tag.Status === "Sold" || tag.Status === "Sale Returned") {
+          alert("The product is already sold out!");
+          setFormData((prevData) => ({
+            ...prevData,
+          }));
+          setIsQtyEditable(true); // Allow editing of qty
+          return;
+        }
+
+        const productId = tag.product_id;
+        const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
+
         setFormData((prevData) => ({
           ...prevData,
-          code: "",  // Reset code when barcode is cleared
+          code: tag.PCode_BarCode || "", // Retain the barcode
+          product_id: tag.product_id || "",
+          opentag_id: tag.opentag_id || "",
+          product_name: tag.sub_category || "", // Make editable
+          metal_type: tag.metal_type || "",
+          design_name: tag.design_master || "", // Make editable
+          purity: tag.pur_Purity || "",
+          selling_purity: tag.Purity || "",
+          printing_purity: tag.printing_purity || "",
+          // Use the tag's pricing if available, otherwise keep existing value
+          pricing: tag.Pricing || prevData.pricing || "By Weight",
+          category: tag.category || "",
+          sub_category: tag.sub_category || "",
+          gross_weight: tag.Gross_Weight || "",
+          stone_weight: tag.Stones_Weight || "",
+          stone_price: tag.Stones_Price || "",
+          weight_bw: tag.Weight_BW || "",
+          va_on: tag.Wastage_On || "Gross Weight",
+          va_percent: tag.Wastage_Percentage || "",
+          wastage_weight: tag.WastageWeight || "",
+          total_weight_aw: tag.TotalWeight_AW || "",
+          pieace_cost: tag.pieace_cost || "",
+          mrp_price: tag.mrp_price || "",
+          mc_on: tag.Making_Charges_On || "MC %",
+          mc_per_gram: tag.MC_Per_Gram || "",
+          making_charges: tag.Making_Charges || "",
+          tax_percent: productDetails?.tax_slab || tag.tax_percent || "",
+          qty: 1, // Allow qty to be editable for tag
+        }));
+        setIsQtyEditable(false); // Allow editing of qty
+      } else {
+        // Reset form if no tag is found
+        setFormData((prevData) => ({
+          ...prevData,
+          code: "", // Reset code
           product_id: "",
           product_name: "",
           metal_type: "",
           design_name: "",
           purity: "",
-          selling_purity: "",
-          printing_purity:"",
-          pricing: "By Weight",
+          // Don't reset pricing here - keep existing value
           category: "",
           sub_category: "",
           gross_weight: "",
@@ -927,159 +1090,16 @@ const useProductHandlers = () => {
           qty: "", // Reset qty
           remarks: "",
           sale_status: "Delivered",
-
-          piece_taxable_amt:"",
-          festival_discount :"",
-
-          custom_purity: "",
-
+          piece_taxable_amt: "",
+          festival_discount: "",
         }));
-        setIsQtyEditable(true); // Default to editable if barcode is cleared
-        return; // Exit early
+        setIsQtyEditable(true); // Default to editable
       }
-
-      // Check for product by code
-      const product = products.find((prod) => String(prod.rbarcode) === String(code));
-      if (product) {
-        setIsBarcodeSelected(true);
-
-        // Find the default purity value that includes "22"
-        const defaultPurity = purityOptions.find((option) =>
-          /22/i.test(option.value)
-        )?.value;  // Set the barcode as selected
-        const metalType = product.Category || "";
-        const mcOnValue = metalType.toLowerCase() === "silver" ? "MC / Gram" : "MC %";
-        setFormData((prevData) => ({
-          ...prevData,
-          code: product.rbarcode,  // Retain the selected barcode
-          product_id: product.product_id,
-          product_name: "", // Make editable
-          metal_type: product.Category,
-          design_name: "", // Make editable
-          // purity: defaultPurity || "",
-          pricing: "By Weight",
-          category: product.product_name,
-          sub_category: "",
-          gross_weight: "",
-          stone_weight: "",
-          stone_price: "",
-          weight_bw: "",
-          va_on: "Gross Weight",
-          va_percent: "",
-          wastage_weight: "",
-          total_weight_aw: "",
-          pieace_cost: "",
-          mrp_price: "",
-          mc_on: mcOnValue,
-          mc_per_gram: "",
-          making_charges: "",
-          disscount_percentage: "",
-          disscount: "",
-          tax_percent: product.tax_slab,
-          qty: 1, // Set qty to 1 for product
-
-          festival_discount :"",
-
-          custom_purity: "",
-
-        }));
-        setIsQtyEditable(true); // Set qty as read-only
-      } else {
-        // Check if tag exists by code
-        const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
-        if (tag) {
-          // setIsBarcodeSelected(true);  
-          // If the tag is marked as "Sold"
-          if (tag.Status === "Sold" || tag.Status === "Sale Returned") {
-            alert("The product is already sold out!");
-            setFormData((prevData) => ({
-              ...prevData,
-            }));
-            setIsQtyEditable(true); // Allow editing of qty
-            return;
-          }
-
-          const productId = tag.product_id;
-          const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-
-          setFormData((prevData) => ({
-            ...prevData,
-            code: tag.PCode_BarCode || "", // Retain the barcode
-            product_id: tag.product_id || "",
-            opentag_id: tag.opentag_id || "",
-            product_name: tag.sub_category || "", // Make editable
-            metal_type: tag.metal_type || "",
-            design_name: tag.design_master || "", // Make editable
-            purity: tag.pur_Purity || "",
-            selling_purity: tag.Purity || "",
-            printing_purity: tag.printing_purity || "",
-            pricing: tag.Pricing || "By Weight",
-            category: tag.category || "",
-            sub_category: tag.sub_category || "",
-            gross_weight: tag.Gross_Weight || "",
-            stone_weight: tag.Stones_Weight || "",
-            stone_price: tag.Stones_Price || "",
-            weight_bw: tag.Weight_BW || "",
-            va_on: tag.Wastage_On || "Gross Weight",
-            va_percent: tag.Wastage_Percentage || "",
-            wastage_weight: tag.WastageWeight || "",
-            total_weight_aw: tag.TotalWeight_AW || "",
-            pieace_cost: tag.pieace_cost || "",
-            mrp_price: tag.mrp_price || "",
-            mc_on: tag.Making_Charges_On || "MC %",
-            mc_per_gram: tag.MC_Per_Gram || "",
-            making_charges: tag.Making_Charges || "",
-            tax_percent: productDetails?.tax_slab || tag.tax_percent || "",
-            qty: 1, // Allow qty to be editable for tag
-          }));
-          setIsQtyEditable(false); // Allow editing of qty
-        } else {
-          // Reset form if no tag is found
-          setFormData((prevData) => ({
-            ...prevData,
-            code: "", // Reset code
-            product_id: "",
-            product_name: "",
-            metal_type: "",
-            design_name: "",
-            purity: "",
-            pricing: "By Weight",
-            category: "",
-            sub_category: "",
-            gross_weight: "",
-            stone_weight: "",
-            stone_price: "",
-            weight_bw: "",
-            va_on: "Gross Weight",
-            va_percent: "",
-            wastage_weight: "",
-            total_weight_aw: "",
-            mc_on: "MC %",
-            mc_per_gram: "",
-            making_charges: "",
-            disscount_percentage: "",
-            disscount: "",
-            rate: "",
-            pieace_cost: "",
-            mrp_price: "",
-            rate_amt: "",
-            tax_percent: "",
-            tax_amt: "",
-            hm_charges: "60.00",
-            total_price: "",
-            qty: "", // Reset qty
-            remarks: "",
-            sale_status: "Delivered",
-            piece_taxable_amt:"",
-            festival_discount :"",
-          }));
-          setIsQtyEditable(true); // Default to editable
-        }
-      }
-    } catch (error) {
-      console.error("Error handling code change:", error);
     }
-  };
+  } catch (error) {
+    console.error("Error handling code change:", error);
+  }
+};
 
   // const handleImageChange = (e) => {
   //   const file = e.target.files[0];

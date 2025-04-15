@@ -138,10 +138,17 @@ const ProductDetails = ({
           <InputField
             label="BarCode/Rbarcode"
             name="code"
-            value={formData.code || defaultBarcode} // Default barcode when formData.code is empty
+            value={formData.code || ""}
             onChange={(e) => handleBarcodeChange(e.target.value)}
             type="select"
-            options={barcodeOptions}
+            options={barcodeOptions.filter(option =>
+              // Filter barcodes based on selected category if one is selected
+              !formData.category ||
+              products.some(prod =>
+                prod.rbarcode === option.value &&
+                prod.product_name === formData.category
+              )
+            )}
             autoFocus
           />
         </Col>
@@ -650,7 +657,7 @@ const ProductDetails = ({
                 type='number'
                 value={formData.mc_per_gram || ""}
                 onChange={handleChange}
-                disabled={formData.mc_on === "MC / Piece"} // Disable when MC / Piece is selected
+                readOnly={formData.mc_on === "MC / Piece"} // Only disable when MC / Piece is selected
               />
             </Col>
 
