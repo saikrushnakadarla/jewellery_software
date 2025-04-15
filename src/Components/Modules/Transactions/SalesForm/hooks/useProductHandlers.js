@@ -89,22 +89,22 @@ const useProductHandlers = () => {
     // First try to get from URL
     const urlParams = new URLSearchParams(window.location.search);
     let tabId = urlParams.get('tabId');
-    
+
     // If not in URL, try sessionStorage
     if (!tabId) {
       tabId = sessionStorage.getItem('tabId');
     }
-    
+
     // If still not found, generate new ID
     if (!tabId) {
       tabId = crypto.randomUUID();
       sessionStorage.setItem('tabId', tabId);
-      
+
       // Update URL without page reload
       const newUrl = `${window.location.pathname}?tabId=${tabId}`;
       window.history.replaceState({}, '', newUrl);
     }
-    
+
     return tabId;
   };
 
@@ -203,34 +203,34 @@ const useProductHandlers = () => {
   const webcamRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    let currentRate = "";
+  // useEffect(() => {
+  //   let currentRate = "";
 
-    const isGoldLikeMetal = ["gold", "diamond", "others"].includes(formData.metal_type?.toLowerCase());
+  //   const isGoldLikeMetal = ["gold", "diamond", "others"].includes(formData.metal_type?.toLowerCase());
 
-    if (isGoldLikeMetal) {
-      if (!formData.purity) {
-        currentRate = rates.rate_22crt; // Default to 22-carat rate if purity is empty
-      } else if (formData.purity.includes("24")) {
-        currentRate = rates.rate_24crt;
-      } else if (formData.purity.includes("22")) {
-        currentRate = rates.rate_22crt;
-      } else if (formData.purity.includes("18")) {
-        currentRate = rates.rate_18crt;
-      } else if (formData.purity.includes("16")) {
-        currentRate = rates.rate_16crt;
-      } else {
-        currentRate = rates.rate_22crt; // Default to 22-carat rate if no match
-      }
-    } else if (formData.metal_type?.toLowerCase() === "silver") {
-      currentRate = rates.silver_rate;
-    }
+  //   if (isGoldLikeMetal) {
+  //     if (!formData.purity) {
+  //       currentRate = rates.rate_22crt; // Default to 22-carat rate if purity is empty
+  //     } else if (formData.purity.includes("24")) {
+  //       currentRate = rates.rate_24crt;
+  //     } else if (formData.purity.includes("22")) {
+  //       currentRate = rates.rate_22crt;
+  //     } else if (formData.purity.includes("18")) {
+  //       currentRate = rates.rate_18crt;
+  //     } else if (formData.purity.includes("16")) {
+  //       currentRate = rates.rate_16crt;
+  //     } else {
+  //       currentRate = rates.rate_22crt; // Default to 22-carat rate if no match
+  //     }
+  //   } else if (formData.metal_type?.toLowerCase() === "silver") {
+  //     currentRate = rates.silver_rate;
+  //   }
 
-    setFormData((prevData) => ({
-      ...prevData,
-      rate: currentRate,
-    }));
-  }, [formData.purity, formData.metal_type, rates]);
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     rate: currentRate,
+  //   }));
+  // }, [formData.purity, formData.metal_type, rates]);
 
 
 
@@ -295,58 +295,68 @@ const useProductHandlers = () => {
       [name]: value,
     }));
 
-    
-      // Handle category changes
-      if (name === "category") {
-        // Find the first product that matches this category
-        const categoryProduct = products.find(prod => 
-            prod.product_name === value
-        );
-        
-        if (categoryProduct) {
-            updatedFormData = {
-                ...updatedFormData,
-                code: categoryProduct.rbarcode || "",
-                product_id: categoryProduct.product_id || "",
-                metal_type: categoryProduct.Category || ""
-            };
-        } else {
-            // If no product found, clear related fields
-            updatedFormData = {
-                ...updatedFormData,
-                code: "",
-                product_id: "",
-                metal_type: ""
-            };
-        }
+    // Handle category changes
+    if (name === "category") {
+      // Find the first product that matches this category
+      const categoryProduct = products.find(prod =>
+        prod.product_name === value
+      );
+
+      if (categoryProduct) {
+        updatedFormData = {
+          ...updatedFormData,
+          code: categoryProduct.rbarcode || "",
+          product_id: categoryProduct.product_id || "",
+          metal_type: categoryProduct.Category || ""
+        };
+      } else {
+        // If no product found, clear related fields
+        updatedFormData = {
+          ...updatedFormData,
+          code: "",
+          product_id: "",
+          metal_type: ""
+        };
+      }
     }
 
-    if (name === "selling_purity") {
-      if (value === "Manual") {
-        // Clear rate if manual mode is selected
-        updatedFormData.rate = "";
-      } else if (rates.rate_24crt) {
-        const purityValue = parseFloat(value);
-        if (!isNaN(purityValue)) {
-          const baseRate = parseFloat(rates.rate_24crt);
-          const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
-          updatedFormData.rate = calculatedRate;
-        }
-      }
-    }  
+    // if (name === "selling_purity") {
+    //   if (value === "Manual") {
+    //     // Clear rate if manual mode is selected
+    //     updatedFormData.rate = "";
+    //   } else if (rates.rate_24crt) {
+    //     const purityValue = parseFloat(value);
+    //     if (!isNaN(purityValue)) {
+    //       const baseRate = parseFloat(rates.rate_24crt);
+    //       const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+    //       updatedFormData.rate = calculatedRate;
+    //     }
+    //   }
+    // }
 
-    // Clear the field if "Select Purity" is chosen
-  if (name === "selling_purity" && value === "") {
-    setFormData(prev => ({
-      ...prev,
-      [name]: "",
-      custom_purity: "" // Also clear custom purity if it exists
-    }));
-    return;
-  }
+    // // Clear the field if "Select Purity" is chosen
+    // if (name === "selling_purity" && value === "") {
+    //   setFormData(prev => ({
+    //     ...prev,
+    //     [name]: "",
+    //     custom_purity: "" // Also clear custom purity if it exists
+    //   }));
+    //   return;
+    // }
 
     // Handle selling_purity changes
+    // Handle selling_purity changes
     if (name === "selling_purity") {
+      // Skip if metal_type is silver (case-insensitive)
+      if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
+        setFormData(prev => ({
+          ...prev,
+          [name]: value,
+          rate: rates.silver_rate || "" // Set rate to silver_rate when metal is silver
+        }));
+        return;
+      }
+    
       if (value === "") {
         // Clear when "Select Purity" is chosen
         setFormData(prev => ({
@@ -366,8 +376,8 @@ const useProductHandlers = () => {
           updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
         }
       }
-    }
-
+    }  
+    
     if (name === "product_name") {
       if (value === "") {
         updatedFormData.selling_purity = "";
@@ -383,25 +393,39 @@ const useProductHandlers = () => {
           updatedFormData.purity = selectedSubCategory.purity || "";
           updatedFormData.printing_purity = selectedSubCategory.printing_purity || "";
     
-          // <-- Paste this block here
-          const purityValue = parseFloat(selectedSubCategory.selling_purity);
-          const baseRate = parseFloat(rates?.rate_24crt) || 0;
-          if (!isNaN(purityValue)) {
-            updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
+          // Check if metal is silver first
+          if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
+            updatedFormData.rate = rates.silver_rate || "";
+          } else {
+            const purityValue = parseFloat(selectedSubCategory.selling_purity);
+            const baseRate = parseFloat(rates?.rate_24crt) || 0;
+            if (!isNaN(purityValue)) {
+              updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
+            }
           }
         }
       }
     }
     
     if (name === "custom_purity" && formData.selling_purity === "Manual") {
-      const purityValue = parseFloat(value);
-      const baseRate = parseFloat(rates?.rate_24crt) || 0;
-      if (!isNaN(purityValue)) {
-        const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
-        updatedFormData.rate = calculatedRate;
+      // Check if metal is silver first
+      if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
+        updatedFormData.rate = value === "" ? "" : rates.silver_rate || "";
+      } else {
+        if (value === "") {
+          // Clear rate when custom purity is cleared
+          updatedFormData.rate = "";
+        } else {
+          const purityValue = parseFloat(value);
+          const baseRate = parseFloat(rates?.rate_24crt) || 0;
+          if (!isNaN(purityValue)) {
+            const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+            updatedFormData.rate = calculatedRate;
+          }
+        }
       }
     }
-    
+
 
     if (name === "metal_type") {
       const metal = value.toLowerCase();
@@ -423,7 +447,7 @@ const useProductHandlers = () => {
         design_name: "",
         purity: "",
         selling_purity: "",
-        printing_purity:"",
+        printing_purity: "",
         pricing: "By Weight",
         category: "",
         sub_category: "",
@@ -456,8 +480,8 @@ const useProductHandlers = () => {
         remarks: "",
         sale_status: "Delivered",
 
-        piece_taxable_amt:"",
-        festival_discount :"",
+        piece_taxable_amt: "",
+        festival_discount: "",
 
         custom_purity: "",
 
@@ -560,21 +584,21 @@ const useProductHandlers = () => {
 
     setFormData(updatedFormData);
   };// In your component, add useEffect to handle initial rate calculation
-  
-  useEffect(() => {
-    if (formData.product_name && formData.selling_purity && formData.selling_purity !== "Manual") {
-      const purityValue = parseFloat(formData.selling_purity);
-      if (!isNaN(purityValue) && rates.rate_24crt) {
-        const baseRate = parseFloat(rates.rate_24crt);
-        const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
-        setFormData(prev => ({
-          ...prev,
-          rate: calculatedRate
-        }));
-      }
-    }
-  }, [formData.product_name, formData.selling_purity, rates.rate_24crt]);
-  
+
+  // useEffect(() => {
+  //   if (formData.product_name && formData.selling_purity && formData.selling_purity !== "Manual") {
+  //     const purityValue = parseFloat(formData.selling_purity);
+  //     if (!isNaN(purityValue) && rates.rate_24crt) {
+  //       const baseRate = parseFloat(rates.rate_24crt);
+  //       const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+  //       setFormData(prev => ({
+  //         ...prev,
+  //         rate: calculatedRate
+  //       }));
+  //     }
+  //   }
+  // }, [formData.product_name, formData.selling_purity, rates.rate_24crt]);
+
 
 
 
@@ -605,7 +629,7 @@ const useProductHandlers = () => {
         design_name: "",
         purity: "",
         selling_purity: "",
-        printing_purity:"",
+        printing_purity: "",
         category: "",
         sub_category: "",
         gross_weight: "",
@@ -633,8 +657,8 @@ const useProductHandlers = () => {
         remarks: "",
         sale_status: "Delivered",
 
-        piece_taxable_amt:"",
-        festival_discount :"",
+        piece_taxable_amt: "",
+        festival_discount: "",
 
         custom_purity: "",
 
@@ -692,7 +716,7 @@ const useProductHandlers = () => {
         design_name: designName,
         purity: "",
         selling_purity: "",
-        printing_purity:"",
+        printing_purity: "",
       }));
 
       setFilteredPurityOptions(uniquePurityOptions); // Update purity options based on design
@@ -702,7 +726,7 @@ const useProductHandlers = () => {
         design_name: "",
         purity: "",
         selling_purity: "",
-        printing_purity:"",
+        printing_purity: "",
       }));
 
       setFilteredPurityOptions([]);
@@ -911,158 +935,21 @@ const useProductHandlers = () => {
     fetchPurity();
   }, [formData.metal_type]);
 
-const handleBarcodeChange = async (code) => {
-  try {
-    if (!code) {
-      // If barcode is cleared, reset all related fields and set code to ""
-      setIsBarcodeSelected(false);  // Reset the barcode selection flag
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",  // Reset code when barcode is cleared
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        selling_purity: "",
-        printing_purity: "",
-        // Don't reset pricing here - keep existing value
-        category: "",
-        sub_category: "",
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "Gross Weight",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        mc_on: "MC %",
-        mc_per_gram: "",
-        making_charges: "",
-        disscount_percentage: "",
-        disscount: "",
-        rate: "",
-        pieace_cost: "",
-        mrp_price: "",
-        rate_amt: "",
-        tax_percent: "",
-        tax_amt: "",
-        hm_charges: "60.00",
-        total_price: "",
-        qty: "", // Reset qty
-        remarks: "",
-        sale_status: "Delivered",
-        piece_taxable_amt: "",
-        festival_discount: "",
-        custom_purity: "",
-      }));
-      setIsQtyEditable(true); // Default to editable if barcode is cleared
-      return; // Exit early
-    }
-
-    // Check for product by code
-    const product = products.find((prod) => String(prod.rbarcode) === String(code));
-    if (product) {
-      setIsBarcodeSelected(true);
-
-      // Find the default purity value that includes "22"
-      const defaultPurity = purityOptions.find((option) =>
-        /22/i.test(option.value)
-      )?.value;  // Set the barcode as selected
-      const metalType = product.Category || "";
-      const mcOnValue = metalType.toLowerCase() === "silver" ? "MC / Gram" : "MC %";
-      setFormData((prevData) => ({
-        ...prevData,
-        code: product.rbarcode,  // Retain the selected barcode
-        product_id: product.product_id,
-        product_name: "", // Make editable
-        metal_type: product.Category,
-        design_name: "", // Make editable
-        // purity: defaultPurity || "",
-        // Don't reset pricing here - keep existing value
-        category: product.product_name,
-        sub_category: "",
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "Gross Weight",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        pieace_cost: "",
-        mrp_price: "",
-        mc_on: mcOnValue,
-        mc_per_gram: "",
-        making_charges: "",
-        disscount_percentage: "",
-        disscount: "",
-        tax_percent: product.tax_slab,
-        qty: 1, // Set qty to 1 for product
-        festival_discount: "",
-        custom_purity: "",
-      }));
-      setIsQtyEditable(true); // Set qty as read-only
-    } else {
-      // Check if tag exists by code
-      const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
-      if (tag) {
-        // If the tag is marked as "Sold"
-        if (tag.Status === "Sold" || tag.Status === "Sale Returned") {
-          alert("The product is already sold out!");
-          setFormData((prevData) => ({
-            ...prevData,
-          }));
-          setIsQtyEditable(true); // Allow editing of qty
-          return;
-        }
-
-        const productId = tag.product_id;
-        const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-
+  const handleBarcodeChange = async (code) => {
+    try {
+      if (!code) {
+        // If barcode is cleared, reset all related fields and set code to ""
+        setIsBarcodeSelected(false);  // Reset the barcode selection flag
         setFormData((prevData) => ({
           ...prevData,
-          code: tag.PCode_BarCode || "", // Retain the barcode
-          product_id: tag.product_id || "",
-          opentag_id: tag.opentag_id || "",
-          product_name: tag.sub_category || "", // Make editable
-          metal_type: tag.metal_type || "",
-          design_name: tag.design_master || "", // Make editable
-          purity: tag.pur_Purity || "",
-          selling_purity: tag.Purity || "",
-          printing_purity: tag.printing_purity || "",
-          // Use the tag's pricing if available, otherwise keep existing value
-          pricing: tag.Pricing || prevData.pricing || "By Weight",
-          category: tag.category || "",
-          sub_category: tag.sub_category || "",
-          gross_weight: tag.Gross_Weight || "",
-          stone_weight: tag.Stones_Weight || "",
-          stone_price: tag.Stones_Price || "",
-          weight_bw: tag.Weight_BW || "",
-          va_on: tag.Wastage_On || "Gross Weight",
-          va_percent: tag.Wastage_Percentage || "",
-          wastage_weight: tag.WastageWeight || "",
-          total_weight_aw: tag.TotalWeight_AW || "",
-          pieace_cost: tag.pieace_cost || "",
-          mrp_price: tag.mrp_price || "",
-          mc_on: tag.Making_Charges_On || "MC %",
-          mc_per_gram: tag.MC_Per_Gram || "",
-          making_charges: tag.Making_Charges || "",
-          tax_percent: productDetails?.tax_slab || tag.tax_percent || "",
-          qty: 1, // Allow qty to be editable for tag
-        }));
-        setIsQtyEditable(false); // Allow editing of qty
-      } else {
-        // Reset form if no tag is found
-        setFormData((prevData) => ({
-          ...prevData,
-          code: "", // Reset code
+          code: "",  // Reset code when barcode is cleared
           product_id: "",
           product_name: "",
           metal_type: "",
           design_name: "",
           purity: "",
+          selling_purity: "",
+          printing_purity: "",
           // Don't reset pricing here - keep existing value
           category: "",
           sub_category: "",
@@ -1092,14 +979,151 @@ const handleBarcodeChange = async (code) => {
           sale_status: "Delivered",
           piece_taxable_amt: "",
           festival_discount: "",
+          custom_purity: "",
         }));
-        setIsQtyEditable(true); // Default to editable
+        setIsQtyEditable(true); // Default to editable if barcode is cleared
+        return; // Exit early
       }
+
+      // Check for product by code
+      const product = products.find((prod) => String(prod.rbarcode) === String(code));
+      if (product) {
+        setIsBarcodeSelected(true);
+
+        // Find the default purity value that includes "22"
+        const defaultPurity = purityOptions.find((option) =>
+          /22/i.test(option.value)
+        )?.value;  // Set the barcode as selected
+        const metalType = product.Category || "";
+        const mcOnValue = metalType.toLowerCase() === "silver" ? "MC / Gram" : "MC %";
+        setFormData((prevData) => ({
+          ...prevData,
+          code: product.rbarcode,  // Retain the selected barcode
+          product_id: product.product_id,
+          product_name: "", // Make editable
+          metal_type: product.Category,
+          design_name: "", // Make editable
+          // purity: defaultPurity || "",
+          // Don't reset pricing here - keep existing value
+          category: product.product_name,
+          sub_category: "",
+          gross_weight: "",
+          stone_weight: "",
+          stone_price: "",
+          weight_bw: "",
+          va_on: "Gross Weight",
+          va_percent: "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          pieace_cost: "",
+          mrp_price: "",
+          mc_on: mcOnValue,
+          mc_per_gram: "",
+          making_charges: "",
+          disscount_percentage: "",
+          disscount: "",
+          tax_percent: product.tax_slab,
+          qty: 1, // Set qty to 1 for product
+          festival_discount: "",
+          custom_purity: "",
+        }));
+        setIsQtyEditable(true); // Set qty as read-only
+      } else {
+        // Check if tag exists by code
+        const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
+        if (tag) {
+          // If the tag is marked as "Sold"
+          if (tag.Status === "Sold" || tag.Status === "Sale Returned") {
+            alert("The product is already sold out!");
+            setFormData((prevData) => ({
+              ...prevData,
+            }));
+            setIsQtyEditable(true); // Allow editing of qty
+            return;
+          }
+
+          const productId = tag.product_id;
+          const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
+
+          setFormData((prevData) => ({
+            ...prevData,
+            code: tag.PCode_BarCode || "", // Retain the barcode
+            product_id: tag.product_id || "",
+            opentag_id: tag.opentag_id || "",
+            product_name: tag.sub_category || "", // Make editable
+            metal_type: tag.metal_type || "",
+            design_name: tag.design_master || "", // Make editable
+            purity: tag.pur_Purity || "",
+            selling_purity: tag.Purity || "",
+            printing_purity: tag.printing_purity || "",
+            // Use the tag's pricing if available, otherwise keep existing value
+            pricing: tag.Pricing || prevData.pricing || "By Weight",
+            category: tag.category || "",
+            sub_category: tag.sub_category || "",
+            gross_weight: tag.Gross_Weight || "",
+            stone_weight: tag.Stones_Weight || "",
+            stone_price: tag.Stones_Price || "",
+            weight_bw: tag.Weight_BW || "",
+            va_on: tag.Wastage_On || "Gross Weight",
+            va_percent: tag.Wastage_Percentage || "",
+            wastage_weight: tag.WastageWeight || "",
+            total_weight_aw: tag.TotalWeight_AW || "",
+            pieace_cost: tag.pieace_cost || "",
+            mrp_price: tag.mrp_price || "",
+            mc_on: tag.Making_Charges_On || "MC %",
+            mc_per_gram: tag.MC_Per_Gram || "",
+            making_charges: tag.Making_Charges || "",
+            tax_percent: productDetails?.tax_slab || tag.tax_percent || "",
+            qty: 1, // Allow qty to be editable for tag
+          }));
+          setIsQtyEditable(false); // Allow editing of qty
+        } else {
+          // Reset form if no tag is found
+          setFormData((prevData) => ({
+            ...prevData,
+            code: "", // Reset code
+            product_id: "",
+            product_name: "",
+            metal_type: "",
+            design_name: "",
+            purity: "",
+            // Don't reset pricing here - keep existing value
+            category: "",
+            sub_category: "",
+            gross_weight: "",
+            stone_weight: "",
+            stone_price: "",
+            weight_bw: "",
+            va_on: "Gross Weight",
+            va_percent: "",
+            wastage_weight: "",
+            total_weight_aw: "",
+            mc_on: "MC %",
+            mc_per_gram: "",
+            making_charges: "",
+            disscount_percentage: "",
+            disscount: "",
+            rate: "",
+            pieace_cost: "",
+            mrp_price: "",
+            rate_amt: "",
+            tax_percent: "",
+            tax_amt: "",
+            hm_charges: "60.00",
+            total_price: "",
+            qty: "", // Reset qty
+            remarks: "",
+            sale_status: "Delivered",
+            piece_taxable_amt: "",
+            festival_discount: "",
+          }));
+          setIsQtyEditable(true); // Default to editable
+        }
+      }
+    } catch (error) {
+      console.error("Error handling code change:", error);
     }
-  } catch (error) {
-    console.error("Error handling code change:", error);
-  }
-};
+  };
 
   // const handleImageChange = (e) => {
   //   const file = e.target.files[0];
