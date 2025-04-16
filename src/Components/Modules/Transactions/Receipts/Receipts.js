@@ -492,24 +492,25 @@ const RepairForm = () => {
     navigate(-1); // Go back one step in the browser history
   };
 
-  const handleStatusUpdate = async (id) => {
+  const handleStatusUpdate = async (id, currentStatus) => {
+    const newStatus = currentStatus === "Delivered" ? "Not Delivered" : "Delivered";
+
     try {
       const response = await axios.put(`${baseURL}/update-repair-status/${id}`, {
-        sale_status: "Delivered"
+        sale_status: newStatus
       });
 
       if (response.status === 200) {
-        // Update the UI immediately after success
         const updatedData = repeatedData.map(item =>
-          item.id === id ? { ...item, sale_status: "Delivered" } : item
+          item.id === id ? { ...item, sale_status: newStatus } : item
         );
         setRepeatedData(updatedData);
       }
-
     } catch (error) {
       console.error("Error updating sale_status:", error);
     }
   };
+
 
 
 
@@ -700,12 +701,12 @@ const RepairForm = () => {
                     <td>
                       <button
                         className="btn btn-success btn-sm"
-                        onClick={() => handleStatusUpdate(item.id)}
-                        disabled={item.sale_status === "Delivered"}
+                        onClick={() => handleStatusUpdate(item.id, item.sale_status)}
                       >
-                        {item.sale_status === "Delivered" ? "Delivered" : "Update"}
+                        {item.sale_status === "Delivered" ? "Mark Not Delivered" : "Mark Delivered"}
                       </button>
                     </td>
+
                   </tr>
                 ))
               ) : (

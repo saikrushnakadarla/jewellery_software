@@ -203,34 +203,34 @@ const useProductHandlers = () => {
   const webcamRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // useEffect(() => {
-  //   let currentRate = "";
+  useEffect(() => {
+    let currentRate = "";
 
-  //   const isGoldLikeMetal = ["gold", "diamond", "others"].includes(formData.metal_type?.toLowerCase());
+    const isGoldLikeMetal = ["gold", "diamond", "others"].includes(formData.metal_type?.toLowerCase());
 
-  //   if (isGoldLikeMetal) {
-  //     if (!formData.purity) {
-  //       currentRate = rates.rate_22crt; // Default to 22-carat rate if purity is empty
-  //     } else if (formData.purity.includes("24")) {
-  //       currentRate = rates.rate_24crt;
-  //     } else if (formData.purity.includes("22")) {
-  //       currentRate = rates.rate_22crt;
-  //     } else if (formData.purity.includes("18")) {
-  //       currentRate = rates.rate_18crt;
-  //     } else if (formData.purity.includes("16")) {
-  //       currentRate = rates.rate_16crt;
-  //     } else {
-  //       currentRate = rates.rate_22crt; // Default to 22-carat rate if no match
-  //     }
-  //   } else if (formData.metal_type?.toLowerCase() === "silver") {
-  //     currentRate = rates.silver_rate;
-  //   }
+    if (isGoldLikeMetal) {
+      if (!formData.purity) {
+        currentRate = rates.rate_22crt; // Default to 22-carat rate if purity is empty
+      } else if (formData.purity.includes("24")) {
+        currentRate = rates.rate_24crt;
+      } else if (formData.purity.includes("22")) {
+        currentRate = rates.rate_22crt;
+      } else if (formData.purity.includes("18")) {
+        currentRate = rates.rate_18crt;
+      } else if (formData.purity.includes("16")) {
+        currentRate = rates.rate_16crt;
+      } else {
+        currentRate = rates.rate_22crt; // Default to 22-carat rate if no match
+      }
+    } else if (formData.metal_type?.toLowerCase() === "silver") {
+      currentRate = rates.silver_rate;
+    }
 
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     rate: currentRate,
-  //   }));
-  // }, [formData.purity, formData.metal_type, rates]);
+    setFormData((prevData) => ({
+      ...prevData,
+      rate: currentRate,
+    }));
+  }, [formData.purity, formData.metal_type, rates]);
 
 
 
