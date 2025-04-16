@@ -111,6 +111,7 @@ const ProductDetails = ({
       mc_per_gram: "",
       making_charges: "",
       rate: "",
+      // rate_24k: "",
       pieace_cost: "",
       mrp_price: "",
       rate_amt: "",
@@ -621,6 +622,15 @@ const ProductDetails = ({
                 onChange={handleChange}
               />
             </Col>
+            {/* <Col xs={12} md={1}>
+              <InputField
+                label="24K Rate"
+                name="rate_24k"
+                type='number'
+                value={formData.rate_24k}
+                onChange={handleChange}
+              />
+            </Col> */}
             <Col xs={12} md={1}>
               <InputField
                 label="Amount"

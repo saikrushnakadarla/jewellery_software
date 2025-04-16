@@ -153,7 +153,7 @@ const useProductHandlers = () => {
     mc_per_gram: "",
     making_charges: "",
     rate: "",
-    // rate_24k: "",
+    rate_24k: "",
     pieace_cost: "",
     mrp_price: "",
     rate_amt: "",
@@ -235,6 +235,25 @@ const useProductHandlers = () => {
 
 
 
+  // useEffect(() => {
+  //   const fetchCurrentRates = async () => {
+  //     try {
+  //       const response = await axios.get(`${baseURL}/get/current-rates`);
+  //       setRates({
+  //         rate_24crt: response.data.rate_24crt || "",
+  //         rate_22crt: response.data.rate_22crt || "",
+  //         rate_18crt: response.data.rate_18crt || "",
+  //         rate_16crt: response.data.rate_16crt || "",
+  //         silver_rate: response.data.silver_rate || "",
+  //       });
+  //     } catch (error) {
+  //       console.error('Error fetching current rates:', error);
+  //     }
+  //   };
+
+  //   fetchCurrentRates();
+  // }, []);
+
 useEffect(() => {
   const fetchCurrentRates = async () => {
     try {
@@ -247,15 +266,11 @@ useEffect(() => {
         silver_rate: response.data.silver_rate || "",
       };
       setRates(newRates);
-      
-      // Update form data based on metal type
-      setFormData(prev => {
-        const isSilver = String(prev.metal_type || "").toLowerCase() === "silver";
-        return {
-          ...prev,
-          rate_24k: isSilver ? newRates.silver_rate : newRates.rate_24crt
-        };
-      });
+      // Also update the form data with the 24k rate
+      setFormData(prev => ({
+        ...prev,
+        rate_24k: newRates.rate_24crt
+      }));
     } catch (error) {
       console.error('Error fetching current rates:', error);
     }
@@ -318,11 +333,7 @@ useEffect(() => {
           ...updatedFormData,
           code: categoryProduct.rbarcode || "",
           product_id: categoryProduct.product_id || "",
-          metal_type: categoryProduct.Category || "",
-          selling_purity: "",
-          product_name: "",
-          rate: "",
-          // rate_24k: "",
+          metal_type: categoryProduct.Category || ""
         };
       } else {
         // If no product found, clear related fields
@@ -371,7 +382,7 @@ useEffect(() => {
         }));
         return;
       }
-
+    
       if (value === "") {
         // Clear when "Select Purity" is chosen
         setFormData(prev => ({
@@ -386,13 +397,13 @@ useEffect(() => {
       } else {
         // Calculate rate for purity value
         const purityValue = parseFloat(value);
-        if (!isNaN(purityValue) && formData.rate_24k) {
-          const baseRate = parseFloat(formData.rate_24k);
+        if (!isNaN(purityValue) && rates.rate_24crt) {
+          const baseRate = parseFloat(rates.rate_24crt);
           updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
         }
       }
-    }
-
+    }  
+    
     if (name === "product_name") {
       if (value === "") {
         updatedFormData.selling_purity = "";
@@ -402,18 +413,18 @@ useEffect(() => {
         const selectedSubCategory = subcategoryOptions.find(
           (option) => option.value === value
         );
-
+    
         if (selectedSubCategory) {
           updatedFormData.selling_purity = selectedSubCategory.selling_purity || "";
           updatedFormData.purity = selectedSubCategory.purity || "";
           updatedFormData.printing_purity = selectedSubCategory.printing_purity || "";
-
+    
           // Check if metal is silver first
           if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
             updatedFormData.rate = rates.silver_rate || "";
           } else {
             const purityValue = parseFloat(selectedSubCategory.selling_purity);
-            const baseRate = parseFloat(formData.rate_24k) || 0;
+            const baseRate = parseFloat(rates?.rate_24crt) || 0;
             if (!isNaN(purityValue)) {
               updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
             }
@@ -421,7 +432,7 @@ useEffect(() => {
         }
       }
     }
-
+    
     if (name === "custom_purity" && formData.selling_purity === "Manual") {
       // Check if metal is silver first
       if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
@@ -432,7 +443,7 @@ useEffect(() => {
           updatedFormData.rate = "";
         } else {
           const purityValue = parseFloat(value);
-          const baseRate = parseFloat(formData.rate_24k) || 0;
+          const baseRate = parseFloat(rates?.rate_24crt) || 0;
           if (!isNaN(purityValue)) {
             const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
             updatedFormData.rate = calculatedRate;
@@ -480,7 +491,7 @@ useEffect(() => {
         mc_per_gram: "",
         making_charges: "",
         rate: "",
-        // rate_24k: "",
+        rate_24k: "",
         pieace_cost: "",
         mrp_price: "",
         rate_amt: "",
@@ -599,7 +610,9 @@ useEffect(() => {
     }
 
     setFormData(updatedFormData);
-  };// In your component, add useEffect to handle initial rate calculation
+  };
+  
+  // In your component, add useEffect to handle initial rate calculation
 
   // useEffect(() => {
   //   if (formData.product_name && formData.selling_purity && formData.selling_purity !== "Manual") {
@@ -662,7 +675,7 @@ useEffect(() => {
         disscount_percentage: "",
         disscount: "",
         rate: "",
-        // rate_24k: "",
+        rate_24k: "",
         pieace_cost: "",
         mrp_price: "",
         rate_amt: "",
@@ -984,7 +997,7 @@ useEffect(() => {
           disscount_percentage: "",
           disscount: "",
           rate: "",
-          // rate_24k: "",
+          rate_24k: "",
           pieace_cost: "",
           mrp_price: "",
           rate_amt: "",
@@ -1063,21 +1076,6 @@ useEffect(() => {
           const productId = tag.product_id;
           const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
 
-          // Calculate the rate based on purity and current rates
-         
-          // Calculate the rate based on metal type
-          let rateValue = "";
-          const metalType = String(tag.metal_type || "").toLowerCase();
-          const purity = tag.Purity || tag.pur_Purity || "";
-
-          if (metalType === "silver") {
-            rateValue = rates.silver_rate || "";
-          } else {
-            rateValue = purity && formData.rate_24k
-              ? (parseFloat(purity) * parseFloat(formData.rate_24k)) / 100
-              : "";
-          }
-
           setFormData((prevData) => ({
             ...prevData,
             code: tag.PCode_BarCode || "", // Retain the barcode
@@ -1108,7 +1106,6 @@ useEffect(() => {
             making_charges: tag.Making_Charges || "",
             tax_percent: productDetails?.tax_slab || tag.tax_percent || "",
             qty: 1, // Allow qty to be editable for tag
-            rate: rateValue, // Add the calculated rate
           }));
           setIsQtyEditable(false); // Allow editing of qty
         } else {
@@ -1138,7 +1135,7 @@ useEffect(() => {
             disscount_percentage: "",
             disscount: "",
             rate: "",
-            // rate_24k: "",
+            rate_24k: "",
             pieace_cost: "",
             mrp_price: "",
             rate_amt: "",
