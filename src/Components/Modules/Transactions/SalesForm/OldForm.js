@@ -386,7 +386,10 @@ useEffect(() => {
           <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={2}>
-          <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)' }}>
+          <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)',     marginTop:"4px",
+    padding: "2px 8px",
+    fontSize:  "15px",
+ }}>
             {editingRow !== null ? "Update" : "Add"}
           </Button>
         </Col>
@@ -394,7 +397,7 @@ useEffect(() => {
 
       <Table striped bordered hover className="mt-4">
         <thead>
-          <tr>
+          <tr style={{fontSize:"13px"}}>
             <th>Product</th>
             <th>Metal</th>
             <th>Gross</th>
@@ -445,8 +448,8 @@ useEffect(() => {
       </Table>
 
       <div className="d-flex justify-content-between px-2 mt-2">
-        <h5>Total Amount:</h5>
-        <h5>₹ {calculateTotalSum()}</h5>
+        <h7>Total Amount:</h7>
+        <h7>₹ {calculateTotalSum()}</h7>
       </div>
 
 

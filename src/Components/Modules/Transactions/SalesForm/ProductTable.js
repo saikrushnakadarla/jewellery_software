@@ -23,10 +23,10 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
 
   return (
 
-    <div style={{ maxHeight: "200px", overflowY: "auto", position: "relative" ,height:"85px"}}>
-      <Table className='dataTable_headerCell1' bordered hover responsive style={{height:"80px"}}>
+    <div style={{ maxHeight: "200px", overflowY: "auto", position: "relative" ,height:"125px"}}>
+      <Table className='dataTable_headerCell1' bordered hover responsive style={{height:"116px"}}>
         <thead style={{ position: "sticky", top: 0, background: "white", zIndex: 2, fontSize:"13px" }}>
-          <tr>
+          <tr  >
             <th>BarCode</th>
             <th>Product Name</th>
             <th>Metal</th>
@@ -54,7 +54,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
         <tbody>
           {repairDetails.length > 0 ? (
             repairDetails.map((detail, index) => (
-              <tr key={index}>
+              <tr key={index} className='table-values-sales'>
                 <td>{detail.code}</td>
                 <td>{detail.product_name}</td>
                 <td>{detail.metal_type}</td>

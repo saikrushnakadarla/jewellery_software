@@ -25,7 +25,7 @@ const InputField = ({
       "&:hover": { borderColor: "#A26D2B" },
       minHeight: "40px",
       height: "40px",
-      fontSize: "14px",
+      fontSize: "12px",
     }),
     valueContainer: (provided) => ({
       ...provided,
@@ -85,7 +85,7 @@ const InputField = ({
           />
         ) : type === "file" ? (
           <input
-            className="styled-input file-input"
+            className="styled-input-sales file-input"
             type="file"
             name={name}
             accept="image/*"
@@ -96,7 +96,7 @@ const InputField = ({
           />
         ) : (
           <input
-            className="styled-input"
+            className="styled-input-sales"
             type={type}
             name={name}
             placeholder={placeholder}

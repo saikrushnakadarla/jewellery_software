@@ -297,56 +297,58 @@ const PaymentDetails = ({
             <h4 className="mb-3" style={{fontSize:"20px"}}>Summary</h4>
             {/* <div style={{ maxHeight: "140px", overflowY: "auto" }}> */}
             <Table bordered hover responsive >
-              <tr>
-                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Total Amount</td>
+              <tr style={{fontSize:"13px"}}>
+                <td colSpan="16" className="text-right">Total Amount</td>
                 <td colSpan="4">{totalAmount.toFixed(2)}</td>
               </tr>
-              <tr>
-                <td colSpan="12" className="text-right" style={{fontSize:"13px"}}>Discount Amount</td>
+              <tr style={{fontSize:"13px"}}>
+                <td colSpan="12" className="text-right" >Discount Amount</td>
                 <td colSpan="4">  @
                   <input
                     type="number"
                     value={discount}
                     onChange={handleDiscountChange}
-                    style={{ width: '70px', padding: '2px' }}
+                    style={{ width: '70px', padding: '2px' , fontSize: "13px"}}
                   />
                 </td>
                 <td colSpan="4">
                   {discountAmt.toFixed(2)}
                 </td>
               </tr>
-              <tr>
-                <td colSpan="12" className="text-right" style={{fontSize:"13px"}}>Festival Offer</td>
+              <tr style={{fontSize:"13px"}}>
+                <td colSpan="12" className="text-right" >Festival Offer</td>
                 <td colSpan="4"> &ensp;&ensp;
                   <Button
                     style={{
-                      padding: '1px 6px',
+                      padding: '2px 5px',
                       backgroundColor: '#4CAF50',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
-                      cursor: 'pointer'
+                      cursor: 'pointer',
+                      fontSize: "13px"
                     }}
                     onClick={handleFestivalShowModal}
                   >Apply</Button>
                 </td>
                 <td colSpan="4">{festivalDiscountAmt.toFixed(2)}</td>
               </tr>
-              <tr>
-                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Taxable Amount</td>
+              <tr style={{fontSize:"13px"}}>
+                <td colSpan="16" className="text-right" >Taxable Amount</td>
                 <td colSpan="4">{taxableAmount.toFixed(2)}</td>
               </tr>
-              <tr>
-                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Tax Amount</td>
+              <tr style={{fontSize:"13px"}}>
+                <td colSpan="16" className="text-right" >Tax Amount</td>
                 <td colSpan="4">{taxAmount.toFixed(2)}</td>
               </tr>
-              <tr>
+              <tr style={{fontSize:"13px"}}>
 
-                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Net Amount</td>
+                <td colSpan="16" className="text-right" >Net Amount</td>
                 {/* <td colSpan="4">{netAmount.toFixed(2)}</td> */}
                 <td colSpan="4">
                   <input
                     type="number"
+                    style={{ width: '100px', padding: '5px' , fontSize: "13px"}}
                     value={isManualNetMode ? manualNetAmount : netAmount.toFixed(2)}
                     onChange={(e) => {
                       const newValue = parseFloat(e.target.value) || 0;
@@ -360,20 +362,20 @@ const PaymentDetails = ({
                 <td colSpan="4">{netAmount.toFixed(2)}</td> */}
 
               </tr>
-              <tr>
-                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Old Items Amount</td>
+              <tr style={{fontSize:"13px"}}>
+                <td colSpan="16" className="text-right" >Old Items Amount</td>
                 <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
               </tr>
-              <tr>
-                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Scheme Amount</td>
+              <tr style={{fontSize:"13px"}}>
+                <td colSpan="16" className="text-right" >Scheme Amount</td>
                 <td colSpan="4">{schemeAmount.toFixed(2)}</td>
               </tr>
-              <tr>
-                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Sale Return Amount</td>
+              <tr style={{fontSize:"13px"}}>
+                <td colSpan="16" className="text-right" >Sale Return Amount</td>
                 <td colSpan="4">{salesNetAmount.toFixed(2)}</td>
               </tr>
-              <tr>
-                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Net Payable Amount</td>
+              <tr style={{fontSize:"13px"}}>
+                <td colSpan="16" className="text-right" >Net Payable Amount</td>
                 <td colSpan="4">{Math.round(netPayAmount).toFixed(2)}</td>
               </tr>
             </Table>
@@ -419,7 +421,10 @@ const PaymentDetails = ({
             <Col xs={12} md={3}>
               <Button
                 onClick={handleSave}
-                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' ,     fontSize : "14px",
+                  marginTop: "3px",
+                  padding: "4px 8px"
+              }}
 
               >
                 Save
@@ -429,7 +434,9 @@ const PaymentDetails = ({
               <Button
                 variant="secondary"
                 onClick={handleBack}
-                style={{ backgroundColor: 'gray', marginLeft: '-40px' }}
+                style={{ backgroundColor: 'gray', marginLeft: '-62px', fontSize : "14px",
+                  marginTop: "3px",
+                  padding: "4px 8px" }}
               >
                 Cancel
               </Button>
