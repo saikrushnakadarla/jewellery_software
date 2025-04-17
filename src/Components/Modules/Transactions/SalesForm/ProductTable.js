@@ -23,9 +23,9 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
 
   return (
 
-    <div style={{ maxHeight: "200px", overflowY: "auto", position: "relative" }}>
-      <Table className='dataTable_headerCell1' bordered hover responsive>
-        <thead style={{ position: "sticky", top: 0, background: "white", zIndex: 2 }}>
+    <div style={{ maxHeight: "200px", overflowY: "auto", position: "relative" ,height:"85px"}}>
+      <Table className='dataTable_headerCell1' bordered hover responsive style={{height:"80px"}}>
+        <thead style={{ position: "sticky", top: 0, background: "white", zIndex: 2, fontSize:"13px" }}>
           <tr>
             <th>BarCode</th>
             <th>Product Name</th>

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
-import InputField from "./../../../Pages/InputField/InputField";
+import InputField from "./InputfieldSales";
 import { useLocation } from "react-router-dom";
 
 const InvoiceDetails = ({ formData, setFormData }) => {

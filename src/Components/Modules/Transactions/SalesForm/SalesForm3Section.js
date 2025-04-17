@@ -35,13 +35,13 @@ const SalesFormSection = ({ setOldSalesData,
 
   return (
     <Col className="sales-form-section">
-      <Row>
+      <Row style={{height:"45px"}}>
         <Col xs={12} className="mb-3">
-          <Button
+          <Button 
             style={{
               backgroundColor: activeForm === "old" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "old" ? "rgb(163, 110, 41)" : "gray",
-              color: "white",
+              color: "white", fontSize:'13px', padding:'5px'
             }}
             onClick={() => setActiveForm("old")}
           >
@@ -51,7 +51,7 @@ const SalesFormSection = ({ setOldSalesData,
             style={{
               backgroundColor: activeForm === "schemes" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "schemes" ? "rgb(163, 110, 41)" : "gray",
-              color: "white",
+              color: "white", fontSize:'13px', padding:'5px'
             }}
             onClick={() => setActiveForm("schemes")}
             className="ms-2"
@@ -62,7 +62,7 @@ const SalesFormSection = ({ setOldSalesData,
             style={{
               backgroundColor: activeForm === "sale_return" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "sale_return" ? "rgb(163, 110, 41)" : "gray",
-              color: "white",
+              color: "white", fontSize:'13px', padding:'5px'
             }}
             onClick={() => setActiveForm("sale_return")}
             className="ms-2"
@@ -73,7 +73,7 @@ const SalesFormSection = ({ setOldSalesData,
             style={{
               backgroundColor: activeForm === "orders" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "orders" ? "rgb(163, 110, 41)" : "gray",
-              color: "white",
+              color: "white", fontSize:'13px', padding:'5px'
             }}
             onClick={() => {
               setActiveForm("orders");
@@ -88,7 +88,7 @@ const SalesFormSection = ({ setOldSalesData,
             style={{
               backgroundColor: activeForm === "repairs" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "repairs" ? "rgb(163, 110, 41)" : "gray",
-              color: "white",
+              color: "white", fontSize:'13px', padding:'5px'
             }}
             onClick={() => {
               setActiveForm("repairs");

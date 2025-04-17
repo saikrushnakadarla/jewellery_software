@@ -449,12 +449,12 @@ const SalesForm = () => {
 
   const handleDiscountChange = (e) => {
     const discountValue = parseFloat(e.target.value) || "";
-  
+
     if (discountValue > 15) {
       alert("Discount cannot be greater than 15%");
       return;
     }
-  
+
     setDiscount(discountValue);
     setManualNetAmount(0); // Reset manualNetAmount to exit manual mode
     setIsManualNetMode(false); // Ensure we're in normal discount mode
@@ -827,7 +827,7 @@ const SalesForm = () => {
   // });
 
   const [manualNetAmount, setManualNetAmount] = useState(0);
-  
+
 
   let totalAmount = 0;
   let discountAmt = 0;
@@ -841,9 +841,10 @@ const SalesForm = () => {
 
   // Assuming manualNetAmount is passed or declared earlier
   if (isManualNetMode && typeof manualNetAmount !== "undefined" && manualNetAmount > 0) {
-    // Step 1: calculate totalAmount and totalMakingCharges
-    let totalPieceCost = 0; // New variable for piece-based items
-    
+    // Step 1: Calculate totalAmount, totalMakingCharges, and totalPieceCost
+    let totalPieceCost = 0;
+    let hasWeightBasedItems = false; // Track if any items are "By Weight"
+
     repairDetails.forEach((item) => {
       const pricing = item.pricing;
       if (pricing === "By Weight") {
@@ -853,16 +854,17 @@ const SalesForm = () => {
         const hmCharges = parseFloat(item.hm_charges) || 0;
         totalAmount += stonePrice + makingCharges + rateAmt + hmCharges;
         totalMakingCharges += makingCharges;
+        hasWeightBasedItems = true; // Mark that weight-based items exist
       } else {
         const pieceCost = parseFloat(item.pieace_cost) || 0;
         const qty = parseFloat(item.qty) || 0;
         const itemTotal = pieceCost * qty;
         totalAmount += itemTotal;
-        totalPieceCost += itemTotal; // Accumulate piece costs
+        totalPieceCost += itemTotal;
       }
     });
 
-    // Step 2: Reverse calculation for each item
+    // Step 2: Reverse calculation for taxable amount and tax
     let cumulativeTaxable = 0;
     let cumulativeTax = 0;
 
@@ -896,20 +898,22 @@ const SalesForm = () => {
     taxAmount = cumulativeTax;
     netAmount = manualNetAmount;
 
-    // Step 3: Calculate discount
+    // Step 3: Calculate discount amount
     discountAmt = totalAmount - taxableAmount;
 
-    // Step 4: Calculate discount percent based on pricing type
-    const discountBase = totalMakingCharges > 0 ? totalMakingCharges : totalPieceCost;
-    discountPercent = discountBase ? (discountAmt * 100) / discountBase : "";
+    // Step 4: Calculate discount percentage
+    // Use making charges if any weight-based items exist, otherwise use piece cost
+    const discountBase = hasWeightBasedItems ? totalMakingCharges : totalPieceCost;
+    discountPercent = discountBase ? (discountAmt * 100) / discountBase : 0;
     const roundedDiscount = parseFloat(discountPercent.toFixed(2));
 
+    // Apply discount if changed
     if (roundedDiscount !== discount) {
       setDiscount(roundedDiscount);
       localStorage.setItem("discount", roundedDiscount.toString());
       applyDiscountToRepairDetails(roundedDiscount);
     }
-} else {
+  } else {
     // Default FORWARD calculation
     repairDetails.forEach((item) => {
       const pricing = item.pricing;
@@ -1431,7 +1435,7 @@ const SalesForm = () => {
               />
             </div>
           </div>
-          <div className="sales-form-section" style={{ marginTop: '-20px' }}>
+          <div className="sales-form-section" style={{ marginTop: '-20px', marginBottom: "5px" }}>
             <ProductDetails
               formData={formData}
               setFormData={setFormData}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, Button, Dropdown, DropdownButton, Modal, Form } from 'react-bootstrap';
-import InputField from './../../../Pages/InputField/InputField';
+import InputField from './InputfieldSales';
 import axios from 'axios';
 import { AiOutlinePlus } from "react-icons/ai";
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -894,7 +894,7 @@ const ProductDetails = ({
             onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
             style={{
               backgroundColor: isEditing ? "#a36e29" : "#a36e29",
-              borderColor: isEditing ? "#a36e29" : "#a36e29",
+              borderColor: isEditing ? "#a36e29" : "#a36e29", padding: "2px 6px", marginTop:"5px", marginLeft:"-1px"
             }}
           >
             {isEditing ? "Update" : "Add"}
@@ -905,7 +905,9 @@ const ProductDetails = ({
             variant="secondary"
             // onClick={refreshSalesData}
             onClick={handleClear}
-            style={{ backgroundColor: 'gray', marginLeft: '-30px' }}
+            style={{ backgroundColor: 'gray', marginLeft: '-30px', padding: "4px 7px",
+              fontSize: "13px",
+              marginTop: "5px", marginLeft:"-68px" }}
           >
             Clear
           </Button>
