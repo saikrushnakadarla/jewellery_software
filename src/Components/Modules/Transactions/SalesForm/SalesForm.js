@@ -837,16 +837,15 @@ const SalesForm = () => {
   let netAmount = 0;
   let discountPercent = 0;
 
-  let totalMakingCharges = 0; // Define this to calculate discountPercent properly
+  let totalMakingCharges = 0;
+  let totalPieceCost = 0;
+  let hasWeightBasedItems = false;
 
-  // Assuming manualNetAmount is passed or declared earlier
   if (isManualNetMode && typeof manualNetAmount !== "undefined" && manualNetAmount > 0) {
-    // Step 1: Calculate totalAmount, totalMakingCharges, and totalPieceCost
-    let totalPieceCost = 0;
-    let hasWeightBasedItems = false; // Track if any items are "By Weight"
-
+    // Step 1: Compute totalAmount, makingCharges, pieceCost
     repairDetails.forEach((item) => {
       const pricing = item.pricing;
+
       if (pricing === "By Weight") {
         const stonePrice = parseFloat(item.stone_price) || 0;
         const makingCharges = parseFloat(item.making_charges) || 0;
@@ -854,7 +853,7 @@ const SalesForm = () => {
         const hmCharges = parseFloat(item.hm_charges) || 0;
         totalAmount += stonePrice + makingCharges + rateAmt + hmCharges;
         totalMakingCharges += makingCharges;
-        hasWeightBasedItems = true; // Mark that weight-based items exist
+        hasWeightBasedItems = true;
       } else {
         const pieceCost = parseFloat(item.pieace_cost) || 0;
         const qty = parseFloat(item.qty) || 0;
@@ -864,7 +863,7 @@ const SalesForm = () => {
       }
     });
 
-    // Step 2: Reverse calculation for taxable amount and tax
+    // Step 2: Reverse tax and discount calculation from netAmount
     let cumulativeTaxable = 0;
     let cumulativeTax = 0;
 
@@ -898,70 +897,65 @@ const SalesForm = () => {
     taxAmount = cumulativeTax;
     netAmount = manualNetAmount;
 
-    // Step 3: Calculate discount amount
     discountAmt = totalAmount - taxableAmount;
 
-    // Step 4: Calculate discount percentage
-    // Use making charges if any weight-based items exist, otherwise use piece cost
-    const discountBase = hasWeightBasedItems ? totalMakingCharges : totalPieceCost;
+    const discountBase = totalMakingCharges + totalPieceCost;
     discountPercent = discountBase ? (discountAmt * 100) / discountBase : 0;
+
+
     const roundedDiscount = parseFloat(discountPercent.toFixed(2));
 
-    // Apply discount if changed
     if (roundedDiscount !== discount) {
       setDiscount(roundedDiscount);
       localStorage.setItem("discount", roundedDiscount.toString());
       applyDiscountToRepairDetails(roundedDiscount);
     }
+
   } else {
-    // Default FORWARD calculation
+    // FORWARD CALCULATION
     repairDetails.forEach((item) => {
       const pricing = item.pricing;
       const itemDiscount = parseFloat(item.disscount) || 0;
       const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
-      const itemTax = parseFloat(item.tax_amt) || 0;
       const itemTaxPercent = parseFloat(item.tax_percent) || 0;
 
+      let itemTotal = 0;
       if (pricing === "By Weight") {
         const stonePrice = parseFloat(item.stone_price) || 0;
         const makingCharges = parseFloat(item.making_charges) || 0;
         const rateAmt = parseFloat(item.rate_amt) || 0;
         const hmCharges = parseFloat(item.hm_charges) || 0;
 
-        const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
+        itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
         totalAmount += itemTotal;
         totalMakingCharges += makingCharges;
-
-        discountAmt += itemDiscount;
-        festivalDiscountAmt += itemFestivalDiscount;
-
-        const totalDiscount = itemDiscount + itemFestivalDiscount;
-        const itemTaxable = itemTotal - totalDiscount;
-        const taxAmt = (itemTaxable * itemTaxPercent) / 100;
-
-        taxableAmount += itemTaxable;
-        taxAmount += taxAmt;
-        netAmount += itemTaxable + taxAmt;
-
+        hasWeightBasedItems = true;
       } else {
         const pieceCost = parseFloat(item.pieace_cost) || 0;
         const qty = parseFloat(item.qty) || 0;
 
-        const itemTotal = pieceCost * qty;
+        itemTotal = pieceCost * qty;
         totalAmount += itemTotal;
-
-        discountAmt += itemDiscount;
-        festivalDiscountAmt += itemFestivalDiscount;
-
-        const totalDiscount = itemDiscount + itemFestivalDiscount;
-        const itemTaxable = itemTotal - totalDiscount;
-
-        taxableAmount += itemTaxable;
-        taxAmount += itemTax;
-        netAmount += itemTaxable + itemTax;
+        totalPieceCost += itemTotal;
       }
+
+      const totalDiscount = itemDiscount + itemFestivalDiscount;
+      const itemTaxable = itemTotal - totalDiscount;
+      const taxAmt = (itemTaxable * itemTaxPercent) / 100;
+
+      discountAmt += itemDiscount;
+      festivalDiscountAmt += itemFestivalDiscount;
+
+      taxableAmount += itemTaxable;
+      taxAmount += taxAmt;
+      netAmount += itemTaxable + taxAmt;
     });
+
+    const discountBase = totalMakingCharges + totalPieceCost;
+    discountPercent = discountBase ? (discountAmt * 100) / discountBase : 0;
+
   }
+
 
 
   const handleManualNetAmountChange = (value) => {
