@@ -301,17 +301,86 @@ const SalesForm = () => {
   useEffect(() => {
     localStorage.setItem("discount", discount); // Save to localStorage when discount changes
   }, [discount]);
+  const [isManualNetMode, setIsManualNetMode] = useState(false);
 
-  const handleDiscountChange = (e) => {
-    const discountValue = parseFloat(e.target.value) || ""; // Default to empty if invalid
+  // const handleDiscountChange = (e) => {
+  //   const discountValue = parseFloat(e.target.value) || ""; // Default to empty if invalid
 
-    if (discountValue > 15) {
-      alert("Discount cannot be greater than 15%");
-      return;
-    }
+  //   if (discountValue > 15) {
+  //     alert("Discount cannot be greater than 15%");
+  //     return;
+  //   }
 
-    setDiscount(discountValue);
+  //   setDiscount(discountValue);
 
+  //   const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
+
+  //   const updatedRepairDetails = storedRepairDetails.map((item) => {
+  //     const makingCharges = parseFloat(item.making_charges) || 0;
+  //     const pieceCost = parseFloat(item.pieace_cost) || 0;
+  //     const qty = parseFloat(item.qty) || 1;
+  //     const taxPercent = parseFloat(item.tax_percent) || 1;
+  //     const piece_taxable_amt = parseFloat(item.piece_taxable_amt) || 0;
+  //     const rateAmt = parseFloat(item.rate_amt) || 0;
+  //     const stonePrice = parseFloat(item.stone_price) || 0;
+  //     const discountAmt = parseFloat(item.disscount) || 0;
+  //     const hmCharges = parseFloat(item.hm_charges) || 0;
+  //     const pricingType = item.pricing;
+  //     const festivalDiscount = parseFloat(item.festival_discount) || 0;
+
+
+  //     let calculatedDiscount = 0;
+
+  //     if (pricingType === "By fixed") {
+  //       const pieceTaxableAmt = pieceCost * qty;
+  //       calculatedDiscount = (pieceTaxableAmt * discountValue) / 100;
+
+  //       const originalPieceTaxableAmt = item.original_piece_taxable_amt
+  //         ? parseFloat(item.original_piece_taxable_amt)
+  //         : pieceTaxableAmt;
+
+  //       const updatedPieceTaxableAmt = originalPieceTaxableAmt - calculatedDiscount - festivalDiscount;
+  //       const taxAmt = (taxPercent * updatedPieceTaxableAmt) / 100;
+  //       const totalPrice = updatedPieceTaxableAmt + taxAmt;
+
+  //       return {
+  //         ...item,
+  //         original_piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
+  //         disscount: calculatedDiscount.toFixed(2),
+  //         disscount_percentage: discountValue,
+  //         piece_taxable_amt: updatedPieceTaxableAmt.toFixed(2),
+  //         tax_amt: taxAmt.toFixed(2),
+  //         total_price: totalPrice.toFixed(2),
+  //       };
+  //     } else {
+  //       calculatedDiscount = (makingCharges * discountValue) / 100;
+
+  //       const previousTotalPrice = parseFloat(item.total_price) || 0;
+  //       const originalTotalPrice = item.original_total_price
+  //         ? parseFloat(item.original_total_price)
+  //         : previousTotalPrice;
+
+  //       // Tax calculation
+  //       const totalBeforeTax = rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount - festivalDiscount;
+  //       const taxAmt = (totalBeforeTax * taxPercent) / 100;
+  //       const updatedTotalPrice = totalBeforeTax + taxAmt;
+
+  //       return {
+  //         ...item,
+  //         original_total_price: originalTotalPrice.toFixed(2),
+  //         disscount: calculatedDiscount.toFixed(2),
+  //         disscount_percentage: discountValue,
+  //         tax_amt: taxAmt.toFixed(2),
+  //         total_price: updatedTotalPrice.toFixed(2),
+  //       };
+  //     }
+  //   });
+
+  //   setRepairDetails(updatedRepairDetails);
+  //   localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedRepairDetails));
+  // };
+
+  const applyDiscountToRepairDetails = (discountValue) => {
     const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
 
     const updatedRepairDetails = storedRepairDetails.map((item) => {
@@ -326,7 +395,6 @@ const SalesForm = () => {
       const hmCharges = parseFloat(item.hm_charges) || 0;
       const pricingType = item.pricing;
       const festivalDiscount = parseFloat(item.festival_discount) || 0;
-
 
       let calculatedDiscount = 0;
 
@@ -359,7 +427,6 @@ const SalesForm = () => {
           ? parseFloat(item.original_total_price)
           : previousTotalPrice;
 
-        // Tax calculation
         const totalBeforeTax = rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount - festivalDiscount;
         const taxAmt = (totalBeforeTax * taxPercent) / 100;
         const updatedTotalPrice = totalBeforeTax + taxAmt;
@@ -378,6 +445,22 @@ const SalesForm = () => {
     setRepairDetails(updatedRepairDetails);
     localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedRepairDetails));
   };
+
+
+  const handleDiscountChange = (e) => {
+    const discountValue = parseFloat(e.target.value) || "";
+  
+    if (discountValue > 15) {
+      alert("Discount cannot be greater than 15%");
+      return;
+    }
+  
+    setDiscount(discountValue);
+    setManualNetAmount(0); // Reset manualNetAmount to exit manual mode
+    setIsManualNetMode(false); // Ensure we're in normal discount mode
+    applyDiscountToRepairDetails(discountValue); // Recalculate with new discount
+  };
+
 
   const [festivalShowModal, festivalSetShowModal] = useState(false);
   const [offers, setOffers] = useState([]);
@@ -690,62 +773,197 @@ const SalesForm = () => {
     navigate("/customermaster", { state: { from: "/sales" } });
   };
 
+  // let totalAmount = 0;
+  // let discountAmt = 0;
+  // let festivalDiscountAmt = 0;
+  // let taxableAmount = 0;
+  // let taxAmount = 0;
+  // let netAmount = 0;
+
+  // repairDetails.forEach((item) => {
+  //   const pricing = item.pricing;
+
+  //   // Parse common discounts
+  //   const itemDiscount = parseFloat(item.disscount) || 0;
+  //   const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
+  //   const itemTax = parseFloat(item.tax_amt) || 0;
+  //   const itemTaxPercent = parseFloat(item.tax_percent) || 0;
+
+  //   if (pricing === "By Weight") {
+  //     const stonePrice = parseFloat(item.stone_price) || 0;
+  //     const makingCharges = parseFloat(item.making_charges) || 0;
+  //     const rateAmt = parseFloat(item.rate_amt) || 0;
+  //     const hmCharges = parseFloat(item.hm_charges) || 0;
+
+  //     const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
+  //     totalAmount += itemTotal;
+
+  //     discountAmt += itemDiscount;
+  //     festivalDiscountAmt += itemFestivalDiscount;
+
+  //     const totalDiscount = itemDiscount + itemFestivalDiscount;
+  //     const itemTaxable = itemTotal - totalDiscount;
+  //     const taxAmt = (itemTaxable * itemTaxPercent) / 100;
+  //     taxableAmount += itemTaxable;
+  //     taxAmount += taxAmt;
+  //     netAmount += itemTaxable + itemTax;
+
+  //   } else {
+  //     const pieceCost = parseFloat(item.pieace_cost) || 0;
+  //     const qty = parseFloat(item.qty) || 0;
+
+  //     const itemTotal = pieceCost * qty;
+  //     totalAmount += itemTotal;
+  //     discountAmt += itemDiscount;
+  //     festivalDiscountAmt += itemFestivalDiscount;
+
+  //     const totalDiscount = itemDiscount + itemFestivalDiscount;
+  //     const itemTaxable = itemTotal - totalDiscount;
+
+  //     taxableAmount += itemTaxable;
+  //     taxAmount += itemTax;
+  //     netAmount += itemTaxable + itemTax;
+  //   }
+  // });
+
+  const [manualNetAmount, setManualNetAmount] = useState(0);
+  
+
   let totalAmount = 0;
   let discountAmt = 0;
   let festivalDiscountAmt = 0;
   let taxableAmount = 0;
   let taxAmount = 0;
   let netAmount = 0;
+  let discountPercent = 0;
 
-  repairDetails.forEach((item) => {
-    const pricing = item.pricing;
+  let totalMakingCharges = 0; // Define this to calculate discountPercent properly
 
-    // Parse common discounts
-    const itemDiscount = parseFloat(item.disscount) || 0;
-    const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
-    const itemTax = parseFloat(item.tax_amt) || 0;
-    const itemTaxPercent = parseFloat(item.tax_percent) || 0;
+  // Assuming manualNetAmount is passed or declared earlier
+  if (isManualNetMode && typeof manualNetAmount !== "undefined" && manualNetAmount > 0) {
+    // Step 1: calculate totalAmount and totalMakingCharges
+    let totalPieceCost = 0; // New variable for piece-based items
+    
+    repairDetails.forEach((item) => {
+      const pricing = item.pricing;
+      if (pricing === "By Weight") {
+        const stonePrice = parseFloat(item.stone_price) || 0;
+        const makingCharges = parseFloat(item.making_charges) || 0;
+        const rateAmt = parseFloat(item.rate_amt) || 0;
+        const hmCharges = parseFloat(item.hm_charges) || 0;
+        totalAmount += stonePrice + makingCharges + rateAmt + hmCharges;
+        totalMakingCharges += makingCharges;
+      } else {
+        const pieceCost = parseFloat(item.pieace_cost) || 0;
+        const qty = parseFloat(item.qty) || 0;
+        const itemTotal = pieceCost * qty;
+        totalAmount += itemTotal;
+        totalPieceCost += itemTotal; // Accumulate piece costs
+      }
+    });
 
-    if (pricing === "By Weight") {
-      const stonePrice = parseFloat(item.stone_price) || 0;
-      const makingCharges = parseFloat(item.making_charges) || 0;
-      const rateAmt = parseFloat(item.rate_amt) || 0;
-      const hmCharges = parseFloat(item.hm_charges) || 0;
+    // Step 2: Reverse calculation for each item
+    let cumulativeTaxable = 0;
+    let cumulativeTax = 0;
 
-      const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
-      totalAmount += itemTotal;
-      
-      discountAmt += itemDiscount;
-      festivalDiscountAmt += itemFestivalDiscount;
+    repairDetails.forEach((item) => {
+      const pricing = item.pricing;
+      const itemTaxPercent = parseFloat(item.tax_percent) || 0;
 
-      const totalDiscount = itemDiscount + itemFestivalDiscount;
-      const itemTaxable = itemTotal - totalDiscount;
-      const taxAmt = (itemTaxable * itemTaxPercent) / 100;
-      taxableAmount += itemTaxable;
-      taxAmount += taxAmt;
-      netAmount += itemTaxable + itemTax;
+      let itemTotal = 0;
+      if (pricing === "By Weight") {
+        const stonePrice = parseFloat(item.stone_price) || 0;
+        const makingCharges = parseFloat(item.making_charges) || 0;
+        const rateAmt = parseFloat(item.rate_amt) || 0;
+        const hmCharges = parseFloat(item.hm_charges) || 0;
+        itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
+      } else {
+        const pieceCost = parseFloat(item.pieace_cost) || 0;
+        const qty = parseFloat(item.qty) || 0;
+        itemTotal = pieceCost * qty;
+      }
 
-    } else {
-      const pieceCost = parseFloat(item.pieace_cost) || 0;
-      const qty = parseFloat(item.qty) || 0;
+      const itemShare = itemTotal / totalAmount;
+      const itemNet = manualNetAmount * itemShare;
+      const itemTaxable = itemNet / (1 + itemTaxPercent / 100);
+      const itemTax = itemNet - itemTaxable;
 
-      const itemTotal = pieceCost * qty;
-      totalAmount += itemTotal;
-      discountAmt += itemDiscount;
-      festivalDiscountAmt += itemFestivalDiscount;
+      cumulativeTaxable += itemTaxable;
+      cumulativeTax += itemTax;
+    });
 
-      const totalDiscount = itemDiscount + itemFestivalDiscount;
-      const itemTaxable = itemTotal - totalDiscount;
+    taxableAmount = cumulativeTaxable;
+    taxAmount = cumulativeTax;
+    netAmount = manualNetAmount;
 
-      taxableAmount += itemTaxable;
-      taxAmount += itemTax;
-      netAmount += itemTaxable + itemTax;
+    // Step 3: Calculate discount
+    discountAmt = totalAmount - taxableAmount;
+
+    // Step 4: Calculate discount percent based on pricing type
+    const discountBase = totalMakingCharges > 0 ? totalMakingCharges : totalPieceCost;
+    discountPercent = discountBase ? (discountAmt * 100) / discountBase : "";
+    const roundedDiscount = parseFloat(discountPercent.toFixed(2));
+
+    if (roundedDiscount !== discount) {
+      setDiscount(roundedDiscount);
+      localStorage.setItem("discount", roundedDiscount.toString());
+      applyDiscountToRepairDetails(roundedDiscount);
     }
-  });
+} else {
+    // Default FORWARD calculation
+    repairDetails.forEach((item) => {
+      const pricing = item.pricing;
+      const itemDiscount = parseFloat(item.disscount) || 0;
+      const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
+      const itemTax = parseFloat(item.tax_amt) || 0;
+      const itemTaxPercent = parseFloat(item.tax_percent) || 0;
+
+      if (pricing === "By Weight") {
+        const stonePrice = parseFloat(item.stone_price) || 0;
+        const makingCharges = parseFloat(item.making_charges) || 0;
+        const rateAmt = parseFloat(item.rate_amt) || 0;
+        const hmCharges = parseFloat(item.hm_charges) || 0;
+
+        const itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
+        totalAmount += itemTotal;
+        totalMakingCharges += makingCharges;
+
+        discountAmt += itemDiscount;
+        festivalDiscountAmt += itemFestivalDiscount;
+
+        const totalDiscount = itemDiscount + itemFestivalDiscount;
+        const itemTaxable = itemTotal - totalDiscount;
+        const taxAmt = (itemTaxable * itemTaxPercent) / 100;
+
+        taxableAmount += itemTaxable;
+        taxAmount += taxAmt;
+        netAmount += itemTaxable + taxAmt;
+
+      } else {
+        const pieceCost = parseFloat(item.pieace_cost) || 0;
+        const qty = parseFloat(item.qty) || 0;
+
+        const itemTotal = pieceCost * qty;
+        totalAmount += itemTotal;
+
+        discountAmt += itemDiscount;
+        festivalDiscountAmt += itemFestivalDiscount;
+
+        const totalDiscount = itemDiscount + itemFestivalDiscount;
+        const itemTaxable = itemTotal - totalDiscount;
+
+        taxableAmount += itemTaxable;
+        taxAmount += itemTax;
+        netAmount += itemTaxable + itemTax;
+      }
+    });
+  }
 
 
-
-
+  const handleManualNetAmountChange = (value) => {
+    setManualNetAmount(value);
+    setIsManualNetMode(true); // Enter manual net amount mode
+  };
 
   const oldItemsAmount = location.state?.old_exchange_amt
     ? parseFloat(location.state.old_exchange_amt)
@@ -932,13 +1150,13 @@ const SalesForm = () => {
       alert("Please select the Customer or enter the Customer Mobile Number");
       return;
     }
-  
+
     try {
       // Fetch tags first (or ensure they're already loaded in `data`)
       const tagResponse = await fetch(`${baseURL}/get/opening-tags-entry`);
       const tagResult = await tagResponse.json();
       const tagData = tagResult.result || [];
-  
+
       // Check if any item in repairDetails is already sold
       const soldItem = repairDetails.find((item) => {
         const matchedTag = tagData.find(
@@ -946,29 +1164,29 @@ const SalesForm = () => {
         );
         return matchedTag !== undefined;
       });
-  
+
       if (soldItem) {
         alert(`Item with code "${soldItem.code}" is already sold out.`);
         return;
       }
-  
+
       // Check if all items are new
       const allItemsAreNew = repairDetails.every(item => item.id === "");
-  
+
       let updatedFormData = { ...formData };
-  
+
       if (allItemsAreNew) {
         const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
         const latestInvoiceNumber = response.data.lastInvoiceNumber;
-  
+
         updatedFormData = {
           ...formData,
           invoice_number: latestInvoiceNumber,
         };
-  
+
         setFormData(updatedFormData);
       }
-  
+
       const dataToSave = {
         repairDetails: repairDetails.map(item => ({
           ...item,
@@ -999,12 +1217,12 @@ const SalesForm = () => {
         salesNetAmount: salesNetAmount || 0,
         salesTaxableAmount: salesTaxableAmount || 0,
       };
-  
+
       console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-  
+
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Sales added successfully");
-  
+
       const pdfDoc = (
         <PDFLayout
           formData={updatedFormData}
@@ -1024,23 +1242,23 @@ const SalesForm = () => {
           netPayableAmount={netPayableAmount}
         />
       );
-  
+
       const pdfBlob = await pdf(pdfDoc).toBlob();
       saveAs(pdfBlob, `${updatedFormData.invoice_number}.pdf`);
       await handleSavePDFToServer(pdfBlob, updatedFormData.invoice_number);
-  
+
       clearData();
       resetForm();
       navigate("/salestable");
       window.location.reload();
       await handleCheckout();
-  
+
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Error saving data");
     }
   };
-  
+
 
   const handleSavePDFToServer = async (pdfBlob, invoiceNumber) => {
     const formData = new FormData();
@@ -1333,6 +1551,11 @@ const SalesForm = () => {
                 setAppliedOffers={setAppliedOffers}
                 festivalDiscountAmt={festivalDiscountAmt}
                 tabId={tabId}
+                manualNetAmount={manualNetAmount}
+                setManualNetAmount={setManualNetAmount}
+                handleManualNetAmountChange={handleManualNetAmountChange}
+                isManualNetMode={isManualNetMode}
+                setIsManualNetMode={setIsManualNetMode}
               />
             </div>
           </div>

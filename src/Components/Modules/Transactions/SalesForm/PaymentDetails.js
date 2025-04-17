@@ -38,7 +38,12 @@ const PaymentDetails = ({
   appliedOffers,
   setAppliedOffers,
   festivalDiscountAmt,
-  tabId
+  tabId,
+  manualNetAmount,
+  setManualNetAmount,
+  handleManualNetAmountChange,
+  isManualNetMode,
+  setIsManualNetMode
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const location = useLocation();
@@ -49,9 +54,9 @@ const PaymentDetails = ({
     const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
     const currentOfferKey = `${selectedOffer._id}_${offerIndex}`;
     const isAlreadyApplied = appliedOffers[currentOfferKey];
-  
+
     let updatedRepairDetails = [...storedRepairDetails];
-  
+
     // First, reset all offers (revert to original state)
     updatedRepairDetails = updatedRepairDetails.map((item) => {
       const taxPercent = parseFloat(item.tax_percent) || 1;
@@ -63,7 +68,7 @@ const PaymentDetails = ({
       const stonePrice = parseFloat(item.stone_price) || 0;
       const makingCharges = parseFloat(item.making_charges) || 0;
       const hmCharges = parseFloat(item.hm_charges) || 0;
-  
+
       if (pricingType === "By fixed") {
         const pieceTaxableAmt = pieceCost * qty;
         const originalPieceTaxableAmt = item.original_piece_taxable_amt
@@ -71,7 +76,7 @@ const PaymentDetails = ({
           : pieceTaxableAmt;
         const taxAmt = (taxPercent * originalPieceTaxableAmt) / 100;
         const totalPrice = originalPieceTaxableAmt + taxAmt;
-  
+
         return {
           ...item,
           piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
@@ -85,15 +90,15 @@ const PaymentDetails = ({
         const originalTotalPrice = item.original_total_price
           ? parseFloat(item.original_total_price)
           : parseFloat(item.total_price);
-          const totalBeforeTax =
+        const totalBeforeTax =
           rateAmt + stonePrice + makingCharges + hmCharges - discountAmt;
-          
+
         const taxAmt = (totalBeforeTax * taxPercent) / 100;
         const updatedTotalPrice = totalBeforeTax + taxAmt;
-          console.log("originalTotalPrice=",originalTotalPrice)
+        console.log("originalTotalPrice=", originalTotalPrice)
         // const taxAmt = (taxPercent * originalTotalPrice) / (100 + taxPercent); 
-        console.log("taxAmt=",taxAmt)
-  
+        console.log("taxAmt=", taxAmt)
+
         return {
           ...item,
           total_price: updatedTotalPrice.toFixed(2),
@@ -104,7 +109,7 @@ const PaymentDetails = ({
         };
       }
     });
-  
+
     // If already applied, just reset state and exit
     if (isAlreadyApplied) {
       setRepairDetails(updatedRepairDetails);
@@ -112,7 +117,7 @@ const PaymentDetails = ({
       setAppliedOffers({});
       return;
     }
-  
+
     // Else apply the new offer
     const updatedWithNewOffer = updatedRepairDetails.map((item) => {
       const makingCharges = parseFloat(item.making_charges) || 0;
@@ -126,7 +131,7 @@ const PaymentDetails = ({
       const hmCharges = parseFloat(item.hm_charges) || 0;
       const pricingType = item.pricing;
       const grossWeight = parseFloat(item.gross_weight) || 0;
-  
+
       const percentageDiscount = parseFloat(selectedOffer.discount_percentage) || 0;
       const rateDiscount = parseFloat(selectedOffer.discount_on_rate) || 0;
       const fixedPercentageDiscount = parseFloat(selectedOffer.discount_percent_fixed) || 0;
@@ -135,20 +140,20 @@ const PaymentDetails = ({
         pricingType === "By fixed"
           ? fixedPercentageDiscount
           : percentageDiscount + weightBasedDiscount;
-  
+
       let calculatedDiscount = 0;
-  
+
       if (pricingType === "By fixed") {
         const pieceTaxableAmt = pieceCost * qty;
         const originalPieceTaxableAmt = item.original_piece_taxable_amt
           ? parseFloat(item.original_piece_taxable_amt)
           : pieceTaxableAmt;
-  
+
         calculatedDiscount = (pieceTaxableAmt * totalDiscountValue) / 100;
         const updatedPieceTaxableAmt = originalPieceTaxableAmt - calculatedDiscount - discountAmt;
         const taxAmt = (taxPercent * updatedPieceTaxableAmt) / 100;
         const totalPrice = updatedPieceTaxableAmt + taxAmt;
-  
+
         return {
           ...item,
           original_piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
@@ -165,10 +170,10 @@ const PaymentDetails = ({
           (rateDiscount / 10) * grossWeight;
         const totalBeforeTax =
           rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount - discountAmt;
-          
+
         const taxAmt = (totalBeforeTax * taxPercent) / 100;
         const updatedTotalPrice = totalBeforeTax + taxAmt;
-  
+
         return {
           ...item,
           original_total_price: item.original_total_price
@@ -182,48 +187,48 @@ const PaymentDetails = ({
         };
       }
     });
-  
+
     setRepairDetails(updatedWithNewOffer);
     localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedWithNewOffer));
-  
+
     // Set the only applied offer key
     setAppliedOffers({
       [currentOfferKey]: true,
     });
   };
-  
-  
 
-useEffect(() => {
-  const storedPaymentDetails = JSON.parse(localStorage.getItem(`paymentDetails_${tabId}`)) || {};
 
-  const cashAmount =
-    location.state?.cash_amount ??
-    storedPaymentDetails.cash_amount ??
-    netPayAmount;
 
-  const cardAmt =
-    location.state?.card_amt ??
-    storedPaymentDetails.card_amt ??
-    0;
+  useEffect(() => {
+    const storedPaymentDetails = JSON.parse(localStorage.getItem(`paymentDetails_${tabId}`)) || {};
 
-  const chqAmt =
-    location.state?.chq_amt ??
-    storedPaymentDetails.chq_amt ??
-    0;
+    const cashAmount =
+      location.state?.cash_amount ??
+      storedPaymentDetails.cash_amount ??
+      netPayAmount;
 
-  const onlineAmt =
-    location.state?.online_amt ??
-    storedPaymentDetails.online_amt ??
-    0;
+    const cardAmt =
+      location.state?.card_amt ??
+      storedPaymentDetails.card_amt ??
+      0;
 
-  setPaymentDetails({
-    cash_amount: cashAmount,
-    card_amt: cardAmt,
-    chq_amt: chqAmt,
-    online_amt: onlineAmt,
-  });
-}, [location.state, netPayAmount, tabId]);
+    const chqAmt =
+      location.state?.chq_amt ??
+      storedPaymentDetails.chq_amt ??
+      0;
+
+    const onlineAmt =
+      location.state?.online_amt ??
+      storedPaymentDetails.online_amt ??
+      0;
+
+    setPaymentDetails({
+      cash_amount: cashAmount,
+      card_amt: cardAmt,
+      chq_amt: chqAmt,
+      online_amt: onlineAmt,
+    });
+  }, [location.state, netPayAmount, tabId]);
 
 
   // useEffect(() => {
@@ -249,7 +254,7 @@ useEffect(() => {
       });
     }
   }, [netPayAmount, location.state, tabId]);
-  
+
 
   useEffect(() => {
     // Sum of all payment details
@@ -282,6 +287,7 @@ useEffect(() => {
     setPaymentDetails(updatedDetails);
     localStorage.setItem(`paymentDetails_${tabId}`, JSON.stringify(updatedDetails)); // Update localStorage on change
   };
+
 
   return (
     <>
@@ -335,7 +341,18 @@ useEffect(() => {
               </tr>
               <tr>
                 <td colSpan="16" className="text-right">Net Amount</td>
-                <td colSpan="4">{netAmount.toFixed(2)}</td>
+                {/* <td colSpan="4">{netAmount.toFixed(2)}</td> */}
+                <td colSpan="4">
+                  <input
+                    type="number"
+                    value={isManualNetMode ? manualNetAmount : netAmount.toFixed(2)}
+                    onChange={(e) => {
+                      const newValue = parseFloat(e.target.value) || 0;
+                      setManualNetAmount(newValue);
+                      setIsManualNetMode(newValue > 0); // Enable manual mode only if value > 0
+                    }}
+                  />
+                </td>
               </tr>
               <tr>
                 <td colSpan="16" className="text-right">Old Items Amount</td>
