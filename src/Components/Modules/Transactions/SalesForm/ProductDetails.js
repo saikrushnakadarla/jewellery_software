@@ -894,7 +894,7 @@ const ProductDetails = ({
             onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
             style={{
               backgroundColor: isEditing ? "#a36e29" : "#a36e29",
-              borderColor: isEditing ? "#a36e29" : "#a36e29", padding: "2px 6px", marginTop:"5px", marginLeft:"-1px"
+              borderColor: isEditing ? "#a36e29" : "#a36e29", padding: "4px 7px", marginTop:"5px", marginLeft:"-1px", fontSize : "13px"
             }}
           >
             {isEditing ? "Update" : "Add"}
@@ -905,9 +905,9 @@ const ProductDetails = ({
             variant="secondary"
             // onClick={refreshSalesData}
             onClick={handleClear}
-            style={{ backgroundColor: 'gray', marginLeft: '-30px', padding: "4px 7px",
+            style={{ backgroundColor: 'gray', marginLeft: '-52px', padding: "4px 7px",
               fontSize: "13px",
-              marginTop: "5px", marginLeft:"-68px" }}
+              marginTop: "5px" }}
           >
             Clear
           </Button>

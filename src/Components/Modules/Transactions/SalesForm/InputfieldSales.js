@@ -23,8 +23,8 @@ const InputField = ({
       borderColor: "#A26D2B",
       boxShadow: state.isFocused ? "0 0 0 1px #A26D2B" : "none",
       "&:hover": { borderColor: "#A26D2B" },
-      minHeight: "40px",
-      height: "40px",
+      minHeight: "35px",
+      height: "35px",
       fontSize: "12px",
     }),
     valueContainer: (provided) => ({

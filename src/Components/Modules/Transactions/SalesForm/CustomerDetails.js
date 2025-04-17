@@ -294,7 +294,7 @@ const CustomerDetails = ({
               fontSize: '0.952rem',
               padding: '0.35rem 0.35rem', fontSize: "13px",
               padding: "5px",
-              marginTop:"4px",
+              marginTop:"2px",
             }}
             onClick={handleAddReceipt}
           >
@@ -310,7 +310,7 @@ const CustomerDetails = ({
               fontSize: '0.952rem',
               padding: '0.35rem 0.35rem',     fontSize: "13px",
               padding:"5px",
-              marginTop:"4px",
+              marginTop:"2px",
               marginLeft: "-100px"
             }}
           >
