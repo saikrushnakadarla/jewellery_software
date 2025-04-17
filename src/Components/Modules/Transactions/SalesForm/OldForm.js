@@ -395,7 +395,7 @@ useEffect(() => {
         </Col>
       </Row>
 
-      <Table striped bordered hover className="mt-4">
+      <Table striped bordered hover >
         <thead>
           <tr style={{fontSize:"13px"}}>
             <th>Product</th>
@@ -447,7 +447,7 @@ useEffect(() => {
         </tbody>
       </Table>
 
-      <div className="d-flex justify-content-between px-2 mt-2">
+      <div className="d-flex justify-content-between px-2 mb-1">
         <h7>Total Amount:</h7>
         <h7>₹ {calculateTotalSum()}</h7>
       </div>
