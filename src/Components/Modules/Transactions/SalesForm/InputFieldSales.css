@@ -3,17 +3,18 @@
     margin-bottom: 20px;
   }
   
-  .select-container {
+  .select-container-sales {
     position: relative;
+    height: 26px;
   }
   
   .floating-label {
     position: absolute;
-    top: -8px;
-    left: 10px;
+    top: -5px;
+    height: 6px;
     background: white;
     padding: 0 5px;
-    font-size: 14px;
+    font-size: 13px;
     color: #A26D2B;
     z-index: 1000;
   }

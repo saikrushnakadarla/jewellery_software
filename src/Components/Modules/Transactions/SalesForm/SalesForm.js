@@ -1213,7 +1213,7 @@ const SalesForm = () => {
               />
             </div>
           </div>
-          <div className="sales-form-section" style={{ marginTop: '-20px' }}>
+          <div className="sales-form-section" style={{ marginTop: '-20px', marginBottom:"5px" }}>
             <ProductDetails
               formData={formData}
               setFormData={setFormData}

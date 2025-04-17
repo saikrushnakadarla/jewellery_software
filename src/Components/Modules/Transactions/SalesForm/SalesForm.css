@@ -56,6 +56,8 @@
   background-color: #a36e29 !important;
   border-color: #a36e29 !important;
   color: white !important;
+  padding: 5px;
+  margin-top: 4px;
 }
 #dropdown-basic-button:hover,
 #dropdown-basic-button:focus,

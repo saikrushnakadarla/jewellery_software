@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Select from "react-select";
-import "./InputField.css";
+import "./InputFieldSales.css";
 
 const InputField = ({
   label,
@@ -64,7 +64,7 @@ const InputField = ({
 
   return (
     <div className="input-field-container">
-      <div className="select-container">
+      <div className="select-container-sales">
         {label && <label className="floating-label">{label}</label>}
         {type === "select" ? (
           <Select

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, Button, Table, Modal } from 'react-bootstrap';
-import InputField from './../../../Pages/InputField/InputField';
+import InputField from './InputfieldSales';
 import axios from "axios";
 import { useLocation } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -288,20 +288,21 @@ useEffect(() => {
       <div>
         <Col className="sales-form-section">
           <Row>
-            <h4 className="mb-3">Summary</h4>
-            <Table bordered hover responsive>
+            <h4 className="mb-3" style={{fontSize:"20px"}}>Summary</h4>
+            {/* <div style={{ maxHeight: "140px", overflowY: "auto" }}> */}
+            <Table bordered hover responsive >
               <tr>
-                <td colSpan="16" className="text-right">Total Amount</td>
+                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Total Amount</td>
                 <td colSpan="4">{totalAmount.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="12" className="text-right">Discount Amount</td>
+                <td colSpan="12" className="text-right" style={{fontSize:"13px"}}>Discount Amount</td>
                 <td colSpan="4">  @
                   <input
                     type="number"
                     value={discount}
                     onChange={handleDiscountChange}
-                    style={{ width: '80px', padding: '5px' }}
+                    style={{ width: '70px', padding: '2px' }}
                   />
                 </td>
                 <td colSpan="4">
@@ -309,11 +310,11 @@ useEffect(() => {
                 </td>
               </tr>
               <tr>
-                <td colSpan="12" className="text-right">Festival Offer</td>
+                <td colSpan="12" className="text-right" style={{fontSize:"13px"}}>Festival Offer</td>
                 <td colSpan="4"> &ensp;&ensp;
                   <Button
                     style={{
-                      padding: '5px 10px',
+                      padding: '1px 6px',
                       backgroundColor: '#4CAF50',
                       color: 'white',
                       border: 'none',
@@ -326,40 +327,41 @@ useEffect(() => {
                 <td colSpan="4">{festivalDiscountAmt.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="16" className="text-right">Taxable Amount</td>
+                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Taxable Amount</td>
                 <td colSpan="4">{taxableAmount.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="16" className="text-right">Tax Amount</td>
+                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Tax Amount</td>
                 <td colSpan="4">{taxAmount.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="16" className="text-right">Net Amount</td>
+                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Net Amount</td>
                 <td colSpan="4">{netAmount.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="16" className="text-right">Old Items Amount</td>
+                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Old Items Amount</td>
                 <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="16" className="text-right">Scheme Amount</td>
+                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Scheme Amount</td>
                 <td colSpan="4">{schemeAmount.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="16" className="text-right">Sale Return Amount</td>
+                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Sale Return Amount</td>
                 <td colSpan="4">{salesNetAmount.toFixed(2)}</td>
               </tr>
               <tr>
-                <td colSpan="16" className="text-right">Net Payable Amount</td>
+                <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Net Payable Amount</td>
                 <td colSpan="4">{Math.round(netPayAmount).toFixed(2)}</td>
               </tr>
             </Table>
+            {/* </div> */}
           </Row>
         </Col>
 
         <Col className="sales-form-section">
           <Row>
-            <h4 className="mb-3">Payment Details</h4>
+            <h4 className="mb-3" style={{fontSize:"18px"}}>Payment Details</h4>
             <Col xs={12} md={4}>
               <InputField
                 label="Cash Amt"

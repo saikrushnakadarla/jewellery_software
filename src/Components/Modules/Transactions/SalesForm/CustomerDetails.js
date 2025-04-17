@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Col, Row, Button } from "react-bootstrap";
-import InputField from "./../../../Pages/InputField/InputField";
+import InputField from "./../../Transactions/SalesForm/InputfieldSales";
 import { AiOutlinePlus } from "react-icons/ai";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -292,7 +292,9 @@ const CustomerDetails = ({
               backgroundColor: '#28a745',
               borderColor: '#28a745',
               fontSize: '0.952rem',
-              padding: '0.35rem 0.35rem',
+              padding: '0.35rem 0.35rem', fontSize: "13px",
+              padding: "5px",
+              marginTop:"4px",
             }}
             onClick={handleAddReceipt}
           >
@@ -306,7 +308,10 @@ const CustomerDetails = ({
               backgroundColor: '#28a745',
               borderColor: '#28a745',
               fontSize: '0.952rem',
-              padding: '0.35rem 0.35rem',
+              padding: '0.35rem 0.35rem',     fontSize: "13px",
+              padding:"5px",
+              marginTop:"4px",
+              marginLeft: "-100px"
             }}
           >
             + New
