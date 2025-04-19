@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import "./Repairs.css";
-import InputField from "../../../Pages/InputField/InputField";
+import InputField from "../../Transactions/SalesForm/InputfieldSales";
 import { Container, Row, Col, Button, Form, Dropdown } from "react-bootstrap";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import baseURL from "../../../../Url/NodeBaseURL";

@@ -15,6 +15,7 @@ import SalesFormSection from "./SalesForm3Section";
 import { pdf } from '@react-pdf/renderer';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import PDFLayout from './TaxInvoiceA4';
+import "./OrderForm.css";
 
 const SalesForm = () => {
   const location = useLocation();
@@ -466,11 +467,11 @@ const SalesForm = () => {
 
   return (
     <div className="main-container">
-      <Container className="sales-form-container">
+      <Container className="sales-form-container-orders">
         <Form>
-          <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>
+          {/* <h3 style={{ marginTop: '-45px', marginBottom: '10px', textAlign: 'left', color: '#a36e29' }}>
             Orders
-          </h3>
+          </h3> */}
           <div className="sales-form">
             <div className="sales-form-left">
               <CustomerDetails
@@ -489,7 +490,7 @@ const SalesForm = () => {
             </div>
           </div>
 
-          <div className="sales-form-section">
+          <div className="sales-form-section" style={{marginTop:"-20px"}}>
             <ProductDetails
               formData={formData}
               handleChange={handleChange}

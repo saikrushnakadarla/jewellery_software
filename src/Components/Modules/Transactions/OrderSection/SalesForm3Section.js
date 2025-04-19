@@ -14,7 +14,9 @@ const SalesFormSection = ({ setOldSalesData, setSchemeSalesData, orderDetails })
               style={{
                 backgroundColor: activeForm === "old" ? "rgb(163, 110, 41)" : "gray",
                 borderColor: activeForm === "old" ? "rgb(163, 110, 41)" : "gray",
-                color: "white",
+                color: "white",     height: "26px",
+                fontSize: "13px",
+                padding: "0px 7px"
               }}
               onClick={() => setActiveForm("old")}
             >

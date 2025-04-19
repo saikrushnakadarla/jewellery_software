@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Estimate.css";
-import InputField from "../../../Pages/InputField/InputField";
+import InputField from "../../Transactions/SalesForm/InputfieldSales";
 import { Container, Row, Col, Button, Table } from "react-bootstrap";
 import axios from "axios";
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -1222,7 +1222,10 @@ const RepairForm = () => {
           )}
           <Col xs={12} md={1}>
             <Button
-              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29",     marginTop:"3px",
+                marginLeft:"-1px",
+                fontSize:"13px",     padding: "5px 9px"
+            } }
               onClick={handleAdd}
             >
               {isEditing ? "Update" : "Add"}
@@ -1233,7 +1236,7 @@ const RepairForm = () => {
         <Row className="estimate-form-section2">
           <Table bordered hover responsive>
             <thead>
-              <tr>
+              <tr style={{fontSize:"14px"}}>
                 <th>S No</th>
                 <th>Code</th>
                 <th>Category</th>
@@ -1249,7 +1252,7 @@ const RepairForm = () => {
             <tbody>
               {entries.length > 0 ? (
                 entries.map((entry, index) => (
-                  <tr key={index}>
+                  <tr key={index} style={{fontSize:"14px"}}>
                     <td>{index + 1}</td>
                     <td>{entry.code}</td>
                     <td>{entry.category}</td>
@@ -1287,46 +1290,46 @@ const RepairForm = () => {
         <Row className="estimate-form-section2">
           <Table bordered hover responsive>
             <>
-              <tr>
+              <tr style={{fontSize:"14px"}}>
                 <td colSpan="20" className="text-right">
                   Total Amount
                 </td>
                 <td colSpan="4">{totalAmount.toFixed(2)}</td>
               </tr>
               
-              <tr>
+              <tr style={{fontSize:"14px"}}>
                 <td colSpan="16" className="text-right">Discount Amount</td>
                 <td colSpan="4">  @
                   <input
                     type="number"
                     value={discount}
                     onChange={handleDiscountChange}
-                    style={{ width: '80px', padding: '5px' }}
+                    style={{ width: '80px', padding: '1px' }}
                   />
                 </td>
                 <td colSpan="4">
                   {discountAmt.toFixed(2)}
                 </td>
               </tr>
-              <tr>
+              <tr style={{fontSize:"14px"}}>
                 <td colSpan="20" className="text-right">
                   Taxable Amount
                 </td>
                 <td colSpan="4">{taxableAmount.toFixed(2)}</td>
               </tr>
-              <tr>
+              <tr style={{fontSize:"14px"}}>
                 <td colSpan="20" className="text-right">
                   Tax Amount
                 </td>
                 <td colSpan="4">{taxAmount.toFixed(2)}</td>
               </tr>
-              <tr>
+              <tr style={{fontSize:"14px"}}>
                 <td colSpan="20" className="text-right">
                   Net Amount
                 </td>
                 <td colSpan="4">{netAmount.toFixed(2)}</td>
               </tr>
-              <tr>
+              <tr style={{fontSize:"14px"}}>
                 <td colSpan="20" className="text-right">
                   Net Payable Amount
                 </td>
@@ -1334,10 +1337,14 @@ const RepairForm = () => {
               </tr>
             </>
           </Table>
-          <Col xs={12} md={12} className="d-flex justify-content-end">
-            <Button className="cus-back-btn" variant="secondary" onClick={handleBack}>cancel</Button>
+          <Col xs={12} md={12} className="d-flex justify-content-end" style={{marginTop:"-10px"}}>
+            <Button className="cus-back-btn" variant="secondary" onClick={handleBack} style={{ width: "60px", marginLeft: '15px',    fontSize:"14px",
+                marginTop:"1px",
+                padding: "1px 8px" , height:"33px"}}>cancel</Button>
             <Button
-              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29", marginLeft: '15px' }}
+              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29", marginLeft: '15px',    fontSize:"14px",
+                marginTop:"1px",
+                padding: "1px 8px" , height:"33px"}}
               onClick={handlePrint}
             >
               Print

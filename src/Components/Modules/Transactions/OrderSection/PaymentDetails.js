@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, Button, Table } from 'react-bootstrap';
-import InputField from './../../../Pages/InputField/InputField';
+import InputField from './../../Transactions/SalesForm/InputfieldSales';
 
 const PaymentDetails = ({
   paymentDetails,
@@ -38,20 +38,20 @@ const PaymentDetails = ({
     <div>
       <Col className="sales-form-section">
         <Row>
-          <h4 className="mb-3">Summary</h4>
+          <h7 className="mb-3">Summary</h7>
           <Table bordered hover responsive>
-            <tr>
+            <tr style={{fontSize:"13px"}}>
               <td colSpan="16" className="text-right">Total Amount</td>
               <td colSpan="4">{totalAmount.toFixed(2)}</td>
             </tr>
-            <tr>
+            <tr style={{fontSize:"13px"}}>
               <td colSpan="12" className="text-right">Discount Amount</td>
               <td colSpan="4">  @
                 <input
                   type="number"
                   value={discount}
                   onChange={handleDiscountChange}
-                  style={{ width: '80px', padding: '5px' }}
+                  style={{ width: '80px', padding: '5px' , height:"23px", fontSize:"12px"}}
                 />
               </td>
               <td colSpan="4">
@@ -61,19 +61,19 @@ const PaymentDetails = ({
 
 
             
-            <tr>
+            <tr style={{fontSize:"13px"}}>
               <td colSpan="16" className="text-right">Taxable Amount</td>
               <td colSpan="4">{taxableAmount.toFixed(2)}</td>
             </tr>
-            <tr>
+            <tr style={{fontSize:"13px"}}>
               <td colSpan="16" className="text-right">Tax Amount</td>
               <td colSpan="4">{taxAmount.toFixed(2)}</td>
             </tr>
-            <tr>
+            <tr style={{fontSize:"13px"}}>
               <td colSpan="16" className="text-right">Net Amount</td>
               <td colSpan="4">{netAmount.toFixed(2)}</td>
             </tr>
-            <tr>
+            <tr style={{fontSize:"13px"}}>
               <td colSpan="16" className="text-right">Old Items Amount</td>
               <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
             </tr>
@@ -81,7 +81,7 @@ const PaymentDetails = ({
               <td colSpan="16" className="text-right">Scheme Amount</td>
               <td colSpan="4">{schemeAmount.toFixed(2)}</td>
             </tr> */}
-            <tr>
+            <tr style={{fontSize:"13px"}}>
               <td colSpan="16" className="text-right">Net Payable Amount</td>
               <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
             </tr>
@@ -91,7 +91,7 @@ const PaymentDetails = ({
 
       <Col className="sales-form-section">
         <Row>
-          <h4 className="mb-3">Payment Details</h4>
+          <h6 className="mb-3">Payment Details</h6>
           <Col xs={12} md={4}>
             <InputField
               label="Cash Amt"
@@ -135,7 +135,9 @@ const PaymentDetails = ({
           <Col xs={12} md={3}>
             <Button
               onClick={handleSave}
-              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29',     fontSize: "14px",
+                marginTop: "3px",
+                padding: "4px 8px" }}
             >
               Save
             </Button>
@@ -145,7 +147,9 @@ const PaymentDetails = ({
               type="button"
               variant="secondary"
               onClick={handleBack}
-              style={{ backgroundColor: 'gray', marginLeft: '-40px' }}
+              style={{ backgroundColor: 'gray', marginLeft: '-55px',    fontSize: "14px",
+                marginTop: "3px",
+                padding: "4px 8px" }}
             >
               Cancel
             </Button>

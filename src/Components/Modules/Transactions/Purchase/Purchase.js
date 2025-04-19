@@ -1318,7 +1318,7 @@ const URDPurchase = () => {
     <div className="main-container">
       <div className="purchase-form-container">
         <Form onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}>
-          <div className="purchase-form" style={{marginTop:"-10px"}}>
+          <div className="purchase-form" style={{ marginTop: "-10px" }}>
             <div className="purchase-form-left">
               <Col className="urd-form1-section">
                 <h4 className="mb-4">Supplier Details</h4>
@@ -1545,7 +1545,10 @@ const URDPurchase = () => {
                         backgroundColor: '#a36e29',
                         borderColor: '#a36e29',
                         fontSize: '0.9rem',
-                        marginLeft: '-13px',
+                        marginLeft: "-8px",
+                        marginTop: "1px",
+                        padding: "5px 10px",
+                        height: "32px",
                         whiteSpace: 'nowrap'
                       }}
                     >
@@ -1834,7 +1837,13 @@ const URDPurchase = () => {
                 />
               </Col>
               <Col xs={12} md={1}>
-                <Button onClick={handleAdd} style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>
+                <Button onClick={handleAdd} style={{
+                  backgroundColor: '#a36e29', borderColor: '#a36e29', marginTop: "2px",
+                  marginLeft: "-1px",
+                  padding: "5px 13px",
+                  height: "32px",
+                  fontSize: "13px"
+                }}>
                   {editingIndex !== null ? "Update" : "Add"}
                 </Button>
               </Col>

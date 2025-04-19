@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Col, Row } from 'react-bootstrap';
-import InputField from './../../../Pages/InputField/InputField';
+import InputField from './../../Transactions/SalesForm/InputfieldSales';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { useLocation } from "react-router-dom";
 

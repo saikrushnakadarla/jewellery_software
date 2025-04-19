@@ -17,7 +17,7 @@ const ProductTable = ({ orderDetails, onDelete, onEdit }) => {
     <div style={{ maxHeight: "200px", overflowY: "auto", position: "relative" }}>
     <Table className='dataTable_headerCell2' bordered hover responsive>
     <thead style={{ position: "sticky", top: 0, background: "white", zIndex: 2 }}>
-        <tr>
+        <tr style={{fontSize:"13px"}}>
           {/* <th>Date</th> */}
           {/* <th>Invoice Number</th> */}
           <th>Product Name</th>

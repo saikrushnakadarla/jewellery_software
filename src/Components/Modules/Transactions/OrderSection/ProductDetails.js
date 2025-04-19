@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, Button, Dropdown, DropdownButton } from 'react-bootstrap';
-import InputField from './../../../Pages/InputField/InputField';
+import InputField from './../../Transactions/SalesForm/InputfieldSales';
 import axios from 'axios';
 import baseURL from "../../../../Url/NodeBaseURL";
 import { FaTrash, FaCamera, FaUpload } from "react-icons/fa";
@@ -76,7 +76,7 @@ const ProductDetails = ({
   }, [formData.category, defaultBarcode]); 
 
   return (
-    <Col >
+    <Col>
       <Row>
         <Col xs={12} md={2}>
           <InputField
@@ -680,7 +680,11 @@ const ProductDetails = ({
             onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
             style={{
               backgroundColor: isEditing ? "#a36e29" : "#a36e29",
-              borderColor: isEditing ? "#a36e29" : "#a36e29",
+              borderColor: isEditing ? "#a36e29" : "#a36e29", padding: "4px 7px" ,
+              marginTop: "3px",
+              marginLeft: "-1px",
+              fontSize: "13px"
+          
             }}
           >
             {isEditing ? "Update" : "Add"}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Col, Row, Button, Table } from "react-bootstrap";
-import InputField from "./../../Masters/ItemMaster/Inputfield";
+import InputField from "./../SalesForm/InputfieldSales";
 import baseURL from "../../../../Url/NodeBaseURL";
 import { FaEdit, FaTrash } from "react-icons/fa";
 const OldSalesForm = ({ setOldSalesData, orderDetails }) => {
@@ -299,7 +299,7 @@ useEffect(() => {
   return (
     <>
       <Row>
-        <h4 className="mb-3">URD Purchase</h4>
+        {/* <h4 className="mb-3" style={{fontSize:"15px"}}>URD Purchase</h4> */}
         <Col xs={12} md={3}>
           <InputField label="Product" name="product" value={oldDetails.product} onChange={handleInputChange} />
         </Col>
@@ -386,7 +386,10 @@ useEffect(() => {
           <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={2}>
-          <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)' }}>
+          <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)',     height: "29px",
+    marginTop: "4px",
+    fontSize: "14px",
+    padding: "2px 9px" }}>
             {editingRow !== null ? "Update" : "Add"}
           </Button>
         </Col>
@@ -394,7 +397,7 @@ useEffect(() => {
 
       <Table striped bordered hover className="mt-4">
         <thead>
-          <tr>
+          <tr style={{fontSize:"13px"}}>
             <th>Product</th>
             <th>Metal</th>
             <th>Gross</th>
@@ -410,7 +413,7 @@ useEffect(() => {
         </thead>
         <tbody>
           {oldTableData.map((data, index) => (
-            <tr key={index}>
+            <tr key={index} style={{fontSize:"13px"}}>
               <td>{data.product}</td>
               <td>{data.metal}</td>
               <td>{data.gross}</td>
@@ -444,9 +447,9 @@ useEffect(() => {
         </tbody>
       </Table>
 
-      <div className="d-flex justify-content-between px-2 mt-2">
-        <h5>Total Amount:</h5>
-        <h5>₹ {calculateTotalSum()}</h5>
+      <div className="d-flex justify-content-between px-2 mt-2" style={{marginTop:"-5px"}}> 
+        <h7>Total Amount:</h7>
+        <h7>₹ {calculateTotalSum()}</h7>
       </div>
 
 

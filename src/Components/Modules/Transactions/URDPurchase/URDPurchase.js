@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./URDPurchase.css";
-import InputField from "../../../Pages/InputField/InputField";
+import InputField from "../../Transactions/SalesForm/InputfieldSales";
 import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
 import { renderMatches, useNavigate, useLocation } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -748,7 +748,12 @@ const URDPurchase = () => {
               </Col>
               <Col xs={12} md={1}>
                 <Button
-                  style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
+                  style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" ,     padding: "5px 9px",
+                    marginTop: "2px",
+                    marginLeft: "-1px",
+                    fontSize: "14px"
+                
+                }}
                   onClick={handleAddOrUpdateItem}
                 >
                   {editingRow !== null ? "Update" : "Add"}
