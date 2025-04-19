@@ -31,10 +31,12 @@ const InputField = ({
       ...provided,
       padding: "0 8px",
       height: "38px",
+      
     }),
     input: (provided) => ({
       ...provided,
       margin: "0px",
+      
     }),
     indicatorsContainer: (provided) => ({
       ...provided,
@@ -43,6 +45,7 @@ const InputField = ({
     menu: (provided) => ({
       ...provided,
       zIndex: 9999, // Ensure the dropdown is on top
+      fontSize: "12px",
     }),
     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
   };
@@ -63,9 +66,9 @@ const InputField = ({
   };
 
   return (
-    <div className="input-field-container">
+    <div className="input-field-container-sales">
       <div className="select-container-sales">
-        {label && <label className="floating-label">{label}</label>}
+        {label && <label className="floating-label-sales">{label}</label>}
         {type === "select" ? (
           <Select
             name={name}

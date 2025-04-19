@@ -297,11 +297,12 @@ const SalesForm = () => {
   const [discount, setDiscount] = useState(() => {
     return parseFloat(localStorage.getItem("discount")) || ""; // Load discount from localStorage
   });
+  const [isManualNetMode, setIsManualNetMode] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("discount", discount); // Save to localStorage when discount changes
   }, [discount]);
-  const [isManualNetMode, setIsManualNetMode] = useState(false);
+
 
   // const handleDiscountChange = (e) => {
   //   const discountValue = parseFloat(e.target.value) || ""; // Default to empty if invalid
@@ -827,158 +828,18 @@ const SalesForm = () => {
   // });
 
   const [manualNetAmount, setManualNetAmount] = useState(0);
-
-
-  let totalAmount = 0;
-  let discountAmt = 0;
-  let festivalDiscountAmt = 0;
-  let taxableAmount = 0;
-  let taxAmount = 0;
-  let netAmount = 0;
-  let discountPercent = 0;
-
-  let totalMakingCharges = 0;
-  let totalPieceCost = 0;
-  let hasWeightBasedItems = false;
-
-  if (isManualNetMode && typeof manualNetAmount !== "undefined" && manualNetAmount > 0) {
-    // Step 1: Compute totalAmount, makingCharges, pieceCost
-    repairDetails.forEach((item) => {
-      const pricing = item.pricing;
-
-      if (pricing === "By Weight") {
-        const stonePrice = parseFloat(item.stone_price) || 0;
-        const makingCharges = parseFloat(item.making_charges) || 0;
-        const rateAmt = parseFloat(item.rate_amt) || 0;
-        const hmCharges = parseFloat(item.hm_charges) || 0;
-        totalAmount += stonePrice + makingCharges + rateAmt + hmCharges;
-        totalMakingCharges += makingCharges;
-        hasWeightBasedItems = true;
-      } else {
-        const pieceCost = parseFloat(item.pieace_cost) || 0;
-        const qty = parseFloat(item.qty) || 0;
-        const itemTotal = pieceCost * qty;
-        totalAmount += itemTotal;
-        totalPieceCost += itemTotal;
-      }
-    });
-
-    // Step 2: Reverse tax and discount calculation from netAmount
-    let cumulativeTaxable = 0;
-    let cumulativeTax = 0;
-
-    repairDetails.forEach((item) => {
-      const pricing = item.pricing;
-      const itemTaxPercent = parseFloat(item.tax_percent) || 0;
-
-      let itemTotal = 0;
-      if (pricing === "By Weight") {
-        const stonePrice = parseFloat(item.stone_price) || 0;
-        const makingCharges = parseFloat(item.making_charges) || 0;
-        const rateAmt = parseFloat(item.rate_amt) || 0;
-        const hmCharges = parseFloat(item.hm_charges) || 0;
-        itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
-      } else {
-        const pieceCost = parseFloat(item.pieace_cost) || 0;
-        const qty = parseFloat(item.qty) || 0;
-        itemTotal = pieceCost * qty;
-      }
-
-      const itemShare = itemTotal / totalAmount;
-      const itemNet = manualNetAmount * itemShare;
-      const itemTaxable = itemNet / (1 + itemTaxPercent / 100);
-      const itemTax = itemNet - itemTaxable;
-
-      cumulativeTaxable += itemTaxable;
-      cumulativeTax += itemTax;
-    });
-
-    taxableAmount = cumulativeTaxable;
-    taxAmount = cumulativeTax;
-    netAmount = manualNetAmount;
-
-    discountAmt = totalAmount - taxableAmount;
-
-    const discountBase = totalMakingCharges + totalPieceCost;
-    discountPercent = discountBase ? (discountAmt * 100) / discountBase : 0;
-
-
-    const roundedDiscount = parseFloat(discountPercent.toFixed(2));
-
-    if (roundedDiscount !== discount) {
-      setDiscount(roundedDiscount);
-      localStorage.setItem("discount", roundedDiscount.toString());
-      applyDiscountToRepairDetails(roundedDiscount);
-    }
-
-  } else {
-    // FORWARD CALCULATION
-    repairDetails.forEach((item) => {
-      const pricing = item.pricing;
-      const itemDiscount = parseFloat(item.disscount) || 0;
-      const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
-      const itemTaxPercent = parseFloat(item.tax_percent) || 0;
-
-      let itemTotal = 0;
-      if (pricing === "By Weight") {
-        const stonePrice = parseFloat(item.stone_price) || 0;
-        const makingCharges = parseFloat(item.making_charges) || 0;
-        const rateAmt = parseFloat(item.rate_amt) || 0;
-        const hmCharges = parseFloat(item.hm_charges) || 0;
-
-        itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
-        totalAmount += itemTotal;
-        totalMakingCharges += makingCharges;
-        hasWeightBasedItems = true;
-      } else {
-        const pieceCost = parseFloat(item.pieace_cost) || 0;
-        const qty = parseFloat(item.qty) || 0;
-
-        itemTotal = pieceCost * qty;
-        totalAmount += itemTotal;
-        totalPieceCost += itemTotal;
-      }
-
-      const totalDiscount = itemDiscount + itemFestivalDiscount;
-      const itemTaxable = itemTotal - totalDiscount;
-      const taxAmt = (itemTaxable * itemTaxPercent) / 100;
-
-      discountAmt += itemDiscount;
-      festivalDiscountAmt += itemFestivalDiscount;
-
-      taxableAmount += itemTaxable;
-      taxAmount += taxAmt;
-      netAmount += itemTaxable + taxAmt;
-    });
-
-    const discountBase = totalMakingCharges + totalPieceCost;
-    discountPercent = discountBase ? (discountAmt * 100) / discountBase : 0;
-
-  }
-
-
-
-  const handleManualNetAmountChange = (value) => {
-    setManualNetAmount(value);
-    setIsManualNetMode(true); // Enter manual net amount mode
-  };
+  const [manualNetPayAmount, setManualNetPayAmount] = useState(0);
 
   const oldItemsAmount = location.state?.old_exchange_amt
     ? parseFloat(location.state.old_exchange_amt)
-    : oldSalesData.reduce(
-      (sum, item) => sum + parseFloat(item.total_amount || 0),
-      0
-    );
+    : oldSalesData.reduce((sum, item) => sum + parseFloat(item.total_amount || 0), 0);
 
   const schemeAmount = location.state?.scheme_amt
     ? parseFloat(location.state.scheme_amt)
-    : schemeSalesData.reduce(
-      (sum, item) => sum + parseFloat(item.paid_amount || 0),
-      0
-    );
+    : schemeSalesData.reduce((sum, item) => sum + parseFloat(item.paid_amount || 0), 0);
 
   const [selectedRows, setSelectedRows] = useState([]);
-  const [isAllSelected, setIsAllSelected] = useState(false); // State to track "Check All" checkbox
+  const [isAllSelected, setIsAllSelected] = useState(false);
 
   const handleCheckboxChange = (event, index) => {
     if (!invoiceDetails.length) return;
@@ -1050,7 +911,6 @@ const SalesForm = () => {
     }
   };
 
-  // Calculate taxable amount based on selected rows
   const salesTaxableAmount = selectedRows.reduce((sum, rowIndex) => {
     const detail = invoiceDetails[rowIndex];
     const stonePrice = parseFloat(detail.stone_price) || 0;
@@ -1076,23 +936,244 @@ const SalesForm = () => {
     isSameMonth(invoiceDetails[rowIndex]?.date)
   );
 
-  // Conditionally assign the correct value
   const salesAmountToPass = allSelectedRowsAreThisMonth ? salesNetAmount : salesTaxableAmount;
 
+  let totalAmount = 0;
+  let discountAmt = 0;
+  let festivalDiscountAmt = 0;
+  let taxableAmount = 0;
+  let taxAmount = 0;
+  let netAmount = 0;
+  let discountPercent = 0;
+  let totalMakingCharges = 0;
+  let totalPieceCost = 0;
+  let hasWeightBasedItems = false;
 
-  // Calculate Net Payable Amount
-  // const payableAmount = netAmount - (schemeAmount + oldItemsAmount);
-  // const netPayableAmount = Math.round(payableAmount);
+  if (isManualNetMode && typeof manualNetAmount !== "undefined" && manualNetAmount > 0) {
+    // Step 1: Compute totalAmount, makingCharges, pieceCost
+    repairDetails.forEach((item) => {
+      const pricing = item.pricing;
 
-  // const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
-  // const netPayAmount = netPayableAmount - salesNetAmount
+      if (pricing === "By Weight") {
+        const stonePrice = parseFloat(item.stone_price) || 0;
+        const makingCharges = parseFloat(item.making_charges) || 0;
+        const rateAmt = parseFloat(item.rate_amt) || 0;
+        const hmCharges = parseFloat(item.hm_charges) || 0;
+        totalAmount += stonePrice + makingCharges + rateAmt + hmCharges;
+        totalMakingCharges += makingCharges;
+        hasWeightBasedItems = true;
+      } else {
+        const pieceCost = parseFloat(item.pieace_cost) || 0;
+        const qty = parseFloat(item.qty) || 0;
+        const itemTotal = pieceCost * qty;
+        totalAmount += itemTotal;
+        totalPieceCost += itemTotal;
+      }
+    });
+
+    // Step 2: Reverse tax and discount calculation from netAmount
+    let cumulativeTaxable = 0;
+    let cumulativeTax = 0;
+    let totalFestivalDiscount = 0;
+
+    repairDetails.forEach((item) => {
+      const pricing = item.pricing;
+      const itemTaxPercent = parseFloat(item.tax_percent) || 0;
+      const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
+      totalFestivalDiscount += itemFestivalDiscount;
+
+      let itemTotal = 0;
+      if (pricing === "By Weight") {
+        const stonePrice = parseFloat(item.stone_price) || 0;
+        const makingCharges = parseFloat(item.making_charges) || 0;
+        const rateAmt = parseFloat(item.rate_amt) || 0;
+        const hmCharges = parseFloat(item.hm_charges) || 0;
+        itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
+      } else {
+        const pieceCost = parseFloat(item.pieace_cost) || 0;
+        const qty = parseFloat(item.qty) || 0;
+        itemTotal = pieceCost * qty;
+      }
+
+      const itemShare = itemTotal / totalAmount;
+      const itemNet = manualNetAmount * itemShare;
+      const itemTaxable = itemNet / (1 + itemTaxPercent / 100);
+      const itemTax = itemNet - itemTaxable;
+
+      cumulativeTaxable += itemTaxable;
+      cumulativeTax += itemTax;
+    });
+
+    taxableAmount = cumulativeTaxable;
+    taxAmount = cumulativeTax;
+    netAmount = manualNetAmount;
+    festivalDiscountAmt = totalFestivalDiscount;
+
+    discountAmt = totalAmount - taxableAmount - totalFestivalDiscount;
+
+    const discountBase = totalMakingCharges + totalPieceCost;
+    discountPercent = discountBase ? (discountAmt * 100) / discountBase : 0;
 
 
-  const payableAmount = netAmount - (schemeAmount + oldItemsAmount + salesNetAmount);
-  const netPayableAmount = Math.round(payableAmount);
+    const roundedDiscount = parseFloat(discountPercent.toFixed(2));
 
+    if (roundedDiscount !== discount) {
+      setDiscount(roundedDiscount);
+      localStorage.setItem("discount", roundedDiscount.toString());
+      applyDiscountToRepairDetails(roundedDiscount);
+    }
+
+  } else {
+    // FORWARD CALCULATION
+    repairDetails.forEach((item) => {
+      const pricing = item.pricing;
+      const itemDiscount = parseFloat(item.disscount) || 0;
+      const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
+      const itemTaxPercent = parseFloat(item.tax_percent) || 0;
+
+      let itemTotal = 0;
+      if (pricing === "By Weight") {
+        const stonePrice = parseFloat(item.stone_price) || 0;
+        const makingCharges = parseFloat(item.making_charges) || 0;
+        const rateAmt = parseFloat(item.rate_amt) || 0;
+        const hmCharges = parseFloat(item.hm_charges) || 0;
+
+        itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
+        totalAmount += itemTotal;
+        totalMakingCharges += makingCharges;
+        hasWeightBasedItems = true;
+      } else {
+        const pieceCost = parseFloat(item.pieace_cost) || 0;
+        const qty = parseFloat(item.qty) || 0;
+
+        itemTotal = pieceCost * qty;
+        totalAmount += itemTotal;
+        totalPieceCost += itemTotal;
+      }
+
+      const totalDiscount = itemDiscount + itemFestivalDiscount;
+      const itemTaxable = itemTotal - totalDiscount;
+      const taxAmt = (itemTaxable * itemTaxPercent) / 100;
+
+      discountAmt += itemDiscount;
+      festivalDiscountAmt += itemFestivalDiscount;
+
+      taxableAmount += itemTaxable;
+      taxAmount += taxAmt;
+      netAmount += itemTaxable + taxAmt;
+    });
+
+    const discountBase = totalMakingCharges + totalPieceCost;
+    discountPercent = discountBase ? (discountAmt * 100) / discountBase : 0;
+
+  }
+
+  const handleManualNetAmountChange = (value) => {
+    setManualNetAmount(value);
+    setIsManualNetMode(true); // Enter manual net amount mode
+  };
+
+
+
+  const handleManualNetPayAmountChange = (value) => {
+    setManualNetPayAmount(value);
+    setIsManualNetMode(true);
+
+    // Calculate total amount without any discounts
+    let totalAmountWithoutDiscounts = 0;
+    let totalMakingCharges = 0;
+    let totalPieceCost = 0;
+
+    repairDetails.forEach((item) => {
+      const pricing = item.pricing;
+      const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
+
+      if (pricing === "By Weight") {
+        const stonePrice = parseFloat(item.stone_price) || 0;
+        const makingCharges = parseFloat(item.making_charges) || 0;
+        const rateAmt = parseFloat(item.rate_amt) || 0;
+        const hmCharges = parseFloat(item.hm_charges) || 0;
+        totalAmountWithoutDiscounts += stonePrice + makingCharges + rateAmt + hmCharges;
+        totalMakingCharges += makingCharges;
+      } else {
+        const pieceCost = parseFloat(item.pieace_cost) || 0;
+        const qty = parseFloat(item.qty) || 0;
+        const itemTotal = pieceCost * qty;
+        totalAmountWithoutDiscounts += itemTotal;
+        totalPieceCost += itemTotal;
+      }
+    });
+
+    // Calculate what the netAmount should be to achieve this netPayAmount
+    const calculatedNetAmount = value + schemeAmount + oldItemsAmount + salesNetAmount;
+
+    // Calculate the required taxable amount after preserving festival discount
+    let totalTaxableAmount = 0;
+    let totalTaxAmount = 0;
+
+    repairDetails.forEach((item) => {
+      const pricing = item.pricing;
+      const itemTaxPercent = parseFloat(item.tax_percent) || 0;
+      const itemFestivalDiscount = parseFloat(item.festival_discount) || 0;
+
+      let itemTotal = 0;
+      if (pricing === "By Weight") {
+        const stonePrice = parseFloat(item.stone_price) || 0;
+        const makingCharges = parseFloat(item.making_charges) || 0;
+        const rateAmt = parseFloat(item.rate_amt) || 0;
+        const hmCharges = parseFloat(item.hm_charges) || 0;
+        itemTotal = stonePrice + makingCharges + rateAmt + hmCharges;
+      } else {
+        const pieceCost = parseFloat(item.pieace_cost) || 0;
+        const qty = parseFloat(item.qty) || 0;
+        itemTotal = pieceCost * qty;
+      }
+
+      // Calculate item's share of the total amount
+      const itemShare = itemTotal / totalAmountWithoutDiscounts;
+
+      // Calculate item's net amount based on the calculatedNetAmount
+      const itemNet = calculatedNetAmount * itemShare;
+
+      // Calculate taxable amount after subtracting festival discount
+      const itemTaxableBeforeFestival = itemNet / (1 + itemTaxPercent / 100);
+      const itemTaxable = Math.max(0, itemTaxableBeforeFestival - itemFestivalDiscount);
+      const itemTax = itemTaxable * (itemTaxPercent / 100);
+
+      totalTaxableAmount += itemTaxable;
+      totalTaxAmount += itemTax;
+    });
+
+    // Now calculate the required discount amount (excluding festival discount)
+    const totalAfterFestivalDiscount = totalAmountWithoutDiscounts - festivalDiscountAmt;
+    const requiredDiscountAmount = totalAfterFestivalDiscount - totalTaxableAmount;
+
+    // Calculate discount percentage based on making charges and piece cost only
+    const discountBase = totalMakingCharges + totalPieceCost;
+    const discountPercent = discountBase ? (requiredDiscountAmount * 100) / discountBase : 0;
+
+    const roundedDiscount = parseFloat(discountPercent.toFixed(2));
+
+    if (roundedDiscount !== discount) {
+      setDiscount(roundedDiscount);
+      localStorage.setItem("discount", roundedDiscount.toString());
+      applyDiscountToRepairDetails(roundedDiscount, true); // Pass true to preserve festival discount
+    }
+
+    setManualNetAmount(calculatedNetAmount);
+  };
+
+  // Update the payableAmount calculation
+  const payableAmount = isManualNetMode
+    ? manualNetPayAmount
+    : netAmount - (schemeAmount + oldItemsAmount + salesNetAmount);
+
+  const netPayableAmount = payableAmount;
   const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
   const netPayAmount = netPayableAmount
+
+
+
 
 
 
@@ -1554,6 +1635,8 @@ const SalesForm = () => {
                 handleManualNetAmountChange={handleManualNetAmountChange}
                 isManualNetMode={isManualNetMode}
                 setIsManualNetMode={setIsManualNetMode}
+                handleManualNetPayAmountChange={handleManualNetPayAmountChange}
+                manualNetPayAmount={manualNetPayAmount}
               />
             </div>
           </div>

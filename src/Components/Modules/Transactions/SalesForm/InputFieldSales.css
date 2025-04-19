@@ -1,4 +1,4 @@
-.input-field-container {
+.input-field-container-sales {
     position: relative;
     margin-bottom: 20px;
   }
@@ -8,7 +8,7 @@
     height: 26px;
   }
   
-  .floating-label {
+  .floating-label-sales {
     position: absolute;
     top: -5px;
     height: 6px;
@@ -17,9 +17,10 @@
     font-size: 13px;
     color: #A26D2B;
     z-index: 1000;
+    margin-left: 7px;
   }
   
-  .input-label {
+  .input-label-sales {
     font-size: 14px;
     color: #333;
     margin-bottom: 5px;

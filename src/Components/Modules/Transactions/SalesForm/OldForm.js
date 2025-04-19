@@ -86,9 +86,9 @@ const OldSalesForm = ({ setOldSalesData, repairDetails, tabId }) => {
   }, [oldDetails.metal]);
 
 
-  
-  
-  
+
+
+
   useEffect(() => {
     const fetchCurrentRates = async () => {
       try {
@@ -108,44 +108,44 @@ const OldSalesForm = ({ setOldSalesData, repairDetails, tabId }) => {
     fetchCurrentRates();
   }, []);
 
-useEffect(() => {
-  const fetchAndFilterPurity = async () => {
-    try {
-      const response = await axios.get(`${baseURL}/purity`);
-      const allPurityOptions = response.data;
+  useEffect(() => {
+    const fetchAndFilterPurity = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/purity`);
+        const allPurityOptions = response.data;
 
-      const filteredPurityOptions = allPurityOptions.filter(
-        (option) => option.metal.toLowerCase() === oldDetails.metal.toLowerCase()
-      );
+        const filteredPurityOptions = allPurityOptions.filter(
+          (option) => option.metal.toLowerCase() === oldDetails.metal.toLowerCase()
+        );
 
-      const defaultPurityOption = filteredPurityOptions.find((option) =>
-        option.name.toLowerCase().replace(/\s/g, "").includes("22k")
-      );
+        const defaultPurityOption = filteredPurityOptions.find((option) =>
+          option.name.toLowerCase().replace(/\s/g, "").includes("22k")
+        );
 
-      setPurityOptions(filteredPurityOptions);
+        setPurityOptions(filteredPurityOptions);
 
-      setOldDetails((prevDetails) => {
-        const updatedDetails = {
-          ...prevDetails,
-          purity: defaultPurityOption?.name || "",
-          purityPercentage: defaultPurityOption?.purity_percentage || 0,
-        };
+        setOldDetails((prevDetails) => {
+          const updatedDetails = {
+            ...prevDetails,
+            purity: defaultPurityOption?.name || "",
+            purityPercentage: defaultPurityOption?.purity_percentage || 0,
+          };
 
-        // **Ensure calculations happen immediately after purity change**
-        updatedDetails.net_wt = calculateNetWeight(updatedDetails);
-        updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
+          // **Ensure calculations happen immediately after purity change**
+          updatedDetails.net_wt = calculateNetWeight(updatedDetails);
+          updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
 
-        return updatedDetails;
-      });
-    } catch (error) {
-      console.error("Error fetching purity options:", error);
+          return updatedDetails;
+        });
+      } catch (error) {
+        console.error("Error fetching purity options:", error);
+      }
+    };
+
+    if (oldDetails.metal) {
+      fetchAndFilterPurity();
     }
-  };
-
-  if (oldDetails.metal) {
-    fetchAndFilterPurity();
-  }
-}, [oldDetails.metal]);
+  }, [oldDetails.metal]);
 
 
   const normalizePurity = (purity) => purity.toLowerCase().replace(/\s+/g, "");
@@ -153,9 +153,9 @@ useEffect(() => {
   useEffect(() => {
     const normalizedMetal = oldDetails.metal?.toLowerCase() || "";
     const normalizedPurity = normalizePurity(oldDetails.purity || "");
-  
+
     let updatedRate = 0;
-  
+
     if (normalizedMetal === "silver") {
       updatedRate = rates.rate_silver || 0;
     } else if (normalizedMetal === "gold" && normalizedPurity === "manual") {
@@ -163,66 +163,66 @@ useEffect(() => {
     } else {
       updatedRate =
         normalizedPurity.includes("24") ? rates.rate_24crt :
-        normalizedPurity.includes("22") ? rates.rate_22crt :
-        normalizedPurity.includes("18") ? rates.rate_18crt :
-        normalizedPurity.includes("16") ? rates.rate_16crt :
-        rates.rate_22crt; // Default to rate_22crt if no match
+          normalizedPurity.includes("22") ? rates.rate_22crt :
+            normalizedPurity.includes("18") ? rates.rate_18crt :
+              normalizedPurity.includes("16") ? rates.rate_16crt :
+                rates.rate_22crt; // Default to rate_22crt if no match
     }
-    
-  
+
+
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, rate: updatedRate };
-  
+
       // Immediately update net weight and total amount after setting rate
       updatedDetails.net_wt = calculateNetWeight({
         ...updatedDetails,
         purityPercentage: updatedDetails.purityPercentage,
       });
-  
+
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
-  
+
       return updatedDetails;
     });
-  
+
   }, [oldDetails.purity, oldDetails.metal, rates]);
-  
+
 
   const calculateNetWeight = ({ gross, dust, purityPercentage, ml_percent }) => {
     const purityPercentageValue = parseFloat(purityPercentage) || 0;
     const grossWeight = parseFloat(gross) || 0;
     const dustWeight = parseFloat(dust) || 0;
     const mlPercentValue = parseFloat(ml_percent) || 0;
-  
+
     const netWeight = ((grossWeight - dustWeight) * (purityPercentageValue - mlPercentValue)) / 100;
     return parseFloat(netWeight.toFixed(3)); // Set to three decimal places
   };
-  
+
 
   const calculateTotalAmount = ({ net_wt, rate }) => {
     const netWeight = Number(net_wt) || 0;
     const rateAmount = Number(rate) || 0;
-  
+
     const totalAmount = netWeight * rateAmount;
     return Number(totalAmount.toFixed(2));
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     setOldDetails((prevDetails) => {
       const updatedDetails = { ...prevDetails, [name]: value };
-  
+
       if (name === "metal") {
         updatedDetails.purity = "";
         updatedDetails.purityPercentage = "";
-  
+
         if (value === "Silver") {
           updatedDetails.rate = rates.rate_silver || "0.00";
         } else {
           updatedDetails.rate = "";
         }
       }
-  
+
       if (name === "purity") {
         if (value !== "Manual") {
           const selectedOption = purityOptions.find((option) => option.name === value);
@@ -233,11 +233,11 @@ useEffect(() => {
       } else if (name === "purityPercentage") {
         updatedDetails.purityPercentage = parseFloat(value) || 0;
       }
-  
+
       // **Update net weight and total amount immediately**
       updatedDetails.net_wt = calculateNetWeight(updatedDetails);
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
-  
+
       return updatedDetails;
     });
   };
@@ -270,16 +270,16 @@ useEffect(() => {
     // Reset form fields
     setOldDetails({
       product: "",
-      metal: "",
-      purity: "",
+      // metal: "",
+      // purity: "",
       purityPercentage: "",
       hsn_code: "",  // Can be empty now
       gross: 0,
       dust: 0,
-      ml_percent: 0,
+      // ml_percent: 0,
       net_wt: 0,
       remarks: "",
-      rate: 0,
+      // rate: 0,
       total_amount: 0,
       total_old_amount: 0,
     });
@@ -299,7 +299,7 @@ useEffect(() => {
   return (
     <>
       <Row>
-        <h4 className="mb-3" style={{fontSize:"17px", marginTop:"-9px"}}>URD Purchase</h4>
+        <h4 className="mb-3" style={{ fontSize: "17px", marginTop: "-9px" }}>URD Purchase</h4>
         <Col xs={12} md={3}>
           <InputField label="Product" name="product" value={oldDetails.product} onChange={handleInputChange} />
         </Col>
@@ -386,10 +386,11 @@ useEffect(() => {
           <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={2}>
-          <Button onClick={handleAddButtonClick} style={{ backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)',     marginTop:"4px",
-    padding: "2px 8px",
-    fontSize:  "15px",
- }}>
+          <Button onClick={handleAddButtonClick} style={{
+            backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)', marginTop: "4px",
+            padding: "2px 8px",
+            fontSize: "15px",
+          }}>
             {editingRow !== null ? "Update" : "Add"}
           </Button>
         </Col>
@@ -397,7 +398,7 @@ useEffect(() => {
 
       <Table striped bordered hover >
         <thead>
-          <tr style={{fontSize:"13px"}}>
+          <tr style={{ fontSize: "13px" }}>
             <th>Product</th>
             <th>Metal</th>
             <th>Gross</th>

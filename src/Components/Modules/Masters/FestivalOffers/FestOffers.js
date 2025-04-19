@@ -58,27 +58,27 @@ function FestOffers() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
+      const offerData = { ...formData, offer_id: 1 }; // Always use offer_id: 1
+  
       if (offer_id) {
-        // PUT update with offer_id in body
-        await axios.put(`${baseURL}/api/offers/${offer_id}`, {
-          offer_id: offer_id,
-          ...formData,
-        });
+        // Update offer with offer_id = 1
+        await axios.put(`${baseURL}/api/offers/1`, offerData);
         alert("Offer updated successfully!");
       } else {
-        // Create new offer
-        await axios.post(`${baseURL}/api/offers`, formData);
+        // Create or overwrite offer with offer_id = 1
+        await axios.post(`${baseURL}/api/offers`, offerData);
         alert("Offer saved successfully!");
       }
-
+  
       navigate("/festofferstable");
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Failed to save offer.");
     }
   };
+  
 
   const handleBack = () => {
     navigate("/festofferstable");
