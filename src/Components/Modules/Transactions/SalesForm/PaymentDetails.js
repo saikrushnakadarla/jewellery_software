@@ -43,17 +43,21 @@ const PaymentDetails = ({
   setManualNetAmount,
   handleManualNetAmountChange,
   isManualNetMode,
-  setIsManualNetMode
+  setIsManualNetMode,
+  handleManualNetPayAmountChange,
+  manualNetPayAmount
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const location = useLocation();
   const [appliedOfferKey, setAppliedOfferKey] = useState(null);
 
+  // In your component state
+  const [isAnyOfferApplied, setIsAnyOfferApplied] = useState(false);
 
   const handleApply = (selectedOffer, offerIndex) => {
     const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
     const currentOfferKey = `${selectedOffer._id}_${offerIndex}`;
-    const isAlreadyApplied = appliedOffers[currentOfferKey];
+    const isAlreadyApplied = appliedOffers[currentOfferKey] || isAnyOfferApplied;
 
     let updatedRepairDetails = [...storedRepairDetails];
 
@@ -95,9 +99,6 @@ const PaymentDetails = ({
 
         const taxAmt = (totalBeforeTax * taxPercent) / 100;
         const updatedTotalPrice = totalBeforeTax + taxAmt;
-        console.log("originalTotalPrice=", originalTotalPrice)
-        // const taxAmt = (taxPercent * originalTotalPrice) / (100 + taxPercent); 
-        console.log("taxAmt=", taxAmt)
 
         return {
           ...item,
@@ -115,6 +116,7 @@ const PaymentDetails = ({
       setRepairDetails(updatedRepairDetails);
       localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedRepairDetails));
       setAppliedOffers({});
+      setIsAnyOfferApplied(false);
       return;
     }
 
@@ -195,7 +197,9 @@ const PaymentDetails = ({
     setAppliedOffers({
       [currentOfferKey]: true,
     });
+    setIsAnyOfferApplied(true);
   };
+
 
 
 
@@ -288,64 +292,73 @@ const PaymentDetails = ({
     localStorage.setItem(`paymentDetails_${tabId}`, JSON.stringify(updatedDetails)); // Update localStorage on change
   };
 
-
   return (
     <>
       <div>
         <Col className="sales-form-section">
           <Row>
-            <h4 className="mb-3" style={{fontSize:"20px"}}>Summary</h4>
+            <h4 className="mb-3" style={{ fontSize: "20px" }}>Summary</h4>
             {/* <div style={{ maxHeight: "140px", overflowY: "auto" }}> */}
             <Table bordered hover responsive >
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right">Total Amount</td>
                 <td colSpan="4">{totalAmount.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
                 <td colSpan="12" className="text-right" >Discount Amount</td>
                 <td colSpan="4">  @
                   <input
                     type="number"
                     value={discount}
                     onChange={handleDiscountChange}
-                    style={{ width: '70px', padding: '2px' , fontSize: "13px"}}
+                    style={{ width: '70px', padding: '2px', fontSize: "13px" }}
                   />
                 </td>
                 <td colSpan="4">
                   {discountAmt.toFixed(2)}
                 </td>
               </tr>
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
                 <td colSpan="12" className="text-right" >Festival Offer</td>
                 <td colSpan="4"> &ensp;&ensp;
                   <Button
                     style={{
                       padding: '2px 5px',
-                      backgroundColor: '#4CAF50',
+                      backgroundColor: isAnyOfferApplied ? '#f44336' : '#4CAF50',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
-                      cursor: 'pointer',
-                      fontSize: "13px"
+                      cursor: offers.length === 0 ? 'not-allowed' : 'pointer',
+                      fontSize: "13px",
+                      opacity: offers.length === 0 ? 0.6 : 1, // visual cue when disabled
                     }}
-                    onClick={handleFestivalShowModal}
-                  >Apply</Button>
+                    disabled={offers.length === 0}
+                    onClick={() => {
+                      if (offers.length > 0) {
+                        handleApply(offers[0], 0);
+                        // handleFestivalShowModal();
+                      }
+                    }}
+                  >
+                    {isAnyOfferApplied ? "Unapply" : "Apply"}
+                  </Button>
                 </td>
+
                 <td colSpan="4">{festivalDiscountAmt.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right" >Taxable Amount</td>
                 <td colSpan="4">{taxableAmount.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right" >Tax Amount</td>
                 <td colSpan="4">{taxAmount.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
 
                 <td colSpan="16" className="text-right" >Net Amount</td>
-                {/* <td colSpan="4">{netAmount.toFixed(2)}</td> */}
-                <td colSpan="4">
+                <td colSpan="4">{netAmount.toFixed(2)}</td>
+                {/* <td colSpan="4">
                   <input
                     type="number"
                     style={{ width: '100px', padding: '5px' , fontSize: "13px"}}
@@ -356,27 +369,38 @@ const PaymentDetails = ({
                       setIsManualNetMode(newValue > 0); // Enable manual mode only if value > 0
                     }}
                   />
-                </td>
+                </td> */}
 
                 {/* <td colSpan="16" className="text-right" style={{fontSize:"13px"}}>Net Amount</td>
                 <td colSpan="4">{netAmount.toFixed(2)}</td> */}
 
               </tr>
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right" >Old Items Amount</td>
                 <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right" >Scheme Amount</td>
                 <td colSpan="4">{schemeAmount.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right" >Sale Return Amount</td>
                 <td colSpan="4">{salesNetAmount.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"13px"}}>
+              <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right" >Net Payable Amount</td>
-                <td colSpan="4">{Math.round(netPayAmount).toFixed(2)}</td>
+                {/* <td colSpan="4">{Math.round(netPayAmount).toFixed(2)}</td> */}
+                <td colSpan="4">
+                  <input
+                    type="number"
+                    style={{ width: '100px', padding: '5px', fontSize: "13px" }}
+                    value={isManualNetMode ? manualNetPayAmount : netPayableAmount.toFixed(2)}
+                    onChange={(e) => {
+                      const newValue = parseFloat(e.target.value) || 0;
+                      handleManualNetPayAmountChange(newValue);
+                    }}
+                  />
+                </td>
               </tr>
             </Table>
             {/* </div> */}
@@ -385,7 +409,7 @@ const PaymentDetails = ({
 
         <Col className="sales-form-section">
           <Row>
-            <h4 className="mb-3" style={{fontSize:"18px"}}>Payment Details</h4>
+            <h4 className="mb-3" style={{ fontSize: "18px" }}>Payment Details</h4>
             <Col xs={12} md={4}>
               <InputField
                 label="Cash Amt"
@@ -421,10 +445,11 @@ const PaymentDetails = ({
             <Col xs={12} md={3}>
               <Button
                 onClick={handleSave}
-                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' ,     fontSize : "14px",
+                style={{
+                  backgroundColor: '#a36e29', borderColor: '#a36e29', fontSize: "14px",
                   marginTop: "3px",
                   padding: "4px 8px"
-              }}
+                }}
 
               >
                 Save
@@ -434,9 +459,11 @@ const PaymentDetails = ({
               <Button
                 variant="secondary"
                 onClick={handleBack}
-                style={{ backgroundColor: 'gray', marginLeft: '-62px', fontSize : "14px",
+                style={{
+                  backgroundColor: 'gray', marginLeft: '-62px', fontSize: "14px",
                   marginTop: "3px",
-                  padding: "4px 8px" }}
+                  padding: "4px 8px"
+                }}
               >
                 Cancel
               </Button>

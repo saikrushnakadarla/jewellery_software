@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Purchase.css";
-import InputField from "../../../Pages/InputField/InputField";
+import InputField from "../SalesForm/InputfieldSales";
 import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
 import { renderMatches, useNavigate, useLocation } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -1318,7 +1318,7 @@ const URDPurchase = () => {
     <div className="main-container">
       <div className="purchase-form-container">
         <Form onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}>
-          <div className="purchase-form">
+          <div className="purchase-form" style={{marginTop:"-10px"}}>
             <div className="purchase-form-left">
               <Col className="urd-form1-section">
                 <h4 className="mb-4">Supplier Details</h4>
