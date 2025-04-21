@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./Receipts.css";
 import InputField from "../../../Pages/InputField/InputField";
 import { Container, Row, Col, Button } from "react-bootstrap";
@@ -9,10 +9,14 @@ import { pdf } from "@react-pdf/renderer";
 import PDFContent from "./ReceiptPdf";
 import { useParams } from "react-router-dom";
 import { saveAs } from "file-saver";
+import { AuthContext } from "../../../Pages/Login/Context";
 
 const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  // If using context
+  // const { user } = useAuth(); // Assuming you have an auth context
+  const { authToken, userId, userName, role } = useContext(AuthContext);
   const repairData = location.state?.repairData;
   const [formData, setFormData] = useState({
     transaction_type: "Receipt",
@@ -661,61 +665,63 @@ const RepairForm = () => {
         <Row className="payments-form-section">
           <h4>Invoice Item Details</h4>
           <table className="table table-bordered">
-            <thead>
-              <tr>
-                {/* <th>Id</th> */}
-                <th>Bar Code</th>
-                <th>Product Name</th>
-                <th>Metal</th>
-                <th>Purity</th>
-                <th>Gross Wt</th>
-                <th>Stone Wt</th>
-                <th>W.Wt</th>
-                <th>Total Wt</th>
-                <th>MC</th>
-                <th>Rate / Piece Cost</th>
-                <th>Tax Amt</th>
-                <th>Total Price</th>
-                <th>Sale Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {repeatedData.length > 0 ? (
-                repeatedData.map((item, index) => (
-                  <tr key={index}>
-                    {/* <td>{item.id}</td> */}
-                    <td>{item.code}</td>
-                    <td>{item.product_name}</td>
-                    <td>{item.metal_type}</td>
-                    <td>{item.selling_purity}</td>
-                    <td>{item.gross_weight}</td>
-                    <td>{item.stone_weight}</td>
-                    <td>{item.wastage_weight}</td>
-                    <td>{item.total_weight_av}</td>
-                    <td>{item.making_charges}</td>
-                    <td>{item.pieace_cost ? item.pieace_cost : item.rate}</td>
-                    <td>{item.tax_amt}</td>
-                    <td>{item.total_price}</td>
-                    <td>{item.sale_status}</td>
-                    <td>
-                      <button
-                        className="btn btn-success btn-sm"
-                        onClick={() => handleStatusUpdate(item.id, item.sale_status)}
-                      >
-                        {item.sale_status === "Delivered" ? "Mark Not Delivered" : "Mark Delivered"}
-                      </button>
-                    </td>
+  <thead>
+    <tr>
+      <th>Bar Code</th>
+      <th>Product Name</th>
+      <th>Metal</th>
+      <th>Purity</th>
+      <th>Gross Wt</th>
+      <th>Stone Wt</th>
+      <th>W.Wt</th>
+      <th>Total Wt</th>
+      <th>MC</th>
+      <th>Rate / Piece Cost</th>
+      <th>Tax Amt</th>
+      <th>Total Price</th>
+      <th>Sale Status</th>
+      {userName === "ADMIN" && <th>Action</th>}
+    </tr>
+  </thead>
+  <tbody>
+    {repeatedData.length > 0 ? (
+      repeatedData.map((item, index) => (
+        <tr key={index}>
+          <td>{item.code}</td>
+          <td>{item.product_name}</td>
+          <td>{item.metal_type}</td>
+          <td>{item.selling_purity}</td>
+          <td>{item.gross_weight}</td>
+          <td>{item.stone_weight}</td>
+          <td>{item.wastage_weight}</td>
+          <td>{item.total_weight_av}</td>
+          <td>{item.making_charges}</td>
+          <td>{item.pieace_cost ? item.pieace_cost : item.rate}</td>
+          <td>{item.tax_amt}</td>
+          <td>{item.total_price}</td>
+          <td>{item.sale_status}</td>
+          {userName === "ADMIN" && (
+            <td>
+              <button
+                className="btn btn-success btn-sm"
+                onClick={() => handleStatusUpdate(item.id, item.sale_status)}
+              >
+                {item.sale_status === "Delivered" ? "Mark Not Delivered" : "Mark Delivered"}
+              </button>
+            </td>
+          )}
+        </tr>
+      ))
+    ) : (
+      <tr>
+        <td colSpan={role === "admin" ? 14 : 13} className="text-center">
+          No item Details available.
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
 
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="13" className="text-center">No item Details available.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
 
 
         </Row>

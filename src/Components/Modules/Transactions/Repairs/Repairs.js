@@ -314,7 +314,8 @@ const RepairForm = () => {
           alert("Repair entry added successfully!");
         }
       }
-      navigate("/repairstable");
+      // navigate("/repairstable");
+      navigate(-1); 
     } catch (error) {
       console.error("Error submitting the form:", error);
       alert("Failed to submit the repair entry");
@@ -327,7 +328,8 @@ const RepairForm = () => {
   };
 
   const handleBack = () => {
-    navigate("/repairstable");
+    // navigate("/repairstable");
+    navigate(-1); 
   };
 
   useEffect(() => {

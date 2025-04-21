@@ -78,7 +78,7 @@ const SalesFormSection = ({ setOldSalesData,
             onClick={() => {
               setActiveForm("orders");
               console.log("Navigating to Orders with Mobile:", selectedMobile); // Log before navigation
-              navigate("/orderstable", { state: { mobile: selectedMobile } });
+              navigate("/orders", { state: { mobile: selectedMobile } });
             }}
             className="ms-2"
           >

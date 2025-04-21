@@ -8,7 +8,7 @@
     height: 26px;
   }
   
-  .floating-label-sales {
+  /* .floating-label-sales {
     position: absolute;
     top: -5px;
     height: 6px;
@@ -18,7 +18,20 @@
     color: #A26D2B;
     z-index: 1000;
     margin-left: 7px;
+  } */
+  .floating-label-sales {
+    position: absolute;
+    top: -5px;
+    height: 10px;
+    background: white;
+    padding: 0 5px;
+    font-size: 13px;
+    color: #A26D2B;
+    z-index: 1;
+    margin-left: 7px;
+    pointer-events: none; /* Prevent focus or click events */
   }
+  
   
   .input-label-sales {
     font-size: 14px;

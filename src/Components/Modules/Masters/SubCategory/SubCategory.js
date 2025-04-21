@@ -161,8 +161,8 @@ function SubCategory() {
         alert("Subcategory created successfully!");
       }
       // navigate("/subcategorytable");
-      const from = location.state?.from || "/subcategorytable";
-      navigate(from);
+      // const from = location.state?.from || "/subcategorytable";
+      navigate(-1); 
     } catch (error) {
       console.error("Error saving subcategory:", error.message);
       alert("Failed to save subcategory. Please try again.");
@@ -171,8 +171,8 @@ function SubCategory() {
   const location = useLocation();
   const handleBack = () => {
     // navigate("/subcategorytable");
-    const from = location.state?.from || "/subcategorytable";
-    navigate(from);
+    // const from = location.state?.from || "/subcategorytable";
+    navigate(-1); 
   };
 
   return (
