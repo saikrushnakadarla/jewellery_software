@@ -356,7 +356,7 @@ const RepairsTable = () => {
 
         // **Set discount percentage in localStorage**
         if (updatedRepairDetails.length > 0 && updatedRepairDetails[0].disscount_percentage) {
-          localStorage.setItem('discount', updatedRepairDetails[0].disscount_percentage);
+          localStorage.setItem(`discount_${tabId}`, updatedRepairDetails[0].disscount_percentage);
          
         }
 

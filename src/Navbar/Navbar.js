@@ -56,15 +56,31 @@ function Navbar() {
     const expectedPath = `/sales?tabId=${tabId}`;
   
     if (currentPathWithQuery !== expectedPath) {
+      // Remove specific known keys
       localStorage.removeItem('oldSalesData');
       localStorage.removeItem('schemeSalesData');
       localStorage.removeItem(`repairDetails_${tabId}`);
       localStorage.removeItem(`paymentDetails_${tabId}`);
       localStorage.removeItem(`oldTableData_${tabId}`);
       localStorage.removeItem('schemeTableData');
-      localStorage.removeItem('discount');
+      localStorage.removeItem(`discount_${tabId}`);
+  
+      // Dynamically remove all keys that start with specific prefixes
+      Object.keys(localStorage).forEach((key) => {
+        if (
+          key.startsWith('saleFormData_') ||
+          key.startsWith('repairDetails_') || 
+          key.startsWith('paymentDetails_') ||
+          key.startsWith('oldTableData_')
+        ) {
+          localStorage.removeItem(key);
+        }
+      });
     }
   }, [location.pathname, location.search, tabId]);
+  
+  
+  
   
   
 
@@ -122,7 +138,8 @@ function Navbar() {
   const isActive = (path) => {
     return location.pathname === path ? 'active' : '';  // Return 'active' if the path matches the current location
   };
-  const userRole = localStorage.getItem('role'); // 'admin' or other roles
+  const userRole = localStorage.getItem('userRole'); // 'admin' or other roles
+  console.log("userRole=",userRole)
 
   return (
     <header className="navbar-header">

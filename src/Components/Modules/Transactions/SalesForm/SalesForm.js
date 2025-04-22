@@ -295,12 +295,12 @@ const SalesForm = () => {
 
   const [editIndex, setEditIndex] = useState(null);
   const [discount, setDiscount] = useState(() => {
-    return parseFloat(localStorage.getItem("discount")) || ""; // Load discount from localStorage
+    return parseFloat(localStorage.getItem(`discount_${tabId}`)) || ""; // Load discount from localStorage
   });
   const [isManualNetMode, setIsManualNetMode] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem("discount", discount); // Save to localStorage when discount changes
+    localStorage.setItem(`discount_${tabId}`, discount); // Save to localStorage when discount changes
   }, [discount]);
 
 
@@ -1171,7 +1171,7 @@ const SalesForm = () => {
 
     if (roundedDiscount !== discount) {
       setDiscount(roundedDiscount);
-      localStorage.setItem("discount", roundedDiscount.toString());
+      localStorage.setItem(`discount_${tabId}`, roundedDiscount.toString());
       applyDiscountToRepairDetails(roundedDiscount);
     }
 
@@ -1308,7 +1308,7 @@ const SalesForm = () => {
 
     if (roundedDiscount !== discount) {
       setDiscount(roundedDiscount);
-      localStorage.setItem("discount", roundedDiscount.toString());
+      localStorage.setItem(`discount_${tabId}`, roundedDiscount.toString());
       applyDiscountToRepairDetails(roundedDiscount, true); // Pass true to preserve festival discount
     }
 
@@ -1371,7 +1371,7 @@ const SalesForm = () => {
     localStorage.removeItem(`paymentDetails_${tabId}`);
     localStorage.removeItem(`oldTableData_${tabId}`);
     localStorage.removeItem('schemeTableData');
-    localStorage.removeItem("discount");
+    localStorage.removeItem(`discount_${tabId}`);
     localStorage.removeItem(`saleFormData_${tabId}`);
     console.log("Data cleared successfully");
   };
@@ -1620,7 +1620,7 @@ const SalesForm = () => {
     localStorage.removeItem(`paymentDetails_${tabId}`);
     localStorage.removeItem(`oldTableData_${tabId}`);
     localStorage.removeItem('schemeTableData');
-    localStorage.removeItem("discount");
+    localStorage.removeItem(`discount_${tabId}`);
     console.log("Data cleared successfully");
     window.location.reload();
   };

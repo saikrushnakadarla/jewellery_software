@@ -246,7 +246,7 @@ const PaymentDetails = ({
               <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right" >Net Payable Amount</td>
                 {/* <td colSpan="4">{Math.round(netPayAmount).toFixed(2)}</td> */}
-                <td colSpan="4">
+                {/* <td colSpan="4">
                   <input
                     type="number"
                     style={{ width: '100px', padding: '5px', fontSize: "13px" }}
@@ -256,7 +256,23 @@ const PaymentDetails = ({
                       handleManualNetPayAmountChange(newValue);
                     }}
                   />
+                </td> */}
+                <td colSpan="4">
+                  <input
+                    type="number"
+                    style={{ width: '100px', padding: '5px', fontSize: "13px" }}
+                    value={
+                      isManualNetMode
+                        ? manualNetPayAmount
+                        : Math.round(netPayableAmount).toFixed(2)
+                    }
+                    onChange={(e) => {
+                      const newValue = parseFloat(e.target.value) || 0;
+                      handleManualNetPayAmountChange(newValue);
+                    }}
+                  />
                 </td>
+
               </tr>
             </Table>
             {/* </div> */}

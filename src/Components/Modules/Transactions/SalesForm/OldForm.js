@@ -397,8 +397,8 @@ const OldSalesForm = ({ setOldSalesData, repairDetails, tabId }) => {
       </Row>
 
       <Table striped bordered hover >
-        <thead>
-          <tr style={{ fontSize: "13px" }}>
+        <thead style={{ fontSize: "13px" }}>
+          <tr>
             <th>Product</th>
             <th>Metal</th>
             <th>Gross</th>
@@ -412,7 +412,7 @@ const OldSalesForm = ({ setOldSalesData, repairDetails, tabId }) => {
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody style={{ fontSize: "13px" }}>
           {oldTableData.map((data, index) => (
             <tr key={index}>
               <td>{data.product}</td>
