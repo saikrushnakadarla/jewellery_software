@@ -453,14 +453,15 @@ const SalesForm = () => {
 
       if (existingDetails.length > 0) {
         // navigate("/orderstable");
-        navigate(-1); 
+        // navigate(-1); 
       
       }
+      navigate(-1); 
       clearData();  // Ensure data is cleared before reloading
       resetForm();
       window.location.reload();
       alert("Order added successfully");
-      navigate(-1); 
+      // navigate(-1); 
       await axios.post(`${baseURL}/save-order-details`, dataToSave);
     } catch (error) {
       console.error("Error saving data:", error);

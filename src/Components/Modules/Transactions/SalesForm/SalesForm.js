@@ -1591,6 +1591,7 @@ const SalesForm = () => {
           taxableAmount={taxableAmount}
           taxAmount={taxAmount}
           discountAmt={discountAmt}
+          festivalDiscountAmt={festivalDiscountAmt}
           oldItemsAmount={oldItemsAmount}
           schemeAmount={schemeAmount}
           salesNetAmount={salesNetAmount}

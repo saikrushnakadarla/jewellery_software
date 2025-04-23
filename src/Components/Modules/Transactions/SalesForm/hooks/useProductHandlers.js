@@ -774,37 +774,89 @@ useEffect(() => {
     fetchCategory();
   }, []);
 
+  // const fetchSubCategory = async () => {
+  //   try {
+  //     const response = await fetch(`${baseURL}/subcategory`); // Use the correct API endpoint
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch data");
+  //     }
+  //     const result = await response.json();
+  //     if (result && result.data) {
+  //       // If formData.metal_type is available, filter based on it, otherwise show all
+  //       const filteredData = formData.product_id
+  //         ? result.data.filter((item) => item.category_id === formData.product_id)
+  //         : result.data;
+
+  //       // Format the filtered options
+  //       const formattedOptions = filteredData.map((item) => ({
+  //         label: item.sub_category_name, // Display value
+  //         value: item.sub_category_name, // Unique ID for value
+  //         selling_purity: item.selling_purity,
+  //         printing_purity: item.printing_purity,
+  //         purity: item.purity,
+  //       }));
+
+  //       setSubcategoryOptions(formattedOptions);
+  //     } else {
+  //       console.error("Invalid API response format", result);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+
   const fetchSubCategory = async () => {
     try {
-      const response = await fetch(`${baseURL}/subcategory`); // Use the correct API endpoint
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
+      const response = await fetch(`${baseURL}/subcategory`);
       const result = await response.json();
       if (result && result.data) {
-        // If formData.metal_type is available, filter based on it, otherwise show all
         const filteredData = formData.product_id
           ? result.data.filter((item) => item.category_id === formData.product_id)
           : result.data;
-
-        // Format the filtered options
+  
         const formattedOptions = filteredData.map((item) => ({
-          label: item.sub_category_name, // Display value
-          value: item.sub_category_name, // Unique ID for value
+          label: item.sub_category_name,
+          value: item.sub_category_name,
           selling_purity: item.selling_purity,
           printing_purity: item.printing_purity,
           purity: item.purity,
         }));
-
+  
         setSubcategoryOptions(formattedOptions);
-      } else {
-        console.error("Invalid API response format", result);
+  
+        // Set the newly added subcategory as selected and update all related fields
+        if (location.state?.newSubCategory) {
+          const found = formattedOptions.find(opt => opt.label === location.state.newSubCategory);
+          if (found) {
+            setFormData(prev => {
+              const updatedData = {
+                ...prev,
+                product_name: found.value,
+                selling_purity: found.selling_purity || "",
+                purity: found.purity || "",
+                printing_purity: found.printing_purity || "",
+              };
+  
+              // Also update the rate if needed
+              if (prev.metal_type && prev.metal_type.toLowerCase() === "silver") {
+                updatedData.rate = rates.silver_rate || "";
+              } else {
+                const purityValue = parseFloat(found.selling_purity);
+                const baseRate = parseFloat(prev.rate_24k) || 0;
+                if (!isNaN(purityValue)) {
+                  updatedData.rate = ((purityValue / 100) * baseRate).toFixed(2);
+                }
+              }
+  
+              return updatedData;
+            });
+          }
+        }
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching subcategories:", error);
     }
   };
-
   useEffect(() => {
     fetchSubCategory();
   }, [formData.category]);

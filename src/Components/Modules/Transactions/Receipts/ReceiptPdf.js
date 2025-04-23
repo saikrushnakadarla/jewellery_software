@@ -241,13 +241,15 @@ const PDFContent = ({ formData }) => {
           {/* Centered Heading */}
           <Text style={[styles.heading, { fontFamily: 'Times-Bold' }]}>SADASHRI VENTURES PRIVATE LIMITED</Text>
 
-          {/* Flat No. and Branch section */}
           <View style={styles.contentContainer}>
+
             {/* Flat No. Section */}
             <View style={styles.leftColumn}>
-              <Text style={styles.flatNo}>Flat No.: 1322/1324, 16th B Cross Housing Board Colony EWS 3rd Phase,</Text>
-              <Text style={styles.cin}>Yelahanka New Town, Bengaluru Urban, Karnataka - 560064.</Text>
-              <Text style={styles.cin}>CN : U46498KX2024PTC185784</Text>
+              <Text style={styles.flatNo}>Flat No : 1323/1324, 16th B Cross Housing </Text>
+              <Text style={styles.cin}>Board Colony EWS 3rd Phase, Yelahanka New </Text>
+              <Text style={styles.cin}>Town, Bengaluru Urban, Karnataka - 560064.</Text>
+              <Text style={styles.cin}>CIN : U46498KA2024PTC185784</Text>
+
             </View>
 
             {/* Vertical Divider */}
@@ -256,8 +258,9 @@ const PDFContent = ({ formData }) => {
             {/* Branch Section */}
             <View style={styles.rightColumn}>
               <Text style={[styles.branch, { fontFamily: 'Times-Bold' }]}>BRANCH:</Text>
-              <Text style={styles.branchContent}>Shop no. 1 No.2063, Dairy Circle, Asha Arcade,</Text>
-              <Text style={styles.branchContent}>16th B Cross Rd, Yalahanka New Town, Bangalore - 064</Text>
+              <Text style={styles.branchContent}>Shop no. 1 No.2063, Dairy Circle, </Text>
+              <Text style={styles.branchContent}> Asha Arcade, 16th B Cross Rd,</Text>
+              <Text style={styles.branchContent}>Yalahanka New Town, Bangalore - 064</Text>
             </View>
           </View>
 

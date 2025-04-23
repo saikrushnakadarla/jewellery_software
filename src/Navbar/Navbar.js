@@ -68,10 +68,11 @@ function Navbar() {
       // Dynamically remove all keys that start with specific prefixes
       Object.keys(localStorage).forEach((key) => {
         if (
-          key.startsWith('saleFormData_') ||
+          // key.startsWith('saleFormData_') ||
           key.startsWith('repairDetails_') || 
           key.startsWith('paymentDetails_') ||
-          key.startsWith('oldTableData_')
+          key.startsWith('oldTableData_') ||
+          key.startsWith('discount_') 
         ) {
           localStorage.removeItem(key);
         }

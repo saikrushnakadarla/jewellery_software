@@ -56,8 +56,8 @@ const PaymentDetails = ({
   // In your component state
 
 
-
-
+  let rounded = Math.round(netPayAmount); // Rounds to nearest whole number
+  console.log(rounded); 
 
   useEffect(() => {
     const storedPaymentDetails = JSON.parse(localStorage.getItem(`paymentDetails_${tabId}`)) || {};
@@ -65,7 +65,7 @@ const PaymentDetails = ({
     const cashAmount =
       location.state?.cash_amount ??
       storedPaymentDetails.cash_amount ??
-      netPayAmount;
+      rounded;
 
     const cardAmt =
       location.state?.card_amt ??
@@ -88,7 +88,7 @@ const PaymentDetails = ({
       chq_amt: chqAmt,
       online_amt: onlineAmt,
     });
-  }, [location.state, netPayAmount, tabId]);
+  }, [location.state, rounded, tabId]);
 
 
   // useEffect(() => {
@@ -103,17 +103,17 @@ const PaymentDetails = ({
 
   useEffect(() => {
     // Only update if cash_amount is NOT provided from location.state
-    if (netPayAmount && location.state?.cash_amount === undefined) {
+    if (rounded && location.state?.cash_amount === undefined) {
       setPaymentDetails((prev) => {
         const updatedDetails = {
           ...prev,
-          cash_amount: parseFloat(netPayAmount).toFixed(2), // Fixed to two decimal places
+          cash_amount: parseFloat(rounded).toFixed(2), // Fixed to two decimal places
         };
         localStorage.setItem(`paymentDetails_${tabId}`, JSON.stringify(updatedDetails));
         return updatedDetails;
       });
     }
-  }, [netPayAmount, location.state, tabId]);
+  }, [rounded, location.state, tabId]);
 
 
   useEffect(() => {
