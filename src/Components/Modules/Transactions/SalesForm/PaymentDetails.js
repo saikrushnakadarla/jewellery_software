@@ -177,7 +177,7 @@ const PaymentDetails = ({
               <tr style={{ fontSize: "13px" }}>
                 <td colSpan="12" className="text-right" >Festival Offer</td>
                 <td colSpan="4"> &ensp;&ensp;
-                  <Button
+                  {/* <Button
                     style={{
                       padding: '2px 5px',
                       backgroundColor: isAnyOfferApplied ? '#f44336' : '#4CAF50',
@@ -197,7 +197,7 @@ const PaymentDetails = ({
                     }}
                   >
                     {isAnyOfferApplied ? "Unapply" : "Apply"}
-                  </Button>
+                  </Button> */}
                 </td>
 
                 <td colSpan="4">{festivalDiscountAmt.toFixed(2)}</td>
