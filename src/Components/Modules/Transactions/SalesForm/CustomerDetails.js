@@ -126,7 +126,8 @@ const CustomerDetails = ({
     if (selectedCustomer) {
       navigate("/receipts", {
         state: {
-          from: "/sales",
+          // from: "/sales",
+          from: `/sales?tabId=${tabId}`,
           invoiceData: {
             account_name: selectedCustomer.account_name,
             mobile: selectedCustomer.mobile,

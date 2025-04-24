@@ -14,6 +14,7 @@ import { AuthContext } from "../../../Pages/Login/Context";
 const RepairForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  console.log("location=", location)
   // If using context
   // const { user } = useAuth(); // Assuming you have an auth context
   const { authToken, userId, userName, role } = useContext(AuthContext);
@@ -34,6 +35,7 @@ const RepairForm = () => {
   });
   const { id } = useParams();
   const { invoiceData } = location.state || {};
+
   useEffect(() => {
     if (invoiceData) {
       console.log('Received Invoice Data:', invoiceData);
@@ -225,13 +227,13 @@ const RepairForm = () => {
       if (name === "total_amt" || name === "discount_amt") {
         const totalAmt = Number(updatedData.total_amt) || 0;
         const discountAmt = Number(updatedData.discount_amt) || 0;
-      
+
         // If `total_amt` is cleared, clear `cash_amt`
         if (name === "total_amt" && value === "") {
           updatedData.cash_amt = "";
         } else if (discountAmt > totalAmt) {
           alert("Paid amount cannot be greater than total amount.");
-      
+
           // Reset the discount_amt if it's greater than total
           updatedData.discount_amt = ""; // or you can set it to totalAmt
           updatedData.cash_amt = "";
@@ -239,7 +241,7 @@ const RepairForm = () => {
           updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
         }
       }
-      
+
 
       // Update `invoiceNumberOptions` when `account_name` changes
       if (name === "account_name") {
@@ -280,21 +282,21 @@ const RepairForm = () => {
           const selectedRepair = repairDetails.find(
             (item) => item.invoice_number === value
           );
-      
+
           if (selectedRepair) {
             const paidAmt = Number(selectedRepair.paid_amt) || 0;
             const receiptsAmt = Number(selectedRepair.receipts_amt) || 0;
             const netBillAmount = Number(selectedRepair.net_bill_amount) || 0;
             const balAfterReceipts = Number(selectedRepair.bal_after_receipts) || 0;
             const balAmt = Number(selectedRepair.bal_amt) || 0;
-      
+
             const total =
               paidAmt + receiptsAmt === netBillAmount
                 ? balAfterReceipts
                 : balAfterReceipts || balAmt;
-      
+
             updatedData.total_amt = total.toFixed(2);
-      
+
             // If there is already a value in discount_amt or cash_amt, clear them
             if (updatedData.discount_amt || updatedData.cash_amt) {
               updatedData.discount_amt = "";
@@ -303,7 +305,7 @@ const RepairForm = () => {
           }
         }
       }
-      
+
 
       return updatedData;
     });
@@ -563,7 +565,7 @@ const RepairForm = () => {
               onChange={handleInputChange}
             />
           </Col>
-          <Col xs={12} md={2}>
+          {/* <Col xs={12} md={2}>
             <InputField
               label="Mobile"
               type="select"
@@ -573,7 +575,6 @@ const RepairForm = () => {
               options={mobileOptions}
             />
           </Col>
-
           <Col xs={12} md={2}>
             <InputField
               label="Account Name"
@@ -585,7 +586,6 @@ const RepairForm = () => {
               autoFocus
             />
           </Col>
-
           <Col xs={12} md={2}>
             <InputField
               label="Invoice Number"
@@ -595,6 +595,70 @@ const RepairForm = () => {
               onChange={handleInputChange}
               options={invoiceNumberOptions}
             />
+          </Col> */}
+          <Col xs={12} md={2}>
+            {invoiceData?.mobile ? (
+              <InputField
+                label="Mobile"
+                type="text"
+                name="mobile"
+                value={formData.mobile}
+                readOnly
+              />
+            ) : (
+              <InputField
+                label="Mobile"
+                type="select"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleInputChange}
+                options={mobileOptions}
+              />
+            )}
+          </Col>
+
+          <Col xs={12} md={2}>
+            {invoiceData?.account_name ? (
+              <InputField
+                label="Account Name"
+                type="text"
+                name="account_name"
+                value={formData.account_name}
+                readOnly
+              />
+            ) : (
+              <InputField
+                label="Account Name"
+                type="select"
+                name="account_name"
+                value={formData.account_name}
+                onChange={handleInputChange}
+                options={accountOptions}
+                autoFocus
+              />
+            )}
+          </Col>
+
+
+          <Col xs={12} md={2}>
+            {invoiceData?.invoice_number ? (
+              <InputField
+                label="Invoice Number"
+                type="text"
+                name="invoice_number"
+                value={formData.invoice_number}
+                readOnly
+              />
+            ) : (
+              <InputField
+                label="Invoice Number"
+                type="select"
+                name="invoice_number"
+                value={formData.invoice_number}
+                onChange={handleInputChange}
+                options={invoiceNumberOptions}
+              />
+            )}
           </Col>
 
           <Col xs={12} md={2}>
@@ -663,62 +727,62 @@ const RepairForm = () => {
         <Row className="payments-form-section">
           <h4>Invoice Item Details</h4>
           <table className="table table-bordered">
-  <thead>
-    <tr>
-      <th>Bar Code</th>
-      <th>Product Name</th>
-      <th>Metal</th>
-      <th>Purity</th>
-      <th>Gross Wt</th>
-      <th>Stone Wt</th>
-      <th>W.Wt</th>
-      <th>Total Wt</th>
-      <th>MC</th>
-      <th>Rate / Piece Cost</th>
-      <th>Tax Amt</th>
-      <th>Total Price</th>
-      <th>Sale Status</th>
-      {userName === "ADMIN" && <th>Action</th>}
-    </tr>
-  </thead>
-  <tbody>
-    {repeatedData.length > 0 ? (
-      repeatedData.map((item, index) => (
-        <tr key={index}>
-          <td>{item.code}</td>
-          <td>{item.product_name}</td>
-          <td>{item.metal_type}</td>
-          <td>{item.selling_purity}</td>
-          <td>{item.gross_weight}</td>
-          <td>{item.stone_weight}</td>
-          <td>{item.wastage_weight}</td>
-          <td>{item.total_weight_av}</td>
-          <td>{item.making_charges}</td>
-          <td>{item.pieace_cost ? item.pieace_cost : item.rate}</td>
-          <td>{item.tax_amt}</td>
-          <td>{item.total_price}</td>
-          <td>{item.sale_status}</td>
-          {userName === "ADMIN" && (
-            <td>
-              <button
-                className="btn btn-success btn-sm"
-                onClick={() => handleStatusUpdate(item.id, item.sale_status)}
-              >
-                {item.sale_status === "Delivered" ? "Mark Not Delivered" : "Mark Delivered"}
-              </button>
-            </td>
-          )}
-        </tr>
-      ))
-    ) : (
-      <tr>
-        <td colSpan={role === "admin" ? 14 : 13} className="text-center">
-          No item Details available.
-        </td>
-      </tr>
-    )}
-  </tbody>
-</table>
+            <thead>
+              <tr>
+                <th>Bar Code</th>
+                <th>Product Name</th>
+                <th>Metal</th>
+                <th>Purity</th>
+                <th>Gross Wt</th>
+                <th>Stone Wt</th>
+                <th>W.Wt</th>
+                <th>Total Wt</th>
+                <th>MC</th>
+                <th>Rate / Piece Cost</th>
+                <th>Tax Amt</th>
+                <th>Total Price</th>
+                <th>Sale Status</th>
+                {userName === "ADMIN" && <th>Action</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {repeatedData.length > 0 ? (
+                repeatedData.map((item, index) => (
+                  <tr key={index}>
+                    <td>{item.code}</td>
+                    <td>{item.product_name}</td>
+                    <td>{item.metal_type}</td>
+                    <td>{item.selling_purity}</td>
+                    <td>{item.gross_weight}</td>
+                    <td>{item.stone_weight}</td>
+                    <td>{item.wastage_weight}</td>
+                    <td>{item.total_weight_av}</td>
+                    <td>{item.making_charges}</td>
+                    <td>{item.pieace_cost ? item.pieace_cost : item.rate}</td>
+                    <td>{item.tax_amt}</td>
+                    <td>{item.total_price}</td>
+                    <td>{item.sale_status}</td>
+                    {userName === "ADMIN" && (
+                      <td>
+                        <button
+                          className="btn btn-success btn-sm"
+                          onClick={() => handleStatusUpdate(item.id, item.sale_status)}
+                        >
+                          {item.sale_status === "Delivered" ? "Mark Not Delivered" : "Mark Delivered"}
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={role === "admin" ? 14 : 13} className="text-center">
+                    No item Details available.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
 
 
 
