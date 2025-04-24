@@ -26,6 +26,7 @@ import Receipts from './Components/Modules/Transactions/Receipts/Receipts';
 import ReceiptsTable from './Components/Modules/Transactions/Receipts/ReceiptsTable';
 import PurchaseReport from './Components/Modules/Reports/PurchaseReport/PurchaseReport'
 import SalesReport from './Components/Modules/Reports/SalesReport/SalesReport'
+import SalesBalanceReport from './Components/Modules/Reports/SalesBalanceReport/SalesBalanceReport'
 import EstimateReport from './Components/Modules/Reports/EstimateReport/EstimateReport'
 import RepairsReport from './Components/Modules/Reports/RepairsReport/RepairsReport'
 import URDPurchaseReport from './Components/Modules/Reports/URDPurchaseReport/URDPurchase'
@@ -112,6 +113,7 @@ function App() {
         <Route path="/receiptstable" element={<ReceiptsTable />} />
         <Route path="/purchaseReport" element={<PurchaseReport />} />
         <Route path="/salesReport" element={<SalesReport />} />
+        <Route path="/salesBalanceReport" element={<SalesBalanceReport />} />
         <Route path="/estimateReport" element={<EstimateReport />} />
         <Route path="/repairsReport" element={<RepairsReport />} />
         <Route path="/urdPurchaseReport" element={<URDPurchaseReport />} />

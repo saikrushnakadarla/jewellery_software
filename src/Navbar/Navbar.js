@@ -260,6 +260,7 @@ function Navbar() {
           {reportsDropdownOpen && (
             <div className="navbar-dropdown-content">
               <Link to="/salesReport" onClick={handleItemClick} className={isActive('/salesReport')}>Sales Report</Link>
+              <Link to="/salesBalanceReport" onClick={handleItemClick} className={isActive('/salesBalanceReport')}>Sales Balance Report</Link>
               <Link to="/estimateReport" onClick={handleItemClick} className={isActive('/estimateReport')}>Estimate Report</Link>
               <Link to="/purchaseReport" onClick={handleItemClick} className={isActive('/purchaseReport')}>Purchase Report</Link>
               <Link to="/repairsReport" onClick={handleItemClick} className={isActive('/repairsReport')}>Repairs Report</Link>
