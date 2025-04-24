@@ -163,6 +163,8 @@ function SubCategory() {
       // navigate("/subcategorytable");
       // const from = location.state?.from || "/subcategorytable";
       navigate(-1); 
+      navigate("/sales", { state: { newSubCategory: formData.sub_category_name } });
+
     } catch (error) {
       console.error("Error saving subcategory:", error.message);
       alert("Failed to save subcategory. Please try again.");
