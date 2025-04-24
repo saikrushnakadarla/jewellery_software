@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DataTable from '../../../Pages/InputField/TableLayout';
 import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from '../../../../Url/NodeBaseURL';
+import { AuthContext } from "../../../Pages/Login/Context";
 import Swal from 'sweetalert2';
 
 const RepairsTable = () => {
@@ -14,7 +15,7 @@ const RepairsTable = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [repairDetails, setRepairDetails] = useState(null);
-
+  const { authToken, userId, userName, role } = useContext(AuthContext);
   // Extract mobile from location state
   const { mobile } = location.state || {};
   const initialSearchValue = location.state?.mobile || '';
@@ -188,6 +189,8 @@ const RepairsTable = () => {
         accessor: 'actions',
         Cell: ({ row }) => {
           const isDisabled = row.original.invoice === "Converted";
+          const isAdmin = userName === "ADMIN"; // Check if user is ADMIN
+          const isToday = isCurrentDate(row.original.date);
 
           return (
             <div>
@@ -195,20 +198,29 @@ const RepairsTable = () => {
                 style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
                 onClick={() => handleViewDetails(row.original.invoice_number)}
               />
+                {/* Edit icon (only for ADMIN) */}
+        {isAdmin && (
               <FaEdit
                 style={{
                   cursor: 'pointer',
                   marginLeft: '10px',
                   color: 'blue',
+                  color: isToday ? 'blue' : 'gray',
                 }}
-                onClick={() => handleEdit(row.original.invoice_number,
+                   onClick={() => {
+              if (isToday) {
+                handleEdit(
+                  row.original.invoice_number,
                   row.original.mobile,
                   row.original.cash_amount,
                   row.original.card_amt,
                   row.original.chq_amt,
-                  row.original.online_amt,
-                )}
+                  row.original.online_amt
+                );
+              }
+            }}
               />
+            )}
               {/* <FaEdit
                 style={{
                   cursor: isDisabled ? 'not-allowed' : 'pointer',
@@ -243,14 +255,22 @@ const RepairsTable = () => {
                   }
                 }}
               /> */}
+               {/* Delete icon (only for ADMIN) */}
+        {isAdmin && (
               <FaTrash
                 style={{
                   cursor: 'pointer',
                   marginLeft: '10px',
                   color: 'red',
+                  color: isToday ? 'red' : 'gray',
                 }}
-                onClick={() => handleDelete(row.original.invoice_number)}
+                onClick={() => {
+                  if (isToday) {
+                    handleDelete(row.original.invoice_number);
+                  }
+                }}
               />
+            )}
             </div>
           );
         },
@@ -259,6 +279,17 @@ const RepairsTable = () => {
     ],
     []
   );
+
+  function isCurrentDate(dateString) {
+    const today = new Date();
+    const date = new Date(dateString);
+    
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  }
 
   const handleEdit = async (
     invoice_number,

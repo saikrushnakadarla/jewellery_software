@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import DataTable from '../../../Pages/InputField/TableLayout'; // Import the reusable DataTable component
 import { FaEdit, FaTrash } from 'react-icons/fa';
-import { Button, Row, Col } from 'react-bootstrap'; 
+import { Button, Row, Col } from 'react-bootstrap';
 import './ReceiptsTable.css';
+import { AuthContext } from "../../../Pages/Login/Context";
 import baseURL from "../../../../Url/NodeBaseURL";
 
 const ReceiptsTable = () => {
   const navigate = useNavigate(); // Initialize navigate function
   const [data, setData] = useState([]); // State to hold fetched data
-
+  const { authToken, userId, userName, role } = useContext(AuthContext);
   const columns = React.useMemo(
     () => [
       {
@@ -58,37 +59,38 @@ const ReceiptsTable = () => {
         Header: "Receipt",
         Cell: ({ row }) =>
           // row.original.invoice_generated === "Yes" && row.original.invoice_number ? (
-            <a
-              href={`${baseURL}/invoices/${row.original.receipt_no}.pdf`} // Fetch from backend
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ textDecoration: 'none' }}
-            >
-              📝 View
-            </a>
+          <a
+            href={`${baseURL}/invoices/${row.original.receipt_no}.pdf`} // Fetch from backend
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none' }}
+          >
+            📝 View
+          </a>
         //   ) : (
         //     "Not Available"
         //   ),
         // id: "invoice",
       },
-      {
-        Header: 'Actions',
-        accessor: 'actions',
-        Cell: ({ row }) => (
-          <div>
+       // Conditionally include Actions column only for ADMIN
+  ...(userName === "ADMIN" ? [
+    {
+      Header: 'Actions',
+      accessor: 'actions',
+      Cell: ({ row }) => (
+        <div>
           <FaEdit
-            className="edit-icon"
             style={{ color: 'blue', cursor: 'pointer', marginRight: '10px' }}
             onClick={() => handleEdit(row.original.id)}
           />
           <FaTrash
-            className="delete-icon"
             style={{ color: 'red', cursor: 'pointer' }}
             onClick={() => handleDelete(row.original.id)}
           />
         </div>
-        ),
-      },
+      ),
+    }
+  ] : []) // Empty array if not ADMIN (column excluded)
     ],
     [data]
   );
@@ -98,7 +100,7 @@ const ReceiptsTable = () => {
       try {
         const response = await fetch(`${baseURL}/get/payments`); // Fetch data from the endpoint
         const result = await response.json();
-        
+
         if (result?.payments) {
           // Filter the data where transaction_type === "Payment"
           const filteredPayments = result.payments.filter(payment => payment.transaction_type === "Receipt");
@@ -113,16 +115,16 @@ const ReceiptsTable = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this Receipt?')) return;
-  
+
     try {
       const response = await fetch(`${baseURL}/delete/receipt/${id}`, {
         method: 'DELETE',
       });
-  
+
       if (response.ok) {
         // Success message
         alert('Receipt deleted successfully');
-        
+
         // Update state after successful deletion
         setData((prevData) => prevData.filter((payment) => payment.id !== id));
       } else {
@@ -161,8 +163,8 @@ const ReceiptsTable = () => {
           </Col>
         </Row>
 
-          <DataTable columns={columns} data={[...data].reverse()} />
-        
+        <DataTable columns={columns} data={[...data].reverse()} />
+
       </div>
     </div>
   );
