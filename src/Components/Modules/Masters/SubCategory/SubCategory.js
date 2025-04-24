@@ -8,12 +8,12 @@ import baseURL from "../../../../Url/NodeBaseURL"; // Ensure this is correctly s
 function SubCategory() {
   const navigate = useNavigate();
   const { state } = useLocation();
-  const { subcategory_id } = state || {}; // Destructure state to get subcategory_id and location
+  const { subcategory_id, metal_type  } = state || {}; // Destructure state to get subcategory_id and location
 
   const [formData, setFormData] = useState({
     category_id: "",
     metal_type_id: "",
-    metal_type: "",
+    metal_type: metal_type || "", // Initialize with passed metal_type if available
     category: "",
     sub_category_name: "",
     pricing: "By Weight",
@@ -27,27 +27,41 @@ function SubCategory() {
   const [allCategoryOptions, setAllCategoryOptions] = useState([]);
   const [filteredCategoryOptions, setFilteredCategoryOptions] = useState([]);
 
-  // Fetch metal types
-  useEffect(() => {
-    const fetchMetalTypes = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/metaltype`);
-        const metalTypes = response.data.map((item) => ({
-          value: item.metal_name,
-          label: item.metal_name,
-          id: item.metal_type_id,
-        }));
+// Modify the useEffect that fetches metal types to preserve the passed metal_type
+useEffect(() => {
+  const fetchMetalTypes = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/metaltype`);
+      const metalTypes = response.data.map((item) => ({
+        value: item.metal_name,
+        label: item.metal_name,
+        id: item.metal_type_id,
+      }));
 
-        // Log the metal_type_id values to verify
-        console.log("Fetched Metal Types:", metalTypes);
+      console.log("Fetched Metal Types:", metalTypes);
 
-        setMetalOptions(metalTypes);
-      } catch (error) {
-        console.error("Error fetching metal types:", error);
+      setMetalOptions(metalTypes);
+      
+      // If metal_type was passed in state, find and set its ID
+      if (metal_type && !subcategory_id) {
+        const selectedMetal = metalTypes.find(
+          (option) => option.value.toLowerCase() === metal_type.toLowerCase()
+        );
+        
+        if (selectedMetal) {
+          setFormData(prev => ({
+            ...prev,
+            metal_type: selectedMetal.value,
+            metal_type_id: selectedMetal.id
+          }));
+        }
       }
-    };
-    fetchMetalTypes();
-  }, []);
+    } catch (error) {
+      console.error("Error fetching metal types:", error);
+    }
+  };
+  fetchMetalTypes();
+}, [metal_type, subcategory_id]);
 
 
   // Fetch categories

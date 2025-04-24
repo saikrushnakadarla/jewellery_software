@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, Button, Dropdown, DropdownButton, Modal, Form } from 'react-bootstrap';
-import InputField from './../../../Pages/InputField/InputField';
+import InputField from './InputfieldSales';
 import axios from 'axios';
 import { AiOutlinePlus } from "react-icons/ai";
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -49,7 +49,8 @@ const ProductDetails = ({
   refreshSalesData,
   fetchCategory,
   fetchSubCategory,
-  taxableAmount
+  taxableAmount,
+  tabId
 }) => {
 
   const [showModal, setShowModal] = useState(false);
@@ -111,6 +112,7 @@ const ProductDetails = ({
       mc_per_gram: "",
       making_charges: "",
       rate: "",
+      // rate_24k: "",
       pieace_cost: "",
       mrp_price: "",
       rate_amt: "",
@@ -138,10 +140,17 @@ const ProductDetails = ({
           <InputField
             label="BarCode/Rbarcode"
             name="code"
-            value={formData.code || defaultBarcode} // Default barcode when formData.code is empty
+            value={formData.code || ""}
             onChange={(e) => handleBarcodeChange(e.target.value)}
             type="select"
-            options={barcodeOptions}
+            options={barcodeOptions.filter(option =>
+              // Filter barcodes based on selected category if one is selected
+              !formData.category ||
+              products.some(prod =>
+                prod.rbarcode === option.value &&
+                prod.product_name === formData.category
+              )
+            )}
             autoFocus
           />
         </Col>
@@ -165,7 +174,14 @@ const ProductDetails = ({
               cursor: "pointer",
               marginBottom: "20px",
             }}
-            onClick={() => navigate("/itemmaster", { state: { from: "/sales" } })}
+            onClick={() =>
+              navigate("/itemmaster", {
+                state: {
+                  from: `/sales?tabId=${tabId}`
+                }
+              })
+            }
+            
           />
         </Col>
 
@@ -199,7 +215,14 @@ const ProductDetails = ({
               cursor: "pointer",
               marginBottom: "20px",
             }}
-            onClick={() => navigate("/subcategory", { state: { from: "/sales" } })}
+            // onClick={() => navigate("/subcategory", { state: { from: "/sales" } })}
+            onClick={() =>
+              navigate("/subcategory", {
+                state: {
+                  from: `/sales?tabId=${tabId}`
+                }
+              })
+            }
           />
         </Col>
 
@@ -614,6 +637,15 @@ const ProductDetails = ({
                 onChange={handleChange}
               />
             </Col>
+            {/* <Col xs={12} md={1}>
+              <InputField
+                label="24K Rate"
+                name="rate_24k"
+                type='number'
+                value={formData.rate_24k}
+                onChange={handleChange}
+              />
+            </Col> */}
             <Col xs={12} md={1}>
               <InputField
                 label="Amount"
@@ -650,7 +682,7 @@ const ProductDetails = ({
                 type='number'
                 value={formData.mc_per_gram || ""}
                 onChange={handleChange}
-                disabled={formData.mc_on === "MC / Piece"} // Disable when MC / Piece is selected
+                readOnly={formData.mc_on === "MC / Piece"} // Only disable when MC / Piece is selected
               />
             </Col>
 
@@ -877,7 +909,7 @@ const ProductDetails = ({
             onClick={isEditing ? handleUpdate : handleAdd} // Conditional action
             style={{
               backgroundColor: isEditing ? "#a36e29" : "#a36e29",
-              borderColor: isEditing ? "#a36e29" : "#a36e29",
+              borderColor: isEditing ? "#a36e29" : "#a36e29", padding: "4px 7px", marginTop:"5px", marginLeft:"-1px", fontSize : "13px"
             }}
           >
             {isEditing ? "Update" : "Add"}
@@ -888,7 +920,9 @@ const ProductDetails = ({
             variant="secondary"
             // onClick={refreshSalesData}
             onClick={handleClear}
-            style={{ backgroundColor: 'gray', marginLeft: '-30px' }}
+            style={{ backgroundColor: 'gray', marginLeft: '-52px', padding: "4px 7px",
+              fontSize: "13px",
+              marginTop: "5px" }}
           >
             Clear
           </Button>

@@ -219,7 +219,8 @@ const ProductDetails = ({
             onClick={() =>
               navigate("/subcategory", {
                 state: {
-                  from: `/sales?tabId=${tabId}`
+                  from: `/sales?tabId=${tabId}`,
+                  metal_type: formData.metal_type // Pass the current metal_type value
                 }
               })
             }

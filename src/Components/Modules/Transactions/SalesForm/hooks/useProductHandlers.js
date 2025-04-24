@@ -398,16 +398,20 @@ useEffect(() => {
         updatedFormData.selling_purity = "";
         updatedFormData.purity = "";
         updatedFormData.printing_purity = "";
+        updatedFormData.pricing = "By Weight"; // Reset pricing when sub category is cleared
       } else {
         const selectedSubCategory = subcategoryOptions.find(
           (option) => option.value === value
         );
-
+    
         if (selectedSubCategory) {
           updatedFormData.selling_purity = selectedSubCategory.selling_purity || "";
           updatedFormData.purity = selectedSubCategory.purity || "";
           updatedFormData.printing_purity = selectedSubCategory.printing_purity || "";
-
+          
+          // Set pricing based on sub category
+          updatedFormData.pricing = selectedSubCategory.pricing || "By Weight";
+    
           // Check if metal is silver first
           if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
             updatedFormData.rate = rates.silver_rate || "";
@@ -646,6 +650,7 @@ useEffect(() => {
         purity: "",
         selling_purity: "",
         printing_purity: "",
+        pricing: "By Weight",
         category: "",
         sub_category: "",
         gross_weight: "",
@@ -734,6 +739,7 @@ useEffect(() => {
         purity: "",
         selling_purity: "",
         printing_purity: "",
+        pricing: "By Weight",
       }));
 
       setFilteredPurityOptions(uniquePurityOptions); // Update purity options based on design
@@ -744,6 +750,7 @@ useEffect(() => {
         purity: "",
         selling_purity: "",
         printing_purity: "",
+        pricing: "By Weight",
       }));
 
       setFilteredPurityOptions([]);
@@ -820,6 +827,7 @@ useEffect(() => {
           selling_purity: item.selling_purity,
           printing_purity: item.printing_purity,
           purity: item.purity,
+          pricing: item.pricing,
         }));
   
         setSubcategoryOptions(formattedOptions);
@@ -835,6 +843,7 @@ useEffect(() => {
                 selling_purity: found.selling_purity || "",
                 purity: found.purity || "",
                 printing_purity: found.printing_purity || "",
+                pricing:found.pricing || "",
               };
   
               // Also update the rate if needed
