@@ -1049,7 +1049,7 @@ const SalesForm = () => {
   };
 
   const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/sales" } });
+    navigate("/customermaster", { state: { from: `/sales?tabId=${tabId}` } });
   };
 
   // let totalAmount = 0;
@@ -1194,7 +1194,9 @@ const SalesForm = () => {
     const stonePrice = parseFloat(detail.stone_price) || 0;
     const makingCharges = parseFloat(detail.making_charges) || 0;
     const rateAmt = parseFloat(detail.rate_amt) || 0;
-    return sum + stonePrice + makingCharges + rateAmt;
+    const itemDiscount = parseFloat(detail.disscount) || 0;
+    const itemFestivalDiscount = parseFloat(detail.festival_discount) || 0;
+    return sum + stonePrice + makingCharges + rateAmt - itemDiscount - itemFestivalDiscount;
   }, 0);
 
   const salesTaxAmount = selectedRows.reduce((sum, rowIndex) => {
@@ -1832,6 +1834,7 @@ const SalesForm = () => {
               fetchCategory={fetchCategory}
               fetchSubCategory={fetchSubCategory}
               taxableAmount={taxableAmount}
+              tabId={tabId}
             />
           </div>
 

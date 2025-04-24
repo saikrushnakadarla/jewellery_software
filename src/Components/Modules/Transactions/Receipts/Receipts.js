@@ -225,18 +225,21 @@ const RepairForm = () => {
       if (name === "total_amt" || name === "discount_amt") {
         const totalAmt = Number(updatedData.total_amt) || 0;
         const discountAmt = Number(updatedData.discount_amt) || 0;
-
+      
         // If `total_amt` is cleared, clear `cash_amt`
         if (name === "total_amt" && value === "") {
           updatedData.cash_amt = "";
         } else if (discountAmt > totalAmt) {
-          // Ensure discount amount is not greater than total amount
-          alert("Discount amount cannot be greater than total amount.");
-          updatedData.discount_amt = "";
+          alert("Paid amount cannot be greater than total amount.");
+      
+          // Reset the discount_amt if it's greater than total
+          updatedData.discount_amt = ""; // or you can set it to totalAmt
+          updatedData.cash_amt = "";
         } else {
           updatedData.cash_amt = (totalAmt - discountAmt).toFixed(2);
         }
       }
+      
 
       // Update `invoiceNumberOptions` when `account_name` changes
       if (name === "account_name") {
@@ -268,45 +271,39 @@ const RepairForm = () => {
       // Update `total_amt` when `invoice_number` changes
       if (name === "invoice_number") {
         if (value === "") {
-          // Clear `total_amt` and `cash_amt` when `invoice_number` is cleared
+          // Clear total_amt, cash_amt, and discount_amt when invoice_number is cleared
           updatedData.total_amt = "";
           updatedData.cash_amt = "";
+          updatedData.discount_amt = "";
           setRepeatedData([]);
         } else {
-          // Set `total_amt` to the `bal_amt` of the selected invoice
           const selectedRepair = repairDetails.find(
             (item) => item.invoice_number === value
           );
-
+      
           if (selectedRepair) {
             const paidAmt = Number(selectedRepair.paid_amt) || 0;
             const receiptsAmt = Number(selectedRepair.receipts_amt) || 0;
             const netBillAmount = Number(selectedRepair.net_bill_amount) || 0;
             const balAfterReceipts = Number(selectedRepair.bal_after_receipts) || 0;
             const balAmt = Number(selectedRepair.bal_amt) || 0;
-
+      
             const total =
               paidAmt + receiptsAmt === netBillAmount
                 ? balAfterReceipts
                 : balAfterReceipts || balAmt;
-
-            updatedData.total_amt = total.toFixed(2);  // ✅ 2 decimal places
-            updatedData.cash_amt = "";
+      
+            updatedData.total_amt = total.toFixed(2);
+      
+            // If there is already a value in discount_amt or cash_amt, clear them
+            if (updatedData.discount_amt || updatedData.cash_amt) {
+              updatedData.discount_amt = "";
+              updatedData.cash_amt = "";
+            }
           }
-
-
-          // if (selectedRepair) {
-          //   updatedData.total_amt = Number(
-          //      selectedRepair.bal_amt || 0
-          //   );
-
-          //   updatedData.cash_amt = ""; 
-          // }
-
-
-
         }
       }
+      
 
       return updatedData;
     });
@@ -405,6 +402,7 @@ const RepairForm = () => {
 
       // Navigate to receipts table
       // navigate("/receiptstable");
+      navigate(-1);
     } catch (error) {
       alert(`Error: ${error.message}`);
     }

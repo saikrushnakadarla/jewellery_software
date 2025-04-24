@@ -24,7 +24,9 @@ const PaymentDetails = ({
     const stonePrice = parseFloat(detail.stone_price) || 0;
     const makingCharges = parseFloat(detail.making_charges) || 0;
     const rateAmt = parseFloat(detail.rate_amt) || 0;
-    return sum + stonePrice + makingCharges + rateAmt;
+    const itemDiscount = parseFloat(detail.disscount) || 0;
+    const itemFestivalDiscount = parseFloat(detail.festival_discount) || 0;
+    return sum + stonePrice + makingCharges + rateAmt - itemDiscount - itemFestivalDiscount;
   }, 0);
 
   const taxAmount = selectedRows.reduce((sum, rowIndex) => {

@@ -49,7 +49,8 @@ const ProductDetails = ({
   refreshSalesData,
   fetchCategory,
   fetchSubCategory,
-  taxableAmount
+  taxableAmount,
+  tabId
 }) => {
 
   const [showModal, setShowModal] = useState(false);
@@ -173,7 +174,14 @@ const ProductDetails = ({
               cursor: "pointer",
               marginBottom: "20px",
             }}
-            onClick={() => navigate("/itemmaster", { state: { from: "/sales" } })}
+            onClick={() =>
+              navigate("/itemmaster", {
+                state: {
+                  from: `/sales?tabId=${tabId}`
+                }
+              })
+            }
+            
           />
         </Col>
 
@@ -207,7 +215,14 @@ const ProductDetails = ({
               cursor: "pointer",
               marginBottom: "20px",
             }}
-            onClick={() => navigate("/subcategory", { state: { from: "/sales" } })}
+            // onClick={() => navigate("/subcategory", { state: { from: "/sales" } })}
+            onClick={() =>
+              navigate("/subcategory", {
+                state: {
+                  from: `/sales?tabId=${tabId}`
+                }
+              })
+            }
           />
         </Col>
 
