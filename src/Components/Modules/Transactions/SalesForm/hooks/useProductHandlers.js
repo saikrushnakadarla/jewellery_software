@@ -253,7 +253,8 @@ useEffect(() => {
         const isSilver = String(prev.metal_type || "").toLowerCase() === "silver";
         return {
           ...prev,
-          rate_24k: isSilver ? newRates.silver_rate : newRates.rate_24crt
+          // rate_24k: isSilver ? newRates.silver_rate : newRates.rate_24crt
+          rate_24k: newRates.rate_24crt
         };
       });
     } catch (error) {
@@ -868,7 +869,7 @@ useEffect(() => {
   };
   useEffect(() => {
     fetchSubCategory();
-  }, [formData.category]);
+  }, [formData.category, formData.rate_24k, rates]);
 
   const [allMetalTypes, setAllMetalTypes] = useState([]);
 
