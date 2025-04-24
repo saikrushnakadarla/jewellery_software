@@ -16,10 +16,11 @@ function SubCategory() {
     metal_type: "",
     category: "",
     sub_category_name: "",
+    pricing: "By Weight",
     prefix: "",
-    purity:"",
-    selling_purity:"",
-    printing_purity:"",
+    purity: "",
+    selling_purity: "",
+    printing_purity: "",
   });
 
   const [metalOptions, setMetalOptions] = useState([]);
@@ -36,10 +37,10 @@ function SubCategory() {
           label: item.metal_name,
           id: item.metal_type_id,
         }));
-  
+
         // Log the metal_type_id values to verify
         console.log("Fetched Metal Types:", metalTypes);
-        
+
         setMetalOptions(metalTypes);
       } catch (error) {
         console.error("Error fetching metal types:", error);
@@ -47,7 +48,7 @@ function SubCategory() {
     };
     fetchMetalTypes();
   }, []);
-  
+
 
   // Fetch categories
   useEffect(() => {
@@ -104,23 +105,23 @@ function SubCategory() {
   }, [subcategory_id]);
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     let modifiedValue = value;
     if (name === "sub_category_name" || name === "prefix") {
       modifiedValue = value.toUpperCase();
     }
-  
+
     if (name === "metal_type") {
       // Log the selected value to check
       console.log("Selected Metal Type:", modifiedValue);
-  
+
       const selectedMetal = metalOptions.find(
         (option) => option.value.toLowerCase() === modifiedValue.toLowerCase()
       );
-  
+
       // Log the selected metal to ensure it's found
       console.log("Selected Metal:", selectedMetal);
-  
+
       setFormData((prevData) => ({
         ...prevData,
         metal_type: selectedMetal?.value || "",
@@ -142,7 +143,7 @@ function SubCategory() {
       }));
     }
   };
-  
+
 
   // Submit form data
   const handleSubmit = async (e) => {
@@ -162,7 +163,14 @@ function SubCategory() {
       }
       // navigate("/subcategorytable");
       // const from = location.state?.from || "/subcategorytable";
-      navigate(-1); 
+
+      // navigate(-1);
+      // navigate("/sales", { state: { newSubCategory: formData.sub_category_name } });
+      const from = location.state?.from || "/subcategorytable";
+      navigate(from, {
+        state: { newSubCategory: formData.sub_category_name }
+      });
+
     } catch (error) {
       console.error("Error saving subcategory:", error.message);
       alert("Failed to save subcategory. Please try again.");
@@ -172,7 +180,7 @@ function SubCategory() {
   const handleBack = () => {
     // navigate("/subcategorytable");
     // const from = location.state?.from || "/subcategorytable";
-    navigate(-1); 
+    navigate(-1);
   };
 
   return (
@@ -181,7 +189,7 @@ function SubCategory() {
         <h2>{subcategory_id ? "Edit Sub Category" : "Add Sub Category"}</h2>
         <form className="customer-master-form" onSubmit={handleSubmit}>
           <Row>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Metal Type"
                 name="metal_type"
@@ -196,7 +204,7 @@ function SubCategory() {
                 autoFocus
               />
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Category"
                 name="category"
@@ -211,13 +219,31 @@ function SubCategory() {
               />
             </Col>
 
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Sub Category"
                 name="sub_category_name"
                 value={formData.sub_category_name}
                 onChange={handleChange}
                 required
+              />
+            </Col>
+
+            <Col md={3}>
+              <InputField
+                label="Pricing"
+                name="pricing"
+                type="select"
+                value={formData.pricing} // No need for fallback value
+                onChange={handleChange}
+                options={[
+                  { value: "By Weight", label: "By Weight" },
+                  { value: "By fixed", label: "By fixed" },
+                  ...(formData.pricing &&
+                    !["By Weight", "By fixed"].includes(formData.pricing)
+                    ? [{ value: formData.pricing, label: formData.pricing }]
+                    : []),
+                ]}
               />
             </Col>
             <Col md={3}>
@@ -229,6 +255,7 @@ function SubCategory() {
                 required
               />
             </Col>
+
             <Col md={3}>
               <InputField
                 label="Purity"
