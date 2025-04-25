@@ -466,7 +466,7 @@ const TaxINVoiceReceipt = ({
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellDescription]}>
-                                                                                {item.metal_type || "N/A"}-{item.product_name || "N/A"}
+                                                                                        {item.metal_type || "N/A"}-{item.product_name || "N/A"}
                                                                                 </Text>
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
@@ -478,7 +478,7 @@ const TaxINVoiceReceipt = ({
                                                                                 </Text>
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                                <Text style={[styles.tableCell, styles.tableCellPurity]}>
+                                                                                {/* <Text style={[styles.tableCell, styles.tableCellPurity]}>
                                                                                         {(() => {
                                                                                                 const category = item.category?.toLowerCase();
                                                                                                 if (category === "gold jewellery") return "91.6 HM";
@@ -487,7 +487,22 @@ const TaxINVoiceReceipt = ({
                                                                                                 if (category === "diamond jewellery") return "91.6 HM";
                                                                                                 return "";
                                                                                         })()}
+                                                                                </Text> */}
+                                                                                <Text style={[styles.tableCell, styles.tableCellPurity]}>
+                                                                                        {(() => {
+                                                                                                if (item.pricing === "By fixed") {
+                                                                                                        return item.printing_purity || "";
+                                                                                                }
+
+                                                                                                const category = item.category?.toLowerCase();
+                                                                                                if (category === "gold jewellery") return "91.6 HM";
+                                                                                                if (category === "silver articles") return "92.5 Sterling";
+                                                                                                if (category === "silver jewellery") return "80 HM";
+                                                                                                if (category === "diamond jewellery") return "91.6 HM";
+                                                                                                return "";
+                                                                                        })()}
                                                                                 </Text>
+
 
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
@@ -602,35 +617,35 @@ const TaxINVoiceReceipt = ({
                                                         {/* {repairDetails.map((item, index) => ( */}
                                                         <View style={{ paddingRight: 10, marginTop: 5 }}>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}}>(-) Discount:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>(-) Discount:</Text>
                                                                         <Text style={{ textAlign: "right" }}>{discountAmt.toFixed(2)}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}}>(-) Fest Discount:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>(-) Fest Discount:</Text>
                                                                         <Text style={{ textAlign: "right" }}>{festivalDiscountAmt.toFixed(2)}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}}>GST Value:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>GST Value:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
                                                                                 {taxableAmount.toFixed(2)}
                                                                         </Text>
                                                                 </View>
 
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}}>CGST @1.50%:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>CGST @1.50%:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
                                                                                 {(taxAmount / 2).toFixed(2)}
                                                                         </Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}}>SGST @1.50%:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>SGST @1.50%:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
                                                                                 {(taxAmount / 2).toFixed(2)}
                                                                         </Text>
                                                                 </View>
 
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}} >Net Bill Value: </Text>
+                                                                        <Text style={{ marginRight: "10px" }} >Net Bill Value: </Text>
                                                                         <Text style={{ textAlign: "right" }}>
                                                                                 {/* {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)} */}
                                                                                 {netAmount.toFixed(2)}
@@ -639,19 +654,19 @@ const TaxINVoiceReceipt = ({
                                                                 </View>
 
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}}>(-) OLD:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>(-) OLD:</Text>
                                                                         <Text style={{ textAlign: "right" }}>{oldItemsAmount.toFixed(2)}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}}>(-) SCHEME:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>(-) SCHEME:</Text>
                                                                         <Text style={{ textAlign: "right" }}>{schemeAmount.toFixed(2)}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}}>(-) SALE RETURN:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>(-) SALE RETURN:</Text>
                                                                         <Text style={{ textAlign: "right" }}>{salesNetAmount.toFixed(2)}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={{ marginRight:"10px"}}>Net Amount:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>Net Amount:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
                                                                                 {Math.round(netPayableAmount).toFixed(2)}
                                                                         </Text>
