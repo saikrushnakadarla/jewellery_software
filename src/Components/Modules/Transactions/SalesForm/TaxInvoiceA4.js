@@ -466,7 +466,7 @@ const TaxINVoiceReceipt = ({
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellDescription]}>
-                                                                                        {item.product_name || "N/A"}
+                                                                                {item.metal_type || "N/A"}-{item.product_name || "N/A"}
                                                                                 </Text>
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 

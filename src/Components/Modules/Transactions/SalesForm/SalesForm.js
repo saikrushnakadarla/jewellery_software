@@ -1893,7 +1893,8 @@ const SalesForm = () => {
                 oldItemsAmount={oldItemsAmount}
                 schemeAmount={schemeAmount}
                 netPayableAmount={netPayableAmount}
-                salesNetAmount={salesAmountToPass}
+                salesNetAmount={salesNetAmount}
+                salesAmountToPass={salesAmountToPass}
                 salesTaxableAmount={salesTaxableAmount}
                 updatedOldItemsAmount={updatedOldItemsAmount}
                 netPayAmount={netPayAmount}

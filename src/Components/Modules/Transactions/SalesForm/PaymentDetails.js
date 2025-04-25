@@ -25,6 +25,7 @@ const PaymentDetails = ({
   netAmount,
   salesNetAmount,
   salesTaxableAmount,
+  salesAmountToPass,
   updatedOldItemsAmount,
   netPayAmount,
   discount,
@@ -241,7 +242,8 @@ const PaymentDetails = ({
               </tr>
               <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right" >Sale Return Amount</td>
-                <td colSpan="4">{salesNetAmount.toFixed(2)}</td>
+                {/* <td colSpan="4">{salesNetAmount.toFixed(2)}</td> */}
+                <td colSpan="4">{salesAmountToPass.toFixed(2)}</td>
               </tr>
               <tr style={{ fontSize: "13px" }}>
                 <td colSpan="16" className="text-right" >Net Payable Amount</td>
