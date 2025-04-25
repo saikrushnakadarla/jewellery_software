@@ -23,7 +23,8 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
 
   return (
 
-    <div style={{ maxHeight: "107px", overflowY: "auto", position: "relative" }}>
+    // <div style={{ maxHeight: "107px", overflowY: "auto", position: "relative" }}>
+      <div >
       <Table className='dataTable_headerCell1' bordered hover responsive>
         <thead style={{ position: "sticky", top: 0, background: "white", zIndex: 2, fontSize: "13px" }}>
           <tr>
@@ -55,7 +56,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
                 <td>{detail.code}</td>
                 <td>{detail.product_name}</td>
                 <td>{detail.metal_type}</td>
-                <td>{detail.purity}</td>
+                <td>{detail.pricing === 'By Weight' ? detail.selling_purity : detail.printing_purity}</td>
                 <td>{detail.gross_weight}</td>
                 <td>{detail.stone_weight}</td>
                 <td>{detail.va_percent}</td>
