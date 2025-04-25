@@ -235,35 +235,33 @@ const useProductHandlers = () => {
 
 
 
-useEffect(() => {
-  const fetchCurrentRates = async () => {
-    try {
-      const response = await axios.get(`${baseURL}/get/current-rates`);
-      const newRates = {
-        rate_24crt: response.data.rate_24crt || "",
-        rate_22crt: response.data.rate_22crt || "",
-        rate_18crt: response.data.rate_18crt || "",
-        rate_16crt: response.data.rate_16crt || "",
-        silver_rate: response.data.silver_rate || "",
-      };
-      setRates(newRates);
-      
-      // Update form data based on metal type
-      setFormData(prev => {
-        const isSilver = String(prev.metal_type || "").toLowerCase() === "silver";
-        return {
-          ...prev,
-          // rate_24k: isSilver ? newRates.silver_rate : newRates.rate_24crt
-          rate_24k: newRates.rate_24crt
+  useEffect(() => {
+    const fetchCurrentRates = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get/current-rates`);
+        const newRates = {
+          rate_24crt: response.data.rate_24crt || "",
+          rate_22crt: response.data.rate_22crt || "",
+          rate_18crt: response.data.rate_18crt || "",
+          rate_16crt: response.data.rate_16crt || "",
+          silver_rate: response.data.silver_rate || "",
         };
-      });
-    } catch (error) {
-      console.error('Error fetching current rates:', error);
-    }
-  };
+        setRates(newRates);
 
-  fetchCurrentRates();
-}, []);
+        // Update form data based on metal type
+        const metalType = formData.metal_type?.toLowerCase();
+
+        setFormData((prev) => ({
+          ...prev,
+          rate_24k: metalType === "silver" ? newRates.silver_rate : newRates.rate_24crt,
+        }));
+      } catch (error) {
+        console.error('Error fetching current rates:', error);
+      }
+    };
+
+    fetchCurrentRates();
+  }, [formData.metal_type]);
 
   const fetchProducts = async () => {
     try {
@@ -400,52 +398,70 @@ useEffect(() => {
         updatedFormData.purity = "";
         updatedFormData.printing_purity = "";
         updatedFormData.pricing = "By Weight"; // Reset pricing when sub category is cleared
+        updatedFormData.rate = "";
       } else {
         const selectedSubCategory = subcategoryOptions.find(
           (option) => option.value === value
         );
-    
+
         if (selectedSubCategory) {
           updatedFormData.selling_purity = selectedSubCategory.selling_purity || "";
           updatedFormData.purity = selectedSubCategory.purity || "";
           updatedFormData.printing_purity = selectedSubCategory.printing_purity || "";
-          
+
           // Set pricing based on sub category
           updatedFormData.pricing = selectedSubCategory.pricing || "By Weight";
-    
-          // Check if metal is silver first
-          if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
-            updatedFormData.rate = rates.silver_rate || "";
-          } else {
-            const purityValue = parseFloat(selectedSubCategory.selling_purity);
-            const baseRate = parseFloat(formData.rate_24k) || 0;
-            if (!isNaN(purityValue)) {
-              updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
-            }
-          }
-        }
-      }
-    }
 
-    if (name === "custom_purity" && formData.selling_purity === "Manual") {
-      // Check if metal is silver first
-      if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
-        updatedFormData.rate = value === "" ? "" : rates.silver_rate || "";
-      } else {
-        if (value === "") {
-          // Clear rate when custom purity is cleared
-          updatedFormData.rate = "";
-        } else {
-          const purityValue = parseFloat(value);
+          // Check if metal is silver first
+          // if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
+          //   updatedFormData.rate = rates.silver_rate || "";
+          // } else {
+          //   const purityValue = parseFloat(selectedSubCategory.selling_purity);
+          //   const baseRate = parseFloat(formData.rate_24k) || 0;
+          //   if (!isNaN(purityValue)) {
+          //     updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
+          //   }
+          // }
+          const purityValue = parseFloat(selectedSubCategory.selling_purity);
           const baseRate = parseFloat(formData.rate_24k) || 0;
           if (!isNaN(purityValue)) {
-            const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
-            updatedFormData.rate = calculatedRate;
+            updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
           }
         }
       }
     }
 
+    // if (name === "custom_purity" && formData.selling_purity === "Manual") {
+    //   // Check if metal is silver first
+    //   if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
+    //     updatedFormData.rate = value === "" ? "" : rates.silver_rate || "";
+    //   } else {
+    //     if (value === "") {
+    //       // Clear rate when custom purity is cleared
+    //       updatedFormData.rate = "";
+    //     } else {
+    //       const purityValue = parseFloat(value);
+    //       const baseRate = parseFloat(formData.rate_24k) || 0;
+    //       if (!isNaN(purityValue)) {
+    //         const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+    //         updatedFormData.rate = calculatedRate;
+    //       }
+    //     }
+    //   }
+    // }
+
+    if (name === "custom_purity" && formData.selling_purity === "Manual") {
+      if (value === "") {
+        // Clear rate when custom purity is cleared
+        updatedFormData.rate = "";
+      } else {
+        const purityValue = parseFloat(value);
+        const baseRate = parseFloat(formData.rate_24k) || 0;
+        if (!isNaN(purityValue)) {
+          updatedFormData.rate = ((purityValue / 100) * baseRate).toFixed(2);
+        }
+      }
+    }
 
     if (name === "metal_type") {
       const metal = value.toLowerCase();
@@ -821,7 +837,7 @@ useEffect(() => {
         const filteredData = formData.product_id
           ? result.data.filter((item) => item.category_id === formData.product_id)
           : result.data;
-  
+
         const formattedOptions = filteredData.map((item) => ({
           label: item.sub_category_name,
           value: item.sub_category_name,
@@ -830,9 +846,9 @@ useEffect(() => {
           purity: item.purity,
           pricing: item.pricing,
         }));
-  
+
         setSubcategoryOptions(formattedOptions);
-  
+
         // Set the newly added subcategory as selected and update all related fields
         if (location.state?.newSubCategory) {
           const found = formattedOptions.find(opt => opt.label === location.state.newSubCategory);
@@ -844,20 +860,25 @@ useEffect(() => {
                 selling_purity: found.selling_purity || "",
                 purity: found.purity || "",
                 printing_purity: found.printing_purity || "",
-                pricing:found.pricing || "",
+                pricing: found.pricing || "",
               };
-  
+
               // Also update the rate if needed
-              if (prev.metal_type && prev.metal_type.toLowerCase() === "silver") {
-                updatedData.rate = rates.silver_rate || "";
-              } else {
-                const purityValue = parseFloat(found.selling_purity);
-                const baseRate = parseFloat(prev.rate_24k) || 0;
-                if (!isNaN(purityValue)) {
-                  updatedData.rate = ((purityValue / 100) * baseRate).toFixed(2);
-                }
+              // if (prev.metal_type && prev.metal_type.toLowerCase() === "silver") {
+              //   updatedData.rate = rates.silver_rate || "";
+              // } else {
+              //   const purityValue = parseFloat(found.selling_purity);
+              //   const baseRate = parseFloat(prev.rate_24k) || 0;
+              //   if (!isNaN(purityValue)) {
+              //     updatedData.rate = ((purityValue / 100) * baseRate).toFixed(2);
+              //   }
+              // }
+              const purityValue = parseFloat(found.selling_purity);
+              const baseRate = parseFloat(prev.rate_24k) || 0;
+              if (!isNaN(purityValue)) {
+                updatedData.rate = ((purityValue / 100) * baseRate).toFixed(2);
               }
-  
+
               return updatedData;
             });
           }
@@ -1126,7 +1147,7 @@ useEffect(() => {
           const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
 
           // Calculate the rate based on purity and current rates
-         
+
           // Calculate the rate based on metal type
           let rateValue = "";
           const metalType = String(tag.metal_type || "").toLowerCase();
