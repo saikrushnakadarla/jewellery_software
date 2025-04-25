@@ -46,7 +46,8 @@ function Login() {
         display: 'flex',
         justifyContent: 'flex-end',
         alignItems: 'center',
-        background: "url('./Logo/sadashribg-2.jpg') no-repeat center center/cover",
+        // background: "url('./Logo/sadashribg-2.jpg') no-repeat center center/cover",
+        background: "url('./iiiQbets.jpeg') no-repeat center center/cover",
         paddingRight: '150px',
       }}
     >

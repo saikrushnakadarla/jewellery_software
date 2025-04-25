@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import baseURL from "../../../Url/NodeBaseURL";
-import backgroundImage from './sadashribg-2.jpg';
+import backgroundImage from './iiiQbets.jpeg';
 import googleImage from './Logo/google.png';
 import Swal from 'sweetalert2';
 import { AuthContext } from './Context';
@@ -128,7 +128,8 @@ function Login() {
           style={{
             fontSize: '28px',
             fontWeight: 'bold',
-            color: '#b77318',
+            // color: '#b77318',
+            color: '#182566',
             marginBottom: '30px',
             textAlign: 'center',
           }}
@@ -141,7 +142,7 @@ function Login() {
             <label
               htmlFor="email"
               className="form-label"
-              style={{ color: '#b77318' }}
+              style={{ color: '#182566', }}
             >
               Email
             </label>
@@ -162,7 +163,7 @@ function Login() {
             <label
               htmlFor="password"
               className="form-label"
-              style={{ color: '#b77318' }}
+              style={{ color: '#182566', }}
             >
               Password
             </label>
@@ -190,7 +191,7 @@ function Login() {
                   top: '50%',
                   transform: 'translateY(-50%)',
                   cursor: 'pointer',
-                  color: '#b77318',
+                  color: '#182566',
                 }}
               ></i>
             </div>
@@ -232,7 +233,7 @@ function Login() {
               fontWeight: 'bold',
               borderRadius: '8px',
               padding: '10px',
-              background: '#b77318',
+              background: '#182566',
               border: 'none',
               outline: 'none',
             }}
