@@ -829,6 +829,8 @@ const useProductHandlers = () => {
   //   }
   // };
 
+  const hasProcessedNewSubCategory = useRef(false);
+
   const fetchSubCategory = async () => {
     try {
       const response = await fetch(`${baseURL}/subcategory`);
@@ -837,7 +839,7 @@ const useProductHandlers = () => {
         const filteredData = formData.product_id
           ? result.data.filter((item) => item.category_id === formData.product_id)
           : result.data;
-
+  
         const formattedOptions = filteredData.map((item) => ({
           label: item.sub_category_name,
           value: item.sub_category_name,
@@ -846,11 +848,11 @@ const useProductHandlers = () => {
           purity: item.purity,
           pricing: item.pricing,
         }));
-
+  
         setSubcategoryOptions(formattedOptions);
-
-        // Set the newly added subcategory as selected and update all related fields
-        if (location.state?.newSubCategory) {
+  
+        // Only process new subcategory once
+        if (location.state?.newSubCategory && !hasProcessedNewSubCategory.current) {
           const found = formattedOptions.find(opt => opt.label === location.state.newSubCategory);
           if (found) {
             setFormData(prev => {
@@ -862,25 +864,17 @@ const useProductHandlers = () => {
                 printing_purity: found.printing_purity || "",
                 pricing: found.pricing || "",
               };
-
-              // Also update the rate if needed
-              // if (prev.metal_type && prev.metal_type.toLowerCase() === "silver") {
-              //   updatedData.rate = rates.silver_rate || "";
-              // } else {
-              //   const purityValue = parseFloat(found.selling_purity);
-              //   const baseRate = parseFloat(prev.rate_24k) || 0;
-              //   if (!isNaN(purityValue)) {
-              //     updatedData.rate = ((purityValue / 100) * baseRate).toFixed(2);
-              //   }
-              // }
+  
               const purityValue = parseFloat(found.selling_purity);
               const baseRate = parseFloat(prev.rate_24k) || 0;
               if (!isNaN(purityValue)) {
                 updatedData.rate = ((purityValue / 100) * baseRate).toFixed(2);
               }
-
+  
               return updatedData;
             });
+            
+            hasProcessedNewSubCategory.current = true;
           }
         }
       }

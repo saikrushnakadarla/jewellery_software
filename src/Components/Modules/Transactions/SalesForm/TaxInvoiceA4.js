@@ -488,7 +488,7 @@ const TaxINVoiceReceipt = ({
                                                                                                 return "";
                                                                                         })()}
                                                                                 </Text> */}
-                                                                                <Text style={[styles.tableCell, styles.tableCellPurity]}>
+                                                                                {/* <Text style={[styles.tableCell, styles.tableCellPurity]}>
                                                                                         {(() => {
                                                                                                 if (item.pricing === "By fixed") {
                                                                                                         return item.printing_purity || "";
@@ -501,8 +501,10 @@ const TaxINVoiceReceipt = ({
                                                                                                 if (category === "diamond jewellery") return "91.6 HM";
                                                                                                 return "";
                                                                                         })()}
+                                                                                </Text> */}
+                                                                                <Text style={[styles.tableCell, styles.tableCellGrossWt]}>
+                                                                                        {item.printing_purity || "0.00"}
                                                                                 </Text>
-
 
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
@@ -528,7 +530,7 @@ const TaxINVoiceReceipt = ({
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellMC]}>
-                                                                                        {item.making_charges || "0.00"}
+                                                                                        {`${item.mc_per_gram || "0.00"}${['gold', 'diamond','others'].includes(item.metal_type?.toLowerCase()) ? '%' : ''}`}
                                                                                 </Text>
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 

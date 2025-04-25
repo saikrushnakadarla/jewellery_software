@@ -51,34 +51,34 @@ function Navbar() {
 
   const tabId = getTabId();
 
-  useEffect(() => {
-    const currentPathWithQuery = `${location.pathname}${location.search}`;
-    const expectedPath = `/sales?tabId=${tabId}`;
+  // useEffect(() => {
+  //   const currentPathWithQuery = `${location.pathname}${location.search}`;
+  //   const expectedPath = `/sales?tabId=${tabId}`;
   
-    if (currentPathWithQuery !== expectedPath) {
-      // Remove specific known keys
-      localStorage.removeItem('oldSalesData');
-      localStorage.removeItem('schemeSalesData');
-      localStorage.removeItem(`repairDetails_${tabId}`);
-      localStorage.removeItem(`paymentDetails_${tabId}`);
-      localStorage.removeItem(`oldTableData_${tabId}`);
-      localStorage.removeItem('schemeTableData');
-      localStorage.removeItem(`discount_${tabId}`);
+  //   if (currentPathWithQuery !== expectedPath) {
+  //     // Remove specific known keys
+  //     localStorage.removeItem('oldSalesData');
+  //     localStorage.removeItem('schemeSalesData');
+  //     localStorage.removeItem(`repairDetails_${tabId}`);
+  //     localStorage.removeItem(`paymentDetails_${tabId}`);
+  //     localStorage.removeItem(`oldTableData_${tabId}`);
+  //     localStorage.removeItem('schemeTableData');
+  //     localStorage.removeItem(`discount_${tabId}`);
   
-      // Dynamically remove all keys that start with specific prefixes
-      Object.keys(localStorage).forEach((key) => {
-        if (
-          // key.startsWith('saleFormData_') ||
-          key.startsWith('repairDetails_') || 
-          key.startsWith('paymentDetails_') ||
-          key.startsWith('oldTableData_') ||
-          key.startsWith('discount_') 
-        ) {
-          localStorage.removeItem(key);
-        }
-      });
-    }
-  }, [location.pathname, location.search, tabId]);
+  //     // Dynamically remove all keys that start with specific prefixes
+  //     Object.keys(localStorage).forEach((key) => {
+  //       if (
+  //         // key.startsWith('saleFormData_') ||
+  //         key.startsWith('repairDetails_') || 
+  //         key.startsWith('paymentDetails_') ||
+  //         key.startsWith('oldTableData_') ||
+  //         key.startsWith('discount_') 
+  //       ) {
+  //         localStorage.removeItem(key);
+  //       }
+  //     });
+  //   }
+  // }, [location.pathname, location.search, tabId]);
   
   
   

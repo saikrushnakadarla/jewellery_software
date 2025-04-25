@@ -303,7 +303,7 @@ function SubCategory() {
 
             <Col md={3}>
               <InputField
-                label="Purity"
+                label="Purchase Purity"
                 name="purity"
                 value={formData.purity}
                 onChange={handleChange}
