@@ -160,22 +160,22 @@ const styles = StyleSheet.create({
                 marginTop: '-4'
         },
         tableCellPurity: {
-                width: '8%',
+                width: '10%',
                 textAlign: 'left',
                 marginTop: '-4'
         },
         tableCellGrossWt: {
-                width: '11%',
+                width: '10%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
         tableCellStoneWt: {
-                width: '11%',
+                width: '10%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
         tableCellNetWt: {
-                width: '11%',
+                width: '10%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
@@ -185,12 +185,12 @@ const styles = StyleSheet.create({
                 marginTop: '-4'
         },
         tableCellMC: {
-                width: '8%',
+                width: '10%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
         tableCellStAmt: {
-                width: '10%',
+                width: '9%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
@@ -281,7 +281,7 @@ const TaxINVoiceReceipt = ({
                                 qty: totals.qty + Number(item.qty || 0),
                                 grossWeight: totals.grossWeight + Number(item.gross_weight || 0),
                                 stoneWeight: totals.stoneWeight + Number(item.stone_weight || 0),
-                                netWeight: totals.netWeight + Number(item.weight_bw || 0),
+                                netWeight: totals.netWeight + Number(item.total_weight_av || 0),
                                 rate: totals.rate + Number(item.rate || 0),
                                 makingCharges: totals.makingCharges + Number(item.making_charges || 0),
                                 stonePrice: totals.stonePrice + Number(item.stone_price || 0),
@@ -502,24 +502,25 @@ const TaxINVoiceReceipt = ({
                                                                                                 return "";
                                                                                         })()}
                                                                                 </Text> */}
-                                                                                <Text style={[styles.tableCell, styles.tableCellGrossWt]}>
+                                                                                <Text style={[styles.tableCell, styles.tableCellPurity]}>
                                                                                         {item.printing_purity || "0.00"}
                                                                                 </Text>
 
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellGrossWt]}>
-                                                                                        {item.gross_weight || "0.00"}
+                                                                                        {item.gross_weight != null ? parseFloat(item.gross_weight).toFixed(3) : "0.000"}
                                                                                 </Text>
+
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellStoneWt]}>
-                                                                                        {item.stone_weight || "0.00"}
+                                                                                        {item.stone_weight || "0.000"}
                                                                                 </Text>
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellNetWt]}>
-                                                                                        {item.total_weight_av || "0.00"}
+                                                                                        {item.total_weight_av || "0.000"}
                                                                                 </Text>
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
@@ -530,8 +531,11 @@ const TaxINVoiceReceipt = ({
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellMC]}>
-                                                                                        {`${item.mc_per_gram || "0.00"}${['gold', 'diamond','others'].includes(item.metal_type?.toLowerCase()) ? '%' : ''}`}
+                                                                                        {item.mc_per_gram != null && ['gold', 'diamond', 'others'].includes(item.metal_type?.toLowerCase())
+                                                                                                ? `${parseFloat(item.mc_per_gram) % 1 === 0 ? parseInt(item.mc_per_gram) : item.mc_per_gram} %`
+                                                                                                : item.mc_per_gram || ''}
                                                                                 </Text>
+
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellStAmt]}>
@@ -560,13 +564,13 @@ const TaxINVoiceReceipt = ({
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellPurity, styles.lastheight]}></Text>
                                                         <Text style={[styles.tableCell, styles.tableCellGrossWt, styles.lastheight]}>
-                                                                {totalValues.grossWeight.toFixed(2)}
+                                                                {totalValues.grossWeight.toFixed(3)}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellStoneWt, styles.lastheight]}>
                                                                 {/* {totalValues.stoneWeight.toFixed(2)} */}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellNetWt, styles.lastheight]}>
-                                                                {totalValues.netWeight.toFixed(2)}
+                                                                {totalValues.netWeight.toFixed(3)}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellRate, styles.lastheight]}>
                                                                 {/* {totalValues.rate.toFixed(2)} */}
@@ -614,6 +618,9 @@ const TaxINVoiceReceipt = ({
                                                                                         Number(card_amt || 0) +
                                                                                         Number(online_amt || 0))
                                                                         ).toFixed(2)}
+                                                                </Text>
+                                                                <Text style={{fontWeight:'bold', fontSize:'15px', color:'green', marginLeft:'190px', marginTop:'15px'}}>
+                                                                        Fest Discount: {festivalDiscountAmt.toFixed(2)}
                                                                 </Text>
                                                         </View>
                                                         {/* {repairDetails.map((item, index) => ( */}

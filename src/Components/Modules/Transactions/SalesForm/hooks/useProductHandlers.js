@@ -361,18 +361,8 @@ const useProductHandlers = () => {
     // Handle selling_purity changes
     // Handle selling_purity changes
     if (name === "selling_purity") {
-      // Skip if metal_type is silver (case-insensitive)
-      if (formData.metal_type && formData.metal_type.toLowerCase() === "silver") {
-        setFormData(prev => ({
-          ...prev,
-          [name]: value,
-          rate: rates.silver_rate || "" // Set rate to silver_rate when metal is silver
-        }));
-        return;
-      }
-
       if (value === "") {
-        // Clear when "Select Purity" is chosen
+        // Clear fields when "Select Purity" is chosen
         setFormData(prev => ({
           ...prev,
           selling_purity: "",
@@ -383,7 +373,7 @@ const useProductHandlers = () => {
       } else if (value === "Manual") {
         updatedFormData.rate = "";
       } else {
-        // Calculate rate for purity value
+        // Calculate rate for any purity value
         const purityValue = parseFloat(value);
         if (!isNaN(purityValue) && formData.rate_24k) {
           const baseRate = parseFloat(formData.rate_24k);
@@ -391,6 +381,7 @@ const useProductHandlers = () => {
         }
       }
     }
+    
 
     if (name === "product_name") {
       if (value === "") {
@@ -1146,14 +1137,18 @@ const useProductHandlers = () => {
           let rateValue = "";
           const metalType = String(tag.metal_type || "").toLowerCase();
           const purity = tag.Purity || tag.pur_Purity || "";
-
-          if (metalType === "silver") {
+          
+          if (purity) {
+            const baseRate = metalType === "silver" ? rates.silver_rate : formData.rate_24k;
+            if (baseRate) {
+              rateValue = (parseFloat(purity) * parseFloat(baseRate)) / 100;
+            }
+          } else if (metalType === "silver") {
             rateValue = rates.silver_rate || "";
-          } else {
-            rateValue = purity && formData.rate_24k
-              ? (parseFloat(purity) * parseFloat(formData.rate_24k)) / 100
-              : "";
           }
+          
+
+          
 
           setFormData((prevData) => ({
             ...prevData,

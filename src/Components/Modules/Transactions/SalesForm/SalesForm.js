@@ -1524,10 +1524,10 @@ const SalesForm = () => {
         return matchedTag !== undefined;
       });
 
-      if (soldItem) {
-        alert(`Item with code "${soldItem.code}" is already sold out.`);
-        return;
-      }
+      // if (soldItem) {
+      //   alert(`Item with code "${soldItem.code}" is already sold out.`);
+      //   return;
+      // }
 
       // Check if all items are new
       const allItemsAreNew = repairDetails.every(item => item.id === "");

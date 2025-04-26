@@ -151,13 +151,14 @@ const RepairForm = () => {
       if (name === "account_name") {
         const match = accountData.find((item) => item.account_name === value);
         updatedData.mobile = match?.mobile || "";
-
-        if (value === "") {
-          updatedData.invoice_number = "";
-          updatedData.total_amt = "";
-          updatedData.cash_amt = "";
-          setInvoiceNumberOptions([]);
-        } else {
+  
+        // Always reset invoice and amounts if account_name changes
+        updatedData.invoice_number = "";
+        updatedData.total_amt = "";
+        updatedData.cash_amt = "";
+        setInvoiceNumberOptions([]);
+  
+        if (value !== "") {
           const filteredInvoices = repairDetails
             .filter((item) => item.account_name === value)
             .filter((item) => {
@@ -166,28 +167,33 @@ const RepairForm = () => {
               const netBillAmount = Number(item.net_bill_amount) || 0;
               const balAfterReceipts = Number(item.bal_after_receipts) || 0;
               const balAmt = Number(item.bal_amt) || 0;
-
+  
               const total =
                 paidAmt + receiptsAmt === netBillAmount
                   ? balAfterReceipts
                   : balAfterReceipts || balAmt;
-
-              return total > 0; // Only include invoices with non-zero balance
+  
+              return total > 0;
             })
             .map((item) => ({
               value: item.invoice_number,
               label: item.invoice_number,
             }));
-
+  
           setInvoiceNumberOptions(filteredInvoices);
-
         }
       }
-
+  
       if (name === "mobile") {
         const match = accountData.find((item) => item.mobile === value);
         updatedData.account_name = match?.account_name || "";
-
+  
+        // Always reset invoice and amounts if mobile changes
+        updatedData.invoice_number = "";
+        updatedData.total_amt = "";
+        updatedData.cash_amt = "";
+        setInvoiceNumberOptions([]);
+  
         if (match?.account_name) {
           const filteredInvoices = repairDetails
             .filter((item) => item.account_name === match.account_name)
@@ -197,30 +203,21 @@ const RepairForm = () => {
               const netBillAmount = Number(item.net_bill_amount) || 0;
               const balAfterReceipts = Number(item.bal_after_receipts) || 0;
               const balAmt = Number(item.bal_amt) || 0;
-
+  
               const total =
                 paidAmt + receiptsAmt === netBillAmount
                   ? balAfterReceipts
                   : balAfterReceipts || balAmt;
-
-              return total > 0; // Exclude if total is 0
+  
+              return total > 0;
             })
             .map((item) => ({
               value: item.invoice_number,
               label: item.invoice_number,
             }));
-
+  
           setInvoiceNumberOptions(filteredInvoices);
-
         }
-
-        if (value === "") {
-          updatedData.invoice_number = "";
-          updatedData.total_amt = "";
-          updatedData.cash_amt = "";
-          setInvoiceNumberOptions([]);
-        }
-
       }
 
       // Handle changes to `total_amt` or `discount_amt`
@@ -742,7 +739,8 @@ const RepairForm = () => {
                 <th>Tax Amt</th>
                 <th>Total Price</th>
                 <th>Sale Status</th>
-                {userName === "ADMIN" && <th>Action</th>}
+                <th>Action</th>
+                {/* {userName === "ADMIN" && <th>Action</th>} */}
               </tr>
             </thead>
             <tbody>
@@ -762,7 +760,7 @@ const RepairForm = () => {
                     <td>{item.tax_amt}</td>
                     <td>{item.total_price}</td>
                     <td>{item.sale_status}</td>
-                    {userName === "ADMIN" && (
+                    {/* {userName === "ADMIN" && ( */}
                       <td>
                         <button
                           className="btn btn-success btn-sm"
@@ -771,12 +769,13 @@ const RepairForm = () => {
                           {item.sale_status === "Delivered" ? "Mark Not Delivered" : "Mark Delivered"}
                         </button>
                       </td>
-                    )}
+                    {/* )} */}
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={role === "admin" ? 14 : 13} className="text-center">
+                  <td colSpan={14} className="text-center">
+                  {/* <td colSpan={role === "admin" ? 14 : 13} className="text-center"> */}
                     No item Details available.
                   </td>
                 </tr>
