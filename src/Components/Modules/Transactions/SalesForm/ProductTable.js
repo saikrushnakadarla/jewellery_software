@@ -116,7 +116,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
               <td>
                 {repairDetails.reduce((sum, item) => sum + parseFloat(item.gross_weight || 0), 0).toFixed(3)}
               </td>
-              <td></td>
+              <td>    {repairDetails.reduce((sum, item) => sum + parseFloat(item.stone_weight || 0), 0).toFixed(3)}</td>
               <td></td>
               <td>
                 {repairDetails.reduce((sum, item) => sum + parseFloat(item.total_weight_av || 0), 0).toFixed(3)}
