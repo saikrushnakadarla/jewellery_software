@@ -509,7 +509,7 @@ const TaxINVoiceReceipt = ({
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellGrossWt]}>
-                                                                                        {item.gross_weight != null ? parseFloat(item.gross_weight).toFixed(3) : "0.000"}
+                                                                                        {item.gross_weight || "0.000"}
                                                                                 </Text>
 
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
@@ -531,10 +531,15 @@ const TaxINVoiceReceipt = ({
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
                                                                                 <Text style={[styles.tableCell, styles.tableCellMC]}>
-                                                                                        {item.mc_per_gram != null && ['gold', 'diamond', 'others'].includes(item.metal_type?.toLowerCase())
-                                                                                                ? `${parseFloat(item.mc_per_gram) % 1 === 0 ? parseInt(item.mc_per_gram) : item.mc_per_gram} %`
-                                                                                                : item.mc_per_gram || ''}
+                                                                                        {item.mc_per_gram != null && item.mc_per_gram !== ""
+                                                                                                ? (['gold', 'diamond', 'others'].includes(item.metal_type?.toLowerCase())
+                                                                                                        ? `${parseFloat(item.mc_per_gram) % 1 === 0
+                                                                                                                ? parseInt(item.mc_per_gram)
+                                                                                                                : item.mc_per_gram} %`
+                                                                                                        : item.mc_per_gram)
+                                                                                                : ''}
                                                                                 </Text>
+
 
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
 
@@ -619,7 +624,7 @@ const TaxINVoiceReceipt = ({
                                                                                         Number(online_amt || 0))
                                                                         ).toFixed(2)}
                                                                 </Text>
-                                                                <Text style={{fontWeight:'bold', fontSize:'15px', color:'green', marginLeft:'190px', marginTop:'15px'}}>
+                                                                <Text style={{ fontWeight: 'bold', fontSize: '15px', color: 'green', marginLeft: '190px', marginTop: '15px' }}>
                                                                         Fest Discount: {festivalDiscountAmt.toFixed(2)}
                                                                 </Text>
                                                         </View>
