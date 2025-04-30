@@ -88,12 +88,15 @@ const SalesForm = () => {
     showOptions,
     fetchCategory,
     fetchSubCategory,
-    tabId
+    isManualTotalPriceChange,
+    setIsManualTotalPriceChange,
+    tabId,
+    isTotalPriceCleared,
+    setIsTotalPriceCleared
   } = useProductHandlers();
 
 
-  // Apply calculations
-  useCalculations(formData, setFormData);
+
 
   const [repairDetails, setRepairDetails] = useState(() => {
     const savedData = localStorage.getItem(`repairDetails_${tabId}`);
@@ -913,9 +916,9 @@ const SalesForm = () => {
     resetProductFields();
 
     // Automatically apply the first available offer every time (regardless of isAnyOfferApplied)
-    if (offers.length > 0) {
-      handleApply(offers[0], 0); // Apply the first offer
-    }
+    // if (offers.length > 0) {
+    //   handleApply(offers[0], 0); // Apply the first offer
+    // }
   };
   
   const handleEdit = (index) => {
@@ -1762,6 +1765,9 @@ const SalesForm = () => {
     }
   }, [formData.code]);
 
+    // Apply calculations
+    useCalculations(formData, setFormData, offers,  isManualTotalPriceChange,
+      setIsManualTotalPriceChange, isTotalPriceCleared);
 
   return (
     <div className="main-container">
@@ -1835,6 +1841,7 @@ const SalesForm = () => {
               fetchSubCategory={fetchSubCategory}
               taxableAmount={taxableAmount}
               tabId={tabId}
+              setIsTotalPriceCleared={setIsTotalPriceCleared}
             />
           </div>
 

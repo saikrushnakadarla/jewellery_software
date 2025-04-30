@@ -295,10 +295,34 @@ const useProductHandlers = () => {
     fetchTags();
   }, []);
 
+// Add this state to track manual changes
+const [isManualTotalPriceChange, setIsManualTotalPriceChange] = useState(false);
+const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     let updatedFormData = { ...formData, [name]: value };
+
+    // if (name === 'total_price') {
+    //   setIsManualTotalPriceChange(true);
+    // }
+    if (name === 'total_price') {
+      setIsManualTotalPriceChange(true);
+      // When field is cleared
+      if (value === '') {
+        setIsTotalPriceCleared(true);
+        setFormData(prev => ({
+          ...prev,
+          [name]: '',
+          mc_per_gram: ''
+        }));
+        return;
+      }
+      // When new value is entered
+      setIsTotalPriceCleared(false);
+    }
+
     setFormData(updatedFormData);
     setFormData((prevData) => ({
       ...prevData,
@@ -1310,7 +1334,11 @@ const useProductHandlers = () => {
     isBarcodeSelected,
     fetchCategory,
     fetchSubCategory,
-    tabId
+    tabId,
+    isManualTotalPriceChange,
+    setIsManualTotalPriceChange,
+    isTotalPriceCleared,
+    setIsTotalPriceCleared
   };
 
 };

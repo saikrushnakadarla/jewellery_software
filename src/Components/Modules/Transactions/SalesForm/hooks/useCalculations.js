@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
-const useCalculations = (formData, setFormData) => {
+const useCalculations = (formData, setFormData, offers,   isManualTotalPriceChange,
+  setIsManualTotalPriceChange, isTotalPriceCleared) => {
   // Calculate Weight BW
   useEffect(() => {
     const grossWeight = parseFloat(formData.gross_weight) || 0;
@@ -45,21 +46,18 @@ const useCalculations = (formData, setFormData) => {
     const rateAmount = parseFloat(formData.rate_amt) || 0;
 
     if (formData.mc_on === "MC / Gram") {
-      // Calculate making_charges as mcPerGram * totalWeight
       const calculatedMakingCharges = mcPerGram * totalWeight;
       setFormData((prev) => ({
         ...prev,
         making_charges: calculatedMakingCharges.toFixed(2),
       }));
     } else if (formData.mc_on === "MC %") {
-      // Calculate making_charges as (mcPerGram * rateAmount) / 100
       const calculatedMakingCharges = (mcPerGram * rateAmount) / 100;
       setFormData((prev) => ({
         ...prev,
         making_charges: calculatedMakingCharges.toFixed(2),
       }));
     } else if (formData.mc_on === "MC / Piece") {
-      // If making_charges is manually entered, calculate mc_per_gram
       if (makingCharges && totalWeight > 0) {
         const calculatedMcPerGram = makingCharges / totalWeight;
         setFormData((prev) => ({
@@ -98,6 +96,9 @@ const useCalculations = (formData, setFormData) => {
 
   // Calculate Tax Amount and Total Price
   useEffect(() => {
+     // Skip if it's a manual total_price change
+    // Skip if total_price was manually cleared or changed
+    if (isTotalPriceCleared || isManualTotalPriceChange) return;
     const taxPercent = parseFloat(formData.tax_percent) || 0;
 
     if (formData.pricing === "By Weight") {
@@ -111,9 +112,7 @@ const useCalculations = (formData, setFormData) => {
       const totalDiscount = discountAmt + festivalDiscount;
 
       const taxableAmount = rateAmt + stonePrice + makingCharges + hmCharges - totalDiscount;
-      console.log("taxableAmount=", taxableAmount)
       const taxAmt = (taxableAmount * taxPercent) / 100;
-      console.log("taxAmt=", taxAmt)
       const totalPrice = taxableAmount + taxAmt;
 
       setFormData((prev) => ({
@@ -127,7 +126,7 @@ const useCalculations = (formData, setFormData) => {
 
       const pieceTaxableAmt = pieceCost * qty;
       const taxAmt = (taxPercent * pieceCost * qty) / 100;
-      const mrpPrice = pieceCost + (taxAmt / qty); // ✅ corrected here
+      const mrpPrice = pieceCost + (taxAmt / qty);
       const totalPrice = pieceTaxableAmt + taxAmt;
 
       setFormData((prev) => ({
@@ -151,18 +150,133 @@ const useCalculations = (formData, setFormData) => {
     formData.stone_price,
     formData.making_charges,
     formData.disscount,
+    formData.festival_discount,
     formData.hm_charges,
     formData.pricing,
     formData.mrp_price,
     formData.pieace_cost,
     formData.qty,
+      /* all your existing dependencies */
+  isTotalPriceCleared,
+  isManualTotalPriceChange
   ]);
 
+  useEffect(() => {
+    if (!offers || offers.length === 0) return;
 
+    const selectedOffer = offers[0]; // Assuming auto-apply first offer
+    const percentageDiscount = parseFloat(selectedOffer.discount_percentage) || 0;
+    const rateDiscount = parseFloat(selectedOffer.discount_on_rate) || 0;
+    const fixedPercentageDiscount = parseFloat(selectedOffer.discount_percent_fixed) || 0;
 
+    const taxPercent = parseFloat(formData.tax_percent) || 1;
+    const pieceCost = parseFloat(formData.pieace_cost) || 0;
+    const qty = parseFloat(formData.qty) || 1;
+    const rateAmt = parseFloat(formData.rate_amt) || 0;
+    const stonePrice = parseFloat(formData.stone_price) || 0;
+    const makingCharges = parseFloat(formData.making_charges) || 0;
+    const hmCharges = parseFloat(formData.hm_charges) || 0;
+    const grossWeight = parseFloat(formData.gross_weight) || 0;
+    const discountAmt = parseFloat(formData.disscount) || 0;
 
+    if (formData.pricing === "By fixed") {
+      const pieceTaxableAmt = pieceCost * qty;
+      const originalPieceTaxableAmt = formData.original_piece_taxable_amt
+        ? parseFloat(formData.original_piece_taxable_amt)
+        : pieceTaxableAmt;
 
+      const calculatedDiscount = (pieceTaxableAmt * fixedPercentageDiscount) / 100;
+      const updatedPieceTaxableAmt = originalPieceTaxableAmt - calculatedDiscount - discountAmt;
+      const taxAmt = (taxPercent * updatedPieceTaxableAmt) / 100;
+      const totalPrice = updatedPieceTaxableAmt + taxAmt;
 
+      setFormData(prev => ({
+        ...prev,
+        original_piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
+        festival_discount: calculatedDiscount.toFixed(2),
+        festival_discount_percentage: percentageDiscount.toFixed(2),
+        festival_discount_on_rate: rateDiscount.toFixed(2),
+        piece_taxable_amt: updatedPieceTaxableAmt.toFixed(2),
+        tax_amt: taxAmt.toFixed(2),
+        total_price: totalPrice.toFixed(2),
+      }));
+    } else {
+      const weightBasedDiscount = (rateDiscount / 10) * grossWeight;
+      const calculatedDiscount = (makingCharges * percentageDiscount) / 100 + weightBasedDiscount;
+      const totalBeforeTax =
+        rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount - discountAmt;
+
+      const taxAmt = (totalBeforeTax * taxPercent) / 100;
+      const totalPrice = totalBeforeTax + taxAmt;
+
+      setFormData(prev => ({
+        ...prev,
+        original_total_price: formData.original_total_price
+          ? formData.original_total_price
+          : parseFloat(formData.total_price || 0).toFixed(2),
+        festival_discount: calculatedDiscount.toFixed(2),
+        festival_discount_percentage: percentageDiscount.toFixed(2),
+        festival_discount_on_rate: rateDiscount.toFixed(2),
+        tax_amt: taxAmt.toFixed(2),
+        total_price: totalPrice.toFixed(2),
+      }));
+    }
+  }, [
+    formData.pricing,
+    formData.tax_percent,
+    formData.pieace_cost,
+    formData.qty,
+    formData.rate_amt,
+    formData.stone_price,
+    formData.making_charges,
+    formData.hm_charges,
+    formData.gross_weight,
+    formData.disscount,
+    formData.original_total_price,
+    formData.original_piece_taxable_amt,
+    offers,
+  ]);
+
+  // 🔁 Reverse calculate mc_per_gram if total_price is changed
+// Reverse calculation effect
+useEffect(() => {
+  if (isManualTotalPriceChange && !isTotalPriceCleared && 
+    formData.pricing === "By Weight" && formData.mc_on === "MC %") {
+  const totalPrice = parseFloat(formData.total_price) || 0;
+  
+  // Skip if field is empty
+  if (isNaN(totalPrice)) return;
+    
+    // Skip if field is empty (user cleared it)
+    if (isNaN(totalPrice)) {
+      setIsManualTotalPriceChange(false);
+      return;
+    }
+
+    const rateAmt = parseFloat(formData.rate_amt) || 0;
+    const stonePrice = parseFloat(formData.stone_price) || 0;
+    const hmCharges = parseFloat(formData.hm_charges) || 0;
+    const discountAmt = parseFloat(formData.disscount) || 0;
+    const festivalDiscount = parseFloat(formData.festival_discount) || 0;
+    const taxPercent = parseFloat(formData.tax_percent) || 0;
+
+    const totalDiscount = discountAmt + festivalDiscount;
+    const estimatedTaxableAmount = totalPrice / (1 + taxPercent / 100);
+    const makingCharges = estimatedTaxableAmount - (rateAmt + stonePrice + hmCharges - totalDiscount);
+
+    if (rateAmt > 0) {
+      const mcPerGram = (makingCharges * 100) / rateAmt;
+      setFormData(prev => ({
+        ...prev,
+        mc_per_gram: mcPerGram.toFixed(2),
+        making_charges: makingCharges.toFixed(2) // Also update making_charges if needed
+      }));
+    }
+    
+    setIsManualTotalPriceChange(false);
+  }
+}, [formData.total_price, isManualTotalPriceChange, isTotalPriceCleared]);
+  
 };
 
 export default useCalculations;

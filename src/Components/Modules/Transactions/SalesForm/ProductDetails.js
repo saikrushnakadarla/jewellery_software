@@ -50,7 +50,8 @@ const ProductDetails = ({
   fetchCategory,
   fetchSubCategory,
   taxableAmount,
-  tabId
+  tabId,
+  setIsTotalPriceCleared
 }) => {
 
   const [showModal, setShowModal] = useState(false);
@@ -753,9 +754,16 @@ const ProductDetails = ({
               <InputField
                 label="Total Price"
                 name="total_price"
-                value={formData.total_price || "0.00"} // Default to "0.00" if undefined
+                // value={formData.total_price || "0.00"} // Default to "0.00" if undefined
+                value={formData.total_price ?? ""}
                 onChange={handleChange} // Optional, since it's auto-calculated
-                readOnly
+                onBlur={() => {
+                  // If user tabs out without entering anything, reset the flag
+                  if (formData.total_price === '') {
+                    setIsTotalPriceCleared(false);
+                  }
+                }}
+                // readOnly
               />
             </Col>
             <Col xs={12} md={2}>
