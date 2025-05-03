@@ -338,34 +338,51 @@ const ProductDetails = ({
     const hmCharges = parseFloat(formData.hm_charges) || 0;
     const stonePrice = parseFloat(formData.stone_price) || 0;
     const discount = parseFloat(formData.disscount) || 0;
-    const festivalDiscount = parseFloat(formData.festival_discount) || 0;
-    const totalWeightAW = parseFloat(formData.total_weight_av) || 0;
+    const totalWeightAW = parseFloat(formData.total_weight_aw) || 0;
     const makingChargesInput = parseFloat(formData.making_charges) || 0;
   
     let mcPerGram = 0;
   
+    console.log("Total Price:", totalPrice);
+    console.log("Tax Percent:", taxPercent);
+    console.log("Rate Amt:", rateAmt);
+    console.log("HM Charges:", hmCharges);
+    console.log("Stone Price:", stonePrice);
+    console.log("Discount:", discount);
+    console.log("Total Weight AW:", totalWeightAW);
+  
     if (!isNaN(totalPrice) && totalPrice > 0 && taxPercent > 0 && rateAmt > 0) {
       const taxableAmount = (totalPrice * 100) / (100 + taxPercent);
   
+      console.log("Taxable Amount:", taxableAmount);
+  
       if (formData.mc_on === "MC %") {
         const makingCharges =
-          taxableAmount - rateAmt - hmCharges - stonePrice + discount + festivalDiscount;
+          taxableAmount - rateAmt - hmCharges - stonePrice + discount;
+  
+        console.log("Making Charges (MC %):", makingCharges);
   
         mcPerGram = (100 * makingCharges) / rateAmt;
       } else if (formData.mc_on === "MC / Gram") {
         const makingCharges =
-          taxableAmount - rateAmt - hmCharges - stonePrice + discount + festivalDiscount;
+          taxableAmount - rateAmt - hmCharges - stonePrice + discount;
+  
+        console.log("Making Charges (MC / Gram):", makingCharges);
   
         if (totalWeightAW > 0) {
           mcPerGram = makingCharges / totalWeightAW;
         }
       } else if (formData.mc_on === "MC / Piece") {
+        console.log("Piece Making Charges:", makingChargesInput);
+  
         if (makingChargesInput > 0 && totalWeightAW > 0) {
           mcPerGram = makingChargesInput / totalWeightAW;
         }
       } else {
         mcPerGram = parseFloat(formData.mc_per_gram) || 0;
       }
+  
+      console.log("Calculated MC per Gram:", mcPerGram);
   
       if (!isNaN(mcPerGram)) {
         setFormData(prev => ({
@@ -375,6 +392,7 @@ const ProductDetails = ({
       }
     }
   };
+  
   
   
 

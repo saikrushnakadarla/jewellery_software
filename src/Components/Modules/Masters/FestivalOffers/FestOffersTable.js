@@ -116,14 +116,18 @@ const FestOffersTable = () => {
                 style={{ cursor: "pointer", color: "blue", marginRight: "10px" }}
                 onClick={() => handleEdit(offer.offer_id)}
               />
-              <FaTrash
+              {/* <FaTrash
                 style={{ cursor: "pointer", color: "red", marginRight: "10px" }}
                 onClick={() => handleDelete(offer)}
-              />
+              /> */}
               <Button
                 variant={offer.offer_status === "Applied" ? "danger" : "success"}
                 size="sm"
                 onClick={handleToggleStatus}
+                style={{               
+                  fontSize: '0.875rem', 
+                  padding: '0.25rem 0.5rem', 
+                }}
               >
                 {offer.offer_status === "Applied" ? "Unapply" : "Apply"}
               </Button>
