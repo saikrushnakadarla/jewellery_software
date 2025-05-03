@@ -338,6 +338,7 @@ const ProductDetails = ({
     const hmCharges = parseFloat(formData.hm_charges) || 0;
     const stonePrice = parseFloat(formData.stone_price) || 0;
     const discount = parseFloat(formData.disscount) || 0;
+    const festivalDiscount = parseFloat(formData.disscount) || 0;
     const totalWeightAW = parseFloat(formData.total_weight_aw) || 0;
     const makingChargesInput = parseFloat(formData.making_charges) || 0;
   
@@ -358,14 +359,14 @@ const ProductDetails = ({
   
       if (formData.mc_on === "MC %") {
         const makingCharges =
-          taxableAmount - rateAmt - hmCharges - stonePrice + discount;
+          taxableAmount - rateAmt - hmCharges - stonePrice + discount + festivalDiscount;
   
         console.log("Making Charges (MC %):", makingCharges);
   
         mcPerGram = (100 * makingCharges) / rateAmt;
       } else if (formData.mc_on === "MC / Gram") {
         const makingCharges =
-          taxableAmount - rateAmt - hmCharges - stonePrice + discount;
+          taxableAmount - rateAmt - hmCharges - stonePrice + discount + festivalDiscount;
   
         console.log("Making Charges (MC / Gram):", makingCharges);
   
