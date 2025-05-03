@@ -167,7 +167,7 @@ function FestOffers() {
                 required
               />
             </Col>
-            <Col md={3}>
+            {/* <Col md={3}>
               <InputField
                 label="Fest Offers Status"
                 name="offer_status"
@@ -176,7 +176,7 @@ function FestOffers() {
                 onChange={handleChange}
                 required
               />
-            </Col>
+            </Col> */}
           </Row>
           <div className="sup-button-container">
             <button type="button" className="cus-back-btn" onClick={handleBack}>

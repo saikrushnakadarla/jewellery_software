@@ -73,8 +73,8 @@ const PaymentDetails = ({
     <div>
       <Col >
         <Row>
-          <h4 className="mb-3">Summary</h4>
-          <Table bordered hover responsive>
+          <h4 className="mb-3" style={{fontSize:"20px"}}>Summary</h4>
+          <Table bordered hover responsive style={{fontSize:"13px"}}>
             {Array.isArray(invoiceDetails) && invoiceDetails.length > 0 ? (
               <>
                 <tr>

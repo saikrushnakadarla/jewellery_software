@@ -31,7 +31,7 @@ const ProductTable = ({
   return (
     <Table striped bordered hover>
       <thead>
-        <tr>
+        <tr style={{fontSize:"13px"}}>
           <th>
             <input
               type="checkbox"
@@ -78,7 +78,7 @@ const ProductTable = ({
           ))
         ) : (
           <tr>
-            <td colSpan="12" className="text-center">
+            <td colSpan="12" className="text-center" style={{fontSize:"13px"}}>
               No data available
             </td>
           </tr>

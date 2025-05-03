@@ -456,10 +456,34 @@ const URDPurchase = () => {
     setEditingRow(index); // Store index for updating
   };
 
-  const handleClose = () => {
-    navigate('/sales');
+  const getTabId = () => {
+    // First try to get from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let tabId = urlParams.get('tabId');
+    
+    // If not in URL, try sessionStorage
+    if (!tabId) {
+      tabId = sessionStorage.getItem('tabId');
+    }
+    
+    // If still not found, generate new ID
+    if (!tabId) {
+      tabId = crypto.randomUUID();
+      sessionStorage.setItem('tabId', tabId);
+      
+      // Update URL without page reload
+      const newUrl = `${window.location.pathname}?tabId=${tabId}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    return tabId;
   };
 
+  const tabId = getTabId();
+
+  const handleClose = () => {
+    navigate(`/sales?tabId=${tabId}`);
+  };
   const handleDeleteItem = (index) => {
     const updatedItems = items.filter((_, i) => i !== index);
     setItems(updatedItems); // Update the state

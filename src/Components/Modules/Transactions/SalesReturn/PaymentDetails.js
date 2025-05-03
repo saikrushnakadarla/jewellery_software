@@ -39,8 +39,33 @@ const PaymentDetails = ({
 
   const navigate = useNavigate();
 
+  const getTabId = () => {
+    // First try to get from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let tabId = urlParams.get('tabId');
+    
+    // If not in URL, try sessionStorage
+    if (!tabId) {
+      tabId = sessionStorage.getItem('tabId');
+    }
+    
+    // If still not found, generate new ID
+    if (!tabId) {
+      tabId = crypto.randomUUID();
+      sessionStorage.setItem('tabId', tabId);
+      
+      // Update URL without page reload
+      const newUrl = `${window.location.pathname}?tabId=${tabId}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    return tabId;
+  };
+
+  const tabId = getTabId();
+
   const handleClose = () => {
-    navigate('/sales');
+    navigate(`/sales?tabId=${tabId}`);
   };
 
   const handleCheckout = async () => {

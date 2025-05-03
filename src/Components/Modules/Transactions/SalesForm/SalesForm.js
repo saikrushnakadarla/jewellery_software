@@ -484,12 +484,18 @@ const SalesForm = () => {
         const filteredOffers = allOffers.filter((offer) => {
           const validFrom = new Date(offer.valid_from);
           const validTo = new Date(offer.valid_to);
+          const offerStatus = offer.offer_status?.toLowerCase(); // Convert to lowercase for case-insensitive comparison
 
-          // Compare dates - check if today is in between valid_from and valid_to
-          return today >= validFrom && today <= validTo;
+          // Compare dates and check offer status
+          return (
+            today >= validFrom && 
+            today <= validTo && 
+            offerStatus === 'applied'
+          );
         });
 
         setOffers(filteredOffers);
+        console.log("offers= ", filteredOffers)
         setLoading(false);
       } catch (error) {
         console.error("Error fetching offers:", error);

@@ -102,11 +102,38 @@ const RepairForm = () => {
       rate: currentRate,
     }));
   }, [formData.purity, formData.metal_type, rates]);
-  
-    const handleClose = () => {
-      navigate('/sales');
-    };
-  
+
+
+  const getTabId = () => {
+    // First try to get from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    let tabId = urlParams.get('tabId');
+    
+    // If not in URL, try sessionStorage
+    if (!tabId) {
+      tabId = sessionStorage.getItem('tabId');
+    }
+    
+    // If still not found, generate new ID
+    if (!tabId) {
+      tabId = crypto.randomUUID();
+      sessionStorage.setItem('tabId', tabId);
+      
+      // Update URL without page reload
+      const newUrl = `${window.location.pathname}?tabId=${tabId}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+    
+    return tabId;
+  };
+
+  const tabId = getTabId();
+
+  const handleClose = () => {
+    navigate(`/sales?tabId=${tabId}`);
+  };
+
+
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -198,7 +225,7 @@ const RepairForm = () => {
           total_price: "",
           total_amount: "0.00",
           opentag_id: "",
-          qty:1,
+          qty: 1,
         };
       }
 
@@ -635,28 +662,28 @@ const RepairForm = () => {
 
   const handleDiscountChange = (e) => {
     const discountValue = parseFloat(e.target.value) || 0; // Default to 0 if empty or NaN
-  
+
     if (discountValue > 15) {
       alert("Discount cannot be greater than 15%");
       return; // Prevent further execution
     }
-  
+
     setDiscount(discountValue);
-  
+
     const storedEstimateDetails = JSON.parse(localStorage.getItem("estimateDetails")) || [];
-  
+
     const updatedEstimateDetails = storedEstimateDetails.map((item) => {
       const makingCharges = parseFloat(item.making_charges) || 0;
       const calculatedDiscount = (makingCharges * discountValue) / 100;
-  
+
       // Preserve original_total_price when applying discount for the first time
       const originalTotalPrice = item.original_total_price
         ? parseFloat(item.original_total_price) // Ensure we're using the correct stored original value
         : parseFloat(item.total_price) || 0;
-  
+
       // If discount is cleared (0%), reset total_price to original_total_price
       const updatedTotalPrice = discountValue === 0 ? originalTotalPrice : originalTotalPrice - calculatedDiscount;
-  
+
       return {
         ...item,
         original_total_price: originalTotalPrice.toFixed(2), // Ensure original value is stored
@@ -665,11 +692,11 @@ const RepairForm = () => {
         total_price: updatedTotalPrice.toFixed(2),
       };
     });
-  
+
     setEntries(updatedEstimateDetails);
     localStorage.setItem("estimateDetails", JSON.stringify(updatedEstimateDetails));
   };
-  
+
 
 
   const handlePrint = async () => {
@@ -1227,10 +1254,11 @@ const RepairForm = () => {
           )}
           <Col xs={12} md={1}>
             <Button
-              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29",     marginTop:"3px",
-                marginLeft:"-1px",
-                fontSize:"13px",     padding: "5px 9px"
-            } }
+              style={{
+                backgroundColor: "#a36e29", borderColor: "#a36e29", marginTop: "3px",
+                marginLeft: "-1px",
+                fontSize: "13px", padding: "5px 9px"
+              }}
               onClick={handleAdd}
             >
               {isEditing ? "Update" : "Add"}
@@ -1241,7 +1269,7 @@ const RepairForm = () => {
         <Row className="estimate-form-section2">
           <Table bordered hover responsive>
             <thead>
-              <tr style={{fontSize:"14px"}}>
+              <tr style={{ fontSize: "14px" }}>
                 <th>S No</th>
                 <th>Code</th>
                 <th>Category</th>
@@ -1257,7 +1285,7 @@ const RepairForm = () => {
             <tbody>
               {entries.length > 0 ? (
                 entries.map((entry, index) => (
-                  <tr key={index} style={{fontSize:"14px"}}>
+                  <tr key={index} style={{ fontSize: "14px" }}>
                     <td>{index + 1}</td>
                     <td>{entry.code}</td>
                     <td>{entry.category}</td>
@@ -1295,14 +1323,14 @@ const RepairForm = () => {
         <Row className="estimate-form-section2">
           <Table bordered hover responsive>
             <>
-              <tr style={{fontSize:"14px"}}>
+              <tr style={{ fontSize: "14px" }}>
                 <td colSpan="20" className="text-right">
                   Total Amount
                 </td>
                 <td colSpan="4">{totalAmount.toFixed(2)}</td>
               </tr>
-              
-              <tr style={{fontSize:"14px"}}>
+
+              <tr style={{ fontSize: "14px" }}>
                 <td colSpan="16" className="text-right">Discount Amount</td>
                 <td colSpan="4">  @
                   <input
@@ -1316,25 +1344,25 @@ const RepairForm = () => {
                   {discountAmt.toFixed(2)}
                 </td>
               </tr>
-              <tr style={{fontSize:"14px"}}>
+              <tr style={{ fontSize: "14px" }}>
                 <td colSpan="20" className="text-right">
                   Taxable Amount
                 </td>
                 <td colSpan="4">{taxableAmount.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"14px"}}>
+              <tr style={{ fontSize: "14px" }}>
                 <td colSpan="20" className="text-right">
                   Tax Amount
                 </td>
                 <td colSpan="4">{taxAmount.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"14px"}}>
+              <tr style={{ fontSize: "14px" }}>
                 <td colSpan="20" className="text-right">
                   Net Amount
                 </td>
                 <td colSpan="4">{netAmount.toFixed(2)}</td>
               </tr>
-              <tr style={{fontSize:"14px"}}>
+              <tr style={{ fontSize: "14px" }}>
                 <td colSpan="20" className="text-right">
                   Net Payable Amount
                 </td>
@@ -1342,22 +1370,28 @@ const RepairForm = () => {
               </tr>
             </>
           </Table>
-          <Col xs={12} md={12} className="d-flex justify-content-end" style={{marginTop:"-10px"}}>
-             <Button
-                        onClick={handleClose}
-                        style={{width: "60px", backgroundColor: "gray", borderColor: "gray" , marginLeft:"5px",  fontSize:"14px",  marginTop:"1px",
-                padding: "1px 8px" , height:"33px"}}
-                        // disabled={!isSubmitEnabled}
-                      >
-                        Close
-                      </Button>
-            <Button className="cus-back-btn" variant="secondary" onClick={handleBack} style={{ width: "60px", marginLeft: '15px',    fontSize:"14px",
-                marginTop:"1px",
-                padding: "1px 8px" , height:"33px"}}>cancel</Button>
+          <Col xs={12} md={12} className="d-flex justify-content-end" style={{ marginTop: "-10px" }}>
             <Button
-              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29", marginLeft: '15px',    fontSize:"14px",
-                marginTop:"1px",
-                padding: "1px 8px" , height:"33px"}}
+              onClick={handleClose}
+              style={{
+                width: "60px", backgroundColor: "gray", borderColor: "gray", marginLeft: "5px", fontSize: "14px", marginTop: "1px",
+                padding: "1px 8px", height: "33px"
+              }}
+            // disabled={!isSubmitEnabled}
+            >
+              Close
+            </Button>
+            <Button className="cus-back-btn" variant="secondary" onClick={handleBack} style={{
+              width: "60px", marginLeft: '15px', fontSize: "14px",
+              marginTop: "1px",
+              padding: "1px 8px", height: "33px"
+            }}>cancel</Button>
+            <Button
+              style={{
+                backgroundColor: "#a36e29", borderColor: "#a36e29", marginLeft: '15px', fontSize: "14px",
+                marginTop: "1px",
+                padding: "1px 8px", height: "33px"
+              }}
               onClick={handlePrint}
             >
               Print
