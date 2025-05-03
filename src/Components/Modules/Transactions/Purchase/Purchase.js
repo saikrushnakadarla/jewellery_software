@@ -617,6 +617,10 @@ const URDPurchase = () => {
     }
   };
 
+  const handleClose1 = () => {
+    navigate('/sales');
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -1917,6 +1921,13 @@ const URDPurchase = () => {
             </div>
           </div>
           <div className="form-buttons">
+               <Button
+                                              onClick={handleClose1}
+                                              style={{ backgroundColor: "gray", borderColor: "gray" , marginLeft:"5px"}}
+                                              // disabled={!isSubmitEnabled}
+                                            >
+                                              Close
+                                            </Button>
             <Button
               variant="secondary"
               onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}

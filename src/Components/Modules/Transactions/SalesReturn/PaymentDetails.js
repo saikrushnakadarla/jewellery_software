@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 import { Col, Row, Button } from "react-bootstrap";
 import InputField from "./../../../Pages/InputField/InputField";
 import { Table } from "react-bootstrap";
@@ -36,7 +37,11 @@ const PaymentDetails = ({
 
   const netAmount = taxableAmount + taxAmount;
 
+  const navigate = useNavigate();
 
+  const handleClose = () => {
+    navigate('/sales');
+  };
 
   const handleCheckout = async () => {
     try {
@@ -140,6 +145,13 @@ const PaymentDetails = ({
               // disabled={!isSubmitEnabled}
             >
               Save
+            </Button>
+            <Button
+              onClick={handleClose}
+              style={{ backgroundColor: "gray", borderColor: "gray" , marginLeft:"5px"}}
+              // disabled={!isSubmitEnabled}
+            >
+              Close
             </Button>
           </Col>
           {/* <Col xs={12} md={2}>

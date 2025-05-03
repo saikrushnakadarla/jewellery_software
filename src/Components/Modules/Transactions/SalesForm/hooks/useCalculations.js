@@ -272,7 +272,7 @@ useEffect(() => {
         making_charges: makingCharges.toFixed(2) // Also update making_charges if needed
       }));
     }
-    
+     
     setIsManualTotalPriceChange(false);
   }
 }, [formData.total_price, isManualTotalPriceChange, isTotalPriceCleared]);

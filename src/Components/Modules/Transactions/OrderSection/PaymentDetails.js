@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Row, Button, Table } from 'react-bootstrap';
 import InputField from './../../Transactions/SalesForm/InputfieldSales';
-
+import { useNavigate } from "react-router-dom";
 const PaymentDetails = ({
   paymentDetails,
   setPaymentDetails,
@@ -23,7 +23,7 @@ const PaymentDetails = ({
   handleDiscountChange,
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
-  
+
   useEffect(() => {
     const totalEnteredAmount =
       parseFloat(paymentDetails.cash_amount || 0) +
@@ -34,24 +34,30 @@ const PaymentDetails = ({
     setIsSubmitEnabled(Math.abs(totalEnteredAmount - parseFloat(totalPrice || 0)) < tolerance);
   }, [paymentDetails, totalPrice]);
 
+  const navigate = useNavigate();
+  const handleClose = () => {
+    navigate('/sales');
+  };
+
+
   return (
     <div>
       <Col className="sales-form-section">
         <Row>
           <h7 className="mb-3">Summary</h7>
           <Table bordered hover responsive>
-            <tr style={{fontSize:"13px"}}>
+            <tr style={{ fontSize: "13px" }}>
               <td colSpan="16" className="text-right">Total Amount</td>
               <td colSpan="4">{totalAmount.toFixed(2)}</td>
             </tr>
-            <tr style={{fontSize:"13px"}}>
+            <tr style={{ fontSize: "13px" }}>
               <td colSpan="12" className="text-right">Discount Amount</td>
               <td colSpan="4">  @
                 <input
                   type="number"
                   value={discount}
                   onChange={handleDiscountChange}
-                  style={{ width: '80px', padding: '5px' , height:"23px", fontSize:"12px"}}
+                  style={{ width: '80px', padding: '5px', height: "23px", fontSize: "12px" }}
                 />
               </td>
               <td colSpan="4">
@@ -60,20 +66,20 @@ const PaymentDetails = ({
             </tr>
 
 
-            
-            <tr style={{fontSize:"13px"}}>
+
+            <tr style={{ fontSize: "13px" }}>
               <td colSpan="16" className="text-right">Taxable Amount</td>
               <td colSpan="4">{taxableAmount.toFixed(2)}</td>
             </tr>
-            <tr style={{fontSize:"13px"}}>
+            <tr style={{ fontSize: "13px" }}>
               <td colSpan="16" className="text-right">Tax Amount</td>
               <td colSpan="4">{taxAmount.toFixed(2)}</td>
             </tr>
-            <tr style={{fontSize:"13px"}}>
+            <tr style={{ fontSize: "13px" }}>
               <td colSpan="16" className="text-right">Net Amount</td>
               <td colSpan="4">{netAmount.toFixed(2)}</td>
             </tr>
-            <tr style={{fontSize:"13px"}}>
+            <tr style={{ fontSize: "13px" }}>
               <td colSpan="16" className="text-right">Old Items Amount</td>
               <td colSpan="4">{oldItemsAmount.toFixed(2)}</td>
             </tr>
@@ -81,7 +87,7 @@ const PaymentDetails = ({
               <td colSpan="16" className="text-right">Scheme Amount</td>
               <td colSpan="4">{schemeAmount.toFixed(2)}</td>
             </tr> */}
-            <tr style={{fontSize:"13px"}}>
+            <tr style={{ fontSize: "13px" }}>
               <td colSpan="16" className="text-right">Net Payable Amount</td>
               <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
             </tr>
@@ -135,9 +141,11 @@ const PaymentDetails = ({
           <Col xs={12} md={3}>
             <Button
               onClick={handleSave}
-              style={{ backgroundColor: '#a36e29', borderColor: '#a36e29',     fontSize: "14px",
+              style={{
+                backgroundColor: '#a36e29', borderColor: '#a36e29', fontSize: "14px",
                 marginTop: "3px",
-                padding: "4px 8px" }}
+                padding: "4px 8px"
+              }}
             >
               Save
             </Button>
@@ -147,11 +155,20 @@ const PaymentDetails = ({
               type="button"
               variant="secondary"
               onClick={handleBack}
-              style={{ backgroundColor: 'gray', marginLeft: '-55px',    fontSize: "14px",
+              style={{
+                backgroundColor: 'gray', marginLeft: '-55px', fontSize: "14px",
                 marginTop: "3px",
-                padding: "4px 8px" }}
+                padding: "4px 8px"
+              }}
             >
               Cancel
+            </Button>
+            <Button
+              onClick={handleClose}
+              style={{ backgroundColor: "gray", borderColor: "gray", marginLeft: "5px" }}
+            // disabled={!isSubmitEnabled}
+            >
+              Close
             </Button>
           </Col>
         </Row>

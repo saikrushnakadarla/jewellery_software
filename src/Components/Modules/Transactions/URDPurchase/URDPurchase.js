@@ -130,7 +130,7 @@ const URDPurchase = () => {
       }));
     }
   }, [productDetails.metal]);
-  
+
 
   useEffect(() => {
     const fetchLastURDPurchaseNumber = async () => {
@@ -198,10 +198,10 @@ const URDPurchase = () => {
     // Normal purity-based rate assignment for gold
     const currentRate =
       normalizedPurity.includes("24") ? rates.rate_24crt :
-      normalizedPurity.includes("22") ? rates.rate_22crt :
-      normalizedPurity.includes("18") ? rates.rate_18crt :
-      normalizedPurity.includes("16") ? rates.rate_16crt :
-      rates.rate_22crt;
+        normalizedPurity.includes("22") ? rates.rate_22crt :
+          normalizedPurity.includes("18") ? rates.rate_18crt :
+            normalizedPurity.includes("16") ? rates.rate_16crt :
+              rates.rate_22crt;
 
 
     setProductDetails((prevDetails) => ({ ...prevDetails, rate: currentRate }));
@@ -209,10 +209,10 @@ const URDPurchase = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-  
+
     setProductDetails((prevDetails) => {
       let updatedDetails = { ...prevDetails, [name]: value };
-  
+
       if (name === "metal") {
         if (!value) {
           // If metal is cleared, reset all dependent fields
@@ -236,7 +236,7 @@ const URDPurchase = () => {
           updatedDetails.rate = value === "Silver" ? rates.rate_silver || "0.00" : "";
         }
       }
-  
+
       if (name === "purity") {
         if (value !== "Manual") {
           const selectedOption = purityOptions.find(option => option.name === value);
@@ -244,33 +244,33 @@ const URDPurchase = () => {
         } else {
           updatedDetails.purityPercentage = 0; // Directly set purityPercentage to 0
         }
-  
+
         // **Get the correct rate based on purity**
         const normalizedPurity = normalizePurity(value);
         updatedDetails.rate =
           normalizedPurity.includes("24") ? rates.rate_24crt :
-          normalizedPurity.includes("22") ? rates.rate_22crt :
-          normalizedPurity.includes("18") ? rates.rate_18crt :
-          normalizedPurity.includes("16") ? rates.rate_16crt :
-          rates.rate_22crt; // Default to rate_22crt if no match
+            normalizedPurity.includes("22") ? rates.rate_22crt :
+              normalizedPurity.includes("18") ? rates.rate_18crt :
+                normalizedPurity.includes("16") ? rates.rate_16crt :
+                  rates.rate_22crt; // Default to rate_22crt if no match
       }
-  
+
       if (name === "purityPercentage") {
         updatedDetails.purityPercentage = parseFloat(value) || 0;
       }
-  
+
       // **Ensure net weight is calculated with the latest purity and rate**
       updatedDetails.eqt_wt = calculateNetWeight({
         ...updatedDetails,
         purityPercentage: updatedDetails.purityPercentage,
       });
-  
+
       updatedDetails.total_amount = calculateTotalAmount(updatedDetails);
-  
+
       return updatedDetails;
     });
   };
-  
+
   const calculateNetWeight = ({ gross, dust, purity, purityPercentage, ml_percent }) => {
     const purityPercentageValue = purity === "Manual"
       ? parseFloat(purityPercentage) || 0
@@ -454,6 +454,10 @@ const URDPurchase = () => {
   const handleEditItem = (item, index) => {
     setProductDetails(item);  // Populate form fields with existing data
     setEditingRow(index); // Store index for updating
+  };
+
+  const handleClose = () => {
+    navigate('/sales');
   };
 
   const handleDeleteItem = (index) => {
@@ -748,12 +752,13 @@ const URDPurchase = () => {
               </Col>
               <Col xs={12} md={1}>
                 <Button
-                  style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" ,     padding: "5px 9px",
+                  style={{
+                    backgroundColor: "#a36e29", borderColor: "#a36e29", padding: "5px 9px",
                     marginTop: "2px",
                     marginLeft: "-1px",
                     fontSize: "14px"
-                
-                }}
+
+                  }}
                   onClick={handleAddOrUpdateItem}
                 >
                   {editingRow !== null ? "Update" : "Add"}
@@ -827,6 +832,13 @@ const URDPurchase = () => {
           <div className="form-buttons">
 
             {/* <Button type="submit" variant="success" style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}>Print</Button> */}
+            <Button
+              onClick={handleClose}
+              style={{ backgroundColor: "gray", borderColor: "gray", marginLeft: "5px" }}
+            // disabled={!isSubmitEnabled}
+            >
+              Close
+            </Button>
             <Button
               variant="secondary"
               onClick={handleBack} style={{ backgroundColor: 'gray', }}

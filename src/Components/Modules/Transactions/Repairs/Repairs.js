@@ -292,6 +292,10 @@ const RepairForm = () => {
     fetchRepairById();
   }, [id]);
 
+  const handleClose = () => {
+    navigate('/sales');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -633,6 +637,13 @@ const RepairForm = () => {
             </div>
           </div>
           <div className="form-buttons">
+              <Button
+                                                          onClick={handleClose}
+                                                          style={{ backgroundColor: "gray", borderColor: "gray" , marginLeft:"5px"}}
+                                                          // disabled={!isSubmitEnabled}
+                                                        >
+                                                          Close
+                                                        </Button>
             <Button className="cus-back-btn" variant="secondary" onClick={handleBack}>cancel</Button>
             <Button
               type="submit"

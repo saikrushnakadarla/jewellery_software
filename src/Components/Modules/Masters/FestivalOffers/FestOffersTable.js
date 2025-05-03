@@ -14,19 +14,19 @@ const FestOffersTable = () => {
 
   // Fetch data
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`${baseURL}/api/offers`);
-        setData(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching offers:", error);
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/api/offers`);
+      setData(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching offers:", error);
+      setLoading(false);
+    }
+  };
 
   const columns = React.useMemo(
     () => [
@@ -56,7 +56,7 @@ const FestOffersTable = () => {
         Cell: ({ value }) => {
           const date = new Date(value);
           const day = String(date.getDate()).padStart(2, '0');
-          const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+          const month = String(date.getMonth() + 1).padStart(2, '0');
           const year = date.getFullYear();
           return `${day}-${month}-${year}`;
         },
@@ -72,11 +72,43 @@ const FestOffersTable = () => {
           return `${day}-${month}-${year}`;
         },
       },
-      
+      {
+        Header: "Fest Offers Status",
+        accessor: "offer_status",
+      },
       {
         Header: "Actions",
         Cell: ({ row }) => {
           const offer = row.original;
+
+          const handleToggleStatus = async () => {
+            try {
+              const newStatus = offer.offer_status === "Applied" ? "Unapplied" : "Applied";
+              
+              // Use the new status-specific API endpoint
+              await axios.put(`${baseURL}/api/offers/${offer.offer_id}/status`, {
+                offer_status: newStatus
+              });
+              
+              // Update local state
+              setData(prevData => 
+                prevData.map(item => 
+                  item.offer_id === offer.offer_id 
+                    ? {...item, offer_status: newStatus} 
+                    : item
+                )
+              );
+              
+              Swal.fire(
+                "Success!",
+                `Offer status changed to ${newStatus}`,
+                "success"
+              );
+            } catch (error) {
+              console.error("Error updating offer status:", error);
+              Swal.fire("Error!", "Failed to update offer status", "error");
+            }
+          };
 
           return (
             <div>
@@ -85,15 +117,22 @@ const FestOffersTable = () => {
                 onClick={() => handleEdit(offer.offer_id)}
               />
               <FaTrash
-                style={{ cursor: "pointer", color: "red" }}
+                style={{ cursor: "pointer", color: "red", marginRight: "10px" }}
                 onClick={() => handleDelete(offer)}
               />
+              <Button
+                variant={offer.offer_status === "Applied" ? "danger" : "success"}
+                size="sm"
+                onClick={handleToggleStatus}
+              >
+                {offer.offer_status === "Applied" ? "Unapply" : "Apply"}
+              </Button>
             </div>
           );
         },
       },
     ],
-    [data]
+    []
   );
 
   const handleEdit = async (id) => {

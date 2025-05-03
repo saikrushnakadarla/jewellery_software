@@ -102,6 +102,11 @@ const RepairForm = () => {
       rate: currentRate,
     }));
   }, [formData.purity, formData.metal_type, rates]);
+  
+    const handleClose = () => {
+      navigate('/sales');
+    };
+  
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -1338,6 +1343,14 @@ const RepairForm = () => {
             </>
           </Table>
           <Col xs={12} md={12} className="d-flex justify-content-end" style={{marginTop:"-10px"}}>
+             <Button
+                        onClick={handleClose}
+                        style={{width: "60px", backgroundColor: "gray", borderColor: "gray" , marginLeft:"5px",  fontSize:"14px",  marginTop:"1px",
+                padding: "1px 8px" , height:"33px"}}
+                        // disabled={!isSubmitEnabled}
+                      >
+                        Close
+                      </Button>
             <Button className="cus-back-btn" variant="secondary" onClick={handleBack} style={{ width: "60px", marginLeft: '15px',    fontSize:"14px",
                 marginTop:"1px",
                 padding: "1px 8px" , height:"33px"}}>cancel</Button>

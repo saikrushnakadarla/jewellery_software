@@ -18,6 +18,7 @@ function FestOffers() {
     discount_percent_fixed: "",
     valid_from: "",
     valid_to: "",
+    offer_status: "",
   });
 
   const formatDate = (dateStr) => {
@@ -41,6 +42,7 @@ function FestOffers() {
         discount_percent_fixed: location.discount_percent_fixed || "",
         valid_from: formatDate(location.valid_from),
         valid_to: formatDate(location.valid_to),
+        offer_status: formatDate(location.offer_status),
       });
     }
   }, [offer_id, location]);
@@ -135,7 +137,7 @@ function FestOffers() {
                 required
               />
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Discount % for Fixed"
                 name="discount_percent_fixed"
@@ -145,7 +147,7 @@ function FestOffers() {
                 required
               />
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Valid From"
                 name="valid_from"
@@ -155,12 +157,22 @@ function FestOffers() {
                 required
               />
             </Col>
-            <Col md={4}>
+            <Col md={3}>
               <InputField
                 label="Valid To"
                 name="valid_to"
                 type="date"
                 value={formData.valid_to}
+                onChange={handleChange}
+                required
+              />
+            </Col>
+            <Col md={3}>
+              <InputField
+                label="Fest Offers Status"
+                name="offer_status"
+                type="text"
+                value={formData.offer_status}
                 onChange={handleChange}
                 required
               />

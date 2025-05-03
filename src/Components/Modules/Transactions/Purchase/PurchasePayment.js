@@ -225,6 +225,10 @@ const RepairForm = () => {
         }
     }, [formData.invoice, formData.category, rateCuts]);
 
+    const handleClose = () => {
+        navigate('/sales');
+      };
+
 
     useEffect(() => {
         if (receivedData.Pricing === "By fixed") {
@@ -491,6 +495,13 @@ const RepairForm = () => {
                     </Col>
                 </Row>
                 <div className="form-buttons">
+                      <Button
+                                  onClick={handleClose}
+                                  style={{ backgroundColor: "gray", borderColor: "gray" , marginLeft:"5px"}}
+                                  // disabled={!isSubmitEnabled}
+                                >
+                                  Close
+                                </Button>
                     <Button
                         variant="secondary"
                         className="cus-back-btn"
