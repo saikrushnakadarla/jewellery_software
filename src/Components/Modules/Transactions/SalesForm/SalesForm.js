@@ -1766,8 +1766,8 @@ const SalesForm = () => {
   }, [formData.code]);
 
     // Apply calculations
-    useCalculations(formData, setFormData, offers,  isManualTotalPriceChange,
-      setIsManualTotalPriceChange, isTotalPriceCleared);
+    // useCalculations(formData, setFormData, offers,  isManualTotalPriceChange,
+    //   setIsManualTotalPriceChange, isTotalPriceCleared);
 
   return (
     <div className="main-container">
@@ -1841,7 +1841,11 @@ const SalesForm = () => {
               fetchSubCategory={fetchSubCategory}
               taxableAmount={taxableAmount}
               tabId={tabId}
+              offers={offers}
+              isTotalPriceCleared={isTotalPriceCleared}
               setIsTotalPriceCleared={setIsTotalPriceCleared}
+              isManualTotalPriceChange={isManualTotalPriceChange} 
+              setIsManualTotalPriceChange={setIsManualTotalPriceChange}
             />
           </div>
 

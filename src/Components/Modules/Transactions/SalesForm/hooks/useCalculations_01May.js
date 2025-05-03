@@ -96,6 +96,9 @@ const useCalculations = (formData, setFormData, offers,   isManualTotalPriceChan
 
   // Calculate Tax Amount and Total Price
   useEffect(() => {
+     // Skip if it's a manual total_price change
+    // Skip if total_price was manually cleared or changed
+    if (isTotalPriceCleared || isManualTotalPriceChange) return;
     const taxPercent = parseFloat(formData.tax_percent) || 0;
 
     if (formData.pricing === "By Weight") {
@@ -153,6 +156,9 @@ const useCalculations = (formData, setFormData, offers,   isManualTotalPriceChan
     formData.mrp_price,
     formData.pieace_cost,
     formData.qty,
+      /* all your existing dependencies */
+  isTotalPriceCleared,
+  isManualTotalPriceChange
   ]);
 
   useEffect(() => {
@@ -266,7 +272,7 @@ useEffect(() => {
         making_charges: makingCharges.toFixed(2) // Also update making_charges if needed
       }));
     }
-     
+    
     setIsManualTotalPriceChange(false);
   }
 }, [formData.total_price, isManualTotalPriceChange, isTotalPriceCleared]);
