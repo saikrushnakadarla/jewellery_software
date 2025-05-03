@@ -170,8 +170,7 @@ const useProductHandlers = () => {
     sale_status: "Delivered",
     piece_taxable_amt: "",
     festival_discount: "",
-    custom_purity: "",
-    manual_price_update: false
+    custom_purity: ""
   });
 
 
@@ -303,17 +302,8 @@ const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-
-    if (name === "total_price") {
-        setIsManualTotalPriceChange(true);
-      }
-    
-      setFormData(prev => ({
-        ...prev,
-        [name]: value,
-      }));
-
     let updatedFormData = { ...formData, [name]: value };
+
     // Handle category changes
     if (name === "category") {
       // Find the first product that matches this category
@@ -620,7 +610,24 @@ const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
     }
 
     setFormData(updatedFormData);
-  };
+  };// In your component, add useEffect to handle initial rate calculation
+
+  // useEffect(() => {
+  //   if (formData.product_name && formData.selling_purity && formData.selling_purity !== "Manual") {
+  //     const purityValue = parseFloat(formData.selling_purity);
+  //     if (!isNaN(purityValue) && rates.rate_24crt) {
+  //       const baseRate = parseFloat(rates.rate_24crt);
+  //       const calculatedRate = ((purityValue / 100) * baseRate).toFixed(2);
+  //       setFormData(prev => ({
+  //         ...prev,
+  //         rate: calculatedRate
+  //       }));
+  //     }
+  //   }
+  // }, [formData.product_name, formData.selling_purity, rates.rate_24crt]);
+
+
+
 
   const handleProductNameChange = (productName) => {
     const productEntries = data.filter((prod) => prod.sub_category === productName);
