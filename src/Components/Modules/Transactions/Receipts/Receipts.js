@@ -389,7 +389,8 @@ const RepairForm = () => {
   const tabId = getTabId();
 
   const handleClose = () => {
-    navigate(`/sales?tabId=${tabId}`);
+    // navigate(`/sales?tabId=${tabId}`);
+    navigate(-1);
   };
   const handleSubmit = async (e) => {
     e.preventDefault();

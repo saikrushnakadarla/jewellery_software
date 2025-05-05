@@ -59,9 +59,10 @@ const PaymentDetails = ({
   };
 
   const tabId = getTabId();
-
+  
   const handleClose = () => {
-    navigate(`/sales?tabId=${tabId}`);
+    // navigate(`/sales?tabId=${tabId}`);
+    navigate(-1);
   };
 
 

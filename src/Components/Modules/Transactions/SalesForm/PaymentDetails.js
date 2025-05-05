@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Col, Row, Button, Table, Modal } from 'react-bootstrap';
 import InputField from './InputfieldSales';
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
 
@@ -53,12 +54,12 @@ const PaymentDetails = ({
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
   const location = useLocation();
   const [appliedOfferKey, setAppliedOfferKey] = useState(null);
-
+  const navigate = useNavigate();
   // In your component state
 
 
   let rounded = Math.round(netPayAmount); // Rounds to nearest whole number
-  console.log(rounded); 
+  console.log(rounded);
 
   useEffect(() => {
     const storedPaymentDetails = JSON.parse(localStorage.getItem(`paymentDetails_${tabId}`)) || {};
@@ -147,6 +148,12 @@ const PaymentDetails = ({
     const updatedDetails = { ...paymentDetails, [field]: newValue };
     setPaymentDetails(updatedDetails);
     localStorage.setItem(`paymentDetails_${tabId}`, JSON.stringify(updatedDetails)); // Update localStorage on change
+  };
+  
+
+  const handleClose = () => {
+    // navigate(`/sales?tabId=${tabId}`);
+    navigate(-1);
   };
 
   return (
@@ -342,6 +349,20 @@ const PaymentDetails = ({
                 Cancel
               </Button>
             </Col>
+            <Col xs={12} md={2}>
+            <Button
+            onClick={handleClose}
+            style={{
+              backgroundColor: "gray", borderColor: "gray", marginLeft: "-57px",
+              marginTop: "px",
+              padding: "4px 10px",
+              fontSize: "14px"
+            }}
+          // disabled={!isSubmitEnabled}
+          >
+            Close
+          </Button>
+          </Col>
           </Row>
         </Col>
 

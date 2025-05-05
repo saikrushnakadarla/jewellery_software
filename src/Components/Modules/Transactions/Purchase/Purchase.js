@@ -643,9 +643,9 @@ const URDPurchase = () => {
   const tabId = getTabId();
 
   const handleClose1 = () => {
-    navigate(`/sales?tabId=${tabId}`);
+    // navigate(`/sales?tabId=${tabId}`);
+    navigate(-1);
   };
-
 
   const handleSave = async (e) => {
     e.preventDefault();
