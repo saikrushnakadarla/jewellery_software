@@ -55,7 +55,7 @@ const ProductTable = ({
       <tbody>
         {Array.isArray(invoiceDetails) && invoiceDetails.length > 0 ? (
           invoiceDetails.map((detail, index) => (
-            <tr key={index}>
+            <tr key={index} style={{fontSize:"12px"}}>
               <td>
                 <input
                   type="checkbox"
