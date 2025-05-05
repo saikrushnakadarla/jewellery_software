@@ -92,7 +92,8 @@ const SalesForm = () => {
     setIsManualTotalPriceChange,
     tabId,
     isTotalPriceCleared,
-    setIsTotalPriceCleared
+    setIsTotalPriceCleared,
+    manualTotalPriceRef
   } = useProductHandlers();
 
 
@@ -1846,6 +1847,7 @@ const SalesForm = () => {
               setIsTotalPriceCleared={setIsTotalPriceCleared}
               isManualTotalPriceChange={isManualTotalPriceChange} 
               setIsManualTotalPriceChange={setIsManualTotalPriceChange}
+              manualTotalPriceRef={manualTotalPriceRef}
             />
           </div>
 

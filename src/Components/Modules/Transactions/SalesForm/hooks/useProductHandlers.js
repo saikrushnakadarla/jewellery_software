@@ -296,22 +296,21 @@ const useProductHandlers = () => {
     fetchTags();
   }, []);
 
-// Add this state to track manual changes
-const [isManualTotalPriceChange, setIsManualTotalPriceChange] = useState(false);
-const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
+  // Add this state to track manual changes
+  const [isManualTotalPriceChange, setIsManualTotalPriceChange] = useState(false);
+  const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
 
-    if (name === "total_price") {
-        setIsManualTotalPriceChange(true);
-      }
-    
-      setFormData(prev => ({
-        ...prev,
-        [name]: value,
-      }));
+    if (name === 'total_price') {
+      setIsManualTotalPriceChange(true);
+    }
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
 
     let updatedFormData = { ...formData, [name]: value };
     // Handle category changes
@@ -390,7 +389,7 @@ const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
         }
       }
     }
-    
+
 
     if (name === "product_name") {
       if (value === "") {
@@ -822,7 +821,7 @@ const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
         const filteredData = formData.product_id
           ? result.data.filter((item) => item.category_id === formData.product_id)
           : result.data;
-  
+
         const formattedOptions = filteredData.map((item) => ({
           label: item.sub_category_name,
           value: item.sub_category_name,
@@ -831,9 +830,9 @@ const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
           purity: item.purity,
           pricing: item.pricing,
         }));
-  
+
         setSubcategoryOptions(formattedOptions);
-  
+
         // Only process new subcategory once
         if (location.state?.newSubCategory && !hasProcessedNewSubCategory.current) {
           const found = formattedOptions.find(opt => opt.label === location.state.newSubCategory);
@@ -847,16 +846,16 @@ const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
                 printing_purity: found.printing_purity || "",
                 pricing: found.pricing || "",
               };
-  
+
               const purityValue = parseFloat(found.selling_purity);
               const baseRate = parseFloat(prev.rate_24k) || 0;
               if (!isNaN(purityValue)) {
                 updatedData.rate = ((purityValue / 100) * baseRate).toFixed(2);
               }
-  
+
               return updatedData;
             });
-            
+
             hasProcessedNewSubCategory.current = true;
           }
         }
@@ -1129,7 +1128,7 @@ const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
           let rateValue = "";
           const metalType = String(tag.metal_type || "").toLowerCase();
           const purity = tag.Purity || tag.pur_Purity || "";
-          
+
           if (purity) {
             const baseRate = metalType === "silver" ? rates.silver_rate : formData.rate_24k;
             if (baseRate) {
@@ -1138,9 +1137,9 @@ const [isTotalPriceCleared, setIsTotalPriceCleared] = useState(false);
           } else if (metalType === "silver") {
             rateValue = rates.silver_rate || "";
           }
-          
 
-          
+
+
 
           setFormData((prevData) => ({
             ...prevData,

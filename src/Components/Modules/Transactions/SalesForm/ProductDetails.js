@@ -148,19 +148,19 @@ const ProductDetails = ({
     const festivalDiscount = parseFloat(formData.festival_discount) || 0;
     const qty = parseFloat(formData.qty) || 0;
     const pieceCost = parseFloat(formData.pieace_cost) || 0;
-  
+
     // Weight BW
     const weightBW = grossWeight - stoneWeight;
-  
+
     // Wastage Weight
     const wastageWeight =
       formData.va_on === "Gross Weight"
         ? (grossWeight * vaPercent) / 100
         : (weightBW * vaPercent) / 100;
-  
+
     // Total Weight AW
     const totalWeightAW = weightBW + wastageWeight;
-  
+
     // Rate Amount
     let rateAmt = 0;
     if (formData.pricing === "By fixed") {
@@ -168,11 +168,11 @@ const ProductDetails = ({
     } else {
       rateAmt = rate * totalWeightAW;
     }
-  
+
     // Making Charges
     let makingCharges = 0;
     let calculatedMcPerGram = null;
-  
+
     if (formData.mc_on === "MC %") {
       makingCharges = (mcPerGram * rateAmt) / 100;
     } else if (formData.mc_on === "MC / Gram") {
@@ -186,16 +186,16 @@ const ProductDetails = ({
     } else {
       makingCharges = parseFloat(formData.making_charges) || 0;
     }
-  
+
     // Taxable Amount & Tax
     let taxAmt = 0;
     let totalPrice = 0;
-  
+
     if (formData.pricing === "By fixed") {
       const taxable = pieceCost * qty;
       taxAmt = (taxPercent * taxable) / 100;
       totalPrice = taxable + taxAmt;
-  
+
       setFormData(prev => ({
         ...prev,
         piece_taxable_amt: taxable.toFixed(2),
@@ -208,14 +208,25 @@ const ProductDetails = ({
       const taxable = rateAmt + stonePrice + makingCharges + hmCharges - totalDiscount;
       taxAmt = (taxable * taxPercent) / 100;
       totalPrice = taxable + taxAmt;
-  
-      setFormData(prev => ({
-        ...prev,
-        tax_amt: taxAmt.toFixed(2),
-        total_price: totalPrice.toFixed(2),
-      }));
+
+      // setFormData(prev => ({
+      //   ...prev,
+      //   tax_amt: taxAmt.toFixed(2),
+      //   total_price: totalPrice.toFixed(2),
+      // }));
+      setFormData(prev => {
+        const roundedTaxAmt = parseFloat(taxAmt).toFixed(2);
+        const roundedTotalPrice = (Math.round(parseFloat(totalPrice) * 100) / 100).toFixed(2);
+      
+        return {
+          ...prev,
+          tax_amt: taxAmt.toFixed(2),
+          total_price: roundedTotalPrice,
+        };
+      });
+      
     }
-  
+
     // Final shared state update
     setFormData(prev => ({
       ...prev,
@@ -267,16 +278,16 @@ const ProductDetails = ({
 
     if (formData.pricing === "By fixed") {
       const pieceTaxableAmt = pieceCost * qty;
-      console.log("pieceTaxableAmt=",pieceTaxableAmt)
+      console.log("pieceTaxableAmt=", pieceTaxableAmt)
       // const originalPieceTaxableAmt = formData.original_piece_taxable_amt
       //   ? parseFloat(formData.original_piece_taxable_amt)
       //   : pieceTaxableAmt;
 
-        const originalPieceTaxableAmt = formData.original_piece_taxable_amt
+      const originalPieceTaxableAmt = formData.original_piece_taxable_amt
         ? parseFloat(formData.original_piece_taxable_amt)
         : pieceTaxableAmt;
 
-        console.log("originalPieceTaxableAmt=",originalPieceTaxableAmt)
+      console.log("originalPieceTaxableAmt=", originalPieceTaxableAmt)
 
       const calculatedDiscount = (pieceTaxableAmt * fixedPercentageDiscount) / 100;
       const updatedPieceTaxableAmt = pieceTaxableAmt - calculatedDiscount;
@@ -329,73 +340,86 @@ const ProductDetails = ({
     formData.original_piece_taxable_amt,
     offers,
   ]);
-  
+
 
   const handleTotalPriceChange = () => {
+
+    if (!offers || offers.length === 0) return;
+
+    const selectedOffer = offers[0]; // Assuming auto-apply first offer
+    const percentageDiscount = parseFloat(selectedOffer.discount_percentage) || 0;
+    const rateDiscount = parseFloat(selectedOffer.discount_on_rate) || 0;
+    const fixedPercentageDiscount = parseFloat(selectedOffer.discount_percent_fixed) || 0;
+
     const totalPrice = parseFloat(formData.total_price);
     const taxPercent = parseFloat(formData.tax_percent) || 0;
     const rateAmt = parseFloat(formData.rate_amt) || 0;
     const hmCharges = parseFloat(formData.hm_charges) || 0;
     const stonePrice = parseFloat(formData.stone_price) || 0;
     const discount = parseFloat(formData.disscount) || 0;
-    const festivalDiscount = parseFloat(formData.disscount) || 0;
-    const totalWeightAW = parseFloat(formData.total_weight_aw) || 0;
+    const festivalDiscount = parseFloat(formData.festival_discount) || 0;
+    const totalWeightAW = parseFloat(formData.total_weight_av) || 0;
     const makingChargesInput = parseFloat(formData.making_charges) || 0;
-  
+    const grossWeight = parseFloat(formData.gross_weight) || 0;
+
     let mcPerGram = 0;
-  
-    console.log("Total Price:", totalPrice);
-    console.log("Tax Percent:", taxPercent);
-    console.log("Rate Amt:", rateAmt);
-    console.log("HM Charges:", hmCharges);
-    console.log("Stone Price:", stonePrice);
-    console.log("Discount:", discount);
-    console.log("Total Weight AW:", totalWeightAW);
-  
-    if (!isNaN(totalPrice) && totalPrice > 0 && taxPercent > 0 && rateAmt > 0) {
+
+    if (
+      !isNaN(totalPrice) &&
+      totalPrice > 0 &&
+      taxPercent > 0 &&
+      rateAmt > 0 &&
+      (100 - percentageDiscount) !== 0
+    ) {
       const taxableAmount = (totalPrice * 100) / (100 + taxPercent);
-  
+
       console.log("Taxable Amount:", taxableAmount);
-  
+
       if (formData.mc_on === "MC %") {
-        const makingCharges =
-          taxableAmount - rateAmt - hmCharges - stonePrice + discount + festivalDiscount;
-  
-        console.log("Making Charges (MC %):", makingCharges);
-  
-        mcPerGram = (100 * makingCharges) / rateAmt;
-      } else if (formData.mc_on === "MC / Gram") {
-        const makingCharges =
-          taxableAmount - rateAmt - hmCharges - stonePrice + discount + festivalDiscount;
-  
-        console.log("Making Charges (MC / Gram):", makingCharges);
-  
+        const weightBasedDiscount = (rateDiscount / 10) * grossWeight;
+
+        const mcPerGramNumerator =
+          (totalPrice / (1 + taxPercent / 100)) -
+          rateAmt -
+          hmCharges +
+          weightBasedDiscount;
+
+        const mcPerGramDenominator = rateAmt * (100 - percentageDiscount);
+
+        mcPerGram = (mcPerGramNumerator * 10000) / mcPerGramDenominator;
+
+        console.log("MC Per Gram:", mcPerGram);
+
+      } else if (formData.mc_on === "MC / Gram" || formData.mc_on === "MC / Piece") {
+        // Reverse calculate mcPerGram from TotalMC
+
+        // TotalMC = taxableAmount - rateAmt - hmCharges - stonePrice + discount + festivalDiscount
+        const weightBasedDiscount = (rateDiscount / 10) * grossWeight;
+        const adjustedFestivalDiscount = ((percentageDiscount / 100) * makingChargesInput) + weightBasedDiscount;
+
+        const totalMC = taxableAmount - rateAmt - hmCharges - stonePrice + discount + adjustedFestivalDiscount;
+
         if (totalWeightAW > 0) {
-          mcPerGram = makingCharges / totalWeightAW;
-        }
-      } else if (formData.mc_on === "MC / Piece") {
-        console.log("Piece Making Charges:", makingChargesInput);
-  
-        if (makingChargesInput > 0 && totalWeightAW > 0) {
-          mcPerGram = makingChargesInput / totalWeightAW;
+          mcPerGram = totalMC / totalWeightAW;
         }
       } else {
         mcPerGram = parseFloat(formData.mc_per_gram) || 0;
       }
-  
+
       console.log("Calculated MC per Gram:", mcPerGram);
-  
+
       if (!isNaN(mcPerGram)) {
         setFormData(prev => ({
           ...prev,
-          mc_per_gram: mcPerGram.toFixed(2),
+          mc_per_gram: mcPerGram,
         }));
       }
     }
+    setIsManualTotalPriceChange(false);
   };
-  
-  
-  
+
+
+
 
 
   return (
@@ -951,7 +975,20 @@ const ProductDetails = ({
                 readOnly={formData.mc_on === "MC / Piece"} // Only disable when MC / Piece is selected
               />
             </Col>
-
+            {/* <Col xs={12} md={1}>
+              <InputField
+                label={formData.mc_on === "MC %" ? "MC %" : "MC/Gm"}
+                name="mc_per_gram"
+                type="number"
+                value={
+                  formData.mc_per_gram !== "" && formData.mc_per_gram !== null
+                    ? parseFloat(formData.mc_per_gram).toFixed(2)
+                    : ""
+                }
+                onChange={handleChange}
+                readOnly={formData.mc_on === "MC / Piece"}
+              />
+            </Col> */}
             <Col xs={12} md={1}>
               <InputField
                 label="Total MC"
@@ -1028,6 +1065,15 @@ const ProductDetails = ({
                 type="button"
                 className="btn btn-primary"
                 onClick={handleTotalPriceChange}
+                disabled={!isManualTotalPriceChange}
+                style={{
+                  backgroundColor: "#a36e29",
+                  borderColor: "#a36e29",
+                  padding: "4px 7px",
+                  marginBottom: "15px",
+                  marginLeft: "-1px",
+                  fontSize: "13px"
+                }}
               >
                 Change
               </button>

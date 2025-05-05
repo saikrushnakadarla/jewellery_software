@@ -533,12 +533,11 @@ const TaxINVoiceReceipt = ({
                                                                                 <Text style={[styles.tableCell, styles.tableCellMC]}>
                                                                                         {item.mc_per_gram != null && item.mc_per_gram !== ""
                                                                                                 ? (['gold', 'diamond', 'others'].includes(item.metal_type?.toLowerCase())
-                                                                                                        ? `${parseFloat(item.mc_per_gram) % 1 === 0
-                                                                                                                ? parseInt(item.mc_per_gram)
-                                                                                                                : item.mc_per_gram} %`
-                                                                                                        : item.mc_per_gram)
+                                                                                                        ? `${parseFloat(item.mc_per_gram).toFixed(2)} %`
+                                                                                                        : parseFloat(item.mc_per_gram).toFixed(2))
                                                                                                 : ''}
                                                                                 </Text>
+
 
 
                                                                                 <View style={[styles.divider1, { marginTop: -2 }]} />
