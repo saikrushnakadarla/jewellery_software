@@ -1513,43 +1513,44 @@ const SalesForm = () => {
       alert("Please select the Customer or enter the Customer Mobile Number");
       return;
     }
-
+  
     try {
-      // Fetch tags first (or ensure they're already loaded in `data`)
+      // Fetch tags
       const tagResponse = await fetch(`${baseURL}/get/opening-tags-entry`);
       const tagResult = await tagResponse.json();
       const tagData = tagResult.result || [];
-
-      // Check if any item in repairDetails is already sold
+  
+      // Check for sold items
       const soldItem = repairDetails.find((item) => {
         const matchedTag = tagData.find(
           (data) => data.PCode_BarCode === item.code && data.Status === "Sold"
         );
         return matchedTag !== undefined;
       });
-
+  
+      // Optional: re-enable if needed
       // if (soldItem) {
       //   alert(`Item with code "${soldItem.code}" is already sold out.`);
       //   return;
       // }
-
-      // Check if all items are new
+  
+      // Handle invoice number
       const allItemsAreNew = repairDetails.every(item => item.id === "");
-
       let updatedFormData = { ...formData };
-
+  
       if (allItemsAreNew) {
         const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
         const latestInvoiceNumber = response.data.lastInvoiceNumber;
-
+  
         updatedFormData = {
           ...formData,
           invoice_number: latestInvoiceNumber,
         };
-
+  
         setFormData(updatedFormData);
       }
-
+  
+      // Prepare payload
       const dataToSave = {
         repairDetails: repairDetails.map(item => ({
           ...item,
@@ -1580,12 +1581,11 @@ const SalesForm = () => {
         salesNetAmount: salesNetAmount || 0,
         salesTaxableAmount: salesTaxableAmount || 0,
       };
-
-      console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-
+  
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Sales added successfully");
-
+  
+      // Generate PDF
       const pdfDoc = (
         <PDFLayout
           formData={updatedFormData}
@@ -1606,23 +1606,50 @@ const SalesForm = () => {
           netPayableAmount={netPayableAmount}
         />
       );
-
+  
       const pdfBlob = await pdf(pdfDoc).toBlob();
-      // saveAs(pdfBlob, `${updatedFormData.invoice_number}.pdf`);
+  
+      // Save PDF to server
       await handleSavePDFToServer(pdfBlob, updatedFormData.invoice_number);
-
+  
+      // Open preview in new tab
+      const previewURL = `${baseURL}/invoices/${updatedFormData.invoice_number}.pdf`;
+      window.open(previewURL, '_blank');
+  
+      // Attempt to share
+      const pdfFile = new File([pdfBlob], `${updatedFormData.invoice_number}.pdf`, {
+        type: 'application/pdf',
+      });
+  
+      if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        try {
+          await navigator.share({
+            title: `Invoice ${updatedFormData.invoice_number}`,
+            text: 'Here is your invoice PDF.',
+            files: [pdfFile],
+          });
+          console.log("PDF shared successfully");
+        } catch (err) {
+          console.warn("Sharing was cancelled or failed:", err);
+        }
+      } else {
+        console.warn("Sharing not supported on this device/browser.");
+      }
+  
+      // Cleanup
       clearData();
       resetForm();
       navigate("/salestable");
       window.location.reload();
       await handleCheckout();
-
+  
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Error saving data");
     }
   };
-
+  
+  
 
   const handleSavePDFToServer = async (pdfBlob, invoiceNumber) => {
     const formData = new FormData();

@@ -13,6 +13,7 @@ import CustomerDashboard from './CustomerDashboard';
 import Receivables from './Receivables';
 import Payables from './Payables';
 import Estimate from './Estimate';
+import AccountBalanceTable from './AccountBalanceTable';
 import AmountBilledToday from './AmountBilledToday';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import { AuthContext } from "../Login/Context";
@@ -93,10 +94,10 @@ function Dashboard() {
 
   const handleNewSalesTab = () => {
     const newTabId = crypto.randomUUID();
-    const url = selectedMobile 
+    const url = selectedMobile
       ? `/sales?tabId=${newTabId}&mobile=${selectedMobile}`
       : `/sales?tabId=${newTabId}`;
-    
+
     window.open(url, "_blank");
   };
 
@@ -158,15 +159,15 @@ function Dashboard() {
               New
             </a> */}
             <a
-          href="#"
-          className="btn-link"
-          onClick={(e) => {
-            e.preventDefault();
-            handleNewSalesTab();
-          }}
-        >
-          New
-        </a>
+              href="#"
+              className="btn-link"
+              onClick={(e) => {
+                e.preventDefault();
+                handleNewSalesTab();
+              }}
+            >
+              New
+            </a>
           </div>
           <div className="metric-card">
             <Purchases selectedCustomerMobile={selectedMobile} />
@@ -282,8 +283,17 @@ function Dashboard() {
           </div>
         </div>
         <div className="row-cards" style={{ marginTop: '15px', marginBottom: '15px' }}>
-          <div className="metric-card">
+          {/* <div className="metric-card">
             <Bar data={barData} options={{ responsive: true, maintainAspectRatio: false }} />
+          </div> */}
+          <div className="metric-card" style={{ padding: '12px' }}>
+            <h3 style={{
+              margin: '0 0 10px 0',
+              fontSize: '20px',
+              textAlign: 'center',
+              color: '#b77318'
+            }}>Account Balances</h3>
+            <AccountBalanceTable />
           </div>
           <div className="metric-card">
             <Pie data={pieDataReceivablesPayables} options={{ responsive: true, maintainAspectRatio: false }} />
