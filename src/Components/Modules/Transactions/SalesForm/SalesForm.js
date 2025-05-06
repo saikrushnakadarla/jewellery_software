@@ -1608,7 +1608,7 @@ const SalesForm = () => {
       );
 
       const pdfBlob = await pdf(pdfDoc).toBlob();
-      saveAs(pdfBlob, `${updatedFormData.invoice_number}.pdf`);
+      // saveAs(pdfBlob, `${updatedFormData.invoice_number}.pdf`);
       await handleSavePDFToServer(pdfBlob, updatedFormData.invoice_number);
 
       clearData();

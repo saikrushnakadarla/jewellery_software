@@ -68,18 +68,18 @@ function Dashboard() {
     ],
   };
 
-  const lineDataRevenue = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr'],
-    datasets: [
-      {
-        label: 'Revenue',
-        data: [10000, 15000, 12000, 20000],
-        borderColor: '#cd853f',
-        borderWidth: 2,
-        fill: false,
-      },
-    ],
-  };
+  // const lineDataRevenue = {
+  //   labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+  //   datasets: [
+  //     {
+  //       label: 'Revenue',
+  //       data: [10000, 15000, 12000, 20000],
+  //       borderColor: '#cd853f',
+  //       borderWidth: 2,
+  //       fill: false,
+  //     },
+  //   ],
+  // };
 
   const pieDataOrderStatus = {
     labels: ['Completed', 'Pending', 'Cancelled'],
@@ -288,9 +288,9 @@ function Dashboard() {
           <div className="metric-card">
             <Pie data={pieDataReceivablesPayables} options={{ responsive: true, maintainAspectRatio: false }} />
           </div>
-          <div className="metric-card">
+          {/* <div className="metric-card">
             <Line data={lineDataRevenue} options={{ responsive: true, maintainAspectRatio: false }} />
-          </div>
+          </div> */}
           <div className="metric-card">
             <Pie data={pieDataOrderStatus} options={{ responsive: true, maintainAspectRatio: false }} />
           </div>

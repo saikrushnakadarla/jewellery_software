@@ -149,26 +149,41 @@ const CustomerDetails = ({
               label="Mobile"
               name="mobile"
               type="select"
-              value={formData.customer_id || ""}
-
+              value={formData.mobile || ""}
               onChange={(e) => {
-                handleCustomerChange(e.target.value);
-                const selectedCustomer = customers.find(
-                  (customer) => customer.account_id === e.target.value
-                );
-                const selectedMobile = selectedCustomer?.mobile || "";
-                setSelectedMobile(selectedMobile);
-                if (selectedMobile) {
-                  fetchBalance(selectedMobile); // Fetch balance for the selected mobile
+                const inputMobile = e.target.value;
+                if (!inputMobile) {
+                  setFormData((prev) => ({
+                    ...prev,
+                    mobile: "",
+                    account_name: "",
+                    email: "",
+                    address1: "",
+                    city: "",
+                    pincode: "",
+                    state: "",
+                    aadhar_card: "",
+                    gst_in: "",
+                  }));
+                  return;
+                }
+
+                // Check for exactly 10 digits
+                const isValidMobile = /^\d{10}$/.test(inputMobile);
+                if (!isValidMobile) {
+                  alert("Please enter a valid 10-digit mobile number.");
+                  return;
+                }
+
+                setFormData((prev) => ({ ...prev, mobile: inputMobile }));
+                const existing = customers.find((c) => c.mobile === inputMobile);
+                if (existing) {
+                  handleCustomerChange(existing.account_id);
+                  fetchBalance(existing.mobile);
                 }
               }}
-              options={[
-                ...customers.map((customer) => ({
-                  value: customer.account_id,
-                  label: customer.mobile,
-                })),
-              ]}
-              ref={mobileRef}
+              options={customers.map((c) => ({ value: c.mobile, label: c.mobile }))}
+              allowCustomInput
             />
           </div>
           <AiOutlinePlus
@@ -185,19 +200,46 @@ const CustomerDetails = ({
 
         <Col xs={12} md={3}>
           <InputField
-            label="Customer Name:"
+            label="Customer Name"
             name="account_name"
             type="select"
-            value={formData.customer_id || ""}
-            onChange={(e) => handleCustomerChange(e.target.value)}
-            options={[
-              ...customers.map((customer) => ({
-                value: customer.account_id,
-                label: customer.account_name,
-              })),
-            ]}
+            value={formData.account_name.toUpperCase() || ""}
+            onChange={(e) => {
+              const inputName = (e.target.value || "").toUpperCase();
+
+              if (!inputName) {
+                // Clear all dependent fields
+                setFormData((prev) => ({
+                  ...prev,
+                  mobile: "",
+                  account_name: "",
+                  email: "",
+                  address1: "",
+                  city: "",
+                  pincode: "",
+                  state: "",
+                  aadhar_card: "",
+                  gst_in: "",
+                }));
+                return;
+              }
+
+              setFormData((prev) => ({ ...prev, account_name: inputName }));
+
+              const existing = customers.find((c) => c.account_name.toUpperCase() === inputName);
+              if (existing) {
+                handleCustomerChange(existing.account_id);
+                fetchBalance(existing.mobile);
+              }
+            }}
+            options={customers.map((c) => ({
+              value: c.account_name.toUpperCase(),
+              label: c.account_name.toUpperCase(),
+            }))}
+            allowCustomInput
           />
         </Col>
+
         <Col xs={12} md={2}>
           <InputField
             label="Email:"
@@ -295,7 +337,7 @@ const CustomerDetails = ({
               fontSize: '0.952rem',
               padding: '0.35rem 0.35rem', fontSize: "13px",
               padding: "5px",
-              marginTop:"2px",
+              marginTop: "2px",
             }}
             onClick={handleAddReceipt}
           >
@@ -309,9 +351,9 @@ const CustomerDetails = ({
               backgroundColor: '#28a745',
               borderColor: '#28a745',
               fontSize: '0.952rem',
-              padding: '0.35rem 0.35rem',     fontSize: "13px",
-              padding:"5px",
-              marginTop:"2px",
+              padding: '0.35rem 0.35rem', fontSize: "13px",
+              padding: "5px",
+              marginTop: "2px",
               marginLeft: "-100px"
             }}
           >

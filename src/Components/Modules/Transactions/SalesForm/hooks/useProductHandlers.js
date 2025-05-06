@@ -111,7 +111,7 @@ const useProductHandlers = () => {
   const tabId = getTabId();
 
   const getFreshFormData = (mobile) => ({
-    customer_id: "value001",
+    customer_id: "36",
     mobile: mobile,
     account_name: "",
     email: "",

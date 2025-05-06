@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 import "./InputFieldSales.css";
 
 const InputField = ({
@@ -13,10 +14,10 @@ const InputField = ({
   options = [],
   required = false,
   max,
-  autoFocus ,
+  autoFocus,
   nextRef,
+  allowCustomInput = false, // NEW PROP
 }) => {
-  // Custom styles for react-select
   const customStyles = {
     control: (provided, state) => ({
       ...provided,
@@ -31,12 +32,10 @@ const InputField = ({
       ...provided,
       padding: "0 8px",
       height: "38px",
-      
     }),
     input: (provided) => ({
       ...provided,
       margin: "0px",
-      
     }),
     indicatorsContainer: (provided) => ({
       ...provided,
@@ -44,7 +43,7 @@ const InputField = ({
     }),
     menu: (provided) => ({
       ...provided,
-      zIndex: 9999, // Ensure the dropdown is on top
+      zIndex: 9999,
       fontSize: "12px",
     }),
     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
@@ -70,22 +69,58 @@ const InputField = ({
       <div className="select-container-sales">
         {label && <label className="floating-label-sales">{label}</label>}
         {type === "select" ? (
-          <Select
-            name={name}
-            options={options}
-            placeholder={placeholder || "Select"}
-            isDisabled={readOnly}
-            autoFocus={autoFocus}
-            value={value ? options.find((opt) => opt.value === value) : null}
-            onChange={(selectedOption) =>
-              onChange({
-                target: { name, value: selectedOption ? selectedOption.value : "" },
-              })
-            }
-            styles={customStyles}
-            menuPortalTarget={document.body}
-            isClearable
-          />
+          allowCustomInput ? (
+            <CreatableSelect
+              name={name}
+              options={options}
+              placeholder={placeholder || "Select or type"}
+              isDisabled={readOnly}
+              autoFocus={autoFocus}
+              value={
+                value && typeof value === "string"
+                  ? { label: value, value }
+                  : options.find((opt) => opt.value === value) || null
+              }
+              onChange={(selectedOption) =>
+                onChange({
+                  target: {
+                    name,
+                    value: selectedOption ? selectedOption.value : "",
+                  },
+                })
+              }
+              styles={customStyles}
+              menuPortalTarget={document.body}
+              isClearable
+              isSearchable
+              formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
+            />
+          ) : (
+            <Select
+              name={name}
+              options={options}
+              placeholder={placeholder || "Select"}
+              isDisabled={readOnly}
+              autoFocus={autoFocus}
+              value={
+                value && typeof value === "string"
+                  ? options.find((opt) => opt.value === value)
+                  : null
+              }
+              onChange={(selectedOption) =>
+                onChange({
+                  target: {
+                    name,
+                    value: selectedOption ? selectedOption.value : "",
+                  },
+                })
+              }
+              styles={customStyles}
+              menuPortalTarget={document.body}
+              isClearable
+              isSearchable
+            />
+          )
         ) : type === "file" ? (
           <input
             className="styled-input-sales file-input"
@@ -109,6 +144,7 @@ const InputField = ({
             required={required}
             max={max}
             autoFocus={autoFocus}
+            ref={inputRef}
           />
         )}
       </div>
@@ -117,5 +153,3 @@ const InputField = ({
 };
 
 export default InputField;
-
-
