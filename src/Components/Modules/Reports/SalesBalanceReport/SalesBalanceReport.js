@@ -23,7 +23,7 @@ const RepairsTable = () => {
 
     // Group data by customer_id
     const groupByCustomer = (data) => {
-        return data.reduce((acc, item) => {
+        const grouped = data.reduce((acc, item) => {
             const key = item.customer_id;
             if (!acc[key]) {
                 acc[key] = {
@@ -38,7 +38,31 @@ const RepairsTable = () => {
             acc[key].invoices.push(item);
             return acc;
         }, {});
+    
+        // Sort invoices by balance within each customer group
+        Object.values(grouped).forEach(customer => {
+            customer.invoices.sort((a, b) => {
+                const calculateInvoiceBalance = (invoice) => {
+                    const bal_amt = Number(invoice.bal_amt) || 0;
+                    const bal_after_receipts = Number(invoice.bal_after_receipts) || 0;
+                    const receipts_amt = Number(invoice.receipts_amt) || 0;
+    
+                    if (bal_amt === receipts_amt) {
+                        return bal_after_receipts || 0;
+                    }
+                    return bal_after_receipts ? bal_after_receipts : bal_amt || 0;
+                };
+    
+                const balanceA = calculateInvoiceBalance(a);
+                const balanceB = calculateInvoiceBalance(b);
+                return balanceB - balanceA; // Descending order
+            });
+        });
+    
+        return grouped;
     };
+    
+
 
     const columns = React.useMemo(
         () => [
@@ -255,10 +279,31 @@ const RepairsTable = () => {
         setRepairDetails(null);
     };
 
-    // Prepare the grouped data for the table
     const groupedData = React.useMemo(() => {
         const grouped = groupByCustomer(data);
-        return Object.values(grouped);
+        return Object.values(grouped).sort((a, b) => {
+            const calculateBalance = (invoices) => {
+                return invoices.reduce((sum, invoice) => {
+                    const bal_amt = Number(invoice.bal_amt) || 0;
+                    const bal_after_receipts = Number(invoice.bal_after_receipts) || 0;
+                    const receipts_amt = Number(invoice.receipts_amt) || 0;
+    
+                    let balance = 0;
+                    if (bal_amt === receipts_amt) {
+                        balance = bal_after_receipts || 0;
+                    } else {
+                        balance = bal_after_receipts ? bal_after_receipts : bal_amt || 0;
+                    }
+    
+                    return sum + balance;
+                }, 0);
+            };
+    
+            const balanceA = calculateBalance(a.invoices || []);
+            const balanceB = calculateBalance(b.invoices || []);
+            
+            return balanceB - balanceA; // For descending order
+        });
     }, [data]);
 
     return (

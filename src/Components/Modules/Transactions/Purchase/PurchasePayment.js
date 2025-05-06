@@ -14,7 +14,7 @@ const RepairForm = () => {
 
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split("T")[0], // Sets today's date in YYYY-MM-DD format
-        mode: "",
+        mode: "Cash",
         cheque_number: "",
         payment_no: "",
         account_name: receivedData.account_name || "",
@@ -303,7 +303,7 @@ const RepairForm = () => {
 
             setFormData({
                 date: new Date().toISOString().split("T")[0],
-                mode: "",
+                mode: "Cash",
                 cheque_number: "",
                 payment_no: "",
                 account_name: "",
@@ -371,7 +371,7 @@ const RepairForm = () => {
                                 { value: "Cheque", label: "Cheque" },
                                 { value: "Online", label: "Online" },
                             ]}
-                            autoFocus
+                            
                         />
                     </Col>
                     <Col xs={12} md={2}>

@@ -101,6 +101,10 @@ function Dashboard() {
     window.open(url, "_blank");
   };
 
+  const handleNavigate = () => {
+    navigate('/purchaseBalanceReport');
+  };
+
 
   return (
     <div className="main-container" style={{ backgroundColor: '#b7721834' }}>
@@ -278,7 +282,7 @@ function Dashboard() {
           <div className="metric-card">
             <Receivables selectedCustomerMobile={selectedMobile} />
           </div>
-          <div className="metric-card">
+          <div className="metric-card" onClick={handleNavigate} style={{ cursor: 'pointer' }}>
             <Payables selectedCustomerMobile={selectedMobile} />
           </div>
         </div>
