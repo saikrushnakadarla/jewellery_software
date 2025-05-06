@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Purchase.css";
-import InputField from "../SalesForm/InputfieldSales";
+import InputField from "./InputField";
 import { Container, Row, Col, Button, Table, Form } from "react-bootstrap";
 import { renderMatches, useNavigate, useLocation } from 'react-router-dom';
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -621,22 +621,22 @@ const URDPurchase = () => {
     // First try to get from URL
     const urlParams = new URLSearchParams(window.location.search);
     let tabId = urlParams.get('tabId');
-    
+
     // If not in URL, try sessionStorage
     if (!tabId) {
       tabId = sessionStorage.getItem('tabId');
     }
-    
+
     // If still not found, generate new ID
     if (!tabId) {
       tabId = crypto.randomUUID();
       sessionStorage.setItem('tabId', tabId);
-      
+
       // Update URL without page reload
       const newUrl = `${window.location.pathname}?tabId=${tabId}`;
       window.history.replaceState({}, '', newUrl);
     }
-    
+
     return tabId;
   };
 
@@ -1359,15 +1359,41 @@ const URDPurchase = () => {
                         label="Mobile"
                         name="mobile"
                         type="select"
-                        value={formData.customer_id || ""} // Use customer_id to match selected value
-                        onChange={(e) => handleCustomerChange(e.target.value)}
-                        options={[
-                          ...customers.map((customer) => ({
-                            value: customer.account_id, // Use account_id as the value
-                            label: customer.mobile, // Display mobile as the label
-                          })),
-                        ]}
-                        autoFocus
+                        value={formData.mobile || ""}
+                        onChange={(e) => {
+                          const inputMobile = e.target.value;
+                          if (!inputMobile) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              mobile: "",
+                              account_name: "",
+                              email: "",
+                              address1: "",
+                              city: "",
+                              pincode: "",
+                              state: "",
+                              aadhar_card: "",
+                              gst_in: "",
+                            }));
+                            return;
+                          }
+
+                          // Check for exactly 10 digits
+                          const isValidMobile = /^\d{10}$/.test(inputMobile);
+                          if (!isValidMobile) {
+                            alert("Please enter a valid 10-digit mobile number.");
+                            return;
+                          }
+
+                          setFormData((prev) => ({ ...prev, mobile: inputMobile }));
+                          const existing = customers.find((c) => c.mobile === inputMobile);
+                          if (existing) {
+                            handleCustomerChange(existing.account_id);
+                            
+                          }
+                        }}
+                        options={customers.map((c) => ({ value: c.mobile, label: c.mobile }))}
+                        allowCustomInput
                       />
                     </div>
                     <AiOutlinePlus
@@ -1381,20 +1407,46 @@ const URDPurchase = () => {
                       }}
                     />
                   </Col>
+
                   <Col xs={12} md={4}>
                     <InputField
-                      label="Suplier Name:"
+                      label="Customer Name"
                       name="account_name"
                       type="select"
-                      value={formData.customer_id || ""} // Use customer_id to match selected value
-                      onChange={(e) => handleCustomerChange(e.target.value)}
-                      options={[
-                        ...customers.map((customer) => ({
-                          value: customer.account_id, // Use account_id as the value
-                          label: customer.account_name, // Display mobile as the label
-                        })),
-                      ]}
+                      value={formData.account_name.toUpperCase() || ""}
+                      onChange={(e) => {
+                        const inputName = (e.target.value || "").toUpperCase();
 
+                        if (!inputName) {
+                          // Clear all dependent fields
+                          setFormData((prev) => ({
+                            ...prev,
+                            mobile: "",
+                            account_name: "",
+                            email: "",
+                            address1: "",
+                            city: "",
+                            pincode: "",
+                            state: "",
+                            aadhar_card: "",
+                            gst_in: "",
+                          }));
+                          return;
+                        }
+
+                        setFormData((prev) => ({ ...prev, account_name: inputName }));
+
+                        const existing = customers.find((c) => c.account_name.toUpperCase() === inputName);
+                        if (existing) {
+                          handleCustomerChange(existing.account_id);
+                          
+                        }
+                      }}
+                      options={customers.map((c) => ({
+                        value: c.account_name.toUpperCase(),
+                        label: c.account_name.toUpperCase(),
+                      }))}
+                      allowCustomInput
                     />
                   </Col>
 
@@ -1947,13 +1999,13 @@ const URDPurchase = () => {
             </div>
           </div>
           <div className="form-buttons">
-               <Button
-                                              onClick={handleClose1}
-                                              style={{ backgroundColor: "gray", borderColor: "gray" , marginLeft:"5px"}}
-                                              // disabled={!isSubmitEnabled}
-                                            >
-                                              Close
-                                            </Button>
+            <Button
+              onClick={handleClose1}
+              style={{ backgroundColor: "gray", borderColor: "gray", marginLeft: "5px" }}
+            // disabled={!isSubmitEnabled}
+            >
+              Close
+            </Button>
             <Button
               variant="secondary"
               onClick={handleBack} style={{ backgroundColor: 'gray', marginRight: '10px' }}

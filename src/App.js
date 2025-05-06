@@ -25,6 +25,7 @@ import PurchaseTable1 from './Components/Modules/Transactions/Purchase/PurchaseT
 import Receipts from './Components/Modules/Transactions/Receipts/Receipts';
 import ReceiptsTable from './Components/Modules/Transactions/Receipts/ReceiptsTable';
 import PurchaseReport from './Components/Modules/Reports/PurchaseReport/PurchaseReport'
+import PurchaseBalanceReport from './Components/Modules/Reports/PurchaseBalanceReport/PurchaseBalanceReport'
 import SalesReport from './Components/Modules/Reports/SalesReport/SalesReport'
 import SalesBalanceReport from './Components/Modules/Reports/SalesBalanceReport/SalesBalanceReport'
 import EstimateReport from './Components/Modules/Reports/EstimateReport/EstimateReport'
@@ -112,6 +113,7 @@ function App() {
         <Route path="/receipts/:id" element={<Receipts />} />
         <Route path="/receiptstable" element={<ReceiptsTable />} />
         <Route path="/purchaseReport" element={<PurchaseReport />} />
+        <Route path="/purchaseBalanceReport" element={<PurchaseBalanceReport />} />
         <Route path="/salesReport" element={<SalesReport />} />
         <Route path="/salesBalanceReport" element={<SalesBalanceReport />} />
         <Route path="/estimateReport" element={<EstimateReport />} />
