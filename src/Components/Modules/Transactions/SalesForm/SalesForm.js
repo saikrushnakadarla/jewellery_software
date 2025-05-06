@@ -1639,7 +1639,7 @@ const SalesForm = () => {
       // Cleanup
       clearData();
       resetForm();
-      navigate("/salestable");
+      // navigate("/salestable");
       window.location.reload();
       await handleCheckout();
   
