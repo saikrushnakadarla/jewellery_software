@@ -24,7 +24,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
   return (
 
     // <div style={{ maxHeight: "107px", overflowY: "auto", position: "relative" }}>
-      <div >
+    <div >
       <Table className='dataTable_headerCell1' bordered hover responsive>
         <thead style={{ position: "sticky", top: 0, background: "white", zIndex: 2, fontSize: "13px" }}>
           <tr>
@@ -45,6 +45,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
             <th>Tax Amt</th>
             <th>Total Price</th>
             <th>Image</th>
+            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
@@ -79,6 +80,10 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
                     "No Image"
                   )}
                 </td>
+                <td style={{ color: detail.sale_status === "Delivered" ? "green" : "red" }}>
+                  {detail.sale_status}
+                </td>
+
                 <td>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <FaEye
@@ -109,7 +114,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
           )}
         </tbody>
         {repairDetails.length > 0 && (
-          <tfoot style={{fontSize:"12px"}}>
+          <tfoot style={{ fontSize: "12px" }}>
             <tr style={{ fontWeight: 'bold', background: '#f8f9fa' }}>
               <td>{repairDetails.length}</td>
               <td colSpan="4"></td>
