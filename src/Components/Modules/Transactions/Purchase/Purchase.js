@@ -1932,9 +1932,9 @@ const URDPurchase = () => {
             </Row>
             <Row>
             </Row>
-            <div style={{ overflowX: "scroll", marginTop: '-20px' }}>
+            <div style={{ marginTop: '-20px' }}>
               <Table striped bordered hover className="mt-4">
-                <thead>
+                <thead style={{ fontSize: "13px" }}>
                   <tr>
                     <th>Category</th>
                     <th>Pcs</th>
@@ -1952,7 +1952,7 @@ const URDPurchase = () => {
                     <th>Actions</th> {/* New Action column */}
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ fontSize: "13px" }}>
                   {tableData.map((data, index) => (
                     <tr key={index}>
                       <td>{data.category}</td>

@@ -47,7 +47,7 @@ const ProductTable = ({ orderDetails, onDelete, onEdit }) => {
           <th>Actions</th> {/* Add Action column for delete */}
         </tr>
       </thead>
-      <tbody>
+      <tbody style={{ fontSize: "13px" }}>
         {orderDetails.length > 0 ? (
           orderDetails.map((detail, index) => (
             <tr key={index}>

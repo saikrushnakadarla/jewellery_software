@@ -173,8 +173,8 @@ const RepairsTable = () => {
               style={{
                 backgroundColor: '#28a745',
                 borderColor: '#28a745',
-                fontSize: '0.875rem', // Smaller font size
-                padding: '0.25rem 0.5rem', // Reduced padding
+                fontSize: '0.800rem', // Smaller font size
+                padding: '0.10rem 0.5rem', // Reduced padding
               }}
               onClick={() => handleAddReceipt(row.original)} // Pass row data to handle receipt creation
               disabled={netBill === totalPaid} // Disable if transaction_status is ConvertedInvoice or netBill equals totalPaid

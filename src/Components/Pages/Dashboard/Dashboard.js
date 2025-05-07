@@ -296,7 +296,7 @@ function Dashboard() {
               fontSize: '20px',
               textAlign: 'center',
               color: '#b77318'
-            }}>Account Balances</h3>
+            }}>Top Customers</h3>
             <AccountBalanceTable />
           </div>
           <div className="metric-card">

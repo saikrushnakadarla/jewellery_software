@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Col, Row, Button, Table } from "react-bootstrap";
-import InputField from "./../../Masters/ItemMaster/Inputfield";
+import InputField from "./InputfieldSales";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 
@@ -246,14 +246,20 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
           />
         </Col>
         <Col xs={12} md={2}>
-          <Button onClick={handleAddButtonClick} style={{backgroundColor:'rgb(163, 110, 41)',borderColor:'rgb(163, 110, 41)'}}>
+          <Button onClick={handleAddButtonClick} 
+          style={{
+            backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)', marginTop: "4px",
+            padding: "3px 8px",
+            fontSize: "15px",
+          }}
+          >
             {editingRow ? "Update" : "Add"}
           </Button>
         </Col>
       </Row>
 
       <Table striped bordered hover className="mt-4">
-        <thead>
+        <thead style={{ fontSize: "13px" }}>
           <tr>
             <th>Member Name</th>
             <th>Member Number</th>
@@ -267,7 +273,7 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody style={{ fontSize: "13px" }}>
           {schemeTableData.map((data, index) => (
             <tr key={index}>
               <td>{data.member_name}</td>
@@ -301,9 +307,9 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
         </tbody>
       </Table>
 
-      <div className="d-flex justify-content-between px-2 mt-2">
-        <h5>Total Amount for Schemes:</h5>
-        <h5>₹ {calculateTotalSum()}</h5>
+      <div className="d-flex justify-content-between px-2 mt-2 mb-1">
+        <h7>Total Amount:</h7>
+        <h7>₹ {calculateTotalSum()}</h7>
       </div>
     </>
   );

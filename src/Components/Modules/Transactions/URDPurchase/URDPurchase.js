@@ -796,7 +796,7 @@ const URDPurchase = () => {
             <h4>Item Details</h4>
 
             <Table bordered hover responsive>
-              <thead>
+              <thead style={{ fontSize: "13px" }}>
                 <tr>
                   <th>S.No</th>
                   {/* <th>product ID</th> */}
@@ -814,7 +814,7 @@ const URDPurchase = () => {
                   <th>Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody style={{ fontSize: "13px" }}>
                 {items.map((item, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>

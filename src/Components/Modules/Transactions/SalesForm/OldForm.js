@@ -386,11 +386,13 @@ const OldSalesForm = ({ setOldSalesData, repairDetails, tabId }) => {
           <InputField label="Remarks" name="remarks" value={oldDetails.remarks} onChange={handleInputChange} />
         </Col>
         <Col xs={12} md={2}>
-          <Button onClick={handleAddButtonClick} style={{
+          <Button onClick={handleAddButtonClick} 
+          style={{
             backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)', marginTop: "4px",
-            padding: "2px 8px",
+            padding: "3px 8px",
             fontSize: "15px",
-          }}>
+          }}
+          >
             {editingRow !== null ? "Update" : "Add"}
           </Button>
         </Col>
