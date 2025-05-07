@@ -3,8 +3,9 @@ import { Col, Row, Button, Table } from "react-bootstrap";
 import InputField from "./InputfieldSales";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
-const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
+const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile, tabId }) => {
   const [schemeDetails, setSchemeDetails] = useState({
     member_name: "",
     member_number: selectedMobile || "", // Pre-fill member_number
@@ -62,14 +63,14 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
 
 
   const [schemeTableData, setSchemeTableData] = useState(() => {
-    const savedData = localStorage.getItem("schemeTableData");
+    const savedData = localStorage.getItem(`schemeTableData_${tabId}`);
     return savedData ? JSON.parse(savedData) : [];
   });
 
   const [editingRow, setEditingRow] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem("schemeTableData", JSON.stringify(schemeTableData));
+    localStorage.setItem(`schemeTableData_${tabId}`, JSON.stringify(schemeTableData));
     setSchemeSalesData(schemeTableData); // Update parent component's state
   }, [schemeTableData, setSchemeSalesData]);
 
@@ -94,7 +95,7 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
         `https://rahul455.pythonanywhere.com/api/member/phone_number/${mobileNumber}/`
       );
       const memberData = response.data[0];
-  
+
       setSchemeDetails({
         member_name: memberData.name,
         member_number: mobileNumber,
@@ -112,7 +113,7 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
       alert("There are no schemes available for this mobile number.");
     }
   };
-  
+
 
   const handleAddButtonClick = () => {
     if (editingRow) {
@@ -175,12 +176,12 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
           />
         </Col>
         <Col xs={12} md={3}>
-        <InputField
-          label="Member Number"
-          name="member_number"
-          value={schemeDetails.member_number}
-          onChange={handleInputChange}
-        />
+          <InputField
+            label="Member Number"
+            name="member_number"
+            value={schemeDetails.member_number}
+            onChange={handleInputChange}
+          />
         </Col>
         <Col xs={12} md={3}>
           <InputField
@@ -246,12 +247,12 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
           />
         </Col>
         <Col xs={12} md={2}>
-          <Button onClick={handleAddButtonClick} 
-          style={{
-            backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)', marginTop: "4px",
-            padding: "3px 8px",
-            fontSize: "15px",
-          }}
+          <Button onClick={handleAddButtonClick}
+            style={{
+              backgroundColor: 'rgb(163, 110, 41)', borderColor: 'rgb(163, 110, 41)', marginTop: "4px",
+              padding: "3px 8px",
+              fontSize: "15px",
+            }}
           >
             {editingRow ? "Update" : "Add"}
           </Button>
@@ -286,7 +287,7 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
               <td>{data.paid_amount}</td>
               <td>{data.pending_amount}</td>
               <td>
-                <Button
+                {/* <Button
                   variant="warning"
                   size="sm"
                   className="mr-2"
@@ -300,7 +301,17 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile }) => {
                   onClick={() => handleDelete(data.member_number)}
                 >
                   Delete
-                </Button>
+                </Button> */}
+                <FaEdit
+                  style={{ cursor: "pointer", marginLeft: "10px", color: "blue" }}
+                  onClick={() => handleEdit(data)}
+                // disabled={editingIndex !== null}
+                />
+                <FaTrash
+                  style={{ cursor: "pointer", marginLeft: "10px", color: "red" }}
+                  onClick={() => handleDelete(data.member_number)}
+                // disabled={editingIndex !== null}
+                />
               </td>
             </tr>
           ))}

@@ -288,8 +288,8 @@ const SalesForm = () => {
 
       const filtered = uniqueInvoice.filter(
         (invoice) =>
-          (invoice.customer_name && customer.account_name && 
-           invoice.customer_name.toLowerCase() === customer.account_name.toLowerCase()) ||
+          (invoice.customer_name && customer.account_name &&
+            invoice.customer_name.toLowerCase() === customer.account_name.toLowerCase()) ||
           invoice.mobile === customer.mobile
       );
       setFilteredInvoices(filtered);
@@ -328,7 +328,7 @@ const SalesForm = () => {
 
   const [discount, setDiscount] = useState();
 
-  
+
   const handleDiscountChange = (e) => {
     const discountValue = parseFloat(e.target.value) || 0; // Default to 0 if empty or NaN
     if (discountValue > 15) {
@@ -336,39 +336,39 @@ const SalesForm = () => {
       return; // Prevent further execution
     }
     setDiscount(discountValue);
-  
+
     const storedOrderDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
-  
+
     const updatedOrderDetails = storedOrderDetails.map((item) => {
       const makingCharges = parseFloat(item.making_charges) || 0; // Default to 0 if NaN
       const calculatedDiscount = (makingCharges * discountValue) / 100;
-  
+
       // Ensure `total_price` is a valid number
       const previousTotalPrice = parseFloat(item.total_price) || 0;
-  
+
       // Store original total price if not already stored
-      const originalTotalPrice = item.original_total_price 
-        ? parseFloat(item.original_total_price) 
+      const originalTotalPrice = item.original_total_price
+        ? parseFloat(item.original_total_price)
         : previousTotalPrice;
-  
+
       // Calculate the updated total price after applying the discount
       const updatedTotalPrice = originalTotalPrice - calculatedDiscount;
-  
-      return { 
-        ...item, 
+
+      return {
+        ...item,
         original_total_price: originalTotalPrice.toFixed(2), // Store original price
         disscount: calculatedDiscount.toFixed(2), // Corrected spelling
         total_price: updatedTotalPrice.toFixed(2) // Update total price
       };
     });
-  
+
     // Update both state and localStorage
     setOrderDetails(updatedOrderDetails);
     localStorage.setItem('orderDetails', JSON.stringify(updatedOrderDetails));
-  
+
     console.log("Updated Order Details:", updatedOrderDetails);
   };
-  
+
   const handleAdd = () => {
     setOrderDetails((prevDetails) => {
       const updatedDetails = [
@@ -381,11 +381,11 @@ const SalesForm = () => {
       return updatedDetails;
     });
     // Reset the relevant fields
-  setFormData((prevData) => ({
-    ...prevData,
-    disscount: "",
-    disscount_percentage: "",
-  }));
+    setFormData((prevData) => ({
+      ...prevData,
+      disscount: "",
+      disscount_percentage: "",
+    }));
 
     resetProductFields();
   };
@@ -441,10 +441,10 @@ const SalesForm = () => {
       rate_amt: "",
       tax_percent: "",
       tax_amt: "",
-      hm_charges:"60.00",
+      hm_charges: "60.00",
       total_price: "",
       qty: "",
-      imagePreview:null,
+      imagePreview: null,
       remarks: "",
     }));
   };
@@ -593,7 +593,7 @@ const SalesForm = () => {
 
   const handleBack = () => {
     // navigate("/orderstable");
-    navigate(-1); 
+    navigate(-1);
   };
 
   const handleAddCustomer = () => {
@@ -695,15 +695,15 @@ const SalesForm = () => {
     };
 
     console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
-    try { 
+    try {
       const existingDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
 
       if (existingDetails.length > 0) {
         // navigate("/orderstable");
         // navigate(-1); 
-      
+
       }
-      navigate(-1); 
+      navigate(-1);
       clearData();  // Ensure data is cleared before reloading
       resetForm();
       window.location.reload();
@@ -749,7 +749,7 @@ const SalesForm = () => {
             </div>
           </div>
 
-          <div className="sales-form-section" style={{marginTop:"-20px"}}>
+          <div className="sales-form-section" style={{ marginTop: "-20px" }}>
             <ProductDetails
               formData={formData}
               handleChange={handleChange}
@@ -814,7 +814,7 @@ const SalesForm = () => {
                 setReturnData={setReturnData}
                 filteredInvoices={filteredInvoices}
                 selectedRows={selectedRows}
-                setSelectedRows={setSelectedRows} 
+                setSelectedRows={setSelectedRows}
                 isAllSelected={isAllSelected}
                 setIsAllSelected={setIsAllSelected}
                 handleCheckboxChange={handleCheckboxChange}
@@ -843,7 +843,11 @@ const SalesForm = () => {
                 oldItemsAmount={oldItemsAmount}
                 schemeAmount={schemeAmount}
                 netPayableAmount={netPayableAmount}
-                oldSalesData={oldSalesData} schemeSalesData={schemeSalesData}
+                oldSalesData={oldSalesData}
+                schemeSalesData={schemeSalesData}
+                salesNetAmount={salesNetAmount}
+                salesAmountToPass={salesAmountToPass}
+                salesTaxableAmount={salesTaxableAmount}
                 discount={discount}
                 handleDiscountChange={handleDiscountChange}
               />

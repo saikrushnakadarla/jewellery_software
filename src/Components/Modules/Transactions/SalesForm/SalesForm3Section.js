@@ -108,6 +108,7 @@ const SalesFormSection = ({ setOldSalesData,
         <SchemeSalesForm
           setSchemeSalesData={setSchemeSalesData}
           selectedMobile={selectedMobile} // Pass the selected mobile number
+          tabId={tabId}
         />
       )}
       {activeForm === "sale_return" && <SaleReturnForm

@@ -181,14 +181,14 @@ const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAd
             readOnly
           />
         </Col>
-        <Col xs={12} md={2}>
+        {/* <Col xs={12} md={2}>
           <InputField
             label="Address2:"
             name="address2"
             value={formData.address2 || ""}
             readOnly
           />
-        </Col>
+        </Col> */}
         <Col xs={12} md={1}>
           <InputField
             label="City"

@@ -107,7 +107,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="18" className="text-center">
+              <td colSpan="19" className="text-center">
                 No data available
               </td>
             </tr>

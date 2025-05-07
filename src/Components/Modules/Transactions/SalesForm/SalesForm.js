@@ -96,9 +96,6 @@ const SalesForm = () => {
     manualTotalPriceRef
   } = useProductHandlers();
 
-
-
-
   const [repairDetails, setRepairDetails] = useState(() => {
     const savedData = localStorage.getItem(`repairDetails_${tabId}`);
     return savedData ? JSON.parse(savedData) : [];
@@ -108,9 +105,6 @@ const SalesForm = () => {
     localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(repairDetails));
   }, [repairDetails, tabId]);
 
-
-
-  // Fetch customers
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -142,15 +136,6 @@ const SalesForm = () => {
 
     fetchLastInvoiceNumber();
   }, []);
-
-  // Save data to localStorage whenever repairDetails or paymentDetails change
-  // useEffect(() => {
-  //   localStorage.setItem('repairDetails', JSON.stringify(repairDetails));
-  // }, [repairDetails]);
-
-  // useEffect(() => {
-  //   localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
-  // }, [paymentDetails]);
 
   const [selectedMobile, setSelectedMobile] = useState("");
   const [uniqueInvoice, setUniqueInvoice] = useState([]);
@@ -295,7 +280,6 @@ const SalesForm = () => {
       setFilteredInvoices(uniqueInvoice);
     }
   };
-
 
   const [editIndex, setEditIndex] = useState(null);
   const [discount, setDiscount] = useState(() => {
@@ -465,7 +449,6 @@ const SalesForm = () => {
     setIsManualNetMode(false); // Ensure we're in normal discount mode
     applyDiscountToRepairDetails(discountValue); // Recalculate with new discount
   };
-
 
   const [festivalShowModal, festivalSetShowModal] = useState(false);
   const [offers, setOffers] = useState([]);
@@ -740,6 +723,7 @@ const SalesForm = () => {
   const [selectedEstimate, setSelectedEstimate] = useState("");
   const [estimateDetails, setEstimateDetails] = useState(null);
   const [stock, setStock] = useState(null);
+
   useEffect(() => {
     const fetchEstimate = async () => {
       try {
@@ -941,7 +925,6 @@ const SalesForm = () => {
     }));
   };
 
-
   const handleUpdate = () => {
     const updatedDetails = repairDetails.map((item, index) =>
       index === editIndex ? { ...formData } : item
@@ -1010,7 +993,7 @@ const SalesForm = () => {
   });
 
   const [schemeTableData, setSchemeTableData] = useState(() => {
-    const savedData = localStorage.getItem('schemeTableData');
+    const savedData = localStorage.getItem(`schemeTableData_${tabId}`);
     return savedData ? JSON.parse(savedData) : [];
   });
 
@@ -1453,7 +1436,7 @@ const SalesForm = () => {
     : netAmount - (schemeAmount + oldItemsAmount + salesNetAmount);
 
   const netPayableAmount = payableAmount;
-  const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
+  // const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;
   const netPayAmount = netPayableAmount
 
 
@@ -1502,7 +1485,7 @@ const SalesForm = () => {
     localStorage.removeItem(`repairDetails_${tabId}`);
     localStorage.removeItem(`paymentDetails_${tabId}`);
     localStorage.removeItem(`oldTableData_${tabId}`);
-    localStorage.removeItem('schemeTableData');
+    localStorage.removeItem(`schemeTableData_${tabId}`);
     localStorage.removeItem(`discount_${tabId}`);
     localStorage.removeItem(`saleFormData_${tabId}`);
     console.log("Data cleared successfully");
@@ -1779,7 +1762,7 @@ const SalesForm = () => {
     localStorage.removeItem(`repairDetails_${tabId}`);
     localStorage.removeItem(`paymentDetails_${tabId}`);
     localStorage.removeItem(`oldTableData_${tabId}`);
-    localStorage.removeItem('schemeTableData');
+    localStorage.removeItem(`schemeTableData_${tabId}`);
     localStorage.removeItem(`discount_${tabId}`);
     console.log("Data cleared successfully");
     window.location.reload();
@@ -1902,7 +1885,7 @@ const SalesForm = () => {
                 setReturnData={setReturnData}
                 selectedMobile={formData.mobile}
                 selectedRows={selectedRows}
-                setSelectedRows={setSelectedRows}
+                setSelectedRows={setSelectedRows} 
                 isAllSelected={isAllSelected}
                 setIsAllSelected={setIsAllSelected}
                 handleCheckboxChange={handleCheckboxChange}
@@ -1936,7 +1919,7 @@ const SalesForm = () => {
                 salesNetAmount={salesNetAmount}
                 salesAmountToPass={salesAmountToPass}
                 salesTaxableAmount={salesTaxableAmount}
-                updatedOldItemsAmount={updatedOldItemsAmount}
+                // updatedOldItemsAmount={updatedOldItemsAmount}
                 netPayAmount={netPayAmount}
                 oldSalesData={oldSalesData} schemeSalesData={schemeSalesData}
                 discount={discount}
