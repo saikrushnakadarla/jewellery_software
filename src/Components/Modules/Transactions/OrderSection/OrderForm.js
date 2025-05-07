@@ -131,15 +131,146 @@ const SalesForm = () => {
     localStorage.setItem('paymentDetails', JSON.stringify(paymentDetails));
   }, [paymentDetails]);
 
+  const [uniqueInvoice, setUniqueInvoice] = useState([]);
+  const [filteredInvoices, setFilteredInvoices] = useState([]);
+  const [invoiceDetails, setInvoiceDetails] = useState(null);
+
+  const [returnData, setReturnData] = useState({
+    invoice_number: '',
+  })
+
+  useEffect(() => {
+    // Set the default date value to the current date in dd-mm-yyyy format if not already set
+    if (!returnData.date) {
+      const currentDate = new Date();
+      setReturnData({
+        ...returnData,
+        date: formatDate(currentDate),
+      });
+    }
+  }, [returnData, setReturnData]);
+
+  // Utility function to format date as dd-mm-yyyy
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  // Handle invoice number change
+  const handleInvoiceChange = (e) => {
+    const selectedInvoiceNumber = e.target.value;
+    const selectedInvoice = filteredInvoices.find(
+      (invoice) => invoice.invoice_number === selectedInvoiceNumber
+    );
+
+    if (selectedInvoice) {
+      setReturnData({
+        ...returnData,
+        invoice_number: selectedInvoiceNumber,
+        date: selectedInvoice.date ? formatDate(selectedInvoice.date) : "", // Format date
+        terms: selectedInvoice.terms || "", // Set the terms from the selected invoice
+      });
+    } else {
+      setReturnData({
+        ...returnData,
+        invoice_number: selectedInvoiceNumber,
+        date: "",
+        terms: "",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const fetchRepairs = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/get-unique-repair-details`);
+        const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
+        setUniqueInvoice(filteredData);
+        setFilteredInvoices(filteredData); // Initially, show all invoices
+      } catch (error) {
+        console.error('Error fetching repair details:', error);
+      }
+    };
+
+    fetchRepairs();
+  }, []);
+
+  useEffect(() => {
+    const fetchInvoiceDetails = async () => {
+      if (!returnData.invoice_number) {
+        setInvoiceDetails([]); // Ensure it's an empty array, not null
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${baseURL}/getsales/${returnData.invoice_number}`);
+        const filteredData = response.data.filter((invoice) => invoice.status !== "Sale Returned");
+
+        setInvoiceDetails(filteredData || []); // Ensure it's always an array
+        console.log("Fetched Invoice Details:", filteredData);
+      } catch (error) {
+        console.error(`Error fetching details for invoice ${returnData.invoice_number}:`, error);
+        setInvoiceDetails([]); // Set empty array on error
+      }
+    };
+
+    fetchInvoiceDetails();
+  }, [returnData.invoice_number]);
+
+
+  // const handleCustomerChange = (customerId) => {
+  //   const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
+
+  //   if (customer) {
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       customer_id: customerId, // Update selected customer ID
+  //       account_name: customer.account_name || "", // Update customer name
+  //       mobile: customer.mobile || "", // Update mobile
+  //       email: customer.email || "",
+  //       address1: customer.address1 || "",
+  //       address2: customer.address2 || "",
+  //       city: customer.city || "",
+  //       pincode: customer.pincode || "",
+  //       state: customer.state || "",
+  //       state_code: customer.state_code || "",
+  //       aadhar_card: customer.aadhar_card || "",
+  //       gst_in: customer.gst_in || "",
+  //       pan_card: customer.pan_card || "",
+  //     }));
+  //   } else {
+  //     // Reset the form if no customer matches
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       customer_id: "",
+  //       account_name: "",
+  //       mobile: "",
+  //       email: "",
+  //       address1: "",
+  //       address2: "",
+  //       city: "",
+  //       pincode: "",
+  //       state: "",
+  //       state_code: "",
+  //       aadhar_card: "",
+  //       gst_in: "",
+  //       pan_card: "",
+  //     }));
+  //   }
+  // };
+
   const handleCustomerChange = (customerId) => {
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
 
     if (customer) {
       setFormData((prevData) => ({
         ...prevData,
-        customer_id: customerId, // Update selected customer ID
-        account_name: customer.account_name || "", // Update customer name
-        mobile: customer.mobile || "", // Update mobile
+        customer_id: customerId,
+        account_name: customer.account_name || "",
+        mobile: customer.mobile || "",
         email: customer.email || "",
         address1: customer.address1 || "",
         address2: customer.address2 || "",
@@ -150,9 +281,19 @@ const SalesForm = () => {
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
+        // keep invoice_number untouched
+        invoice_number: prevData.invoice_number || "",
       }));
+      setSelectedMobile(customer.mobile || "");
+
+      const filtered = uniqueInvoice.filter(
+        (invoice) =>
+          (invoice.customer_name && customer.account_name && 
+           invoice.customer_name.toLowerCase() === customer.account_name.toLowerCase()) ||
+          invoice.mobile === customer.mobile
+      );
+      setFilteredInvoices(filtered);
     } else {
-      // Reset the form if no customer matches
       setFormData((prevData) => ({
         ...prevData,
         customer_id: "",
@@ -168,7 +309,11 @@ const SalesForm = () => {
         aadhar_card: "",
         gst_in: "",
         pan_card: "",
+        // preserve invoice_number
+        invoice_number: prevData.invoice_number || "",
       }));
+      setSelectedMobile("");
+      setFilteredInvoices(uniqueInvoice);
     }
   };
 
@@ -344,6 +489,108 @@ const SalesForm = () => {
     });
   };
 
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [isAllSelected, setIsAllSelected] = useState(false);
+
+  const handleCheckboxChange = (event, index) => {
+    if (!invoiceDetails.length) return;
+
+    const isChecked = event.target.checked;
+    let updatedSelectedRows = isChecked
+      ? [...selectedRows, index]
+      : selectedRows.filter((i) => i !== index);
+
+    setSelectedRows(updatedSelectedRows);
+    setIsAllSelected(updatedSelectedRows.length === invoiceDetails.length);
+  };
+
+  const handleSelectAllChange = (event) => {
+    if (!invoiceDetails.length) return;
+
+    const isChecked = event.target.checked;
+    setSelectedRows(isChecked ? invoiceDetails.map((_, index) => index) : []);
+    setIsAllSelected(isChecked);
+  };
+
+  const handleCheckout = async () => {
+    if (!invoiceDetails.length || !selectedRows.length) {
+      // alert("No invoices selected for sale return.");
+      return;
+    }
+
+    try {
+      const selectedInvoices = selectedRows.map((rowIndex) => invoiceDetails[rowIndex]);
+
+      const repairDetailsUpdates = selectedInvoices.map((invoice) => ({
+        id: invoice.id,
+        status: "Sale Returned",
+      }));
+
+      const openTagsUpdates = selectedInvoices.map((invoice) => ({
+        PCode_BarCode: invoice.code,
+        Status: "Sale Returned",
+      }));
+
+      const productUpdates = selectedInvoices.map((invoice) => ({
+        product_id: invoice.product_id,
+        qty: invoice.qty,
+        gross_weight: invoice.gross_weight,
+      }));
+
+      const codesForAvailableEntries = selectedInvoices.map((invoice) => invoice.code);
+
+      // Execute all API calls in parallel
+      const responses = await Promise.allSettled([
+        axios.post(`${baseURL}/updateRepairDetails`, { updates: repairDetailsUpdates }),
+        axios.post(`${baseURL}/updateOpenTags`, { updates: openTagsUpdates }),
+        axios.post(`${baseURL}/updateProduct`, { updates: productUpdates }),
+        axios.post(`${baseURL}/addAvailableEntry`, { codes: codesForAvailableEntries }),
+      ]);
+
+      // Check if any API failed
+      const failedRequests = responses.filter(res => res.status === "rejected");
+      if (failedRequests.length > 0) {
+        console.error("Some API calls failed:", failedRequests);
+        alert("Some updates failed. Please check console for details.");
+      } else {
+        alert("Sale Return added Successfully!");
+      }
+
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      alert("An error occurred during checkout. Please try again.");
+    }
+  };
+
+  const salesTaxableAmount = selectedRows.reduce((sum, rowIndex) => {
+    const detail = invoiceDetails[rowIndex];
+    const stonePrice = parseFloat(detail.stone_price) || 0;
+    const makingCharges = parseFloat(detail.making_charges) || 0;
+    const rateAmt = parseFloat(detail.rate_amt) || 0;
+    const itemDiscount = parseFloat(detail.disscount) || 0;
+    const itemFestivalDiscount = parseFloat(detail.festival_discount) || 0;
+    return sum + stonePrice + makingCharges + rateAmt - itemDiscount - itemFestivalDiscount;
+  }, 0);
+
+  const salesTaxAmount = selectedRows.reduce((sum, rowIndex) => {
+    const detail = invoiceDetails[rowIndex];
+    return sum + parseFloat(detail.tax_amt || 0);
+  }, 0);
+
+  const salesNetAmount = salesTaxableAmount + salesTaxAmount;
+
+  const isSameMonth = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+  };
+
+  const allSelectedRowsAreThisMonth = selectedRows.every(rowIndex =>
+    isSameMonth(invoiceDetails[rowIndex]?.date)
+  );
+
+  const salesAmountToPass = allSelectedRowsAreThisMonth ? salesNetAmount : salesTaxableAmount;
+
   const handleBack = () => {
     // navigate("/orderstable");
     navigate(-1); 
@@ -469,6 +716,13 @@ const SalesForm = () => {
     }
   };
 
+  const resetSaleReturnForm = () => {
+    setReturnData({
+      invoice_number: "",
+    });
+  }
+
+
   return (
     <div className="main-container">
       <Container className="sales-form-container-orders">
@@ -549,6 +803,27 @@ const SalesForm = () => {
                 schemeTableData={schemeTableData}
                 setSchemeTableData={setSchemeTableData}
                 orderDetails={orderDetails}
+                selectedMobile={formData.mobile}
+                setFilteredInvoices={setFilteredInvoices}
+                uniqueInvoice={uniqueInvoice}
+                setUniqueInvoice={setUniqueInvoice}
+                invoiceDetails={invoiceDetails}
+                setInvoiceDetails={setInvoiceDetails}
+                handleInvoiceChange={handleInvoiceChange}
+                returnData={returnData}
+                setReturnData={setReturnData}
+                filteredInvoices={filteredInvoices}
+                selectedRows={selectedRows}
+                setSelectedRows={setSelectedRows} 
+                isAllSelected={isAllSelected}
+                setIsAllSelected={setIsAllSelected}
+                handleCheckboxChange={handleCheckboxChange}
+                handleSelectAllChange={handleSelectAllChange}
+                salesTaxableAmount={salesTaxableAmount}
+                salesTaxAmount={salesTaxAmount}
+                salesNetAmount={salesNetAmount}
+                resetSaleReturnForm={resetSaleReturnForm}
+                handleCheckout={handleCheckout}
               />
             </div>
 

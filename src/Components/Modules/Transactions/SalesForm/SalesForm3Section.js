@@ -93,7 +93,7 @@ const SalesFormSection = ({ setOldSalesData,
             onClick={() => {
               setActiveForm("repairs");
               console.log("Navigating to Repairs with Mobile:", selectedMobile); // Log before navigation
-              navigate("/repairs", { state: { mobile: selectedMobile } });
+              navigate("/repairstable", { state: { mobile: selectedMobile } });
             }}
             className="ms-2"
           >

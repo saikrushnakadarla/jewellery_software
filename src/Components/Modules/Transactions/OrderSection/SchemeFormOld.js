@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { Col, Row, Button, Table } from "react-bootstrap";
-import InputField from "../SalesForm/InputfieldSales";
+import InputField from "./InputfieldSales";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 
