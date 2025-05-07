@@ -1561,7 +1561,7 @@ const SalesForm = () => {
         memberSchemes: schemeSalesData,
         oldItemsAmount: oldItemsAmount || 0,
         schemeAmount: schemeAmount || 0,
-        salesNetAmount: salesNetAmount || 0,
+        salesNetAmount: salesAmountToPass || 0,
         salesTaxableAmount: salesTaxableAmount || 0,
       };
   
@@ -1583,7 +1583,7 @@ const SalesForm = () => {
           festivalDiscountAmt={festivalDiscountAmt}
           oldItemsAmount={oldItemsAmount}
           schemeAmount={schemeAmount}
-          salesNetAmount={salesNetAmount}
+          salesNetAmount={salesAmountToPass}
           salesTaxableAmount={salesTaxableAmount}
           netAmount={netAmount}
           netPayableAmount={netPayableAmount}

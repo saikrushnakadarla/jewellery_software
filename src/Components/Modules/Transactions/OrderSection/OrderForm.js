@@ -692,6 +692,7 @@ const SalesForm = () => {
       memberSchemes: schemeSalesData,
       oldItemsAmount: oldItemsAmount || 0,
       schemeAmount: schemeAmount || 0,
+      salesNetAmount: salesAmountToPass || 0,
     };
 
     console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
