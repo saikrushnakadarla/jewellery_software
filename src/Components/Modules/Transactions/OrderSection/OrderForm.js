@@ -480,6 +480,7 @@ const SalesForm = () => {
             <div className="sales-form-left">
               <CustomerDetails
                 formData={formData}
+                setFormData={setFormData}
                 handleCustomerChange={handleCustomerChange}
                 handleAddCustomer={handleAddCustomer}
                 customers={customers}

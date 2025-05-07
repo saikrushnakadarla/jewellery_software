@@ -4,7 +4,7 @@ import InputField from './../../Transactions/SalesForm/InputfieldSales';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { useLocation } from "react-router-dom";
 
-const CustomerDetails = ({ formData, handleCustomerChange, handleAddCustomer, customers }) => {
+const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAddCustomer, customers }) => {
   const location = useLocation();
 
   // Update formData.mobile if mobile is passed via location.state
@@ -23,7 +23,7 @@ const CustomerDetails = ({ formData, handleCustomerChange, handleAddCustomer, cu
   return (
     <Col className="sales-form-section">
       <Row>
-        <Col xs={12} md={3} className="d-flex align-items-center">
+        {/* <Col xs={12} md={3} className="d-flex align-items-center">
           <div style={{ flex: 1 }}>
             <InputField
               label="Mobile"
@@ -65,6 +65,103 @@ const CustomerDetails = ({ formData, handleCustomerChange, handleAddCustomer, cu
               })),
             ]}
 
+          />
+        </Col> */}
+
+        <Col xs={12} md={3} className="d-flex align-items-center">
+          <div style={{ flex: 1 }}>
+            <InputField
+              label="Mobile"
+              name="mobile"
+              type="select"
+              value={formData.mobile || ""}
+              onChange={(e) => {
+                const inputMobile = e.target.value;
+                if (!inputMobile) {
+                  setFormData((prev) => ({
+                    ...prev,
+                    mobile: "",
+                    account_name: "",
+                    email: "",
+                    address1: "",
+                    city: "",
+                    pincode: "",
+                    state: "",
+                    aadhar_card: "",
+                    gst_in: "",
+                  }));
+                  return;
+                }
+
+                // Check for exactly 10 digits
+                const isValidMobile = /^\d{10}$/.test(inputMobile);
+                if (!isValidMobile) {
+                  alert("Please enter a valid 10-digit mobile number.");
+                  return;
+                }
+
+                setFormData((prev) => ({ ...prev, mobile: inputMobile }));
+                const existing = customers.find((c) => c.mobile === inputMobile);
+                if (existing) {
+                  handleCustomerChange(existing.account_id);
+
+                }
+              }}
+              options={customers.map((c) => ({ value: c.mobile, label: c.mobile }))}
+              allowCustomInput
+            />
+          </div>
+          <AiOutlinePlus
+            size={20}
+            color="black"
+            onClick={handleAddCustomer}
+            style={{
+              marginLeft: "10px",
+              cursor: "pointer",
+              marginBottom: "20px",
+            }}
+          />
+        </Col>
+
+        <Col xs={12} md={3}>
+          <InputField
+            label="Customer Name"
+            name="account_name"
+            type="select"
+            value={formData.account_name.toUpperCase() || ""}
+            onChange={(e) => {
+              const inputName = (e.target.value || "").toUpperCase();
+
+              if (!inputName) {
+                // Clear all dependent fields
+                setFormData((prev) => ({
+                  ...prev,
+                  mobile: "",
+                  account_name: "",
+                  email: "",
+                  address1: "",
+                  city: "",
+                  pincode: "",
+                  state: "",
+                  aadhar_card: "",
+                  gst_in: "",
+                }));
+                return;
+              }
+
+              setFormData((prev) => ({ ...prev, account_name: inputName }));
+
+              const existing = customers.find((c) => c.account_name.toUpperCase() === inputName);
+              if (existing) {
+                handleCustomerChange(existing.account_id);
+
+              }
+            }}
+            options={customers.map((c) => ({
+              value: c.account_name.toUpperCase(),
+              label: c.account_name.toUpperCase(),
+            }))}
+            allowCustomInput
           />
         </Col>
         <Col xs={12} md={2}>
