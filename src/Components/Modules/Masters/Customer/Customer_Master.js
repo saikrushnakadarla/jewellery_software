@@ -23,7 +23,7 @@ function Customer_Master() {
     state_code: '',
     phone: '',
     religion: '',
-    mobile: '',
+    mobile: location.state?.mobile || '',
     email: '',
     birthday: '',
     anniversary: '',
@@ -252,7 +252,10 @@ function Customer_Master() {
       if (saveResponse.ok) {
         alert(`Customer ${id ? "updated" : "created"} successfully!`);
         const from = location.state?.from || "/customerstable";
-        navigate(from);
+        // navigate(from);
+        navigate(from, {
+          state: { mobile: formData.mobile }
+        });
       } else {
         alert("Failed to save customer.");
       }

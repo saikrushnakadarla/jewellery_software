@@ -140,6 +140,26 @@ const CustomerDetails = ({
     }
   };
 
+  // Add this useEffect to your sales form component
+  useEffect(() => {
+    if (location.state?.selectedMobile) {
+      setFormData(prev => ({
+        ...prev,
+        mobile: location.state.selectedMobile
+      }));
+
+      // Also trigger the customer lookup if needed
+      const existing = customers.find(c => c.mobile === location.state.selectedMobile);
+      if (existing) {
+        handleCustomerChange(existing.account_id);
+        fetchBalance(existing.mobile);
+      }
+
+      // Clear the state to prevent re-selection on re-renders
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state?.selectedMobile, customers]);
+
   return (
     <Col className="sales-form-section">
       <Row>
@@ -189,7 +209,11 @@ const CustomerDetails = ({
           <AiOutlinePlus
             size={20}
             color="black"
-            onClick={handleAddCustomer}
+            // onClick={handleAddCustomer}
+            onClick={() => {
+              console.log("Mobile passed to handleAddCustomer:", formData.mobile);
+              handleAddCustomer(formData.mobile); // This should be passing the correct mobile number
+            }}
             style={{
               marginLeft: "10px",
               cursor: "pointer",

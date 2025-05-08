@@ -1035,8 +1035,18 @@ const SalesForm = () => {
     navigate("/salestable");
   };
 
-  const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: `/sales?tabId=${tabId}` } });
+  // const handleAddCustomer = () => {
+  //   navigate("/customermaster", { state: { from: `/sales?tabId=${tabId}` } });
+  // };
+
+  const handleAddCustomer = (mobile) => {
+    console.log("handleAddCustomer received mobile:", mobile);
+    navigate("/customermaster", { 
+      state: { 
+        from: `/sales?tabId=${tabId}`,
+        mobile: mobile // Pass the mobile number here
+      } 
+    });
   };
 
   // let totalAmount = 0;
