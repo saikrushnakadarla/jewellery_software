@@ -7,6 +7,8 @@ import { FaTrash, FaEdit, FaEye } from 'react-icons/fa';
 import EditRepairForm from "./EditRepairForm";
 import './RepairsTable.css';
 import { useLocation, useNavigate } from 'react-router-dom';
+import PDFLayout from './Invoice';
+import { pdf } from '@react-pdf/renderer';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -71,18 +73,84 @@ const RepairsTable = () => {
     fetchAssignedRepairDetails();
   }, []);
 
+  // const handleActionChange = async (repairId, action) => {
+  //   if (action === 'Assign to Workshop') {
+  //     const repair = repairs.find((repair) => repair.repair_id === repairId);
+  //     setSelectedRepair(repair);
+  //     setShowModal(true);
+  //   } else if (action === 'Receive from Workshop') {
+  //     const repair = repairs.find((repair) => repair.repair_id === repairId);
+  //     setSelectedRepair(repair);
+  //     setShowReceiveModal(true);
+  //   } else if (action === 'Delivery to Customer') {
+  //     await updateRepairStatus(repairId, 'Delivery to Customer');
+  //     fetchRepairs();
+  //   }
+  // };
+
   const handleActionChange = async (repairId, action) => {
     if (action === 'Assign to Workshop') {
       const repair = repairs.find((repair) => repair.repair_id === repairId);
       setSelectedRepair(repair);
       setShowModal(true);
-    } else if (action === 'Receive from Workshop') {
+    } 
+    else if (action === 'Receive from Workshop') {
       const repair = repairs.find((repair) => repair.repair_id === repairId);
       setSelectedRepair(repair);
       setShowReceiveModal(true);
-    } else if (action === 'Delivery to Customer') {
-      await updateRepairStatus(repairId, 'Delivery to Customer');
-      fetchRepairs();
+    } 
+    else if (action === 'Delivery to Customer') {
+      try {
+        // Step 1: Update status first
+        await updateRepairStatus(repairId, 'Delivery to Customer');
+  
+        // Step 2: Find the repair data
+        const repair = repairs.find((repair) => repair.repair_id === repairId);
+        
+        if (!repair) {
+          console.error("Repair data not found!");
+          return;
+        }
+  
+        // Step 3: Ensure repairDetails is an array (fixes the .reduce() error)
+        const repairDetails = Array.isArray(repair.repairDetails) 
+          ? repair.repairDetails 
+          : repair.repairDetails 
+            ? [repair.repairDetails]  // Wrap single object in array
+            : [];  // Fallback: empty array if undefined
+  
+        // Step 4: Generate PDF
+        const pdfDoc = (
+          <PDFLayout
+            formData={repair}
+            // repairDetails={repairDetails}  // Now guaranteed to be an array
+            // netAmount={repair.netAmount || 0}
+            // netPayableAmount={repair.netPayableAmount || 0}
+          />
+        );
+  
+        // Step 5: Create and download PDF
+        const blob = await pdf(pdfDoc).toBlob();
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Repair_${repair.repair_no}_Delivery.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
+  
+        // Step 6: Refresh data
+        fetchRepairs();
+      } catch (error) {
+        console.error("PDF Download Failed:", error);
+        alert("Failed to generate PDF. Please check the console for details.");
+      }
     }
   };
 

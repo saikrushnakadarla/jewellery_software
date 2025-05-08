@@ -24,38 +24,38 @@ const RepairsTable = () => {
 
         // Group purchases by account_name + mobile
         const grouped = purchases.reduce((acc, curr) => {
-            const key = `${curr.account_name}-${curr.mobile}`;
-            if (!acc[key]) {
-              acc[key] = {
-                account_name: curr.account_name,
-                mobile: curr.mobile,
-                invoices: [],
-                invoiceSet: new Set(),
-                totalRateCut: 0,
-                totalBalance: 0,
-              };
-            }
-          
-            if (!acc[key].invoiceSet.has(curr.invoice)) {
-              acc[key].invoiceSet.add(curr.invoice);
-          
-              const matchingCuts = rateCuts.filter(rc => rc.invoice === curr.invoice);
-              const totalRateCut = matchingCuts.reduce((sum, item) => sum + Number(item.rate_cut_amt || 0), 0);
-              const totalBalance = matchingCuts.reduce((sum, item) => sum + Number(item.balance_amount || 0), 0);
-          
-              acc[key].totalRateCut += totalRateCut;
-              acc[key].totalBalance += totalBalance;
-          
-              acc[key].invoices.push({
-                ...curr,
-                totalRateCut,
-                totalBalance,
-              });
-            }
-          
-            return acc;
-          }, {});
-          
+          const key = `${curr.account_name}-${curr.mobile}`;
+          if (!acc[key]) {
+            acc[key] = {
+              account_name: curr.account_name,
+              mobile: curr.mobile,
+              invoices: [],
+              invoiceSet: new Set(),
+              totalRateCut: 0,
+              totalBalance: 0,
+            };
+          }
+
+          if (!acc[key].invoiceSet.has(curr.invoice)) {
+            acc[key].invoiceSet.add(curr.invoice);
+
+            const matchingCuts = rateCuts.filter(rc => rc.invoice === curr.invoice);
+            const totalRateCut = matchingCuts.reduce((sum, item) => sum + Number(item.rate_cut_amt || 0), 0);
+            const totalBalance = matchingCuts.reduce((sum, item) => sum + Number(item.balance_amount || 0), 0);
+
+            acc[key].totalRateCut += totalRateCut;
+            acc[key].totalBalance += totalBalance;
+
+            acc[key].invoices.push({
+              ...curr,
+              totalRateCut,
+              totalBalance,
+            });
+          }
+
+          return acc;
+        }, {});
+
 
         const groupedData = Object.values(grouped).map(({ invoiceSet, ...rest }) => rest);
         groupedData.sort((a, b) => b.totalBalance - a.totalBalance);
@@ -97,13 +97,14 @@ const RepairsTable = () => {
       accessor: 'totalBalance',
     },
   ], []);
-  
+
 
   const renderRowSubComponent = ({ row }) => (
     <div className="p-3">
       <table className="table table-bordered">
         <thead>
           <tr>
+          <th>Days</th>
             <th>Date</th>
             <th>Invoice No.</th>
             <th>Total Amount</th>
@@ -111,14 +112,22 @@ const RepairsTable = () => {
           </tr>
         </thead>
         <tbody>
-          {row.original.invoices.map((inv, index) => (
-            <tr key={index}>
-              <td>{new Date(inv.date).toISOString().slice(0, 10).split('-').reverse().join('-')}</td>
-              <td>{inv.invoice}</td>
-              <td>{inv.totalRateCut}</td>
-              <td>{inv.totalBalance}</td>
-            </tr>
-          ))}
+          {row.original.invoices.map((inv, index) => {
+            const invoiceDate = new Date(inv.date);
+            const currentDate = new Date();
+            const timeDiff = currentDate - invoiceDate;
+            const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+            return (
+              <tr key={index}>
+                   <td>{dayDiff}</td>
+                <td>{invoiceDate.toISOString().slice(0, 10).split('-').reverse().join('-')}</td>
+                <td>{inv.invoice}</td>
+                <td>{inv.totalRateCut}</td>
+                <td>{inv.totalBalance}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
@@ -138,7 +147,7 @@ const RepairsTable = () => {
           <DataTable
             columns={columns}
             data={data}
-            
+
             renderRowSubComponent={renderRowSubComponent}
           />
         )}
