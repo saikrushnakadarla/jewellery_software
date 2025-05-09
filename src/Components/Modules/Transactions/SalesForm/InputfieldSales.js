@@ -10,6 +10,7 @@ const InputField = ({
   value,
   readOnly,
   onChange,
+  onKeyDown,
   name,
   options = [],
   required = false,
@@ -76,6 +77,7 @@ const InputField = ({
               placeholder={placeholder || "Select or type"}
               isDisabled={readOnly}
               autoFocus={autoFocus}
+              onKeyDown={onKeyDown}
               value={
                 value && typeof value === "string"
                   ? { label: value, value }
@@ -89,6 +91,23 @@ const InputField = ({
                   },
                 })
               }
+              onCreateOption={(inputValue) => {
+                // Call the onChange to update the field value
+                onChange({
+                  target: {
+                    name,
+                    value: inputValue,
+                  },
+                });
+            
+                // Then call a custom handler if needed
+                if (typeof onKeyDown === "function") {
+                  onKeyDown({
+                    key: "Enter",
+                    value: inputValue,
+                  });
+                }
+              }}
               styles={customStyles}
               menuPortalTarget={document.body}
               isClearable

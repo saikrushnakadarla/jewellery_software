@@ -188,7 +188,6 @@ const CustomerDetails = ({
                   return;
                 }
 
-                // Check for exactly 10 digits
                 const isValidMobile = /^\d{10}$/.test(inputMobile);
                 if (!isValidMobile) {
                   alert("Please enter a valid 10-digit mobile number.");
@@ -196,15 +195,27 @@ const CustomerDetails = ({
                 }
 
                 setFormData((prev) => ({ ...prev, mobile: inputMobile }));
+
                 const existing = customers.find((c) => c.mobile === inputMobile);
                 if (existing) {
                   handleCustomerChange(existing.account_id);
                   fetchBalance(existing.mobile);
                 }
               }}
+              onKeyDown={({ key, value }) => {
+                if (key === "Enter") {
+                  const isValidMobile = /^\d{10}$/.test(value);
+                  const exists = customers.some((c) => c.mobile === value);
+                  if (isValidMobile && !exists) {
+                    handleAddCustomer(value);
+                  }
+                }
+              }}
               options={customers.map((c) => ({ value: c.mobile, label: c.mobile }))}
               allowCustomInput
             />
+
+
           </div>
           <AiOutlinePlus
             size={20}
