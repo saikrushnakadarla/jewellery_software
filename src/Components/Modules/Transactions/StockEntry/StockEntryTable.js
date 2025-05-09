@@ -755,12 +755,12 @@ const StockEntryTable = (selectedProduct) => {
         <Modal.Header closeButton>
           <Modal.Title>View Product Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ fontSize:'13px' }}>
           {selectedRow ? (
             <>
               {/* <div className='small'> */}
                 <Row >
-                  <Col md={2} style={{ whiteSpace: "nowrap" }}>
+                  <Col md={3} style={{ whiteSpace: "nowrap" }}>
                     <p><strong>Supplier:</strong> {selectedRow.account_name}</p>
                   </Col>
                   <Col md={3} style={{ whiteSpace: "nowrap" }}>

@@ -22,6 +22,8 @@ const PaymentDetails = ({
   netAmount,
   discount,
   handleDiscountChange,
+  advanceAmount,
+  setAdvanceAmount
 }) => {
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(false);
 
@@ -40,31 +42,33 @@ const PaymentDetails = ({
     // First try to get from URL
     const urlParams = new URLSearchParams(window.location.search);
     let tabId = urlParams.get('tabId');
-    
+
     // If not in URL, try sessionStorage
     if (!tabId) {
       tabId = sessionStorage.getItem('tabId');
     }
-    
+
     // If still not found, generate new ID
     if (!tabId) {
       tabId = crypto.randomUUID();
       sessionStorage.setItem('tabId', tabId);
-      
+
       // Update URL without page reload
       const newUrl = `${window.location.pathname}?tabId=${tabId}`;
       window.history.replaceState({}, '', newUrl);
     }
-    
+
     return tabId;
   };
 
   const tabId = getTabId();
-  
+
   const handleClose = () => {
     // navigate(`/sales?tabId=${tabId}`);
     navigate(-1);
   };
+
+  const maxAdvanceAmount = netAmount - (schemeAmount + oldItemsAmount + salesAmountToPass);
 
 
   return (
@@ -115,10 +119,35 @@ const PaymentDetails = ({
               <td colSpan="4">{schemeAmount.toFixed(2)}</td>
             </tr>
             <tr style={{ fontSize: "13px" }}>
-                <td colSpan="16" className="text-right" >Sale Return Amount</td>
-                {/* <td colSpan="4">{salesNetAmount.toFixed(2)}</td> */}
-                <td colSpan="4">{salesAmountToPass.toFixed(2)}</td>
-              </tr>
+              <td colSpan="16" className="text-right" >Sale Return Amount</td>
+              {/* <td colSpan="4">{salesNetAmount.toFixed(2)}</td> */}
+              <td colSpan="4">{salesAmountToPass.toFixed(2)}</td>
+            </tr>
+            <tr style={{ fontSize: "13px" }}>
+              <td colSpan="16" className="text-right">Advance Amount</td>
+              <td colSpan="4">
+                <input
+                  type="number"
+                  value={advanceAmount}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === "") {
+                      setAdvanceAmount(""); 
+                    } else {
+                      const numberValue = Number(value);
+                      if (numberValue <= maxAdvanceAmount) {
+                        setAdvanceAmount(numberValue);
+                      } else {
+                        alert(`Advance Amount should not exceed ₹${maxAdvanceAmount.toFixed(2)}`);
+                        setAdvanceAmount(""); 
+                      }
+                    }
+                  }}
+                  style={{ width: '100px', padding: '5px', fontSize: "13px" }}
+                  min="0"
+                />
+              </td>
+            </tr>
             <tr style={{ fontSize: "13px" }}>
               <td colSpan="16" className="text-right">Net Payable Amount</td>
               <td colSpan="4">{netPayableAmount.toFixed(2)}</td>
@@ -197,10 +226,12 @@ const PaymentDetails = ({
             </Button>
             <Button
               onClick={handleClose}
-              style={{ backgroundColor: "gray", borderColor: "gray",     marginLeft: "16px" ,
+              style={{
+                backgroundColor: "gray", borderColor: "gray", marginLeft: "16px",
                 marginTop: "-57px",
                 padding: "4px 10px",
-                fontSize: "14px" }}
+                fontSize: "14px"
+              }}
             // disabled={!isSubmitEnabled}
             >
               Close

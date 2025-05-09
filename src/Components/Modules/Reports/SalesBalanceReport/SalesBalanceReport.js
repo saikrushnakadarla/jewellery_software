@@ -203,8 +203,8 @@ const RepairsTable = () => {
                             style={{
                                 backgroundColor: '#28a745',
                                 borderColor: '#28a745',
-                                fontSize: '0.875rem', // Smaller font size
-                                padding: '0.25rem 0.5rem', // Reduced padding
+                                fontSize: '0.800rem', // Smaller font size
+                                padding: '0.10rem 0.5rem', // Reduced padding
                             }}
                             onClick={() => handleAddReceipt(row.original)} // Pass row data to handle receipt creation
                             disabled={netBill === totalPaid} // Disable if transaction_status is ConvertedInvoice or netBill equals totalPaid
@@ -252,7 +252,9 @@ const RepairsTable = () => {
         const fetchRepairs = async () => {
             try {
                 const response = await axios.get(`${baseURL}/get-unique-repair-details`);
-                const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
+                const filteredData = response.data.filter(
+                    (item) => item.transaction_status === 'Sales' || item.transaction_status === "ConvertedInvoice"
+                );
                 setData(filteredData);
                 setLoading(false);
             } catch (error) {
@@ -372,7 +374,7 @@ const RepairsTable = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>Sales Details</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body style={{ fontSize:'13px' }}>
                     {repairDetails && (
                         <>
                             <h5>Customer Info</h5>

@@ -94,6 +94,11 @@ const RepairsTable = () => {
         Cell: ({ value }) => value || 0
       },
       {
+        Header: 'SaleReturn Amt',
+        accessor: 'sale_return_amt',
+        Cell: ({ value }) => value || 0
+      },
+      {
         Header: 'Net Amt',
         accessor: 'net_bill_amount',
         Cell: ({ value }) => value || 0
@@ -573,7 +578,7 @@ const RepairsTable = () => {
         <Modal.Header closeButton>
           <Modal.Title>Sales Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ fontSize:'13px' }}>
           {repairDetails && (
             <>
               <h5>Customer Info</h5>
@@ -609,7 +614,7 @@ const RepairsTable = () => {
               <h5>Products</h5>
               <div className="table-responsive">
                 <Table bordered>
-                  <thead style={{ whiteSpace: 'nowrap' }}>
+                  <thead style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
                     <tr>
                       <th>Bar Code</th>
                       <th>Product Name</th>
@@ -627,7 +632,7 @@ const RepairsTable = () => {
                       <th>Total Price</th>
                     </tr>
                   </thead>
-                  <tbody style={{ whiteSpace: 'nowrap' }}>
+                  <tbody style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
                     {repairDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>{product.code}</td>

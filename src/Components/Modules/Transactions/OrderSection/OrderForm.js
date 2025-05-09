@@ -631,8 +631,10 @@ const SalesForm = () => {
       0
     );
 
+    const [advanceAmount, setAdvanceAmount] = useState("");
+
   // Calculate Net Payable Amount
-  const payableAmount = netAmount - (schemeAmount + oldItemsAmount);
+  const payableAmount = netAmount - (schemeAmount + oldItemsAmount + salesAmountToPass + advanceAmount);
   const netPayableAmount = Math.round(payableAmount);
 
   const clearData = () => {
@@ -655,6 +657,7 @@ const SalesForm = () => {
     localStorage.removeItem('paymentDetails');
     localStorage.removeItem('oldTableData');
     localStorage.removeItem('schemeTableData');
+    localStorage.removeItem(`discount`);
   };
 
   const handleSave = async () => {
@@ -693,6 +696,7 @@ const SalesForm = () => {
       oldItemsAmount: oldItemsAmount || 0,
       schemeAmount: schemeAmount || 0,
       salesNetAmount: salesAmountToPass || 0,
+      advanceAmount: advanceAmount || 0,
     };
 
     console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
@@ -851,6 +855,8 @@ const SalesForm = () => {
                 salesTaxableAmount={salesTaxableAmount}
                 discount={discount}
                 handleDiscountChange={handleDiscountChange}
+                setAdvanceAmount={setAdvanceAmount}
+                advanceAmount={advanceAmount}
               />
             </div>
           </div>

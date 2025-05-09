@@ -124,7 +124,9 @@ const RepairsTable = () => {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
 
         // Filter the data based on the 'transaction_status' column
-        const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
+        const filteredData = response.data.filter(
+           (item) => item.transaction_status === 'Sales' || item.transaction_status === "ConvertedInvoice"
+        );
 
         setData(filteredData); // Set the filtered data
         setLoading(false);
@@ -193,16 +195,16 @@ const RepairsTable = () => {
         <Modal.Header closeButton>
           <Modal.Title>Sales Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ fontSize:'13px' }}>
           {repairDetails && (
             <>
               <h5>Customer Info</h5>
               <Table bordered>
                 <tbody>
-                  <tr>
+                  {/* <tr>
                     <td>Customer ID</td>
                     <td>{repairDetails.uniqueData.customer_id}</td>
-                  </tr>
+                  </tr> */}
                   <tr>
                     <td>Mobile</td>
                     <td>{repairDetails.uniqueData.mobile}</td>
@@ -233,7 +235,7 @@ const RepairsTable = () => {
               <h5>Products</h5>
               <div className="table-responsive">
                 <Table bordered>
-                  <thead style={{whiteSpace:'nowrap'}}>
+                  <thead style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
                     <tr>
                       <th>BarCode</th>
                       <th>Product Name</th>
@@ -249,7 +251,7 @@ const RepairsTable = () => {
                       <th>Total Price</th>
                     </tr>
                   </thead>
-                  <tbody style={{whiteSpace:'nowrap'}}>
+                  <tbody style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
                     {repairDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>{product.code}</td>

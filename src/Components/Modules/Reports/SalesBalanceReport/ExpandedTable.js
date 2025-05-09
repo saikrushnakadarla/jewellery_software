@@ -99,7 +99,7 @@ export default function DataTable({ columns, data, renderRowSubComponent }) {
       />
 
       <div className="table-responsive">
-        <table {...getTableProps()} className="table table-striped">
+        <table {...getTableProps()} className="table table-striped" style={{ fontSize:'13px' }}>
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()} className="dataTable_headerRow">

@@ -26,6 +26,17 @@ function Navbar() {
     }
   }, [location.pathname]);
 
+
+  useEffect(() => {
+    if (location.pathname !== "/orders") {
+      localStorage.removeItem("orderDetails");
+      localStorage.removeItem("paymentDetails");
+      localStorage.removeItem("oldTableData");
+      localStorage.removeItem("schemeTableData");
+      localStorage.removeItem(`discount`);
+    }
+  }, [location.pathname]);
+
   const getTabId = () => {
     // First try to get from URL
     const urlParams = new URLSearchParams(window.location.search);

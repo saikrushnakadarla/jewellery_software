@@ -1382,7 +1382,7 @@ const SalesForm = () => {
     });
 
     // Calculate what the netAmount should be to achieve this netPayAmount
-    const calculatedNetAmount = value + schemeAmount + oldItemsAmount + salesNetAmount;
+    const calculatedNetAmount = value + schemeAmount + oldItemsAmount + salesAmountToPass;
 
     // Calculate the required taxable amount after preserving festival discount
     let totalTaxableAmount = 0;
@@ -1443,7 +1443,7 @@ const SalesForm = () => {
   // Update the payableAmount calculation
   const payableAmount = isManualNetMode
     ? manualNetPayAmount
-    : netAmount - (schemeAmount + oldItemsAmount + salesNetAmount);
+    : netAmount - (schemeAmount + oldItemsAmount + salesAmountToPass);
 
   const netPayableAmount = payableAmount;
   // const updatedOldItemsAmount = oldItemsAmount + salesNetAmount;

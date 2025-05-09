@@ -644,7 +644,7 @@ const RepairsTable = () => {
         <Modal.Header closeButton>
           <Modal.Title>Purchase Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ fontSize:'13px' }}>
           {purchaseDetails && (
             <>
               <h5>Customer Info</h5>

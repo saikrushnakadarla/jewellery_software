@@ -30,7 +30,7 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Sr. No.',
+        Header: 'S No.',
         Cell: ({ row }) => row.index + 1,
       },
       {
@@ -39,8 +39,12 @@ const RepairsTable = () => {
         Cell: ({ value }) => formatDate(value),
       },
       {
-        Header: 'Mobile Number',
+        Header: 'Mobile',
         accessor: 'mobile',
+      },
+      {
+        Header: 'Account',
+        accessor: 'account_name',
       },
       {
         Header: 'Order No.',
@@ -50,10 +54,7 @@ const RepairsTable = () => {
         Header: 'Invoice No.',
         accessor: 'invoice_number',
       },
-      {
-        Header: 'Account Name',
-        accessor: 'account_name',
-      },
+      
       {
         Header: 'Total Amt',
         accessor: 'net_amount',
@@ -62,6 +63,21 @@ const RepairsTable = () => {
       {
         Header: 'Old Amt',
         accessor: 'old_exchange_amt',
+        Cell: ({ value }) => value || 0
+      },
+      {
+        Header: 'Scheme Amt',
+        accessor: 'scheme_amt',
+        Cell: ({ value }) => value || 0
+      },
+      {
+        Header: 'SaleReturn Amt',
+        accessor: 'sale_return_amt',
+        Cell: ({ value }) => value || 0
+      },
+      {
+        Header: 'Advance Amt',
+        accessor: 'advance_amt',
         Cell: ({ value }) => value || 0
       },
       {
@@ -177,14 +193,14 @@ const RepairsTable = () => {
               style={{
                 backgroundColor: isDisabled ? "#ccc" : "#28a745",
                 borderColor: isDisabled ? "#ccc" : "#28a745",
-                fontSize: "0.875rem",
-                padding: "0.25rem 0.5rem",
+                fontSize: "0.800rem",
+                padding: "0.10rem 0.5rem",
                 cursor: isDisabled ? "not-allowed" : "pointer",
               }}
               onClick={() => handleConvert(row.original)}
               disabled={isDisabled}
             >
-              Convert
+              Generate
             </Button>
           );
         },
@@ -625,16 +641,16 @@ const RepairsTable = () => {
         <Modal.Header closeButton>
           <Modal.Title>Orders Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{ fontSize:'13px' }}>
           {orderDetails && (
             <>
               <h5>Customer Info</h5>
               <Table bordered>
                 <tbody>
-                  <tr>
+                  {/* <tr>
                     <td>Customer ID</td>
                     <td>{orderDetails.uniqueData.customer_id}</td>
-                  </tr>
+                  </tr> */}
                   <tr>
                     <td>Mobile</td>
                     <td>{orderDetails.uniqueData.mobile}</td>
@@ -665,7 +681,7 @@ const RepairsTable = () => {
               <h5>Products</h5>
               <div className="table-responsive">
                 <Table bordered>
-                  <thead style={{whiteSpace:'nowrap'}}>
+                  <thead style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
                     <tr>
                       <th>Bar Code</th>
                       <th>Product Name</th>
@@ -683,7 +699,7 @@ const RepairsTable = () => {
                       <th>Worker Name</th>
                     </tr>
                   </thead>
-                  <tbody style={{whiteSpace:'nowrap'}}>
+                  <tbody style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
                     {orderDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>{product.code}</td>
@@ -706,6 +722,8 @@ const RepairsTable = () => {
                                 product.code,
                                 e.target.value
                               )}
+                              style={{fontSize:'13px',width:'120px' }}
+                              
                             >
                               <option value="">Select Worker</option>
                               {Array.isArray(accounts) && accounts.map((account, idx) => (
