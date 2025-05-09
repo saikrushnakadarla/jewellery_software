@@ -112,7 +112,7 @@ const useProductHandlers = () => {
 
   const getFreshFormData = (mobile) => ({
     id:'',
-    customer_id: "36",
+    customer_id: "",
     mobile: mobile,
     account_name: "",
     email: "",
@@ -1111,7 +1111,7 @@ const useProductHandlers = () => {
         const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
         if (tag) {
           // If the tag is marked as "Sold"
-          if (tag.Status === "Sold" || tag.Status === "Sale Returned") {
+          if (tag.Status === "Sold" || tag.Status === "Sale Returned" || tag.Status === "Reserved") {
             alert("The product is already sold out!");
             setFormData((prevData) => ({
               ...prevData,

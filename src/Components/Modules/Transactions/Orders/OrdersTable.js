@@ -160,12 +160,13 @@ const RepairsTable = () => {
                     handleEdit(
                       row.original.order_number,
                       row.original.mobile,
-                      row.original.old_exchange_amt,
-                      row.original.scheme_amt,
+                      // row.original.old_exchange_amt,
+                      // row.original.scheme_amt,
                       row.original.cash_amount,
                       row.original.card_amt,
                       row.original.chq_amt,
-                      row.original.online_amt
+                      row.original.online_amt,
+                      row.original.advance_amt,
                     );
                   }
                 }}
@@ -463,8 +464,11 @@ const RepairsTable = () => {
     cash_amount,
     card_amt,
     chq_amt,
-    online_amt
+    online_amt,
+    advance_amt
   ) => {
+
+    console.log("Advance Amt=",advance_amt)
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to edit this record?',
@@ -540,11 +544,12 @@ const RepairsTable = () => {
             chq_amt,
             online_amt,
             orderDetails: details,
+            advance_amt
           },
         });
 
         // Call handleDelete without confirmation
-        await handleDelete(order_number, true, true);
+        // await handleDelete(order_number, true, true);
       } catch (error) {
         console.error('Error fetching repair details:', error);
         Swal.fire('Error', 'Unable to fetch repair details. Please try again.', 'error');

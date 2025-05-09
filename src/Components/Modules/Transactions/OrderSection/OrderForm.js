@@ -88,6 +88,7 @@ const SalesForm = () => {
     webcamRef,
     setShowOptions,
     showOptions,
+    advance_amt
   } = useProductHandlers();
 
   useCalculations(formData, setFormData);
@@ -631,7 +632,7 @@ const SalesForm = () => {
       0
     );
 
-    const [advanceAmount, setAdvanceAmount] = useState("");
+    const [advanceAmount, setAdvanceAmount] = useState(advance_amt);
 
   // Calculate Net Payable Amount
   const payableAmount = netAmount - (schemeAmount + oldItemsAmount + salesAmountToPass + advanceAmount);

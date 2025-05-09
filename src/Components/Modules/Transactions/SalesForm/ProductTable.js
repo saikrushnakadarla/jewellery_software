@@ -107,7 +107,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
             ))
           ) : (
             <tr>
-              <td colSpan="19" className="text-center">
+              <td colSpan="19 " className="text-center">
                 No data available
               </td>
             </tr>
@@ -126,7 +126,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
               <td>
                 {repairDetails.reduce((sum, item) => sum + parseFloat(item.total_weight_av || 0), 0).toFixed(3)}
               </td>
-              <td colSpan="9"></td>
+              <td colSpan="10"></td>
             </tr>
           </tfoot>
         )}
