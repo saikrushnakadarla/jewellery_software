@@ -148,6 +148,7 @@ const useProductHandlers = () => {
       }
       const result = await response.json();
       setProducts(result);
+      console.log("Products=",result)
     } catch (error) {
       console.error('Error fetching products:', error);
     }

@@ -7,6 +7,7 @@ import axios from 'axios';
 import baseURL from '../../../../Url/NodeBaseURL';
 import Swal from 'sweetalert2';
 import PDFLayout from '../../Transactions/OrderSection/TaxInvoiceA4';
+import { pdf } from '@react-pdf/renderer';
 const RepairsTable = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -30,7 +31,7 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'S No.',
+        Header: 'SI',
         Cell: ({ row }) => row.index + 1,
       },
       {
@@ -54,7 +55,7 @@ const RepairsTable = () => {
         Header: 'Invoice No.',
         accessor: 'invoice_number',
       },
-      
+
       {
         Header: 'Total Amt',
         accessor: 'net_amount',
@@ -85,14 +86,14 @@ const RepairsTable = () => {
         accessor: 'net_bill_amount',
         Cell: ({ value }) => value || 0
       },
-      
+
       {
         Header: 'Paid Amt',
         accessor: 'paid_amt',
         Cell: ({ row }) => {
           const paid_amt = Number(row.original.paid_amt) || 0;
           const receipts_amt = Number(row.original.receipts_amt) || 0;
-          const totalPaid = (paid_amt + receipts_amt).toFixed(2);      
+          const totalPaid = (paid_amt + receipts_amt).toFixed(2);
           return totalPaid;
         },
       },
@@ -102,16 +103,16 @@ const RepairsTable = () => {
         Cell: ({ row }) => {
           const bal_amt = Number(row.original.bal_amt) || 0;
           const bal_after_receipts = Number(row.original.bal_after_receipts) || 0;
-          const receipts_amt = Number(row.original.receipts_amt) || 0;      
+          const receipts_amt = Number(row.original.receipts_amt) || 0;
           let finalBalance;
           if (bal_amt === receipts_amt) {
             finalBalance = bal_after_receipts || 0;
           } else {
             finalBalance = bal_after_receipts ? bal_after_receipts : bal_amt || 0;
-          }      
+          }
           return finalBalance.toFixed(2);
         },
-      }, 
+      },
       // {
       //   Header: 'Status',
       //   accessor: 'status',
@@ -140,7 +141,7 @@ const RepairsTable = () => {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => {
-          const isEditDisabled = row.original.invoice === "Converted"; // Check if the invoice is "Converted"
+          const isEditDisabled = row.original.invoice === "Converted";
 
           return (
             <div>
@@ -188,18 +189,21 @@ const RepairsTable = () => {
         Header: 'Invoice',
         accessor: 'convert',
         Cell: ({ row }) => {
-          const isDisabled = row.original.invoice; // Use extracted invoice status
+          const isDisabled = row.original.invoice;
           return (
             <Button
               style={{
                 backgroundColor: isDisabled ? "#ccc" : "#28a745",
                 borderColor: isDisabled ? "#ccc" : "#28a745",
+                // backgroundColor: "#28a745",
+                // borderColor: "#28a745",
                 fontSize: "0.800rem",
                 padding: "0.10rem 0.5rem",
                 cursor: isDisabled ? "not-allowed" : "pointer",
+                // cursor: "pointer",
               }}
               onClick={() => handleConvert(row.original)}
-              disabled={isDisabled}
+            disabled={isDisabled}
             >
               Generate
             </Button>
@@ -211,143 +215,161 @@ const RepairsTable = () => {
     []
   );
 
- 
- // Initialize missing variables as state
- const [formData, setFormData] = useState({});
- const [repairDetails, setRepairDetails] = useState({});
- const [paymentDetails, setPaymentDetails] = useState({});
- const [taxAmount, setTaxAmount] = useState(0);
- const [discountAmt, setDiscountAmt] = useState(0);
- const [oldItemsAmount, setOldItemsAmount] = useState(0);
- const [schemeAmount, setSchemeAmount] = useState(0);
- const [netPayableAmount, setNetPayableAmount] = useState(0);
 
- const fetchOrderDetails = async (orderNumber) => {
-   try {
-     const response = await axios.get(`${baseURL}/invoice/${orderNumber}`);
-     if (response.data.success) {
-       // Assign values based on the API response or some other source
-       setFormData(response.data.formData);
-       setRepairDetails(response.data.repairDetails);
-       setPaymentDetails(response.data.paymentDetails);
-       setTaxAmount(response.data.taxAmount);
-       setDiscountAmt(response.data.discountAmt);
-       setOldItemsAmount(response.data.oldItemsAmount);
-       setSchemeAmount(response.data.schemeAmount);
-       setNetPayableAmount(response.data.netPayableAmount);
-     }
-   } catch (error) {
-     console.error("Error fetching order details:", error);
-   }
- };
+  // Initialize missing variables as state
+  const [formData, setFormData] = useState({});
+  const [repairDetails, setRepairDetails] = useState({});
+  const [paymentDetails, setPaymentDetails] = useState({});
+  const [taxAmount, setTaxAmount] = useState(0);
+  const [discountAmt, setDiscountAmt] = useState(0);
+  const [oldItemsAmount, setOldItemsAmount] = useState(0);
+  const [schemeAmount, setSchemeAmount] = useState(0);
+  const [netPayableAmount, setNetPayableAmount] = useState(0);
 
- const handleConvert = async (order) => {
-   const result = await Swal.fire({
-     title: 'Are you sure?',
-     text: 'Do you want to convert this sale order to an invoice?',
-     icon: 'warning',
-     showCancelButton: true,
-     confirmButtonColor: '#3085d6',
-     cancelButtonColor: '#d33',
-     confirmButtonText: 'Yes, convert it!',
-     cancelButtonText: 'No, cancel',
-   });
-
-   // If the user confirms, proceed with the conversion
-   if (result.isConfirmed) {
-     try {
-       const response = await axios.post(`${baseURL}/convert-order`, {
-         order_number: order.order_number,
-       });
-
-       if (response.data.success) {
-         Swal.fire('Converted!', 'Order has been converted to invoice.', 'success'); // Success message
-
-         // Fetch the invoice number after conversion
-         const invoiceResponse = await axios.get(`${baseURL}/invoice/${order.order_number}`);
-
-         if (invoiceResponse.data.success) {
-           const invoiceNumber = invoiceResponse.data.invoice_number;
-
-           // Generate PDF Blob
-           const pdfDoc = (
-             <PDFLayout
-               formData={formData}
-               repairDetails={repairDetails}
-               cash_amount={paymentDetails.cash_amount || 0}
-               card_amt={paymentDetails.card_amt || 0}
-               chq_amt={paymentDetails.chq_amt || 0}
-               online_amt={paymentDetails.online_amt || 0}
-               taxAmount={taxAmount}
-               discountAmt={discountAmt}
-               oldItemsAmount={oldItemsAmount}
-               schemeAmount={schemeAmount}
-               netPayableAmount={netPayableAmount}
-             />
-           );
-
-           // Assuming you have a function to generate and download the PDF
-           const pdfBlob = generatePDF(pdfDoc);
-           downloadPDF(pdfBlob, `${invoiceNumber}.pdf`);
-         }
-       }
-
-       // Additional logic to update state or re-fetch data
-       fetchRepairs(); // Refresh the list of repairs
-     } catch (error) {
-       console.error('Error converting order:', error);
-       Swal.fire('Error', 'Unable to convert the order. Please try again.', 'error'); // Error message
-     }
-   } else {
-     Swal.fire('Cancelled', 'Order conversion has been cancelled.', 'info'); // Cancellation message
-   }
- };
-
- // Add the generatePDF and downloadPDF helper functions here
- const generatePDF = (pdfDoc) => {
-   // Implement PDF generation logic here (e.g., using react-pdf or jsPDF)
-   const pdfBlob = new Blob([pdfDoc], { type: 'application/pdf' });
-   return pdfBlob;
- };
-
- const downloadPDF = (pdfBlob, filename) => {
-   const link = document.createElement('a');
-   link.href = URL.createObjectURL(pdfBlob);
-   link.download = filename;
-   link.click();
- };
+  //  const fetchOrderDetails = async (orderNumber) => {
+  //    try {
+  //      const response = await axios.get(`${baseURL}/invoice/${orderNumber}`);
+  //      console.log("Order details=",response)
+  //      if (response.data.success) {
+  //        // Assign values based on the API response or some other source
+  //        setFormData(response.data.formData);
+  //        setRepairDetails(response.data.repairDetails);
+  //        setPaymentDetails(response.data.paymentDetails);
+  //        setTaxAmount(response.data.taxAmount);
+  //        setDiscountAmt(response.data.discountAmt);
+  //        setOldItemsAmount(response.data.oldItemsAmount);
+  //        setSchemeAmount(response.data.schemeAmount);
+  //        setNetPayableAmount(response.data.netPayableAmount);
+  //      }
+  //    } catch (error) {
+  //      console.error("Error fetching order details:", error);
+  //    }
+  //  };
+  //  useEffect(() => {
+  //   fetchOrderDetails();
+  // }, []);
 
 
- const handleStatusChange = async (orderNumber, newStatus) => {
-  try {
-    console.log("Sending Request with:", { order_number: orderNumber, order_status: newStatus }); // Debugging
-
-    // Make the PUT request to update the status in the backend
-    const response = await axios.put(`${baseURL}/update-order-status`, {
-      order_number: orderNumber,
-      order_status: newStatus,
+  const handleConvert = async (order) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to convert this sale order to an invoice?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, convert it!',
+      cancelButtonText: 'No, cancel',
     });
 
-    if (response.status === 200) {
-      // Update the local state with the new status
-      setData((prevData) =>
-        prevData.map((item) =>
-          item.order_number === orderNumber ? { ...item, order_status: newStatus } : item
-        )
-      );
+    // If the user confirms, proceed with the conversion
+    if (result.isConfirmed) {
+      try {
+        const response = await axios.post(`${baseURL}/convert-order`, {
+          order_number: order.order_number,
+        });
 
-      Swal.fire("Success", "Order status updated successfully.", "success");
+        if (response.data.success) {
+          Swal.fire('Converted!', 'Order has been converted to invoice.', 'success'); // Success message
+
+          // Fetch the invoice number after conversion
+          const invoiceResponse = await axios.get(`${baseURL}/invoice/${order.order_number}`);
+
+          
+
+          if (invoiceResponse.data.success) {
+            const invoiceData = invoiceResponse.data.data;
+            const invoiceNumber = invoiceData.invoice_number;
+
+            console.log("Order details=", invoiceData)
+
+            setRepairDetails(invoiceData);
+
+            // Generate PDF Blob
+            const pdfDoc = (
+              <PDFLayout
+                repairDetails={invoiceData} 
+              />
+            );
+
+            
+
+            const pdfBlob = await pdf(pdfDoc).toBlob();
+            await handleSavePDFToServer(pdfBlob, invoiceNumber);
+
+            // Create a download link and trigger it
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(pdfBlob);
+            link.download = `${invoiceNumber}.pdf`;
+            link.click();
+
+            // Clean up
+            URL.revokeObjectURL(link.href);
+          }
+        }
+
+        // Additional logic to update state or re-fetch data
+        fetchRepairs(); // Refresh the list of repairs
+      } catch (error) {
+        console.error('Error converting order:', error);
+        Swal.fire('Error', 'Unable to convert the order. Please try again.', 'error'); // Error message
+      }
     } else {
-      Swal.fire("Error", "Failed to update the order status.", "error");
+      Swal.fire('Cancelled', 'Order conversion has been cancelled.', 'info'); // Cancellation message
     }
-  } catch (error) {
-    console.error("Error updating order status:", error.response?.data || error.message);
+  };
 
-    Swal.fire("Error", "An error occurred while updating the order status.", "error");
-  }
-};
+  const handleSavePDFToServer = async (pdfBlob, invoiceNumber) => {
+    const formData = new FormData();
+    formData.append("invoice", pdfBlob, `${invoiceNumber}.pdf`);
 
-  
+    try {
+      const response = await fetch(`${baseURL}/upload-invoice`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload invoice");
+      }
+
+      console.log(`Invoice ${invoiceNumber} saved on server`);
+    } catch (error) {
+      console.error("Error uploading invoice:", error);
+    }
+  };
+
+
+  const handleStatusChange = async (orderNumber, newStatus) => {
+    try {
+      console.log("Sending Request with:", { order_number: orderNumber, order_status: newStatus }); // Debugging
+
+      // Make the PUT request to update the status in the backend
+      const response = await axios.put(`${baseURL}/update-order-status`, {
+        order_number: orderNumber,
+        order_status: newStatus,
+      });
+
+      if (response.status === 200) {
+        // Update the local state with the new status
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.order_number === orderNumber ? { ...item, order_status: newStatus } : item
+          )
+        );
+
+        Swal.fire("Success", "Order status updated successfully.", "success");
+      } else {
+        Swal.fire("Error", "Failed to update the order status.", "error");
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error.response?.data || error.message);
+
+      Swal.fire("Error", "An error occurred while updating the order status.", "error");
+    }
+  };
+
+
   const fetchRepairs = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-order-details`);
@@ -468,7 +490,7 @@ const RepairsTable = () => {
     advance_amt
   ) => {
 
-    console.log("Advance Amt=",advance_amt)
+    console.log("Advance Amt=", advance_amt)
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to edit this record?',
@@ -513,18 +535,18 @@ const RepairsTable = () => {
           order_number, // Ensure the order_number is explicitly included
         }));
 
-          // Format old items details with today's date
-          const formattedOldItems = oldItemsDetails.map((item) => ({
-            ...item,
-            date: today,
-            order_number, // Ensure invoice_number is included
-          }));
+        // Format old items details with today's date
+        const formattedOldItems = oldItemsDetails.map((item) => ({
+          ...item,
+          date: today,
+          order_number, // Ensure invoice_number is included
+        }));
 
         // Combine existing details with the new ones
         const updatedDetails = [...existingDetails, ...formattedDetails];
 
-         // Combine existing old items with new ones
-         const updatedOldItems = [...existingOldItems, ...formattedOldItems];
+        // Combine existing old items with new ones
+        const updatedOldItems = [...existingOldItems, ...formattedOldItems];
 
         // Save updated details back to localStorage
         localStorage.setItem('orderDetails', JSON.stringify(updatedDetails));
@@ -646,7 +668,7 @@ const RepairsTable = () => {
         <Modal.Header closeButton>
           <Modal.Title>Orders Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ fontSize:'13px' }}>
+        <Modal.Body style={{ fontSize: '13px' }}>
           {orderDetails && (
             <>
               <h5>Customer Info</h5>
@@ -686,7 +708,7 @@ const RepairsTable = () => {
               <h5>Products</h5>
               <div className="table-responsive">
                 <Table bordered>
-                  <thead style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
+                  <thead style={{ whiteSpace: 'nowrap', fontSize: '13px' }}>
                     <tr>
                       <th>Bar Code</th>
                       <th>Product Name</th>
@@ -704,7 +726,7 @@ const RepairsTable = () => {
                       <th>Worker Name</th>
                     </tr>
                   </thead>
-                  <tbody style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
+                  <tbody style={{ whiteSpace: 'nowrap', fontSize: '13px' }}>
                     {orderDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>{product.code}</td>
@@ -727,8 +749,8 @@ const RepairsTable = () => {
                                 product.code,
                                 e.target.value
                               )}
-                              style={{fontSize:'13px',width:'120px' }}
-                              
+                              style={{ fontSize: '13px', width: '120px' }}
+
                             >
                               <option value="">Select Worker</option>
                               {Array.isArray(accounts) && accounts.map((account, idx) => (

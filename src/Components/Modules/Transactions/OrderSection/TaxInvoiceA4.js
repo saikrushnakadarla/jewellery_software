@@ -1,12 +1,10 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
-import logo1 from '../../../Pages/Login/Logo/logo_dark.png'
+import logo1 from '../../../../Navbar/sadashri.png'
 import { toWords } from "number-to-words";
+import QRCode from "qrcode";
+import baseURL from '../../../../Url/NodeBaseURL';
 
-
-
-// Define styles
 const styles = StyleSheet.create({
         page: {
                 padding: 5,
@@ -49,7 +47,7 @@ const styles = StyleSheet.create({
         container: {
                 flex: 1,
                 // justifyContent: 'center', 
-                alignItems: 'center',  // Centers the content horizontally
+                alignrepairDetailss: 'center',  // Centers the content horizontally
                 padding: 20,
                 marginTop: -60,
         },
@@ -61,7 +59,7 @@ const styles = StyleSheet.create({
         },
         contentContainer: {
                 flexDirection: 'row',  // Side by side layout
-                alignItems: 'center',
+                alignrepairDetailss: 'center',
                 justifyContent: 'center',
                 borderBottomWidth: 1,  // Horizontal line under both sections
                 borderColor: 'black',
@@ -162,22 +160,22 @@ const styles = StyleSheet.create({
                 marginTop: '-4'
         },
         tableCellPurity: {
-                width: '8%',
+                width: '10%',
                 textAlign: 'left',
                 marginTop: '-4'
         },
         tableCellGrossWt: {
-                width: '11%',
+                width: '10%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
         tableCellStoneWt: {
-                width: '11%',
+                width: '10%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
         tableCellNetWt: {
-                width: '11%',
+                width: '10%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
@@ -187,12 +185,12 @@ const styles = StyleSheet.create({
                 marginTop: '-4'
         },
         tableCellMC: {
-                width: '8%',
+                width: '10%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
         tableCellStAmt: {
-                width: '10%',
+                width: '9%',
                 textAlign: 'right',
                 marginTop: '-4'
         },
@@ -206,96 +204,98 @@ const styles = StyleSheet.create({
                 height: 28,
                 // marginTop:'10'
         },
+        qrCodeContainer: {
+                alignrepairDetailss: "center",
+                marginTop: 10,
+                marginBottom: 10,
+        },
+        qrCode: {
+                width: 100,
+                height: 100,
+        },
 });
 
-
-const TaxINVoiceReceipt = ({
-        formData,
-        orderDetails,
-        cash_amount,
-        card_amt,
-        chq_amt,
-        online_amt,
-        taxAmount,
-        oldItemsAmount,
-        schemeAmount,
-        netPayableAmount,
-      }) => {
-        // Calculate total values
-        const totalValues = orderDetails.reduce(
-                (totals, item) => {
-                        return {
-                                qty: totals.qty + Number(item.qty || 0),
-                                grossWeight: totals.grossWeight + Number(item.gross_weight || 0),
-                                stoneWeight: totals.stoneWeight + Number(item.stone_weight || 0),
-                                netWeight: totals.netWeight + Number(item.weight_bw || 0),
-                                rate: totals.rate + Number(item.rate || 0),
-                                makingCharges: totals.makingCharges + Number(item.making_charges || 0),
-                                stonePrice: totals.stonePrice + Number(item.stone_price || 0),
-                                rateAmount: totals.rateAmount + Number(item.rate_amt || 0),
-                        };
-                },
-                {
-                        qty: 0,
-                        grossWeight: 0,
-                        stoneWeight: 0,
-                        netWeight: 0,
-                        rate: 0,
-                        makingCharges: 0,
-                        stonePrice: 0,
-                        rateAmount: 0,
+const TaxINVoiceReceipt = ({ repairDetails, }) => {
+        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const formatDate = (dateString) => {
+                if (!dateString) return "";
+                const date = new Date(dateString);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+                const year = date.getFullYear();
+                return `${day}-${month}-${year}`;
+        };
+        const netBillValueInWords = toWords(repairDetails?.net_bill_amount ?? 0).replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
+        const [loading, setLoading] = useState(true); // State for loading
+        const [error, setError] = useState(null); // State for error handling
+        const [data, setData] = useState([]); // State to store table data
+        const fetchProducts = async () => {
+                try {
+                        const response = await fetch(`${baseURL}/get/products`);
+                        if (!response.ok) {
+                                throw new Error('Failed to fetch products');
+                        }
+                        const result = await response.json();
+                        setData(result);
+                        console.log("result=",result)
+                } catch (error) {
+                        setError(error.message);
+                } finally {
+                        setLoading(false);
                 }
-        );
-        const netBillValue = totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount;
+        };
 
-    // Convert the value into words
-    const netBillValueInWords = toWords(netBillValue).replace(/(^\w|\s\w)/g, m => m.toUpperCase()); // Capitalize words
+        useEffect(() => {
+                fetchProducts();
+        }, []);
+
+        // const matchedProduct = data.product_name === repairDetails.category;
+        const matchedProduct = data.find(product => product.product_name === repairDetails.category);
+        console.log("matchedProduct=",matchedProduct)
+
 
         return (
                 <Document>
                         <Page size="A4" style={styles.page}>
                                 {/* First Row */}
                                 <View style={styles.row}>
-                                        <View style={[styles.column, { marginTop: 20, width: '20%', marginLeft: 20, fontFamily: 'Times-Bold' }]}>
+                                        <View style={[styles.column, { marginTop: 20, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
                                                 <Text style={[styles.boldText, { marginBottom: 5 }]}>CUSTOMER DETAILS:</Text>
-                                                <Text style={{ marginBottom: 5 }}>{formData.account_name}</Text>
-
-                                                <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
-                                                <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
-                                                <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text>
+                                                <Text style={{ marginBottom: 5 }}>{repairDetails.account_name || ""},</Text>
+                                                <Text style={{ marginBottom: 5 }}>{repairDetails.city}</Text>
+                                                <Text style={{ marginBottom: 5 }}>MOBILE: {repairDetails.mobile}</Text>
+                                                <Text style={{ marginBottom: 5 }}>PAN NO: {repairDetails.pan_card}</Text>
                                         </View>
 
-                                        <View style={[styles.column, { width: '40%' }]}>
-                                                <Image
-                                                        style={styles.image1}
-                                                        src={logo1}
-                                                />
-                                        </View>
-                                        <View style={[styles.column, { width: '10%' }]}>
-
-                                                {/* <Image
-                                                        style={styles.image2}
-                                                        src={logo2}
-                                                /> */}
+                                        <View style={[styles.column, { width: "40%" }]}>
+                                                <Image style={styles.image1} src={logo1} />
                                         </View>
 
-                                        <View style={[styles.column, { marginTop: 0, width: '20%', marginLeft: 20, fontFamily: 'Times-Bold' }]}>
-                                                {/* <Text style={{ fontWeight: 'bold', fontSize: 12, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text> */}
-                                                {/* <View style={{ alignItems: 'center', marginBottom: 10 }}>
-                                                        <Barcode value="SV1224" format="CODE128" width={1.5} height={50} />
-                                                </View> */}
+                                        <View style={[styles.column, { width: "10%" }]}></View>
+
+                                        <View style={[styles.column, { marginTop: 0, width: "20%", marginLeft: 20, fontFamily: "Times-Bold" }]}>
+                                                <Text style={{ fontWeight: "bold", fontSize: 12, marginBottom: 10, marginLeft: 20 }}>TAX INVOICE</Text>
 
                                                 {/* BILL NO */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>BILL NO:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.invoice_number}</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>{repairDetails.invoice_number}</Text>
                                                 </View>
 
                                                 {/* DATE */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>DATE:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formData.date}</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>{formatDate(repairDetails.date)}</Text>
                                                 </View>
+
+
+                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                                                        <Text>TIME:</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>
+                                                                {currentTime}
+                                                        </Text>
+                                                </View>
+
 
                                                 {/* STAFF */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
@@ -309,9 +309,7 @@ const TaxINVoiceReceipt = ({
                                                         <Text style={{ textAlign: "right", flex: 1 }}>29ABMCS9253K1ZG</Text>
                                                 </View>
                                         </View>
-
                                 </View>
-
 
 
                                 <View style={styles.container}>
@@ -345,7 +343,7 @@ const TaxINVoiceReceipt = ({
                                         {/* Horizontal Divider under both sections */}
                                         <View style={styles.horizontalLine1} />
 
-                                        <View>
+                                        <View style={{ textAlign: 'center' }}>
                                                 <Text>
                                                         Mob : 9964644424 EMAIL : sadashri.Yel@gmail.com
                                                 </Text>
@@ -399,64 +397,73 @@ const TaxINVoiceReceipt = ({
                                                         <View style={styles.horizontalLine} />
 
                                                         {/* Add rows of data below */}
-                                                        {orderDetails.map((item, index) => (
-                                                                <View style={[styles.tableRow, { fontFamily: 'Times-Roman' }]} key={index}>
-                                                                        <Text style={[styles.tableCell, styles.tableCellHeader]}>{index + 1}</Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellDescription]}>
-                                                                                {item.product_name || "N/A"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                        <View style={[styles.tableRow, { fontFamily: 'Times-Roman' }]} >
+                                                                <Text style={[styles.tableCell, styles.tableCellHeader]}>1</Text>
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellHSN]}>{item.hsn_code}</Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <Text style={[styles.tableCell, styles.tableCellDescription]}>
+                                                                        {repairDetails.metal_type || "N/A"}-{repairDetails.product_name || "N/A"}
+                                                                </Text>
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellQty]}>
-                                                                                {item.qty || "0"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <Text style={[styles.tableCell, styles.tableCellHSN]}>{matchedProduct?.hsn_code || "N/A"}</Text>
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellPurity]}>
-                                                                                {item.purity || "N/A"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <Text style={[styles.tableCell, styles.tableCellQty]}>
+                                                                        {repairDetails.qty || "0"}
+                                                                </Text>
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <Text style={[styles.tableCell, styles.tableCellPurity]}>
+                                                                        {repairDetails.purity || "0.00"}
+                                                                </Text>
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellGrossWt]}>
-                                                                                {item.gross_weight || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellStoneWt]}>
-                                                                                {item.stone_weight || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <Text style={[styles.tableCell, styles.tableCellGrossWt]}>
+                                                                        {repairDetails.gross_weight || "0.000"}
+                                                                </Text>
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellNetWt]}>
-                                                                                {item.total_weight_av || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellRate]}>
-                                                                                {item.rate || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <Text style={[styles.tableCell, styles.tableCellStoneWt]}>
+                                                                        {repairDetails.stone_weight || "0.000"}
+                                                                </Text>
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellMC]}>
-                                                                                {item.making_charges || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <Text style={[styles.tableCell, styles.tableCellNetWt]}>
+                                                                        {repairDetails.total_weight_av || "0.000"}
+                                                                </Text>
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellStAmt]}>
-                                                                                {item.stone_price || "0.00"}
-                                                                        </Text>
-                                                                        <View style={[styles.divider1, { marginTop: -2 }]} />
+                                                                <Text style={[styles.tableCell, styles.tableCellRate]}>
+                                                                        {/* {repairDetails.rate || "0.00"} */}
+                                                                        {repairDetails.pieace_cost ? repairDetails.pieace_cost : repairDetails.rate}
+                                                                </Text>
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
 
-                                                                        <Text style={[styles.tableCell, styles.tableCellTotal]}>
-                                                                                {(parseFloat(item.rate_amt || 0) + parseFloat(item.stone_price || 0) + parseFloat(item.making_charges || 0)).toFixed(2) || "0.00"}
-                                                                        </Text>
-                                                                </View>
-                                                        ))}
+                                                                <Text style={[styles.tableCell, styles.tableCellMC]}>
+                                                                        {repairDetails.mc_per_gram != null && repairDetails.mc_per_gram !== ""
+                                                                                ? (['gold', 'diamond', 'others'].includes(repairDetails.metal_type?.toLowerCase())
+                                                                                        ? `${parseFloat(repairDetails.mc_per_gram)} %`
+                                                                                        : parseFloat(repairDetails.mc_per_gram))
+                                                                                : ''}
+                                                                </Text>
+
+
+
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
+
+                                                                <Text style={[styles.tableCell, styles.tableCellStAmt]}>
+                                                                        {repairDetails.stone_price || "0.00"}
+                                                                </Text>
+                                                                <View style={[styles.divider1, { marginTop: -2 }]} />
+
+                                                                <Text style={[styles.tableCell, styles.tableCellTotal]}>
+                                                                        {(parseFloat(repairDetails.rate_amt || 0) + parseFloat(repairDetails.stone_price || 0) + parseFloat(repairDetails.making_charges || 0)) || "0.00"}
+                                                                </Text>
+                                                        </View>
+
 
 
                                                 </View>
@@ -468,32 +475,32 @@ const TaxINVoiceReceipt = ({
                                                         <Text style={[styles.tableCell, styles.tableCellDescription, styles.lastheight]}></Text>
                                                         <Text style={[styles.tableCell, styles.tableCellHSN, styles.lastheight]}></Text>
                                                         <Text style={[styles.tableCell, styles.tableCellQty, styles.lastheight]}>
-                                                                {Math.round(totalValues.qty)}
+                                                                {repairDetails.qty}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellPurity, styles.lastheight]}></Text>
                                                         <Text style={[styles.tableCell, styles.tableCellGrossWt, styles.lastheight]}>
-                                                                {totalValues.grossWeight.toFixed(2)}
+                                                                {repairDetails.gross_weight}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellStoneWt, styles.lastheight]}>
-                                                                {/* {totalValues.stoneWeight.toFixed(2)} */}
+                                                                {/* {totalValues.stoneWeight} */}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellNetWt, styles.lastheight]}>
-                                                                {totalValues.netWeight.toFixed(2)}
+                                                                {repairDetails.total_weight_av}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellRate, styles.lastheight]}>
-                                                                {/* {totalValues.rate.toFixed(2)} */}
+                                                                {/* {totalValues.rate} */}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellMC, styles.lastheight]}>
-                                                                {/* {totalValues.makingCharges.toFixed(2)} */}
+                                                                {/* {totalValues.makingCharges} */}
                                                         </Text>
                                                         <Text style={[styles.tableCell, styles.tableCellStAmt, styles.lastheight]}>
-                                                                {/* {totalValues.stonePrice.toFixed(2)} */}
+                                                                {/* {totalValues.stonePrice} */}
                                                         </Text>
                                                         {/* <Text style={[styles.tableCell, styles.tableCellTotal, styles.lastheight]}>
-                                                                {totalValues.rateAmount.toFixed(2)}
+                                                                {totalValues.rateAmount}
                                                         </Text> */}
                                                         <Text style={[styles.tableCell, styles.tableCellTotal, styles.lastheight]}>
-                                                                {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice).toFixed(2)}
+                                                                {(parseFloat(repairDetails.rate_amt || 0) + parseFloat(repairDetails.stone_price || 0) + parseFloat(repairDetails.making_charges || 0)) || "0.00"}
                                                         </Text>
                                                 </View>
 
@@ -503,91 +510,124 @@ const TaxINVoiceReceipt = ({
 
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", fontFamily: 'Times-Bold' }}>
                                                         {/* Left Side Content */}
-                                                        
+
                                                         <View style={{ paddingLeft: 10, marginTop: 20 }}>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>
-                                                                Cash Recd: {cash_amount ?? "0.00"}
+                                                                        Cash Recd: {Number(repairDetails.cash_amount || 0)}
                                                                 </Text>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>
-                                                                Card Recd: {card_amt ?? "0.00"}
+                                                                        Card Recd: {Number(repairDetails.card_amt || 0)}
                                                                 </Text>
                                                                 <Text style={[styles.bold, { marginBottom: 3 }]}>
-                                                                Cheque Recd: {chq_amt ?? "0.00"}
+                                                                        Cheque Recd: {Number(repairDetails.chq_amt || 0)}
                                                                 </Text>
                                                                 <Text style={[styles.bold]}>
-                                                                NEFT Recd: {online_amt ?? "0.00"} #: Bank:
+                                                                        NEFT Recd: {Number(repairDetails.online_amt || 0)} #: Bank:
                                                                 </Text>
-                                                        </View>
+                                                                <Text style={[styles.bold]}>
+                                                                        Balance Amount:{" "}
+                                                                        {(
+                                                                                Number(repairDetails.net_bill_amount || 0) -
+                                                                                (
+                                                                                        Number(repairDetails.cash_amount || 0) +
+                                                                                        Number(repairDetails.chq_amt || 0) +
+                                                                                        Number(repairDetails.card_amt || 0) +
+                                                                                        Number(repairDetails.online_amt || 0)
+                                                                                )
+                                                                        ).toFixed(2)}
+                                                                </Text>
 
-                                                        
-                                                        {/* {orderDetails.map((item, index) => ( */}
+                                                                {/* <Text style={{ fontWeight: 'bold', fontSize: '15px', color: 'green', marginLeft: '190px', marginTop: '15px' }}>
+                                                                        Fest Discount: {festivalDiscountAmt}
+                                                                </Text> */}
+                                                        </View>
+                                                        {/* {repairDetails.map((repairDetails, index) => ( */}
                                                         <View style={{ paddingRight: 10, marginTop: 5 }}>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text>Discount:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>0</Text>
-                                                                </View>
-                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text>GST Value:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>
-                                                                                {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice).toFixed(2)}
+                                                                        <Text style={{ marginRight: "10px" }}>(-) Discount:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{repairDetails?.discount ?? '0.00'}
                                                                         </Text>
                                                                 </View>
+                                                                {/* <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                        <Text style={{ marginRight: "10px" }}>(-) Fest Discount:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{repairDetails.festivalDiscountAmt}</Text>
+                                                                </View> */}
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text>CGST @1.50%:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>GST Value:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                                {(taxAmount / 2).toFixed(2)}
-                                                                        </Text>
-                                                                        </View>
-                                                                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text>SGST @1.50%:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>
-                                                                                {(taxAmount / 2).toFixed(2)}
+                                                                                {repairDetails.taxable_amount}
                                                                         </Text>
                                                                 </View>
 
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={[styles.bold]}>Net Bill Value: </Text>
+                                                                        <Text style={{ marginRight: "10px" }}>CGST @1.50%:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                        {/* {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount).toFixed(2)} */}
-                                                                        {netBillValue.toFixed(2)}
+                                                                                {(repairDetails.tax_amount / 2)}
+                                                                        </Text>
+                                                                </View>
+                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                        <Text style={{ marginRight: "10px" }}>SGST @1.50%:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>
+                                                                                {(repairDetails.tax_amount / 2)}
+                                                                        </Text>
+                                                                </View>
+
+                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                        <Text style={{ marginRight: "10px" }} >Net Bill Value: </Text>
+                                                                        <Text style={{ textAlign: "right" }}>
+                                                                                {/* {(totalValues.rateAmount + totalValues.makingCharges + totalValues.stonePrice + taxAmount)} */}
+                                                                                {repairDetails.net_amount}
                                                                         </Text>
 
                                                                 </View>
+
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text>(-) OLD:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>{oldItemsAmount.toFixed(2)}</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>(-) OLD:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{repairDetails.old_exchange_amt}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text>(-) SCHEME:</Text>
-                                                                        <Text style={{ textAlign: "right" }}>{schemeAmount.toFixed(2)}</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>(-) SCHEME:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{repairDetails.scheme_amt}</Text>
                                                                 </View>
                                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
-                                                                        <Text style={[styles.bold]}>Net Amount:</Text>
+                                                                        <Text style={{ marginRight: "10px" }}>(-) SALE RETURN:</Text>
+                                                                        <Text style={{ textAlign: "right" }}>{repairDetails.sale_return_amt}</Text>
+                                                                </View>
+                                                                <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                                                        <Text style={{ marginRight: "10px" }}>Net Amount:</Text>
                                                                         <Text style={{ textAlign: "right" }}>
-                                                                        {netPayableAmount.toFixed(2)}
+                                                                                {repairDetails.net_bill_amount}
                                                                         </Text>
                                                                 </View>
+
+
                                                         </View>
 
 
                                                 </View>
-                                                <View style={{ alignItems: "center", fontFamily: 'Times-Bold' }}>
-                                                <Text>
-                                                        (Rupees {netBillValueInWords} Only)
-                                                </Text>
+                                                <View style={{ textAlign: "center", fontFamily: 'Times-Bold' }}>
+                                                        <Text>
+                                                                (Rupees {netBillValueInWords} Only)
+                                                        </Text>
                                                 </View>
 
                                                 <View style={{ flexDirection: "row", marginTop: 20, justifyContent: "space-between", marginBottom: 3, fontFamily: 'Times-Bold' }}>
                                                         {/* Left Side */}
-                                                        <View style={{ alignItems: "flex-start", paddingLeft: 10 }}>
+                                                        <View style={{ alignrepairDetailss: "flex-start", paddingLeft: 10 }}>
                                                                 <Text style={[styles.bold]}>For Customer</Text>
                                                         </View>
 
                                                         {/* Right Side */}
-                                                        <View style={{ alignItems: "flex-end", paddingRight: 10 }}>
+                                                        <View style={{ alignrepairDetailss: "flex-end", paddingRight: 10 }}>
                                                                 <Text style={[styles.bold]}>For SADASHRI VENTURES PRIVATE LIMITED</Text>
                                                         </View>
+
                                                 </View>
+
+                                                {/* <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                                                        {qrCodeUrl && <Image style={styles.qrCode} src={qrCodeUrl} />}
+                                                </View> */}
+
 
 
 
@@ -595,7 +635,7 @@ const TaxINVoiceReceipt = ({
 
                                 </View>
 
-                                <View></View>
+
                         </Page>
                 </Document>
         );
