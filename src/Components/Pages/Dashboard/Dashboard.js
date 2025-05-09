@@ -101,8 +101,11 @@ function Dashboard() {
     window.open(url, "_blank");
   };
 
-  const handleNavigate = () => {
+  const handleClickPayables = () => {
     navigate('/purchaseBalanceReport');
+  };
+  const handleClickReceivables = () => {
+    navigate('/salesBalanceReport');
   };
 
 
@@ -279,10 +282,10 @@ function Dashboard() {
               New
             </a>
           </div>
-          <div className="metric-card">
+          <div className="metric-card"  onClick={handleClickReceivables} style={{ cursor: 'pointer' }}>
             <Receivables selectedCustomerMobile={selectedMobile} />
           </div>
-          <div className="metric-card" onClick={handleNavigate} style={{ cursor: 'pointer' }}>
+          <div className="metric-card" onClick={handleClickPayables} style={{ cursor: 'pointer' }}>
             <Payables selectedCustomerMobile={selectedMobile} />
           </div>
         </div>

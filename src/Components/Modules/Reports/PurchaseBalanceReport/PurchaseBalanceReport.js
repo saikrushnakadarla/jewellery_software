@@ -99,39 +99,58 @@ const RepairsTable = () => {
   ], []);
 
 
-  const renderRowSubComponent = ({ row }) => (
-    <div className="p-3">
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-          <th>Days</th>
-            <th>Date</th>
-            <th>Invoice No.</th>
-            <th>Total Amount</th>
-            <th>Balance Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {row.original.invoices.map((inv, index) => {
-            const invoiceDate = new Date(inv.date);
-            const currentDate = new Date();
-            const timeDiff = currentDate - invoiceDate;
-            const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return `${String(date.getDate()).padStart(2, '0')}-${String(
+      date.getMonth() + 1
+    ).padStart(2, '0')}-${date.getFullYear()}`;
+  };
 
-            return (
+
+  const renderRowSubComponent = ({ row }) => {
+    const calculateDaysDifference = (dateString) => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const today = new Date();
+
+      date.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+
+      const diffTime = today - date;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays + 1;
+    };
+
+    return (
+      <div className="p-3">
+        <table className="table table-bordered">
+          <thead>
+            <tr>
+              <th>Days</th>
+              <th>Date</th>
+              <th>Invoice No.</th>
+              <th>Total Amount</th>
+              <th>Balance Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {row.original.invoices.map((inv, index) => (
               <tr key={index}>
-                   <td>{dayDiff}</td>
-                <td>{invoiceDate.toISOString().slice(0, 10).split('-').reverse().join('-')}</td>
+                <td>{calculateDaysDifference(inv.date)}</td>
+                <td>{formatDate(inv.date)}</td>
                 <td>{inv.invoice}</td>
                 <td>{inv.totalRateCut}</td>
                 <td>{inv.totalBalance}</td>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+
 
   return (
     <div className="main-container">

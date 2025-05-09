@@ -59,10 +59,12 @@ const ProductDetails = ({
   const [showModal, setShowModal] = useState(false);
   const isByFixed = formData.pricing === "By fixed";
   const navigate = useNavigate();
+
   const defaultBarcode = formData.category
     ? products.find((product) => product.product_name === formData.category)?.rbarcode || ""
     : "";
 
+  // Generate options list for barcode selection
   const barcodeOptions = [
     ...products
       .filter((product) => (formData.category ? product.product_name === formData.category : true))
@@ -78,15 +80,17 @@ const ProductDetails = ({
       })),
   ];
 
+  // Ensure default barcode is included in options
   if (defaultBarcode && !barcodeOptions.some((option) => option.value === defaultBarcode)) {
     barcodeOptions.unshift({ value: defaultBarcode, label: defaultBarcode });
   }
 
+  // Set default barcode only if formData.code is empty
   useEffect(() => {
     if (!formData.code && defaultBarcode) {
       handleBarcodeChange(defaultBarcode);
     }
-  }, [formData.category, defaultBarcode]);
+  }, [formData.category, defaultBarcode]); 
 
   const handleClear = () => {
     setFormData(prevFormData => ({
@@ -425,7 +429,7 @@ const ProductDetails = ({
   return (
     <Col >
       <Row>
-        <Col xs={12} md={2}>
+        {/* <Col xs={12} md={2}>
           <InputField
             label="BarCode/Rbarcode"
             name="code"
@@ -442,7 +446,20 @@ const ProductDetails = ({
             )}
             autoFocus
           />
-        </Col>
+        </Col> */}
+
+
+        <Col xs={12} md={2}>
+                  <InputField
+                    label="BarCode/Rbarcode"
+                    name="code"
+                    value={formData.code || defaultBarcode} // Default barcode when formData.code is empty
+                    onChange={(e) => handleBarcodeChange(e.target.value)}
+                    type="select"
+                    options={barcodeOptions}
+                    autoFocus
+                  />
+                </Col>
 
         <Col xs={12} md={2} className="d-flex align-items-center">
           <div style={{ flex: 1 }}>

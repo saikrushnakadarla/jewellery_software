@@ -172,6 +172,35 @@ const useProductHandlers = () => {
       [name]: value,
     }));
 
+
+    if (name === "category") {
+      // Find the first product that matches this category
+      const categoryProduct = products.find(prod =>
+        prod.product_name === value
+      );
+
+      if (categoryProduct) {
+        updatedFormData = {
+          ...updatedFormData,
+          code: categoryProduct.rbarcode || "",
+          product_id: categoryProduct.product_id || "",
+          metal_type: categoryProduct.Category || "",
+          selling_purity: "",
+          product_name: "",
+          rate: "",
+          // rate_24k: "",
+        };
+      } else {
+        // If no product found, clear related fields
+        updatedFormData = {
+          ...updatedFormData,
+          code: "",
+          product_id: "",
+          metal_type: ""
+        };
+      }
+    }
+
     if (name === "category" && value === "") {
       updatedFormData = {
         ...updatedFormData, // Keep other existing values
