@@ -313,7 +313,7 @@ const TaxINVoiceReceipt = ({
                         <Text style={{ marginBottom: 5 }}>{formData.account_name || ""},</Text>
                         <Text style={{ marginBottom: 5 }}>{formData.city}</Text>
                         <Text style={{ marginBottom: 5 }}>MOBILE: {formData.mobile}</Text>
-                        <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text>
+                        {/* <Text style={{ marginBottom: 5 }}>PAN NO: {formData.pan_card}</Text> */}
                     </View>
 
                     <View style={[styles.column, { width: "40%" }]}>
@@ -336,13 +336,21 @@ const TaxINVoiceReceipt = ({
                             <Text>DATE:</Text>
                             <Text style={{ textAlign: "right", flex: 1 }}>{formatDate(formData.date)}</Text>
                         </View>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                        {/* <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                             <View style={{ flexDirection: "row" }}>
-                                <Text>Delivery DATE: </Text>
+                                <Text>Delivery Date: </Text>
                                 <Text style={{ marginLeft: '5px' }}>{formatDate(new Date())}</Text>
-                                {/* <Text style={{marginLeft:'5px'}}>  TIME: </Text> */}
+                               
                                 <Text style={{ marginLeft: '5px' }}>{currentTime}</Text>
                             </View>
+                        </View> */}
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                            <Text>DELIVERY DATE:</Text>
+                            <Text style={{ textAlign: "right", flex: 1 }}>{formatDate(new Date())}</Text>
+                        </View>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                            <Text>TIME:</Text>
+                            <Text style={{ textAlign: "right", flex: 1 }}>{currentTime}</Text>
                         </View>
 
                         {/* STAFF */}
@@ -352,10 +360,10 @@ const TaxINVoiceReceipt = ({
                         </View>
 
                         {/* GSTIN */}
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
+                        {/* <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                             <Text>GSTIN:</Text>
                             <Text style={{ textAlign: "right", flex: 1 }}>29ABMCS9253K1ZG</Text>
-                        </View>
+                        </View> */}
                     </View>
                 </View>
 
@@ -391,7 +399,7 @@ const TaxINVoiceReceipt = ({
                     {/* Horizontal Divider under both sections */}
                     <View style={styles.horizontalLine1} />
 
-                    <View>
+                    <View style={{textAlign:'center'}}>
                         <Text>
                             Mob : 9964644424 EMAIL : sadashri.Yel@gmail.com
                         </Text>
