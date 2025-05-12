@@ -203,7 +203,7 @@ const RepairsTable = () => {
                 // cursor: "pointer",
               }}
               onClick={() => handleConvert(row.original)}
-            // disabled={isDisabled}
+            disabled={isDisabled}
             >
               Generate
             </Button>
