@@ -221,6 +221,9 @@ const SalesForm = () => {
     fetchInvoiceDetails();
   }, [returnData.invoice_number]);
 
+  const [customerImage, setCustomerImage] = useState("");
+
+
 
   // const handleCustomerChange = (customerId) => {
   //   const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
@@ -265,7 +268,7 @@ const SalesForm = () => {
 
   const handleCustomerChange = (customerId) => {
     const customer = customers.find((cust) => String(cust.account_id) === String(customerId));
-
+    console.log("customer", customer)
     if (customer) {
       setFormData((prevData) => ({
         ...prevData,
@@ -282,19 +285,31 @@ const SalesForm = () => {
         aadhar_card: customer.aadhar_card || "",
         gst_in: customer.gst_in || "",
         pan_card: customer.pan_card || "",
-        // keep invoice_number untouched
         invoice_number: prevData.invoice_number || "",
       }));
+
       setSelectedMobile(customer.mobile || "");
 
       const filtered = uniqueInvoice.filter(
         (invoice) =>
-          (invoice.customer_name && customer.account_name &&
+          (invoice.customer_name &&
+            customer.account_name &&
             invoice.customer_name.toLowerCase() === customer.account_name.toLowerCase()) ||
           invoice.mobile === customer.mobile
       );
       setFilteredInvoices(filtered);
+
+      // 👉 Set the image URL if available
+      if (customer.images && customer.images.length > 0) {
+        // setCustomerImage(customer.images[0].url);
+         setCustomerImage(customer.images[0].filename);
+        console.log("image", customer.images[0].filename )
+         console.log("image", customer.images[0].url )
+      } else {
+        setCustomerImage(""); // clear if no image
+      }
     } else {
+      // reset logic
       setFormData((prevData) => ({
         ...prevData,
         customer_id: "",
@@ -310,12 +325,13 @@ const SalesForm = () => {
         aadhar_card: "",
         gst_in: "",
         pan_card: "",
-        // preserve invoice_number
         invoice_number: prevData.invoice_number || "",
       }));
       setSelectedMobile("");
       setFilteredInvoices(uniqueInvoice);
+      setCustomerImage("");
     }
+
   };
 
   const [editIndex, setEditIndex] = useState(null);
@@ -632,7 +648,7 @@ const SalesForm = () => {
       0
     );
 
-    const [advanceAmount, setAdvanceAmount] = useState(advance_amt);
+  const [advanceAmount, setAdvanceAmount] = useState(advance_amt);
 
   // Calculate Net Payable Amount
   const payableAmount = netAmount - (schemeAmount + oldItemsAmount + salesAmountToPass + advanceAmount);
@@ -691,6 +707,7 @@ const SalesForm = () => {
         chq_amt: paymentDetails.chq_amt || 0,
         online: paymentDetails.online || "",
         online_amt: paymentDetails.online_amt || 0,
+        
       })),
       oldItems: oldSalesData,
       memberSchemes: schemeSalesData,
@@ -698,6 +715,7 @@ const SalesForm = () => {
       schemeAmount: schemeAmount || 0,
       salesNetAmount: salesAmountToPass || 0,
       advanceAmount: advanceAmount || 0,
+      customerImage: customerImage,
     };
 
     console.log("Payload to be sent:", JSON.stringify(dataToSave, null, 2));
@@ -745,6 +763,7 @@ const SalesForm = () => {
                 handleAddCustomer={handleAddCustomer}
                 customers={customers}
                 setSelectedMobile={setSelectedMobile}
+                customerImage={customerImage}
               />
             </div>
             <div className="sales-form-right">

@@ -3,9 +3,12 @@ import { Col, Row } from 'react-bootstrap';
 import InputField from './../../Transactions/SalesForm/InputfieldSales';
 import { AiOutlinePlus } from 'react-icons/ai';
 import { useLocation } from "react-router-dom";
+import baseURL from '../../../../Url/NodeBaseURL';
 
-const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAddCustomer, customers }) => {
+const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAddCustomer, customers, customerImage }) => {
   const location = useLocation();
+
+
 
   // Update formData.mobile if mobile is passed via location.state
   useEffect(() => {
@@ -221,7 +224,7 @@ const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAd
             readOnly
           />
         </Col>
-        <Col xs={12} md={3}>
+        <Col xs={12} md={2}>
           <InputField
             label="Aadhar"
             name="aadhar_card"
@@ -245,8 +248,22 @@ const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAd
             readOnly
           />
         </Col>
+        {customerImage && (
+          <Col xs={12} md={2}>
+            <div style={{ width: "50px", height: "50px" }}>
+              <img
+                // src={customerImage}
+                   src={`${baseURL}/uploads/${customerImage}`}
+                alt="Customer"
+                style={{ width: "100%", height: "80%", marginBottom:"0px", objectFit: "cover", borderRadius: "8px", border: "1px solid #ccc" }}
+              />
+            </div>
+          </Col>
+        )}
+
       </Row>
     </Col>
+
   );
 };
 

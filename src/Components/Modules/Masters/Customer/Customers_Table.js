@@ -39,6 +39,28 @@ const RepairsTable = () => {
         accessor: 'email',
       },
       {
+        Header: "Image",
+        accessor: "images",
+        Cell: ({ value }) =>
+          value && value.length > 0 ? (
+            <img
+              src={`${baseURL}/uploads/${value[0].filename}`}
+              alt="customerImage"
+              style={{
+                width: "50px",
+                height: "50px",
+                borderRadius: "5px",
+                objectFit: "cover",
+                cursor: "pointer",
+              }}
+            // onClick={() => handleImageClick(`http://localhost:5000/uploads/${value[0].filename}`)}
+            />
+          ) : (
+            "No Image"
+          ),
+      },
+
+      {
         Header: 'Action',
         Cell: ({ row }) => (
           <div >
@@ -91,6 +113,7 @@ const RepairsTable = () => {
           }));
 
         setData(customers);
+        console.log("customer", customers)
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);

@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
         image1: {
                 // width: 100,F
                 height: 50,
-                marginTop: 0,
+                marginTop: 10,
 
         },
         image2: {
@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
                 fontWeight: 'bold',
                 fontSize: 10,
                 textAlign: 'center',
+                marginTop:-25,
                 marginBottom: 5,
         },
         contentContainer: {
@@ -237,7 +238,7 @@ const TaxINVoiceReceipt = ({ repairDetails, }) => {
                         }
                         const result = await response.json();
                         setData(result);
-                        console.log("result=",result)
+                        console.log("result=", result)
                 } catch (error) {
                         setError(error.message);
                 } finally {
@@ -251,7 +252,7 @@ const TaxINVoiceReceipt = ({ repairDetails, }) => {
 
         // const matchedProduct = data.product_name === repairDetails.category;
         const matchedProduct = data.find(product => product.product_name === repairDetails.category);
-        console.log("matchedProduct=",matchedProduct)
+        console.log("matchedProduct=", matchedProduct)
 
 
         return (
@@ -265,6 +266,11 @@ const TaxINVoiceReceipt = ({ repairDetails, }) => {
                                                 <Text style={{ marginBottom: 5 }}>{repairDetails.city}</Text>
                                                 <Text style={{ marginBottom: 5 }}>MOBILE: {repairDetails.mobile}</Text>
                                                 <Text style={{ marginBottom: 5 }}>PAN NO: {repairDetails.pan_card}</Text>
+                                                <Image
+                                                        source={{ uri: `${baseURL}/uploads/${repairDetails.customerImage}` }}
+                                                        style={{ width: 40, height: 40, marginBottom: 5 }} // Adjust size as needed
+                                                        resizeMode="cover"
+                                                />
                                         </View>
 
                                         <View style={[styles.column, { width: "40%" }]}>
