@@ -85,24 +85,29 @@ const RepairForm = () => {
     fetchRepairs();
   }, []);
 
-  useEffect(() => {
-    const fetchRepairDetailsByInvoice = async () => {
-      if (formData.invoice_number) {
-        try {
-          const response = await axios.get(`${baseURL}/get-repair-details/${formData.invoice_number}`);
-          console.log("Detailed repair data:", response.data);
+useEffect(() => {
+  const fetchRepairDetailsByInvoice = async () => {
+    if (formData.invoice_number) {
+      try {
+        const response = await axios.get(`${baseURL}/get-repair-details/${formData.invoice_number}`);
+        console.log("Detailed repair data:", response.data);
 
-          // Store repeatedData in state
-          setRepeatedData(response.data.repeatedData || []);
+        // Filter by transaction_status and set repeatedData
+        const filteredData = (response.data.repeatedData || []).filter(
+          item => item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice"
+        );
 
-        } catch (error) {
-          console.error('Error fetching repair details by invoice number:', error);
-        }
+        setRepeatedData(filteredData);
+
+      } catch (error) {
+        console.error('Error fetching repair details by invoice number:', error);
       }
-    };
+    }
+  };
 
-    fetchRepairDetailsByInvoice();
-  }, [formData.invoice_number]);
+  fetchRepairDetailsByInvoice();
+}, [formData.invoice_number]);
+
 
   useEffect(() => {
     const fetchAccountNames = async () => {
