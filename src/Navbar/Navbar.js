@@ -41,22 +41,22 @@ function Navbar() {
     // First try to get from URL
     const urlParams = new URLSearchParams(window.location.search);
     let tabId = urlParams.get('tabId');
-    
+
     // If not in URL, try sessionStorage
     if (!tabId) {
       tabId = sessionStorage.getItem('tabId');
     }
-    
+
     // If still not found, generate new ID
     if (!tabId) {
       tabId = crypto.randomUUID();
       sessionStorage.setItem('tabId', tabId);
-      
+
       // Update URL without page reload
       const newUrl = `${window.location.pathname}?tabId=${tabId}`;
       window.history.replaceState({}, '', newUrl);
     }
-    
+
     return tabId;
   };
 
@@ -65,7 +65,7 @@ function Navbar() {
   // useEffect(() => {
   //   const currentPathWithQuery = `${location.pathname}${location.search}`;
   //   const expectedPath = `/sales?tabId=${tabId}`;
-  
+
   //   if (currentPathWithQuery !== expectedPath) {
   //     // Remove specific known keys
   //     localStorage.removeItem('oldSalesData');
@@ -75,7 +75,7 @@ function Navbar() {
   //     localStorage.removeItem(`oldTableData_${tabId}`);
   //     localStorage.removeItem('schemeTableData');
   //     localStorage.removeItem(`discount_${tabId}`);
-  
+
   //     // Dynamically remove all keys that start with specific prefixes
   //     Object.keys(localStorage).forEach((key) => {
   //       if (
@@ -90,11 +90,11 @@ function Navbar() {
   //     });
   //   }
   // }, [location.pathname, location.search, tabId]);
-  
-  
-  
-  
-  
+
+
+
+
+
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -151,7 +151,7 @@ function Navbar() {
     return location.pathname === path ? 'active' : '';  // Return 'active' if the path matches the current location
   };
   const userRole = localStorage.getItem('userRole'); // 'admin' or other roles
-  console.log("userRole=",userRole)
+  console.log("userRole=", userRole)
 
   return (
     <header className="navbar-header">
@@ -281,6 +281,8 @@ function Navbar() {
               <Link to="/ratesdata" onClick={handleItemClick} className={isActive('/ratesdata')}>Rates Report</Link>
               <Link to="/barcodeprinting" onClick={handleItemClick} className={isActive('/barcodeprinting')}>Barcode Printing Report</Link>
               {/* <Link to="/cashReport" onClick={handleItemClick} className={isActive('/cashReport')}>Cash Report</Link> */}
+              <Link to="/itemsales" onClick={handleItemClick} className={isActive('/itemsales')}>Item Sale Report</Link>
+
             </div>
           )}
         </div>
