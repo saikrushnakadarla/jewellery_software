@@ -70,17 +70,7 @@ const ItemSale = () => {
         accessor: 'invoices',
         Cell: ({ value }) => value.length,
       },
-    //   {
-    //     Header: 'Total Amt',
-    //     accessor: 'total_amount',
-    //     Cell: ({ row }) => {
-    //       const total = row.original.invoices.reduce(
-    //         (sum, invoice) => sum + (parseFloat(invoice.net_amount) || 0),
-    //         0
-    //       );
-    //       return total.toFixed(2);
-    //     },
-    //   },
+  
     ],
     []
   );
@@ -117,53 +107,6 @@ const ItemSale = () => {
         accessor: 'total_price',
         Cell: ({ value }) => parseFloat(value || 0).toFixed(2)
       },
-    //   {
-    //     Header: 'Old Amt',
-    //     accessor: 'old_exchange_amt',
-    //     Cell: ({ value }) => parseFloat(value || 0).toFixed(2)
-    //   },
-    //   {
-    //     Header: 'Scheme Amt',
-    //     accessor: 'scheme_amt',
-    //     Cell: ({ value }) => parseFloat(value || 0).toFixed(2)
-    //   },
-    //   {
-    //     Header: 'Net Amt',
-    //     accessor: 'net_bill_amount',
-    //     Cell: ({ value }) => parseFloat(value || 0).toFixed(2)
-    //   },
-    //   {
-    //     Header: 'Paid Amt',
-    //     accessor: 'paid_amt',
-    //     Cell: ({ row }) => {
-    //       const paid_amt = Number(row.original.paid_amt) || 0;
-    //       const receipts_amt = Number(row.original.receipts_amt) || 0;
-    //       return (paid_amt + receipts_amt).toFixed(2);
-    //     },
-    //   },
-    //   {
-    //     Header: 'Bal Amt',
-    //     accessor: 'bal_amt',
-    //     Cell: ({ row }) => {
-    //       const bal_amt = Number(row.original.bal_amt) || 0;
-    //       const bal_after_receipts = Number(row.original.bal_after_receipts) || 0;
-    //       const receipts_amt = Number(row.original.receipts_amt) || 0;
-    //       let finalBalance = bal_amt === receipts_amt
-    //         ? bal_after_receipts || 0
-    //         : bal_after_receipts ? bal_after_receipts : bal_amt || 0;
-    //       return finalBalance.toFixed(2);
-    //     },
-    //   },
-    //   {
-    //     Header: 'Actions',
-    //     accessor: 'actions',
-    //     Cell: ({ row }) => (
-    //       <FaEye
-    //         style={{ cursor: 'pointer', color: 'green' }}
-    //         onClick={() => handleViewDetails(row.original.invoice_number)}
-    //       />
-    //     ),
-    //   },
     ],
     []
   );
@@ -225,18 +168,18 @@ const ItemSale = () => {
   );
 
   return (
-    <div className="main-container">
+    <div className="main-container" style={{ fontSize: '14px' }}>
       <div className="payments-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3>Item Sales Report</h3>
+            <h3 style={{ fontSize: '14px' }}>Item Sales Report</h3>
           </Col>
         </Row>
         {loading ? (
           <p>Loading...</p>
         ) : (
           <>
-            <Table striped bordered hover responsive {...getTableProps()}>
+            <Table striped bordered hover responsive {...getTableProps()} style={{ fontSize: '14px' }}>
               <thead>
                 {headerGroups.map(headerGroup => (
                   <tr {...headerGroup.getHeaderGroupProps()}>
@@ -262,7 +205,7 @@ const ItemSale = () => {
                         <tr>
                           <td colSpan={columns.length}>
                             <div style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
-                              <Table striped bordered responsive>
+                              <Table striped bordered responsive style={{ fontSize: '14px' }}>
                                 <thead>
                                   <tr>
                                     {invoiceColumns.map((column, i) => (
@@ -314,14 +257,14 @@ const ItemSale = () => {
       </div>
 
       <Modal show={showModal} onHide={handleCloseModal} size="xl" className='m-auto'>
-        <Modal.Header closeButton>
-          <Modal.Title>Sales Details</Modal.Title>
+        <Modal.Header closeButton style={{ fontSize: '14px' }}>
+          <Modal.Title style={{ fontSize: '14px' }}>Sales Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ fontSize: '13px' }}>
+        <Modal.Body style={{ fontSize: '14px' }}>
           {repairDetails && (
             <>
-              <h5>Customer Info</h5>
-              <Table bordered>
+              <h5 style={{ fontSize: '14px' }}>Customer Info</h5>
+              <Table bordered style={{ fontSize: '14px' }}>
                 <tbody>
                   <tr>
                     <td>Customer ID</td>
@@ -354,9 +297,9 @@ const ItemSale = () => {
                 </tbody>
               </Table>
 
-              <h5>Products</h5>
+              <h5 style={{ fontSize: '14px' }}>Products</h5>
               <div className="table-responsive">
-                <Table bordered>
+                <Table bordered style={{ fontSize: '14px' }}>
                   <thead style={{ whiteSpace: 'nowrap' }}>
                     <tr>
                       <th>BarCode</th>
@@ -402,8 +345,8 @@ const ItemSale = () => {
             </>
           )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+        <Modal.Footer style={{ fontSize: '14px' }}>
+          <Button variant="secondary" onClick={handleCloseModal} style={{ fontSize: '14px' }}>
             Close
           </Button>
         </Modal.Footer>
