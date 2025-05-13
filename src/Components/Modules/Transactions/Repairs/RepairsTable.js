@@ -84,8 +84,8 @@ const RepairsTable = () => {
   //     const repair = repairs.find((repair) => repair.repair_id === repairId);
   //     setSelectedRepair(repair);
   //     setShowReceiveModal(true);
-  //   } else if (action === 'Delivery to Customer') {
-  //     await updateRepairStatus(repairId, 'Delivery to Customer');
+  //   } else if (action === 'Delivered to Customer') {
+  //     await updateRepairStatus(repairId, 'Delivered to Customer');
   //     fetchRepairs();
   //   }
   // };
@@ -101,10 +101,10 @@ const RepairsTable = () => {
       setSelectedRepair(repair);
       setShowReceiveModal(true);
     }
-    else if (action === 'Delivery to Customer') {
+    else if (action === 'Delivered to Customer') {
       try {
         // Step 1: Update status first
-        await updateRepairStatus(repairId, 'Delivery to Customer');
+        await updateRepairStatus(repairId, 'Delivered to Customer');
 
         // Step 2: Find the repair data
         const repair = repairs.find((repair) => repair.repair_id === repairId);
@@ -481,7 +481,7 @@ const RepairsTable = () => {
                 className="form-select custom-select"
                 onChange={(e) => handleActionChange(row.original.repair_id, e.target.value)}
                 defaultValue=""
-                disabled={status === 'Delivery to Customer'} // Disable the dropdown if status is "Delivery to Customer"
+                disabled={status === 'Delivered to Customer'} // Disable the dropdown if status is "Delivered to Customer"
               >
                 <option value="" disabled>
                   Select Status
@@ -496,10 +496,10 @@ const RepairsTable = () => {
                 >
                   Receive from Workshop
                 </option>
-                <option value="Delivery to Customer"
+                <option value="Delivered to Customer"
                   disabled={status === 'Pending' || status === 'Assign to Workshop'}
                 >
-                  Delivery to Customer
+                  Delivered to Customer
                 </option>
               </select>
             </div>
@@ -530,7 +530,7 @@ const RepairsTable = () => {
         Header: 'Invoice',
         accessor: 'convert',
         Cell: ({ row }) => {
-          const isDelivery = row.original.status === 'Delivery to Customer';
+          const isDelivery = row.original.status === 'Receive from Workshop';
           const isConverted = row.original.invoice === 'Converted';
           const isEnabled = isDelivery && !isConverted;
 
@@ -599,6 +599,7 @@ const RepairsTable = () => {
             link.click();
             URL.revokeObjectURL(link.href);
           }
+          fetchRepairs();
 
         }
       }
