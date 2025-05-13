@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
         marginTop: '-4'
     },
     tableCellTotal: {
-        width: '6%',
+        width: '10%',
         textAlign: 'right',
         marginTop: '-4',
         marginLeft:50

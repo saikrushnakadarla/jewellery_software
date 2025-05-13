@@ -215,40 +215,7 @@ const RepairsTable = () => {
     []
   );
 
-
-  // Initialize missing variables as state
-  const [formData, setFormData] = useState({});
   const [repairDetails, setRepairDetails] = useState({});
-  const [paymentDetails, setPaymentDetails] = useState({});
-  const [taxAmount, setTaxAmount] = useState(0);
-  const [discountAmt, setDiscountAmt] = useState(0);
-  const [oldItemsAmount, setOldItemsAmount] = useState(0);
-  const [schemeAmount, setSchemeAmount] = useState(0);
-  const [netPayableAmount, setNetPayableAmount] = useState(0);
-
-  //  const fetchOrderDetails = async (orderNumber) => {
-  //    try {
-  //      const response = await axios.get(`${baseURL}/invoice/${orderNumber}`);
-  //      console.log("Order details=",response)
-  //      if (response.data.success) {
-  //        // Assign values based on the API response or some other source
-  //        setFormData(response.data.formData);
-  //        setRepairDetails(response.data.repairDetails);
-  //        setPaymentDetails(response.data.paymentDetails);
-  //        setTaxAmount(response.data.taxAmount);
-  //        setDiscountAmt(response.data.discountAmt);
-  //        setOldItemsAmount(response.data.oldItemsAmount);
-  //        setSchemeAmount(response.data.schemeAmount);
-  //        setNetPayableAmount(response.data.netPayableAmount);
-  //      }
-  //    } catch (error) {
-  //      console.error("Error fetching order details:", error);
-  //    }
-  //  };
-  //  useEffect(() => {
-  //   fetchOrderDetails();
-  // }, []);
-
 
   const handleConvert = async (order) => {
     const result = await Swal.fire({
@@ -274,9 +241,6 @@ const RepairsTable = () => {
 
           // Fetch the invoice number after conversion
           const invoiceResponse = await axios.get(`${baseURL}/invoice/${order.order_number}`);
-
-          
-
           if (invoiceResponse.data.success) {
             const invoiceData = invoiceResponse.data.data;
             const invoiceNumber = invoiceData.invoice_number;

@@ -9,6 +9,8 @@ import './RepairsTable.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PDFLayout from './Invoice';
 import { pdf } from '@react-pdf/renderer';
+import Swal from 'sweetalert2';
+import InvoicePDFLayout from './TaxInvoiceA4';
 
 const RepairsTable = () => {
   const navigate = useNavigate();
@@ -93,58 +95,58 @@ const RepairsTable = () => {
       const repair = repairs.find((repair) => repair.repair_id === repairId);
       setSelectedRepair(repair);
       setShowModal(true);
-    } 
+    }
     else if (action === 'Receive from Workshop') {
       const repair = repairs.find((repair) => repair.repair_id === repairId);
       setSelectedRepair(repair);
       setShowReceiveModal(true);
-    } 
+    }
     else if (action === 'Delivery to Customer') {
       try {
         // Step 1: Update status first
         await updateRepairStatus(repairId, 'Delivery to Customer');
-  
+
         // Step 2: Find the repair data
         const repair = repairs.find((repair) => repair.repair_id === repairId);
-        
+
         if (!repair) {
           console.error("Repair data not found!");
           return;
         }
-  
+
         // Step 3: Ensure repairDetails is an array (fixes the .reduce() error)
-        const repairDetails = Array.isArray(repair.repairDetails) 
-          ? repair.repairDetails 
-          : repair.repairDetails 
+        const repairDetails = Array.isArray(repair.repairDetails)
+          ? repair.repairDetails
+          : repair.repairDetails
             ? [repair.repairDetails]  // Wrap single object in array
             : [];  // Fallback: empty array if undefined
-  
+
         // Step 4: Generate PDF
         const pdfDoc = (
           <PDFLayout
             formData={repair}
-            // repairDetails={repairDetails}  // Now guaranteed to be an array
-            // netAmount={repair.netAmount || 0}
-            // netPayableAmount={repair.netPayableAmount || 0}
+          // repairDetails={repairDetails}  // Now guaranteed to be an array
+          // netAmount={repair.netAmount || 0}
+          // netPayableAmount={repair.netPayableAmount || 0}
           />
         );
-  
+
         // Step 5: Create and download PDF
         const blob = await pdf(pdfDoc).toBlob();
         const url = URL.createObjectURL(blob);
-        
+
         const a = document.createElement('a');
         a.href = url;
         a.download = `Repair_${repair.repair_no}_Delivery.pdf`;
         document.body.appendChild(a);
         a.click();
-        
+
         // Cleanup
         setTimeout(() => {
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
         }, 100);
-  
+
         // Step 6: Refresh data
         fetchRepairs();
       } catch (error) {
@@ -365,7 +367,7 @@ const RepairsTable = () => {
   const columns = React.useMemo(
     () => [
       {
-        Header: 'Sr.No.',
+        Header: 'SNo.',
         Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
       },
       {
@@ -440,6 +442,8 @@ const RepairsTable = () => {
         },
       },
 
+
+
       // {
       //   Header: 'Image',
       //   accessor: 'image',
@@ -466,8 +470,6 @@ const RepairsTable = () => {
       //     );
       //   },
       // },
-
-
       {
         Header: 'Update Status',
         accessor: 'update_status',
@@ -524,9 +526,115 @@ const RepairsTable = () => {
           </div>
         ),
       },
+      {
+        Header: 'Invoice',
+        accessor: 'convert',
+        Cell: ({ row }) => {
+          const isDelivery = row.original.status === 'Delivery to Customer';
+          const isConverted = row.original.invoice === 'Converted';
+          const isEnabled = isDelivery && !isConverted;
+
+          return (
+            <Button
+              style={{
+                backgroundColor: isEnabled ? '#28a745' : '#ccc',
+                borderColor: isEnabled ? '#28a745' : '#ccc',
+                fontSize: '0.800rem',
+                padding: '0.10rem 0.5rem',
+                cursor: isEnabled ? 'pointer' : 'not-allowed',
+              }}
+              disabled={!isEnabled}
+              onClick={() => handleConvert(row.original)}
+            >
+              Generate
+            </Button>
+          );
+        },
+      }
+
+
     ],
     [repairs]
   );
+
+  const [repairInvoiceDetails, setRepairInvoiceDetails] = useState({});
+
+
+
+  const handleConvert = async (repair) => {
+    try {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to convert this repair to an invoice?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, convert it!',
+        cancelButtonText: 'No, cancel',
+      });
+
+      if (result.isConfirmed) {
+        const response = await axios.post(`${baseURL}/convert-repair`, repair);
+
+        if (response.data.success) {
+          Swal.fire('Converted!', 'Repair has been converted to invoice.', 'success');
+          const invoiceResponse = await axios.get(`${baseURL}/get-repair-invoice/${repair.repair_no}`);
+          if (invoiceResponse.data.success) {
+            const invoice = invoiceResponse.data.invoice;
+            console.log("Invoice details=", invoice)
+            const invoiceNumber = invoice.invoice_number;
+
+            setRepairInvoiceDetails(invoice);
+            const pdfDoc = (
+              <InvoicePDFLayout
+                repairDetails={invoice}
+              />
+            );
+            const pdfBlob = await pdf(pdfDoc).toBlob();
+            await handleSavePDFToServer(pdfBlob, invoiceNumber);
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(pdfBlob);
+            link.download = `${invoiceNumber}.pdf`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+          }
+
+        }
+      }
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An unexpected error occurred!',
+        confirmButtonColor: '#d33',
+      });
+    }
+  };
+
+  const handleSavePDFToServer = async (pdfBlob, invoiceNumber) => {
+    const formData = new FormData();
+    formData.append("invoice", pdfBlob, `${invoiceNumber}.pdf`);
+
+    try {
+      const response = await fetch(`${baseURL}/upload-invoice`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to upload invoice");
+      }
+
+      console.log(`Invoice ${invoiceNumber} saved on server`);
+    } catch (error) {
+      console.error("Error uploading invoice:", error);
+    }
+  };
+
+
+
 
   const handleViewRepair = async (id) => {
     try {
