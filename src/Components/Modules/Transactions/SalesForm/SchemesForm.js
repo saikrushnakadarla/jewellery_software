@@ -165,7 +165,7 @@ const SchemeSalesForm = ({ setSchemeSalesData, selectedMobile, tabId }) => {
   return (
     <>
       <Row>
-        <h4 className="mb-3">Schemes</h4>
+        {/* <h4 className="mb-3">Schemes</h4> */}
         <Col xs={12} md={3}>
           <InputField
             label="Member Name"

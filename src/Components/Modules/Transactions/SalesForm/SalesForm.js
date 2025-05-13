@@ -1874,7 +1874,7 @@ const SalesForm = () => {
           <div className="sales-form-section">
             <ProductTable repairDetails={repairDetails} onEdit={handleEdit} onDelete={handleDelete} />
           </div>
-          <div className="sales-form2">
+          <div className="sales-form">
             <div className="sales-form-third">
               <SalesFormSection metal={metal}
                 setMetal={setMetal}

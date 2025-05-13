@@ -299,7 +299,7 @@ const OldSalesForm = ({ setOldSalesData, repairDetails, tabId }) => {
   return (
     <>
       <Row>
-        <h4 className="mb-3" style={{ fontSize: "17px", marginTop: "-9px" }}>URD Purchase</h4>
+        {/* <h4 className="mb-3" style={{ fontSize: "17px", marginTop: "-9px" }}>URD Purchase</h4> */}
         <Col xs={12} md={3}>
           <InputField label="Product" name="product" value={oldDetails.product} onChange={handleInputChange} />
         </Col>

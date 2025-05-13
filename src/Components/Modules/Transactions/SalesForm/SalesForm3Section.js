@@ -5,6 +5,8 @@ import SchemeSalesForm from "./SchemesForm";
 import SaleReturnForm from "./SaleReturnForm"; // Import the SaleReturnForm component
 import { useNavigate } from "react-router-dom";
 import './SalesForm3section.css';
+import Repairtable from "./Repairs";
+import Oderstable from "./OrdersTable";
 const SalesFormSection = ({ setOldSalesData,
   setSchemeSalesData,
   selectedMobile,
@@ -35,13 +37,13 @@ const SalesFormSection = ({ setOldSalesData,
 
   return (
     <Col className="sales-form-section">
-      <Row style={{height:"45px"}}>
+      <Row style={{ height: "45px" }}>
         <Col xs={12} className="mb-3">
-          <Button 
+          <Button
             style={{
               backgroundColor: activeForm === "old" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "old" ? "rgb(163, 110, 41)" : "gray",
-              color: "white", fontSize:'13px', padding:'5px'
+              color: "white", fontSize: '13px', padding: '5px'
             }}
             onClick={() => setActiveForm("old")}
           >
@@ -51,7 +53,7 @@ const SalesFormSection = ({ setOldSalesData,
             style={{
               backgroundColor: activeForm === "schemes" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "schemes" ? "rgb(163, 110, 41)" : "gray",
-              color: "white", fontSize:'13px', padding:'5px'
+              color: "white", fontSize: '13px', padding: '5px'
             }}
             onClick={() => setActiveForm("schemes")}
             className="ms-2"
@@ -62,7 +64,7 @@ const SalesFormSection = ({ setOldSalesData,
             style={{
               backgroundColor: activeForm === "sale_return" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "sale_return" ? "rgb(163, 110, 41)" : "gray",
-              color: "white", fontSize:'13px', padding:'5px'
+              color: "white", fontSize: '13px', padding: '5px'
             }}
             onClick={() => setActiveForm("sale_return")}
             className="ms-2"
@@ -73,27 +75,29 @@ const SalesFormSection = ({ setOldSalesData,
             style={{
               backgroundColor: activeForm === "orders" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "orders" ? "rgb(163, 110, 41)" : "gray",
-              color: "white", fontSize:'13px', padding:'5px'
+              color: "white", fontSize: '13px', padding: '5px'
             }}
             onClick={() => {
               setActiveForm("orders");
-              console.log("Navigating to Orders with Mobile:", selectedMobile); // Log before navigation
-              navigate("/orders", { state: { mobile: selectedMobile } });
+              console.log("Selected Mobile:", selectedMobile); // Optional: for debugging or handling
+              // You can handle `selectedMobile` elsewhere as needed
             }}
             className="ms-2"
+
           >
             Orders
           </Button>
           <Button
             style={{
-              backgroundColor: activeForm === "repairs" ? "rgb(163, 110, 41)" : "gray",
+              backgroundColor: activeForm === "repair" ? "rgb(163, 110, 41)" : "gray",
               borderColor: activeForm === "repairs" ? "rgb(163, 110, 41)" : "gray",
-              color: "white", fontSize:'13px', padding:'5px'
+              color: "white", fontSize: '13px', padding: '5px'
             }}
-            onClick={() => {
-              setActiveForm("repairs");
-              console.log("Navigating to Repairs with Mobile:", selectedMobile); // Log before navigation
-              navigate("/repairstable", { state: { mobile: selectedMobile } });
+          
+              onClick={() => {
+              setActiveForm("repair");
+              console.log("Selected Mobile:", selectedMobile); // Optional: for debugging or handling
+              // You can handle `selectedMobile` elsewhere as needed
             }}
             className="ms-2"
           >
@@ -103,12 +107,22 @@ const SalesFormSection = ({ setOldSalesData,
 
       </Row>
 
-      {activeForm === "old" && <OldSalesForm setOldSalesData={setOldSalesData} repairDetails={repairDetails} tabId={tabId}/>}
+      {activeForm === "old" && <OldSalesForm setOldSalesData={setOldSalesData} repairDetails={repairDetails} tabId={tabId} />}
       {activeForm === "schemes" && (
         <SchemeSalesForm
           setSchemeSalesData={setSchemeSalesData}
           selectedMobile={selectedMobile} // Pass the selected mobile number
           tabId={tabId}
+        />
+      )}
+      {activeForm === "orders" && (
+        <Oderstable
+        selectedMobile={selectedMobile}
+        />
+      )}
+       {activeForm === "repair" && (
+        <Repairtable
+        selectedMobile={selectedMobile}
         />
       )}
       {activeForm === "sale_return" && <SaleReturnForm
