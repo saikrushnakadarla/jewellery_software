@@ -82,7 +82,8 @@ const useProductHandlers = () => {
     festival_discount: "",
     custom_purity: "",
     manual_price_update: false,
-    order_status: "In Progress"
+    order_status: "In Progress",
+    size:"",
   });
 
   const [uniqueProducts, setUniqueProducts] = useState([]);
@@ -257,6 +258,7 @@ const useProductHandlers = () => {
         product_image: null,
         imagePreview: null,
         remarks: "",
+        size:"",
       };
     }
 
@@ -440,8 +442,9 @@ const useProductHandlers = () => {
         tax_amt: "",
         hm_charges: "60.00",
         total_price: "",
-        qty: "", // Rese
+        qty: "", 
         remarks: "",
+        size:"",
       }));
 
       setFilteredMetalTypes(metalTypes);
@@ -752,8 +755,9 @@ const useProductHandlers = () => {
           tax_amt: "",
           hm_charges: "60.00",
           total_price: "",
-          qty: "", // Reset qty
+          qty: "", 
           remarks: "",
+          size:"",
         }));
         setIsQtyEditable(true); // Default to editable if barcode is cleared
         return; // Exit early
@@ -870,8 +874,9 @@ const useProductHandlers = () => {
             tax_amt: "",
             hm_charges: "60.00",
             total_price: "",
-            qty: "", // Reset qty
+            qty: "", 
             remarks: "",
+            size:""
           }));
           setIsQtyEditable(true); // Default to editable
         }

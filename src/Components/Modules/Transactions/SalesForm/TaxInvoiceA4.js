@@ -616,13 +616,14 @@ const TaxINVoiceReceipt = ({
                                                                 <Text style={[styles.bold]}>
                                                                         Balance Amount:{" "}
                                                                         {(
-                                                                                Number(netPayableAmount || 0) -
+                                                                                Math.round(Number(netPayableAmount || 0)) -
                                                                                 (Number(cash_amount || 0) +
                                                                                         Number(chq_amt || 0) +
                                                                                         Number(card_amt || 0) +
                                                                                         Number(online_amt || 0))
                                                                         ).toFixed(2)}
                                                                 </Text>
+
                                                                 <Text style={{ fontWeight: 'bold', fontSize: '15px', color: 'green', marginLeft: '190px', marginTop: '15px' }}>
                                                                         Fest Discount: {festivalDiscountAmt.toFixed(2)}
                                                                 </Text>

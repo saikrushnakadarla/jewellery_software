@@ -175,15 +175,19 @@ const CustomerDetails = ({
                 if (!inputMobile) {
                   setFormData((prev) => ({
                     ...prev,
-                    mobile: "",
+                    customer_id: "",
                     account_name: "",
+                    mobile: "",
                     email: "",
                     address1: "",
+                    address2: "",
                     city: "",
                     pincode: "",
                     state: "",
+                    state_code: "",
                     aadhar_card: "",
                     gst_in: "",
+                    pan_card: "",
                   }));
                   return;
                 }
@@ -246,15 +250,19 @@ const CustomerDetails = ({
                 // Clear all dependent fields
                 setFormData((prev) => ({
                   ...prev,
-                  mobile: "",
+                  customer_id: "",
                   account_name: "",
+                  mobile: "",
                   email: "",
                   address1: "",
+                  address2: "",
                   city: "",
                   pincode: "",
                   state: "",
+                  state_code: "",
                   aadhar_card: "",
                   gst_in: "",
+                  pan_card: "",
                 }));
                 return;
               }

@@ -296,22 +296,22 @@ const RepairForm = () => {
     // First try to get from URL
     const urlParams = new URLSearchParams(window.location.search);
     let tabId = urlParams.get('tabId');
-    
+
     // If not in URL, try sessionStorage
     if (!tabId) {
       tabId = sessionStorage.getItem('tabId');
     }
-    
+
     // If still not found, generate new ID
     if (!tabId) {
       tabId = crypto.randomUUID();
       sessionStorage.setItem('tabId', tabId);
-      
+
       // Update URL without page reload
       const newUrl = `${window.location.pathname}?tabId=${tabId}`;
       window.history.replaceState({}, '', newUrl);
     }
-    
+
     return tabId;
   };
 
@@ -344,7 +344,7 @@ const RepairForm = () => {
         }
       }
       // navigate("/repairstable");
-      navigate(-1); 
+      navigate(-1);
     } catch (error) {
       console.error("Error submitting the form:", error);
       alert("Failed to submit the repair entry");
@@ -352,13 +352,23 @@ const RepairForm = () => {
   };
 
 
-  const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/repairs" } });
+  // const handleAddCustomer = () => {
+  //   navigate("/customermaster", { state: { from: "/repairs" } });
+  // };
+
+  const handleAddCustomer = (mobile) => {
+    console.log("handleAddCustomer received mobile:", mobile);
+    navigate("/customermaster", { 
+      state: { 
+        from: `/repairs`,
+        mobile: mobile // Pass the mobile number here
+      } 
+    });
   };
 
   const handleBack = () => {
     // navigate("/repairstable");
-    navigate(-1); 
+    navigate(-1);
   };
 
   useEffect(() => {
@@ -389,7 +399,7 @@ const RepairForm = () => {
               <Col className="form-section">
                 <h4 className="mb-4">Customer Details</h4>
                 <Row>
-                  <Col xs={12} md={3} className="d-flex align-items-center">
+                  {/* <Col xs={12} md={3} className="d-flex align-items-center">
                     <div style={{ flex: 1 }}>
                       <InputField
                         label="Mobile"
@@ -431,6 +441,120 @@ const RepairForm = () => {
                         })),
                       ]}
 
+                    />
+                  </Col> */}
+
+                  <Col xs={12} md={3} className="d-flex align-items-center">
+                    <div style={{ flex: 1 }}>
+                      <InputField
+                        label="Mobile"
+                        name="mobile"
+                        type="select"
+                        value={formData.mobile || ""}
+                        onChange={(e) => {
+                          const inputMobile = e.target.value;
+                          if (!inputMobile) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              mobile: "",
+                              account_name: "",
+                              email: "",
+                              address1: "",
+                              address2:"",
+                              city: "",
+                              pincode: "",
+                              state: "",
+                              aadhar_card: "",
+                              gst_in: "",
+                            }));
+                            return;
+                          }
+
+                          const isValidMobile = /^\d{10}$/.test(inputMobile);
+                          if (!isValidMobile) {
+                            alert("Please enter a valid 10-digit mobile number.");
+                            return;
+                          }
+
+                          setFormData((prev) => ({ ...prev, mobile: inputMobile }));
+
+                          const existing = customers.find((c) => c.mobile === inputMobile);
+                          if (existing) {
+                            handleCustomerChange(existing.account_id);
+
+                          }
+                        }}
+                        onKeyDown={({ key, value }) => {
+                          if (key === "Enter") {
+                            const isValidMobile = /^\d{10}$/.test(value);
+                            const exists = customers.some((c) => c.mobile === value);
+                            if (isValidMobile && !exists) {
+                              handleAddCustomer(value);
+                            }
+                          }
+                        }}
+                        options={customers.map((c) => ({ value: c.mobile, label: c.mobile }))}
+                        allowCustomInput
+                      />
+
+
+                    </div>
+                    <AiOutlinePlus
+                      size={20}
+                      color="black"
+                      // onClick={handleAddCustomer}
+                      onClick={() => {
+                        console.log("Mobile passed to handleAddCustomer:", formData.mobile);
+                        handleAddCustomer(formData.mobile); // This should be passing the correct mobile number
+                      }}
+                      style={{
+                        marginLeft: "10px",
+                        cursor: "pointer",
+                        marginBottom: "20px",
+                      }}
+                    />
+                  </Col>
+
+                  <Col xs={12} md={3}>
+                    <InputField
+                      label="Customer Name"
+                      name="account_name"
+                      type="select"
+                      value={formData.account_name.toUpperCase() || ""}
+                      onChange={(e) => {
+                        const inputName = (e.target.value || "").toUpperCase();
+
+                        if (!inputName) {
+                          // Clear all dependent fields
+                          setFormData((prev) => ({
+                            ...prev,
+                            mobile: "",
+                            account_name: "",
+                            email: "",
+                            address1: "",
+                            address2:"",
+                            city: "",
+                            pincode: "",
+                            state: "",
+                            aadhar_card: "",
+                            gst_in: "",
+                          }));
+                          return;
+                        }
+
+                        setFormData((prev) => ({ ...prev, account_name: inputName }));
+
+                        const existing = customers.find((c) => c.account_name.toUpperCase() === inputName);
+                        if (existing) {
+                          handleCustomerChange(existing.account_id);
+
+                        }
+                      }}
+                      options={customers.map((c) => ({
+                        value: c.account_name.toUpperCase(),
+                        label: c.account_name.toUpperCase(),
+                      }))}
+                      allowCustomInput
                     />
                   </Col>
                   <Col xs={12} md={3}>
@@ -662,13 +786,13 @@ const RepairForm = () => {
             </div>
           </div>
           <div className="form-buttons">
-              <Button
-                                                          onClick={handleClose}
-                                                          style={{ backgroundColor: "gray", borderColor: "gray" , marginLeft:"5px"}}
-                                                          // disabled={!isSubmitEnabled}
-                                                        >
-                                                          Close
-                                                        </Button>
+            <Button
+              onClick={handleClose}
+              style={{ backgroundColor: "gray", borderColor: "gray", marginLeft: "5px" }}
+            // disabled={!isSubmitEnabled}
+            >
+              Close
+            </Button>
             <Button className="cus-back-btn" variant="secondary" onClick={handleBack}>cancel</Button>
             <Button
               type="submit"

@@ -425,6 +425,14 @@ const ProductDetails = ({
                 readOnly
               />
             </Col>
+            <Col xs={12} md={1}>
+              <InputField
+                label="Size"
+                name="size"
+                value={formData.size}
+                onChange={handleChange}
+              />
+            </Col>
 
             <Col xs={12} md={1}>
               <InputField
@@ -508,9 +516,9 @@ const ProductDetails = ({
                 readOnly={!isQtyEditable}
               />
             </Col> */}
-            <Col xs={12} md={2}>
+            <Col xs={12} md={1}>
               <InputField
-                label="HM Charges"
+                label="HM Charge"
                 name="hm_charges"
                 value={formData.hm_charges || "0.00"} // Default to "0.00" if undefined
                 onChange={handleChange} // Optional, since it's auto-calculated

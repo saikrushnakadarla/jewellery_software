@@ -5,7 +5,7 @@ import { AiOutlinePlus } from 'react-icons/ai';
 import { useLocation } from "react-router-dom";
 import baseURL from '../../../../Url/NodeBaseURL';
 
-const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAddCustomer, customers, customerImage }) => {
+const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAddCustomer, customers, customerImage, setCustomerImage }) => {
   const location = useLocation();
 
 
@@ -83,20 +83,25 @@ const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAd
                 if (!inputMobile) {
                   setFormData((prev) => ({
                     ...prev,
-                    mobile: "",
+                    customer_id: "",
                     account_name: "",
+                    mobile: "",
                     email: "",
                     address1: "",
+                    address2: "",
                     city: "",
                     pincode: "",
                     state: "",
+                    state_code: "",
                     aadhar_card: "",
                     gst_in: "",
+                    pan_card: "",
                   }));
+                  setCustomerImage("");
                   return;
+                  
                 }
 
-                // Check for exactly 10 digits
                 const isValidMobile = /^\d{10}$/.test(inputMobile);
                 if (!isValidMobile) {
                   alert("Please enter a valid 10-digit mobile number.");
@@ -104,20 +109,36 @@ const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAd
                 }
 
                 setFormData((prev) => ({ ...prev, mobile: inputMobile }));
+
                 const existing = customers.find((c) => c.mobile === inputMobile);
                 if (existing) {
                   handleCustomerChange(existing.account_id);
 
                 }
               }}
+              onKeyDown={({ key, value }) => {
+                if (key === "Enter") {
+                  const isValidMobile = /^\d{10}$/.test(value);
+                  const exists = customers.some((c) => c.mobile === value);
+                  if (isValidMobile && !exists) {
+                    handleAddCustomer(value);
+                  }
+                }
+              }}
               options={customers.map((c) => ({ value: c.mobile, label: c.mobile }))}
               allowCustomInput
             />
+
+
           </div>
           <AiOutlinePlus
             size={20}
             color="black"
-            onClick={handleAddCustomer}
+            // onClick={handleAddCustomer}
+            onClick={() => {
+              console.log("Mobile passed to handleAddCustomer:", formData.mobile);
+              handleAddCustomer(formData.mobile); // This should be passing the correct mobile number
+            }}
             style={{
               marginLeft: "10px",
               cursor: "pointer",
@@ -139,16 +160,21 @@ const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAd
                 // Clear all dependent fields
                 setFormData((prev) => ({
                   ...prev,
-                  mobile: "",
+                  customer_id: "",
                   account_name: "",
+                  mobile: "",
                   email: "",
                   address1: "",
+                  address2: "",
                   city: "",
                   pincode: "",
                   state: "",
+                  state_code: "",
                   aadhar_card: "",
                   gst_in: "",
+                  pan_card: "",
                 }));
+                setCustomerImage("");
                 return;
               }
 
@@ -253,9 +279,9 @@ const CustomerDetails = ({ formData, setFormData, handleCustomerChange, handleAd
             <div style={{ width: "50px", height: "50px" }}>
               <img
                 // src={customerImage}
-                   src={`${baseURL}/uploads/${customerImage}`}
+                src={`${baseURL}/uploads/${customerImage}`}
                 alt="Customer"
-                style={{ width: "100%", height: "80%", marginBottom:"0px", objectFit: "cover", borderRadius: "8px", border: "1px solid #ccc" }}
+                style={{ width: "100%", height: "80%", marginBottom: "0px", objectFit: "cover", borderRadius: "8px", border: "1px solid #ccc" }}
               />
             </div>
           </Col>

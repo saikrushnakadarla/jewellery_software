@@ -682,6 +682,7 @@ const RepairsTable = () => {
                       <th>Stone Wt</th>
                       <th>W.Wt</th>
                       <th>Total Wt</th>
+                      <th>Size</th>
                       <th>MC</th>
                       <th>Rate</th>
                       <th>Tax Amt</th>
@@ -701,6 +702,7 @@ const RepairsTable = () => {
                         <td>{product.stone_weight}</td>
                         <td>{product.wastage_weight}</td>
                         <td>{product.total_weight_av}</td>
+                        <td>{product.size}</td>
                         <td>{product.making_charges}</td>
                         <td>{product.rate}</td>
                         <td>{product.tax_amt}</td>

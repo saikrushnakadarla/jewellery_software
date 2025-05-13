@@ -70,7 +70,7 @@ const ItemSale = () => {
         accessor: 'invoices',
         Cell: ({ value }) => value.length,
       },
-  
+
     ],
     []
   );
@@ -86,19 +86,23 @@ const ItemSale = () => {
         Header: 'Account Name',
         accessor: 'account_name',
       },
-       {
+      {
+        Header: 'Mobile',
+        accessor: 'mobile',
+      },
+      {
         Header: 'Sub Category',
         accessor: 'sub_category',
       },
-       {
+      {
         Header: 'Gross Weight',
         accessor: 'gross_weight',
       },
-       {
+      {
         Header: 'Net Weight',
         accessor: 'weight_bw',
       },
-       {
+      {
         Header: 'Purity',
         accessor: 'purity',
       },
@@ -172,7 +176,7 @@ const ItemSale = () => {
       <div className="payments-table-container">
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
-            <h3 style={{ fontSize: '14px' }}>Item Sales Report</h3>
+            <h3>Item Sales Report</h3>
           </Col>
         </Row>
         {loading ? (

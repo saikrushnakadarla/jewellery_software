@@ -463,6 +463,7 @@ const SalesForm = () => {
       qty: "",
       imagePreview: null,
       remarks: "",
+      size:"",
     }));
   };
 
@@ -613,8 +614,18 @@ const SalesForm = () => {
     navigate(-1);
   };
 
-  const handleAddCustomer = () => {
-    navigate("/customermaster", { state: { from: "/orders" } });
+  // const handleAddCustomer = () => {
+  //   navigate("/customermaster", { state: { from: "/orders" } });
+  // };
+
+    const handleAddCustomer = (mobile) => {
+    console.log("handleAddCustomer received mobile:", mobile);
+    navigate("/customermaster", { 
+      state: { 
+        from: `/orders`,
+        mobile: mobile // Pass the mobile number here
+      } 
+    });
   };
 
   const totalAmount = orderDetails.reduce((sum, item) => {
@@ -764,6 +775,7 @@ const SalesForm = () => {
                 customers={customers}
                 setSelectedMobile={setSelectedMobile}
                 customerImage={customerImage}
+                setCustomerImage={setCustomerImage}
               />
             </div>
             <div className="sales-form-right">
