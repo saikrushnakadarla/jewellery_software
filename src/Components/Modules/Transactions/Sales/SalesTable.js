@@ -336,7 +336,7 @@ const RepairsTable = () => {
 
         // Filter repeatedData to include only items with specific transaction statuses
         const filteredRepairData = repairDetails.repeatedData.filter(
-          (item) => item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice"
+          (item) => item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice" || item.transaction_status === "ConvertedRepairInvoice"
         );
 
         if (filteredRepairData.length === 0) {
@@ -487,7 +487,7 @@ const RepairsTable = () => {
 
       // Filter out only 'Sales' items
       const filteredData = response.data.filter(
-        (item) => item.transaction_status === 'Sales' || item.transaction_status === "ConvertedInvoice"
+        (item) => item.transaction_status === 'Sales' || item.transaction_status === "ConvertedInvoice" || item.transaction_status === "ConvertedRepairInvoice"
       );
       console.log("Filtered Orders: ", filteredData);
 
@@ -507,7 +507,7 @@ const RepairsTable = () => {
 
       // Filter repeatedData to include only 'Sales' or 'ConvertedInvoice'
       const filteredData = response.data.repeatedData.filter(
-        (item) => item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice"
+        (item) => item.transaction_status === "Sales" || item.transaction_status === "ConvertedInvoice" || item.transaction_status === "ConvertedRepairInvoice"
       );
 
       // Check if any item in repeatedData has invoice === "Converted"

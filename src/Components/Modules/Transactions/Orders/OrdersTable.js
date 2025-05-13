@@ -337,12 +337,12 @@ const RepairsTable = () => {
   const fetchRepairs = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-order-details`);
-      // console.log("Full response data: ", response.data); 
-      // const filteredData = response.data.filter(
-      //   (item) => item.transaction_status === 'Orders'
-      // );
-      // console.log("Filtered Orders: ", filteredData); 
-      setData(response.data);
+      console.log("Full response data: ", response.data); 
+      const filteredData = response.data.filter(
+        (item) => item.transaction_status === 'Orders' || item.transaction_status === "ConvertedInvoice"
+      );
+      console.log("Filtered Orders: ", filteredData); 
+      setData(filteredData);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching repair details:', error);
