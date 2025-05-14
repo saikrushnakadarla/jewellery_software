@@ -45,7 +45,7 @@ const DataTable = ({ columns, data, initialSearchValue = "" }) => {
         style={{ maxWidth: "300px", marginBottom: "10px" }}
       /> */}
 
-      <Table striped bordered hover responsive {...getTableProps()}>
+      <Table striped bordered hover responsive {...getTableProps()} style={{whiteSpace:"nowrap"}}>
         <thead>
           {headerGroups.map((headerGroup, i) => (
             <tr {...headerGroup.getHeaderGroupProps()} key={i}>

@@ -496,11 +496,11 @@ const RepairsTable = () => {
                 >
                   Receive from Workshop
                 </option>
-                <option value="Delivered to Customer"
+                {/* <option value="Delivered to Customer"
                   disabled={status === 'Pending' || status === 'Assign to Workshop'}
                 >
                   Delivered to Customer
-                </option>
+                </option> */}
               </select>
             </div>
           );
