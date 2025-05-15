@@ -191,7 +191,7 @@ const SalesForm = () => {
   };
 
   useEffect(() => {
-    const fetchRepairs = async () => {
+    const fetchSales = async () => {
       try {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
         const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
@@ -202,7 +202,7 @@ const SalesForm = () => {
       }
     };
 
-    fetchRepairs();
+    fetchSales();
   }, []);
 
   useEffect(() => {
@@ -435,7 +435,6 @@ const SalesForm = () => {
     localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedRepairDetails));
   };
 
-
   const handleDiscountChange = (e) => {
     const discountValue = parseFloat(e.target.value) || "";
 
@@ -469,8 +468,15 @@ const SalesForm = () => {
           const validFrom = new Date(offer.valid_from);
           const validTo = new Date(offer.valid_to);
 
-          // Compare dates - check if today is in between valid_from and valid_to
-          return today >= validFrom && today <= validTo;
+          // Ensure today's date is within valid range
+          const isDateValid = today >= validFrom && today <= validTo;
+
+          // Ensure offer_status is UNAPPLIED (case-insensitive)
+          const isStatusUnapplied =
+            offer.offer_status &&
+            offer.offer_status.toLowerCase() === "applied";
+
+          return isDateValid && isStatusUnapplied;
         });
 
         setOffers(filteredOffers);
@@ -483,6 +489,7 @@ const SalesForm = () => {
 
     fetchData();
   }, []);
+
 
   const [isAnyOfferApplied, setIsAnyOfferApplied] = useState(false);
 
@@ -819,9 +826,13 @@ const SalesForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState("");
-  
+  const [autoEditIndex, setAutoEditIndex] = useState(null);
+  const [autoUpdateInProgress, setAutoUpdateInProgress] = useState(false);
 
-  const fetchRepairs = async () => {
+
+
+
+  const fetchOrders = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-order-details`);
       console.log("Full response data: ", response.data);
@@ -842,7 +853,7 @@ const SalesForm = () => {
   };
 
   useEffect(() => {
-    fetchRepairs();
+    fetchOrders();
     handleViewDetails();
   }, []);
 
@@ -887,8 +898,9 @@ const SalesForm = () => {
       const filteredData = response.data.repeatedData.map(item => ({
         ...item,
         invoice_number: formData.invoice_number, // Add invoice_number from formData
-        transaction_status: "Sales",             // Add transaction_status as "Sales"
+        transaction_status: "Orders",             // Add transaction_status as "Sales"
         date: formData.date,
+        invoice: 'Converted',
       }));
 
       if (filteredData.length > 0) {
@@ -897,6 +909,7 @@ const SalesForm = () => {
 
         // Update state with filtered data
         setRepairDetails(filteredData);
+        setAutoEditIndex(0);
 
         // Immediately retrieve and log stored data
         const storedData = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`));
@@ -938,12 +951,106 @@ const SalesForm = () => {
     }
   };
 
+
   useEffect(() => {
-    if (repairDetails.length > 0) {
-      console.log("Updated repairDetails:", repairDetails);
+    if (repairDetails.length > 0 && autoEditIndex !== null) {
+      handleEdit(autoEditIndex); // Trigger edit for current index
+      setAutoUpdateInProgress(true); // Enable update trigger
     }
-  }, [repairDetails]);
-  
+  }, [repairDetails, autoEditIndex]);
+
+  useEffect(() => {
+    if (autoUpdateInProgress) {
+      handleUpdate(); // Update after editing
+      setAutoUpdateInProgress(false); // Reset update trigger
+    }
+  }, [formData]);
+
+  // This effect moves to the next index after update
+  useEffect(() => {
+    if (!autoUpdateInProgress && autoEditIndex !== null) {
+      const nextIndex = autoEditIndex + 1;
+      if (nextIndex < repairDetails.length) {
+        setAutoEditIndex(nextIndex); // Proceed to next item
+      } else {
+        setAutoEditIndex(null); // Finished all updates
+        console.log("All items updated.");
+      }
+    }
+  }, [autoUpdateInProgress]);
+
+
+
+  const [repairs, setRepairs] = useState([]);
+  const [selectedRepairs, setSelectedRepairs] = useState({});
+
+  const fetchRepairs = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/get/repairs`);
+      setRepairs(response.data);
+      console.log("Repairs=", response.data);
+    } catch (error) {
+      console.error('Error fetching repairs:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRepairs();
+  }, []);
+
+  const handleRepairCheckboxChange = (repair, isChecked) => {
+    const storageKey = `repairDetails_${tabId}`;
+    const existingData = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+    if (isChecked) {
+      // Pick only the desired fields
+      const filteredRepair = {
+        sub_category: repair.item,
+        product_name: repair.item,
+        customer_id: repair.customer_id,
+        account_name: repair.account_name,
+        mobile: repair.mobile,
+        email: repair.email,
+        address1: repair.address1,
+        address2: repair.address2,
+        city: repair.city,
+        metal_type: repair.metal_type,
+        purity: repair.purity,
+        category: repair.category,
+        gross_weight: repair.gross_weight,
+        total_weight_av: repair.gross_weight,
+        printing_purity: repair.purity,
+        selling_purity: repair.purity,
+        qty: repair.qty,
+        total_price: repair.total_amt,
+        repair_no: repair.repair_no, // Include to identify uniquely
+      };
+
+      // Add only if not already present
+      const alreadyExists = existingData.some(item => item.repair_no === repair.repair_no);
+      if (!alreadyExists) {
+        const updatedData = [...existingData, filteredRepair];
+        localStorage.setItem(storageKey, JSON.stringify(updatedData));
+        setRepairDetails(updatedData);
+
+      }
+
+
+
+      setSelectedRepairs({ ...selectedRepairs, [repair.repair_no]: true });
+
+    } else {
+      // Remove item by repair_no
+      const updatedData = existingData.filter(item => item.repair_no !== repair.repair_no);
+      localStorage.setItem(storageKey, JSON.stringify(updatedData));
+
+      const updatedSelection = { ...selectedRepairs };
+      delete updatedSelection[repair.repair_no];
+      setSelectedRepairs(updatedSelection);
+      setRepairDetails([]);
+    }
+  };
+
   // const handleAdd = () => {
   //   const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
 
@@ -2064,6 +2171,8 @@ const SalesForm = () => {
                 orderDetails={orderDetails}
                 loading={loading}
                 formatDate={formatDate}
+                repairs={repairs}
+                handleRepairCheckboxChange={handleRepairCheckboxChange}
               />
             </div>
             <div className="sales-form-fourth">
