@@ -52,8 +52,12 @@ const ProductDetails = ({
   taxableAmount,
   tabId,
   setIsTotalPriceCleared,
-  isManualTotalPriceChange, setIsManualTotalPriceChange,
-  offers
+  isManualTotalPriceChange, 
+  setIsManualTotalPriceChange,
+  offers,
+  handleOrderChange,
+  selectedOrder,
+  orderData
 }) => {
 
   const [showModal, setShowModal] = useState(false);
@@ -90,7 +94,7 @@ const ProductDetails = ({
     if (!formData.code && defaultBarcode) {
       handleBarcodeChange(defaultBarcode);
     }
-  }, [formData.category, defaultBarcode]); 
+  }, [formData.category, defaultBarcode]);
 
   const handleClear = () => {
     setFormData(prevFormData => ({
@@ -221,14 +225,14 @@ const ProductDetails = ({
       setFormData(prev => {
         const roundedTaxAmt = parseFloat(taxAmt).toFixed(2);
         const roundedTotalPrice = (Math.round(parseFloat(totalPrice) * 100) / 100).toFixed(2);
-      
+
         return {
           ...prev,
           tax_amt: taxAmt.toFixed(2),
           total_price: roundedTotalPrice,
         };
       });
-      
+
     }
 
     // Final shared state update
@@ -450,16 +454,16 @@ const ProductDetails = ({
 
 
         <Col xs={12} md={2}>
-                  <InputField
-                    label="BarCode/Rbarcode"
-                    name="code"
-                    value={formData.code || defaultBarcode} // Default barcode when formData.code is empty
-                    onChange={(e) => handleBarcodeChange(e.target.value)}
-                    type="select"
-                    options={barcodeOptions}
-                    autoFocus
-                  />
-                </Col>
+          <InputField
+            label="BarCode/Rbarcode"
+            name="code"
+            value={formData.code || defaultBarcode} // Default barcode when formData.code is empty
+            onChange={(e) => handleBarcodeChange(e.target.value)}
+            type="select"
+            options={barcodeOptions}
+            autoFocus
+          />
+        </Col>
 
         <Col xs={12} md={2} className="d-flex align-items-center">
           <div style={{ flex: 1 }}>
@@ -1280,6 +1284,20 @@ const ProductDetails = ({
               ...estimate.map((item) => ({
                 value: item.estimate_number,
                 label: item.estimate_number
+              }))
+            ]}
+          />
+        </Col>
+        <Col xs={12} md={2}>
+          <InputField
+            label="Order Number"
+            type="select"
+            value={selectedOrder}
+            onChange={handleOrderChange}
+            options={[
+              ...orderData.map((item) => ({
+                value: item.order_number,
+                label: item.order_number
               }))
             ]}
           />

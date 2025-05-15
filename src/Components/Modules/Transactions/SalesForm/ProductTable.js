@@ -4,6 +4,7 @@ import { FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 import "./ProductTable.css";
 
 const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
+  console.log("repairDetails=",repairDetails)
   const taxableAmount = repairDetails.reduce((sum, item) => {
     const stonePrice = parseFloat(item.stone_price) || 0;
     const makingCharges = parseFloat(item.making_charges) || 0;
@@ -30,6 +31,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
           <tr>
             <th>S No</th>
             <th>BarCode</th>
+            {/* <th>Invoice Number</th> */}
             <th>Product Name</th>
             <th>Metal</th>
             <th>Purity</th>
@@ -55,6 +57,7 @@ const ProductTable = ({ repairDetails, onDelete, onEdit }) => {
               <tr key={index} className='table-values-sales'>
                 <td>{index + 1}</td>
                 <td>{detail.code}</td>
+                {/* <td>{detail.invoice_number}</td> */}
                 <td>{detail.product_name}</td>
                 <td>{detail.metal_type}</td>
                 <td>{detail.pricing === 'By Weight' ? detail.selling_purity : detail.printing_purity}</td>

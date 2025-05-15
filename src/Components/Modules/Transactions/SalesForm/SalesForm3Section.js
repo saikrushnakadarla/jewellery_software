@@ -6,7 +6,7 @@ import SaleReturnForm from "./SaleReturnForm"; // Import the SaleReturnForm comp
 import { useNavigate } from "react-router-dom";
 import './SalesForm3section.css';
 import Repairtable from "./Repairs";
-import Oderstable from "./OrdersTable";
+import Oderstable from "./SalesOrderTable";
 const SalesFormSection = ({ setOldSalesData,
   setSchemeSalesData,
   selectedMobile,
@@ -29,7 +29,17 @@ const SalesFormSection = ({ setOldSalesData,
   repairDetails,
   resetSaleReturnForm,
   handleCheckout,
-  tabId
+  tabId,
+  setRepairDetails,
+  formData,
+  orderData,
+  handleCloseModal,
+  handleViewDetails,
+  handleOrderCheckboxChange,
+  showModal,
+  orderDetails,
+  loading,
+  formatDate
 }) => {
 
   const [activeForm, setActiveForm] = useState("old");
@@ -93,8 +103,8 @@ const SalesFormSection = ({ setOldSalesData,
               borderColor: activeForm === "repairs" ? "rgb(163, 110, 41)" : "gray",
               color: "white", fontSize: '13px', padding: '5px'
             }}
-          
-              onClick={() => {
+
+            onClick={() => {
               setActiveForm("repair");
               console.log("Selected Mobile:", selectedMobile); // Optional: for debugging or handling
               // You can handle `selectedMobile` elsewhere as needed
@@ -117,12 +127,24 @@ const SalesFormSection = ({ setOldSalesData,
       )}
       {activeForm === "orders" && (
         <Oderstable
-        selectedMobile={selectedMobile}
+          selectedMobile={selectedMobile}
+          tabId={tabId}
+          setRepairDetails={setRepairDetails}
+          formData={formData}
+          repairDetails={repairDetails}
+          orderData={orderData}
+          handleCloseModal={handleCloseModal}
+          handleViewDetails={handleViewDetails}
+          handleOrderCheckboxChange={handleOrderCheckboxChange}
+          showModal={showModal}
+          orderDetails={orderDetails}
+          loading={loading}
+          formatDate={formatDate}
         />
       )}
-       {activeForm === "repair" && (
+      {activeForm === "repair" && (
         <Repairtable
-        selectedMobile={selectedMobile}
+          selectedMobile={selectedMobile}
         />
       )}
       {activeForm === "sale_return" && <SaleReturnForm
