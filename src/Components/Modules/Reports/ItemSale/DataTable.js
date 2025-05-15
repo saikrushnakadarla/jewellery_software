@@ -1,9 +1,8 @@
-// DataTable.js
 import React, { useState, useEffect } from 'react';
 import { useTable, usePagination, useGlobalFilter, useSortBy, useExpanded } from 'react-table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function GlobalFilter({ globalFilter, setGlobalFilter, handleDateFilter }) {
+function GlobalFilter({ globalFilter, setGlobalFilter, handleDateFilter, onFilter }) {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
 
@@ -11,15 +10,40 @@ function GlobalFilter({ globalFilter, setGlobalFilter, handleDateFilter }) {
     handleDateFilter(fromDate, toDate);
   };
 
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setGlobalFilter(value);
+    if (onFilter) {
+      onFilter(value);
+    }
+  };
+
+  const clearSearch = () => {
+    setGlobalFilter('');
+    if (onFilter) {
+      onFilter('');
+    }
+  };
+
   return (
     <div className="dataTable_search mb-3 d-flex align-items-center gap-2">
-      <input
-        value={globalFilter || ''}
-        onChange={(e) => setGlobalFilter(e.target.value)}
-        className="form-control"
-        placeholder="Search all data..."
-        style={{ maxWidth: '250px' }}
-      />
+      <div className="position-relative" style={{ maxWidth: '250px' }}>
+        <input
+          value={globalFilter || ''}
+          onChange={handleSearchChange}
+          className="form-control pe-4"
+          placeholder="Search all data..."
+        />
+        {globalFilter && (
+          <span 
+            className="position-absolute end-0 top-50 translate-middle-y me-2"
+            style={{ cursor: 'pointer', size: "20px" }}
+            onClick={clearSearch}
+          >
+            ×
+          </span>
+        )}
+      </div>
       <input
         type="date"
         value={fromDate}
@@ -41,7 +65,7 @@ function GlobalFilter({ globalFilter, setGlobalFilter, handleDateFilter }) {
   );
 }
 
-export default function DataTable({ columns, data, renderRowSubComponent }) {
+export default function DataTable({ columns, data, renderRowSubComponent, globalFilter, setGlobalFilter, onFilter }) {
   const [filteredData, setFilteredData] = useState(data);
   const [originalData, setOriginalData] = useState(data);
 
@@ -79,34 +103,13 @@ export default function DataTable({ columns, data, renderRowSubComponent }) {
     nextPage,
     previousPage,
     setPageSize,
-    setGlobalFilter,
-    state: { pageIndex, pageSize, globalFilter, expanded },
+    state: { pageIndex, pageSize, expanded },
   } = useTable(
     {
       columns,
       data: filteredData,
       initialState: { pageIndex: 0 },
-      globalFilter: (rows, columns, filterValue) => {
-        const lowerFilter = filterValue.toLowerCase();
-        return rows.filter(row => {
-          // Search in main row data
-          const mainRowMatch = columns.some(column => {
-            const value = row.values[column.accessor];
-            return String(value).toLowerCase().includes(lowerFilter);
-          });
-
-          // Search in expanded row data (invoices)
-          const expandedRowMatch = row.original.invoices.some(invoice => {
-            return Object.values(invoice).some(value => 
-              String(value).toLowerCase().includes(lowerFilter)
-            );
-          });
-
-          return mainRowMatch || expandedRowMatch;
-        });
-      },
     },
-    useGlobalFilter,
     useSortBy,
     useExpanded,
     usePagination
@@ -117,7 +120,8 @@ export default function DataTable({ columns, data, renderRowSubComponent }) {
       <GlobalFilter 
         globalFilter={globalFilter} 
         setGlobalFilter={setGlobalFilter} 
-        handleDateFilter={handleDateFilter} 
+        handleDateFilter={handleDateFilter}
+        onFilter={onFilter}
       />
 
       <div className="table-responsive">

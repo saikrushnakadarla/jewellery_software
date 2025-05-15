@@ -1,17 +1,23 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrash, FaEye, FaChevronDown, FaChevronRight } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaEye, FaChevronDown, FaChevronRight, FaFileExcel, FaFilePdf } from 'react-icons/fa';
 import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 import baseURL from '../../../../Url/NodeBaseURL';
 import DataTable from './DataTable';
+import autoTable from 'jspdf-autotable';
 
 const ItemSale = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [repairDetails, setRepairDetails] = useState(null);
+  const [globalFilter, setGlobalFilter] = useState('');
 
   // Group data by category, sub_category, and design_name
   const groupByItem = (data) => {
@@ -74,7 +80,7 @@ const ItemSale = () => {
     []
   );
 
-    const formatDate = (dateString) => {
+  const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
     return `${String(date.getDate()).padStart(2, '0')}-${String(
@@ -82,11 +88,10 @@ const ItemSale = () => {
     ).padStart(2, '0')}-${date.getFullYear()}`;
   };
 
-
   // Columns for the expanded invoice rows
   const invoiceColumns = React.useMemo(
     () => [
-       {
+      {
         Header: 'Date',
         accessor: 'date',
         Cell: ({ value }) => formatDate(value) || 'N/A'
@@ -140,6 +145,7 @@ const ItemSale = () => {
         );
 
         setData(filteredData);
+        setFilteredData(filteredData);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching repair details:', error);
@@ -165,8 +171,179 @@ const ItemSale = () => {
     setRepairDetails(null);
   };
 
+  // Filter data based on search term
+  const filterData = (searchTerm) => {
+    if (!searchTerm) {
+      setFilteredData(data);
+      return;
+    }
+
+    const lowerFilter = searchTerm.toLowerCase();
+    const filtered = data.filter(item => {
+      // Search in main item properties
+      const mainPropsMatch = 
+        item.category?.toLowerCase().includes(lowerFilter) ||
+        item.sub_category?.toLowerCase().includes(lowerFilter) ||
+        item.design_name?.toLowerCase().includes(lowerFilter) ||
+        item.metal_type?.toLowerCase().includes(lowerFilter);
+
+      // Search in invoice details
+      const invoiceMatch = item.invoices?.some(invoice => 
+        Object.values(invoice).some(value => 
+          String(value).toLowerCase().includes(lowerFilter)
+        )
+      );
+
+      return mainPropsMatch || invoiceMatch;
+    });
+
+    setFilteredData(filtered);
+  };
+
+  // Export to Excel function with hierarchical structure
+  const exportToExcel = () => {
+    // Use the filtered data for export
+    const exportData = [];
+    const groupedData = groupByItem(filteredData);
+    
+    groupedData.forEach((group, groupIndex) => {
+      // Add group header row
+      exportData.push({
+        'Sr. No.': groupIndex + 1,
+        'Category': group.category,
+        'Sub Category': group.sub_category,
+        'Metal Type': group.metal_type,
+        'Design Name': group.design_name,
+        'Total Qty': group.invoices.length,
+        'Date': '',
+        'Invoice No.': '',
+        'Account Name': '',
+        'Mobile': '',
+        'Gross Weight': '',
+        'Net Weight': '',
+        'Purity': '',
+        'Total Amt': ''
+      });
+      
+      // Add invoice details for this group
+      group.invoices.forEach((invoice) => {
+        exportData.push({
+          'Sr. No.': '',
+          'Category': '',
+          'Sub Category': '',
+          'Metal Type': '',
+          'Design Name': '',
+          'Total Qty': '',
+          'Date': formatDate(invoice.date),
+          'Invoice No.': invoice.invoice_number,
+          'Account Name': invoice.account_name,
+          'Mobile': invoice.mobile,
+          'Gross Weight': invoice.gross_weight,
+          'Net Weight': invoice.weight_bw,
+          'Purity': invoice.purity,
+          'Total Amt': parseFloat(invoice.total_price || 0).toFixed(2)
+        });
+      });
+      
+      // Add empty row between groups
+      exportData.push({});
+    });
+    
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "ItemSalesReport");
+    
+    // Generate a file name with current date
+    const date = new Date();
+    const fileName = `ItemSalesReport_${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}.xlsx`;
+    
+    XLSX.writeFile(workbook, fileName);
+  };
+
+  // Export to PDF function with hierarchical structure
+  const exportToPDF = () => {
+    // Use the filtered data for export
+    const groupedData = groupByItem(filteredData);
+    
+    // Create new PDF document
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(16);
+    doc.text('Item Sales Report', 14, 15);
+    
+    // Add date
+    doc.setFontSize(10);
+    const date = new Date();
+    doc.text(`Generated on: ${date.toLocaleDateString()}`, 14, 22);
+    
+    let startY = 30;
+    
+    groupedData.forEach((group, groupIndex) => {
+      // Add group header
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0); // Black color
+      doc.setFont(undefined, 'bold');
+      doc.text(
+        `${groupIndex + 1}. ${group.category} - ${group.sub_category} - ${group.metal_type} - ${group.design_name} (Total Qty: ${group.invoices.length})`,
+        14,
+        startY
+      );
+      
+      startY += 8;
+      
+      // Prepare invoice data for this group
+      const invoiceData = group.invoices.map(invoice => [
+        formatDate(invoice.date),
+        invoice.invoice_number,
+        invoice.account_name,
+        invoice.mobile,
+        invoice.gross_weight,
+        invoice.weight_bw,
+        invoice.purity,
+        parseFloat(invoice.total_price || 0).toFixed(2)
+      ]);
+      
+      // Add table for invoices
+      autoTable(doc, {
+        head: [
+          ['Date', 'Invoice No.', 'Account Name', 'Mobile', 
+           'Gross Weight', 'Net Weight', 'Purity', 'Total Amt']
+        ],
+        body: invoiceData,
+        startY: startY,
+        styles: {
+          fontSize: 8,
+          cellPadding: 2
+        },
+        headStyles: {
+          fillColor: [22, 160, 133],
+          textColor: 255,
+          fontSize: 9
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245]
+        }
+      });
+      
+      // Update startY position for next group
+      startY = doc.lastAutoTable.finalY + 10;
+      
+      // Add page break if needed
+      if (startY > 280 && groupIndex < groupedData.length - 1) {
+        doc.addPage();
+        startY = 20;
+      }
+    });
+    
+    // Generate a file name with current date
+    const fileName = `ItemSalesReport_${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}.pdf`;
+    
+    doc.save(fileName);
+  };
+
   // Group the data for display
-  const groupedData = useMemo(() => groupByItem(data), [data]);
+  const groupedData = useMemo(() => groupByItem(filteredData), [filteredData]);
 
   // Render expanded row (sub-component)
   const renderRowSubComponent = React.useCallback(
@@ -223,6 +400,14 @@ const ItemSale = () => {
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Item Sales Report</h3>
+            <div>
+              <Button variant="success" onClick={exportToExcel} className="me-2" style={{ fontSize: '14px' }}>
+                <FaFileExcel className="me-1" /> Export to Excel
+              </Button>
+              <Button variant="danger" onClick={exportToPDF} style={{ fontSize: '14px' }}>
+                <FaFilePdf className="me-1" /> Export to PDF
+              </Button>
+            </div>
           </Col>
         </Row>
         {loading ? (
@@ -232,6 +417,9 @@ const ItemSale = () => {
             columns={columns}
             data={groupedData}
             renderRowSubComponent={renderRowSubComponent}
+            globalFilter={globalFilter}
+            setGlobalFilter={setGlobalFilter}
+            onFilter={filterData}
           />
         )}
       </div>
