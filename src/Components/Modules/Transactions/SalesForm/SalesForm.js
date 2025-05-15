@@ -191,7 +191,7 @@ const SalesForm = () => {
   };
 
   useEffect(() => {
-    const fetchRepairs = async () => {
+    const fetchSales = async () => {
       try {
         const response = await axios.get(`${baseURL}/get-unique-repair-details`);
         const filteredData = response.data.filter(item => item.transaction_status === 'Sales');
@@ -202,7 +202,7 @@ const SalesForm = () => {
       }
     };
 
-    fetchRepairs();
+    fetchSales();
   }, []);
 
   useEffect(() => {
@@ -435,7 +435,6 @@ const SalesForm = () => {
     localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedRepairDetails));
   };
 
-
   const handleDiscountChange = (e) => {
     const discountValue = parseFloat(e.target.value) || "";
 
@@ -469,8 +468,15 @@ const SalesForm = () => {
           const validFrom = new Date(offer.valid_from);
           const validTo = new Date(offer.valid_to);
 
-          // Compare dates - check if today is in between valid_from and valid_to
-          return today >= validFrom && today <= validTo;
+          // Ensure today's date is within valid range
+          const isDateValid = today >= validFrom && today <= validTo;
+
+          // Ensure offer_status is UNAPPLIED (case-insensitive)
+          const isStatusUnapplied =
+            offer.offer_status &&
+            offer.offer_status.toLowerCase() === "applied";
+
+          return isDateValid && isStatusUnapplied;
         });
 
         setOffers(filteredOffers);
@@ -483,6 +489,7 @@ const SalesForm = () => {
 
     fetchData();
   }, []);
+
 
   const [isAnyOfferApplied, setIsAnyOfferApplied] = useState(false);
 
@@ -819,9 +826,9 @@ const SalesForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState("");
-  
 
-  const fetchRepairs = async () => {
+
+  const fetchOrders = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-order-details`);
       console.log("Full response data: ", response.data);
@@ -842,7 +849,7 @@ const SalesForm = () => {
   };
 
   useEffect(() => {
-    fetchRepairs();
+    fetchOrders();
     handleViewDetails();
   }, []);
 
@@ -887,8 +894,9 @@ const SalesForm = () => {
       const filteredData = response.data.repeatedData.map(item => ({
         ...item,
         invoice_number: formData.invoice_number, // Add invoice_number from formData
-        transaction_status: "Sales",             // Add transaction_status as "Sales"
+        transaction_status: "Orders",             // Add transaction_status as "Sales"
         date: formData.date,
+        invoice: 'Converted',
       }));
 
       if (filteredData.length > 0) {
@@ -943,7 +951,24 @@ const SalesForm = () => {
       console.log("Updated repairDetails:", repairDetails);
     }
   }, [repairDetails]);
-  
+
+
+  const [repairs, setRepairs] = useState([]);
+
+  const fetchRepairs = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/get/repairs`);
+      setRepairs(response.data);
+      console.log("Repairs=", response.data);
+    } catch (error) {
+      console.error('Error fetching repairs:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRepairs();
+  }, []);
+
   // const handleAdd = () => {
   //   const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
 
@@ -2064,6 +2089,7 @@ const SalesForm = () => {
                 orderDetails={orderDetails}
                 loading={loading}
                 formatDate={formatDate}
+                repairs={repairs}
               />
             </div>
             <div className="sales-form-fourth">

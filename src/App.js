@@ -23,6 +23,7 @@ import Purchase from './Components/Modules/Transactions/Purchase/Purchase';
 import PurchaseTable from './Components/Modules/Transactions/Purchase/PurchaseTable';
 import PurchaseTable1 from './Components/Modules/Transactions/Purchase/PurchaseTable1';
 import Receipts from './Components/Modules/Transactions/Receipts/Receipts';
+import OrderReceipts from './Components/Modules/Transactions/Receipts/OrderReceipts';
 import ReceiptsTable from './Components/Modules/Transactions/Receipts/ReceiptsTable';
 import PurchaseReport from './Components/Modules/Reports/PurchaseReport/PurchaseReport'
 import PurchaseBalanceReport from './Components/Modules/Reports/PurchaseBalanceReport/PurchaseBalanceReport'
@@ -111,6 +112,7 @@ function App() {
         <Route path="/purchasetable" element={<PurchaseTable />} />
         <Route path="/purchasetableold" element={<PurchaseTable1 />} />
         <Route path="/receipts" element={<Receipts />} />
+        <Route path="/orderreceipts" element={<OrderReceipts />} />
         <Route path="/receipts/:id" element={<Receipts />} />
         <Route path="/receiptstable" element={<ReceiptsTable />} />
         <Route path="/purchaseReport" element={<PurchaseReport />} />
@@ -160,7 +162,6 @@ function App() {
         <Route path="/subcategory/:id" element={<SubCategory />} />
         <Route path="/estimateSales" element={<EstimateSales />} />
         <Route path="/qrcode" element={<QRScanner />} />
-
         <Route path="/purchase-payment" element={<PurchasePayment />} />
         <Route path="/ratecuts" element={<RateCuts />} />
          <Route path="/itemsales" element={<ItemSales />} />
