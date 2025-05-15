@@ -3,7 +3,7 @@ import { Table, Form } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from "../../../../Url/NodeBaseURL";
 
-const RepairsTable = ({ selectedMobile, tabId, setRepairDetails }) => {
+const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairCheckboxChange }) => {
     const [repairs, setRepairs] = useState([]);
     const [selectedRepairs, setSelectedRepairs] = useState({});
 
@@ -116,7 +116,7 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails }) => {
                                             type="checkbox"
                                             checked={!!selectedRepairs[repair.repair_no]}
                                             onChange={(e) =>
-                                                handleCheckboxChange(repair, e.target.checked)
+                                                handleRepairCheckboxChange(repair, e.target.checked)
                                             }
                                         />
                                     </td>

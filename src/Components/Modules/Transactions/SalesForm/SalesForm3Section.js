@@ -40,7 +40,8 @@ const SalesFormSection = ({ setOldSalesData,
   orderDetails,
   loading,
   formatDate,
-  repairs
+  repairs,
+  handleRepairCheckboxChange
 }) => {
 
   const [activeForm, setActiveForm] = useState("old");
@@ -149,6 +150,7 @@ const SalesFormSection = ({ setOldSalesData,
           repairs={repairs}
           tabId={tabId}
           setRepairDetails={setRepairDetails}
+          handleRepairCheckboxChange={handleRepairCheckboxChange}
         />
       )}
       {activeForm === "sale_return" && <SaleReturnForm

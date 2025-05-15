@@ -826,6 +826,10 @@ const SalesForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState("");
+  const [autoEditIndex, setAutoEditIndex] = useState(null);
+  const [autoUpdateInProgress, setAutoUpdateInProgress] = useState(false);
+
+
 
 
   const fetchOrders = async () => {
@@ -905,6 +909,7 @@ const SalesForm = () => {
 
         // Update state with filtered data
         setRepairDetails(filteredData);
+        setAutoEditIndex(0);
 
         // Immediately retrieve and log stored data
         const storedData = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`));
@@ -946,14 +951,38 @@ const SalesForm = () => {
     }
   };
 
+
   useEffect(() => {
-    if (repairDetails.length > 0) {
-      console.log("Updated repairDetails:", repairDetails);
+    if (repairDetails.length > 0 && autoEditIndex !== null) {
+      handleEdit(autoEditIndex); // Trigger edit for current index
+      setAutoUpdateInProgress(true); // Enable update trigger
     }
-  }, [repairDetails]);
+  }, [repairDetails, autoEditIndex]);
+
+  useEffect(() => {
+    if (autoUpdateInProgress) {
+      handleUpdate(); // Update after editing
+      setAutoUpdateInProgress(false); // Reset update trigger
+    }
+  }, [formData]);
+
+  // This effect moves to the next index after update
+  useEffect(() => {
+    if (!autoUpdateInProgress && autoEditIndex !== null) {
+      const nextIndex = autoEditIndex + 1;
+      if (nextIndex < repairDetails.length) {
+        setAutoEditIndex(nextIndex); // Proceed to next item
+      } else {
+        setAutoEditIndex(null); // Finished all updates
+        console.log("All items updated.");
+      }
+    }
+  }, [autoUpdateInProgress]);
+
 
 
   const [repairs, setRepairs] = useState([]);
+  const [selectedRepairs, setSelectedRepairs] = useState({});
 
   const fetchRepairs = async () => {
     try {
@@ -968,6 +997,59 @@ const SalesForm = () => {
   useEffect(() => {
     fetchRepairs();
   }, []);
+
+  const handleRepairCheckboxChange = (repair, isChecked) => {
+    const storageKey = `repairDetails_${tabId}`;
+    const existingData = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+    if (isChecked) {
+      // Pick only the desired fields
+      const filteredRepair = {
+        sub_category: repair.item,
+        product_name: repair.item,
+        customer_id: repair.customer_id,
+        account_name: repair.account_name,
+        mobile: repair.mobile,
+        email: repair.email,
+        address1: repair.address1,
+        address2: repair.address2,
+        city: repair.city,
+        metal_type: repair.metal_type,
+        purity: repair.purity,
+        category: repair.category,
+        gross_weight: repair.gross_weight,
+        total_weight_av: repair.gross_weight,
+        printing_purity: repair.purity,
+        selling_purity: repair.purity,
+        qty: repair.qty,
+        total_price: repair.total_amt,
+        repair_no: repair.repair_no, // Include to identify uniquely
+      };
+
+      // Add only if not already present
+      const alreadyExists = existingData.some(item => item.repair_no === repair.repair_no);
+      if (!alreadyExists) {
+        const updatedData = [...existingData, filteredRepair];
+        localStorage.setItem(storageKey, JSON.stringify(updatedData));
+        setRepairDetails(updatedData);
+
+      }
+
+
+
+      setSelectedRepairs({ ...selectedRepairs, [repair.repair_no]: true });
+
+    } else {
+      // Remove item by repair_no
+      const updatedData = existingData.filter(item => item.repair_no !== repair.repair_no);
+      localStorage.setItem(storageKey, JSON.stringify(updatedData));
+
+      const updatedSelection = { ...selectedRepairs };
+      delete updatedSelection[repair.repair_no];
+      setSelectedRepairs(updatedSelection);
+      setRepairDetails([]);
+    }
+  };
 
   // const handleAdd = () => {
   //   const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
@@ -2090,6 +2172,7 @@ const SalesForm = () => {
                 loading={loading}
                 formatDate={formatDate}
                 repairs={repairs}
+                handleRepairCheckboxChange={handleRepairCheckboxChange}
               />
             </div>
             <div className="sales-form-fourth">

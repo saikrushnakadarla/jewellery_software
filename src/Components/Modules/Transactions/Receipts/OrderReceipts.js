@@ -401,8 +401,8 @@ const RepairForm = () => {
         e.preventDefault();
         try {
             const endpoint = id
-                ? `${baseURL}/edit/receipt/${id}`
-                : `${baseURL}/post/payments`;
+                ? `${baseURL}/edit/orderreceipt/${id}`
+                : `${baseURL}/post/orderpayments`;
             const method = id ? "PUT" : "POST";
 
             const response = await fetch(endpoint, {
