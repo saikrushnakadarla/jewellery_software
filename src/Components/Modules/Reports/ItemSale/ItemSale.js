@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTable, useExpanded } from 'react-table';
 import { FaEdit, FaTrash, FaEye, FaChevronDown, FaChevronRight } from 'react-icons/fa';
 import { Button, Row, Col, Modal, Table } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from '../../../../Url/NodeBaseURL';
+import DataTable from './DataTable';
 
 const ItemSale = () => {
   const navigate = useNavigate();
@@ -70,14 +70,27 @@ const ItemSale = () => {
         accessor: 'invoices',
         Cell: ({ value }) => value.length,
       },
-
     ],
     []
   );
 
+    const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return `${String(date.getDate()).padStart(2, '0')}-${String(
+      date.getMonth() + 1
+    ).padStart(2, '0')}-${date.getFullYear()}`;
+  };
+
+
   // Columns for the expanded invoice rows
   const invoiceColumns = React.useMemo(
     () => [
+       {
+        Header: 'Date',
+        accessor: 'date',
+        Cell: ({ value }) => formatDate(value) || 'N/A'
+      },
       {
         Header: 'Invoice No.',
         accessor: 'invoice_number',
@@ -155,20 +168,53 @@ const ItemSale = () => {
   // Group the data for display
   const groupedData = useMemo(() => groupByItem(data), [data]);
 
-  // Create a table instance
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-    state: { expanded },
-  } = useTable(
-    {
-      columns,
-      data: groupedData,
+  // Render expanded row (sub-component)
+  const renderRowSubComponent = React.useCallback(
+    ({ row }) => {
+      return (
+        <div style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
+          <Table striped bordered responsive style={{ fontSize: '14px' }}>
+            <thead>
+              <tr>
+                {invoiceColumns.map((column, i) => (
+                  <th key={i}>{column.Header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {row.original.invoices.map((invoice, i) => (
+                <tr key={i}>
+                  {invoiceColumns.map((column, j) => {
+                    if (column.accessor) {
+                      return (
+                        <td key={j}>
+                          {column.Cell ?
+                            column.Cell({
+                              value: invoice[column.accessor],
+                              row: { original: invoice }
+                            }) :
+                            invoice[column.accessor]
+                          }
+                        </td>
+                      );
+                    }
+                    if (column.id) {
+                      return (
+                        <td key={j}>
+                          {column.Cell({ row: { original: invoice } })}
+                        </td>
+                      );
+                    }
+                    return null;
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </div>
+      );
     },
-    useExpanded
+    [invoiceColumns]
   );
 
   return (
@@ -182,81 +228,11 @@ const ItemSale = () => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <>
-            <Table striped bordered hover responsive {...getTableProps()} style={{ fontSize: '14px' }}>
-              <thead>
-                {headerGroups.map(headerGroup => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
-                    {headerGroup.headers.map(column => (
-                      <th {...column.getHeaderProps()}>{column.render('Header')}</th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody {...getTableBodyProps()}>
-                {rows.map(row => {
-                  prepareRow(row);
-                  return (
-                    <React.Fragment key={row.id}>
-                      <tr {...row.getRowProps()}>
-                        {row.cells.map(cell => {
-                          return (
-                            <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                          );
-                        })}
-                      </tr>
-                      {row.isExpanded && (
-                        <tr>
-                          <td colSpan={columns.length}>
-                            <div style={{ padding: '20px', backgroundColor: '#f8f9fa' }}>
-                              <Table striped bordered responsive style={{ fontSize: '14px' }}>
-                                <thead>
-                                  <tr>
-                                    {invoiceColumns.map((column, i) => (
-                                      <th key={i}>{column.Header}</th>
-                                    ))}
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {row.original.invoices.map((invoice, i) => (
-                                    <tr key={i}>
-                                      {invoiceColumns.map((column, j) => {
-                                        if (column.accessor) {
-                                          return (
-                                            <td key={j}>
-                                              {column.Cell ?
-                                                column.Cell({
-                                                  value: invoice[column.accessor],
-                                                  row: { original: invoice }
-                                                }) :
-                                                invoice[column.accessor]
-                                              }
-                                            </td>
-                                          );
-                                        }
-                                        if (column.id) {
-                                          return (
-                                            <td key={j}>
-                                              {column.Cell({ row: { original: invoice } })}
-                                            </td>
-                                          );
-                                        }
-                                        return null;
-                                      })}
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </Table>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </tbody>
-            </Table>
-          </>
+          <DataTable
+            columns={columns}
+            data={groupedData}
+            renderRowSubComponent={renderRowSubComponent}
+          />
         )}
       </div>
 
