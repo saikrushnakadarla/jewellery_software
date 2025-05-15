@@ -66,7 +66,6 @@
 // export default Customers;
 
 
-
 import React, { useState, useEffect, useRef } from "react";
 import baseURL from "../../../Url/NodeBaseURL";
 
@@ -106,6 +105,7 @@ function Customers({ onSelectCustomer }) {
       // Reset to all customers if the query is empty
       setFilteredCustomers(customers);
       setIsDropdownVisible(false);
+      onSelectCustomer(null); // Clear the filter in parent component
     } else {
       const filtered = customers.filter(
         (customer) =>
@@ -127,6 +127,7 @@ function Customers({ onSelectCustomer }) {
     setSearchQuery("");
     setFilteredCustomers(customers); // Reset the filtered list
     setIsDropdownVisible(false);
+    onSelectCustomer(null); // Clear the filter in parent component
   };
 
   const handleClickOutside = (event) => {

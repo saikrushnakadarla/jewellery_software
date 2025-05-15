@@ -98,55 +98,29 @@ const useProductHandlers = () => {
   const fileInputRef = useRef(null);
 
 
-  // useEffect(() => {
-  //   let currentRate = "";
+  useEffect(() => {
+    let currentRate = "";
 
-  //   if (formData.metal_type?.toLowerCase() === "gold" && formData.purity) {
-  //     // Check if the purity value includes specific numbers
-  //     if (formData.purity.includes("24")) {
-  //       currentRate = rates.rate_24crt;
-  //     } else if (formData.purity.includes("22")) {
-  //       currentRate = rates.rate_22crt;
-  //     } else if (formData.purity.includes("18")) {
-  //       currentRate = rates.rate_18crt;
-  //     } else if (formData.purity.includes("16")) {
-  //       currentRate = rates.rate_16crt;
-  //     }
-  //   } else if (formData.metal_type?.toLowerCase() === "silver" && formData.purity) {
-  //     currentRate = rates.silver_rate;
-  //   }
-
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     rate: currentRate,
-  //   }));
-  // }, [formData.purity, formData.metal_type, rates]);
-
-useEffect(() => {
-  let currentRate = "";
-
-  // Check if the metal type is explicitly silver
-  if (formData.metal_type?.toLowerCase() === "silver" && formData.purity) {
-    currentRate = rates.silver_rate;
-  } 
-  // For all other cases (gold or non-gold/non-silver), use gold rates
-  else if (formData.purity) {
-    if (formData.purity.includes("24")) {
-      currentRate = rates.rate_24crt;
-    } else if (formData.purity.includes("22")) {
-      currentRate = rates.rate_22crt;
-    } else if (formData.purity.includes("18")) {
-      currentRate = rates.rate_18crt;
-    } else if (formData.purity.includes("16")) {
-      currentRate = rates.rate_16crt;
+    if (formData.metal_type?.toLowerCase() === "gold" && formData.purity) {
+      // Check if the purity value includes specific numbers
+      if (formData.purity.includes("24")) {
+        currentRate = rates.rate_24crt;
+      } else if (formData.purity.includes("22")) {
+        currentRate = rates.rate_22crt;
+      } else if (formData.purity.includes("18")) {
+        currentRate = rates.rate_18crt;
+      } else if (formData.purity.includes("16")) {
+        currentRate = rates.rate_16crt;
+      }
+    } else if (formData.metal_type?.toLowerCase() === "silver" && formData.purity) {
+      currentRate = rates.silver_rate;
     }
-  }
 
-  setFormData((prevData) => ({
-    ...prevData,
-    rate: currentRate,
-  }));
-}, [formData.purity, formData.metal_type, rates]);
+    setFormData((prevData) => ({
+      ...prevData,
+      rate: currentRate,
+    }));
+  }, [formData.purity, formData.metal_type, rates]);
 
   useEffect(() => {
     const fetchCurrentRates = async () => {
@@ -207,118 +181,43 @@ useEffect(() => {
     const { name, value } = e.target;
 
     // Preserve the current barcode
-    // const currentBarcode = formData.code;
+    const currentBarcode = formData.code;
 
-    // let updatedFormData = { ...formData, [name]: value };
-    // setFormData(updatedFormData);
-    // setFormData((prevData) => ({
-    //   ...prevData,
-    //   [name]: value,
-    // }));
-
-      // Preserve the current barcode
-  const currentBarcode = formData.code;
-
-  let updatedFormData = { ...formData, [name]: value };
-  setFormData(updatedFormData);
-  setFormData((prevData) => ({
-    ...prevData,
-    [name]: value,
-  }));
-
-  // Add this condition to set mc_on to "MC / Gram" when metal_type is silver
-  // if (name === "metal_type" && value.toLowerCase() === "silver") {
-  //   setFormData(prevData => ({
-  //     ...prevData,
-  //     mc_on: "MC / Gram"
-  //   }));
-  // }
-  
-// Handle metal type changes specifically
-  if (name === "metal_type") {
-    const lowerValue = value.toLowerCase();
-    const prevMetalLower = formData.metal_type?.toLowerCase();
-
-    // When changing from silver to gold/non-silver
-    if (prevMetalLower === "silver" && lowerValue !== "silver") {
-      updatedFormData = {
-        ...updatedFormData,
-        mc_on: "MC %",          // Switch to MC%
-        mc_per_gram: "",        // Clear MC per gram
-        making_charges: "",     // Clear making charges
-      };
-    }
-    // When changing from gold/non-silver to silver
-    else if (prevMetalLower !== "silver" && lowerValue === "silver") {
-      updatedFormData = {
-        ...updatedFormData,
-        mc_on: "MC / Gram",     // Switch to MC/Gram
-        mc_per_gram: "",        // Clear MC per gram
-        making_charges: "",     // Clear making charges
-      };
-    }
-  }
-
-  setFormData(updatedFormData);
+    let updatedFormData = { ...formData, [name]: value };
+    setFormData(updatedFormData);
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
 
 
-    // if (name === "category") {
-    //   // Find the first product that matches this category
-    //   const categoryProduct = products.find(prod =>
-    //     prod.product_name === value
-    //   );
-
-    //   if (categoryProduct) {
-    //     updatedFormData = {
-    //       ...updatedFormData,
-    //       code: categoryProduct.rbarcode || "",
-    //       product_id: categoryProduct.product_id || "",
-    //       metal_type: categoryProduct.Category || "",
-    //       selling_purity: "",
-    //       product_name: "",
-    //       rate: "",
-    //       // rate_24k: "",
-    //     };
-    //   } else {
-    //     // If no product found, clear related fields
-    //     updatedFormData = {
-    //       ...updatedFormData,
-    //       code: "",
-    //       product_id: "",
-    //       metal_type: ""
-    //     };
-    //   }
-    // }
     if (name === "category") {
-    // Find the first product that matches this category
-    const categoryProduct = products.find(prod =>
-      prod.product_name === value
-    );
+      // Find the first product that matches this category
+      const categoryProduct = products.find(prod =>
+        prod.product_name === value
+      );
 
-    if (categoryProduct) {
-      updatedFormData = {
-        ...updatedFormData,
-        code: categoryProduct.rbarcode || "",
-        product_id: categoryProduct.product_id || "",
-        metal_type: categoryProduct.Category || "",
-        selling_purity: "",
-        product_name: "",
-        rate: "",
-      };
-      
-      // Add this to set mc_on to "MC / Gram" if category is silver
-      if (categoryProduct.Category?.toLowerCase() === "silver") {
-        updatedFormData.mc_on = "MC / Gram";
+      if (categoryProduct) {
+        updatedFormData = {
+          ...updatedFormData,
+          code: categoryProduct.rbarcode || "",
+          product_id: categoryProduct.product_id || "",
+          metal_type: categoryProduct.Category || "",
+          selling_purity: "",
+          product_name: "",
+          rate: "",
+          // rate_24k: "",
+        };
+      } else {
+        // If no product found, clear related fields
+        updatedFormData = {
+          ...updatedFormData,
+          code: "",
+          product_id: "",
+          metal_type: ""
+        };
       }
-    } else {
-      updatedFormData = {
-        ...updatedFormData,
-        code: "",
-        product_id: "",
-        metal_type: ""
-      };
     }
-  }
 
     if (name === "category" && value === "") {
       updatedFormData = {
@@ -777,176 +676,59 @@ useEffect(() => {
     fetchDesignName();
   }, []);
 
-useEffect(() => {
-  const fetchPurity = async () => {
+  useEffect(() => {
+    const fetchPurity = async () => {
+      try {
+        const response = await fetch(`${baseURL}/purity`);
+        const data = await response.json();
+
+        let filteredData = data;
+
+        // If metal_type is set, filter based on it; otherwise, show all
+        if (formData.metal_type) {
+          filteredData = data.filter((product) =>
+            product.metal?.toLowerCase() === formData.metal_type.toLowerCase()
+          );
+        }
+
+        const purities = Array.from(
+          new Set(filteredData.map((product) => `${product.name} | ${product.purity}`))
+        );
+
+        const purityOptions = purities.map((purity) => ({
+          value: purity,
+          label: purity,
+        }));
+
+        setpurityOptions(purityOptions);
+
+        // Set default purity only if metal_type is available
+        if (formData.metal_type && purityOptions.length > 0) {
+          const defaultPurity = purityOptions.find((option) =>
+            /22/i.test(option.value)
+          )?.value;
+
+          setFormData((prevData) => ({
+            ...prevData,
+            purity: defaultPurity || "",
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchPurity();
+  }, [formData.metal_type]);
+
+  const handleBarcodeChange = async (code) => {
     try {
-      const response = await fetch(`${baseURL}/purity`);
-      const data = await response.json();
-
-      let filteredData = data;
-
-      // If metal_type is explicitly silver, filter for silver
-      if (formData.metal_type?.toLowerCase() === "silver") {
-        filteredData = data.filter((product) =>
-          product.metal?.toLowerCase() === "silver"
-        );
-      } 
-      // For all other cases (gold or non-gold/non-silver), use gold purity options
-      else {
-        filteredData = data.filter((product) =>
-          product.metal?.toLowerCase() === "gold"
-        );
-      }
-
-      const purities = Array.from(
-        new Set(filteredData.map((product) => `${product.name} | ${product.purity}`))
-      );
-
-      const purityOptions = purities.map((purity) => ({
-        value: purity,
-        label: purity,
-      }));
-
-      setpurityOptions(purityOptions);
-
-      // Set default purity (22k) for gold or non-silver cases
-      if (formData.metal_type?.toLowerCase() !== "silver" && purityOptions.length > 0) {
-        const defaultPurity = purityOptions.find((option) =>
-          /22/i.test(option.value)
-        )?.value;
-
+      if (!code) {
+        // If barcode is cleared, reset all related fields and set code to ""
+        setIsBarcodeSelected(false);  // Reset the barcode selection flag
         setFormData((prevData) => ({
           ...prevData,
-          purity: defaultPurity || "",
-        }));
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    }
-  };
-
-  fetchPurity();
-}, [formData.metal_type]);
-
-const handleBarcodeChange = async (code) => {
-  try {
-    if (!code) {
-      // If barcode is cleared, reset all related fields
-      setIsBarcodeSelected(false);
-      setFormData((prevData) => ({
-        ...prevData,
-        code: "",
-        product_id: "",
-        product_name: "",
-        metal_type: "",
-        design_name: "",
-        purity: "",
-        category: "",
-        sub_category: "",
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "Gross Weight",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        mc_on: "MC %", // Reset to default MC%
-        mc_per_gram: "",
-        making_charges: "",
-        disscount_percentage: "",
-        disscount: "",
-        rate: "",
-        rate_amt: "",
-        tax_percent: "",
-        tax_amt: "",
-        hm_charges: "60.00",
-        total_price: "",
-        qty: "",
-        remarks: "",
-        size: "",
-      }));
-      setIsQtyEditable(true);
-      return;
-    }
-
-    // Check for product by code
-    const product = products.find((prod) => String(prod.rbarcode) === String(code));
-    if (product) {
-      setIsBarcodeSelected(true);
-      const isSilver = product.Category?.toLowerCase() === "silver";
-
-      // Set default purity (22k for gold, empty for silver)
-      const defaultPurity = isSilver 
-        ? "" 
-        : purityOptions.find((option) => /22/i.test(option.value))?.value;
-
-      setFormData((prevData) => ({
-        ...prevData,
-        code: product.rbarcode,
-        product_id: product.product_id,
-        product_name: "",
-        metal_type: product.Category,
-        design_name: "",
-        purity: defaultPurity || "",
-        category: product.product_name,
-        sub_category: "",
-        gross_weight: "",
-        stone_weight: "",
-        stone_price: "",
-        weight_bw: "",
-        va_on: "Gross Weight",
-        va_percent: "",
-        wastage_weight: "",
-        total_weight_aw: "",
-        mc_on: isSilver ? "MC / Gram" : "MC %", // Auto-set based on metal type
-        mc_per_gram: isSilver ? prevData.mc_per_gram : "", // Clear if not silver
-        making_charges: isSilver ? prevData.making_charges : "", // Clear if not silver
-        disscount_percentage: "",
-        disscount: "",
-        tax_percent: product.tax_slab,
-        qty: 1,
-      }));
-      setIsQtyEditable(false);
-    } else {
-      // Check if tag exists by code
-      const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
-      if (tag) {
-        const isSilver = tag.metal_type?.toLowerCase() === "silver";
-        const productId = tag.product_id;
-        const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
-
-        setFormData((prevData) => ({
-          ...prevData,
-          code: tag.PCode_BarCode || "",
-          product_id: tag.product_id || "",
-          opentag_id: tag.opentag_id || "",
-          product_name: tag.sub_category || "",
-          metal_type: tag.metal_type || "",
-          design_name: tag.design_master || "",
-          purity: tag.Purity || "",
-          category: tag.category || "",
-          sub_category: tag.sub_category || "",
-          gross_weight: tag.Gross_Weight || "",
-          stone_weight: tag.Stones_Weight || "",
-          stone_price: tag.Stones_Price || "",
-          weight_bw: tag.Weight_BW || "",
-          va_on: tag.Wastage_On || "",
-          va_percent: tag.Wastage_Percentage || "",
-          wastage_weight: tag.WastageWeight || "",
-          total_weight_aw: tag.TotalWeight_AW || "",
-          mc_on: isSilver ? "MC / Gram" : tag.Making_Charges_On || "MC %", // Auto-set
-          mc_per_gram: isSilver ? tag.MC_Per_Gram || "" : "", // Only keep for silver
-          making_charges: isSilver ? tag.Making_Charges || "" : "", // Only keep for silver
-          tax_percent: productDetails?.tax_slab || "",
-          qty: 1,
-        }));
-        setIsQtyEditable(true);
-      } else {
-        // No matching product or tag found - reset form
-        setFormData((prevData) => ({
-          ...prevData,
-          code: "",
+          code: "",  // Reset code when barcode is cleared
           product_id: "",
           product_name: "",
           metal_type: "",
@@ -962,7 +744,7 @@ const handleBarcodeChange = async (code) => {
           va_percent: "",
           wastage_weight: "",
           total_weight_aw: "",
-          mc_on: "MC %", // Default to MC%
+          mc_on: "MC %",
           mc_per_gram: "",
           making_charges: "",
           disscount_percentage: "",
@@ -973,17 +755,136 @@ const handleBarcodeChange = async (code) => {
           tax_amt: "",
           hm_charges: "60.00",
           total_price: "",
-          qty: "",
+          qty: "", 
           remarks: "",
-          size: "",
+          size:"",
         }));
-        setIsQtyEditable(true);
+        setIsQtyEditable(true); // Default to editable if barcode is cleared
+        return; // Exit early
       }
+
+      // Check for product by code
+      const product = products.find((prod) => String(prod.rbarcode) === String(code));
+      if (product) {
+        setIsBarcodeSelected(true);
+
+        // Find the default purity value that includes "22"
+        const defaultPurity = purityOptions.find((option) =>
+          /22/i.test(option.value)
+        )?.value;  // Set the barcode as selected
+        setFormData((prevData) => ({
+          ...prevData,
+          code: product.rbarcode,  // Retain the selected barcode
+          product_id: product.product_id,
+          product_name: "", // Make editable
+          metal_type: product.Category,
+          design_name: "", // Make editable
+          purity: defaultPurity || "",
+          category: product.product_name,
+          sub_category: "",
+          gross_weight: "",
+          stone_weight: "",
+          stone_price: "",
+          weight_bw: "",
+          va_on: "Gross Weight",
+          va_percent: "",
+          wastage_weight: "",
+          total_weight_aw: "",
+          mc_on: "MC %",
+          mc_per_gram: "",
+          making_charges: "",
+          disscount_percentage: "",
+          disscount: "",
+          tax_percent: product.tax_slab,
+          qty: 1, // Set qty to 1 for product
+        }));
+        setIsQtyEditable(false); // Set qty as read-only
+      } else {
+        // Check if tag exists by code
+        const tag = data.find((tag) => String(tag.PCode_BarCode) === String(code));
+        if (tag) {
+          // setIsBarcodeSelected(true);  
+          // If the tag is marked as "Sold"
+          // if (tag.Status === "Sold") {
+          //   alert("The product is already sold out!");
+          //   setFormData((prevData) => ({
+          //     ...prevData,
+          //   }));
+          //   setIsQtyEditable(true); // Allow editing of qty
+          //   return;
+          // }
+
+          const productId = tag.product_id;
+          const productDetails = products.find((prod) => String(prod.product_id) === String(productId));
+
+          setFormData((prevData) => ({
+            ...prevData,
+            code: tag.PCode_BarCode || "", // Retain the barcode
+            product_id: tag.product_id || "",
+            opentag_id: tag.opentag_id || "",
+            product_name: tag.sub_category || "", // Make editable
+            metal_type: tag.metal_type || "",
+            design_name: tag.design_master || "", // Make editable
+            purity: tag.Purity || "",
+            category: tag.category || "",
+            sub_category: tag.sub_category || "",
+            gross_weight: tag.Gross_Weight || "",
+            stone_weight: tag.Stones_Weight || "",
+            stone_price: tag.Stones_Price || "",
+            weight_bw: tag.Weight_BW || "",
+            va_on: tag.Wastage_On || "",
+            va_percent: tag.Wastage_Percentage || "",
+            wastage_weight: tag.WastageWeight || "",
+            total_weight_aw: tag.TotalWeight_AW || "",
+            mc_on: tag.Making_Charges_On || "",
+            mc_per_gram: tag.MC_Per_Gram || "",
+            making_charges: tag.Making_Charges || "",
+            tax_percent: productDetails?.tax_slab || "",
+            qty: 1, // Allow qty to be editable for tag
+          }));
+          setIsQtyEditable(true); // Allow editing of qty
+        } else {
+          // Reset form if no tag is found
+          setFormData((prevData) => ({
+            ...prevData,
+            code: "", // Reset code
+            product_id: "",
+            product_name: "",
+            metal_type: "",
+            design_name: "",
+            purity: "",
+            category: "",
+            sub_category: "",
+            gross_weight: "",
+            stone_weight: "",
+            stone_price: "",
+            weight_bw: "",
+            va_on: "Gross Weight",
+            va_percent: "",
+            wastage_weight: "",
+            total_weight_aw: "",
+            mc_on: "MC %",
+            mc_per_gram: "",
+            making_charges: "",
+            disscount_percentage: "",
+            disscount: "",
+            rate: "",
+            rate_amt: "",
+            tax_percent: "",
+            tax_amt: "",
+            hm_charges: "60.00",
+            total_price: "",
+            qty: "", 
+            remarks: "",
+            size:""
+          }));
+          setIsQtyEditable(true); // Default to editable
+        }
+      }
+    } catch (error) {
+      console.error("Error handling code change:", error);
     }
-  } catch (error) {
-    console.error("Error handling barcode change:", error);
-  }
-};
+  };
 
   const [image, setImage] = useState(null);
   const handleImageChange = (e) => {
