@@ -85,7 +85,7 @@ function Customers({ onSelectCustomer }) {
         }
         const result = await response.json();
         const filteredCustomers = result.filter(
-          (item) => item.account_group === "CUSTOMERS"
+          (item) => item.account_group === "CUSTOMERS" || item.account_group === "SUPPLIERS"
         );
         setCustomers(filteredCustomers);
         setFilteredCustomers(filteredCustomers);

@@ -8,7 +8,8 @@ import baseURL from '../../../../Url/NodeBaseURL';
 import Swal from 'sweetalert2';
 import PDFLayout from '../../Transactions/OrderSection/TaxInvoiceA4';
 import { pdf } from '@react-pdf/renderer';
-const RepairsTable = ({selectedMobile }) => {
+
+const RepairsTable = ({ selectedMobile, tabId }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [data, setData] = useState([]);
@@ -16,7 +17,7 @@ const RepairsTable = ({selectedMobile }) => {
   const [showModal, setShowModal] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [accounts, setAccounts] = useState([]);
- const [searchValue, setSearchValue] = useState(selectedMobile || "");
+  const [searchValue, setSearchValue] = useState(selectedMobile || "");
 
   // Extract mobile from location state
   const { mobile } = location.state || {};
@@ -113,54 +114,54 @@ const RepairsTable = ({selectedMobile }) => {
           return finalBalance.toFixed(2);
         },
       },
-    //   {
-    //     Header: 'Actions',
-    //     accessor: 'actions',
-    //     Cell: ({ row }) => {
-    //       const isEditDisabled = row.original.invoice === "Converted";
+      {
+        Header: 'Actions',
+        accessor: 'actions',
+        Cell: ({ row }) => {
+          const isEditDisabled = row.original.invoice === "Converted";
 
-    //       return (
-    //         <div>
-    //           <FaEye
-    //             style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
-    //             onClick={() => handleViewDetails(row.original.order_number)}
-    //           />
+          return (
+            <div>
+              <FaEye
+                style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
+                onClick={() => handleViewDetails(row.original.order_number)}
+              />
 
-    //           <FaEdit
-    //             style={{
-    //               cursor: isEditDisabled ? 'not-allowed' : 'pointer', // Change cursor style when disabled
-    //               marginLeft: '10px',
-    //               color: isEditDisabled ? 'gray' : 'blue', // Change color when disabled
-    //             }}
-    //             onClick={() => {
-    //               if (!isEditDisabled) { // Only allow editing if not disabled
-    //                 handleEdit(
-    //                   row.original.order_number,
-    //                   row.original.mobile,
-    //                   // row.original.old_exchange_amt,
-    //                   // row.original.scheme_amt,
-    //                   row.original.cash_amount,
-    //                   row.original.card_amt,
-    //                   row.original.chq_amt,
-    //                   row.original.online_amt,
-    //                   row.original.advance_amt,
-    //                 );
-    //               }
-    //             }}
-    //           />
+              <FaEdit
+                style={{
+                  cursor: isEditDisabled ? 'not-allowed' : 'pointer', // Change cursor style when disabled
+                  marginLeft: '10px',
+                  color: isEditDisabled ? 'gray' : 'blue', // Change color when disabled
+                }}
+                onClick={() => {
+                  if (!isEditDisabled) { // Only allow editing if not disabled
+                    handleEdit(
+                      row.original.order_number,
+                      row.original.mobile,
+                      // row.original.old_exchange_amt,
+                      // row.original.scheme_amt,
+                      row.original.cash_amount,
+                      row.original.card_amt,
+                      row.original.chq_amt,
+                      row.original.online_amt,
+                      row.original.advance_amt,
+                    );
+                  }
+                }}
+              />
 
-    //           <FaTrash
-    //             style={{
-    //               cursor: 'pointer',
-    //               marginLeft: '10px',
-    //               color: 'red',
-    //             }}
-    //             onClick={() => handleDelete(row.original.order_number)}
-    //           />
-    //         </div>
-    //       );
-    //     },
-    //   },
+              <FaTrash
+                style={{
+                  cursor: 'pointer',
+                  marginLeft: '10px',
+                  color: 'red',
+                }}
+                onClick={() => handleDelete(row.original.order_number)}
+              />
+            </div>
+          );
+        },
+      },
       {
         Header: 'Invoice',
         accessor: 'convert',
@@ -179,7 +180,7 @@ const RepairsTable = ({selectedMobile }) => {
                 // cursor: "pointer",
               }}
               onClick={() => handleConvert(row.original)}
-            disabled={isDisabled}
+              disabled={isDisabled}
             >
               Generate
             </Button>
@@ -228,11 +229,11 @@ const RepairsTable = ({selectedMobile }) => {
             // Generate PDF Blob
             const pdfDoc = (
               <PDFLayout
-                repairDetails={invoiceData} 
+                repairDetails={invoiceData}
               />
             );
 
-            
+
 
             const pdfBlob = await pdf(pdfDoc).toBlob();
             await handleSavePDFToServer(pdfBlob, invoiceNumber);
@@ -313,11 +314,15 @@ const RepairsTable = ({selectedMobile }) => {
   const fetchRepairs = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-order-details`);
-      console.log("Full response data: ", response.data); 
+      console.log("Full response data: ", response.data);
+
       const filteredData = response.data.filter(
-        (item) => item.transaction_status === 'Orders' || item.transaction_status === "ConvertedInvoice"
+        (item) =>
+          (item.transaction_status === 'Orders' || item.transaction_status === 'ConvertedInvoice') &&
+          item.invoice !== 'Converted'
       );
-      console.log("Filtered Orders: ", filteredData); 
+
+      console.log("Filtered Orders: ", filteredData);
       setData(filteredData);
       setLoading(false);
     } catch (error) {
@@ -325,6 +330,8 @@ const RepairsTable = ({selectedMobile }) => {
       setLoading(false);
     }
   };
+
+
   useEffect(() => {
     fetchRepairs();
     handleViewDetails();
@@ -581,7 +588,7 @@ const RepairsTable = ({selectedMobile }) => {
     ).padStart(2, '0')}-${date.getFullYear()}`;
   };
 
-   useEffect(() => {
+  useEffect(() => {
     if (selectedMobile) {
       setSearchValue(selectedMobile); // auto-fill search bar
     }
@@ -589,7 +596,7 @@ const RepairsTable = ({selectedMobile }) => {
 
   return (
     // <div className="main-container">
-    <div style={{paddingBottom:"15px"}}>
+    <div style={{ paddingBottom: "15px" }}>
       <div >
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
@@ -606,13 +613,14 @@ const RepairsTable = ({selectedMobile }) => {
         {loading ? (
           <p>Loading...</p>
         ) : (
-        // u  <DataTable columns={colmns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
-         <DataTable
-        columns={columns}
-        data={data.filter(item =>
-          item.mobile?.toString().includes(searchValue)
-        )}
-      />
+          // u  <DataTable columns={colmns} data={[...data].reverse()} initialSearchValue={initialSearchValue} />
+          <DataTable
+            columns={columns}
+            data={data.filter(item =>
+              item.mobile?.toString().includes(searchValue)
+            )}
+            tabId={tabId}
+          />
         )}
       </div>
 

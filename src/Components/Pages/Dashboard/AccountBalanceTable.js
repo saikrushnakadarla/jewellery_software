@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import baseURL from '../../../Url/NodeBaseURL';
 
 const AccountBalanceTable = () => {
     const [accountData, setAccountData] = useState([]);
@@ -8,7 +9,7 @@ const AccountBalanceTable = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/get-unique-repair-details');
+                const response = await fetch(`${baseURL}/get-unique-repair-details`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

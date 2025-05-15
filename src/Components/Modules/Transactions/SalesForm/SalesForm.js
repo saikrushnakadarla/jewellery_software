@@ -639,10 +639,10 @@ const SalesForm = () => {
   const handleApply = (selectedOffer, offerIndex) => {
     const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
     const currentOfferKey = `${selectedOffer._id}_${offerIndex}`;
-  
+
     // Don't reset existing discounts - just apply to all items
     let updatedRepairDetails = [...storedRepairDetails];
-  
+
     updatedRepairDetails = updatedRepairDetails.map((item) => {
       const taxPercent = parseFloat(item.tax_percent) || 1;
       const pieceCost = parseFloat(item.pieace_cost) || 0;
@@ -654,7 +654,7 @@ const SalesForm = () => {
       const makingCharges = parseFloat(item.making_charges) || 0;
       const hmCharges = parseFloat(item.hm_charges) || 0;
       const grossWeight = parseFloat(item.gross_weight) || 0;
-  
+
       const percentageDiscount = parseFloat(selectedOffer.discount_percentage) || 0;
       const rateDiscount = parseFloat(selectedOffer.discount_on_rate) || 0;
       const fixedPercentageDiscount = parseFloat(selectedOffer.discount_percent_fixed) || 0;
@@ -663,18 +663,18 @@ const SalesForm = () => {
         pricingType === "By fixed"
           ? fixedPercentageDiscount
           : percentageDiscount + weightBasedDiscount;
-  
+
       if (pricingType === "By fixed") {
         const pieceTaxableAmt = pieceCost * qty;
         const originalPieceTaxableAmt = item.original_piece_taxable_amt
           ? parseFloat(item.original_piece_taxable_amt)
           : pieceTaxableAmt;
-  
+
         const calculatedDiscount = (pieceTaxableAmt * totalDiscountValue) / 100;
         const updatedPieceTaxableAmt = originalPieceTaxableAmt - calculatedDiscount - discountAmt;
         const taxAmt = (taxPercent * updatedPieceTaxableAmt) / 100;
         const totalPrice = updatedPieceTaxableAmt + taxAmt;
-  
+
         return {
           ...item,
           original_piece_taxable_amt: originalPieceTaxableAmt.toFixed(2),
@@ -691,10 +691,10 @@ const SalesForm = () => {
           (rateDiscount / 10) * grossWeight;
         const totalBeforeTax =
           rateAmt + stonePrice + makingCharges + hmCharges - calculatedDiscount - discountAmt;
-  
+
         const taxAmt = (totalBeforeTax * taxPercent) / 100;
         const updatedTotalPrice = totalBeforeTax + taxAmt;
-  
+
         return {
           ...item,
           original_total_price: item.original_total_price
@@ -708,10 +708,10 @@ const SalesForm = () => {
         };
       }
     });
-  
+
     setRepairDetails(updatedRepairDetails);
     localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(updatedRepairDetails));
-  
+
     // Mark the offer as applied
     setAppliedOffers({
       [currentOfferKey]: true,
@@ -790,6 +790,7 @@ const SalesForm = () => {
         // Immediately retrieve and log stored data
         const storedData = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`));
         console.log("Stored repairDetails:", storedData);
+        console.log("Stored repairDetails:", repairDetails);
       } else {
         // Clear localStorage if no matching data
         localStorage.removeItem(`repairDetails_${tabId}`);
@@ -814,6 +815,135 @@ const SalesForm = () => {
     }
   };
 
+  const [orderData, setOrderData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState("");
+  
+
+  const fetchRepairs = async () => {
+    try {
+      const response = await axios.get(`${baseURL}/get-unique-order-details`);
+      console.log("Full response data: ", response.data);
+
+      const filteredData = response.data.filter(
+        (item) =>
+          (item.transaction_status === 'Orders' || item.transaction_status === 'ConvertedInvoice') &&
+          item.invoice !== 'Converted'
+      );
+
+      console.log("Filtered Orders: ", filteredData);
+      setOrderData(filteredData);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching repair details:', error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRepairs();
+    handleViewDetails();
+  }, []);
+
+  const handleViewDetails = async (order_number) => {
+    try {
+      const response = await axios.get(`${baseURL}/get-order-details/${order_number}`);
+      console.log("Fetched order details: ", response.data); // Log full response data
+
+      // Filter repeatedData to include only items where transaction_status is "Orders"
+      const filteredData = response.data.repeatedData.filter(
+        (item) => item.transaction_status === "Orders"
+      );
+
+      // Check if any item in repeatedData has invoice === "Converted"
+      const isInvoiceConverted = filteredData.some(item => item.invoice === "Converted");
+      console.log("isInvoiceConverted=", isInvoiceConverted)
+
+      // Set state with filtered repeatedData and invoice status
+      setOrderDetails({
+        ...response.data,
+        repeatedData: filteredData,
+        isInvoiceConverted,
+      });
+
+      setShowModal(true);
+
+    } catch (error) {
+      console.error("Error fetching repair details:", error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setOrderDetails(null);
+  };
+
+  const fetchOrderDetails = async (order_number) => {
+    try {
+      const response = await axios.get(`${baseURL}/get-order-details/${order_number}`);
+
+      // Filter only matching repeatedData items
+      const filteredData = response.data.repeatedData.map(item => ({
+        ...item,
+        invoice_number: formData.invoice_number, // Add invoice_number from formData
+        transaction_status: "Sales",             // Add transaction_status as "Sales"
+        date: formData.date,
+      }));
+
+      if (filteredData.length > 0) {
+        // Store filtered data in localStorage
+        localStorage.setItem(`repairDetails_${tabId}`, JSON.stringify(filteredData));
+
+        // Update state with filtered data
+        setRepairDetails(filteredData);
+
+        // Immediately retrieve and log stored data
+        const storedData = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`));
+        console.log("Stored repairDetails:", storedData);
+        return filteredData;
+      } else {
+        // Clear localStorage if no matching data
+        localStorage.removeItem(`repairDetails_${tabId}`);
+        setRepairDetails([]); // Clear state
+        console.log("No matching data found. LocalStorage cleared.");
+      }
+    } catch (error) {
+      console.error('Error fetching selected estimate details:', error);
+    }
+  };
+
+  const handleOrderChange = (e) => {
+    const selectedValue = e.target.value;
+    setSelectedOrder(selectedValue);
+
+    if (selectedValue) {
+      fetchOrderDetails(selectedValue);
+    } else {
+      setOrderDetails(null);
+      localStorage.removeItem(`repairDetails_${tabId}`);
+      setRepairDetails([]);
+    }
+  };
+
+  const handleOrderCheckboxChange = async (e, order_number) => {
+    const isChecked = e.target.checked;
+
+    if (isChecked) {
+      await fetchOrderDetails(order_number);
+    } else {
+      localStorage.removeItem(`repairDetails_${tabId}`);
+      setRepairDetails([]);
+      console.log(`Removed repairDetails_${tabId} from localStorage`);
+    }
+  };
+
+  useEffect(() => {
+    if (repairDetails.length > 0) {
+      console.log("Updated repairDetails:", repairDetails);
+    }
+  }, [repairDetails]);
+  
   // const handleAdd = () => {
   //   const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
 
@@ -905,7 +1035,7 @@ const SalesForm = () => {
     //   handleApply(offers[0], 0); // Apply the first offer
     // }
   };
-  
+
   const handleEdit = (index) => {
     setEditIndex(index);
 
@@ -1041,11 +1171,11 @@ const SalesForm = () => {
 
   const handleAddCustomer = (mobile) => {
     console.log("handleAddCustomer received mobile:", mobile);
-    navigate("/customermaster", { 
-      state: { 
+    navigate("/customermaster", {
+      state: {
         from: `/sales?tabId=${tabId}`,
         mobile: mobile // Pass the mobile number here
-      } 
+      }
     });
   };
 
@@ -1186,6 +1316,14 @@ const SalesForm = () => {
     }
   };
 
+  useEffect(() => {
+    const stored = localStorage.getItem(`repairDetails_${tabId}`);
+    if (stored) {
+      setRepairDetails(JSON.parse(stored));
+    }
+  }, []);
+
+
   const salesTaxableAmount = selectedRows.reduce((sum, rowIndex) => {
     const detail = invoiceDetails[rowIndex];
     const stonePrice = parseFloat(detail.stone_price) || 0;
@@ -1228,7 +1366,9 @@ const SalesForm = () => {
 
   if (isManualNetMode && typeof manualNetAmount !== "undefined" && manualNetAmount > 0) {
     // Step 1: Compute totalAmount, makingCharges, pieceCost
+
     repairDetails.forEach((item) => {
+
       const pricing = item.pricing;
 
       if (pricing === "By Weight") {
@@ -1344,6 +1484,7 @@ const SalesForm = () => {
     discountPercent = discountBase ? (discountAmt * 100) / discountBase : 0;
 
   }
+
 
   const handleManualNetAmountChange = (value) => {
     setManualNetAmount(value);
@@ -1506,13 +1647,13 @@ const SalesForm = () => {
       alert("Please select the Customer or enter the Customer Mobile Number");
       return;
     }
-  
+
     try {
       // Fetch tags
       const tagResponse = await fetch(`${baseURL}/get/opening-tags-entry`);
       const tagResult = await tagResponse.json();
       const tagData = tagResult.result || [];
-  
+
       // Check for sold items
       const soldItem = repairDetails.find((item) => {
         const matchedTag = tagData.find(
@@ -1520,29 +1661,29 @@ const SalesForm = () => {
         );
         return matchedTag !== undefined;
       });
-  
+
       // Optional: re-enable if needed
       // if (soldItem) {
       //   alert(`Item with code "${soldItem.code}" is already sold out.`);
       //   return;
       // }
-  
+
       // Handle invoice number
       const allItemsAreNew = repairDetails.every(item => item.id === "");
       let updatedFormData = { ...formData };
-  
+
       if (allItemsAreNew) {
         const response = await axios.get(`${baseURL}/lastInvoiceNumber`);
         const latestInvoiceNumber = response.data.lastInvoiceNumber;
-  
+
         updatedFormData = {
           ...formData,
           invoice_number: latestInvoiceNumber,
         };
-  
+
         setFormData(updatedFormData);
       }
-  
+
       // Prepare payload
       const dataToSave = {
         repairDetails: repairDetails.map(item => ({
@@ -1574,10 +1715,10 @@ const SalesForm = () => {
         salesNetAmount: salesAmountToPass || 0,
         salesTaxableAmount: salesTaxableAmount || 0,
       };
-  
+
       await axios.post(`${baseURL}/save-repair-details`, dataToSave);
       alert("Sales added successfully");
-  
+
       // Generate PDF
       const pdfDoc = (
         <PDFLayout
@@ -1599,21 +1740,21 @@ const SalesForm = () => {
           netPayableAmount={netPayableAmount}
         />
       );
-  
+
       const pdfBlob = await pdf(pdfDoc).toBlob();
-  
+
       // Save PDF to server
       await handleSavePDFToServer(pdfBlob, updatedFormData.invoice_number);
-  
+
       // Open preview in new tab
       const previewURL = `${baseURL}/invoices/${updatedFormData.invoice_number}.pdf`;
       window.open(previewURL, '_blank');
-  
+
       // Attempt to share
       const pdfFile = new File([pdfBlob], `${updatedFormData.invoice_number}.pdf`, {
         type: 'application/pdf',
       });
-  
+
       if (navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
         try {
           await navigator.share({
@@ -1628,21 +1769,21 @@ const SalesForm = () => {
       } else {
         console.warn("Sharing not supported on this device/browser.");
       }
-  
+
       // Cleanup
       clearData();
       resetForm();
       // navigate("/salestable");
       window.location.reload();
       await handleCheckout();
-  
+
     } catch (error) {
       console.error("Error saving data:", error);
       alert("Error saving data");
     }
   };
-  
-  
+
+
 
   const handleSavePDFToServer = async (pdfBlob, invoiceNumber) => {
     const formData = new FormData();
@@ -1786,9 +1927,12 @@ const SalesForm = () => {
     }
   }, [formData.code]);
 
-    // Apply calculations
-    // useCalculations(formData, setFormData, offers,  isManualTotalPriceChange,
-    //   setIsManualTotalPriceChange, isTotalPriceCleared);
+  // Apply calculations
+  // useCalculations(formData, setFormData, offers,  isManualTotalPriceChange,
+  //   setIsManualTotalPriceChange, isTotalPriceCleared);
+
+
+
 
   return (
     <div className="main-container">
@@ -1865,9 +2009,12 @@ const SalesForm = () => {
               offers={offers}
               isTotalPriceCleared={isTotalPriceCleared}
               setIsTotalPriceCleared={setIsTotalPriceCleared}
-              isManualTotalPriceChange={isManualTotalPriceChange} 
+              isManualTotalPriceChange={isManualTotalPriceChange}
               setIsManualTotalPriceChange={setIsManualTotalPriceChange}
               manualTotalPriceRef={manualTotalPriceRef}
+              handleOrderChange={handleOrderChange}
+              selectedOrder={selectedOrder}
+              orderData={orderData}
             />
           </div>
 
@@ -1895,7 +2042,7 @@ const SalesForm = () => {
                 setReturnData={setReturnData}
                 selectedMobile={formData.mobile}
                 selectedRows={selectedRows}
-                setSelectedRows={setSelectedRows} 
+                setSelectedRows={setSelectedRows}
                 isAllSelected={isAllSelected}
                 setIsAllSelected={setIsAllSelected}
                 handleCheckboxChange={handleCheckboxChange}
@@ -1907,6 +2054,16 @@ const SalesForm = () => {
                 resetSaleReturnForm={resetSaleReturnForm}
                 handleCheckout={handleCheckout}
                 tabId={tabId}
+                setRepairDetails={setRepairDetails}
+                formData={formData}
+                orderData={orderData}
+                handleCloseModal={handleCloseModal}
+                handleViewDetails={handleViewDetails}
+                handleOrderCheckboxChange={handleOrderCheckboxChange}
+                showModal={showModal}
+                orderDetails={orderDetails}
+                loading={loading}
+                formatDate={formatDate}
               />
             </div>
             <div className="sales-form-fourth">

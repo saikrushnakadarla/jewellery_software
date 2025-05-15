@@ -24,22 +24,22 @@ const RepairsTable = () => {
     // First try to get from URL
     const urlParams = new URLSearchParams(window.location.search);
     let tabId = urlParams.get('tabId');
-    
+
     // If not in URL, try sessionStorage
     if (!tabId) {
       tabId = sessionStorage.getItem('tabId');
     }
-    
+
     // If still not found, generate new ID
     if (!tabId) {
       tabId = crypto.randomUUID();
       sessionStorage.setItem('tabId', tabId);
-      
+
       // Update URL without page reload
       const newUrl = `${window.location.pathname}?tabId=${tabId}`;
       window.history.replaceState({}, '', newUrl);
     }
-    
+
     return tabId;
   };
 
@@ -77,7 +77,7 @@ const RepairsTable = () => {
       {
         Header: 'Order No',
         accessor: 'order_number',
-      },      
+      },
       {
         Header: 'Total Amt',
         accessor: 'net_amount',
@@ -134,14 +134,14 @@ const RepairsTable = () => {
         Header: "Invoice",
         Cell: ({ row }) =>
           // row.original.invoice_generated === "Yes" && row.original.invoice_number ? (
-            <a
-              href={`${baseURL}/invoices/${row.original.invoice_number}.pdf`} // Fetch from backend
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ textDecoration: 'none' }}
-            >
-              📝 View
-            </a>
+          <a
+            href={`${baseURL}/invoices/${row.original.invoice_number}.pdf`} // Fetch from backend
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none' }}
+          >
+            📝 View
+          </a>
         //   ) : (
         //     "Not Available"
         //   ),
@@ -152,10 +152,10 @@ const RepairsTable = () => {
       //   accessor: 'status',
       //   Cell: ({ row }) => {
       //     const { net_bill_amount, paid_amt, receipts_amt } = row.original;
-      
+
       //     const totalPaid = Number(paid_amt) + Number(receipts_amt);
       //     const netBill = Number(net_bill_amount);
-      
+
       //     return (
       //       <span style={{  color: netBill === totalPaid ? 'green' : 'red' }}>
       //         {netBill === totalPaid ? 'Delivered' : 'Not Delivered'}
@@ -203,29 +203,29 @@ const RepairsTable = () => {
                 style={{ cursor: 'pointer', marginLeft: '10px', color: 'green' }}
                 onClick={() => handleViewDetails(row.original.invoice_number)}
               />
-                {/* Edit icon (only for ADMIN) */}
-        {isAdmin && (
-              <FaEdit
-                style={{
-                  cursor: 'pointer',
-                  marginLeft: '10px',
-                  color: 'blue',
-                  color: isToday ? 'blue' : 'gray',
-                }}
-                   onClick={() => {
-              if (isToday) {
-                handleEdit(
-                  row.original.invoice_number,
-                  row.original.mobile,
-                  row.original.cash_amount,
-                  row.original.card_amt,
-                  row.original.chq_amt,
-                  row.original.online_amt
-                );
-              }
-            }}
-              />
-            )}
+              {/* Edit icon (only for ADMIN) */}
+              {isAdmin && (
+                <FaEdit
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: '10px',
+                    color: 'blue',
+                    color: isToday ? 'blue' : 'gray',
+                  }}
+                  onClick={() => {
+                    if (isToday) {
+                      handleEdit(
+                        row.original.invoice_number,
+                        row.original.mobile,
+                        row.original.cash_amount,
+                        row.original.card_amt,
+                        row.original.chq_amt,
+                        row.original.online_amt
+                      );
+                    }
+                  }}
+                />
+              )}
               {/* <FaEdit
                 style={{
                   cursor: isDisabled ? 'not-allowed' : 'pointer',
@@ -260,22 +260,22 @@ const RepairsTable = () => {
                   }
                 }}
               /> */}
-               {/* Delete icon (only for ADMIN) */}
-        {isAdmin && (
-              <FaTrash
-                style={{
-                  cursor: 'pointer',
-                  marginLeft: '10px',
-                  color: 'red',
-                  color: isToday ? 'red' : 'gray',
-                }}
-                onClick={() => {
-                  if (isToday) {
-                    handleDelete(row.original.invoice_number);
-                  }
-                }}
-              />
-            )}
+              {/* Delete icon (only for ADMIN) */}
+              {isAdmin && (
+                <FaTrash
+                  style={{
+                    cursor: 'pointer',
+                    marginLeft: '10px',
+                    color: 'red',
+                    color: isToday ? 'red' : 'gray',
+                  }}
+                  onClick={() => {
+                    if (isToday) {
+                      handleDelete(row.original.invoice_number);
+                    }
+                  }}
+                />
+              )}
             </div>
           );
         },
@@ -288,7 +288,7 @@ const RepairsTable = () => {
   function isCurrentDate(dateString) {
     const today = new Date();
     const date = new Date(dateString);
-    
+
     return (
       date.getDate() === today.getDate() &&
       date.getMonth() === today.getMonth() &&
@@ -305,10 +305,10 @@ const RepairsTable = () => {
     online_amt
   ) => {
 
-    console.log("cash_amount=",cash_amount)
-    console.log("card_amt=",card_amt)
-    console.log("chq_amt=",chq_amt)
-    console.log("online_amt=",online_amt)
+    console.log("cash_amount=", cash_amount)
+    console.log("card_amt=", card_amt)
+    console.log("chq_amt=", chq_amt)
+    console.log("online_amt=", online_amt)
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to edit this record?',
@@ -384,16 +384,16 @@ const RepairsTable = () => {
           chq_amt: parseFloat(chq_amt) || 0,
           online_amt: parseFloat(online_amt) || 0,
         };
-        
+
         console.log("Storing paymentDetails to localStorage:", paymentDetails);
-        
+
         localStorage.setItem(`paymentDetails_${tabId}`, JSON.stringify(paymentDetails));
-        
+
 
         // **Set discount percentage in localStorage**
         if (updatedRepairDetails.length > 0 && updatedRepairDetails[0].disscount_percentage) {
           localStorage.setItem(`discount_${tabId}`, updatedRepairDetails[0].disscount_percentage);
-         
+
         }
 
         // Navigate to the sales page
@@ -475,7 +475,7 @@ const RepairsTable = () => {
   const handleCreate = () => {
     // Generate a new tab ID or use existing one if available
     const tabId = crypto.randomUUID();
-    
+
     // Navigate to sales page with the tabId
     navigate(`/sales?tabId=${tabId}`);
   };
@@ -535,14 +535,14 @@ const RepairsTable = () => {
   //   navigate("/receipts", { state: { from: "/salestable", invoiceData } });
   // };
   const handleAddReceipt = (invoiceData) => {
-    navigate("/receipts", { 
-      state: { 
-        from: "/salestable", 
+    navigate("/receipts", {
+      state: {
+        from: "/salestable",
         invoiceData: {
           ...invoiceData, // Spread all existing invoice data
           mobile: invoiceData.mobile // Ensure mobile is included
-        } 
-      } 
+        }
+      }
     });
   };
 
@@ -578,7 +578,7 @@ const RepairsTable = () => {
         <Modal.Header closeButton>
           <Modal.Title>Sales Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ fontSize:'13px' }}>
+        <Modal.Body style={{ fontSize: '13px' }}>
           {repairDetails && (
             <>
               <h5>Customer Info</h5>
@@ -614,7 +614,7 @@ const RepairsTable = () => {
               <h5>Products</h5>
               <div className="table-responsive">
                 <Table bordered>
-                  <thead style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
+                  <thead style={{ whiteSpace: 'nowrap', fontSize: '13px' }}>
                     <tr>
                       <th>Bar Code</th>
                       <th>Product Name</th>
@@ -632,7 +632,7 @@ const RepairsTable = () => {
                       <th>Total Price</th>
                     </tr>
                   </thead>
-                  <tbody style={{ whiteSpace: 'nowrap', fontSize:'13px' }}>
+                  <tbody style={{ whiteSpace: 'nowrap', fontSize: '13px' }}>
                     {repairDetails.repeatedData.map((product, index) => (
                       <tr key={index}>
                         <td>{product.code}</td>
