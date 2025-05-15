@@ -72,25 +72,26 @@ const ReceiptsTable = () => {
         //   ),
         // id: "invoice",
       },
-       // Conditionally include Actions column only for ADMIN
-  ...(userName === "ADMIN" ? [
-    {
-      Header: 'Actions',
-      accessor: 'actions',
-      Cell: ({ row }) => (
-        <div>
-          <FaEdit
-            style={{ color: 'blue', cursor: 'pointer', marginRight: '10px' }}
-            onClick={() => handleEdit(row.original.id)}
-          />
-          <FaTrash
-            style={{ color: 'red', cursor: 'pointer' }}
-            onClick={() => handleDelete(row.original.id)}
-          />
-        </div>
-      ),
-    }
-  ] : []) // Empty array if not ADMIN (column excluded)
+      // Conditionally include Actions column only for ADMIN
+      ...(userName === "ADMIN" ? [
+        {
+          Header: 'Actions',
+          accessor: 'actions',
+          Cell: ({ row }) => (
+            <div>
+              <FaEdit
+                style={{ color: 'blue', cursor: 'pointer', marginRight: '10px' }}
+                onClick={() => handleEdit(row.original.id, row.original.invoice_number)}
+              />
+
+              <FaTrash
+                style={{ color: 'red', cursor: 'pointer' }}
+                onClick={() => handleDelete(row.original.id)}
+              />
+            </div>
+          ),
+        }
+      ] : []) // Empty array if not ADMIN (column excluded)
     ],
     [data]
   );
@@ -117,7 +118,7 @@ const ReceiptsTable = () => {
     if (!window.confirm('Are you sure you want to delete this Receipt?')) return;
 
     try {
-      const response = await fetch(`${baseURL}/delete/receipt/${id}`, {
+      const response = await fetch(`${baseURL}/delete/orderreceipt/${id}`, {
         method: 'DELETE',
       });
 
@@ -138,10 +139,19 @@ const ReceiptsTable = () => {
     }
   };
 
-  const handleEdit = (id) => {
-    // navigate('/receipts', { state: { repairData: rowData } });
-    navigate(`/receipts/${id}`);
+  // const handleEdit = (id) => {
+  //   // navigate('/receipts', { state: { repairData: rowData } });
+  //   navigate(`/receipts/${id}`);
+  // };
+
+  const handleEdit = (id, invoiceNumber) => {
+    if (invoiceNumber && invoiceNumber.startsWith("INV")) {
+      navigate(`/receipts/${id}`);
+    } else {
+      navigate(`/orderreceipts/${id}`);
+    }
   };
+
 
   const handleCreate = () => {
     navigate('/receipts'); // Navigate to the payments creation page

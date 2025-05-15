@@ -16,6 +16,11 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, formData, repai
     formatDate
 }) => {
 
+    const filteredOrders = orderData.filter(
+        (item) => String(item.mobile) === String(selectedMobile)
+    );
+
+
     return (
         // <div className="main-container">
         <div style={{ paddingBottom: "15px" }}>
@@ -29,10 +34,6 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, formData, repai
                             <th>Mobile</th>
                             <th>Account</th>
                             <th>Order No.</th>
-                            {/* <th>Total Amt</th>
-                            <th>Old Amt</th>
-                            <th>Scheme Amt</th>
-                            <th>SaleReturn Amt</th> */}
                             <th>Advance Amt</th>
                             <th>Net Amt</th>
                             <th>Paid Amt</th>
@@ -41,8 +42,8 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, formData, repai
                         </tr>
                     </thead>
                     <tbody>
-                        {!loading && orderData.length > 0 ? (
-                            orderData.map((item, index) => {
+                        {!loading && filteredOrders.length > 0 ? (
+                            filteredOrders.map((item, index) => {
                                 const paid_amt = Number(item.paid_amt) || 0;
                                 const receipts_amt = Number(item.receipts_amt) || 0;
                                 const totalPaid = (paid_amt + receipts_amt).toFixed(2);
@@ -59,7 +60,9 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, formData, repai
                                         <td>
                                             <Form.Check
                                                 type="checkbox"
-                                                onChange={(e) => handleOrderCheckboxChange(e, item.order_number)}
+                                                onChange={(e) =>
+                                                    handleOrderCheckboxChange(e, item.order_number)
+                                                }
                                             />
                                         </td>
                                         <td>{index + 1}</td>
@@ -67,10 +70,6 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, formData, repai
                                         <td>{item.mobile}</td>
                                         <td>{item.account_name}</td>
                                         <td>{item.order_number}</td>
-                                        {/* <td>{item.net_amount || 0}</td>
-                                        <td>{item.old_exchange_amt || 0}</td>
-                                        <td>{item.scheme_amt || 0}</td>
-                                        <td>{item.sale_return_amt || 0}</td> */}
                                         <td>{item.advance_amt || 0}</td>
                                         <td>{item.net_bill_amount || 0}</td>
                                         <td>{totalPaid}</td>
@@ -87,11 +86,13 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, formData, repai
                         ) : (
                             <tr>
                                 <td colSpan="15" className="text-center">
-                                    {loading ? 'Loading...' : 'No Orders Found'}
+                                    {loading ? 'Loading...' : 'No Orders found'}
                                 </td>
                             </tr>
                         )}
                     </tbody>
+
+
                 </Table>
 
             </div>

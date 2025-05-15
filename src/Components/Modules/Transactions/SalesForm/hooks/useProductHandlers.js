@@ -172,7 +172,8 @@ const useProductHandlers = () => {
     piece_taxable_amt: "",
     festival_discount: "",
     custom_purity: "",
-    manual_price_update: false
+    manual_price_update: false,
+    order_number:'',
   });
 
 

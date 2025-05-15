@@ -28,6 +28,18 @@ const RepairsTable = () => {
     }
   }, [mobile]);
 
+  const handleAddReceipt = (invoiceData) => {
+    navigate("/orderreceipts", {
+      state: {
+        from: "/orderstable",
+        invoiceData: {
+          ...invoiceData, // Spread all existing invoice data
+          mobile: invoiceData.mobile // Ensure mobile is included
+        }
+      }
+    });
+  };
+
   const columns = React.useMemo(
     () => [
       {
@@ -138,6 +150,34 @@ const RepairsTable = () => {
       //   Cell: ({ row }) => row.original.order_status || '-',
       // },
       {
+        Header: 'Receipts',
+        accessor: 'receipts',
+        Cell: ({ row }) => {
+          const { net_bill_amount, paid_amt, receipts_amt, invoice } = row.original;
+
+          const totalPaid = Number(paid_amt) + Number(receipts_amt);
+          const netBill = Number(net_bill_amount);
+
+          const isDisabled = netBill === totalPaid || invoice;
+
+          return (
+            <Button
+              style={{
+                backgroundColor: '#28a745',
+                borderColor: '#28a745',
+                fontSize: '0.800rem',
+                padding: '0.10rem 0.5rem',
+              }}
+              onClick={() => handleAddReceipt(row.original)}
+              disabled={isDisabled}
+            >
+              Add Receipt
+            </Button>
+          );
+        },
+      },
+
+      {
         Header: 'Actions',
         accessor: 'actions',
         Cell: ({ row }) => {
@@ -203,7 +243,7 @@ const RepairsTable = () => {
                 // cursor: "pointer",
               }}
               onClick={() => handleConvert(row.original)}
-            disabled={isDisabled}
+              disabled={isDisabled}
             >
               Generate
             </Button>
@@ -252,11 +292,11 @@ const RepairsTable = () => {
             // Generate PDF Blob
             const pdfDoc = (
               <PDFLayout
-                repairDetails={invoiceData} 
+                repairDetails={invoiceData}
               />
             );
 
-            
+
 
             const pdfBlob = await pdf(pdfDoc).toBlob();
             await handleSavePDFToServer(pdfBlob, invoiceNumber);
@@ -337,11 +377,11 @@ const RepairsTable = () => {
   const fetchRepairs = async () => {
     try {
       const response = await axios.get(`${baseURL}/get-unique-order-details`);
-      console.log("Full response data: ", response.data); 
+      console.log("Full response data: ", response.data);
       const filteredData = response.data.filter(
         (item) => item.transaction_status === 'Orders' || item.transaction_status === "ConvertedInvoice"
       );
-      console.log("Filtered Orders: ", filteredData); 
+      console.log("Filtered Orders: ", filteredData);
       setData(filteredData);
       setLoading(false);
     } catch (error) {

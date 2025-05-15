@@ -5,7 +5,7 @@ import SchemeSalesForm from "./SchemesForm";
 import SaleReturnForm from "./SaleReturnForm"; // Import the SaleReturnForm component
 import { useNavigate } from "react-router-dom";
 import './SalesForm3section.css';
-import Repairtable from "./Repairs";
+import Repairtable from "./SalesRepairTable";
 import Oderstable from "./SalesOrderTable";
 const SalesFormSection = ({ setOldSalesData,
   setSchemeSalesData,
@@ -39,7 +39,9 @@ const SalesFormSection = ({ setOldSalesData,
   showModal,
   orderDetails,
   loading,
-  formatDate
+  formatDate,
+  repairs,
+  handleRepairCheckboxChange
 }) => {
 
   const [activeForm, setActiveForm] = useState("old");
@@ -145,6 +147,10 @@ const SalesFormSection = ({ setOldSalesData,
       {activeForm === "repair" && (
         <Repairtable
           selectedMobile={selectedMobile}
+          repairs={repairs}
+          tabId={tabId}
+          setRepairDetails={setRepairDetails}
+          handleRepairCheckboxChange={handleRepairCheckboxChange}
         />
       )}
       {activeForm === "sale_return" && <SaleReturnForm
