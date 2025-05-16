@@ -16,16 +16,33 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, formData, repai
     formatDate,
     selectedOrder
 }) => {
+    const navigate = useNavigate();
 
     const filteredOrders = orderData.filter(
         (item) => String(item.mobile) === String(selectedMobile)
     );
 
+  const handleNavigate = (e) => {
+    e.preventDefault(); // Prevent form submission if inside a <form>
+    console.log("Selected Mobile being passed:", selectedMobile);
+    navigate('/orders', { state: { mobile: selectedMobile } });
+};
 
     return (
         // <div className="main-container">
         <div style={{ paddingBottom: "15px" }}>
             <div className="table-responsive">
+                <Row className="mb-3">
+                    <Col className="d-flex justify-content-between align-items-center">
+                        <button className="btn btn-primary" onClick={handleNavigate} style={{
+                            backgroundColor: "rgb(163, 110, 41)",
+                            borderColor: "rgb(163, 110, 41)",
+                            color: "white", fontSize: '13px', padding: '5px'
+                        }} >
+                            New
+                        </button>
+                    </Col>
+                </Row>
                 <Table bordered hover style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>
                     <thead>
                         <tr>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Table, Form } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from "../../../../Url/NodeBaseURL";
@@ -87,10 +88,26 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
             setRepairDetails([]); 
         }
     };
+   const navigate = useNavigate();
+      const handleNavigate = (e) => {
+    e.preventDefault(); // Prevent form submission if inside a <form>
+    console.log("Selected Mobile being passed:", selectedMobile);
+    navigate('/repairs', { state: { mobile: selectedMobile } });
+};
+
 
     return (
         <div style={{ paddingBottom: "15px" }}>
             <div className="table-responsive">
+                
+                        <button className="btn btn-primary" onClick={handleNavigate} style={{
+                            backgroundColor: "rgb(163, 110, 41)",
+                            borderColor: "rgb(163, 110, 41)",
+                            color: "white", fontSize: '13px', padding: '5px', marginBottom: "10px"
+                        }} >
+                            New
+                        </button>
+                  
                 <Table bordered hover style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>
                     <thead>
                         <tr>
