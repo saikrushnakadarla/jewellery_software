@@ -36,6 +36,7 @@ const SalesFormSection = ({ setOldSalesData,
   handleCloseModal,
   handleViewDetails,
   handleOrderCheckboxChange,
+  selectedOrder,
   showModal,
   orderDetails,
   loading,
@@ -137,6 +138,7 @@ const SalesFormSection = ({ setOldSalesData,
           orderData={orderData}
           handleCloseModal={handleCloseModal}
           handleViewDetails={handleViewDetails}
+          selectedOrder={selectedOrder}
           handleOrderCheckboxChange={handleOrderCheckboxChange}
           showModal={showModal}
           orderDetails={orderDetails}

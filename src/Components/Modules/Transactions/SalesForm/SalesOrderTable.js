@@ -13,7 +13,8 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, formData, repai
     showModal,
     orderDetails,
     loading,
-    formatDate
+    formatDate,
+    selectedOrder
 }) => {
 
     const filteredOrders = orderData.filter(
@@ -60,11 +61,11 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, formData, repai
                                         <td>
                                             <Form.Check
                                                 type="checkbox"
-                                                onChange={(e) =>
-                                                    handleOrderCheckboxChange(e, item.order_number)
-                                                }
+                                                checked={selectedOrder === item.order_number} // Only this one is checked
+                                                onChange={(e) => handleOrderCheckboxChange(e, item.order_number)}
                                             />
                                         </td>
+
                                         <td>{index + 1}</td>
                                         <td>{formatDate(item.date)}</td>
                                         <td>{item.mobile}</td>

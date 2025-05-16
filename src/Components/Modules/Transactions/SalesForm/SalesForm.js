@@ -939,17 +939,24 @@ const SalesForm = () => {
     }
   };
 
-  const handleOrderCheckboxChange = async (e, order_number) => {
-    const isChecked = e.target.checked;
+const handleOrderCheckboxChange = async (e, order_number) => {
+  const isChecked = e.target.checked;
 
-    if (isChecked) {
-      await fetchOrderDetails(order_number);
-    } else {
-      localStorage.removeItem(`repairDetails_${tabId}`);
-      setRepairDetails([]);
-      console.log(`Removed repairDetails_${tabId} from localStorage`);
-    }
-  };
+  if (isChecked) {
+    // Uncheck previous selection by clearing localStorage
+    localStorage.removeItem(`repairDetails_${tabId}`);
+    setRepairDetails([]);
+    
+    await fetchOrderDetails(order_number);
+    setSelectedOrder(order_number); // Mark this as selected
+  } else {
+    // Uncheck the currently selected order
+    localStorage.removeItem(`repairDetails_${tabId}`);
+    setRepairDetails([]);
+    setSelectedOrder(""); // Clear selection
+    console.log(`Removed repairDetails_${tabId} from localStorage`);
+  }
+};
 
 
   useEffect(() => {
@@ -1208,7 +1215,7 @@ const SalesForm = () => {
       rate: "",
       rate_amt: "",
       pricing: "By Weight",
-      tax_percent: "",
+      tax_percent: "03% GST",
       tax_amt: "",
       hm_charges: "60.00",
       total_price: "",
@@ -2166,6 +2173,7 @@ const SalesForm = () => {
                 orderData={orderData}
                 handleCloseModal={handleCloseModal}
                 handleViewDetails={handleViewDetails}
+                selectedOrder={selectedOrder}
                 handleOrderCheckboxChange={handleOrderCheckboxChange}
                 showModal={showModal}
                 orderDetails={orderDetails}

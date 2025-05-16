@@ -174,6 +174,8 @@ const useProductHandlers = () => {
     custom_purity: "",
     manual_price_update: false,
     order_number:'',
+    receipts_amt:"",
+    bal_after_receipts:"",
   });
 
 
@@ -672,7 +674,7 @@ const useProductHandlers = () => {
         pieace_cost: "",
         mrp_price: "",
         rate_amt: "",
-        tax_percent: "",
+        tax_percent: "03% GST",
         tax_amt: "",
         hm_charges: "60.00",
         total_price: "",
@@ -1049,7 +1051,7 @@ const useProductHandlers = () => {
           pieace_cost: "",
           mrp_price: "",
           rate_amt: "",
-          tax_percent: "",
+          tax_percent: "03% GST",
           tax_amt: "",
           hm_charges: "60.00",
           total_price: "",
@@ -1171,7 +1173,7 @@ const useProductHandlers = () => {
             mc_on: tag.Making_Charges_On || "MC %",
             mc_per_gram: tag.MC_Per_Gram || "",
             making_charges: tag.Making_Charges || "",
-            tax_percent: productDetails?.tax_slab || tag.tax_percent || "",
+            tax_percent: productDetails?.tax_slab || tag.tax_percent || "03% GST",
             qty: 1, // Allow qty to be editable for tag
             rate: rateValue, // Add the calculated rate
           }));
@@ -1207,7 +1209,7 @@ const useProductHandlers = () => {
             pieace_cost: "",
             mrp_price: "",
             rate_amt: "",
-            tax_percent: "",
+            tax_percent: "03% GST",
             tax_amt: "",
             hm_charges: "60.00",
             total_price: "",
