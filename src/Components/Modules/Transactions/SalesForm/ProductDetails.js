@@ -1288,7 +1288,7 @@ const ProductDetails = ({
             ]}
           />
         </Col>
-        <Col xs={12} md={2}>
+        {/* <Col xs={12} md={2}>
           <InputField
             label="Order Number"
             type="select"
@@ -1301,7 +1301,7 @@ const ProductDetails = ({
               }))
             ]}
           />
-        </Col>
+        </Col> */}
       </Row>
 
     </Col>

@@ -94,7 +94,7 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
                 <Table bordered hover style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>
                     <thead>
                         <tr>
-                            <th>Select</th>
+                            {/* <th>Select</th> */}
                             <th>SI</th>
                             <th>Date</th>
                             <th>Mobile</th>
@@ -111,7 +111,7 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
                         {filteredRepairs.length > 0 ? (
                             filteredRepairs.map((repair, index) => (
                                 <tr key={index}>
-                                    <td>
+                                    {/* <td>
                                         <Form.Check
                                             type="checkbox"
                                             checked={!!selectedRepairs[repair.repair_no]}
@@ -119,7 +119,7 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
                                                 handleRepairCheckboxChange(repair, e.target.checked)
                                             }
                                         />
-                                    </td>
+                                    </td> */}
                                     <td>{index + 1}</td>
                                     <td>{formatDate(repair.date)}</td>
                                     <td>{repair.mobile}</td>

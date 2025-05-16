@@ -939,24 +939,24 @@ const SalesForm = () => {
     }
   };
 
-const handleOrderCheckboxChange = async (e, order_number) => {
-  const isChecked = e.target.checked;
+  const handleOrderCheckboxChange = async (e, order_number) => {
+    const isChecked = e.target.checked;
 
-  if (isChecked) {
-    // Uncheck previous selection by clearing localStorage
-    localStorage.removeItem(`repairDetails_${tabId}`);
-    setRepairDetails([]);
-    
-    await fetchOrderDetails(order_number);
-    setSelectedOrder(order_number); // Mark this as selected
-  } else {
-    // Uncheck the currently selected order
-    localStorage.removeItem(`repairDetails_${tabId}`);
-    setRepairDetails([]);
-    setSelectedOrder(""); // Clear selection
-    console.log(`Removed repairDetails_${tabId} from localStorage`);
-  }
-};
+    if (isChecked) {
+      // Uncheck previous selection by clearing localStorage
+      localStorage.removeItem(`repairDetails_${tabId}`);
+      setRepairDetails([]);
+
+      await fetchOrderDetails(order_number);
+      setSelectedOrder(order_number); // Mark this as selected
+    } else {
+      // Uncheck the currently selected order
+      localStorage.removeItem(`repairDetails_${tabId}`);
+      setRepairDetails([]);
+      setSelectedOrder(""); // Clear selection
+      console.log(`Removed repairDetails_${tabId} from localStorage`);
+    }
+  };
 
 
   useEffect(() => {
@@ -1005,12 +1005,11 @@ const handleOrderCheckboxChange = async (e, order_number) => {
     fetchRepairs();
   }, []);
 
-  const handleRepairCheckboxChange = (repair, isChecked) => {
-    const storageKey = `repairDetails_${tabId}`;
-    const existingData = JSON.parse(localStorage.getItem(storageKey)) || [];
+  const fetchRepairDetails = async (repair) => {
+    try {
+      const storageKey = `repairDetails_${tabId}`;
 
-    if (isChecked) {
-      // Pick only the desired fields
+      // Filter and map necessary fields
       const filteredRepair = {
         sub_category: repair.item,
         product_name: repair.item,
@@ -1030,33 +1029,58 @@ const handleOrderCheckboxChange = async (e, order_number) => {
         selling_purity: repair.purity,
         qty: repair.qty,
         total_price: repair.total_amt,
-        repair_no: repair.repair_no, // Include to identify uniquely
+        repair_no: repair.repair_no, // for unique tracking
+        invoice_number: formData.invoice_number, // extra fields like in orders
+        transaction_status: "Repairs",
+        date: formData.date,
+        invoice: "Converted",
+        rate: repair.total_amt,
+        gross_weight: "1",
+        tax_percent: "0",
+        hm_charges: "0",
       };
 
-      // Add only if not already present
-      const alreadyExists = existingData.some(item => item.repair_no === repair.repair_no);
-      if (!alreadyExists) {
-        const updatedData = [...existingData, filteredRepair];
-        localStorage.setItem(storageKey, JSON.stringify(updatedData));
-        setRepairDetails(updatedData);
-
-      }
-
-
-
-      setSelectedRepairs({ ...selectedRepairs, [repair.repair_no]: true });
-
-    } else {
-      // Remove item by repair_no
-      const updatedData = existingData.filter(item => item.repair_no !== repair.repair_no);
+      // Store in localStorage
+      const updatedData = [filteredRepair];
       localStorage.setItem(storageKey, JSON.stringify(updatedData));
 
-      const updatedSelection = { ...selectedRepairs };
-      delete updatedSelection[repair.repair_no];
-      setSelectedRepairs(updatedSelection);
-      setRepairDetails([]);
+      // Update state
+      setRepairDetails(updatedData);
+      setAutoEditIndex(0);
+      setSelectedRepairs({ [repair.repair_no]: true });
+
+      // Debug
+      const storedData = JSON.parse(localStorage.getItem(storageKey));
+      console.log("Stored repairDetails:", storedData);
+
+      return updatedData;
+    } catch (error) {
+      console.error("Error fetching repair details:", error);
     }
   };
+
+
+  const handleRepairCheckboxChange = async (e, repair) => {
+    const isChecked = e.target.checked;
+    const storageKey = `repairDetails_${tabId}`;
+
+    if (isChecked) {
+      // Clear existing selection
+      localStorage.removeItem(storageKey);
+      setRepairDetails([]);
+      setSelectedRepairs({});
+
+      await fetchRepairDetails(repair); // Store new data
+    } else {
+      localStorage.removeItem(storageKey);
+      setRepairDetails([]);
+      setSelectedRepairs({});
+      console.log(`Removed ${storageKey} from localStorage`);
+    }
+  };
+  
+
+
 
   // const handleAdd = () => {
   //   const storedRepairDetails = JSON.parse(localStorage.getItem(`repairDetails_${tabId}`)) || [];
