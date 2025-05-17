@@ -973,7 +973,6 @@ const SalesForm = () => {
     }
   }, [formData]);
 
-  // This effect moves to the next index after update
   useEffect(() => {
     if (!autoUpdateInProgress && autoEditIndex !== null) {
       const nextIndex = autoEditIndex + 1;
@@ -1009,8 +1008,8 @@ const SalesForm = () => {
     try {
       const storageKey = `repairDetails_${tabId}`;
 
-      // Filter and map necessary fields
-      const filteredRepair = {
+      // Create new filtered entry with necessary fields
+      const filteredData = [{
         sub_category: repair.item,
         product_name: repair.item,
         customer_id: repair.customer_id,
@@ -1023,62 +1022,73 @@ const SalesForm = () => {
         metal_type: repair.metal_type,
         purity: repair.purity,
         category: repair.category,
-        gross_weight: repair.gross_weight,
+        gross_weight: "1", // fixed?
         total_weight_av: repair.gross_weight,
         printing_purity: repair.purity,
         selling_purity: repair.purity,
         qty: repair.qty,
         total_price: repair.total_amt,
-        repair_no: repair.repair_no, // for unique tracking
-        invoice_number: formData.invoice_number, // extra fields like in orders
+        repair_no: repair.repair_no,
+        invoice_number: formData.invoice_number,
         transaction_status: "Repairs",
         date: formData.date,
         invoice: "Converted",
         rate: repair.total_amt,
-        gross_weight: "1",
         tax_percent: "0",
-        hm_charges: "0",
-      };
+        hm_charges: "0"
+      }];
 
       // Store in localStorage
-      const updatedData = [filteredRepair];
-      localStorage.setItem(storageKey, JSON.stringify(updatedData));
+      localStorage.setItem(storageKey, JSON.stringify(filteredData));
 
       // Update state
-      setRepairDetails(updatedData);
+      setRepairDetails(filteredData);
       setAutoEditIndex(0);
-      setSelectedRepairs({ [repair.repair_no]: true });
 
-      // Debug
+      // Debug log
       const storedData = JSON.parse(localStorage.getItem(storageKey));
-      console.log("Stored repairDetails:", storedData);
+      console.log("Stored repairDetails (Repairs):", storedData);
 
-      return updatedData;
+      return filteredData;
     } catch (error) {
       console.error("Error fetching repair details:", error);
     }
   };
 
 
-  const handleRepairCheckboxChange = async (e, repair) => {
-    const isChecked = e.target.checked;
-    const storageKey = `repairDetails_${tabId}`;
+const handleRepairCheckboxChange = async (e, repair_no) => {
+  const isChecked = e.target.checked;
+  const storageKey = `repairDetails_${tabId}`;
 
-    if (isChecked) {
-      // Clear existing selection
-      localStorage.removeItem(storageKey);
-      setRepairDetails([]);
-      setSelectedRepairs({});
+  const repair = repairs.find(r => r.repair_no === repair_no);
+  if (!repair) return console.warn("Repair not found");
 
-      await fetchRepairDetails(repair); // Store new data
-    } else {
-      localStorage.removeItem(storageKey);
-      setRepairDetails([]);
-      setSelectedRepairs({});
-      console.log(`Removed ${storageKey} from localStorage`);
-    }
-  };
-  
+  if (isChecked) {
+    localStorage.removeItem(storageKey);
+    setRepairDetails([]);
+    setSelectedRepairs({});
+
+    await fetchRepairDetails(repair);
+
+    setSelectedRepairs((prev) => ({
+      ...prev,
+      [repair.repair_no]: true,
+    }));
+
+    setSelectedOrder(""); // Optional reset
+  } else {
+    localStorage.removeItem(storageKey);
+    setRepairDetails([]);
+    setSelectedRepairs((prev) => {
+      const updated = { ...prev };
+      delete updated[repair.repair_no];
+      return updated;
+    });
+  }
+};
+
+
+
 
 
 

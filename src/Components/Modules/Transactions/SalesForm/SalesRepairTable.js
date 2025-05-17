@@ -57,9 +57,9 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
                 purity: repair.purity,
                 category: repair.category,
                 gross_weight: repair.gross_weight,
-                total_weight_av:repair.gross_weight,
-                printing_purity:repair.purity,
-                selling_purity:repair.purity,
+                total_weight_av: repair.gross_weight,
+                printing_purity: repair.purity,
+                selling_purity: repair.purity,
                 qty: repair.qty,
                 total_price: repair.total_amt,
                 repair_no: repair.repair_no, // Include to identify uniquely
@@ -73,7 +73,7 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
                 setRepairDetails(updatedData);
             }
 
-            
+
 
             setSelectedRepairs({ ...selectedRepairs, [repair.repair_no]: true });
 
@@ -85,33 +85,33 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
             const updatedSelection = { ...selectedRepairs };
             delete updatedSelection[repair.repair_no];
             setSelectedRepairs(updatedSelection);
-            setRepairDetails([]); 
+            setRepairDetails([]);
         }
     };
-   const navigate = useNavigate();
-      const handleNavigate = (e) => {
-    e.preventDefault(); // Prevent form submission if inside a <form>
-    console.log("Selected Mobile being passed:", selectedMobile);
-    navigate('/repairs', { state: { mobile: selectedMobile } });
-};
+    const navigate = useNavigate();
+    const handleNavigate = (e) => {
+        e.preventDefault(); // Prevent form submission if inside a <form>
+        console.log("Selected Mobile being passed:", selectedMobile);
+        navigate('/repairs', { state: { mobile: selectedMobile } });
+    };
 
 
     return (
         <div style={{ paddingBottom: "15px" }}>
             <div className="table-responsive">
-                
-                        <button className="btn btn-primary" onClick={handleNavigate} style={{
-                            backgroundColor: "rgb(163, 110, 41)",
-                            borderColor: "rgb(163, 110, 41)",
-                            color: "white", fontSize: '13px', padding: '5px', marginBottom: "10px"
-                        }} >
-                            New
-                        </button>
-                  
+
+                <button className="btn btn-primary" onClick={handleNavigate} style={{
+                    backgroundColor: "rgb(163, 110, 41)",
+                    borderColor: "rgb(163, 110, 41)",
+                    color: "white", fontSize: '13px', padding: '5px', marginBottom: "10px"
+                }} >
+                    New
+                </button>
+
                 <Table bordered hover style={{ fontSize: '13px', whiteSpace: 'nowrap' }}>
                     <thead>
                         <tr>
-                            {/* <th>Select</th> */}
+                            <th>Select</th>
                             <th>SI</th>
                             <th>Date</th>
                             <th>Mobile</th>
@@ -128,15 +128,15 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
                         {filteredRepairs.length > 0 ? (
                             filteredRepairs.map((repair, index) => (
                                 <tr key={index}>
-                                    {/* <td>
+                                    <td>
                                         <Form.Check
                                             type="checkbox"
-                                            checked={!!selectedRepairs[repair.repair_no]}
-                                            onChange={(e) =>
-                                                handleRepairCheckboxChange(repair, e.target.checked)
-                                            }
+                                            // checked={!!selectedRepairs[repair.repair_no]}
+                                            checked={selectedRepairs === repair.repair_no}
+                                            onChange={(e) => handleRepairCheckboxChange(e, repair.repair_no)}
                                         />
-                                    </td> */}
+                                    </td>
+
                                     <td>{index + 1}</td>
                                     <td>{formatDate(repair.date)}</td>
                                     <td>{repair.mobile}</td>
