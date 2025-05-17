@@ -74,6 +74,9 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails }) => {
                 pricing: 'By Weight',
                 sale_status: 'Not Delivered',
                 order_number: `${repair.repair_no}`,
+                date: new Date().toISOString().split("T")[0],
+                invoice:'Converted',
+                transaction_status:"ConvertedRepairInvoice"
                 // Add any other required fields
             };
 
