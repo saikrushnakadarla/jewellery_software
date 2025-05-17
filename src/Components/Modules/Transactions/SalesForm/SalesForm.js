@@ -1022,8 +1022,19 @@ const SalesForm = () => {
         metal_type: repair.metal_type,
         purity: repair.purity,
         category: repair.category,
-        gross_weight: "1", // fixed?
-        total_weight_av: repair.gross_weight,
+        gross_weight: "1",
+        stone_weight: "0",
+        stone_price: "0",
+        weight_bw: "0",
+        va_on: "Gross Weight",
+        va_percent: "0",
+        wastage_weight: "0",
+        total_weight_av: "1",
+        mc_on: "MC %",
+        disscount_percentage: "0",
+        disscount: "0",
+        mc_per_gram: "0",
+        making_charges: "0",
         printing_purity: repair.purity,
         selling_purity: repair.purity,
         qty: repair.qty,
@@ -1035,6 +1046,7 @@ const SalesForm = () => {
         invoice: "Converted",
         rate: repair.total_amt,
         tax_percent: "0",
+        tax_amt: "0",
         hm_charges: "0"
       }];
 
@@ -1056,36 +1068,36 @@ const SalesForm = () => {
   };
 
 
-const handleRepairCheckboxChange = async (e, repair_no) => {
-  const isChecked = e.target.checked;
-  const storageKey = `repairDetails_${tabId}`;
+  const handleRepairCheckboxChange = async (e, repair_no) => {
+    const isChecked = e.target.checked;
+    const storageKey = `repairDetails_${tabId}`;
 
-  const repair = repairs.find(r => r.repair_no === repair_no);
-  if (!repair) return console.warn("Repair not found");
+    const repair = repairs.find(r => r.repair_no === repair_no);
+    if (!repair) return console.warn("Repair not found");
 
-  if (isChecked) {
-    localStorage.removeItem(storageKey);
-    setRepairDetails([]);
-    setSelectedRepairs({});
+    if (isChecked) {
+      localStorage.removeItem(storageKey);
+      setRepairDetails([]);
+      setSelectedRepairs({});
 
-    await fetchRepairDetails(repair);
+      await fetchRepairDetails(repair);
 
-    setSelectedRepairs((prev) => ({
-      ...prev,
-      [repair.repair_no]: true,
-    }));
+      setSelectedRepairs((prev) => ({
+        ...prev,
+        [repair.repair_no]: true,
+      }));
 
-    setSelectedOrder(""); // Optional reset
-  } else {
-    localStorage.removeItem(storageKey);
-    setRepairDetails([]);
-    setSelectedRepairs((prev) => {
-      const updated = { ...prev };
-      delete updated[repair.repair_no];
-      return updated;
-    });
-  }
-};
+      setSelectedOrder(""); // Optional reset
+    } else {
+      localStorage.removeItem(storageKey);
+      setRepairDetails([]);
+      setSelectedRepairs((prev) => {
+        const updated = { ...prev };
+        delete updated[repair.repair_no];
+        return updated;
+      });
+    }
+  };
 
 
 
