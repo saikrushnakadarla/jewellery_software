@@ -153,6 +153,7 @@ const SalesFormSection = ({ setOldSalesData,
           tabId={tabId}
           setRepairDetails={setRepairDetails}
           handleRepairCheckboxChange={handleRepairCheckboxChange}
+          formData={formData}
         />
       )}
       {activeForm === "sale_return" && <SaleReturnForm

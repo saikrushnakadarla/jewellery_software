@@ -4,7 +4,7 @@ import { Table, Form } from 'react-bootstrap';
 import axios from 'axios';
 import baseURL from "../../../../Url/NodeBaseURL";
 
-const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairCheckboxChange }) => {
+const RepairsTable = ({ selectedMobile, tabId, setRepairDetails }) => {
     const [repairs, setRepairs] = useState([]);
     const [selectedRepairs, setSelectedRepairs] = useState({});
 
@@ -42,7 +42,7 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
         const existingData = JSON.parse(localStorage.getItem(storageKey)) || [];
 
         if (isChecked) {
-            // Pick only the desired fields
+            // Create complete repair object with all required fields
             const filteredRepair = {
                 sub_category: repair.item,
                 product_name: repair.item,
@@ -56,13 +56,25 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
                 metal_type: repair.metal_type,
                 purity: repair.purity,
                 category: repair.category,
-                gross_weight: repair.gross_weight,
-                total_weight_av: repair.gross_weight,
+                gross_weight: 1,
+                total_weight_av: 1,
                 printing_purity: repair.purity,
                 selling_purity: repair.purity,
                 qty: repair.qty,
                 total_price: repair.total_amt,
-                repair_no: repair.repair_no, // Include to identify uniquely
+                repair_no: repair.repair_no,
+                // Additional fields needed for payment calculations
+                rate: repair.total_amt || 0,
+                hm_charges: 0,
+                rate_amt: repair.total_amt || 0,
+                making_charges: 0,
+                stone_price: 0,
+                tax_amt: 0,
+                tax_percent: 0,
+                pricing: 'By Weight',
+                sale_status: 'Not Delivered',
+                order_number: `${repair.repair_no}`,
+                // Add any other required fields
             };
 
             // Add only if not already present
@@ -73,38 +85,46 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
                 setRepairDetails(updatedData);
             }
 
-
-
-            setSelectedRepairs({ ...selectedRepairs, [repair.repair_no]: true });
-
+            setSelectedRepairs(prev => ({
+                ...prev,
+                [repair.repair_no]: true
+            }));
         } else {
             // Remove item by repair_no
             const updatedData = existingData.filter(item => item.repair_no !== repair.repair_no);
             localStorage.setItem(storageKey, JSON.stringify(updatedData));
+            setRepairDetails(updatedData);
 
-            const updatedSelection = { ...selectedRepairs };
-            delete updatedSelection[repair.repair_no];
-            setSelectedRepairs(updatedSelection);
-            setRepairDetails([]);
+            setSelectedRepairs(prev => {
+                const newState = {...prev};
+                delete newState[repair.repair_no];
+                return newState;
+            });
         }
     };
+
     const navigate = useNavigate();
     const handleNavigate = (e) => {
-        e.preventDefault(); // Prevent form submission if inside a <form>
+        e.preventDefault();
         console.log("Selected Mobile being passed:", selectedMobile);
         navigate('/repairs', { state: { mobile: selectedMobile } });
     };
 
-
     return (
         <div style={{ paddingBottom: "15px" }}>
             <div className="table-responsive">
-
-                <button className="btn btn-primary" onClick={handleNavigate} style={{
-                    backgroundColor: "rgb(163, 110, 41)",
-                    borderColor: "rgb(163, 110, 41)",
-                    color: "white", fontSize: '13px', padding: '5px', marginBottom: "10px"
-                }} >
+                <button 
+                    className="btn btn-primary" 
+                    onClick={handleNavigate} 
+                    style={{
+                        backgroundColor: "rgb(163, 110, 41)",
+                        borderColor: "rgb(163, 110, 41)",
+                        color: "white", 
+                        fontSize: '13px', 
+                        padding: '5px', 
+                        marginBottom: "10px"
+                    }}
+                >
                     New
                 </button>
 
@@ -131,12 +151,10 @@ const RepairsTable = ({ selectedMobile, tabId, setRepairDetails, handleRepairChe
                                     <td>
                                         <Form.Check
                                             type="checkbox"
-                                            // checked={!!selectedRepairs[repair.repair_no]}
-                                            checked={selectedRepairs === repair.repair_no}
-                                            onChange={(e) => handleRepairCheckboxChange(e, repair.repair_no)}
+                                            checked={!!selectedRepairs[repair.repair_no]}
+                                            onChange={(e) => handleCheckboxChange(repair, e.target.checked)}
                                         />
                                     </td>
-
                                     <td>{index + 1}</td>
                                     <td>{formatDate(repair.date)}</td>
                                     <td>{repair.mobile}</td>
