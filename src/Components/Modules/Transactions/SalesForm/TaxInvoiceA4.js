@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Page, Text, View, Document, StyleSheet, Image } from "@react-pdf/renderer";
-import logo1 from '../../../../Navbar/sadashri.png'
+// import logo1 from '../../../../Navbar/sadashri.png'
+import logo1 from '../../../../Navbar/Company_logo.png'
 import { toWords } from "number-to-words";
 import QRCode from "qrcode";
 import baseURL from '../../../../Url/NodeBaseURL';
@@ -360,7 +361,7 @@ const TaxINVoiceReceipt = ({
                                                 {/* STAFF */}
                                                 <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 5 }}>
                                                         <Text>STAFF:</Text>
-                                                        <Text style={{ textAlign: "right", flex: 1 }}>Sadashri Jewels</Text>
+                                                        <Text style={{ textAlign: "right", flex: 1 }}>iiiQbets</Text>
                                                 </View>
 
                                                 {/* GSTIN */}
@@ -374,7 +375,7 @@ const TaxINVoiceReceipt = ({
 
                                 <View style={styles.container}>
                                         {/* Centered Heading */}
-                                        <Text style={[styles.heading, { fontFamily: 'Times-Bold' }]}>SADASHRI VENTURES PRIVATE LIMITED</Text>
+                                        <Text style={[styles.heading, { fontFamily: 'Times-Bold' }]}>KRIKA MKB CORPORATI PRIVATE LIMITED</Text>
 
                                         {/* Flat No. and Branch section */}
                                         <View style={styles.contentContainer}>
@@ -405,7 +406,7 @@ const TaxINVoiceReceipt = ({
 
                                         <View>
                                                 <Text>
-                                                        Mob : 9964644424 EMAIL : sadashri.Yel@gmail.com
+                                                        Mob : 9964644424 EMAIL : iiiQbets@gmail.com
                                                 </Text>
                                         </View>
 

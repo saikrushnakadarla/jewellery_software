@@ -3,8 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FaSignOutAlt } from "react-icons/fa";
-import logo from './sadashri.png';
-// import logo from './Company_logo.png';
+// import logo from './sadashri.png';
+import logo from './Company_logo.png';
 import './Navbar.css';
 import { AuthContext } from "../Components/Pages/Login/Context";
 import Swal from 'sweetalert2';
@@ -156,8 +156,8 @@ function Navbar() {
   return (
     <header className="navbar-header">
       <div className="navbar-brand">
-        <img src={logo} alt="Logo" className="" style={{ width: "200px" }} />
-        {/* <img src={logo} alt="Logo" className="" style={{ width: "110px",height:'60px' }} /> */}
+        {/* <img src={logo} alt="Logo" className="" style={{ width: "200px" }} /> */}
+        <img src={logo} alt="Logo" className="" style={{ width: "110px",height:'60px' }} />
       </div>
 
       <div

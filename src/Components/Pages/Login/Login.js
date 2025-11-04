@@ -2,7 +2,8 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import baseURL from "../../../Url/NodeBaseURL";
-import backgroundImage from './sadashribg-2.jpg';
+// import backgroundImage from './sadashribg-2.jpg';
+import backgroundImage from './iiiQbets.jpeg';
 import googleImage from './Logo/google.png';
 import Swal from 'sweetalert2';
 import { AuthContext } from './Context';
@@ -242,7 +243,7 @@ function Login() {
           </button>
 
           {/* Google Login Button */}
-          <button
+          {/* <button
             type="button"
             className="btn google-btn d-flex align-items-center justify-content-center"
             style={{
@@ -268,7 +269,7 @@ function Login() {
               }}
             />
             Login with Google
-          </button>
+          </button> */}
         </form>
       </div>
     </div>
