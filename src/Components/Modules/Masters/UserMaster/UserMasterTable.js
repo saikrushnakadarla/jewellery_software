@@ -5,55 +5,95 @@ import { FaEdit, FaTrash } from "react-icons/fa"; // Import the delete icon
 import { Button, Row, Col } from "react-bootstrap";
 import baseURL from "../../../../Url/NodeBaseURL"; // Ensure you have the correct base URL for your API
 import Swal from "sweetalert2"; // Import SweetAlert2
+
 const UserMasterTable = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]); // State to store table data
   const [loading, setLoading] = useState(true); // State for loading indicator
+  const [permissions, setPermissions] = useState({});
 
-  const columns = React.useMemo(
-    () => [
+  useEffect(() => {
+    const fetchPermissions = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) return;
+
+        const response = await fetch(`${baseURL}/permissions/${user.user_type_id}`);
+        if (!response.ok) throw new Error('Failed to fetch permissions');
+
+        const perms = await response.json();
+        console.log('All permissions:', perms); // full object
+        console.log('User Master permissions:', perms.permissions['User Master']); // correct path
+
+        setPermissions(perms.permissions['User Master'] || {}); // Store only Customer Master permissions
+
+      } catch (error) {
+        console.error('Error fetching permissions:', error);
+      }
+    };
+
+    fetchPermissions();
+  }, []);
+
+  const columns = React.useMemo(() => {
+    const cols = [
       {
         Header: "Sr. No.",
-        Cell: ({ row }) => row.index + 1, // Generate a sequential number based on the row index
+        Cell: ({ row }) => row.index + 1, // Generate a sequential number
       },
       {
         Header: "User Name",
         accessor: "user_name",
+        Cell: ({ value }) => value || "N/A",
       },
       {
         Header: "Email",
         accessor: "email",
+        Cell: ({ value }) => value || "N/A",
       },
       {
         Header: "Phone Number",
         accessor: "phone_number",
+        Cell: ({ value }) => value || "N/A",
       },
       {
         Header: "User Type",
-        accessor: "role", // Assuming role corresponds to the "User Type"
+        accessor: "role",
+        Cell: ({ value }) => value || "N/A",
       },
       {
         Header: "Password",
-        accessor: "password", // Assuming role corresponds to the "User Type"
+        accessor: "password",
+        Cell: ({ value }) => value || "N/A",
       },
-      {
-        Header: "Actions",
+    ];
+
+    // ✅ Add Action column only if modify or delete permission exists
+    if (permissions.modify || permissions.delete) {
+      cols.push({
+        Header: "Action",
         Cell: ({ row }) => (
-          <>
-            <FaEdit
-              style={{ cursor: "pointer", color: "blue", marginRight: "10px" }}
-              onClick={() => handleEdit(row.original.id)}
-            />
-            <FaTrash
-              style={{ cursor: "pointer", color: "red" }}
-              onClick={() => handleDelete(row.original.id)}
-            />
-          </>
+          <div className="d-flex align-items-center">
+            {permissions.modify && (
+              <FaEdit
+                style={{ cursor: "pointer", color: "blue", marginRight: "10px" }}
+                onClick={() => handleEdit(row.original.id)}
+              />
+            )}
+            {permissions.delete && (
+              <FaTrash
+                style={{ cursor: "pointer", color: "red" }}
+                onClick={() => handleDelete(row.original.id)}
+              />
+            )}
+          </div>
         ),
-      },
-    ],
-    []
-  );
+      });
+    }
+
+    return cols;
+  }, [permissions]);
+
 
   // Fetch the data from the API
   useEffect(() => {
@@ -114,13 +154,15 @@ const UserMasterTable = () => {
         <Row className="mb-3">
           <Col className="d-flex justify-content-between align-items-center">
             <h3>Users</h3>
-            <Button
-              className="create_but"
-              onClick={handleCreate}
-              style={{ backgroundColor: "#a36e29", borderColor: "#a36e29" }}
-            >
-              + Create
-            </Button>
+            {permissions.add && (
+              <Button
+                className="create_but"
+                onClick={handleCreate}
+                style={{ backgroundColor: '#a36e29', borderColor: '#a36e29' }}
+              >
+                + Create
+              </Button>
+            )}
           </Col>
         </Row>
         {loading ? (

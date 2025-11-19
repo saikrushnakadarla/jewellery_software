@@ -1,0 +1,210 @@
+/* ---------- USER ROLE PAGE ---------- */
+.userrole-container {
+  /* Push content below the fixed navbar */
+  padding: 110px 40px 40px 40px;
+  background: #fefefe;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.userrole-title {
+  text-align: left;
+  color: #a36e29;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- TABLE ---------- */
+.userrole-table {
+  width: 95%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.userrole-table th {
+  background-color: #a36e29;
+  color: white;
+  padding: 12px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.userrole-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  font-size: 15px;
+}
+
+.userrole-table tr:nth-child(even) {
+  background-color: #faf7f3;
+}
+
+.userrole-table tr:hover {
+  background-color: #f1e9e1;
+}
+
+.menu-name {
+  text-align: left;
+  padding-left: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* ---------- CHECKBOX ---------- */
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #a36e29;
+}
+
+/* ---------- BUTTONS ---------- */
+.selectall-btn {
+  background-color: #a36e29;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.selectall-btn:hover {
+  background-color: #864c1a;
+}
+
+.userrole-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 15px;
+}
+
+.save-btn,
+.cancel-btn {
+  background-color: #a36e29;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  font-size: 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-weight: 600;
+}
+
+.cancel-btn {
+  background-color: #777;
+}
+
+.save-btn:hover {
+  background-color: #864c1a;
+}
+
+.cancel-btn:hover {
+  background-color: #555;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 1024px) {
+  .userrole-table th,
+  .userrole-table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .selectall-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .userrole-container {
+    padding: 100px 15px 30px 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .userrole-title {
+    font-size: 22px;
+  }
+
+  .save-btn,
+  .cancel-btn {
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+
+  .userrole-table {
+    width: 100%;
+  }
+
+  .userrole-table th,
+  .userrole-table td {
+    font-size: 12px;
+  }
+}
+
+
+/* ---------- USER TYPE INPUT ---------- */
+.userrole-input-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* 👈 moved to left */
+  width: 95%; /* match table width */
+  margin-bottom: 25px;
+  gap: 10px;
+}
+
+.userrole-label {
+  font-size: 18px;
+  font-weight: 600;
+  color: #a36e29;
+  letter-spacing: 0.3px;
+}
+
+/* .userrole-select {
+   width: 500px;
+} */
+
+
+
+.userrole-input {
+  width: 500px;
+  padding: 8px 12px;
+  border: 1.5px solid #a36e29;
+  border-radius: 6px;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.userrole-input:focus {
+  border-color: #864c1a;
+  box-shadow: 0 0 4px rgba(163, 110, 41, 0.3);
+}
+
+/* ---------- RESPONSIVE FOR INPUT ---------- */
+@media (max-width: 600px) {
+  .userrole-input-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .userrole-label {
+    font-size: 16px;
+  }
+
+  .userrole-input {
+    width: 100%;
+  }
+}

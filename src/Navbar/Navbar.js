@@ -204,6 +204,7 @@ function Navbar() {
                   User Master
                 </Link>
               )}
+              {userRole === 'admin' && <Link to="/userrole" onClick={handleItemClick} className={isActive('/userrole')}>User Profile</Link>}
               <Link to="/customerstable" onClick={handleItemClick} className={isActive('/customerstable') || isActive('/customermaster')}>Customer Master</Link>
               <Link to="/suppliertable" onClick={handleItemClick} className={isActive('/suppliertable') || isActive('/suppliermaster')}>Supplier Master</Link>
               <Link to="/itemmastertable" onClick={handleItemClick} className={isActive('/itemmastertable') || isActive('/itemmaster')}>Category Master</Link>
