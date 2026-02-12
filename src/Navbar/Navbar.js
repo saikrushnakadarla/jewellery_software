@@ -91,11 +91,6 @@ function Navbar() {
   //   }
   // }, [location.pathname, location.search, tabId]);
 
-
-
-
-
-
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
@@ -117,6 +112,20 @@ function Navbar() {
       default:
         break;
     }
+  };
+
+    const openDropdown = (type) => {
+    if (type === "masters") setMastersDropdownOpen(true);
+    if (type === "transactions") setTransactionsDropdownOpen(true);
+    if (type === "reports") setReportsDropdownOpen(true);
+    if (type === "utility") setUtilityDropdownOpen(true);
+  };
+
+  const closeDropdown = (type) => {
+    if (type === "masters") setMastersDropdownOpen(false);
+    if (type === "transactions") setTransactionsDropdownOpen(false);
+    if (type === "reports") setReportsDropdownOpen(false);
+    if (type === "utility") setUtilityDropdownOpen(false);
   };
 
   const handleItemClick = () => {
@@ -185,10 +194,10 @@ function Navbar() {
             </Link>
           </span>
         </div>
-        <div
+       <div
           className="navbar-dropdown"
-          onMouseEnter={() => toggleDropdown('masters')}
-          onMouseLeave={() => toggleDropdown('masters')}
+          onMouseEnter={() => openDropdown("masters")}
+          onMouseLeave={() => closeDropdown("masters")}
         >
           <span className="navbar-dropdown-title">
             MASTERS{' '}
@@ -225,10 +234,10 @@ function Navbar() {
         </div>
 
         {/* Transactions Dropdown */}
-        <div
+         <div
           className="navbar-dropdown"
-          onMouseEnter={() => toggleDropdown('transactions')}
-          onMouseLeave={() => toggleDropdown('transactions')}
+          onMouseEnter={() => openDropdown("transactions")}
+          onMouseLeave={() => closeDropdown("transactions")}
         >
           <span className="navbar-dropdown-title">
             TRANSACTIONS{' '}
@@ -260,8 +269,8 @@ function Navbar() {
         {/* Reports Dropdown */}
         <div
           className="navbar-dropdown"
-          onMouseEnter={() => toggleDropdown('reports')}
-          onMouseLeave={() => toggleDropdown('reports')}
+          onMouseEnter={() => openDropdown("reports")}
+          onMouseLeave={() => closeDropdown("reports")}
         >
           <span className="navbar-dropdown-title">
             REPORTS{' '}
@@ -280,7 +289,7 @@ function Navbar() {
               <Link to="/repairsReport" onClick={handleItemClick} className={isActive('/repairsReport')}>Repairs Report</Link>
               <Link to="/urdPurchaseReport" onClick={handleItemClick} className={isActive('/urdPurchaseReport')}>URDPurchase Report</Link>
               <Link to="/ratesdata" onClick={handleItemClick} className={isActive('/ratesdata')}>Rates Report</Link>
-              <Link to="/barcodeprinting" onClick={handleItemClick} className={isActive('/barcodeprinting')}>Barcode Printing Report</Link>
+              {/* <Link to="/barcodeprinting" onClick={handleItemClick} className={isActive('/barcodeprinting')}>Barcode Printing Report</Link> */}
               {/* <Link to="/cashReport" onClick={handleItemClick} className={isActive('/cashReport')}>Cash Report</Link> */}
               <Link to="/itemsales" onClick={handleItemClick} className={isActive('/itemsales')}>Item Sale Report</Link>
 

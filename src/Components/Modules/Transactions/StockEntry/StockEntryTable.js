@@ -9,6 +9,8 @@ import StoneDetailsModal from "./StoneDetailsModal";
 import baseURL from "../../../../Url/NodeBaseURL";
 import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
+import { jsPDF } from "jspdf";
+import QRCode from "qrcode";
 
 const StockEntryTable = (selectedProduct) => {
   const navigate = useNavigate();
@@ -122,31 +124,98 @@ const StockEntryTable = (selectedProduct) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // 🔹 Exclude rate_24k before sending
+    const payload = { ...formData };
+    delete payload.rate_24k; // Remove rate_24k
+
     fetch(`${baseURL}/update/opening-tags-entry/${formData.opentag_id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload), // send payload without rate_24k
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error('Failed to update the record');
+          throw new Error("Failed to update the record");
         }
         return response.json();
       })
       .then(() => {
-        alert('Stock updated successfully');
-        setIsEditMode(false); // Hide the form
-        // Refresh the table data
+        alert("Stock updated successfully");
+
+        // 🔹 Generate & Download PDF AFTER update
+        generateAndDownloadPDF(formData);
+
+        setIsEditMode(false);
+
+        // 🔹 Refresh table data
         setData((prevData) =>
           prevData.map((item) =>
-            item.opentag_id === formData.opentag_id ? formData : item
-          )
+            item.opentag_id === formData.opentag_id ? formData : item,
+          ),
         );
       })
       .catch((error) => {
-        console.error('Error updating record:', error);
+        console.error("Error updating record:", error);
       });
   };
+
+    const generateAndDownloadPDF = async (data) => {
+      const doc = new jsPDF();
+      let qrContent = "";
+  
+      if (data.Pricing === "By Weight") {
+        qrContent = `PCode: ${data.PCode_BarCode}, Name: ${data.sub_category}, Weight: ${data.Gross_Weight}, Tag Weight: ${data.tag_weight}, Total Weight AW: ${data.TotalWeight_AW}, Making Charges: ${data.Making_Charges}`;
+      } else if (data.Pricing === "By fixed") {
+        qrContent = `PCode: ${data.PCode_BarCode}, Name: ${data.sub_category}, Piece Cost: ${data.pieace_cost}`;
+      }
+  
+      try {
+        const qrImageData = await QRCode.toDataURL(qrContent);
+  
+        doc.setFontSize(10); // Set a smaller font size
+        doc.text("Product QR Code", 10, 10);
+        doc.addImage(qrImageData, "PNG", 10, 15, 30, 30); // Smaller QR code
+  
+        doc.setFontSize(8); // Reduce font size for text content
+        doc.text(`PCode: ${data.PCode_BarCode}`, 50, 20);
+        doc.text(`Name: ${data.sub_category}`, 50, 25);
+  
+        if (data.Pricing === "By Weight") {
+          doc.text(`Weight: ${data.Gross_Weight}`, 50, 30);
+          doc.text(`Tag Weight: ${data.tag_weight}`, 50, 35);
+          doc.text(`Total Weight: ${data.TotalWeight_AW}`, 50, 40);
+          doc.text(`Making Charges: ${data.Making_Charges}`, 50, 45);
+        } else if (data.Pricing === "By fixed") {
+          doc.text(`Piece Cost: ${data.pieace_cost}`, 50, 30);
+        }
+  
+        const pdfBlob = doc.output("blob");
+        await handleSavePDFToServer(pdfBlob, data.PCode_BarCode);
+      } catch (error) {
+        console.error("Error generating QR Code PDF:", error);
+      }
+    };
+  
+    const handleSavePDFToServer = async (pdfBlob, pcode) => {
+      const formData = new FormData();
+      formData.append("invoice", pdfBlob, `${pcode}.pdf`);
+  
+      try {
+        const response = await fetch(`${baseURL}/upload-invoice`, {
+          method: "POST",
+          body: formData,
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to upload invoice");
+        }
+  
+        console.log(`Tag PDF ${pcode} saved on server`);
+      } catch (error) {
+        console.error("Error uploading tag PDF:", error);
+      }
+    };
 
   const columns = React.useMemo(
     () => [
@@ -165,6 +234,19 @@ const StockEntryTable = (selectedProduct) => {
       { Header: 'Total Wt', accessor: 'TotalWeight_AW' },
       { Header: 'MC', accessor: 'Making_Charges' },
       { Header: 'Status', accessor: 'Status' },
+      {
+        Header: "Barcode",
+        Cell: ({ row }) => (
+          <a
+            href={`${baseURL}/invoices/${row.original.PCode_BarCode}.pdf`} // Fetch from backend
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: "none" }}
+          >
+            📝 View
+          </a>
+        ),
+      },
       {
         Header: 'Action',
         Cell: ({ row }) => (

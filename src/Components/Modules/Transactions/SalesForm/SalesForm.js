@@ -409,7 +409,7 @@ const SalesForm = () => {
           total_price: totalPrice.toFixed(2),
         };
       } else {
-        calculatedDiscount = (makingCharges * discountValue) / 100;
+        calculatedDiscount = ((makingCharges + rateAmt + stonePrice + hmCharges) * discountValue) / 100;
 
         const previousTotalPrice = parseFloat(item.total_price) || 0;
         const originalTotalPrice = item.original_total_price
