@@ -15,10 +15,10 @@ const UserMasterTable = () => {
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user) return;
+        const userId = JSON.parse(localStorage.getItem('userId'));
+        // if (!user) return;
 
-        const response = await fetch(`${baseURL}/permissions/${user.user_type_id}`);
+        const response = await fetch(`${baseURL}/permissions/${userId}`);
         if (!response.ok) throw new Error('Failed to fetch permissions');
 
         const perms = await response.json();
